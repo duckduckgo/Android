@@ -42,22 +42,15 @@ import org.mockito.MockitoAnnotations
 
 class TabSwitcherViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    @Mock private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    @Captor private lateinit var commandCaptor: ArgumentCaptor<Command>
 
-    @Mock
-    private lateinit var mockTabRepository: TabRepository
+    @Mock private lateinit var mockTabRepository: TabRepository
 
     private lateinit var testee: TabSwitcherViewModel
 
@@ -82,27 +75,30 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
-        testee.onNewTabRequested()
-        verify(mockTabRepository).add()
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
-    }
+    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() =
+        runBlocking<Unit> {
+            testee.onNewTabRequested()
+            verify(mockTabRepository).add()
+            verify(mockCommandObserver).onChanged(commandCaptor.capture())
+            assertEquals(Command.Close, commandCaptor.lastValue)
+        }
 
     @Test
-    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
-        testee.onTabSelected(TabEntity("abc", "", "", position = 0))
-        verify(mockTabRepository).select(eq("abc"))
-        verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.Close, commandCaptor.lastValue)
-    }
+    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() =
+        runBlocking<Unit> {
+            testee.onTabSelected(TabEntity("abc", "", "", position = 0))
+            verify(mockTabRepository).select(eq("abc"))
+            verify(mockCommandObserver).onChanged(commandCaptor.capture())
+            assertEquals(Command.Close, commandCaptor.lastValue)
+        }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified() = runBlocking<Unit> {
-        val entity = TabEntity("abc", "", "", position = 0)
-        testee.onTabDeleted(entity)
-        verify(mockTabRepository).delete(entity)
-    }
+    fun whenTabDeletedThenRepositoryNotified() =
+        runBlocking<Unit> {
+            val entity = TabEntity("abc", "", "", position = 0)
+            testee.onTabDeleted(entity)
+            verify(mockTabRepository).delete(entity)
+        }
 
     @Test
     fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runBlocking {
@@ -133,9 +129,7 @@ class TabSwitcherViewModelTest {
 
         val expectedTabs = listOf(listOf(), listOf(tab))
         var index = 0
-        testee.deletableTabs.observeForever {
-            assertEquals(expectedTabs[index++], it)
-        }
+        testee.deletableTabs.observeForever { assertEquals(expectedTabs[index++], it) }
 
         repoDeletableTabs.send(listOf())
         repoDeletableTabs.send(listOf(tab))
@@ -145,9 +139,7 @@ class TabSwitcherViewModelTest {
     fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runBlocking {
         val tab = TabEntity("ID", position = 0)
 
-        testee.deletableTabs.observeForever {
-            assertEquals(listOf(tab), it)
-        }
+        testee.deletableTabs.observeForever { assertEquals(listOf(tab), it) }
 
         repoDeletableTabs.send(listOf(tab))
         repoDeletableTabs.send(listOf(tab))

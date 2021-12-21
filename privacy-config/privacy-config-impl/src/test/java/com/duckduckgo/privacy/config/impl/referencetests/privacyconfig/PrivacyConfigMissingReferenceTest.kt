@@ -43,8 +43,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigPersister
     private val mockTogglesRepository: PrivacyFeatureTogglesRepository = mock()
@@ -60,9 +59,12 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
+            val referenceTest =
+                adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
             referenceJsonFile = referenceTest?.missingFeature?.referenceConfig!!
-            return referenceTest.missingFeature.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
+            return referenceTest.missingFeature.tests.filterNot {
+                it.exceptPlatforms.contains("android-browser")
+            }
         }
     }
 
@@ -71,13 +73,13 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         prepareDb()
         referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
 
-        testee = RealPrivacyConfigPersister(
+        testee =
+            RealPrivacyConfigPersister(
                 referenceTestUtilities.getPrivacyFeaturePluginPoint(),
                 mockTogglesRepository,
                 referenceTestUtilities.unprotectedTemporaryRepository,
                 referenceTestUtilities.privacyRepository,
-                db
-        )
+                db)
     }
 
     @After
@@ -86,11 +88,15 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
-        testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() =
+        coroutineRule.runBlocking {
+            testee.persistPrivacyConfig(
+                referenceTestUtilities.getJsonPrivacyConfig(
+                    "reference_tests/privacyconfig/$referenceJsonFile"))
 
-        verify(referenceTestUtilities.privacyFeatureTogglesRepository, never()).insert(PrivacyFeatureToggles(testCase.featureName, true))
-    }
+            verify(referenceTestUtilities.privacyFeatureTogglesRepository, never())
+                .insert(PrivacyFeatureToggles(testCase.featureName, true))
+        }
 
     private fun prepareDb() {
         db =
@@ -114,7 +120,5 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         val tests: List<TestCase>
     )
 
-    data class ReferenceTest(
-        val missingFeature: MissingTest
-    )
+    data class ReferenceTest(val missingFeature: MissingTest)
 }

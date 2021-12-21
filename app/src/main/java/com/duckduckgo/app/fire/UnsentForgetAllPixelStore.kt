@@ -33,9 +33,11 @@ interface UnsentForgetAllPixelStore {
 /**
  * Stores information about unsent clear data Pixels.
  *
- * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
+ * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise
+ * the change can be lost in the process restart.
  */
-class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val context: Context) : UnsentForgetAllPixelStore {
+class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val context: Context) :
+    UnsentForgetAllPixelStore {
 
     override val pendingPixelCountClearData: Int
         get() = preferences.getInt(KEY_UNSENT_CLEAR_PIXELS, 0)
@@ -53,9 +55,7 @@ class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val
     }
 
     override fun resetCount() {
-        preferences.edit(commit = true) {
-            putInt(KEY_UNSENT_CLEAR_PIXELS, 0)
-        }
+        preferences.edit(commit = true) { putInt(KEY_UNSENT_CLEAR_PIXELS, 0) }
     }
 
     private val preferences: SharedPreferences
@@ -63,8 +63,7 @@ class UnsentForgetAllPixelStoreSharedPreferences @Inject constructor(private val
 
     companion object {
 
-        @VisibleForTesting
-        const val FILENAME = "com.duckduckgo.app.fire.unsentpixels.settings"
+        @VisibleForTesting const val FILENAME = "com.duckduckgo.app.fire.unsentpixels.settings"
         const val KEY_UNSENT_CLEAR_PIXELS = "KEY_UNSENT_CLEAR_PIXELS"
         const val KEY_TIMESTAMP_LAST_CLEARED = "KEY_TIMESTAMP_LAST_CLEARED"
     }

@@ -46,8 +46,7 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         viewModel.fetchBookmarkFolders(
             intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
             getString(R.string.bookmarksSectionTitle),
-            currentFolder as BookmarkFolder?
-        )
+            currentFolder as BookmarkFolder?)
     }
 
     private fun setupAdapter() {
@@ -57,22 +56,16 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState.observe(
-            this,
-            { viewState ->
-                viewState?.let {
-                    adapter.submitList(it.folderStructure)
-                }
-            }
-        )
+            this, { viewState -> viewState?.let { adapter.submitList(it.folderStructure) } })
 
         viewModel.command.observe(
             this,
             {
                 when (it) {
-                    is BookmarkFoldersViewModel.Command.SelectFolder -> setSelectedFolderResult(it.selectedBookmarkFolder)
+                    is BookmarkFoldersViewModel.Command.SelectFolder ->
+                        setSelectedFolderResult(it.selectedBookmarkFolder)
                 }
-            }
-        )
+            })
     }
 
     private fun setSelectedFolderResult(bookmarkFolder: BookmarkFolder?) {
@@ -90,13 +83,15 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         const val KEY_BOOKMARK_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
         const val KEY_CURRENT_FOLDER = "KEY_CURRENT_FOLDER"
 
-        fun intent(context: Context, parentFolderId: Long, currentFolder: BookmarkFolder? = null): Intent {
+        fun intent(
+            context: Context,
+            parentFolderId: Long,
+            currentFolder: BookmarkFolder? = null
+        ): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()
             bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)
-            currentFolder?.let {
-                bundle.putSerializable(KEY_CURRENT_FOLDER, it)
-            }
+            currentFolder?.let { bundle.putSerializable(KEY_CURRENT_FOLDER, it) }
             intent.putExtras(bundle)
             return intent
         }

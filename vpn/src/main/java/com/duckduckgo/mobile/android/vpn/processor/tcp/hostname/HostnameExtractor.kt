@@ -16,14 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
+import java.nio.charset.StandardCharsets
 import timber.log.Timber
 import xyz.hexene.localvpn.TCB
-import java.nio.charset.StandardCharsets
 
 interface HostnameExtractor {
 
     fun extract(tcb: TCB, payloadBytes: ByteArray): String?
-
 }
 
 class AndroidHostnameExtractor(
@@ -53,5 +52,4 @@ class AndroidHostnameExtractor(
             return
         }
     }
-
 }

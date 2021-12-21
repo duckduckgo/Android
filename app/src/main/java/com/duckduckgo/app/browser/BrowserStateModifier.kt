@@ -32,8 +32,7 @@ class BrowserStateModifier {
             canSharePage = true,
             canAddBookmarks = true,
             addFavorite = HighlightableButton.Visible(),
-            addToHomeEnabled = true
-        )
+            addToHomeEnabled = true)
     }
 
     @CheckReturnValue
@@ -47,7 +46,6 @@ class BrowserStateModifier {
             canAddBookmarks = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
-            canGoBack = false
-        )
+            canGoBack = false)
     }
 }

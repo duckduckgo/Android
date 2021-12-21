@@ -34,8 +34,7 @@ import dagger.multibindings.IntoMap
     scope = VpnScope::class,
 )
 interface TrackerBlockingVpnServiceComponent : AndroidInjector<TrackerBlockingVpnService> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<TrackerBlockingVpnService>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<TrackerBlockingVpnService>
 }
 
 @ContributesTo(AppScope::class)

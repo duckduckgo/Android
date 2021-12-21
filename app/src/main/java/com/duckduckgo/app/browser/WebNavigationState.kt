@@ -46,8 +46,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return Unchanged
     }
 
-    if (this is EmptyNavigationState)
-        return PageNavigationCleared
+    if (this is EmptyNavigationState) return PageNavigationCleared
 
     if (originalUrl == null && previous?.originalUrl != null) {
         return PageCleared
@@ -60,7 +59,8 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
         return NewPage(latestUrl, title)
     }
 
-    // The most up-to-date record of the url is the current one, this may change many times during a page load
+    // The most up-to-date record of the url is the current one, this may change many times during a
+    // page load
     // If the host changes too, we class it as a new page load
     if (currentUrl != previous?.currentUrl) {
 
@@ -74,7 +74,10 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
     return Other
 }
 
-data class WebViewNavigationState(private val stack: WebBackForwardList, override val progress: Int? = null) : WebNavigationState {
+data class WebViewNavigationState(
+    private val stack: WebBackForwardList,
+    override val progress: Int? = null
+) : WebNavigationState {
 
     override val originalUrl: String? = stack.originalUrl
 
@@ -91,8 +94,9 @@ data class WebViewNavigationState(private val stack: WebBackForwardList, overrid
     override val hasNavigationHistory = stack.size != 0
 
     /**
-     * Auto generated equality method. We create this manually to omit the privately stored system stack property as
-     * we are only interested in our properties and the stacks are never equal unless the same instances are compared.
+     * Auto generated equality method. We create this manually to omit the privately stored system
+     * stack property as we are only interested in our properties and the stacks are never equal
+     * unless the same instances are compared.
      */
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -111,9 +115,7 @@ data class WebViewNavigationState(private val stack: WebBackForwardList, overrid
         return true
     }
 
-    /**
-     * Auto generated hash method to support equality method
-     */
+    /** Auto generated hash method to support equality method */
     override fun hashCode(): Int {
         var result = originalUrl?.hashCode() ?: 0
         result = 31 * result + (currentUrl?.hashCode() ?: 0)
@@ -128,7 +130,8 @@ data class WebViewNavigationState(private val stack: WebBackForwardList, overrid
 }
 
 @Suppress("DataClassPrivateConstructor")
-data class EmptyNavigationState private constructor(
+data class EmptyNavigationState
+private constructor(
     override val originalUrl: String?,
     override val currentUrl: String?,
     override val title: String?
@@ -138,8 +141,7 @@ data class EmptyNavigationState private constructor(
             return EmptyNavigationState(
                 webNavigationState.originalUrl,
                 webNavigationState.currentUrl,
-                webNavigationState.title
-            )
+                webNavigationState.title)
         }
     }
 

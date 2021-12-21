@@ -16,9 +16,8 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -31,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface ExceptionRulesDebugActivityComponent : AndroidInjector<ExceptionRulesDebugActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<ExceptionRulesDebugActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<ExceptionRulesDebugActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface ExceptionRulesDebugActivityComponentProvider {
-    fun provideExceptionRulesDebugActivityComponentFactory(): ExceptionRulesDebugActivityComponent.Factory
+    fun provideExceptionRulesDebugActivityComponentFactory():
+        ExceptionRulesDebugActivityComponent.Factory
 }
 
 @Module

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
-import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
+import xyz.hexene.localvpn.Packet
 
 interface PayloadBytesExtractor {
     fun extract(packet: Packet, payloadBuffer: ByteBuffer): ByteArray
@@ -31,11 +31,15 @@ class ConcretePayloadBytesExtractor : PayloadBytesExtractor {
         val newArray = ByteArray(payloadSize)
 
         if (payloadBuffer.hasArray()) {
-            System.arraycopy(payloadBuffer.array(), payloadBuffer.arrayOffset() + headerLength, newArray, 0, payloadSize)
+            System.arraycopy(
+                payloadBuffer.array(),
+                payloadBuffer.arrayOffset() + headerLength,
+                newArray,
+                0,
+                payloadSize)
         } else {
             payloadBuffer.get(newArray, headerLength, payloadSize)
         }
         return newArray
     }
-
 }

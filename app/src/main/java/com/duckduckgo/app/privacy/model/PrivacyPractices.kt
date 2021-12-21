@@ -31,19 +31,24 @@ interface PrivacyPractices : DataLoadable {
         UNKNOWN
     }
 
-    data class Practices(val score: Int, val summary: Summary, val goodReasons: List<String>, val badReasons: List<String>)
+    data class Practices(
+        val score: Int,
+        val summary: Summary,
+        val goodReasons: List<String>,
+        val badReasons: List<String>
+    )
 
     fun privacyPracticesFor(url: String): Practices
 
     companion object {
 
         val UNKNOWN = Practices(2, Summary.UNKNOWN, emptyList(), emptyList())
-
     }
-
 }
 
-class PrivacyPracticesImpl @Inject constructor(
+class PrivacyPracticesImpl
+@Inject
+constructor(
     private val termsOfServiceStore: TermsOfServiceStore,
     private val entityLookup: EntityLookup
 ) : PrivacyPractices {
@@ -70,9 +75,11 @@ class PrivacyPracticesImpl @Inject constructor(
 
     override fun privacyPracticesFor(url: String): PrivacyPractices.Practices {
         val entity = entityLookup.entityForUrl(url)
-        val terms = termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") } ?: return PrivacyPractices.UNKNOWN
+        val terms =
+            termsOfServiceStore.terms.find { sameOrSubdomain(url, it.name ?: "") }
+                ?: return PrivacyPractices.UNKNOWN
         val score = entityScores[entity?.name] ?: terms.derivedScore
-        return PrivacyPractices.Practices(score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
+        return PrivacyPractices.Practices(
+            score, terms.practices, terms.goodPrivacyTerms, terms.badPrivacyTerms)
     }
-
 }

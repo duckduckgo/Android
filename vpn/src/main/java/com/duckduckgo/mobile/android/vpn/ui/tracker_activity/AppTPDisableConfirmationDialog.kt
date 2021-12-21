@@ -47,17 +47,18 @@ class AppTPDisableConfirmationDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_confirm_disable, null)
+        val rootView =
+            layoutInflater.inflate(R.layout.dialog_tracking_protection_confirm_disable, null)
 
         val disableOneApp = rootView.findViewById<Button>(R.id.disableConfirmationDialogOneApp)
         val disableAllApps = rootView.findViewById<Button>(R.id.disableConfirmationDialogAllApps)
         val cancel = rootView.findViewById<Button>(R.id.disableConfirmationDialogCancel)
 
-        val alertDialog = MaterialAlertDialogBuilder(
-            requireActivity(),
-            com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
-        )
-            .setView(rootView)
+        val alertDialog =
+            MaterialAlertDialogBuilder(
+                    requireActivity(),
+                    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
+                .setView(rootView)
 
         isCancelable = false
 
@@ -66,11 +67,7 @@ class AppTPDisableConfirmationDialog : DialogFragment() {
         return alertDialog.create()
     }
 
-    private fun configureListeners(
-        disableOneApp: Button,
-        disableAllApps: Button,
-        cancel: Button
-    ) {
+    private fun configureListeners(disableOneApp: Button, disableAllApps: Button, cancel: Button) {
         disableOneApp.setOnClickListener {
             dismiss()
             listener.onOpenAppProtection()

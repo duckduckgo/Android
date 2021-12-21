@@ -29,7 +29,9 @@ class DefaultBrowserSystemSettings {
         fun intent(): Intent {
             val intent = Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS)
             intent.putExtra(SETTINGS_SELECT_OPTION_KEY, DEFAULT_BROWSER_APP_OPTION)
-            intent.putExtra(SETTINGS_SHOW_FRAGMENT_ARGS, bundleOf(SETTINGS_SELECT_OPTION_KEY to DEFAULT_BROWSER_APP_OPTION))
+            intent.putExtra(
+                SETTINGS_SHOW_FRAGMENT_ARGS,
+                bundleOf(SETTINGS_SELECT_OPTION_KEY to DEFAULT_BROWSER_APP_OPTION))
             return intent
         }
 

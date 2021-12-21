@@ -25,9 +25,9 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.launch
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,
@@ -49,14 +49,14 @@ class OnboardingViewModel(
 
     fun onOnboardingDone() {
         // Executing this on IO to avoid any delay changing threads between Main-IO.
-        viewModelScope.launch(dispatchers.io()) {
-            userStageStore.stageCompleted(AppStage.NEW)
-        }
+        viewModelScope.launch(dispatchers.io()) { userStageStore.stageCompleted(AppStage.NEW) }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class OnboardingViewModelFactory @Inject constructor(
+class OnboardingViewModelFactory
+@Inject
+constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val pageLayoutManager: Provider<OnboardingPageManager>,
     private val dispatchers: Provider<DispatcherProvider>
@@ -64,7 +64,10 @@ class OnboardingViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(userStageStore.get(), pageLayoutManager.get(), dispatchers.get()) as T)
+                isAssignableFrom(OnboardingViewModel::class.java) ->
+                    (OnboardingViewModel(
+                        userStageStore.get(), pageLayoutManager.get(), dispatchers.get()) as
+                        T)
                 else -> null
             }
         }

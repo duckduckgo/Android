@@ -22,10 +22,10 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginati
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.Found
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.NotFound
+import java.io.File
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
-import java.io.File
 
 class ProcNetFileConnectionMatcherTest {
 
@@ -35,21 +35,31 @@ class ProcNetFileConnectionMatcherTest {
     fun whenValidTcpV4FileButGivenConnectionNotInFileThenNoMatchFound() = runBlocking {
         val file = "valid_tcp4_proc_net".getFile()
         val connectionInfo = noMatchConnectionInfo()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
         result.assertMatchNotFound()
     }
 
     @Test
     fun whenValidTcpV4FileAndGivenConnectionEntryFirstInFileThenMatchFound() = runBlocking {
         val file = "valid_tcp4_proc_net".getFile()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = matchingConnectionFirstEntry(), pattern = ipv4RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file,
+                connectionInfo = matchingConnectionFirstEntry(),
+                pattern = ipv4RegexPattern())
         result.assertMatchFound(expectedUid = 10013)
     }
 
     @Test
     fun whenValidTcpV4FileAndGivenConnectionEntryLastInFileThenMatchFound() = runBlocking {
         val file = "valid_tcp4_proc_net".getFile()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = matchingConnectionLastEntry(), pattern = ipv4RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file,
+                connectionInfo = matchingConnectionLastEntry(),
+                pattern = ipv4RegexPattern())
         result.assertMatchFound(expectedUid = 10055)
     }
 
@@ -57,21 +67,31 @@ class ProcNetFileConnectionMatcherTest {
     fun whenValidTcpV6FileButGivenConnectionNotInFileThenNoMatchFound() = runBlocking {
         val file = "valid_tcp6_proc_net".getFile()
         val connectionInfo = noMatchConnectionInfo()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = connectionInfo, pattern = ipv6RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file, connectionInfo = connectionInfo, pattern = ipv6RegexPattern())
         result.assertMatchNotFound()
     }
 
     @Test
     fun whenValidTcpV6FileAndGivenConnectionEntryFirstInFileThenMatchFound() = runBlocking {
         val file = "valid_tcp6_proc_net".getFile()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = matchingConnectionFirstEntry(), pattern = ipv6RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file,
+                connectionInfo = matchingConnectionFirstEntry(),
+                pattern = ipv6RegexPattern())
         result.assertMatchFound(expectedUid = 10073)
     }
 
     @Test
     fun whenValidTcpV6FileAndGivenConnectionEntryLastInFileThenMatchFound() = runBlocking {
         val file = "valid_tcp6_proc_net".getFile()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = matchingConnectionLastEntry(), pattern = ipv6RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file,
+                connectionInfo = matchingConnectionLastEntry(),
+                pattern = ipv6RegexPattern())
         result.assertMatchFound(expectedUid = 10013)
     }
 
@@ -79,7 +99,9 @@ class ProcNetFileConnectionMatcherTest {
     fun whenInvalidEmptyFileThenNoMatchFound() = runBlocking {
         val file = "invalid_proc_net_empty".getFile()
         val connectionInfo = noMatchConnectionInfo()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
         result.assertMatchNotFound()
     }
 
@@ -87,7 +109,9 @@ class ProcNetFileConnectionMatcherTest {
     fun whenInvalidCorruptedFileThenNoMatchFound() = runBlocking {
         val file = "invalid_proc_net_corrupted".getFile()
         val connectionInfo = noMatchConnectionInfo()
-        val result = testee.searchNetworkFile(file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
+        val result =
+            testee.searchNetworkFile(
+                file = file, connectionInfo = connectionInfo, pattern = ipv4RegexPattern())
         result.assertMatchNotFound()
     }
 
@@ -113,9 +137,7 @@ class ProcNetFileConnectionMatcherTest {
     }
 
     private fun String.getFile(): File {
-        return File(testDir, this).also {
-            assertTrue("File $this does not exist", it.exists())
-        }
+        return File(testDir, this).also { assertTrue("File $this does not exist", it.exists()) }
     }
 
     companion object {

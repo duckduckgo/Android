@@ -28,37 +28,37 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser.Companion
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.util.*
+import java.util.concurrent.Executors
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import java.util.*
-import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 19,
-    entities = [
-        VpnState::class,
-        VpnTracker::class,
-        VpnRunningStats::class,
-        VpnServiceStateStats::class,
-        VpnDataStats::class,
-        VpnPreferences::class,
-        HeartBeatEntity::class,
-        VpnPhoenixEntity::class,
-        VpnNotification::class,
-        AppTracker::class,
-        AppTrackerMetadata::class,
-        AppTrackerExcludedPackage::class,
-        AppTrackerExclusionListMetadata::class,
-        AppTrackerExceptionRule::class,
-        AppTrackerExceptionRuleMetadata::class,
-        AppTrackerPackage::class,
-        AppTrackerManualExcludedApp::class,
-        AppTrackerSystemAppOverridePackage::class,
-        AppTrackerSystemAppOverrideListMetadata::class,
-    ]
-)
-
+    exportSchema = true,
+    version = 19,
+    entities =
+        [
+            VpnState::class,
+            VpnTracker::class,
+            VpnRunningStats::class,
+            VpnServiceStateStats::class,
+            VpnDataStats::class,
+            VpnPreferences::class,
+            HeartBeatEntity::class,
+            VpnPhoenixEntity::class,
+            VpnNotification::class,
+            AppTracker::class,
+            AppTrackerMetadata::class,
+            AppTrackerExcludedPackage::class,
+            AppTrackerExclusionListMetadata::class,
+            AppTrackerExceptionRule::class,
+            AppTrackerExceptionRuleMetadata::class,
+            AppTrackerPackage::class,
+            AppTrackerManualExcludedApp::class,
+            AppTrackerSystemAppOverridePackage::class,
+            AppTrackerSystemAppOverrideListMetadata::class,
+        ])
 @TypeConverters(VpnTypeConverters::class)
 abstract class VpnDatabase : RoomDatabase() {
 
@@ -76,39 +76,38 @@ abstract class VpnDatabase : RoomDatabase() {
 
     companion object {
 
-        @Volatile
-        private var INSTANCE: VpnDatabase? = null
+        @Volatile private var INSTANCE: VpnDatabase? = null
 
         fun getInstance(context: Context): VpnDatabase =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
-            }
+            INSTANCE
+                ?: synchronized(this) { INSTANCE ?: buildDatabase(context).also { INSTANCE = it } }
 
         private fun buildDatabase(context: Context): VpnDatabase {
             return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
                 .enableMultiInstanceInvalidation()
                 .fallbackToDestructiveMigrationFrom(*IntRange(1, 17).toList().toIntArray())
                 .addMigrations(*ALL_MIGRATIONS.toTypedArray())
-                .addCallback(object : Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        super.onCreate(db)
-                        ioThread {
-                            prepopulateUUID(context)
-                            prepopulateAppTrackerBlockingList(context, getInstance(context))
-                            prepopulateAppTrackerExclusionList(context, getInstance(context))
-                            prepopulateAppTrackerExceptionRules(context, getInstance(context))
+                .addCallback(
+                    object : Callback() {
+                        override fun onCreate(db: SupportSQLiteDatabase) {
+                            super.onCreate(db)
+                            ioThread {
+                                prepopulateUUID(context)
+                                prepopulateAppTrackerBlockingList(context, getInstance(context))
+                                prepopulateAppTrackerExclusionList(context, getInstance(context))
+                                prepopulateAppTrackerExceptionRules(context, getInstance(context))
+                            }
                         }
-                    }
 
-                    override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
-                        ioThread {
-                            prepopulateUUID(context)
-                            prepopulateAppTrackerBlockingList(context, getInstance(context))
-                            prepopulateAppTrackerExclusionList(context, getInstance(context))
-                            prepopulateAppTrackerExceptionRules(context, getInstance(context))
+                        override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
+                            ioThread {
+                                prepopulateUUID(context)
+                                prepopulateAppTrackerBlockingList(context, getInstance(context))
+                                prepopulateAppTrackerExclusionList(context, getInstance(context))
+                                prepopulateAppTrackerExceptionRules(context, getInstance(context))
+                            }
                         }
-                    }
-                })
+                    })
                 .build()
         }
 
@@ -120,7 +119,10 @@ abstract class VpnDatabase : RoomDatabase() {
 
         @VisibleForTesting
         internal fun prepopulateAppTrackerBlockingList(context: Context, vpnDatabase: VpnDatabase) {
-            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+            context
+                .resources
+                .openRawResource(R.raw.full_app_trackers_blocklist)
+                .bufferedReader()
                 .use { it.readText() }
                 .also {
                     val trackers = getFullAppTrackerBlockingList(it)
@@ -132,8 +134,14 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         @VisibleForTesting
-        internal fun prepopulateAppTrackerExclusionList(context: Context, vpnDatabase: VpnDatabase) {
-            context.resources.openRawResource(R.raw.app_tracker_app_exclusion_list).bufferedReader()
+        internal fun prepopulateAppTrackerExclusionList(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
+            context
+                .resources
+                .openRawResource(R.raw.app_tracker_app_exclusion_list)
+                .bufferedReader()
                 .use { it.readText() }
                 .also {
                     val excludedAppPackages = parseAppTrackerExclusionList(it)
@@ -141,8 +149,14 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun prepopulateAppTrackerExceptionRules(context: Context, vpnDatabase: VpnDatabase) {
-            context.resources.openRawResource(R.raw.app_tracker_exception_rules).bufferedReader()
+        private fun prepopulateAppTrackerExceptionRules(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
+            context
+                .resources
+                .openRawResource(R.raw.app_tracker_exception_rules)
+                .bufferedReader()
                 .use { it.readText() }
                 .also { json ->
                     val rules = parseJsonAppTrackerExceptionRules(json)
@@ -150,35 +164,41 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+        private fun getFullAppTrackerBlockingList(
+            json: String
+        ): Pair<List<AppTracker>, List<AppTrackerPackage>> {
             return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
 
         private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
             val moshi = Moshi.Builder().build()
-            val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)
-            return adapter.fromJson(json)?.rules.orEmpty().map {
-                AppTrackerExcludedPackage(it)
-            }
+            val adapter: JsonAdapter<JsonAppTrackerExclusionList> =
+                moshi.adapter(JsonAppTrackerExclusionList::class.java)
+            return adapter.fromJson(json)?.rules.orEmpty().map { AppTrackerExcludedPackage(it) }
         }
 
         private fun parseJsonAppTrackerExceptionRules(json: String): List<AppTrackerExceptionRule> {
             val moshi = Moshi.Builder().build()
-            val adapter: JsonAdapter<JsonAppTrackerExceptionRules> = moshi.adapter(JsonAppTrackerExceptionRules::class.java)
+            val adapter: JsonAdapter<JsonAppTrackerExceptionRules> =
+                moshi.adapter(JsonAppTrackerExceptionRules::class.java)
             return adapter.fromJson(json)?.rules.orEmpty()
         }
 
-        private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list` (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)")
+        private val MIGRATION_18_TO_19: Migration =
+            object : Migration(18, 19) {
+                override fun migrate(database: SupportSQLiteDatabase) {
+                    database.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list` (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))")
+                    database.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)")
+                }
             }
-        }
 
         val ALL_MIGRATIONS: List<Migration>
-            get() = listOf(
-                MIGRATION_18_TO_19,
-            )
+            get() =
+                listOf(
+                    MIGRATION_18_TO_19,
+                )
     }
 }
 
@@ -186,7 +206,8 @@ object VpnTypeConverters {
 
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
-    private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
+    private val stringListAdapter: JsonAdapter<List<String>> =
+        Moshi.Builder().build().adapter(stringListType)
 
     @TypeConverter
     @JvmStatic
@@ -232,6 +253,7 @@ object VpnTypeConverters {
 }
 
 private val IO_EXECUTOR = Executors.newSingleThreadExecutor()
+
 fun ioThread(f: () -> Unit) {
     IO_EXECUTOR.execute(f)
 }

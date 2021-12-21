@@ -22,18 +22,17 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Provider
 
-class EmailProtectionSignOutViewModel(
-    private val emailManager: EmailManager
-) : ViewModel() {
+class EmailProtectionSignOutViewModel(private val emailManager: EmailManager) : ViewModel() {
 
-    private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val commandChannel =
+        Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
@@ -41,26 +40,23 @@ class EmailProtectionSignOutViewModel(
     }
 
     fun onSignOutButtonClicked() {
-        viewModelScope.launch {
-            commandChannel.send(Command.SignOut)
-        }
+        viewModelScope.launch { commandChannel.send(Command.SignOut) }
     }
 
     fun onEmailLogoutConfirmed() {
-        viewModelScope.launch {
-            emailManager.signOut()
-        }
+        viewModelScope.launch { emailManager.signOut() }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class EmailProtectionSignOutViewModelFactory @Inject constructor(
-    private val emailManager: Provider<EmailManager>
-) : ViewModelFactoryPlugin {
+class EmailProtectionSignOutViewModelFactory
+@Inject
+constructor(private val emailManager: Provider<EmailManager>) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(EmailProtectionSignOutViewModel::class.java) -> (EmailProtectionSignOutViewModel(emailManager.get()) as T)
+                isAssignableFrom(EmailProtectionSignOutViewModel::class.java) ->
+                    (EmailProtectionSignOutViewModel(emailManager.get()) as T)
                 else -> null
             }
         }

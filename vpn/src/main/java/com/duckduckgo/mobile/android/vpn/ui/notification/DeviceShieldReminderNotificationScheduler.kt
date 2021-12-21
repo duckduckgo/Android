@@ -33,14 +33,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
-class DeviceShieldReminderNotificationScheduler @Inject constructor(
+class DeviceShieldReminderNotificationScheduler
+@Inject
+constructor(
     private val context: Context,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
@@ -73,20 +75,21 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
 
     private fun scheduleUndesiredStopReminderAlarm() {
         Timber.v("Scheduling the VpnReminderNotificationWorker worker 5 hours from now")
-        val request = PeriodicWorkRequestBuilder<VpnReminderNotificationWorker>(5, TimeUnit.HOURS)
-            .setInitialDelay(5, TimeUnit.HOURS)
-            .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
-            .build()
+        val request =
+            PeriodicWorkRequestBuilder<VpnReminderNotificationWorker>(5, TimeUnit.HOURS)
+                .setInitialDelay(5, TimeUnit.HOURS)
+                .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+                .build()
 
         workManager.enqueueUniquePeriodicWork(
             VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
             ExistingPeriodicWorkPolicy.KEEP,
-            request
-        )
+            request)
     }
 
     private fun cancelUndesiredStopReminderAlarm() {
-        workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+        workManager.cancelAllWorkByTag(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
     }
 
     private fun cancelReminderForTomorrow() {
@@ -98,18 +101,24 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun showImmediateReminderNotification() {
-        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
-        notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+        val notification =
+            deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+        notificationManager.notify(
+            TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
     }
 
     private fun scheduleReminderForTomorrow() {
         Timber.v("Scheduling the VpnReminderNotification worker a week from now")
-        val request = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
-            .setInitialDelay(24, TimeUnit.HOURS)
-            .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
-            .build()
+        val request =
+            OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
+                .setInitialDelay(24, TimeUnit.HOURS)
+                .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+                .build()
 
-        workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
+        workManager.enqueueUniqueWork(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG,
+            ExistingWorkPolicy.KEEP,
+            request)
     }
 
     //
@@ -117,9 +126,6 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         val receiver = ComponentName(context, VpnReminderReceiver::class.java)
 
         context.packageManager.setComponentEnabledSetting(
-            receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            PackageManager.DONT_KILL_APP
-        )
+            receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
     }
 }

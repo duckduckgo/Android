@@ -32,11 +32,11 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Named
-import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 data class WebViewHttpAuthCredentials(val username: String, val password: String)
 
@@ -44,21 +44,28 @@ data class WebViewHttpAuthCredentials(val username: String, val password: String
 // if necessary the method impls will change thread to access the http auth dao
 interface WebViewHttpAuthStore {
     @UiThread
-    fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String)
+    fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    )
     @UiThread
-    fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials?
-    @UiThread
-    fun clearHttpAuthUsernamePassword(webView: WebView)
-    @WorkerThread
-    suspend fun cleanHttpAuthDatabase()
+    fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials?
+    @UiThread fun clearHttpAuthUsernamePassword(webView: WebView)
+    @WorkerThread suspend fun cleanHttpAuthDatabase()
 }
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = LifecycleObserver::class
-)
+@ContributesMultibinding(scope = AppScope::class, boundType = LifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
-class RealWebViewHttpAuthStore @Inject constructor(
+class RealWebViewHttpAuthStore
+@Inject
+constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
@@ -77,7 +84,13 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
+    override fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    ) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
@@ -85,13 +98,18 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials? {
-        val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
-        } else {
-            @Suppress("DEPRECATION")
-            webView.getHttpAuthUsernamePassword(host, realm)
-        } ?: return null
+    override fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials? {
+        val credentials =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+            } else {
+                @Suppress("DEPRECATION") webView.getHttpAuthUsernamePassword(host, realm)
+            }
+                ?: return null
 
         return WebViewHttpAuthCredentials(username = credentials[0], password = credentials[1])
     }

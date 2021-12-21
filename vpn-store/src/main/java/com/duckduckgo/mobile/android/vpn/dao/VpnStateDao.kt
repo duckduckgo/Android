@@ -26,10 +26,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnStateDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnState)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(state: VpnState)
 
-    @Query("select * from vpn_state")
-    fun get(): Flow<VpnState>
-
+    @Query("select * from vpn_state") fun get(): Flow<VpnState>
 }

@@ -16,11 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.breakage
 
-data class InstalledApp(
-    val packageName: String,
-    val name: String,
-    val isSelected: Boolean = false
-)
+data class InstalledApp(val packageName: String, val name: String, val isSelected: Boolean = false)
 
 object ReportBreakageAppListView {
     data class State(

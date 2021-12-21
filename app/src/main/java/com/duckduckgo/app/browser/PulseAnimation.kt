@@ -80,10 +80,11 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
 
-            pulseAnimation = AnimatorSet().apply {
-                play(pulse)
-                start()
-            }
+            pulseAnimation =
+                AnimatorSet().apply {
+                    play(pulse)
+                    start()
+                }
         }
     }
 
@@ -99,15 +100,13 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
                 view,
                 PropertyValuesHolder.ofFloat("scaleX", fromScaleSize, toScaleSize),
                 PropertyValuesHolder.ofFloat("scaleY", fromScaleSize, toScaleSize),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
-            )
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f))
         } else {
             ObjectAnimator.ofPropertyValuesHolder(
                 view,
                 PropertyValuesHolder.ofFloat("scaleX", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
                 PropertyValuesHolder.ofFloat("scaleY", ANIM_INITIAL_SCALE, ANIM_FINAL_SCALE),
-                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f)
-            )
+                PropertyValuesHolder.ofFloat("alpha", 0f, 1f, 1f, 0.1f))
         }
     }
 
@@ -117,7 +116,8 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : LifecycleObse
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
         highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
-        val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
+        val layoutParams =
+            FrameLayout.LayoutParams(targetView.width, targetView.height, Gravity.CENTER)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
         return highlightImageView
     }

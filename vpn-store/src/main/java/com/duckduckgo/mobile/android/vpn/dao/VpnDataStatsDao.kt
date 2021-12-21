@@ -27,17 +27,19 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnDataStatsDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(stat: VpnDataStats): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(stat: VpnDataStats): Long
 
-    @Query("UPDATE vpn_data_stats SET dataSent = dataSent + :dataSent, packetsSent = packetsSent + 1 WHERE id =:id")
+    @Query(
+        "UPDATE vpn_data_stats SET dataSent = dataSent + :dataSent, packetsSent = packetsSent + 1 WHERE id =:id")
     fun updateDataSent(dataSent: Int, id: String = DatabaseDateFormatter.bucketByHour())
 
-    @Query("UPDATE vpn_data_stats SET dataReceived = dataReceived + :dataReceived, packetsReceived = packetsReceived + 1 WHERE id =:id")
+    @Query(
+        "UPDATE vpn_data_stats SET dataReceived = dataReceived + :dataReceived, packetsReceived = packetsReceived + 1 WHERE id =:id")
     fun updateDataReceived(dataReceived: Int, id: String)
 
     fun upsertDataReceived(dataReceived: Int, id: String = bucket()) {
-        val newStats = VpnDataStats(id = id, dataReceived = dataReceived.toLong(), packetsReceived = 1)
+        val newStats =
+            VpnDataStats(id = id, dataReceived = dataReceived.toLong(), packetsReceived = 1)
 
         if (insert(newStats) == -1L) {
             updateDataReceived(dataReceived, id)

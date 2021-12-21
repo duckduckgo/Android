@@ -30,13 +30,23 @@ interface BlobConverterInjector {
 class BlobConverterInjectorJs : BlobConverterInjector {
     private val javaScriptInjector = JavaScriptInjector()
 
-    override fun addJsInterface(webView: WebView, onBlobTransformed: (url: String, mimeType: String) -> Unit) {
-        webView.addJavascriptInterface(BlobConverterJavascriptInterface(onBlobTransformed), JAVASCRIPT_INTERFACE_NAME)
+    override fun addJsInterface(
+        webView: WebView,
+        onBlobTransformed: (url: String, mimeType: String) -> Unit
+    ) {
+        webView.addJavascriptInterface(
+            BlobConverterJavascriptInterface(onBlobTransformed), JAVASCRIPT_INTERFACE_NAME)
     }
 
     @UiThread
-    override fun convertBlobIntoDataUriAndDownload(webView: WebView, blobUrl: String, contentType: String?) {
-        webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS(webView.context, blobUrl, contentType)}", null)
+    override fun convertBlobIntoDataUriAndDownload(
+        webView: WebView,
+        blobUrl: String,
+        contentType: String?
+    ) {
+        webView.evaluateJavascript(
+            "javascript:${javaScriptInjector.getFunctionsJS(webView.context, blobUrl, contentType)}",
+            null)
     }
 
     private class JavaScriptInjector {
@@ -44,9 +54,14 @@ class BlobConverterInjectorJs : BlobConverterInjector {
 
         fun getFunctionsJS(context: Context, blobUrl: String, contentType: String?): String {
             if (!this::functions.isInitialized) {
-                functions = context.resources.openRawResource(R.raw.blob_converter).bufferedReader().use { it.readText() }
+                functions =
+                    context.resources.openRawResource(R.raw.blob_converter).bufferedReader().use {
+                        it.readText()
+                    }
             }
-            return functions.replace("%blobUrl%", blobUrl).replace("%contentType%", contentType.orEmpty())
+            return functions
+                .replace("%blobUrl%", blobUrl)
+                .replace("%contentType%", contentType.orEmpty())
         }
     }
 }

@@ -31,14 +31,12 @@ import java.security.GeneralSecurityException
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
-    private val context: Context,
-    private val pixel: Pixel
-) : AppTrackingProtectionWaitlistDataStore {
+class DefaultAppTrackingProtectionWaitlistDataStore
+@Inject
+constructor(private val context: Context, private val pixel: Pixel) :
+    AppTrackingProtectionWaitlistDataStore {
 
-    private val encryptedPreferences: SharedPreferences? by lazy {
-        encryptedPreferences()
-    }
+    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
     @Synchronized
     private fun encryptedPreferences(): SharedPreferences? {
@@ -46,12 +44,9 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
             return EncryptedSharedPreferences.create(
                 context,
                 FILENAME,
-                MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build(),
+                MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
         } catch (e: IOException) {
             pixel.enqueueFire(DeviceShieldPixelNames.ATP_ENCRYPTED_IO_EXCEPTION)
         } catch (e: GeneralSecurityException) {
@@ -63,9 +58,7 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
     override var waitlistTimestamp: Int
         get() = encryptedPreferences?.getInt(KEY_WAITLIST_TIMESTAMP, -1) ?: -1
         set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                putInt(KEY_WAITLIST_TIMESTAMP, value)
-            }
+            encryptedPreferences?.edit(commit = true) { putInt(KEY_WAITLIST_TIMESTAMP, value) }
         }
 
     override var waitlistToken: String?
@@ -81,17 +74,14 @@ class DefaultAppTrackingProtectionWaitlistDataStore @Inject constructor(
         get() = encryptedPreferences?.getString(KEY_INVITE_CODE, null)
         set(value) {
             encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(KEY_INVITE_CODE)
-                else putString(KEY_INVITE_CODE, value)
+                if (value == null) remove(KEY_INVITE_CODE) else putString(KEY_INVITE_CODE, value)
             }
         }
 
     override var sendNotification: Boolean
         get() = encryptedPreferences?.getBoolean(KEY_SEND_NOTIFICATION, false) ?: false
         set(value) {
-            encryptedPreferences?.edit(commit = true) {
-                putBoolean(KEY_SEND_NOTIFICATION, value)
-            }
+            encryptedPreferences?.edit(commit = true) { putBoolean(KEY_SEND_NOTIFICATION, value) }
         }
 
     override var lastUsedDate: String?

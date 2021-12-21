@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
+import dagger.SingleInstanceIn
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import dagger.SingleInstanceIn
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

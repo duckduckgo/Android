@@ -37,66 +37,72 @@ import org.mockito.ArgumentMatchers.anyString
 @ExperimentalCoroutinesApi
 class BookmarkFoldersViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     private val bookmarksRepository: BookmarksRepository = mock()
 
     private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
 
-    private val viewStateCaptor: ArgumentCaptor<BookmarkFoldersViewModel.ViewState> = ArgumentCaptor.forClass(BookmarkFoldersViewModel.ViewState::class.java)
-    private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> = ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
+    private val viewStateCaptor: ArgumentCaptor<BookmarkFoldersViewModel.ViewState> =
+        ArgumentCaptor.forClass(BookmarkFoldersViewModel.ViewState::class.java)
+    private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> =
+        ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
 
-    private val folderStructure = listOf(
-        BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
-        BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false)
-    )
+    private val folderStructure =
+        listOf(
+            BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
+            BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false))
 
     private val testee: BookmarkFoldersViewModel by lazy {
-        val model = BookmarkFoldersViewModel(bookmarksRepository, coroutineRule.testDispatcherProvider)
+        val model =
+            BookmarkFoldersViewModel(bookmarksRepository, coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
     }
 
     @Before
-    fun before() = coroutineRule.runBlocking {
-        whenever(bookmarksRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
-    }
+    fun before() =
+        coroutineRule.runBlocking {
+            whenever(bookmarksRepository.getFlatFolderStructure(anyLong(), any(), anyString()))
+                .thenReturn(folderStructure)
+        }
 
     @Test
-    fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = coroutineRule.runBlocking {
-        val selectedFolderId = 0L
-        val rootFolderName = "Bookmarks"
-        val folder = BookmarkFolder(2, "a folder", 1)
+    fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() =
+        coroutineRule.runBlocking {
+            val selectedFolderId = 0L
+            val rootFolderName = "Bookmarks"
+            val folder = BookmarkFolder(2, "a folder", 1)
 
-        testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
+            testee.fetchBookmarkFolders(selectedFolderId, rootFolderName, folder)
 
-        verify(bookmarksRepository).getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
-        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+            verify(bookmarksRepository)
+                .getFlatFolderStructure(selectedFolderId, folder, rootFolderName)
+            verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
 
-        assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
-        assertEquals(folderStructure, viewStateCaptor.allValues[1].folderStructure)
-    }
+            assertEquals(
+                emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
+            assertEquals(folderStructure, viewStateCaptor.allValues[1].folderStructure)
+        }
 
     @Test
-    fun whenItemSelectedThenIssueSelectFolderCommand() = coroutineRule.runBlocking {
-        val folder = BookmarkFolder(2, "a folder", 1)
+    fun whenItemSelectedThenIssueSelectFolderCommand() =
+        coroutineRule.runBlocking {
+            val folder = BookmarkFolder(2, "a folder", 1)
 
-        testee.onItemSelected(folder)
+            testee.onItemSelected(folder)
 
-        verify(commandObserver).onChanged(commandCaptor.capture())
+            verify(commandObserver).onChanged(commandCaptor.capture())
 
-        assertEquals(folder, (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
-    }
+            assertEquals(
+                folder,
+                (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder)
+                    .selectedBookmarkFolder)
+        }
 }

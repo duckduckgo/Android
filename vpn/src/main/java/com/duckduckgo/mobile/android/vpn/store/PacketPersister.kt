@@ -48,5 +48,4 @@ class DummyPacketPersister : PacketPersister {
     override fun persistDataReceived(packetLength: Int, packetType: String) {
         Timber.v("[%s] Updating data received: %d bytes of data", packetType, packetLength)
     }
-
 }

@@ -41,16 +41,22 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
+        viewModel
+            .viewState
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { render(it) }
+            .launchIn(lifecycleScope)
         setContentView(binding.root)
         setupToolbar(toolbar)
     }
 
     private fun render(viewState: EmailProtectionViewModel.ViewState) {
         when (val state = viewState.emailState) {
-            is EmailProtectionViewModel.EmailState.SignedIn -> launchEmailProtectionSignOut(state.emailAddress)
+            is EmailProtectionViewModel.EmailState.SignedIn ->
+                launchEmailProtectionSignOut(state.emailAddress)
             is EmailProtectionViewModel.EmailState.SignedOut -> launchEmailProtectionSignIn()
-            is EmailProtectionViewModel.EmailState.NotSupported -> launchEmailProtectionNotSupported()
+            is EmailProtectionViewModel.EmailState.NotSupported ->
+                launchEmailProtectionNotSupported()
         }
     }
 
@@ -73,9 +79,7 @@ class EmailProtectionActivity : DuckDuckGoActivity() {
         val tag = fragment.javaClass.name
         if (supportFragmentManager.findFragmentByTag(tag) != null) return
 
-        supportFragmentManager.commit {
-            replace(R.id.fragmentContainer, fragment, fragment.tag)
-        }
+        supportFragmentManager.commit { replace(R.id.fragmentContainer, fragment, fragment.tag) }
     }
 
     companion object {

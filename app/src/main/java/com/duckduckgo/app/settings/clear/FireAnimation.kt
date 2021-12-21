@@ -22,14 +22,17 @@ import java.io.Serializable
 
 sealed class FireAnimation(val resId: Int, val nameResId: Int) : Serializable {
     object HeroFire : FireAnimation(R.raw.hero_fire_inferno, R.string.settingsHeroFireAnimation)
-    object HeroWater : FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
-    object HeroAbstract : FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
+    object HeroWater :
+        FireAnimation(R.raw.hero_water_whirlpool, R.string.settingsHeroWaterAnimation)
+    object HeroAbstract :
+        FireAnimation(R.raw.hero_abstract_airstream, R.string.settingsHeroAbstractAnimation)
     object None : FireAnimation(-1, R.string.settingsNoneAnimation)
 }
 
-fun FireAnimation.getPixelValue() = when (this) {
-    FireAnimation.HeroFire -> Pixel.PixelValues.FIRE_ANIMATION_INFERNO
-    FireAnimation.HeroWater -> Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL
-    FireAnimation.HeroAbstract -> Pixel.PixelValues.FIRE_ANIMATION_AIRSTREAM
-    FireAnimation.None -> Pixel.PixelValues.FIRE_ANIMATION_NONE
-}
+fun FireAnimation.getPixelValue() =
+    when (this) {
+        FireAnimation.HeroFire -> Pixel.PixelValues.FIRE_ANIMATION_INFERNO
+        FireAnimation.HeroWater -> Pixel.PixelValues.FIRE_ANIMATION_WHIRLPOOL
+        FireAnimation.HeroAbstract -> Pixel.PixelValues.FIRE_ANIMATION_AIRSTREAM
+        FireAnimation.None -> Pixel.PixelValues.FIRE_ANIMATION_NONE
+    }

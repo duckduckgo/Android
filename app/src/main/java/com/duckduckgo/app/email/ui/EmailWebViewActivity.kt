@@ -32,14 +32,11 @@ import javax.inject.Inject
 
 class EmailWebViewActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var userAgentProvider: UserAgentProvider
+    @Inject lateinit var userAgentProvider: UserAgentProvider
 
-    @Inject
-    lateinit var webViewClient: BrowserWebViewClient
+    @Inject lateinit var webViewClient: BrowserWebViewClient
 
-    @Inject
-    lateinit var emailInjector: EmailInjector
+    @Inject lateinit var emailInjector: EmailInjector
 
     private val binding: ActivityEmailWebviewBinding by viewBinding()
 
@@ -71,12 +68,10 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
                 databaseEnabled = false
                 setSupportZoom(true)
             }
-            emailInjector.addJsInterface(it) { }
+            emailInjector.addJsInterface(it) {}
         }
 
-        url?.let {
-            binding.simpleWebview.loadUrl(it)
-        }
+        url?.let { binding.simpleWebview.loadUrl(it) }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

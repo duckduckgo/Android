@@ -27,11 +27,13 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
 import com.facebook.soloader.SoLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 @ContributesMultibinding(AppScope::class)
-class FlipperInitializer @Inject constructor(
+class FlipperInitializer
+@Inject
+constructor(
     private val context: Context,
     private val flipperPluginPoint: PluginPoint<FlipperPlugin>
 ) : LifecycleObserver {
@@ -42,9 +44,7 @@ class FlipperInitializer @Inject constructor(
         SoLoader.init(context, false)
 
         with(AndroidFlipperClient.getInstance(context)) {
-            flipperPluginPoint.getPlugins().forEach { plugin ->
-                addPlugin(plugin)
-            }
+            flipperPluginPoint.getPlugins().forEach { plugin -> addPlugin(plugin) }
 
             // Common device plugins
             addPlugin(DatabasesFlipperPlugin(context))
@@ -52,5 +52,4 @@ class FlipperInitializer @Inject constructor(
             start()
         }
     }
-
 }

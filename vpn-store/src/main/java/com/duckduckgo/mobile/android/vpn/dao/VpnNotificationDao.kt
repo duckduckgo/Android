@@ -20,21 +20,15 @@ import androidx.room.*
 
 @Dao
 interface VpnNotificationsDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(notification: VpnNotification): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE) fun insert(notification: VpnNotification): Long
 
-    @Query("select * from vpn_notification where id=:id")
-    fun get(id: Int): VpnNotification
+    @Query("select * from vpn_notification where id=:id") fun get(id: Int): VpnNotification
 
-    @Query("select count(1) > 0 from vpn_notification where id = :id")
-    fun exists(id: Int): Boolean
+    @Query("select count(1) > 0 from vpn_notification where id = :id") fun exists(id: Int): Boolean
 
     @Query("UPDATE vpn_notification SET timesRun = timesRun + 1 WHERE id =:id")
     fun increment(id: Int)
 }
 
 @Entity(tableName = "vpn_notification")
-data class VpnNotification(
-    @PrimaryKey val id: Int,
-    val timesRun: Long = 0
-)
+data class VpnNotification(@PrimaryKey val id: Int, val timesRun: Long = 0)

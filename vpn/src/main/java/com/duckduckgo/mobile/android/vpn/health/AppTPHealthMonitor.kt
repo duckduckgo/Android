@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,36 +39,39 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
  * alarm if there is prolonged bad health detected.
  *
  * Periodically samples the health metrics. When sampling:
+ * ```
  *      get stats from last period of time, defined in SLIDING_WINDOW_DURATION_MS
  *      where appropriate, calculates a ratio of multiple values
- *
+ * ```
  * This sample isn't stored, but instead we check if the value/ratio is acceptable.
+ * ```
  *    If it is, all is well.
  *    If the rate is not acceptable, we flag it but don't yet raise the alarm
- *
+ * ```
  * On the next health sample, we check the value again.
+ * ```
  *    If it's fine now, remove the flag (false alarm)
  *    If the rate is still not good after N samples, we're now in bad health. Raise the alarm.
+ * ```
  */
-
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class AppTPHealthMonitor @Inject constructor(
+class AppTPHealthMonitor
+@Inject
+constructor(
     @VpnCoroutineScope private val coroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter,
     private val healthClassifier: HealthClassifier,
     applicationContext: Context,
     private val tracerPacketBuilder: TracerPacketBuilder,
     private val vpnQueues: VpnQueues
-) :
-    AppHealthMonitor {
+) : AppHealthMonitor {
 
     companion object {
 
@@ -84,7 +88,8 @@ class AppTPHealthMonitor @Inject constructor(
     private val now: Long
         get() = System.currentTimeMillis()
 
-    private val _healthState = MutableStateFlow(SystemHealthSubmission(isBadHealth = false, emptyList()))
+    private val _healthState =
+        MutableStateFlow(SystemHealthSubmission(isBadHealth = false, emptyList()))
     val healthState: StateFlow<SystemHealthSubmission> = _healthState
 
     private val monitoringJob = ConflatedJob()
@@ -96,12 +101,19 @@ class AppTPHealthMonitor @Inject constructor(
     private val healthRules = mutableListOf<HealthRule>()
 
     private val tunReadAlerts = object : HealthRule("tunReadAlerts") {}.also { healthRules.add(it) }
-    private val socketReadExceptionAlerts = object : HealthRule("socketReadExceptionAlerts") {}.also { healthRules.add(it) }
-    private val socketWriteExceptionAlerts = object : HealthRule("socketWriteExceptionAlerts") {}.also { healthRules.add(it) }
-    private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
-    private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
+    private val socketReadExceptionAlerts =
+        object : HealthRule("socketReadExceptionAlerts") {}.also { healthRules.add(it) }
+    private val socketWriteExceptionAlerts =
+        object : HealthRule("socketWriteExceptionAlerts") {}.also { healthRules.add(it) }
+    private val socketConnectExceptionAlerts =
+        object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
+    private val tunWriteExceptionAlerts =
+        object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val memoryAlerts = object : HealthRule("memoryAlerts") {}.also { healthRules.add(it) }
-    private val tracerPacketsAlerts = object : HealthRule("tracerPacketsAlerts", samplesToWaitBeforeAlerting = 2) {}.also { healthRules.add(it) }
+    private val tracerPacketsAlerts =
+        object : HealthRule("tracerPacketsAlerts", samplesToWaitBeforeAlerting = 2) {}.also {
+            healthRules.add(it)
+        }
 
     private val badHealthNotificationManager = HealthNotificationManager(applicationContext)
 
@@ -127,15 +139,20 @@ class AppTPHealthMonitor @Inject constructor(
 
         val prolongedBadHealthRules = prolongedBadHealthRules()
         if (prolongedBadHealthRules.isNotEmpty()) {
-            Timber.i("App health check caught some problem(s).\n%s", prolongedBadHealthRules.joinToString(separator = "\n"))
-            badHealthNotificationManager.showBadHealthNotification(prolongedBadHealthRules, systemHealth)
+            Timber.i(
+                "App health check caught some problem(s).\n%s",
+                prolongedBadHealthRules.joinToString(separator = "\n"))
+            badHealthNotificationManager.showBadHealthNotification(
+                prolongedBadHealthRules, systemHealth)
         } else {
             Timber.i("App health check is good")
             badHealthNotificationManager.hideBadHealthNotification()
         }
     }
 
-    private fun buildSystemHealthReport(healthStates: MutableList<HealthState>): SystemHealthSubmission {
+    private fun buildSystemHealthReport(
+        healthStates: MutableList<HealthState>
+    ): SystemHealthSubmission {
         val badHealthMetrics = healthStates.filterIsInstance<BadHealth>()
         val goodHealthMetrics = healthStates.filterIsInstance<GoodHealth>()
 
@@ -163,32 +180,50 @@ class AppTPHealthMonitor @Inject constructor(
         return state
     }
 
-    private fun sampleTunReadQueueReadRate(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleTunReadQueueReadRate(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
-        val readFromNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val readFromNetworkQueue =
+            healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
 
-        val state = healthClassifier.determineHealthTunInputQueueReadRatio(tunReads, readFromNetworkQueue)
+        val state =
+            healthClassifier.determineHealthTunInputQueueReadRatio(tunReads, readFromNetworkQueue)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleSocketReadExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
-        val readExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
+    private fun sampleSocketReadExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val readExceptions =
+            healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelReadExceptions(readExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleSocketWriteExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
-        val writeExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_WRITE_EXCEPTION(), timeWindow)
+    private fun sampleSocketWriteExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val writeExceptions =
+            healthMetricCounter.getStat(SOCKET_CHANNEL_WRITE_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelWriteExceptions(writeExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleSocketConnectExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
-        val connectExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
-        val state = healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions)
+    private fun sampleSocketConnectExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val connectExceptions =
+            healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
+        val state =
+            healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
@@ -230,10 +265,11 @@ class AppTPHealthMonitor @Inject constructor(
                 tunReadAlerts.recordBadHealthSample()
             }
 
-            val fakeMetrics = mutableMapOf<String, Metric>().also {
-                it["fakeMetric1"] = Metric("foo")
-                it["fakeMetric2"] = Metric("bar")
-            }
+            val fakeMetrics =
+                mutableMapOf<String, Metric>().also {
+                    it["fakeMetric1"] = Metric("foo")
+                    it["fakeMetric2"] = Metric("bar")
+                }
             val submission = RawMetricsSubmission("Fake", fakeMetrics)
             healthStates.add(BadHealth(submission))
         }
@@ -242,27 +278,30 @@ class AppTPHealthMonitor @Inject constructor(
     override fun startMonitoring() {
         Timber.v("AppTp Health - start monitoring")
 
-        monitoringJob += coroutineScope.launch {
-            while (isActive) {
-                checkCurrentHealth()
-                delay(MONITORING_FREQUENCY_MS)
+        monitoringJob +=
+            coroutineScope.launch {
+                while (isActive) {
+                    checkCurrentHealth()
+                    delay(MONITORING_FREQUENCY_MS)
+                }
             }
-        }
 
-        tracerInjectionJob += coroutineScope.launch {
-            while (isActive) {
-                injectTracerPacket()
-                delay(TRACER_INJECTION_FREQUENCY_MS)
+        tracerInjectionJob +=
+            coroutineScope.launch {
+                while (isActive) {
+                    injectTracerPacket()
+                    delay(TRACER_INJECTION_FREQUENCY_MS)
+                }
             }
-        }
 
-        oldMetricCleanupJob += coroutineScope.launch {
-            while (isActive) {
-                Timber.i("Cleaning up old health metrics")
-                healthMetricCounter.purgeOldMetrics()
-                delay(OLD_METRIC_CLEANUP_FREQUENCY_MS)
+        oldMetricCleanupJob +=
+            coroutineScope.launch {
+                while (isActive) {
+                    Timber.i("Cleaning up old health metrics")
+                    healthMetricCounter.purgeOldMetrics()
+                    delay(OLD_METRIC_CLEANUP_FREQUENCY_MS)
+                }
             }
-        }
     }
 
     override fun stopMonitoring() {
@@ -276,7 +315,8 @@ class AppTPHealthMonitor @Inject constructor(
     private fun injectTracerPacket() {
         val packet = tracerPacketBuilder.build()
         healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.CREATED))
-        healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.ADDED_TO_NETWORK_TO_DEVICE_QUEUE))
+        healthMetricCounter.logTracerPacketEvent(
+            TracerEvent(packet.tracerId, TracedState.ADDED_TO_NETWORK_TO_DEVICE_QUEUE))
         vpnQueues.tcpDeviceToNetwork.offer(packet)
     }
 
@@ -290,7 +330,10 @@ class AppTPHealthMonitor @Inject constructor(
         this.simulatedGoodHealth = goodHealth
     }
 
-    private abstract class HealthRule(open val name: String, open var samplesToWaitBeforeAlerting: Int = 4) {
+    private abstract class HealthRule(
+        open val name: String,
+        open var samplesToWaitBeforeAlerting: Int = 4
+    ) {
         var badHealthSampleCount: Int = 0
 
         fun recordBadHealthSample() {
@@ -306,5 +349,4 @@ class AppTPHealthMonitor @Inject constructor(
             return badHealthSampleCount >= samplesToWaitBeforeAlerting
         }
     }
-
 }

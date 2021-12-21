@@ -120,12 +120,12 @@ class DeviceAppLookupTest {
     companion object {
         val noApps = emptyList<DeviceApp>()
 
-        val apps = listOf(
-            DeviceApp(DDG_MOVIES, "", Intent()),
-            DeviceApp(DDG_MUSIC, "", Intent()),
-            DeviceApp(FILES, "", Intent()),
-            DeviceApp(LIVE_DDG, "", Intent()),
-            DeviceApp(APP_WITH_RESERVED_CHARS, "", Intent())
-        )
+        val apps =
+            listOf(
+                DeviceApp(DDG_MOVIES, "", Intent()),
+                DeviceApp(DDG_MUSIC, "", Intent()),
+                DeviceApp(FILES, "", Intent()),
+                DeviceApp(LIVE_DDG, "", Intent()),
+                DeviceApp(APP_WITH_RESERVED_CHARS, "", Intent()))
     }
 }

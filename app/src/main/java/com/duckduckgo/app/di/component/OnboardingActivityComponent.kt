@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface OnboardingActivityComponent : AndroidInjector<OnboardingActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<OnboardingActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<OnboardingActivity>
 }
 
 @ContributesTo(AppScope::class)

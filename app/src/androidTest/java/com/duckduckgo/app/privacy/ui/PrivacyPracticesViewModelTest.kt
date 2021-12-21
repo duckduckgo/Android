@@ -30,23 +30,20 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
 @ExperimentalTime
 class PrivacyPracticesViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    @get:Rule val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val tabRepository: TabRepository = mock()
 
@@ -58,52 +55,56 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
+    fun whenNoDataThenDefaultValuesAreUsed() =
+        coroutineTestRule.runBlocking {
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
-        testee.privacyPractices("1").test {
-            val viewState = awaitItem()
-            assertEquals("", viewState.domain)
-            assertEquals(UNKNOWN, viewState.practices)
-            assertEquals(0, viewState.goodTerms.size)
-            assertEquals(0, viewState.badTerms.size)
+            testee.privacyPractices("1").test {
+                val viewState = awaitItem()
+                assertEquals("", viewState.domain)
+                assertEquals(UNKNOWN, viewState.practices)
+                assertEquals(0, viewState.goodTerms.size)
+                assertEquals(0, viewState.badTerms.size)
+            }
         }
-    }
 
     @Test
-    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = coroutineTestRule.runBlocking {
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() =
+        coroutineTestRule.runBlocking {
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(url = "http://example.com/path"))
+            siteData.postValue(site(url = "http://example.com/path"))
 
-        testee.privacyPractices("1").test {
-            assertEquals("example.com", awaitItem().domain)
+            testee.privacyPractices("1").test { assertEquals("example.com", awaitItem().domain) }
         }
-    }
 
     @Test
-    fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() = coroutineTestRule.runBlocking {
-        val privacyPractices = PrivacyPractices.Practices(0, POOR, listOf("good", "also good"), listOf("bad"))
-        val siteData = MutableLiveData<Site>()
-        whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
+    fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() =
+        coroutineTestRule.runBlocking {
+            val privacyPractices =
+                PrivacyPractices.Practices(0, POOR, listOf("good", "also good"), listOf("bad"))
+            val siteData = MutableLiveData<Site>()
+            whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(privacyPractices = privacyPractices))
+            siteData.postValue(site(privacyPractices = privacyPractices))
 
-        testee.privacyPractices("1").test {
-            val viewState = awaitItem()
-            assertEquals(POOR, viewState.practices)
-            assertEquals(2, viewState.goodTerms.size)
-            assertEquals(1, viewState.badTerms.size)
+            testee.privacyPractices("1").test {
+                val viewState = awaitItem()
+                assertEquals(POOR, viewState.practices)
+                assertEquals(2, viewState.goodTerms.size)
+                assertEquals(1, viewState.badTerms.size)
+            }
         }
-    }
 
-    private fun site(url: String = "", privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN): Site {
+    private fun site(
+        url: String = "",
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         return site
     }
-
 }

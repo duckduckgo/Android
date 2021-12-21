@@ -17,9 +17,8 @@
 package com.duckduckgo.widget
 
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.Test
-
 import org.junit.Assert.*
+import org.junit.Test
 import org.junit.experimental.runners.Enclosed
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -56,8 +55,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
                     TestCase(5, 348),
                     TestCase(6, 416),
                     TestCase(7, 484),
-                    TestCase(8, 552)
-                )
+                    TestCase(8, 552))
             }
         }
     }
@@ -92,8 +90,7 @@ class SearchAndFavoritesGridCalculatorKtTest {
                     TestCase(4, 564),
                     TestCase(4, 662),
                     TestCase(4, 760),
-                    TestCase(4, 858)
-                )
+                    TestCase(4, 858))
             }
         }
     }

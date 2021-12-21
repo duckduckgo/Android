@@ -40,7 +40,8 @@ class AccessibilityModule {
         context: Context,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
-    ): AccessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, dispatcherProvider, appCoroutineScope)
+    ): AccessibilitySettingsDataStore =
+        AccessibilitySettingsSharedPreferences(context, dispatcherProvider, appCoroutineScope)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

@@ -18,7 +18,6 @@
 
 package com.duckduckgo.app.referencetests
 
-import android.util.Base64
 import android.webkit.*
 import androidx.core.net.toUri
 import androidx.room.Room
@@ -66,9 +65,7 @@ import org.junit.runners.Parameterized
 @RunWith(Parameterized::class)
 class DomainsReferenceTest(private val testCase: TestCase) {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var entityLookup: EntityLookup
     private lateinit var db: AppDatabase
@@ -98,22 +95,22 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var domainTests: DomainTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("reference_tests/domain_matching_tests.json")
+            val jsonObject: JSONObject =
+                FileUtilities.getJsonObjectFromFile("reference_tests/domain_matching_tests.json")
 
             jsonObject.keys().forEach {
                 if (it == "domainTests") {
                     domainTests = adapter.fromJson(jsonObject.get(it).toString())
                 }
             }
-            return domainTests?.tests?.filterNot { it.exceptPlatforms?.contains("android-browser") ?: false } ?: emptyList()
+            return domainTests?.tests?.filterNot {
+                it.exceptPlatforms?.contains("android-browser") ?: false
+            }
+                ?: emptyList()
         }
     }
 
-    data class DomainTest(
-        val name: String,
-        val desc: String,
-        val tests: List<TestCase>
-    )
+    data class DomainTest(val name: String, val desc: String, val tests: List<TestCase>)
 
     data class TestCase(
         val name: String,
@@ -131,50 +128,60 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         initialiseResourceSurrogates()
         whenever(mockRequest.isForMainFrame).thenReturn(false)
 
-        testee = WebViewRequestInterceptor(
-            trackerDetector = trackerDetector,
-            httpsUpgrader = mockHttpsUpgrader,
-            resourceSurrogates = resourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
-            gpc = mockGpc,
-            userAgentProvider = userAgentProvider
-        )
+        testee =
+            WebViewRequestInterceptor(
+                trackerDetector = trackerDetector,
+                httpsUpgrader = mockHttpsUpgrader,
+                resourceSurrogates = resourceSurrogates,
+                privacyProtectionCountDao = mockPrivacyProtectionCountDao,
+                gpc = mockGpc,
+                userAgentProvider = userAgentProvider)
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
-        whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() =
+        runBlocking<Unit> {
+            whenever(mockRequest.url).thenReturn(testCase.requestURL.toUri())
 
-        val response = testee.shouldIntercept(
-            request = mockRequest,
-            documentUrl = testCase.siteURL,
-            webView = webView,
-            webViewClientListener = null
-        )
+            val response =
+                testee.shouldIntercept(
+                    request = mockRequest,
+                    documentUrl = testCase.siteURL,
+                    webView = webView,
+                    webViewClientListener = null)
 
-        when (testCase.expectAction) {
-            null -> {
-                assertRequestCanContinueToLoad(response)
-            }
-            "ignore" -> {
-                assertRequestCanContinueToLoad(response)
-            }
-            "block" -> {
-                assertCancelledResponse(response)
+            when (testCase.expectAction) {
+                null -> {
+                    assertRequestCanContinueToLoad(response)
+                }
+                "ignore" -> {
+                    assertRequestCanContinueToLoad(response)
+                }
+                "block" -> {
+                    assertCancelledResponse(response)
+                }
             }
         }
-    }
 
     private fun initialiseTds() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
 
         tdsEntityDao = db.tdsEntityDao()
         tdsDomainEntityDao = db.tdsDomainEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
-        trackerDetector = TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+        trackerDetector =
+            TrackerDetectorImpl(
+                entityLookup,
+                mockUserWhitelistDao,
+                mockContentBlocking,
+                mockTrackerAllowlist,
+                mockWebTrackersBlockedDao)
 
         val json = FileUtilities.loadText("reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -190,8 +197,10 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     }
 
     private fun initialiseResourceSurrogates() {
-        val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        val resourceSurrogateLoader = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
+        val dataStore =
+            ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
+        val resourceSurrogateLoader =
+            ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
         val surrogatesFile = FileUtilities.loadText("reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)

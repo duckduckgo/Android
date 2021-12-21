@@ -24,16 +24,17 @@ import com.facebook.flipper.core.FlipperPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.threeten.bp.LocalTime
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
-class PixelFlipperPlugin @Inject constructor() : FlipperPlugin, Interceptor, PixelInterceptorPlugin {
+class PixelFlipperPlugin @Inject constructor() :
+    FlipperPlugin, Interceptor, PixelInterceptorPlugin {
 
     private var connection: FlipperConnection? = null
 
@@ -95,5 +96,7 @@ abstract class PixelFlipperPluginModule {
 
     @Binds
     @IntoSet
-    abstract fun bindPixelFlipperPluginInterceptor(pixelFlipperPlugin: PixelFlipperPlugin): PixelInterceptorPlugin
+    abstract fun bindPixelFlipperPluginInterceptor(
+        pixelFlipperPlugin: PixelFlipperPlugin
+    ): PixelInterceptorPlugin
 }

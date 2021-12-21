@@ -47,7 +47,8 @@ class InitialPromptDecider(
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsed()
         val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USAGE_BEFORE_FIRST_PROMPT
 
-        Timber.i("Number of days usage: $daysUsed. Enough to show app enjoyment prompt: ${if (enoughDaysUsed) "yes" else "no"}")
+        Timber.i(
+            "Number of days usage: $daysUsed. Enough to show app enjoyment prompt: ${if (enoughDaysUsed) "yes" else "no"}")
         return enoughDaysUsed
     }
 }
@@ -74,14 +75,17 @@ class SecondaryPromptDecider(
     private suspend fun enoughDaysPassedToShowSecondPrompt(): Boolean {
         val date = appEnjoymentRepository.dateUserDismissedFirstPrompt()
         if (date == null) {
-            Timber.d("Couldn't find a previous time first prompt was handled; must never have been shown")
+            Timber.d(
+                "Couldn't find a previous time first prompt was handled; must never have been shown")
             return false
         }
 
         val daysUsed = appDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(date)
-        val enoughDaysUsed = daysUsed >= MINIMUM_DAYS_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECOND_PROMPT
+        val enoughDaysUsed =
+            daysUsed >= MINIMUM_DAYS_USAGE_SINCE_INITIAL_PROMPT_BEFORE_SECOND_PROMPT
 
-        Timber.i("Days since first prompt dismissed: $daysUsed. Enough to show 2nd prompt: ${if (enoughDaysUsed) "yes" else "no"}")
+        Timber.i(
+            "Days since first prompt dismissed: $daysUsed. Enough to show 2nd prompt: ${if (enoughDaysUsed) "yes" else "no"}")
 
         return enoughDaysUsed
     }

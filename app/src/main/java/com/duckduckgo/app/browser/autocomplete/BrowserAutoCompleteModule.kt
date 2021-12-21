@@ -27,6 +27,6 @@ import dagger.Provides
 class BrowserAutoCompleteModule {
 
     @Provides
-    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
-
+    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore =
+        SettingsSharedPreferences(context, variantManager)
 }

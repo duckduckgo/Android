@@ -35,9 +35,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleInstanceIn
 
 @Module
 class SystemComponentsModule {
@@ -48,11 +48,13 @@ class SystemComponentsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider = InstalledDeviceAppListProvider(packageManager)
+    fun deviceAppsListProvider(packageManager: PackageManager): DeviceAppListProvider =
+        InstalledDeviceAppListProvider(packageManager)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
+    fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup =
+        InstalledDeviceAppLookup(deviceAppListProvider)
 
     @Provides
     fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
@@ -65,7 +67,8 @@ class SystemComponentsModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): FireAnimationLoader {
-        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider, appCoroutineScope)
+        return LottieFireAnimationLoader(
+            context, settingsDataStore, dispatcherProvider, appCoroutineScope)
     }
 }
 

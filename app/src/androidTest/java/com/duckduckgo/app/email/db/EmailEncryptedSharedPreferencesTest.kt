@@ -32,28 +32,31 @@ import org.junit.Test
 @ExperimentalCoroutinesApi
 class EmailEncryptedSharedPreferencesTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockPixel: Pixel = mock()
     lateinit var testee: EmailEncryptedSharedPreferences
 
     @Before
     fun before() {
-        testee = EmailEncryptedSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext, mockPixel)
+        testee =
+            EmailEncryptedSharedPreferences(
+                InstrumentationRegistry.getInstrumentation().targetContext, mockPixel)
     }
 
     @Test
-    fun whenNextAliasEqualsValueThenValueIsSentToNextAliasChannel() = coroutineRule.runBlocking {
-        testee.nextAlias = "test"
+    fun whenNextAliasEqualsValueThenValueIsSentToNextAliasChannel() =
+        coroutineRule.runBlocking {
+            testee.nextAlias = "test"
 
-        assertEquals("test", testee.nextAlias)
-    }
+            assertEquals("test", testee.nextAlias)
+        }
 
     @Test
-    fun whenNextAliasEqualsNullThenNullIsSentToNextAliasChannel() = coroutineRule.runBlocking {
-        testee.nextAlias = null
+    fun whenNextAliasEqualsNullThenNullIsSentToNextAliasChannel() =
+        coroutineRule.runBlocking {
+            testee.nextAlias = null
 
-        assertNull(testee.nextAlias)
-    }
+            assertNull(testee.nextAlias)
+        }
 }

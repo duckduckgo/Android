@@ -37,7 +37,8 @@ private class VpnTrackerDetectorInterceptorPluginPoint(
 @ContributesTo(VpnScope::class)
 abstract class VpnTrackerDetectorInterceptorModule {
     @Multibinds
-    abstract fun bindVpnTrackerDetectorInterceptorPlugins(): DaggerSet<VpnTrackerDetectorInterceptor>
+    abstract fun bindVpnTrackerDetectorInterceptorPlugins():
+        DaggerSet<VpnTrackerDetectorInterceptor>
 
     @Module
     @ContributesTo(VpnScope::class)

@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
-interface ReportBreakageSingleChoiceFormActivityComponent : AndroidInjector<ReportBreakageSingleChoiceFormActivity> {
+@MergeSubcomponent(scope = ActivityScope::class)
+interface ReportBreakageSingleChoiceFormActivityComponent :
+    AndroidInjector<ReportBreakageSingleChoiceFormActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ReportBreakageSingleChoiceFormActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface ReportBreakageSingleChoiceFormActivityComponentProvider {
-    fun provideReportBreakageSingleChoiceFormActivityComponentProviderFactory(): ReportBreakageSingleChoiceFormActivityComponent.Factory
+    fun provideReportBreakageSingleChoiceFormActivityComponentProviderFactory():
+        ReportBreakageSingleChoiceFormActivityComponent.Factory
 }
 
 @Module
@@ -49,5 +49,6 @@ abstract class ReportBreakageSingleChoiceFormActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(ReportBreakageSingleChoiceFormActivity::class)
-    abstract fun ReportBreakageSingleChoiceFormActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun ReportBreakageSingleChoiceFormActivityComponent.Factory.bind():
+        AndroidInjector.Factory<*>
 }

@@ -37,10 +37,12 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * These tests communicate with the server and therefore will be slowed down if there is slow internet access.
- * Additionally, this makes them susceptible to failing if the device running tests has no internet access.
+ * These tests communicate with the server and therefore will be slowed down if there is slow
+ * internet access. Additionally, this makes them susceptible to failing if the device running tests
+ * has no internet access.
  *
- * Would normally have separate tests for each assertion, but these tests are relatively expensive to run.
+ * Would normally have separate tests for each assertion, but these tests are relatively expensive
+ * to run.
  */
 @LargeTest
 class AtbIntegrationTest {
@@ -50,23 +52,25 @@ class AtbIntegrationTest {
     private lateinit var testee: StatisticsRequester
     private lateinit var statisticsStore: StatisticsDataStore
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
     @Before
     fun before() {
         mockVariantManager = mock()
-        statisticsStore = StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
+        statisticsStore =
+            StatisticsSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
         statisticsStore.clearAtb()
 
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
+        whenever(mockVariantManager.getVariant())
+            .thenReturn(Variant("ma", 100.0, filterBy = { true }))
         service = getDaggerComponent().retrofit().create(StatisticsService::class.java)
 
-        val plugins = object : PluginPoint<RefreshRetentionAtbPlugin> {
-            override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
-                return listOf()
+        val plugins =
+            object : PluginPoint<RefreshRetentionAtbPlugin> {
+                override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
+                    return listOf()
+                }
             }
-        }
         testee = StatisticsRequester(statisticsStore, service, mockVariantManager, plugins)
     }
 

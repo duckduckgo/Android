@@ -23,8 +23,8 @@ import android.content.Intent
 import timber.log.Timber
 
 /**
- * We don't need to take any action here; but having this registered
- * ensures our VPN process is restarted after an app update
+ * We don't need to take any action here; but having this registered ensures our VPN process is
+ * restarted after an app update
  */
 class AppUpdateReceiver : BroadcastReceiver() {
 
@@ -32,5 +32,4 @@ class AppUpdateReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         Timber.i("Notified of app update")
     }
-
 }

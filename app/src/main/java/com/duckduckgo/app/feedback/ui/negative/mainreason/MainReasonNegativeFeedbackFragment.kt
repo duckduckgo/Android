@@ -28,7 +28,8 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_main_reason) {
+class MainReasonNegativeFeedbackFragment :
+    FeedbackFragment(R.layout.content_feedback_negative_disambiguation_main_reason) {
     private lateinit var recyclerAdapter: MainReasonAdapter
 
     interface MainReasonNegativeFeedbackListener {
@@ -44,16 +45,20 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        recyclerAdapter = MainReasonAdapter(object : (FeedbackTypeMainReasonDisplay) -> Unit {
-            override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
-                listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
-            }
-        })
+        recyclerAdapter =
+            MainReasonAdapter(
+                object : (FeedbackTypeMainReasonDisplay) -> Unit {
+                    override fun invoke(reason: FeedbackTypeMainReasonDisplay) {
+                        listener?.userSelectedNegativeFeedbackMainReason(reason.mainReason)
+                    }
+                })
 
         activity?.let {
             binding.recyclerView.layoutManager = LinearLayoutManager(it)
             binding.recyclerView.adapter = recyclerAdapter
-            binding.recyclerView.addItemDecoration(FeedbackItemDecoration(ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
+            binding.recyclerView.addItemDecoration(
+                FeedbackItemDecoration(
+                    ContextCompat.getDrawable(it, R.drawable.feedback_list_divider)!!))
 
             val listValues = getMainReasonsDisplayText()
             recyclerAdapter.submitList(listValues)
@@ -61,9 +66,7 @@ class MainReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
     }
 
     private fun getMainReasonsDisplayText(): List<FeedbackTypeMainReasonDisplay> {
-        return MainReason.values().mapNotNull {
-            FeedbackTypeDisplay.mainReasons[it]
-        }
+        return MainReason.values().mapNotNull { FeedbackTypeDisplay.mainReasons[it] }
     }
 
     companion object {

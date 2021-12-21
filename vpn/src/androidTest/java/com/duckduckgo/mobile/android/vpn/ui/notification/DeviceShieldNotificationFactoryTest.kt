@@ -41,13 +41,19 @@ class DeviceShieldNotificationFactoryTest {
     @Before
     fun before() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         vpnTrackerDao = db.vpnTrackerDao()
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
 
-        factory = DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
+        factory =
+            DeviceShieldNotificationFactory(
+                InstrumentationRegistry.getInstrumentation().targetContext.resources,
+                appTrackerBlockingStatsRepository)
     }
 
     @After
@@ -58,7 +64,8 @@ class DeviceShieldNotificationFactoryTest {
     @Test
     fun createsDeviceShieldEnabledNotification() {
         val notification = factory.createNotificationDeviceShieldEnabled()
-        notification.assertTitleEquals("App Tracking Protection is enabled and blocking tracking attempts across your apps")
+        notification.assertTitleEquals(
+            "App Tracking Protection is enabled and blocking tracking attempts across your apps")
         assertFalse(notification.hidden)
     }
 
@@ -73,10 +80,10 @@ class DeviceShieldNotificationFactoryTest {
 
     @Test
     fun createTrackersCountDeviceShieldNotificationWhenTrackersFoundInTwoApps() {
-        val trackers = listOf(
-            aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
-        )
+        val trackers =
+            listOf(
+                aTrackerAndCompany(appContainingTracker = trackingApp1()),
+                aTrackerAndCompany(appContainingTracker = trackingApp2()))
         val notification = factory.createNotificationNewTrackerFound(trackers)
 
         notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
@@ -85,12 +92,12 @@ class DeviceShieldNotificationFactoryTest {
 
     @Test
     fun createTrackersCountDeviceShieldNotificationWhenMultipleTrackersFoundInSameAppAppIsNotCountedTwice() {
-        val trackers = listOf(
-            aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp1()),
-            aTrackerAndCompany(appContainingTracker = trackingApp2())
-        )
+        val trackers =
+            listOf(
+                aTrackerAndCompany(appContainingTracker = trackingApp1()),
+                aTrackerAndCompany(appContainingTracker = trackingApp1()),
+                aTrackerAndCompany(appContainingTracker = trackingApp1()),
+                aTrackerAndCompany(appContainingTracker = trackingApp2()))
         val notification = factory.createNotificationNewTrackerFound(trackers)
         notification.assertTitleEquals("Tracking attempts blocked across 2 apps (past hour).")
     }
@@ -114,16 +121,16 @@ class DeviceShieldNotificationFactoryTest {
             timestamp = timestamp,
             company = trackerCompanyName,
             companyDisplayName = trackerCompanyName,
-            trackingApp = appContainingTracker
-        )
+            trackingApp = appContainingTracker)
     }
 
     private fun defaultApp() = TrackingApp("app.foo.com", "Foo App")
     private fun trackingApp1() = TrackingApp("package1", "app1")
     private fun trackingApp2() = TrackingApp("package2", "app2")
-
 }
 
-private fun DeviceShieldNotificationFactory.DeviceShieldNotification.assertTitleEquals(expected: String) {
+private fun DeviceShieldNotificationFactory.DeviceShieldNotification.assertTitleEquals(
+    expected: String
+) {
     assertEquals("Given notification titles do not match", expected, this.title.toString())
 }

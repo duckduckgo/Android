@@ -27,11 +27,18 @@ class DaggerWorkerFactory(
     private val workerInjectorPluginPoint: WorkerInjectorPluginPoint,
 ) : WorkerFactory() {
 
-    override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+    override fun createWorker(
+        appContext: Context,
+        workerClassName: String,
+        workerParameters: WorkerParameters
+    ): ListenableWorker? {
 
         try {
-            val workerClass = Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
-            val constructor = workerClass.getDeclaredConstructor(Context::class.java, WorkerParameters::class.java)
+            val workerClass =
+                Class.forName(workerClassName).asSubclass(ListenableWorker::class.java)
+            val constructor =
+                workerClass.getDeclaredConstructor(
+                    Context::class.java, WorkerParameters::class.java)
             val instance = constructor.newInstance(appContext, workerParameters)
 
             workerInjectorPluginPoint.getPlugins().forEach { plugin ->
@@ -47,6 +54,5 @@ class DaggerWorkerFactory(
             Timber.e(exception, "Worker $workerClassName could not be created")
             return null
         }
-
     }
 }

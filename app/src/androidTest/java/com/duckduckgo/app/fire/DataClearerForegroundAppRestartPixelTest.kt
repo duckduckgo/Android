@@ -92,7 +92,6 @@ class DataClearerForegroundAppRestartPixelTest {
 
     private fun givenEmptyIntent(): Intent = Intent(context, BrowserActivity::class.java)
 
-    private fun givenIntentWithData(url: String) = Intent(Intent.ACTION_VIEW).apply {
-        data = Uri.parse(url)
-    }
+    private fun givenIntentWithData(url: String) =
+        Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(url) }
 }

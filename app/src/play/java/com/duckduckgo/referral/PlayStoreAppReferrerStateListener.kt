@@ -32,13 +32,15 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
-class PlayStoreAppReferrerStateListener @Inject constructor(
+class PlayStoreAppReferrerStateListener
+@Inject
+constructor(
     val context: Context,
     private val packageManager: PackageManager,
     private val appInstallationReferrerParser: AppInstallationReferrerParser,
@@ -51,20 +53,19 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
     private var referralResult: ParsedReferrerResult = ReferrerInitialising
 
-    /**
-     * Initialises the referrer service. This should only be called once.
-     */
+    /** Initialises the referrer service. This should only be called once. */
     override fun initialiseReferralRetrieval() {
         try {
             initialisationStartTime = System.currentTimeMillis()
 
             if (appReferrerDataStore.referrerCheckedPreviously) {
 
-                referralResult = if (appReferrerDataStore.installedFromEuAuction) {
-                    EuAuctionReferrerFound(fromCache = true)
-                } else {
-                    loadPreviousReferrerData()
-                }
+                referralResult =
+                    if (appReferrerDataStore.installedFromEuAuction) {
+                        EuAuctionReferrerFound(fromCache = true)
+                    } else {
+                        loadPreviousReferrerData()
+                    }
 
                 Timber.i("Already inspected this referrer data")
                 return
@@ -109,7 +110,6 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 DEVELOPER_ERROR -> referralResultFailed(DeveloperError)
                 SERVICE_DISCONNECTED -> referralResultFailed(ServiceDisconnected)
                 else -> referralResultFailed(UnknownError)
-
             }
 
             referralClient.endConnection()
@@ -120,14 +120,18 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     }
 
     /**
-     * Retrieves the app installation referral code.
-     * This might return a result immediately or might wait for a result to become available. There is no guarantee that a result will ever be returned.
+     * Retrieves the app installation referral code. This might return a result immediately or might
+     * wait for a result to become available. There is no guarantee that a result will ever be
+     * returned.
      *
-     * It is the caller's responsibility to guard against this function not returning a result in a timely manner, or not returning a result ever.
+     * It is the caller's responsibility to guard against this function not returning a result in a
+     * timely manner, or not returning a result ever.
      */
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ReferrerInitialising) {
-            Timber.d("Referrer already determined (%s); immediately answering", referralResult.javaClass.simpleName)
+            Timber.d(
+                "Referrer already determined (%s); immediately answering",
+                referralResult.javaClass.simpleName)
             return referralResult
         }
 
@@ -148,8 +152,10 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
     private fun playStoreReferralServiceInstalled(): Boolean {
         val playStoreConnectionServiceIntent = Intent()
-        playStoreConnectionServiceIntent.component = ComponentName(PLAY_STORE_PACKAGE, PLAY_STORE_REFERRAL_SERVICE)
-        val matchingServices = packageManager.queryIntentServices(playStoreConnectionServiceIntent, 0)
+        playStoreConnectionServiceIntent.component =
+            ComponentName(PLAY_STORE_PACKAGE, PLAY_STORE_REFERRAL_SERVICE)
+        val matchingServices =
+            packageManager.queryIntentServices(playStoreConnectionServiceIntent, 0)
         return matchingServices.size > 0
     }
 

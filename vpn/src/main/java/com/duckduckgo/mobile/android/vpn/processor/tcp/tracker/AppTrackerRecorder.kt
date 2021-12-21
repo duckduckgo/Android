@@ -28,11 +28,11 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlin.random.Random
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 interface AppTrackerRecorder {
     fun insertTracker(vpnTracker: VpnTracker)
@@ -43,7 +43,8 @@ interface AppTrackerRecorder {
     boundType = VpnServiceCallbacks::class,
 )
 @SingleInstanceIn(VpnScope::class)
-class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
+class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) :
+    VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
     private val dao = vpnDatabase.vpnTrackerDao()
@@ -53,20 +54,19 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.i("Batched app tracker recorder starting")
 
-        periodicInsertionJob += coroutineScope.launch(insertionDispatcher) {
-            while (isActive) {
-                flushInMemoryTrackersToDatabase()
-                delay(Random.nextLong(PERIODIC_INSERTION_FREQUENCY_MS))
+        periodicInsertionJob +=
+            coroutineScope.launch(insertionDispatcher) {
+                while (isActive) {
+                    flushInMemoryTrackersToDatabase()
+                    delay(Random.nextLong(PERIODIC_INSERTION_FREQUENCY_MS))
+                }
             }
-        }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()
-        coroutineScope.launch(insertionDispatcher) {
-            flushInMemoryTrackersToDatabase()
-        }
+        coroutineScope.launch(insertionDispatcher) { flushInMemoryTrackersToDatabase() }
     }
 
     @WorkerThread
@@ -85,9 +85,7 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     }
 
     override fun insertTracker(vpnTracker: VpnTracker) {
-        synchronized(batchedTrackers) {
-            batchedTrackers.add(vpnTracker)
-        }
+        synchronized(batchedTrackers) { batchedTrackers.add(vpnTracker) }
     }
 
     companion object {
@@ -101,5 +99,7 @@ abstract class AppTrackerRecorderModule {
 
     @Binds
     @SingleInstanceIn(VpnScope::class)
-    abstract fun providesAppTrackerRecorder(batchedAppTrackerRecorder: BatchedAppTrackerRecorder): AppTrackerRecorder
+    abstract fun providesAppTrackerRecorder(
+        batchedAppTrackerRecorder: BatchedAppTrackerRecorder
+    ): AppTrackerRecorder
 }

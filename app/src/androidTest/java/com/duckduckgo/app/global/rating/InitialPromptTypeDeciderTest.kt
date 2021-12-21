@@ -40,51 +40,57 @@ class InitialPromptTypeDeciderTest {
     private val mockOnboardingStore: OnboardingStore = mock()
 
     @Before
-    fun setup() = runBlocking<Unit> {
+    fun setup() =
+        runBlocking<Unit> {
+            testee =
+                InitialPromptTypeDecider(
+                    playStoreUtils = mockPlayStoreUtils,
+                    searchCountDao = mockSearchCountDao,
+                    initialPromptDecider = mockInitialPromptDecider,
+                    secondaryPromptDecider = mockSecondaryPromptDecider,
+                    context = InstrumentationRegistry.getInstrumentation().targetContext,
+                    onboardingStore = mockOnboardingStore)
 
-        testee = InitialPromptTypeDecider(
-            playStoreUtils = mockPlayStoreUtils,
-            searchCountDao = mockSearchCountDao,
-            initialPromptDecider = mockInitialPromptDecider,
-            secondaryPromptDecider = mockSecondaryPromptDecider,
-            context = InstrumentationRegistry.getInstrumentation().targetContext,
-            onboardingStore = mockOnboardingStore
-        )
-
-        whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
-        whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
-        whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
-        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(false)
-    }
-
-    @Test
-    fun whenPlayNotInstalledThenNoPromptShown() = runBlocking<Unit> {
-        whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(false)
-        assertPromptNotShown(testee.determineInitialPromptType())
-    }
+            whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
+            whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
+            whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
+            whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(false)
+        }
 
     @Test
-    fun whenNotEnoughSearchesMadeThenNoPromptShown() = runBlocking<Unit> {
-        whenever(mockSearchCountDao.getSearchesMade()).thenReturn(0)
-        assertPromptNotShown(testee.determineInitialPromptType())
-    }
+    fun whenPlayNotInstalledThenNoPromptShown() =
+        runBlocking<Unit> {
+            whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(false)
+            assertPromptNotShown(testee.determineInitialPromptType())
+        }
 
     @Test
-    fun whenEnoughSearchesMadeAndFirstPromptNotShownBeforeThenShouldShowFirstPrompt() = runBlocking<Unit> {
-        whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(true)
-        whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
-        val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
-        assertFirstPrompt(type.promptCount)
-    }
+    fun whenNotEnoughSearchesMadeThenNoPromptShown() =
+        runBlocking<Unit> {
+            whenever(mockSearchCountDao.getSearchesMade()).thenReturn(0)
+            assertPromptNotShown(testee.determineInitialPromptType())
+        }
 
     @Test
-    fun whenEnoughSearchesMadeAndFirstPromptShownBeforeThenShouldShowSecondPrompt() = runBlocking<Unit> {
-        whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(false)
-        whenever(mockSecondaryPromptDecider.shouldShowPrompt()).thenReturn(true)
-        whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
-        val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
-        assertSecondPrompt(type.promptCount)
-    }
+    fun whenEnoughSearchesMadeAndFirstPromptNotShownBeforeThenShouldShowFirstPrompt() =
+        runBlocking<Unit> {
+            whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(true)
+            whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
+            val type =
+                testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
+            assertFirstPrompt(type.promptCount)
+        }
+
+    @Test
+    fun whenEnoughSearchesMadeAndFirstPromptShownBeforeThenShouldShowSecondPrompt() =
+        runBlocking<Unit> {
+            whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(false)
+            whenever(mockSecondaryPromptDecider.shouldShowPrompt()).thenReturn(true)
+            whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
+            val type =
+                testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
+            assertSecondPrompt(type.promptCount)
+        }
 
     @Test
     fun whenUsersMarkedAsReturningUserThenNoPromptShown() = runBlocking {

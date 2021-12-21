@@ -41,35 +41,39 @@ class OfflinePixelSenderTest {
     private var mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private var mockPixel: PixelSender = mock()
 
-    private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel)
+    private var testee: OfflinePixelSender =
+        OfflinePixelSender(
+            mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel)
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     @Before
     fun before() {
-        val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", "version", 1588167165000)
+        val exceptionEntity =
+            UncaughtExceptionEntity(
+                1, UncaughtExceptionSource.GLOBAL, "test", "version", 1588167165000)
 
         runBlocking<Unit> {
             whenever(mockPixel.sendPixel(any(), any(), any())).thenReturn(Completable.complete())
-            whenever(mockUncaughtExceptionRepository.getExceptions()).thenReturn(listOf(exceptionEntity))
+            whenever(mockUncaughtExceptionRepository.getExceptions())
+                .thenReturn(listOf(exceptionEntity))
         }
     }
 
     @Test
     fun whenSendUncaughtExceptionsPixelThenTimestampFormattedToUtc() {
-        val params = mapOf(
-            EXCEPTION_MESSAGE to "test",
-            EXCEPTION_APP_VERSION to "version",
-            EXCEPTION_TIMESTAMP to "2020-04-29T13:32:45+0000"
-        )
+        val params =
+            mapOf(
+                EXCEPTION_MESSAGE to "test",
+                EXCEPTION_APP_VERSION to "version",
+                EXCEPTION_TIMESTAMP to "2020-04-29T13:32:45+0000")
 
         testee.sendOfflinePixels().blockingAwait()
 
-        verify(mockPixel).sendPixel(Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap())
+        verify(mockPixel)
+            .sendPixel(
+                Pixel.StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName, params, emptyMap())
     }
 }

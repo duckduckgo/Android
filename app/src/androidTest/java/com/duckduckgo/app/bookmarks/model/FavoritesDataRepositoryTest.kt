@@ -27,23 +27,19 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
+import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import dagger.Lazy
 import org.mockito.Mockito.verify
 
 @ExperimentalCoroutinesApi
 class FavoritesDataRepositoryTest {
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     private val mockFaviconManager: FaviconManager = mock()
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -53,9 +49,12 @@ class FavoritesDataRepositoryTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         favoritesDao = db.favoritesDao()
         repository = FavoritesDataRepository(favoritesDao, lazyFaviconManager)
     }
@@ -129,56 +128,63 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteDeletedThenDatabaseUpdated() = coroutineRule.runBlocking {
-        val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
-        givenFavorite(favorite)
+    fun whenFavoriteDeletedThenDatabaseUpdated() =
+        coroutineRule.runBlocking {
+            val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
+            givenFavorite(favorite)
 
-        repository.delete(favorite)
+            repository.delete(favorite)
 
-        assertNull(favoritesDao.favorite(favorite.id))
-        verify(mockFaviconManager).deletePersistedFavicon(favorite.url)
-    }
-
-    @Test
-    fun whenUserHasFavoritesThenReturnTrue() = coroutineRule.runBlocking {
-        val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
-        givenFavorite(favorite)
-
-        assertTrue(repository.userHasFavorites())
-    }
+            assertNull(favoritesDao.favorite(favorite.id))
+            verify(mockFaviconManager).deletePersistedFavicon(favorite.url)
+        }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = coroutineRule.runBlocking {
-        val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
-        val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
+    fun whenUserHasFavoritesThenReturnTrue() =
+        coroutineRule.runBlocking {
+            val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
+            givenFavorite(favorite)
 
-        repository.insert(favorite)
-        repository.insert(otherFavorite)
-
-        val result = repository.favorite("www.website.com")
-
-        assertEquals(favorite, result)
-    }
+            assertTrue(repository.userHasFavorites())
+        }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = coroutineRule.runBlocking {
-        val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
-        val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
+    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() =
+        coroutineRule.runBlocking {
+            val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
+            val otherFavorite =
+                Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
 
-        repository.insert(favorite)
-        repository.insert(otherFavorite)
+            repository.insert(favorite)
+            repository.insert(otherFavorite)
 
-        val result = repository.favorite("www.test.com")
+            val result = repository.favorite("www.website.com")
 
-        assertNull(result)
-    }
+            assertEquals(favorite, result)
+        }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = coroutineRule.runBlocking {
-        val result = repository.favorite("www.test.com")
+    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() =
+        coroutineRule.runBlocking {
+            val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
+            val otherFavorite =
+                Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
 
-        assertNull(result)
-    }
+            repository.insert(favorite)
+            repository.insert(otherFavorite)
+
+            val result = repository.favorite("www.test.com")
+
+            assertNull(result)
+        }
+
+    @Test
+    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() =
+        coroutineRule.runBlocking {
+            val result = repository.favorite("www.test.com")
+
+            assertNull(result)
+        }
 
     private fun givenFavorite(vararg favorite: Favorite) {
         favorite.forEach {
@@ -187,8 +193,10 @@ class FavoritesDataRepositoryTest {
     }
 
     private fun givenMoreFavoritesStored() {
-        favoritesDao.insert(FavoriteEntity(title = "title", url = "http://example.com", position = 0))
-        favoritesDao.insert(FavoriteEntity(title = "title 2", url = "http://other.com", position = 1))
+        favoritesDao.insert(
+            FavoriteEntity(title = "title", url = "http://example.com", position = 0))
+        favoritesDao.insert(
+            FavoriteEntity(title = "title 2", url = "http://other.com", position = 1))
     }
 
     private fun givenNoFavoritesStored() {
@@ -196,7 +204,8 @@ class FavoritesDataRepositoryTest {
     }
 
     private fun assertFavoriteExistsInDb(favorite: Favorite) {
-        val storedFavorite = favoritesDao.favorite(favorite.id) ?: error("Favorite not found in database")
+        val storedFavorite =
+            favoritesDao.favorite(favorite.id) ?: error("Favorite not found in database")
         assertEquals(storedFavorite.title, favorite.title)
         assertEquals(storedFavorite.url, favorite.url)
         assertEquals(storedFavorite.position, favorite.position)

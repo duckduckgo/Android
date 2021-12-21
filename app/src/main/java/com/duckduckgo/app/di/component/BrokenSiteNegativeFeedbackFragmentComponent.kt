@@ -30,17 +30,17 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
-interface BrokenSiteNegativeFeedbackFragmentComponent : AndroidInjector<BrokenSiteNegativeFeedbackFragment> {
+@MergeSubcomponent(scope = FragmentScope::class)
+interface BrokenSiteNegativeFeedbackFragmentComponent :
+    AndroidInjector<BrokenSiteNegativeFeedbackFragment> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<BrokenSiteNegativeFeedbackFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface BrokenSiteNegativeFeedbackFragmentComponentProvider {
-    fun provideBrokenSiteNegativeFeedbackFragmentComponentFactory(): BrokenSiteNegativeFeedbackFragmentComponent.Factory
+    fun provideBrokenSiteNegativeFeedbackFragmentComponentFactory():
+        BrokenSiteNegativeFeedbackFragmentComponent.Factory
 }
 
 @Module
@@ -49,5 +49,6 @@ abstract class BrokenSiteNegativeFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
     @ClassKey(BrokenSiteNegativeFeedbackFragment::class)
-    abstract fun BrokenSiteNegativeFeedbackFragmentComponent.Factory.bind(): AndroidInjector.Factory<*>
+    abstract fun BrokenSiteNegativeFeedbackFragmentComponent.Factory.bind():
+        AndroidInjector.Factory<*>
 }

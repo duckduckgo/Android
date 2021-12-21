@@ -45,6 +45,9 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
+import java.io.File
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -54,9 +57,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
-import java.io.File
-import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 class NetworkModule {
@@ -73,10 +73,9 @@ class NetworkModule {
         val cache = Cache(cacheLocation, CACHE_SIZE)
         return OkHttpClient.Builder()
             .addInterceptor(apiRequestInterceptor)
-            .cache(cache).apply {
-                apiInterceptorPlugins.getPlugins().forEach {
-                    addInterceptor(it.getInterceptor())
-                }
+            .cache(cache)
+            .apply {
+                apiInterceptorPlugins.getPlugins().forEach { addInterceptor(it.getInterceptor()) }
             }
             .build()
     }
@@ -121,7 +120,10 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
-    fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun nonCachingRetrofit(
+        @Named("nonCaching") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -169,7 +171,9 @@ class NetworkModule {
         retrofit.create(ResourceSurrogateListService::class.java)
 
     @Provides
-    fun appTrackingProtectionWaitlistService(@Named("api") retrofit: Retrofit): AppTrackingProtectionWaitlistService =
+    fun appTrackingProtectionWaitlistService(
+        @Named("api") retrofit: Retrofit
+    ): AppTrackingProtectionWaitlistService =
         retrofit.create(AppTrackingProtectionWaitlistService::class.java)
 
     @Provides
@@ -182,7 +186,14 @@ class NetworkModule {
         featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope)
+        BrokenSiteSubmitter(
+            statisticsStore,
+            variantManager,
+            tdsMetadataDao,
+            gpc,
+            featureToggle,
+            pixel,
+            appCoroutineScope)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
@@ -197,7 +208,13 @@ class NetworkModule {
         pixel: Pixel,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope)
+        FireAndForgetFeedbackSubmitter(
+            feedbackService,
+            variantManager,
+            apiKeyMapper,
+            statisticsStore,
+            pixel,
+            appCoroutineScope)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =

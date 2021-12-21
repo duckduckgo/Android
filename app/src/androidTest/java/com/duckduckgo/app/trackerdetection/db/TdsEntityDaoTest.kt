@@ -29,18 +29,19 @@ import org.junit.Test
 
 class TdsEntityDaoTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: AppDatabase
     private lateinit var entityDao: TdsEntityDao
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         entityDao = db.tdsEntityDao()
     }
 
@@ -52,19 +53,19 @@ class TdsEntityDaoTest {
     @Test
     fun whenListIsUpdatedThenEntitiesAreUpdated() {
 
-        val list = listOf(
-            TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
-            TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
-            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0)
-        )
+        val list =
+            listOf(
+                TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
+                TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
+                TdsEntity("Entity 3 Ltd", "Entity 3", 3.0))
 
         entityDao.updateAll(list)
 
-        val updates = listOf(
-            TdsEntity("Entity 3 LTd", "Entity 3", 4.0),
-            TdsEntity("Entity 4 Ltd", "Entity 4", 5.0),
-            TdsEntity("Entity 5 LtD", "Entity 5", 6.0)
-        )
+        val updates =
+            listOf(
+                TdsEntity("Entity 3 LTd", "Entity 3", 4.0),
+                TdsEntity("Entity 4 Ltd", "Entity 4", 5.0),
+                TdsEntity("Entity 5 LtD", "Entity 5", 6.0))
 
         entityDao.updateAll(updates)
 
@@ -76,26 +77,25 @@ class TdsEntityDaoTest {
     @Test
     fun whenEntitiesWithSameNameAddedThenOnlySingleEntryForDomainExists() {
 
-        val list = listOf(
-            TdsEntity("Entity 1 Ltd", "Entity A", 0.0),
-            TdsEntity("Entity 1 Ltd", "Entity B", 0.0),
-            TdsEntity("Entity 1 Ltd", "Entity C", 0.0)
-        )
+        val list =
+            listOf(
+                TdsEntity("Entity 1 Ltd", "Entity A", 0.0),
+                TdsEntity("Entity 1 Ltd", "Entity B", 0.0),
+                TdsEntity("Entity 1 Ltd", "Entity C", 0.0))
 
         entityDao.updateAll(list)
 
         assertEquals(1, entityDao.count())
-
     }
 
     @Test
     fun whenAllEntitiesDeletedThenGetAllIsEmpty() {
 
-        val list = listOf(
-            TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
-            TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
-            TdsEntity("Entity 3 Ltd", "Entity 3", 3.0)
-        )
+        val list =
+            listOf(
+                TdsEntity("Entity 1 Ltd", "Entity 1", 1.0),
+                TdsEntity("Entity 2 Ltd", "Entity 2", 2.0),
+                TdsEntity("Entity 3 Ltd", "Entity 3", 3.0))
 
         entityDao.updateAll(list)
 
@@ -116,5 +116,4 @@ class TdsEntityDaoTest {
     fun whenDatabaseIsNewThenItIsEmpty() {
         assertEquals(0, entityDao.count())
     }
-
 }

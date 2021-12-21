@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface WhitelistActivityComponent : AndroidInjector<WhitelistActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<WhitelistActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<WhitelistActivity>
 }
 
 @ContributesTo(AppScope::class)

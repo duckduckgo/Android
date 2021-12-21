@@ -28,8 +28,7 @@ interface AuthCookiesAllowedDomainsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity): Long
 
-    @Delete
-    fun delete(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity)
+    @Delete fun delete(authCookieAllowedDomainEntity: AuthCookieAllowedDomainEntity)
 
     @Query("SELECT * FROM auth_cookies_allowed_domains WHERE domain = :host limit 1")
     fun getDomain(host: String): AuthCookieAllowedDomainEntity?

@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import timber.log.Timber
-import xyz.hexene.localvpn.TCB
 import java.io.RandomAccessFile
 import javax.inject.Inject
+import timber.log.Timber
+import xyz.hexene.localvpn.TCB
 
 @SingleInstanceIn(VpnScope::class)
 @ContributesMultibinding(VpnScope::class)
@@ -31,13 +31,14 @@ class VpnNetworkMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin
     override fun collectMemoryMetrics(): Map<String, String> {
         Timber.v("Collecting vpn network memory resources")
 
-        val memoryStat = try {
-            val reader = RandomAccessFile(PROC_STAT_FILE_PATH, "r")
-            reader.readLine()
-        } catch (t: Throwable) {
-            Timber.e(t, "Error reading $PROC_STAT_FILE_PATH")
-            null
-        }
+        val memoryStat =
+            try {
+                val reader = RandomAccessFile(PROC_STAT_FILE_PATH, "r")
+                reader.readLine()
+            } catch (t: Throwable) {
+                Timber.e(t, "Error reading $PROC_STAT_FILE_PATH")
+                null
+            }
 
         return mutableMapOf<String, String>().apply {
             this["TCBCacheSize"] = TCB.tcbCache.size.toString()

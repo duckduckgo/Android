@@ -41,16 +41,18 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 
 @Module
 class PrivacyModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityLookup: EntityLookup): PrivacyPractices =
-        PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
+    fun privacyPractices(
+        termsOfServiceStore: TermsOfServiceStore,
+        entityLookup: EntityLookup
+    ): PrivacyPractices = PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -78,8 +80,7 @@ class PrivacyModule {
             cookieManager,
             appCacheClearer,
             geoLocationPermissions,
-            thirdPartyCookieManager
-        )
+            thirdPartyCookieManager)
     }
 
     @Provides
@@ -108,6 +109,7 @@ class PrivacyModule {
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         dispatcherProvider: DispatcherProvider
     ): GeoLocationPermissions {
-        return GeoLocationPermissionsManager(context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
+        return GeoLocationPermissionsManager(
+            context, locationPermissionsRepository, fireproofWebsiteRepository, dispatcherProvider)
     }
 }

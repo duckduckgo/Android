@@ -24,12 +24,14 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class HttpsPlugin @Inject constructor(
+class HttpsPlugin
+@Inject
+constructor(
     private val httpsRepository: HttpsRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
@@ -38,8 +40,7 @@ class HttpsPlugin @Inject constructor(
         if (name == featureName.value) {
             val httpsExceptions = mutableListOf<HttpsExceptionEntity>()
             val moshi = Moshi.Builder().build()
-            val jsonAdapter: JsonAdapter<HttpsFeature> =
-                moshi.adapter(HttpsFeature::class.java)
+            val jsonAdapter: JsonAdapter<HttpsFeature> = moshi.adapter(HttpsFeature::class.java)
 
             val httpsFeature: HttpsFeature? = jsonAdapter.fromJson(jsonString)
             httpsFeature?.exceptions?.map {

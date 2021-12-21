@@ -21,25 +21,26 @@ import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toDrmException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface DrmRepository {
     fun updateAll(exceptions: List<DrmExceptionEntity>)
     val exceptions: CopyOnWriteArrayList<DrmException>
 }
 
-class RealDrmRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    DrmRepository {
+class RealDrmRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : DrmRepository {
 
     private val drmDao: DrmDao = database.drmDao()
     override val exceptions = CopyOnWriteArrayList<DrmException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
     override fun updateAll(exceptions: List<DrmExceptionEntity>) {
@@ -49,8 +50,6 @@ class RealDrmRepository(val database: PrivacyConfigDatabase, coroutineScope: Cor
 
     private fun loadToMemory() {
         exceptions.clear()
-        drmDao.getAll().map {
-            exceptions.add(it.toDrmException())
-        }
+        drmDao.getAll().map { exceptions.add(it.toDrmException()) }
     }
 }

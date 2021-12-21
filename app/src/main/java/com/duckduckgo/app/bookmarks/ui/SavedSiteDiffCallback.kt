@@ -19,21 +19,33 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.recyclerview.widget.DiffUtil
 
 class BookmarksDiffCallback : DiffUtil.ItemCallback<BookmarksAdapter.BookmarksItemTypes>() {
-    override fun areItemsTheSame(oldItem: BookmarksAdapter.BookmarksItemTypes, newItem: BookmarksAdapter.BookmarksItemTypes): Boolean {
+    override fun areItemsTheSame(
+        oldItem: BookmarksAdapter.BookmarksItemTypes,
+        newItem: BookmarksAdapter.BookmarksItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: BookmarksAdapter.BookmarksItemTypes, newItem: BookmarksAdapter.BookmarksItemTypes): Boolean {
+    override fun areContentsTheSame(
+        oldItem: BookmarksAdapter.BookmarksItemTypes,
+        newItem: BookmarksAdapter.BookmarksItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 }
 
 class FavoritesDiffCallback : DiffUtil.ItemCallback<FavoritesAdapter.FavoriteItemTypes>() {
-    override fun areItemsTheSame(oldItem: FavoritesAdapter.FavoriteItemTypes, newItem: FavoritesAdapter.FavoriteItemTypes): Boolean {
+    override fun areItemsTheSame(
+        oldItem: FavoritesAdapter.FavoriteItemTypes,
+        newItem: FavoritesAdapter.FavoriteItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: FavoritesAdapter.FavoriteItemTypes, newItem: FavoritesAdapter.FavoriteItemTypes): Boolean {
+    override fun areContentsTheSame(
+        oldItem: FavoritesAdapter.FavoriteItemTypes,
+        newItem: FavoritesAdapter.FavoriteItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 }

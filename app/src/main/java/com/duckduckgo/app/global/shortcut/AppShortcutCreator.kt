@@ -36,24 +36,25 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
-import timber.log.Timber
-import javax.inject.Inject
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
+import javax.inject.Inject
+import timber.log.Timber
 
 @Module
 @ContributesTo(AppScope::class)
 class AppShortcutCreatorModule {
     @Provides
     @IntoSet
-    fun provideAppShortcutCreatorObserver(appShortcutCreator: AppShortcutCreator): LifecycleObserver {
+    fun provideAppShortcutCreatorObserver(
+        appShortcutCreator: AppShortcutCreator
+    ): LifecycleObserver {
         return AppShortcutCreatorLifecycleObserver(appShortcutCreator)
     }
 }
 
-class AppShortcutCreatorLifecycleObserver(
-    private val appShortcutCreator: AppShortcutCreator
-) : LifecycleObserver {
+class AppShortcutCreatorLifecycleObserver(private val appShortcutCreator: AppShortcutCreator) :
+    LifecycleObserver {
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun configureAppShortcuts() {
@@ -88,9 +89,9 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
                     it.putExtra(BrowserActivity.NEW_SEARCH_EXTRA, true)
-                }
-            )
-            .build().toShortcutInfo()
+                })
+            .build()
+            .toShortcutInfo()
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
@@ -102,22 +103,25 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
                 Intent(context, BrowserActivity::class.java).also {
                     it.action = Intent.ACTION_VIEW
                     it.putExtra(BrowserActivity.PERFORM_FIRE_ON_ENTRY_EXTRA, true)
-                }
-            )
-            .build().toShortcutInfo()
+                })
+            .build()
+            .toShortcutInfo()
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)
     private fun buildBookmarksShortcut(context: Context): ShortcutInfo {
-        val bookmarksActivity = BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
+        val bookmarksActivity =
+            BookmarksActivity.intent(context).also { it.action = Intent.ACTION_VIEW }
 
-        val stackBuilder = TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
+        val stackBuilder =
+            TaskStackBuilder.create(context).addNextIntentWithParentStack(bookmarksActivity)
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_SHOW_BOOKMARKS)
             .setShortLabel(context.getString(R.string.bookmarksActivityTitle))
             .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_bookmarks))
             .setIntents(stackBuilder.intents)
-            .build().toShortcutInfo()
+            .build()
+            .toShortcutInfo()
     }
 
     companion object {
@@ -125,5 +129,4 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
     }
-
 }

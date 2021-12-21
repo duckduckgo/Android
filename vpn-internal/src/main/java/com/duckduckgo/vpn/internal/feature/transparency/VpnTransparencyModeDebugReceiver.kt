@@ -24,22 +24,20 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
- * This receiver allows to enable/disable transparency mode. Where
- * traffic passes through the VPN but no tracker is blocked.
+ * This receiver allows to enable/disable transparency mode. Where traffic passes through the VPN
+ * but no tracker is blocked.
  *
  * $ adb shell am broadcast -a transparency --es turn <on/off>
  *
  * where `--es turn <on/off> to enable/disable VPN transparency mode
  */
-class TransparencyModeDebugReceiver(
-    context: Context,
-    receiver: (Intent) -> Unit
-) : InternalFeatureReceiver(context, receiver) {
+class TransparencyModeDebugReceiver(context: Context, receiver: (Intent) -> Unit) :
+    InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
 
@@ -47,15 +45,11 @@ class TransparencyModeDebugReceiver(
 
         private const val ACTION = "transparency"
         fun turnOnIntent(): Intent {
-            return Intent(ACTION).apply {
-                putExtra("turn", "on")
-            }
+            return Intent(ACTION).apply { putExtra("turn", "on") }
         }
 
         fun turnOffIntent(): Intent {
-            return Intent(ACTION).apply {
-                putExtra("turn", "off")
-            }
+            return Intent(ACTION).apply { putExtra("turn", "off") }
         }
 
         fun isTurnOnIntent(intent: Intent): Boolean {
@@ -68,7 +62,9 @@ class TransparencyModeDebugReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class ExceptionRulesDebugReceiverRegister @Inject constructor(
+class ExceptionRulesDebugReceiverRegister
+@Inject
+constructor(
     private val context: Context,
     private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor
 ) : VpnServiceCallbacks {
@@ -81,21 +77,25 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
 
         unregisterReceiver()
 
-        receiver = TransparencyModeDebugReceiver(context) { intent ->
-            when {
-                TransparencyModeDebugReceiver.isTurnOnIntent(intent) -> {
-                    Timber.i("Debug receiver TransparencyModeDebugReceiver turning ON transparency mode")
-                    trackerDetectorInterceptor.setEnable(true)
-                }
-                TransparencyModeDebugReceiver.isTurnOffIntent(intent) -> {
-                    Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
-                    trackerDetectorInterceptor.setEnable(false)
-                }
-                else -> {
-                    Timber.v("Debug receiver TransparencyModeDebugReceiver unknown intent")
+        receiver =
+            TransparencyModeDebugReceiver(context) { intent ->
+                when {
+                    TransparencyModeDebugReceiver.isTurnOnIntent(intent) -> {
+                        Timber.i(
+                            "Debug receiver TransparencyModeDebugReceiver turning ON transparency mode")
+                        trackerDetectorInterceptor.setEnable(true)
+                    }
+                    TransparencyModeDebugReceiver.isTurnOffIntent(intent) -> {
+                        Timber.i(
+                            "Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
+                        trackerDetectorInterceptor.setEnable(false)
+                    }
+                    else -> {
+                        Timber.v("Debug receiver TransparencyModeDebugReceiver unknown intent")
+                    }
                 }
             }
-        }.apply { register() }
+                .apply { register() }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {

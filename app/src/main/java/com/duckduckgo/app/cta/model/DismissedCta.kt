@@ -37,13 +37,8 @@ enum class CtaId {
     UNKNOWN
 }
 
-@Entity(
-    tableName = "dismissed_cta"
-)
-data class DismissedCta(
-    @PrimaryKey
-    var ctaId: CtaId
-) {
+@Entity(tableName = "dismissed_cta")
+data class DismissedCta(@PrimaryKey var ctaId: CtaId) {
 
     class IdTypeConverter {
 

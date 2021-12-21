@@ -27,8 +27,10 @@ class HeartBeatUtils {
                 return "Reason not available"
             }
 
-            return context.historicalExitReasonsByProcessName("com.duckduckgo.mobile.android.vpn:vpn", 1)
-                .firstOrNull() ?: "Reason: not found"
+            return context
+                .historicalExitReasonsByProcessName("com.duckduckgo.mobile.android.vpn:vpn", 1)
+                .firstOrNull()
+                ?: "Reason: not found"
         }
     }
 }

@@ -24,13 +24,15 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class AppDataLoader @Inject constructor(
+class AppDataLoader
+@Inject
+constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val termsOfServiceStore: TermsOfServiceStore,
     private val privacyPractices: PrivacyPractices

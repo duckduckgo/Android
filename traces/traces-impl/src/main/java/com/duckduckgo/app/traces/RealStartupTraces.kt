@@ -25,9 +25,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealStartupTraces @Inject constructor(
-    private val context: Context
-) : StartupTraces {
+class RealStartupTraces @Inject constructor(private val context: Context) : StartupTraces {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)

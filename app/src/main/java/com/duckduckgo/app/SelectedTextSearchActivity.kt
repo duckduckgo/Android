@@ -26,8 +26,9 @@ import com.duckduckgo.app.browser.BrowserActivity
 import timber.log.Timber
 
 /**
- * Exists purely to pull out the intent extra and launch the query in a new tab.
- * This needs to be its own Activity so that we can customize the label that is user-facing, presented when the user selects some text.
+ * Exists purely to pull out the intent extra and launch the query in a new tab. This needs to be
+ * its own Activity so that we can customize the label that is user-facing, presented when the user
+ * selects some text.
  */
 class SelectedTextSearchActivity : AppCompatActivity() {
 
@@ -53,5 +54,4 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
         return null
     }
-
 }

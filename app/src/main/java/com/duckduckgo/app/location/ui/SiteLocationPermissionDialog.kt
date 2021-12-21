@@ -28,18 +28,17 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.mobile.android.ui.view.gone
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class SiteLocationPermissionDialog : DialogFragment() {
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
     private var faviconJob: Job? = null
 
@@ -68,7 +67,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
+        val binding =
+            ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
         val alertDialog = AlertDialog.Builder(requireActivity()).setView(binding.root)
 
@@ -80,14 +80,12 @@ class SiteLocationPermissionDialog : DialogFragment() {
             binding.siteAllowAlwaysLocationPermission,
             binding.siteAllowOnceLocationPermission,
             binding.siteDenyOnceLocationPermission,
-            binding.siteDenyAlwaysLocationPermission
-        )
+            binding.siteDenyAlwaysLocationPermission)
         hideExtraViews(
             binding.siteAllowOnceLocationPermission,
             binding.siteDenyOnceLocationPermission,
             binding.siteAllowOnceLocationPermissionDivider,
-            binding.siteDenyLocationPermissionDivider
-        )
+            binding.siteDenyLocationPermissionDivider)
         makeCancellable()
 
         return alertDialog.create()
@@ -111,7 +109,10 @@ class SiteLocationPermissionDialog : DialogFragment() {
     }
 
     private fun populateTitle(title: TextView) {
-        title.text = getString(R.string.preciseLocationSiteDialogTitle, getOriginUrl().websiteFromGeoLocationsApiOrigin())
+        title.text =
+            getString(
+                R.string.preciseLocationSiteDialogTitle,
+                getOriginUrl().websiteFromGeoLocationsApiOrigin())
     }
 
     private fun populateSubtitle(subtitle: TextView) {
@@ -127,9 +128,10 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val tabId = getTabId()
 
         faviconJob?.cancel()
-        faviconJob = this.lifecycleScope.launch {
-            faviconManager.loadToViewFromLocalOrFallback(tabId, originUrl, imageView)
-        }
+        faviconJob =
+            this.lifecycleScope.launch {
+                faviconManager.loadToViewFromLocalOrFallback(tabId, originUrl, imageView)
+            }
     }
 
     private fun configureListeners(
@@ -141,7 +143,8 @@ class SiteLocationPermissionDialog : DialogFragment() {
         val originUrl = getOriginUrl()
         allowAlways.setOnClickListener {
             dismiss()
-            listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.ALLOW_ALWAYS)
+            listener.onSiteLocationPermissionSelected(
+                originUrl, LocationPermissionType.ALLOW_ALWAYS)
         }
         allowOnce.setOnClickListener {
             dismiss()
@@ -155,7 +158,6 @@ class SiteLocationPermissionDialog : DialogFragment() {
             dismiss()
             listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
         }
-
     }
 
     private fun hideExtraViews(
@@ -205,7 +207,11 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
         private const val DDG_DOMAIN = "duckduckgo.com"
 
-        fun instance(origin: String, isEditingPermission: Boolean, tabId: String): SiteLocationPermissionDialog {
+        fun instance(
+            origin: String,
+            isEditingPermission: Boolean,
+            tabId: String
+        ): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)

@@ -33,9 +33,7 @@ import org.junit.Test
 @Suppress("RemoveExplicitTypeArguments")
 class AppEnjoymentDatabaseRepositoryTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: AppEnjoymentDatabaseRepository
 
@@ -44,9 +42,12 @@ class AppEnjoymentDatabaseRepositoryTest {
 
     @Before
     fun setup() {
-        database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
 
         dao = database.appEnjoymentDao()
         testee = AppEnjoymentDatabaseRepository(dao)
@@ -58,69 +59,78 @@ class AppEnjoymentDatabaseRepositoryTest {
     }
 
     @Test
-    fun whenFirstCreatedThenPrompt1CanBeShown() = runBlocking<Unit> {
-        assertTrue(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenFirstCreatedThenPrompt1CanBeShown() =
+        runBlocking<Unit> { assertTrue(testee.canUserBeShownFirstPrompt()) }
 
     @Test
-    fun whenUserGaveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
-        testee.onUserSelectedToGiveFeedback(FIRST_PROMPT)
-        assertFalse(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenUserGaveFeedbackForPrompt1ThenPrompt1CannotBeShown() =
+        runBlocking<Unit> {
+            testee.onUserSelectedToGiveFeedback(FIRST_PROMPT)
+            assertFalse(testee.canUserBeShownFirstPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedToGiveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
-        testee.onUserDeclinedToGiveFeedback(FIRST_PROMPT)
-        assertFalse(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenUserDeclinedToGiveFeedbackForPrompt1ThenPrompt1CannotBeShown() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToGiveFeedback(FIRST_PROMPT)
+            assertFalse(testee.canUserBeShownFirstPrompt())
+        }
 
     @Test
-    fun whenUserGaveRatingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
-        testee.onUserSelectedToRateApp(FIRST_PROMPT)
-        assertFalse(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenUserGaveRatingForPrompt1ThenPrompt1CannotBeShown() =
+        runBlocking<Unit> {
+            testee.onUserSelectedToRateApp(FIRST_PROMPT)
+            assertFalse(testee.canUserBeShownFirstPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedRatingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
-        testee.onUserDeclinedToRateApp(FIRST_PROMPT)
-        assertFalse(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenUserDeclinedRatingForPrompt1ThenPrompt1CannotBeShown() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToRateApp(FIRST_PROMPT)
+            assertFalse(testee.canUserBeShownFirstPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
-        testee.onUserDeclinedToSayIfEnjoyingApp(FIRST_PROMPT)
-        assertFalse(testee.canUserBeShownFirstPrompt())
-    }
+    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt1ThenPrompt1CannotBeShown() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToSayIfEnjoyingApp(FIRST_PROMPT)
+            assertFalse(testee.canUserBeShownFirstPrompt())
+        }
 
     @Test
-    fun whenUserGaveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
-        testee.onUserSelectedToGiveFeedback(SECOND_PROMPT)
-        assertFalse(testee.canUserBeShownSecondPrompt())
-    }
+    fun whenUserGaveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() =
+        runBlocking<Unit> {
+            testee.onUserSelectedToGiveFeedback(SECOND_PROMPT)
+            assertFalse(testee.canUserBeShownSecondPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedToGiveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
-        testee.onUserDeclinedToGiveFeedback(SECOND_PROMPT)
-        assertFalse(testee.canUserBeShownSecondPrompt())
-    }
+    fun whenUserDeclinedToGiveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToGiveFeedback(SECOND_PROMPT)
+            assertFalse(testee.canUserBeShownSecondPrompt())
+        }
 
     @Test
-    fun whenUserGaveRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
-        testee.onUserSelectedToRateApp(SECOND_PROMPT)
-        assertFalse(testee.canUserBeShownSecondPrompt())
-    }
+    fun whenUserGaveRatingForPrompt2ThenPrompt2CannotBeShownAgain() =
+        runBlocking<Unit> {
+            testee.onUserSelectedToRateApp(SECOND_PROMPT)
+            assertFalse(testee.canUserBeShownSecondPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
-        testee.onUserDeclinedToRateApp(SECOND_PROMPT)
-        assertFalse(testee.canUserBeShownSecondPrompt())
-    }
+    fun whenUserDeclinedRatingForPrompt2ThenPrompt2CannotBeShownAgain() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToRateApp(SECOND_PROMPT)
+            assertFalse(testee.canUserBeShownSecondPrompt())
+        }
 
     @Test
-    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
-        testee.onUserDeclinedToSayIfEnjoyingApp(SECOND_PROMPT)
-        assertFalse(testee.canUserBeShownSecondPrompt())
-    }
+    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt2ThenPrompt2CannotBeShownAgain() =
+        runBlocking<Unit> {
+            testee.onUserDeclinedToSayIfEnjoyingApp(SECOND_PROMPT)
+            assertFalse(testee.canUserBeShownSecondPrompt())
+        }
 
     companion object {
         private val FIRST_PROMPT = PromptCount(1)

@@ -45,23 +45,29 @@ class ClearDataNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(false)
-        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
-        assertTrue(testee.canShow())
-    }
+    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(false)
+            whenever(settingsDataStore.automaticallyClearWhatOption)
+                .thenReturn(ClearWhatOption.CLEAR_NONE)
+            assertTrue(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(false)
-        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(false)
+            whenever(settingsDataStore.automaticallyClearWhatOption)
+                .thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
+            assertFalse(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(true)
-        whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(true)
+            whenever(settingsDataStore.automaticallyClearWhatOption)
+                .thenReturn(ClearWhatOption.CLEAR_NONE)
+            assertFalse(testee.canShow())
+        }
 }

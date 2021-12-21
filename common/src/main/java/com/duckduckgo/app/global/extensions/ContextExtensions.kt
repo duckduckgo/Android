@@ -27,7 +27,8 @@ import java.util.*
 fun Context.historicalExitReasonsByProcessName(name: String, n: Int = 10): List<String> {
     val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
 
-    return activityManager.getHistoricalProcessExitReasons(null, 0, 0)
+    return activityManager
+        .getHistoricalProcessExitReasons(null, 0, 0)
         .filter { it.processName == name }
         .take(n)
         .map { "[${Date(it.timestamp)} - Reason: ${it.reason}: ${it.description}" }

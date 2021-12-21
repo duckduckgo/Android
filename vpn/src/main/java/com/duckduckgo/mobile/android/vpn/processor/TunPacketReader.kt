@@ -23,14 +23,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
-import xyz.hexene.localvpn.Packet
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
+import xyz.hexene.localvpn.Packet
 
-class TunPacketReader @AssistedInject constructor(
+class TunPacketReader
+@AssistedInject
+constructor(
     @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter
@@ -61,7 +63,6 @@ class TunPacketReader @AssistedInject constructor(
                     Timber.w(e, "Failed while reading from the TUN")
                 }
             }
-
         } catch (e: InterruptedException) {
             Timber.w(e, "Thread interrupted")
             running = false

@@ -25,10 +25,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(
-    scope = AppScope::class,
-    replaces = [StatisticsLibraryConfigModule::class]
-)
+@ContributesTo(scope = AppScope::class, replaces = [StatisticsLibraryConfigModule::class])
 class InternalStatisticsLibraryConfigModule {
     @Provides
     @SingleInstanceIn(AppScope::class)

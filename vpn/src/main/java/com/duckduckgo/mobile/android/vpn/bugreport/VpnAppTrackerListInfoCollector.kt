@@ -20,11 +20,13 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
-class VpnAppTrackerListInfoCollector @Inject constructor(
+class VpnAppTrackerListInfoCollector
+@Inject
+constructor(
     private val vpnDatabase: VpnDatabase,
 ) : VpnStateCollectorPlugin {
 
@@ -33,9 +35,23 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
         return JSONObject().apply {
-            put(APP_TRACKER_BLOCKLIST, vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag.orEmpty())
-            put(APP_EXCLUSION_LIST, vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag.orEmpty())
-            put(APP_EXCEPTION_RULE_LIST, vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag.orEmpty())
+            put(
+                APP_TRACKER_BLOCKLIST,
+                vpnDatabase
+                    .vpnAppTrackerBlockingDao()
+                    .getTrackerBlocklistMetadata()
+                    ?.eTag
+                    .orEmpty())
+            put(
+                APP_EXCLUSION_LIST,
+                vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag.orEmpty())
+            put(
+                APP_EXCEPTION_RULE_LIST,
+                vpnDatabase
+                    .vpnAppTrackerBlockingDao()
+                    .getTrackerExceptionRulesMetadata()
+                    ?.eTag
+                    .orEmpty())
         }
     }
 

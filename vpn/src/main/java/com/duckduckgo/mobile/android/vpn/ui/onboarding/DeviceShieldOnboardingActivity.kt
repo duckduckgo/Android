@@ -33,13 +33,13 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
-class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding) {
+class DeviceShieldOnboardingActivity :
+    AppCompatActivity(R.layout.activity_device_shield_onboarding) {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
     private lateinit var viewPager: ViewPager2
 
@@ -49,7 +49,9 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     private lateinit var onboardingClose: ImageButton
     private lateinit var enableDeviceShieldToggle: View
 
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 
     private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
 
@@ -74,30 +76,25 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private fun configureUI() {
         viewPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages)
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                showOnboardingPage(position)
-                super.onPageSelected(position)
-            }
-        })
+        viewPager.registerOnPageChangeCallback(
+            object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    showOnboardingPage(position)
+                    super.onPageSelected(position)
+                }
+            })
 
         onboardingFAQCta.setOnClickListener {
-            DeviceShieldFAQActivity.intent(this).also {
-                startActivity(it)
-            }
+            DeviceShieldFAQActivity.intent(this).also { startActivity(it) }
         }
 
         nextOnboardingPageCta.setOnClickListener {
             viewPager.currentItem = viewPager.currentItem + 1
         }
 
-        onboardingClose.setOnClickListener {
-            close()
-        }
+        onboardingClose.setOnClickListener { close() }
 
-        enableDeviceShieldToggle.setOnClickListener {
-            startVpnIfAllowed()
-        }
+        enableDeviceShieldToggle.setOnClickListener { startVpnIfAllowed() }
     }
 
     private fun showOnboardingPage(position: Int) {

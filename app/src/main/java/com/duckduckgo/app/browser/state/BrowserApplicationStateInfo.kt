@@ -29,9 +29,10 @@ import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class BrowserApplicationStateInfo @Inject constructor(
-    private val observers: DaggerSet<BrowserLifecycleObserver>
-) : ActivityLifecycleCallbacks {
+class BrowserApplicationStateInfo
+@Inject
+constructor(private val observers: DaggerSet<BrowserLifecycleObserver>) :
+    ActivityLifecycleCallbacks {
     private var created = 0
     private var started = 0
     private var resumed = 0

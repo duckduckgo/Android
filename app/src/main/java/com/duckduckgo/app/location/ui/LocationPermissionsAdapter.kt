@@ -34,11 +34,11 @@ import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEntryBindin
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsSectionTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsToggleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -81,7 +81,8 @@ class LocationPermissionsAdapter(
                 allowedLocationPermissions.clear()
                 deniedLocationPermissions.clear()
                 value.forEach {
-                    if (it.permission == LocationPermissionType.ALLOW_ONCE || it.permission == LocationPermissionType.ALLOW_ALWAYS) {
+                    if (it.permission == LocationPermissionType.ALLOW_ONCE ||
+                        it.permission == LocationPermissionType.ALLOW_ALWAYS) {
                         allowedLocationPermissions.add(it)
                     } else {
                         deniedLocationPermissions.add(it)
@@ -98,19 +99,24 @@ class LocationPermissionsAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationPermissionsViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): LocationPermissionsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
-                val binding = ViewLocationPermissionsDescriptionBinding.inflate(inflater, parent, false)
+                val binding =
+                    ViewLocationPermissionsDescriptionBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding)
             }
             TOGGLE_TYPE -> {
                 val binding = ViewLocationPermissionsToggleBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(
                     binding,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onLocationPermissionToggled(isChecked) }
-                )
+                    CompoundButton.OnCheckedChangeListener { _, isChecked ->
+                        viewModel.onLocationPermissionToggled(isChecked)
+                    })
             }
             DIVIDER_TYPE -> {
                 val binding = ViewLocationPermissionsDividerBinding.inflate(inflater, parent, false)
@@ -118,19 +124,24 @@ class LocationPermissionsAdapter(
             }
             PRECISE_LOCATION_DOMAIN_TYPE -> {
                 val binding = ViewLocationPermissionsEntryBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(inflater, binding, viewModel, lifecycleOwner, faviconManager)
+                LocationPermissionsViewHolder.LocationPermissionsItemViewHolder(
+                    inflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
-                val binding = ViewLocationPermissionsEmptyHintBinding.inflate(inflater, parent, false)
+                val binding =
+                    ViewLocationPermissionsEmptyHintBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsSimpleViewViewHolder(binding)
             }
             ALLOWED_SITES_SECTION_TITLE_TYPE -> {
-                val binding = ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
+                val binding =
+                    ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
                 LocationPermissionsViewHolder.LocationPermissionsAllowedSectionViewHolder(binding)
             }
             DENIED_SITES_SECTION_TITLE_TYPE -> {
-                val binding = ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
-                binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+                val binding =
+                    ViewLocationPermissionsSectionTitleBinding.inflate(inflater, parent, false)
+                binding.locationPermissionsSectionTitle.setText(
+                    R.string.preciseLocationDeniedSitesSectionTitle)
                 LocationPermissionsViewHolder.LocationPermissionsDeniedSectionViewHolder(binding)
             }
             else -> throw IllegalArgumentException("viewType not found")
@@ -140,7 +151,8 @@ class LocationPermissionsAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position < getSortedHeaderElements().size) {
             getSortedHeaderElements()[position]
-        } else if (deniedLocationPermissions.isNotEmpty() && position == getSortedHeaderElements().size + allowedLocationPermissions.size) {
+        } else if (deniedLocationPermissions.isNotEmpty() &&
+            position == getSortedHeaderElements().size + allowedLocationPermissions.size) {
             DENIED_SITES_SECTION_TITLE_TYPE
         } else {
             getListItemType()
@@ -168,11 +180,12 @@ class LocationPermissionsAdapter(
         return getItemsSize() + itemsNotOnList()
     }
 
-    private fun getItemsSize() = if (locationPermissions.isEmpty()) {
-        EMPTY_HINT_ITEM_SIZE
-    } else {
-        locationPermissions.size
-    }
+    private fun getItemsSize() =
+        if (locationPermissions.isEmpty()) {
+            EMPTY_HINT_ITEM_SIZE
+        } else {
+            locationPermissions.size
+        }
 
     private fun itemsNotOnList(): Int {
         return if (deniedLocationPermissions.isEmpty()) {
@@ -184,10 +197,12 @@ class LocationPermissionsAdapter(
 
     private fun getLocationPermission(position: Int): LocationPermissionEntity {
         return if (allowedLocationPermissions.isNotEmpty()) {
-            if (position >= getSortedHeaderElements().size && position < getSortedHeaderElements().size + allowedLocationPermissions.size) {
+            if (position >= getSortedHeaderElements().size &&
+                position < getSortedHeaderElements().size + allowedLocationPermissions.size) {
                 allowedLocationPermissions[position - getSortedHeaderElements().size]
             } else {
-                deniedLocationPermissions[position - itemsNotOnList() - allowedLocationPermissions.size]
+                deniedLocationPermissions[
+                    position - itemsNotOnList() - allowedLocationPermissions.size]
             }
         } else {
             deniedLocationPermissions[position - itemsNotOnList()]
@@ -208,30 +223,35 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
     class LocationPermissionsToggleViewHolder(
         private val binding: ViewLocationPermissionsToggleBinding,
         private val listener: CompoundButton.OnCheckedChangeListener
-    ) :
-        LocationPermissionsViewHolder(binding.root) {
+    ) : LocationPermissionsViewHolder(binding.root) {
         fun bind(locationPermissionEnabled: Boolean) {
-            binding.locationPermissionsToggle.quietlySetIsChecked(locationPermissionEnabled, listener)
+            binding.locationPermissionsToggle.quietlySetIsChecked(
+                locationPermissionEnabled, listener)
         }
     }
 
-    class LocationPermissionsAllowedSectionViewHolder(private val binding: ViewLocationPermissionsSectionTitleBinding) :
-        LocationPermissionsViewHolder(binding.root) {
+    class LocationPermissionsAllowedSectionViewHolder(
+        private val binding: ViewLocationPermissionsSectionTitleBinding
+    ) : LocationPermissionsViewHolder(binding.root) {
         fun bind(allowedPermissions: Boolean) {
-            binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationAllowedSitesSectionTitle)
+            binding.locationPermissionsSectionTitle.setText(
+                R.string.preciseLocationAllowedSitesSectionTitle)
             binding.root.isGone = !allowedPermissions
         }
     }
 
-    class LocationPermissionsDeniedSectionViewHolder(private val binding: ViewLocationPermissionsSectionTitleBinding) :
-        LocationPermissionsViewHolder(binding.root) {
+    class LocationPermissionsDeniedSectionViewHolder(
+        private val binding: ViewLocationPermissionsSectionTitleBinding
+    ) : LocationPermissionsViewHolder(binding.root) {
         fun bind(deniedPermissionsItems: Boolean) {
-            binding.locationPermissionsSectionTitle.setText(R.string.preciseLocationDeniedSitesSectionTitle)
+            binding.locationPermissionsSectionTitle.setText(
+                R.string.preciseLocationDeniedSitesSectionTitle)
             binding.locationPermissionsSectionTitle.isGone = !deniedPermissionsItems
         }
     }
 
-    class LocationPermissionsSimpleViewViewHolder(binding: ViewBinding) : LocationPermissionsViewHolder(binding.root)
+    class LocationPermissionsSimpleViewViewHolder(binding: ViewBinding) :
+        LocationPermissionsViewHolder(binding.root)
 
     class LocationPermissionsItemViewHolder(
         private val layoutInflater: LayoutInflater,
@@ -239,8 +259,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
         private val viewModel: LocationPermissionsViewModel,
         private val lifecycleOwner: LifecycleOwner,
         private val faviconManager: FaviconManager
-    ) :
-        LocationPermissionsViewHolder(binding.root) {
+    ) : LocationPermissionsViewHolder(binding.root) {
 
         private val context: Context = binding.root.context
         private lateinit var entity: LocationPermissionEntity
@@ -251,22 +270,19 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             this.entity = entity
             val website = entity.domain.websiteFromGeoLocationsApiOrigin()
 
-            singleListItem.contentDescription = context.getString(
-                R.string.preciseLocationDeleteContentDescription,
-                website
-            )
+            singleListItem.contentDescription =
+                context.getString(R.string.preciseLocationDeleteContentDescription, website)
 
             singleListItem.setTitle(website)
             loadFavicon(entity.domain)
 
-            singleListItem.setOverflowClickListener { anchor ->
-                showOverFlowMenu(anchor, entity)
-            }
+            singleListItem.setOverflowClickListener { anchor -> showOverFlowMenu(anchor, entity) }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = itemView.findViewById(R.id.image))
             }
         }
 

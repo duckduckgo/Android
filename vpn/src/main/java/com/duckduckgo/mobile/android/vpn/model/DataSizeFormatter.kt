@@ -20,7 +20,9 @@ import java.text.NumberFormat
 import javax.inject.Inject
 import javax.inject.Named
 
-class DataSizeFormatter @Inject constructor(@Named("numberFormatterWithSeparator") val numberFormatter: NumberFormat) {
+class DataSizeFormatter
+@Inject
+constructor(@Named("numberFormatterWithSeparator") val numberFormatter: NumberFormat) {
 
     fun format(bytes: Long): String {
 
@@ -33,12 +35,10 @@ class DataSizeFormatter @Inject constructor(@Named("numberFormatterWithSeparator
                 val formatted = bytes.toDouble() / BYTES_PER_MEGABYTE
                 "${numberFormatter.format(formatted)} MB"
             }
-
             (bytes >= BYTES_PER_KILOBYTE) -> {
                 val formatted = bytes.toDouble() / BYTES_PER_KILOBYTE
                 "${numberFormatter.format(formatted)} KB"
             }
-
             else -> "${numberFormatter.format(bytes)} bytes"
         }
     }

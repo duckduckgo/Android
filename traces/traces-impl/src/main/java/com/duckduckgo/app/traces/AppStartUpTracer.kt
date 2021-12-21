@@ -33,14 +33,13 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = LifecycleObserver::class
-)
+@ContributesMultibinding(scope = AppScope::class, boundType = LifecycleObserver::class)
 class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEventObserver {
 
     // content provide shall have empty constructor
-    private val startupTraces: StartupTraces by lazy { RealStartupTraces(context!!.applicationContext) }
+    private val startupTraces: StartupTraces by lazy {
+        RealStartupTraces(context!!.applicationContext)
+    }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         if (event == Lifecycle.Event.ON_START) {
@@ -51,21 +50,14 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
     override fun onCreate(): Boolean {
         if (startupTraces.isTraceEnabled) {
             val tracesDirPath = context!!.applicationInfo.dataDir
-            val fileNameFormat = SimpleDateFormat(
-                "yyyy-MM-dd_HH-mm-ss_SSS'.trace'",
-                Locale.US
-            )
+            val fileNameFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS'.trace'", Locale.US)
             val fileName = fileNameFormat.format(Date())
             val traceFilePath = "$tracesDirPath/$fileName"
             // Save up to 50Mb data.
             val maxBufferSize = 50 * 1000 * 1000
             // Sample every 1000 microsecond (1ms)
             val samplingIntervalUs = 1000
-            Debug.startMethodTracingSampling(
-                traceFilePath,
-                maxBufferSize,
-                samplingIntervalUs
-            )
+            Debug.startMethodTracingSampling(traceFilePath, maxBufferSize, samplingIntervalUs)
         }
 
         return false

@@ -47,27 +47,30 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+        val isGpcEnabled =
+            (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true &&
+                    gpc.isEnabled())
+                .toString()
 
         appCoroutineScope.launch(Dispatchers.IO) {
-            val params = mapOf(
-                CATEGORY_KEY to brokenSite.category,
-                SITE_URL_KEY to brokenSite.siteUrl,
-                UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
-                TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
-                APP_VERSION_KEY to BuildConfig.VERSION_NAME,
-                ATB_KEY to atbWithVariant(),
-                OS_KEY to Build.VERSION.SDK_INT.toString(),
-                MANUFACTURER_KEY to Build.MANUFACTURER,
-                MODEL_KEY to Build.MODEL,
-                WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
-                SITE_TYPE_KEY to brokenSite.siteType,
-                GPC to isGpcEnabled
-            )
-            val encodedParams = mapOf(
-                BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
-                SURROGATES_KEY to brokenSite.surrogates
-            )
+            val params =
+                mapOf(
+                    CATEGORY_KEY to brokenSite.category,
+                    SITE_URL_KEY to brokenSite.siteUrl,
+                    UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
+                    TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
+                    APP_VERSION_KEY to BuildConfig.VERSION_NAME,
+                    ATB_KEY to atbWithVariant(),
+                    OS_KEY to Build.VERSION.SDK_INT.toString(),
+                    MANUFACTURER_KEY to Build.MANUFACTURER,
+                    MODEL_KEY to Build.MODEL,
+                    WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
+                    SITE_TYPE_KEY to brokenSite.siteType,
+                    GPC to isGpcEnabled)
+            val encodedParams =
+                mapOf(
+                    BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
+                    SURROGATES_KEY to brokenSite.surrogates)
             runCatching {
                 pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }

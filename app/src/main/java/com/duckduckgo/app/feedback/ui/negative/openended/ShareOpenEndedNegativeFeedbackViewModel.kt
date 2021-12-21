@@ -33,23 +33,34 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
         command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
     }
 
-    fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
-        command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
+    fun userSubmittingNegativeFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        openEndedComment: String
+    ) {
+        command.value =
+            Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
     }
 
     sealed class Command {
-        data class ExitAndSubmitNegativeFeedback(val mainReason: MainReason, val subReason: SubReason?, val feedback: String) : Command()
+        data class ExitAndSubmitNegativeFeedback(
+            val mainReason: MainReason,
+            val subReason: SubReason?,
+            val feedback: String
+        ) : Command()
         data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
         object Exit : Command()
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class ShareOpenEndedNegativeFeedbackViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+class ShareOpenEndedNegativeFeedbackViewModelFactory @Inject constructor() :
+    ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) -> (ShareOpenEndedNegativeFeedbackViewModel() as T)
+                isAssignableFrom(ShareOpenEndedNegativeFeedbackViewModel::class.java) ->
+                    (ShareOpenEndedNegativeFeedbackViewModel() as T)
                 else -> null
             }
         }

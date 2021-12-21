@@ -23,11 +23,11 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
 
@@ -36,14 +36,20 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
     private val choices = MutableStateFlow(CHOICES)
     private var refreshTickerChannel = MutableStateFlow(System.currentTimeMillis())
 
-    private val command = Channel<ReportBreakageSingleChoiceFormView.Command>(1, BufferOverflow.DROP_OLDEST)
-    internal fun commands(): Flow<ReportBreakageSingleChoiceFormView.Command> = command.receiveAsFlow()
+    private val command =
+        Channel<ReportBreakageSingleChoiceFormView.Command>(1, BufferOverflow.DROP_OLDEST)
+    internal fun commands(): Flow<ReportBreakageSingleChoiceFormView.Command> =
+        command.receiveAsFlow()
 
     internal fun getChoices(): Flow<ReportBreakageSingleChoiceFormView.State> {
-        return choices.asStateFlow()
+        return choices
+            .asStateFlow()
             .combine(refreshTickerChannel) { choices, _ -> choices }
             .map { it.update(selectedChoice) }
-            .map { ReportBreakageSingleChoiceFormView.State(it, canSubmit = it.any { choice -> choice.isSelected }) }
+            .map {
+                ReportBreakageSingleChoiceFormView.State(
+                    it, canSubmit = it.any { choice -> choice.isSelected })
+            }
     }
 
     internal fun onChoiceSelected(choice: Choice) {
@@ -67,17 +73,19 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
 
     companion object {
         @VisibleForTesting
-        val CHOICES = listOf(
-            Choice(R.string.atp_ReportBreakageChoiceLoggedIn),
-            Choice(R.string.atp_ReportBreakageChoiceProblemWhenLogin),
-            Choice(R.string.atp_ReportBreakageChoiceProblemCreatingAccount),
-            Choice(R.string.atp_ReportBreakageChoiceNoLogging),
-        )
+        val CHOICES =
+            listOf(
+                Choice(R.string.atp_ReportBreakageChoiceLoggedIn),
+                Choice(R.string.atp_ReportBreakageChoiceProblemWhenLogin),
+                Choice(R.string.atp_ReportBreakageChoiceProblemCreatingAccount),
+                Choice(R.string.atp_ReportBreakageChoiceNoLogging),
+            )
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class ReportBreakageSingleChoiceFormViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
+class ReportBreakageSingleChoiceFormViewModelFactory @Inject constructor() :
+    ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

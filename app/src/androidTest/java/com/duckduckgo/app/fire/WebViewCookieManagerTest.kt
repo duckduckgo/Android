@@ -32,20 +32,15 @@ private data class Cookie(val url: String, val value: String)
 
 @ExperimentalCoroutinesApi
 class WebViewCookieManagerTest {
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     private val removeCookieStrategy = mock<RemoveCookiesStrategy>()
     private val cookieManager = mock<CookieManager>()
     private val ddgCookie = Cookie(DDG_HOST, "da=abc")
     private val externalHostCookie = Cookie("example.com", "dz=zyx")
-    private val testee: WebViewCookieManager = WebViewCookieManager(
-        cookieManager,
-        DDG_HOST,
-        removeCookieStrategy,
-        coroutineRule.testDispatcherProvider
-    )
+    private val testee: WebViewCookieManager =
+        WebViewCookieManager(
+            cookieManager, DDG_HOST, removeCookieStrategy, coroutineRule.testDispatcherProvider)
 
     @Before
     fun setup() {
@@ -55,54 +50,50 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesRemovedThenInternalCookiesRecreated() = coroutineRule.runBlocking {
-        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+    fun whenCookiesRemovedThenInternalCookiesRecreated() =
+        coroutineRule.runBlocking {
+            givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
+            withContext(Dispatchers.Main) { testee.removeExternalCookies() }
+
+            verify(cookieManager).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
         }
-
-        verify(cookieManager).setCookie(eq(ddgCookie.url), eq(ddgCookie.value), any())
-    }
 
     @Test
-    fun whenCookiesStoredThenRemoveCookiesExecuted() = coroutineRule.runBlocking {
-        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+    fun whenCookiesStoredThenRemoveCookiesExecuted() =
+        coroutineRule.runBlocking {
+            givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
+            withContext(Dispatchers.Main) { testee.removeExternalCookies() }
+
+            verify(removeCookieStrategy).removeCookies()
         }
-
-        verify(removeCookieStrategy).removeCookies()
-    }
 
     @Test
-    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = coroutineRule.runBlocking {
-        givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
+    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() =
+        coroutineRule.runBlocking {
+            givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
-        }
+            withContext(Dispatchers.Main) { testee.removeExternalCookies() }
 
-        cookieManager.inOrder {
-            verify().flush()
-            verify().getCookie(DDG_HOST)
-            verify().hasCookies()
-            verify().setCookie(eq(DDG_HOST), any(), any())
-            verify().flush()
+            cookieManager.inOrder {
+                verify().flush()
+                verify().getCookie(DDG_HOST)
+                verify().hasCookies()
+                verify().setCookie(eq(DDG_HOST), any(), any())
+                verify().flush()
+            }
         }
-    }
 
     @Test
-    fun whenNoCookiesThenRemoveProcessNotExecuted() = coroutineRule.runBlocking {
-        givenCookieManagerWithCookies()
+    fun whenNoCookiesThenRemoveProcessNotExecuted() =
+        coroutineRule.runBlocking {
+            givenCookieManagerWithCookies()
 
-        withContext(Dispatchers.Main) {
-            testee.removeExternalCookies()
+            withContext(Dispatchers.Main) { testee.removeExternalCookies() }
+
+            verifyZeroInteractions(removeCookieStrategy)
         }
-
-        verifyZeroInteractions(removeCookieStrategy)
-    }
 
     private fun givenCookieManagerWithCookies(vararg cookies: Cookie) {
         if (cookies.isEmpty()) {

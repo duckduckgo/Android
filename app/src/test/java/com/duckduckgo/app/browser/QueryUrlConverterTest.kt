@@ -37,7 +37,9 @@ class QueryUrlConverterTest {
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
-    private val requestRewriter = DuckDuckGoRequestRewriter(DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
+    private val requestRewriter =
+        DuckDuckGoRequestRewriter(
+            DuckDuckGoUrlDetector(), mockStatisticsStore, variantManager, mockAppReferrerDataStore)
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Before
@@ -101,21 +103,27 @@ class QueryUrlConverterTest {
     @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsFalseThenSearchQueryBuilt() {
         val input = "example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = false))
+        val result =
+            testee.convertQueryToUrl(
+                input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = false))
         assertDuckDuckGoSearchQuery("example.com", result)
     }
 
     @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsTrueThenUrlReturned() {
         val input = "http://example.com"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        val result =
+            testee.convertQueryToUrl(
+                input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
         assertEquals(input, result)
     }
 
     @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsNullAndIsNotUrlThenSearchQueryBuilt() {
         val input = "foo"
-        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
+        val result =
+            testee.convertQueryToUrl(
+                input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = null))
         assertDuckDuckGoSearchQuery("foo", result)
     }
 
@@ -123,7 +131,8 @@ class QueryUrlConverterTest {
     fun whenConvertQueryToUrlContainsAMajorVerticalThenVerticalAddedToUrl() {
         val input = "foo"
         val vertical = QueryUrlConverter.majorVerticals.random()
-        val result = testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
+        val result =
+            testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
         assertTrue(result.contains("iar=$vertical"))
     }
 
@@ -131,7 +140,8 @@ class QueryUrlConverterTest {
     fun whenConvertQueryToUrlContainsANonMajorVerticalThenVerticalNotAddedToUrl() {
         val input = "foo"
         val vertical = "nonMajor"
-        val result = testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
+        val result =
+            testee.convertQueryToUrl(input, vertical = vertical, queryOrigin = QueryOrigin.FromUser)
         assertFalse(result.contains("iar=$vertical"))
     }
 
@@ -143,6 +153,8 @@ class QueryUrlConverterTest {
         assertEquals("ddg_android", uri.getQueryParameter("t"))
         val encodedQuery = uri.encodedQuery
         assertNotNull(encodedQuery)
-        assertTrue("Query string doesn't match. Expected `q=$query` somewhere in query ${uri.encodedQuery}", encodedQuery!!.contains("q=$query"))
+        assertTrue(
+            "Query string doesn't match. Expected `q=$query` somewhere in query ${uri.encodedQuery}",
+            encodedQuery!!.contains("q=$query"))
     }
 }

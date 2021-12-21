@@ -21,8 +21,8 @@ import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
 import com.duckduckgo.di.scopes.AppScope
-import kotlinx.coroutines.flow.Flow
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SingleInstanceIn(AppScope::class)
@@ -31,10 +31,12 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 0 order by position limit 1")
     abstract fun firstTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
+    @Query(
+        "select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun selectedTab(): TabEntity?
 
-    @Query("select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
+    @Query(
+        "select * from tabs inner join tab_selection on tabs.tabId = tab_selection.tabId order by position limit 1")
     abstract fun liveSelectedTab(): LiveData<TabEntity>
 
     @Query("select * from tabs where deletable is 0 order by position")
@@ -49,23 +51,18 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 1 order by position")
     abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 
-    @Query("select * from tabs where tabId = :tabId")
-    abstract fun tab(tabId: String): TabEntity?
+    @Query("select * from tabs where tabId = :tabId") abstract fun tab(tabId: String): TabEntity?
 
     @Query("select tabId from tabs where url LIKE :query")
     abstract suspend fun selectTabByUrl(query: String): String?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertTab(tab: TabEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) abstract fun insertTab(tab: TabEntity)
 
-    @Update
-    abstract fun updateTab(tab: TabEntity)
+    @Update abstract fun updateTab(tab: TabEntity)
 
-    @Delete
-    abstract fun deleteTab(tab: TabEntity)
+    @Delete abstract fun deleteTab(tab: TabEntity)
 
-    @Query("delete from tabs where deletable is 1")
-    abstract fun deleteTabsMarkedAsDeletable()
+    @Query("delete from tabs where deletable is 1") abstract fun deleteTabsMarkedAsDeletable()
 
     @Transaction
     open fun markTabAsDeletable(tab: TabEntity) {
@@ -73,18 +70,14 @@ abstract class TabsDao {
         deleteTabsMarkedAsDeletable()
         // ensure the tab is in the DB
         val dbTab = tab(tab.tabId)
-        dbTab?.let {
-            updateTab(dbTab.copy(deletable = true))
-        }
+        dbTab?.let { updateTab(dbTab.copy(deletable = true)) }
     }
 
     @Transaction
     open fun undoDeletableTab(tab: TabEntity) {
         // ensure the tab is in the DB
         val dbTab = tab(tab.tabId)
-        dbTab?.let {
-            updateTab(dbTab.copy(deletable = false))
-        }
+        dbTab?.let { updateTab(dbTab.copy(deletable = false)) }
     }
 
     @Transaction
@@ -93,16 +86,12 @@ abstract class TabsDao {
         if (selectedTab() != null) {
             return
         }
-        firstTab()?.let {
-            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
-        }
+        firstTab()?.let { insertTabSelection(TabSelectionEntity(tabId = it.tabId)) }
     }
 
-    @Query("delete from tabs")
-    abstract fun deleteAllTabs()
+    @Query("delete from tabs") abstract fun deleteAllTabs()
 
-    @Query("delete from tabs where url is null")
-    abstract fun deleteBlankTabs()
+    @Query("delete from tabs where url is null") abstract fun deleteBlankTabs()
 
     @Query("update tabs set position = position + 1 where position >= :position")
     abstract fun incrementPositionStartingAt(position: Int)
@@ -122,9 +111,7 @@ abstract class TabsDao {
             return
         }
 
-        firstTab()?.let {
-            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
-        }
+        firstTab()?.let { insertTabSelection(TabSelectionEntity(tabId = it.tabId)) }
     }
 
     @Transaction
@@ -140,9 +127,7 @@ abstract class TabsDao {
             return
         }
 
-        firstTab()?.let {
-            insertTabSelection(TabSelectionEntity(tabId = it.tabId))
-        }
+        firstTab()?.let { insertTabSelection(TabSelectionEntity(tabId = it.tabId)) }
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -160,5 +145,4 @@ abstract class TabsDao {
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
     abstract fun updateUrlAndTitle(tabId: String, url: String?, title: String?, viewed: Boolean)
-
 }

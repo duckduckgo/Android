@@ -25,9 +25,8 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 
-private class VpnServiceCallbacksPluginPoint(
-    private val plugins: DaggerSet<VpnServiceCallbacks>
-) : PluginPoint<VpnServiceCallbacks> {
+private class VpnServiceCallbacksPluginPoint(private val plugins: DaggerSet<VpnServiceCallbacks>) :
+    PluginPoint<VpnServiceCallbacks> {
     override fun getPlugins(): Collection<VpnServiceCallbacks> {
         // not that it matters but sorting adds predictability here
         return plugins.sortedBy { it.javaClass.simpleName }

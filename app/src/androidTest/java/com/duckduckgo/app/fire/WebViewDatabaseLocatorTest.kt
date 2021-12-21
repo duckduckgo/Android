@@ -51,12 +51,8 @@ class WebViewDatabaseLocatorTest {
 
     @Test
     fun whenDatabasePathNotFoundThenReturnsEmpty() {
-        val mockApplicationInfo = mock<ApplicationInfo>().apply {
-            dataDir = "nonExistingDir"
-        }
-        val context = mock<Context> {
-            on { applicationInfo } doReturn mockApplicationInfo
-        }
+        val mockApplicationInfo = mock<ApplicationInfo>().apply { dataDir = "nonExistingDir" }
+        val context = mock<Context> { on { applicationInfo } doReturn mockApplicationInfo }
         val webViewDatabaseLocator = WebViewDatabaseLocator(context)
 
         val databasePath = webViewDatabaseLocator.getDatabasePath()

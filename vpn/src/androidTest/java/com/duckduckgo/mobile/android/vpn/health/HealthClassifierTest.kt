@@ -22,13 +22,14 @@ import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.*
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Completed
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Invalid
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class HealthClassifierTest {
 
-    private val testee = HealthClassifier(InstrumentationRegistry.getInstrumentation().targetContext)
+    private val testee =
+        HealthClassifier(InstrumentationRegistry.getInstrumentation().targetContext)
     val tracers = mutableListOf<TracerSummary>()
 
     @Test
@@ -109,32 +110,44 @@ class HealthClassifierTest {
 
     @Test
     fun whenNumberOfSocketReadExceptionsBelowThresholdThenReportsGoodHealth() {
-        testee.determineHealthSocketChannelReadExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS).assertGoodHealth()
+        testee
+            .determineHealthSocketChannelReadExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertGoodHealth()
     }
 
     @Test
     fun whenNumberOfSocketReadExceptionsAboveThresholdThenReportsBadHealth() {
-        testee.determineHealthSocketChannelReadExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS).assertBadHealth()
+        testee
+            .determineHealthSocketChannelReadExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertBadHealth()
     }
 
     @Test
     fun whenNumberOfSocketWriteExceptionsBelowThresholdThenReportsGoodHealth() {
-        testee.determineHealthSocketChannelWriteExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS).assertGoodHealth()
+        testee
+            .determineHealthSocketChannelWriteExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertGoodHealth()
     }
 
     @Test
     fun whenNumberOfSocketWriteExceptionsAboveThresholdThenReportsGoodHealth() {
-        testee.determineHealthSocketChannelWriteExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS).assertBadHealth()
+        testee
+            .determineHealthSocketChannelWriteExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertBadHealth()
     }
 
     @Test
     fun whenNumberOfSocketConnectExceptionsBelowThresholdThenReportsGoodHealth() {
-        testee.determineHealthSocketChannelConnectExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS).assertGoodHealth()
+        testee
+            .determineHealthSocketChannelConnectExceptions(ACCEPTABLE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertGoodHealth()
     }
 
     @Test
     fun whenNumberOfSocketConnectExceptionsAboveThresholdThenReportsBadHealth() {
-        testee.determineHealthSocketChannelConnectExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS).assertBadHealth()
+        testee
+            .determineHealthSocketChannelConnectExceptions(EXCESSIVE_NUMBER_SOCKET_EXCEPTIONS)
+            .assertBadHealth()
     }
 
     @Test
@@ -185,15 +198,21 @@ class HealthClassifierTest {
     }
 
     private fun HealthState.assertGoodHealth() {
-        assertTrue(String.format("Expected GoodHealth but was %s", this.javaClass.simpleName), (this) is GoodHealth)
+        assertTrue(
+            String.format("Expected GoodHealth but was %s", this.javaClass.simpleName),
+            (this) is GoodHealth)
     }
 
     private fun HealthState.assertBadHealth() {
-        assertTrue(String.format("Expected BadHealth but was %s", this.javaClass.simpleName), (this) is BadHealth)
+        assertTrue(
+            String.format("Expected BadHealth but was %s", this.javaClass.simpleName),
+            (this) is BadHealth)
     }
 
     private fun HealthState.assertInitializing() {
-        assertTrue(String.format("Expected Initializing but was %s", this.javaClass.simpleName), (this) is Initializing)
+        assertTrue(
+            String.format("Expected Initializing but was %s", this.javaClass.simpleName),
+            (this) is Initializing)
     }
 
     private fun configureTracers(numberInvalid: Int, numberSlowTracers: Int, totalTracers: Int) {

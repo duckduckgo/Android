@@ -53,27 +53,31 @@ class HttpsEmbeddedDataIntegrationTest {
 
     @Before
     fun before() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName()))
+            .thenReturn(true)
 
-        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
 
         val httpsBloomSpecDao = db.httpsBloomFilterSpecDao()
         val httpsFalsePositivesDao = db.httpsFalsePositivesDao()
         val binaryDataStore = BinaryDataStore(context)
 
-        val persister = HttpsDataPersister(
-            binaryDataStore,
-            httpsBloomSpecDao,
-            httpsFalsePositivesDao,
-            db
-        )
+        val persister =
+            HttpsDataPersister(binaryDataStore, httpsBloomSpecDao, httpsFalsePositivesDao, db)
 
-        val embeddedDataPersister = PlayHttpsEmbeddedDataPersister(persister, binaryDataStore, httpsBloomSpecDao, context, moshi)
+        val embeddedDataPersister =
+            PlayHttpsEmbeddedDataPersister(
+                persister, binaryDataStore, httpsBloomSpecDao, context, moshi)
 
-        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister)
-        httpsUpgrader = HttpsUpgraderImpl(factory, httpsFalsePositivesDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
+        val factory =
+            HttpsBloomFilterFactoryImpl(
+                httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister)
+        httpsUpgrader =
+            HttpsUpgraderImpl(
+                factory, httpsFalsePositivesDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
         httpsUpgrader.reloadData()
     }
 
@@ -94,6 +98,8 @@ class HttpsEmbeddedDataIntegrationTest {
 
     @Test
     fun whenUpgraderLoadedWithEmbeddedDataAndItemInBloomListThenNotUpdgraded() {
-        assertFalse(httpsUpgrader.shouldUpgrade(Uri.parse("http://fjdsfhdksjfhdsfhdjsfhdsjfhdsjkfhdsjja.com")))
+        assertFalse(
+            httpsUpgrader.shouldUpgrade(
+                Uri.parse("http://fjdsfhdksjfhdsfhdjsfhdsjfhdsjkfhdsjja.com")))
     }
 }

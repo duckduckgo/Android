@@ -47,7 +47,9 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         arguments?.getLong(KEY_PARENT_FOLDER_ID)?.let {
             val name = binding.titleInput.text.toString()
             if (name.isNotBlank()) {
-                val bookmarkFolder = arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder
+                val bookmarkFolder =
+                    arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as
+                        BookmarkFolder
                 listener?.onBookmarkFolderUpdated(bookmarkFolder.copy(name = name, parentId = it))
             }
         }
@@ -57,7 +59,11 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
         const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
 
-        fun instance(parentFolderId: Long, parentFolderName: String, bookmarkFolder: BookmarkFolder): EditBookmarkFolderDialogFragment {
+        fun instance(
+            parentFolderId: Long,
+            parentFolderName: String,
+            bookmarkFolder: BookmarkFolder
+        ): EditBookmarkFolderDialogFragment {
             val dialogFragment = EditBookmarkFolderDialogFragment()
             val bundle = Bundle()
             bundle.putLong(KEY_PARENT_FOLDER_ID, parentFolderId)

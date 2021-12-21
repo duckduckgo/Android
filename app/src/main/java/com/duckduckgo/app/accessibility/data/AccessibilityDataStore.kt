@@ -40,7 +40,8 @@ class AccessibilitySettingsSharedPreferences(
     private val appCoroutineScope: CoroutineScope
 ) : AccessibilitySettingsDataStore {
 
-    private val accessibilityStateFlow = MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+    private val accessibilityStateFlow =
+        MutableStateFlow(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
@@ -48,7 +49,8 @@ class AccessibilitySettingsSharedPreferences(
     override val fontSize: Float
         get() {
             return if (overrideSystemFontSize) {
-                if (appFontSize <= FONT_SIZE_DEFAULT) appFontSize else (appFontSize - (appFontSize - FONT_SIZE_DEFAULT) * SCALE_FACTOR)
+                if (appFontSize <= FONT_SIZE_DEFAULT) appFontSize
+                else (appFontSize - (appFontSize - FONT_SIZE_DEFAULT) * SCALE_FACTOR)
             } else {
                 systemFontSize
             }
@@ -78,14 +80,15 @@ class AccessibilitySettingsSharedPreferences(
             emitNewValues()
         }
 
-    override fun settingsFlow() = accessibilityStateFlow.asStateFlow().onSubscription {
-        emitNewValues()
-    }
+    override fun settingsFlow() =
+        accessibilityStateFlow.asStateFlow().onSubscription { emitNewValues() }
 
     private fun emitNewValues() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            accessibilityStateFlow.emit(AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
-            Timber.v("AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
+            accessibilityStateFlow.emit(
+                AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom))
+            Timber.v(
+                "AccessibilityActSettings: new value emitted ${AccessibilitySettings(overrideSystemFontSize, fontSize, forceZoom)}")
         }
     }
 

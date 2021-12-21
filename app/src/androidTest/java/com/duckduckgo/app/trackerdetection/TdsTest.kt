@@ -24,15 +24,20 @@ import org.junit.Test
 class TdsTest {
 
     /**
-     * If this test fails is because you updated the internal tds json file without changing the default etag value in TrackerDataLoader.
-     * Change the DEFAULT_ETAG value with the latest etag header from tds and then change the value of DEFAULT_TDS_HASH_VALUE below with the new one
-     * to make the test pass.
-     **/
-
+     * If this test fails is because you updated the internal tds json file without changing the
+     * default etag value in TrackerDataLoader. Change the DEFAULT_ETAG value with the latest etag
+     * header from tds and then change the value of DEFAULT_TDS_HASH_VALUE below with the new one to
+     * make the test pass.
+     */
     @Test
     fun whenInternalTdsFileChangesThenEtagValueChanges() {
-        val tdsContent = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.tds)
-            .bufferedReader().use { it.readText() }
+        val tdsContent =
+            InstrumentationRegistry.getInstrumentation()
+                .targetContext
+                .resources
+                .openRawResource(R.raw.tds)
+                .bufferedReader()
+                .use { it.readText() }
 
         assertEquals(DEFAULT_TDS_HASH_VALUE, tdsContent.hashCode())
     }

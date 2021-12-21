@@ -24,10 +24,10 @@ import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAcc
 class QuickAccessDragTouchItemListener(
     private val favoritesQuickAccessAdapter: FavoritesQuickAccessAdapter,
     private val dragDropListener: DragDropListener
-) : ItemTouchHelper.SimpleCallback(
-    ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-    0
-) {
+) :
+    ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
+        0) {
     interface DragDropListener {
         fun onListChanged(listElements: List<QuickAccessFavorite>)
     }
@@ -36,7 +36,11 @@ class QuickAccessDragTouchItemListener(
         return false
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         val items = favoritesQuickAccessAdapter.currentList.toMutableList()
         val quickAccessFavorite = items[viewHolder.bindingAdapterPosition]
         items.removeAt(viewHolder.bindingAdapterPosition)

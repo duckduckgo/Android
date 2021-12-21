@@ -37,37 +37,19 @@ interface IconModifier {
 }
 
 enum class AppIcon(
-    val componentName: String, // Must correspond to the <activity-alias> `android:name`s in AndroidManifest
+    val componentName:
+        String, // Must correspond to the <activity-alias> `android:name`s in AndroidManifest
     @DrawableRes val icon: Int = R.drawable.ic_app_icon_red_round
 ) {
-    DEFAULT(
-        componentName = "$QUALIFIER.Launcher",
-        icon = R.drawable.ic_app_icon_red_round
-    ),
-    GOLD(
-        componentName = "$QUALIFIER.LauncherGold",
-        icon = R.drawable.ic_app_icon_gold_round
-    ),
-    GREEN(
-        componentName = "$QUALIFIER.LauncherGreen",
-        icon = R.drawable.ic_app_icon_green_round
-    ),
-    BLUE(
-        componentName = "$QUALIFIER.LauncherBlue",
-        icon = R.drawable.ic_app_icon_blue_round
-    ),
-    PURPLE(
-        componentName = "$QUALIFIER.LauncherPurple",
-        icon = R.drawable.ic_app_icon_purple_round
-    ),
-    BLACK(
-        componentName = "$QUALIFIER.LauncherBlack",
-        icon = R.drawable.ic_app_icon_black_round
-    ),
+    DEFAULT(componentName = "$QUALIFIER.Launcher", icon = R.drawable.ic_app_icon_red_round),
+    GOLD(componentName = "$QUALIFIER.LauncherGold", icon = R.drawable.ic_app_icon_gold_round),
+    GREEN(componentName = "$QUALIFIER.LauncherGreen", icon = R.drawable.ic_app_icon_green_round),
+    BLUE(componentName = "$QUALIFIER.LauncherBlue", icon = R.drawable.ic_app_icon_blue_round),
+    PURPLE(componentName = "$QUALIFIER.LauncherPurple", icon = R.drawable.ic_app_icon_purple_round),
+    BLACK(componentName = "$QUALIFIER.LauncherBlack", icon = R.drawable.ic_app_icon_black_round),
     SILHOUETTE(
         componentName = "$QUALIFIER.LauncherSilhoutte",
-        icon = R.drawable.ic_app_icon_silhouette_round
-    );
+        icon = R.drawable.ic_app_icon_silhouette_round);
 
     companion object {
         fun from(componentName: String): AppIcon {
@@ -76,10 +58,10 @@ enum class AppIcon(
     }
 }
 
-class AppIconModifier @Inject constructor(
-    private val context: Context,
-    private val appShortcutCreator: AppShortcutCreator
-) : IconModifier {
+class AppIconModifier
+@Inject
+constructor(private val context: Context, private val appShortcutCreator: AppShortcutCreator) :
+    IconModifier {
 
     override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
         disable(context, newIcon)
@@ -91,19 +73,21 @@ class AppIconModifier @Inject constructor(
     }
 
     private fun enable(context: Context, appIcon: AppIcon) {
-        setComponentState(context, appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
+        setComponentState(
+            context, appIcon.componentName, PackageManager.COMPONENT_ENABLED_STATE_ENABLED)
     }
 
     private fun disable(context: Context, appIcon: AppIcon) {
         AppIcon.values().filterNot { it.componentName == appIcon.componentName }.forEach {
-            setComponentState(context, it.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
+            setComponentState(
+                context, it.componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED)
         }
     }
 
     private fun setComponentState(context: Context, componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
             ComponentName(BuildConfig.APPLICATION_ID, componentName),
-            componentState, PackageManager.DONT_KILL_APP
-        )
+            componentState,
+            PackageManager.DONT_KILL_APP)
     }
 }

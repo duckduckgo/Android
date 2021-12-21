@@ -22,7 +22,10 @@ import org.jsoup.nodes.Element
 
 interface SavedSitesParser {
     fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String
-    suspend fun parseHtml(document: Document, bookmarksRepository: BookmarksRepository): List<SavedSite>
+    suspend fun parseHtml(
+        document: Document,
+        bookmarksRepository: BookmarksRepository
+    ): List<SavedSite>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
@@ -59,29 +62,31 @@ class RealSavedSitesParser : SavedSitesParser {
                 { node ->
                     if (node.value.url == null) {
                         if (node.value.depth == 0) {
-                            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>")
+                            appendLine(
+                                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>")
                         } else {
-                            appendLine(getTabString(node.value.depth) + "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>")
+                            appendLine(
+                                getTabString(node.value.depth) +
+                                    "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>")
                         }
                         appendLine(getTabString(node.value.depth) + "    <DL><p>")
                     } else {
-                        appendLine(getTabString(node.value.depth) + "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</A>")
+                        appendLine(
+                            getTabString(node.value.depth) +
+                                "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</A>")
                     }
                 },
                 { node ->
                     if (node.value.url == null) {
                         appendLine(getTabString(node.value.depth) + "    </DL><p>")
                     }
-                }
-            )
+                })
         }
     }
 
     private fun getTabString(multiplier: Int): String {
         var tabString = ""
-        repeat(multiplier) {
-            tabString += "    "
-        }
+        repeat(multiplier) { tabString += "    " }
         return tabString
     }
 
@@ -90,10 +95,12 @@ class RealSavedSitesParser : SavedSitesParser {
             return ""
         }
         return buildString {
-            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">$FAVORITES_FOLDER</H3>")
+            appendLine(
+                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">$FAVORITES_FOLDER</H3>")
             appendLine("    <DL><p>")
             favorites.forEach { entity ->
-                appendLine("        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
+                appendLine(
+                    "        <DT><A HREF=\"${entity.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${entity.title}</A>")
             }
             appendLine("    </DL><p>")
         }
@@ -117,21 +124,26 @@ class RealSavedSitesParser : SavedSitesParser {
         var favorites = 0
 
         documentElement.select("DL").first()?.let { itemBlock ->
-
-            itemBlock.childNodes()
+            itemBlock
+                .childNodes()
                 .map { it as Element }
                 .filter { it.select("DT").isNotEmpty() }
                 .forEach { element ->
-
                     val folder = element.select("H3").first()
 
                     if (folder != null) {
                         val folderName = folder.text()
 
                         if (folderName == FAVORITES_FOLDER || folderName == BOOKMARKS_FOLDER) {
-                            parseElement(element, 0, bookmarksRepository, savedSites, folderName == FAVORITES_FOLDER)
+                            parseElement(
+                                element,
+                                0,
+                                bookmarksRepository,
+                                savedSites,
+                                folderName == FAVORITES_FOLDER)
                         } else {
-                            val bookmarkFolder = BookmarkFolder(name = folderName, parentId = parentId)
+                            val bookmarkFolder =
+                                BookmarkFolder(name = folderName, parentId = parentId)
                             val id = bookmarksRepository.insert(bookmarkFolder)
                             parseElement(element, id, bookmarksRepository, savedSites, false)
                         }
@@ -141,10 +153,13 @@ class RealSavedSitesParser : SavedSitesParser {
                             val link = linkItem.attr("href")
                             val title = linkItem.text()
                             if (inFavorite) {
-                                savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
+                                savedSites.add(
+                                    SavedSite.Favorite(0, title = title, url = link, favorites))
                                 favorites++
                             } else {
-                                val bookmark = SavedSite.Bookmark(0, title = title, url = link, parentId = parentId)
+                                val bookmark =
+                                    SavedSite.Bookmark(
+                                        0, title = title, url = link, parentId = parentId)
                                 savedSites.add(bookmark)
                             }
                         }

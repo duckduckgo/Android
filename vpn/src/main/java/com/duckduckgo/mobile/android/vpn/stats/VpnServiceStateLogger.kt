@@ -25,28 +25,31 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
-)
+@ContributesMultibinding(scope = VpnScope::class, boundType = VpnServiceCallbacks::class)
 @SingleInstanceIn(VpnScope::class)
-class VpnServiceStateLogger @Inject constructor(
+class VpnServiceStateLogger
+@Inject
+constructor(
     private val dispatcherProvider: VpnDispatcherProvider,
     private val vpnDatabase: VpnDatabase
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
+            vpnDatabase
+                .vpnServiceStateDao()
+                .insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
         }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.DISABLED))
+            vpnDatabase
+                .vpnServiceStateDao()
+                .insert(VpnServiceStateStats(state = VpnServiceState.DISABLED))
         }
     }
 }

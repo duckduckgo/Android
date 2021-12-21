@@ -23,13 +23,13 @@ import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @FlowPreview
@@ -38,8 +38,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
 
     private val manager: TrackingProtectionWaitlistManager = mock()
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var viewModel: AppTPWaitlistRedeemCodeViewModel
 
@@ -49,48 +48,51 @@ class AppTPWaitlistRedeemCodeViewModelTest {
     }
 
     @Test
-    fun whenUserSuccessfullyRedeemsCodeThenViewStateisRedeemed() = coroutineRule.runBlocking {
-        whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Redeemed)
+    fun whenUserSuccessfullyRedeemsCodeThenViewStateisRedeemed() =
+        coroutineRule.runBlocking {
+            whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Redeemed)
 
-        viewModel.viewState.test {
-            viewModel.redeemCode("1234")
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeemed)
+            viewModel.viewState.test {
+                viewModel.redeemCode("1234")
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeemed)
+            }
         }
-    }
 
     @Test
-    fun whenUserRedeemsInvalidCodeThenViewStateisInvalidCode() = coroutineRule.runBlocking {
-        whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.InvalidCode)
-        viewModel.viewState.test {
-            viewModel.redeemCode("1234")
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+    fun whenUserRedeemsInvalidCodeThenViewStateisInvalidCode() =
+        coroutineRule.runBlocking {
+            whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.InvalidCode)
+            viewModel.viewState.test {
+                viewModel.redeemCode("1234")
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+            }
         }
-    }
 
     @Test
-    fun whenUserRedeemsAlreadyRedeemedCodeThenViewStateisInvalidCode() = coroutineRule.runBlocking {
-        whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.AlreadyRedeemed)
-        viewModel.viewState.test {
-            viewModel.redeemCode("1234")
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+    fun whenUserRedeemsAlreadyRedeemedCodeThenViewStateisInvalidCode() =
+        coroutineRule.runBlocking {
+            whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.AlreadyRedeemed)
+            viewModel.viewState.test {
+                viewModel.redeemCode("1234")
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.InvalidCode)
+            }
         }
-    }
 
     @Test
-    fun whenRedeemCodeFailsThenViewStateIsGeneralError() = coroutineRule.runBlocking {
-        whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Failure)
-        viewModel.viewState.test {
-            viewModel.redeemCode("1234")
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
-            assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.ErrorRedeeming)
+    fun whenRedeemCodeFailsThenViewStateIsGeneralError() =
+        coroutineRule.runBlocking {
+            whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Failure)
+            viewModel.viewState.test {
+                viewModel.redeemCode("1234")
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Idle)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.Redeeming)
+                assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.ErrorRedeeming)
+            }
         }
-    }
-
 }

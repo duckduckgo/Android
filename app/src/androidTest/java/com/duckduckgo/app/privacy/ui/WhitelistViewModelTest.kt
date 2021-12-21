@@ -37,13 +37,9 @@ import org.junit.Test
 
 class WhitelistViewModelTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val mockDao: UserWhitelistDao = mock()
     private val liveData = MutableLiveData<List<UserWhitelistedDomain>>()
@@ -51,14 +47,17 @@ class WhitelistViewModelTest {
     private val mockCommandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
 
-    private val testee by lazy { WhitelistViewModel(mockDao, TestCoroutineScope(), coroutineRule.testDispatcherProvider) }
+    private val testee by lazy {
+        WhitelistViewModel(mockDao, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+    }
 
     @Before
-    fun before() = coroutineRule.runBlocking {
-        liveData.value = emptyList()
-        whenever(mockDao.all()).thenReturn(liveData)
-        testee.command.observeForever(mockCommandObserver)
-    }
+    fun before() =
+        coroutineRule.runBlocking {
+            liveData.value = emptyList()
+            whenever(mockDao.all()).thenReturn(liveData)
+            testee.command.observeForever(mockCommandObserver)
+        }
 
     @After
     fun after() {

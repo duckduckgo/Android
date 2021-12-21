@@ -22,11 +22,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
+import java.lang.Thread.UncaughtExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.Thread.UncaughtExceptionHandler
-import dagger.SingleInstanceIn
 
 class VpnUncaughtExceptionHandler(
     private val context: Context,
@@ -39,7 +39,6 @@ class VpnUncaughtExceptionHandler(
             Timber.e("Out of memory; triggering a VPN restart")
 
             restartVpn()
-
         } else {
             Timber.e(throwable, "VPN uncaughtException")
             originalHandler?.uncaughtException(thread, throwable)
@@ -59,9 +58,11 @@ class VpnExceptionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providesVpnUncaughtExceptionHandler(context: Context, @AppCoroutineScope vpnCoroutineScope: CoroutineScope): VpnUncaughtExceptionHandler {
+    fun providesVpnUncaughtExceptionHandler(
+        context: Context,
+        @AppCoroutineScope vpnCoroutineScope: CoroutineScope
+    ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return VpnUncaughtExceptionHandler(context, originalHandler, vpnCoroutineScope)
     }
-
 }

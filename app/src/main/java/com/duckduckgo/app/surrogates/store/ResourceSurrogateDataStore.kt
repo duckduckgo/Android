@@ -23,8 +23,7 @@ class ResourceSurrogateDataStore @Inject constructor(private val context: Contex
 
     fun hasData(): Boolean = context.fileExists(FILENAME)
 
-    fun loadData(): ByteArray =
-        context.openFileInput(FILENAME).use { it.readBytes() }
+    fun loadData(): ByteArray = context.openFileInput(FILENAME).use { it.readBytes() }
 
     fun saveData(byteArray: ByteArray) {
         context.openFileOutput(FILENAME, Context.MODE_PRIVATE).use { it.write(byteArray) }
@@ -42,5 +41,4 @@ class ResourceSurrogateDataStore @Inject constructor(private val context: Contex
     companion object {
         private const val FILENAME = "surrogates.js"
     }
-
 }

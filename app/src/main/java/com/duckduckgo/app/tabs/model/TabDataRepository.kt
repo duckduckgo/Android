@@ -29,6 +29,8 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
+import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -39,11 +41,11 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
 @SingleInstanceIn(AppScope::class)
-class TabDataRepository @Inject constructor(
+class TabDataRepository
+@Inject
+constructor(
     private val tabsDao: TabsDao,
     private val siteFactory: SiteFactory,
     private val webViewPreviewPersister: WebViewPreviewPersister,
@@ -59,11 +61,11 @@ class TabDataRepository @Inject constructor(
 
     override val childClosedTabs = childTabClosedSharedFlow.asSharedFlow()
 
-    // We only want the new emissions when subscribing, however Room does not honour that contract so we
+    // We only want the new emissions when subscribing, however Room does not honour that contract
+    // so we
     // need to drop the first emission always (this is equivalent to the Observable semantics)
-    override val flowDeletableTabs: Flow<List<TabEntity>> = tabsDao.flowDeletableTabs()
-        .drop(1)
-        .distinctUntilChanged()
+    override val flowDeletableTabs: Flow<List<TabEntity>> =
+        tabsDao.flowDeletableTabs().drop(1).distinctUntilChanged()
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
@@ -75,7 +77,11 @@ class TabDataRepository @Inject constructor(
         return tabId
     }
 
-    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, sourceTabId: String): String {
+    override suspend fun addFromSourceTab(
+        url: String?,
+        skipHome: Boolean,
+        sourceTabId: String
+    ): String {
         val tabId = generateTabId()
 
         add(
@@ -83,8 +89,7 @@ class TabDataRepository @Inject constructor(
             data = buildSiteData(url),
             skipHome = skipHome,
             isDefaultTab = false,
-            sourceTabId = sourceTabId
-        )
+            sourceTabId = sourceTabId)
 
         return tabId
     }
@@ -92,12 +97,7 @@ class TabDataRepository @Inject constructor(
     override suspend fun addDefaultTab(): String {
         val tabId = generateTabId()
 
-        add(
-            tabId = tabId,
-            data = buildSiteData(null),
-            skipHome = false,
-            isDefaultTab = true
-        )
+        add(tabId = tabId, data = buildSiteData(null), skipHome = false, isDefaultTab = true)
 
         return tabId
     }
@@ -113,24 +113,33 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    private fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String? = null) {
+    private fun add(
+        tabId: String,
+        data: MutableLiveData<Site>,
+        skipHome: Boolean,
+        isDefaultTab: Boolean,
+        sourceTabId: String? = null
+    ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
-
-            Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
+            Timber.i(
+                "Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
 
             if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
-                Timber.i("Default tab being added but there are already tabs; will not add this tab")
+                Timber.i(
+                    "Default tab being added but there are already tabs; will not add this tab")
                 return@scheduleDirect
             }
 
             val lastTab = tabsDao.lastTab()
-            val position = if (lastTab == null) {
-                0
-            } else {
-                lastTab.position + 1
-            }
-            Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
+            val position =
+                if (lastTab == null) {
+                    0
+                } else {
+                    lastTab.position + 1
+                }
+            Timber.i(
+                "About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
 
             tabsDao.addAndSelectTab(
                 TabEntity(
@@ -140,9 +149,7 @@ class TabDataRepository @Inject constructor(
                     skipHome = skipHome,
                     viewed = true,
                     position = position,
-                    sourceTabId = sourceTabId
-                )
-            )
+                    sourceTabId = sourceTabId))
         }
     }
 
@@ -161,15 +168,15 @@ class TabDataRepository @Inject constructor(
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
             val title = uri.host?.removePrefix("www.") ?: url
-            val tab = TabEntity(
-                tabId = generateTabId(),
-                url = url,
-                title = title,
-                skipHome = false,
-                viewed = false,
-                position = position + 1,
-                sourceTabId = tabId
-            )
+            val tab =
+                TabEntity(
+                    tabId = generateTabId(),
+                    url = url,
+                    title = title,
+                    skipHome = false,
+                    viewed = false,
+                    position = position + 1,
+                    sourceTabId = tabId)
             tabsDao.insertTabAtPosition(tab)
         }
     }
@@ -201,40 +208,30 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun markDeletable(tab: TabEntity) {
-        databaseExecutor().scheduleDirect {
-            tabsDao.markTabAsDeletable(tab)
-        }
+        databaseExecutor().scheduleDirect { tabsDao.markTabAsDeletable(tab) }
     }
 
     override suspend fun undoDeletable(tab: TabEntity) {
-        databaseExecutor().scheduleDirect {
-            tabsDao.undoDeletableTab(tab)
-        }
+        databaseExecutor().scheduleDirect { tabsDao.undoDeletableTab(tab) }
     }
 
-    override suspend fun purgeDeletableTabs() = withContext(Dispatchers.IO) {
-        appCoroutineScope.launch {
-            tabsDao.purgeDeletableTabsAndUpdateSelection()
-        }.join()
-    }
+    override suspend fun purgeDeletableTabs() =
+        withContext(Dispatchers.IO) {
+            appCoroutineScope.launch { tabsDao.purgeDeletableTabsAndUpdateSelection() }.join()
+        }
 
     override suspend fun deleteTabAndSelectSource(tabId: String) {
         databaseExecutor().scheduleDirect {
             val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect
 
             deleteOldPreviewImages(tabToDelete.tabId)
-            val tabToSelect = tabToDelete.sourceTabId
-                .takeUnless { it.isNullOrBlank() }
-                ?.let {
-                    tabsDao.tab(it)
-                }
+            val tabToSelect =
+                tabToDelete.sourceTabId.takeUnless { it.isNullOrBlank() }?.let { tabsDao.tab(it) }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
             siteData.remove(tabToDelete.tabId)
 
             tabToSelect?.let {
-                appCoroutineScope.launch {
-                    childTabClosedSharedFlow.emit(tabToSelect.tabId)
-                }
+                appCoroutineScope.launch { childTabClosedSharedFlow.emit(tabToSelect.tabId) }
             }
         }
     }
@@ -288,16 +285,19 @@ class TabDataRepository @Inject constructor(
 
     private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {
         Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
-        appCoroutineScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
+        appCoroutineScope.launch {
+            webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage)
+        }
     }
 
     /**
-     * In this class we typically delegate DB work to a scheduler
-     * Historically, this was the IO scheduler, which can use multiple threads to do the work
-     * However, this presented the possibility of race conditions. One such case was when the blank tab was shown to the user and the URL
-     * they actually wanted was opened in a background tab.
+     * In this class we typically delegate DB work to a scheduler Historically, this was the IO
+     * scheduler, which can use multiple threads to do the work However, this presented the
+     * possibility of race conditions. One such case was when the blank tab was shown to the user
+     * and the URL they actually wanted was opened in a background tab.
      *
-     * While there are likely even better ways of doing this, moving to a single-threaded executor is likely good enough to fix this for now
+     * While there are likely even better ways of doing this, moving to a single-threaded executor
+     * is likely good enough to fix this for now
      */
     private fun databaseExecutor(): Scheduler {
         return Schedulers.single()

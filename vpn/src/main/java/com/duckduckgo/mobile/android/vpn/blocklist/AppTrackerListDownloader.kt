@@ -20,17 +20,17 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.extensions.extractETag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
-import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
+import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 import timber.log.Timber
-import javax.inject.Inject
 
 data class AppTrackerBlocklist(
     val etag: ETag = ETag.InvalidETag,
@@ -59,31 +59,26 @@ sealed class ETag {
 }
 
 interface AppTrackerListDownloader {
-    @WorkerThread
-    fun downloadAppTrackerBlocklist(): AppTrackerBlocklist
+    @WorkerThread fun downloadAppTrackerBlocklist(): AppTrackerBlocklist
 
-    @WorkerThread
-    fun downloadAppTrackerExclusionList(): AppTrackerExclusionList
+    @WorkerThread fun downloadAppTrackerExclusionList(): AppTrackerExclusionList
 
-    @WorkerThread
-    fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList
+    @WorkerThread fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList
 
-    @WorkerThread
-    fun downloadAppTrackerExceptionRules(): AppTrackerRuleList
+    @WorkerThread fun downloadAppTrackerExceptionRules(): AppTrackerRuleList
 }
 
 @ContributesBinding(AppScope::class)
-class RealAppTrackerListDownloader @Inject constructor(
-    private val appTrackerListService: AppTrackerListService
-) : AppTrackerListDownloader {
+class RealAppTrackerListDownloader
+@Inject
+constructor(private val appTrackerListService: AppTrackerListService) : AppTrackerListDownloader {
     override fun downloadAppTrackerBlocklist(): AppTrackerBlocklist {
         Timber.d("Downloading the app tracker blocklist...")
-        val response = runCatching {
-            appTrackerListService.appTrackerBlocklist().execute()
-        }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
+        val response =
+            runCatching { appTrackerListService.appTrackerBlocklist().execute() }.getOrElse {
+                Timber.w("Error downloading tracker rules list: $it")
+                Response.error(400, "".toResponseBody(null))
+            }
 
         if (!response.isSuccessful) {
             Timber.e("Fail to download the app tracker blocklist, error code: ${response.code()}")
@@ -96,9 +91,11 @@ class RealAppTrackerListDownloader @Inject constructor(
         val blocklist = extractBlocklist(responseBody)
         val packages = extractAppPackages(responseBody)
 
-        Timber.d("Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}")
+        Timber.d(
+            "Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}")
 
-        return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages)
+        return AppTrackerBlocklist(
+            etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages)
     }
 
     private fun extractBlocklist(response: JsonAppBlockingList?): List<AppTracker> {
@@ -111,61 +108,65 @@ class RealAppTrackerListDownloader @Inject constructor(
 
     override fun downloadAppTrackerExclusionList(): AppTrackerExclusionList {
         Timber.d("Downloading the app tracker exclusion list...")
-        val response = runCatching {
-            appTrackerListService.appTrackerExclusionList().execute()
-        }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
+        val response =
+            runCatching { appTrackerListService.appTrackerExclusionList().execute() }.getOrElse {
+                Timber.w("Error downloading tracker rules list: $it")
+                Response.error(400, "".toResponseBody(null))
+            }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
+            Timber.e(
+                "Fail to download the app tracker exclusion list, error code: ${response.code()}")
             return AppTrackerExclusionList()
         }
 
         val eTag = response.headers().extractETag()
-        val exclusionList = response.body()?.rules.orEmpty()
-            .map { AppTrackerExcludedPackage(it) }
+        val exclusionList = response.body()?.rules.orEmpty().map { AppTrackerExcludedPackage(it) }
 
         Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
 
-        return AppTrackerExclusionList(etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
+        return AppTrackerExclusionList(
+            etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
     }
 
     override fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList {
         Timber.d("Downloading the app tracker system app overrides list...")
-        val response = runCatching {
-            appTrackerListService.appTrackerSystemAppsOverrides().execute()
-        }.getOrElse {
-            Timber.w("Error downloading system app overrides list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
+        val response =
+            runCatching { appTrackerListService.appTrackerSystemAppsOverrides().execute() }
+                .getOrElse {
+                    Timber.w("Error downloading system app overrides list: $it")
+                    Response.error(400, "".toResponseBody(null))
+                }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app system app overrides list, error code: ${response.code()}")
+            Timber.e(
+                "Fail to download the app system app overrides list, error code: ${response.code()}")
             return AppTrackerSystemAppOverrideList()
         }
 
         val eTag = response.headers().extractETag()
-        val systemAppOverrides = response.body()?.rules.orEmpty()
-                .map { AppTrackerSystemAppOverridePackage(it) }
+        val systemAppOverrides =
+            response.body()?.rules.orEmpty().map { AppTrackerSystemAppOverridePackage(it) }
 
         Timber.d("Received the app system app overrides list, size: ${systemAppOverrides.size}")
 
-        return AppTrackerSystemAppOverrideList(etag = ETag.ValidETag(eTag), overridePackages = systemAppOverrides)
+        return AppTrackerSystemAppOverrideList(
+            etag = ETag.ValidETag(eTag), overridePackages = systemAppOverrides)
     }
 
     override fun downloadAppTrackerExceptionRules(): AppTrackerRuleList {
         Timber.d("Downloading the app tracker rule list...")
-        val response = kotlin.runCatching {
-            appTrackerListService.appTrackerExceptionRules().execute()
-        }.getOrElse {
-            Timber.w("Error downloading tracker rules list: $it")
-            Response.error(400, "".toResponseBody(null))
-        }
+        val response =
+            kotlin
+                .runCatching { appTrackerListService.appTrackerExceptionRules().execute() }
+                .getOrElse {
+                    Timber.w("Error downloading tracker rules list: $it")
+                    Response.error(400, "".toResponseBody(null))
+                }
 
         if (!response.isSuccessful) {
-            Timber.e("Fail to download the app tracker exclusion list, error code: ${response.code()}")
+            Timber.e(
+                "Fail to download the app tracker exclusion list, error code: ${response.code()}")
             return AppTrackerRuleList()
         }
 
@@ -174,6 +175,7 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         Timber.d("Received the app tracker rule list, size: ${exceptionRules.size}")
 
-        return AppTrackerRuleList(etag = ETag.ValidETag(eTag), trackerExceptionRules = exceptionRules)
+        return AppTrackerRuleList(
+            etag = ETag.ValidETag(eTag), trackerExceptionRules = exceptionRules)
     }
 }

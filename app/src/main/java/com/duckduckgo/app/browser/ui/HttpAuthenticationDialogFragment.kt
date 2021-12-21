@@ -38,7 +38,10 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
     var listener: HttpAuthenticationListener? = null
 
     interface HttpAuthenticationListener {
-        fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials)
+        fun handleAuthentication(
+            request: BasicAuthenticationRequest,
+            credentials: BasicAuthenticationCredentials
+        )
         fun cancelAuthentication(request: BasicAuthenticationRequest)
     }
 
@@ -54,20 +57,23 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
 
         informationText.text = getString(R.string.authenticationDialogMessage, url)
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
-                listener?.handleAuthentication(
-                    request,
-                    BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString())
-                )
-                didUserCompleteAuthentication = true
-            }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
-                rootView.hideKeyboard()
-                listener?.cancelAuthentication(request)
-                didUserCompleteAuthentication = true
-            }
-            .setTitle(R.string.authenticationDialogTitle)
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
+                    listener?.handleAuthentication(
+                        request,
+                        BasicAuthenticationCredentials(
+                            username = usernameInput.text.toString(),
+                            password = passwordInput.text.toString()))
+                    didUserCompleteAuthentication = true
+                }
+                .setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
+                    rootView.hideKeyboard()
+                    listener?.cancelAuthentication(request)
+                    didUserCompleteAuthentication = true
+                }
+                .setTitle(R.string.authenticationDialogTitle)
 
         val alert = alertBuilder.create()
         showKeyboard(usernameInput, alert)

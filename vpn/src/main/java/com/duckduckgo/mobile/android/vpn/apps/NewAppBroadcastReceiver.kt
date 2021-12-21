@@ -31,18 +31,17 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.service.goAsync
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(
-    scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class
-)
-class NewAppBroadcastReceiver @Inject constructor(
+@ContributesMultibinding(scope = VpnScope::class, boundType = VpnServiceCallbacks::class)
+class NewAppBroadcastReceiver
+@Inject
+constructor(
     private val applicationContext: Context,
     private val appCategoryDetector: AppCategoryDetector,
     private val appTrackerRepository: AppTrackerRepository,
@@ -62,7 +61,8 @@ class NewAppBroadcastReceiver @Inject constructor(
         val pendingResult = goAsync()
         goAsync(pendingResult) {
             if (isGame(packageName) || isInExclusionList(packageName)) {
-                Timber.i("Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
+                Timber.i(
+                    "Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
             } else {
                 Timber.i("Newly installed package $packageName not in exclusion list")
@@ -73,12 +73,12 @@ class NewAppBroadcastReceiver @Inject constructor(
     private fun register() {
         kotlin.runCatching { applicationContext.unregisterReceiver(this) }
 
-        IntentFilter().apply {
-            addAction(Intent.ACTION_PACKAGE_ADDED)
-            addDataScheme("package")
-        }.run {
-            applicationContext.registerReceiver(this@NewAppBroadcastReceiver, this)
-        }
+        IntentFilter()
+            .apply {
+                addAction(Intent.ACTION_PACKAGE_ADDED)
+                addDataScheme("package")
+            }
+            .run { applicationContext.registerReceiver(this@NewAppBroadcastReceiver, this) }
     }
 
     private fun unregister() {
@@ -90,9 +90,12 @@ class NewAppBroadcastReceiver @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun isInExclusionList(packageName: String): Boolean = withContext(dispatcherProvider.io()) {
-        return@withContext appTrackerRepository.getAppExclusionList().any { it.packageId == packageName }
-    }
+    private suspend fun isInExclusionList(packageName: String): Boolean =
+        withContext(dispatcherProvider.io()) {
+            return@withContext appTrackerRepository.getAppExclusionList().any {
+                it.packageId == packageName
+            }
+        }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.v("New app receiver started")

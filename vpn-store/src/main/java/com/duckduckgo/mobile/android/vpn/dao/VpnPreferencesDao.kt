@@ -25,8 +25,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
 @Dao
 interface VpnPreferencesDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(state: VpnPreferences)
 
     @Query("select * from vpn_preferences where preference = :preference")
     fun get(preference: String): VpnPreferences?

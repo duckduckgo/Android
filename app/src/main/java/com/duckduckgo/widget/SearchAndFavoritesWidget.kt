@@ -32,8 +32,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 enum class WidgetTheme {
     LIGHT,
@@ -54,11 +54,9 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"
     }
 
-    @Inject
-    lateinit var widgetPrefs: WidgetPreferences
+    @Inject lateinit var widgetPrefs: WidgetPreferences
 
-    @Inject
-    lateinit var gridCalculator: SearchAndFavoritesGridCalculator
+    @Inject lateinit var gridCalculator: SearchAndFavoritesGridCalculator
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -67,39 +65,53 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
         Timber.i("SearchAndFavoritesWidget - onUpdate")
-        appWidgetIds.forEach { id ->
-            updateWidget(context, appWidgetManager, id, null)
-        }
+        appWidgetIds.forEach { id -> updateWidget(context, appWidgetManager, id, null) }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
     }
 
-    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle
+    ) {
         Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
         updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        appWidgetIds.forEach {
-            widgetPrefs.removeWidgetSettings(it)
-        }
+        appWidgetIds.forEach { widgetPrefs.removeWidgetSettings(it) }
         super.onDeleted(context, appWidgetIds)
     }
 
-    private fun updateWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+    private fun updateWidget(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
         val widgetTheme = widgetPrefs.widgetTheme(appWidgetId)
         Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
 
-        val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
+        val (columns, rows) =
+            getCurrentWidgetSize(
+                context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
         widgetPrefs.storeWidgetSize(appWidgetId, columns, rows)
 
         val remoteViews = RemoteViews(context.packageName, layoutId)
 
-        remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
-        remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+        remoteViews.setViewVisibility(
+            R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
+        remoteViews.setOnClickPendingIntent(
+            R.id.widgetSearchBarContainer, buildPendingIntent(context))
         configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
         configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
 
@@ -109,7 +121,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     }
 
     private fun getLayoutThemed(numColumns: Int, theme: WidgetTheme): Int {
-        // numcolumns method is not available for remoteViews. We rely on different xml to use different values on that attribute
+        // numcolumns method is not available for remoteViews. We rely on different xml to use
+        // different values on that attribute
         return when (theme) {
             WidgetTheme.LIGHT -> {
                 when (numColumns) {
@@ -144,7 +157,11 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
     }
 
-    private fun getCurrentWidgetSize(context: Context, appWidgetOptions: Bundle, newOptions: Bundle?): Pair<Int, Int> {
+    private fun getCurrentWidgetSize(
+        context: Context,
+        appWidgetOptions: Bundle,
+        newOptions: Bundle?
+    ): Pair<Int, Int> {
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
         var landsWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
         var landsHeight = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
@@ -158,8 +175,18 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         }
 
         val orientation = context.resources.configuration.orientation
-        val width = if (orientation == Configuration.ORIENTATION_LANDSCAPE) { landsWidth } else { portraitWidth }
-        val height = if (orientation == Configuration.ORIENTATION_LANDSCAPE) { landsHeight } else { portraitHeight }
+        val width =
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                landsWidth
+            } else {
+                portraitWidth
+            }
+        val height =
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                landsHeight
+            } else {
+                portraitHeight
+            }
 
         var columns = gridCalculator.calculateColumns(context, width)
         var rows = gridCalculator.calculateRows(context, height)
@@ -168,9 +195,15 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         return Pair(columns, rows)
     }
 
-    private fun configureFavoritesGridView(context: Context, appWidgetId: Int, remoteViews: RemoteViews, widgetTheme: WidgetTheme) {
+    private fun configureFavoritesGridView(
+        context: Context,
+        appWidgetId: Int,
+        remoteViews: RemoteViews,
+        widgetTheme: WidgetTheme
+    ) {
         val favoriteItemClickIntent = Intent(context, BrowserActivity::class.java)
-        val favoriteClickPendingIntent = PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
+        val favoriteClickPendingIntent =
+            PendingIntent.getActivity(context, 0, favoriteItemClickIntent, 0)
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
@@ -183,8 +216,14 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
         remoteViews.setPendingIntentTemplate(R.id.favoritesGrid, favoriteClickPendingIntent)
     }
 
-    private fun configureEmptyWidgetCta(context: Context, appWidgetId: Int, remoteViews: RemoteViews, widgetTheme: WidgetTheme) {
-        remoteViews.setOnClickPendingIntent(R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
+    private fun configureEmptyWidgetCta(
+        context: Context,
+        appWidgetId: Int,
+        remoteViews: RemoteViews,
+        widgetTheme: WidgetTheme
+    ) {
+        remoteViews.setOnClickPendingIntent(
+            R.id.emptyGridViewContainer, buildOnboardingPendingIntent(context, appWidgetId))
 
         val extras = Bundle()
         extras.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

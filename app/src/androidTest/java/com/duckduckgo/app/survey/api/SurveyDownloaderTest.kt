@@ -38,11 +38,10 @@ class SurveyDownloaderTest {
     private var mockEmailManager: EmailManager = mock()
     private var mockAtpCohortManager: AtpCohortManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager)
+    private var testee =
+        SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager)
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
     @Before
     fun setup() {
@@ -126,7 +125,8 @@ class SurveyDownloaderTest {
     fun whenSurveyForEmailReceivedAndUserIsSignedInThenCreateSurveyWithCorrectCohort() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
+        whenever(mockCall.execute())
+            .thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao).insert(Survey("abc", SURVEY_URL_WITH_COHORT, -1, SCHEDULED))
@@ -136,7 +136,8 @@ class SurveyDownloaderTest {
     fun whenSurveyForEmailReceivedAndUserIsNotSignedInThenDoNotCreateSurvey() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
         whenever(mockEmailManager.getCohort()).thenReturn("cohort")
-        whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
+        whenever(mockCall.execute())
+            .thenReturn(Response.success(surveyWithAllocationForEmail("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
         testee.download().blockingAwait()
         verify(mockDao, never()).insert(any())
@@ -152,32 +153,44 @@ class SurveyDownloaderTest {
     }
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
-        val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, emptyList())
-        )
+        val surveyOptions =
+            listOf(
+                SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
+                SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, emptyList()))
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
-        val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, emptyList())
-        )
+        val surveyOptions =
+            listOf(
+                SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
+                SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, emptyList()))
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
-        val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
-        )
+        val surveyOptions =
+            listOf(
+                SurveyGroup.SurveyOption(
+                    SURVEY_URL,
+                    -1,
+                    1.0,
+                    true,
+                    null,
+                    listOf(SurveyUrlParameter.EmailCohortParam.parameter)))
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAtp(id: String): SurveyGroup {
-        val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
-        )
+        val surveyOptions =
+            listOf(
+                SurveyGroup.SurveyOption(
+                    SURVEY_URL,
+                    -1,
+                    1.0,
+                    null,
+                    true,
+                    listOf(SurveyUrlParameter.AtpCohortParam.parameter)))
         return SurveyGroup(id, surveyOptions)
     }
 

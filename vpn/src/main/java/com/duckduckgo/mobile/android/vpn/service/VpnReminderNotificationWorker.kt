@@ -54,7 +54,8 @@ class VpnReminderNotificationWorkerInjectorPlugin(
     }
 }
 
-class VpnReminderNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class VpnReminderNotificationWorker(val context: Context, params: WorkerParameters) :
+    CoroutineWorker(context, params) {
     lateinit var vpnReminderReceiverManager: VpnReminderReceiverManager
 
     override suspend fun doWork(): Result {
@@ -66,5 +67,4 @@ class VpnReminderNotificationWorker(val context: Context, params: WorkerParamete
         const val WORKER_VPN_REMINDER_UNDESIRED_TAG = "VpnReminderNotificationUndesiredWorker"
         const val WORKER_VPN_REMINDER_DAILY_TAG = "VpnReminderNotificationDailyWorker"
     }
-
 }

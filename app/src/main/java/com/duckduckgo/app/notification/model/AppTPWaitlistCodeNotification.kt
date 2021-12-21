@@ -19,8 +19,8 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
@@ -57,7 +57,8 @@ class AppTPWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val name = context.getString(R.string.atp_WaitlistNotificationTitle)
     override val icon = R.drawable.notification_logo
     override val title: String = context.getString(R.string.atp_WaitlistNotificationTitle)
-    override val description: String = context.getString(R.string.atp_WaitlistNotificationDescription)
+    override val description: String =
+        context.getString(R.string.atp_WaitlistNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val pixelSuffix = "atpc"

@@ -40,11 +40,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Provider
 
 class PrivacyDashboardViewModel(
     private val userWhitelistDao: UserWhitelistDao,
@@ -82,8 +82,10 @@ class PrivacyDashboardViewModel(
 
     private val sitesVisited: LiveData<Int> = networkLeaderboardDao.sitesVisited()
     private val sitesVisitedObserver = Observer<Int> { onSitesVisitedChanged(it) }
-    private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> = networkLeaderboardDao.trackerNetworkLeaderboard()
-    private val trackerNetworkActivityObserver = Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
+    private val trackerNetworkLeaderboard: LiveData<List<NetworkLeaderboardEntry>> =
+        networkLeaderboardDao.trackerNetworkLeaderboard()
+    private val trackerNetworkActivityObserver =
+        Observer<List<NetworkLeaderboardEntry>> { onTrackerNetworkEntriesChanged(it) }
 
     init {
         pixel.fire(PRIVACY_DASHBOARD_OPENED)
@@ -102,23 +104,26 @@ class PrivacyDashboardViewModel(
     fun onSitesVisitedChanged(count: Int?) {
         val siteCount = count ?: 0
         val networkCount = viewState.value?.trackerNetworkEntries?.count() ?: 0
-        viewState.value = viewState.value?.copy(
-            shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(siteCount, networkCount),
-            sitesVisited = siteCount
-        )
+        viewState.value =
+            viewState.value?.copy(
+                shouldShowTrackerNetworkLeaderboard =
+                    showTrackerNetworkLeaderboard(siteCount, networkCount),
+                sitesVisited = siteCount)
     }
 
     fun onTrackerNetworkEntriesChanged(networkLeaderboardEntries: List<NetworkLeaderboardEntry>?) {
         val domainCount = viewState.value?.sitesVisited ?: 0
         val networkEntries = networkLeaderboardEntries ?: emptyList()
-        viewState.value = viewState.value?.copy(
-            shouldShowTrackerNetworkLeaderboard = showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
-            trackerNetworkEntries = networkEntries
-        )
+        viewState.value =
+            viewState.value?.copy(
+                shouldShowTrackerNetworkLeaderboard =
+                    showTrackerNetworkLeaderboard(domainCount, networkEntries.count()),
+                trackerNetworkEntries = networkEntries)
     }
 
     private fun showTrackerNetworkLeaderboard(siteVisitedCount: Int, networkCount: Int): Boolean {
-        return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
+        return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE &&
+            networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
     fun onSiteChanged(site: Site?) {
@@ -131,43 +136,42 @@ class PrivacyDashboardViewModel(
     }
 
     private fun resetViewState() {
-        viewState.value = ViewState(
-            domain = "",
-            beforeGrade = PrivacyGrade.UNKNOWN,
-            afterGrade = PrivacyGrade.UNKNOWN,
-            httpsStatus = HttpsStatus.SECURE,
-            trackerCount = 0,
-            allTrackersBlocked = true,
-            toggleEnabled = null,
-            practices = UNKNOWN,
-            shouldShowTrackerNetworkLeaderboard = false,
-            sitesVisited = 0,
-            trackerNetworkEntries = emptyList(),
-            shouldReloadPage = false,
-            isSiteInTempAllowedList = false
-        )
+        viewState.value =
+            ViewState(
+                domain = "",
+                beforeGrade = PrivacyGrade.UNKNOWN,
+                afterGrade = PrivacyGrade.UNKNOWN,
+                httpsStatus = HttpsStatus.SECURE,
+                trackerCount = 0,
+                allTrackersBlocked = true,
+                toggleEnabled = null,
+                practices = UNKNOWN,
+                shouldShowTrackerNetworkLeaderboard = false,
+                sitesVisited = 0,
+                trackerNetworkEntries = emptyList(),
+                shouldReloadPage = false,
+                isSiteInTempAllowedList = false)
     }
 
     private suspend fun updateSite(site: Site) {
         val grades = site.calculateGrades()
         val domain = site.domain ?: ""
         val toggleEnabled = withContext(dispatchers.io()) { !userWhitelistDao.contains(domain) }
-        val isInTemporaryAllowlist = withContext(dispatchers.io()) {
-            contentBlocking.isAnException(domain)
-        }
+        val isInTemporaryAllowlist =
+            withContext(dispatchers.io()) { contentBlocking.isAnException(domain) }
 
         withContext(dispatchers.main()) {
-            viewState.value = viewState.value?.copy(
-                domain = site.domain ?: "",
-                beforeGrade = grades.grade,
-                afterGrade = grades.improvedGrade,
-                httpsStatus = site.https,
-                trackerCount = site.trackerCount,
-                allTrackersBlocked = site.allTrackersBlocked,
-                toggleEnabled = toggleEnabled,
-                practices = site.privacyPractices.summary,
-                isSiteInTempAllowedList = isInTemporaryAllowlist
-            )
+            viewState.value =
+                viewState.value?.copy(
+                    domain = site.domain ?: "",
+                    beforeGrade = grades.grade,
+                    afterGrade = grades.improvedGrade,
+                    httpsStatus = site.https,
+                    trackerCount = site.trackerCount,
+                    allTrackersBlocked = site.allTrackersBlocked,
+                    toggleEnabled = toggleEnabled,
+                    practices = site.privacyPractices.summary,
+                    isSiteInTempAllowedList = isInTemporaryAllowlist)
         }
     }
 
@@ -180,10 +184,7 @@ class PrivacyDashboardViewModel(
             return
         }
 
-        viewState.value = viewState.value?.copy(
-            toggleEnabled = enabled,
-            shouldReloadPage = true
-        )
+        viewState.value = viewState.value?.copy(toggleEnabled = enabled, shouldReloadPage = true)
 
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
@@ -214,7 +215,9 @@ class PrivacyDashboardViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class PrivacyDashboardViewModelFactory @Inject constructor(
+class PrivacyDashboardViewModelFactory
+@Inject
+constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
     private val contentBlocking: Provider<ContentBlocking>,
     private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
@@ -224,7 +227,14 @@ class PrivacyDashboardViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) ->
+                    PrivacyDashboardViewModel(
+                        userWhitelistDao.get(),
+                        contentBlocking.get(),
+                        networkLeaderboardDao.get(),
+                        pixel.get(),
+                        appCoroutineScope.get()) as
+                        T
                 else -> null
             }
         }

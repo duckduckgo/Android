@@ -21,7 +21,8 @@ interface Entity {
     val displayName: String
     val prevalence: Double
 
-    val isMajor get() = prevalence > MAJOR_NETWORK_PREVALENCE
+    val isMajor
+        get() = prevalence > MAJOR_NETWORK_PREVALENCE
 
     companion object {
         const val MAJOR_NETWORK_PREVALENCE = 7.0

@@ -23,12 +23,16 @@ import androidx.test.espresso.ViewAction
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.util.HumanReadables
 import androidx.test.espresso.util.TreeIterables
+import java.util.concurrent.TimeoutException
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.hamcrest.StringDescription
-import java.util.concurrent.TimeoutException
 
-fun waitForView(viewMatcher: Matcher<View>, timeout: Long = 10000, waitForDisplayed: Boolean = true): ViewAction {
+fun waitForView(
+    viewMatcher: Matcher<View>,
+    timeout: Long = 10000,
+    waitForDisplayed: Boolean = true
+): ViewAction {
     return object : ViewAction {
         override fun getConstraints(): Matcher<View> {
             return Matchers.any(View::class.java)
@@ -47,8 +51,10 @@ fun waitForView(viewMatcher: Matcher<View>, timeout: Long = 10000, waitForDispla
             val visibleMatcher = isDisplayed()
 
             do {
-                val viewVisible = TreeIterables.breadthFirstViewTraversal(view)
-                    .any { viewMatcher.matches(it) && visibleMatcher.matches(it) }
+                val viewVisible =
+                    TreeIterables.breadthFirstViewTraversal(view).any {
+                        viewMatcher.matches(it) && visibleMatcher.matches(it)
+                    }
 
                 if (viewVisible == waitForDisplayed) return
                 uiController.loopMainThreadForAtLeast(50)

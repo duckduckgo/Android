@@ -29,10 +29,11 @@ import androidx.core.view.ViewCompat
 
 /**
  * WebView subclass which allows the WebView to
- *   - hide the toolbar when placed in a CoordinatorLayout
- *   - add the flag so that users' typing isn't used for personalisation
+ * - hide the toolbar when placed in a CoordinatorLayout
+ * - add the flag so that users' typing isn't used for personalisation
  *
- * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
+ * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling
+ * behaviour
  */
 class DuckDuckGoWebView : WebView, NestedScrollingChild {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
@@ -105,7 +106,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
                 lastDeltaY = deltaY
             }
-
             MotionEvent.ACTION_DOWN -> {
                 hasGestureFinished = false
                 // disable swipeRefresh until we can be sure it should be enabled
@@ -115,7 +115,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
                 lastY = eventY
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
             }
-
             else -> {
                 returnValue = super.onTouchEvent(event)
                 stopNestedScroll()
@@ -139,14 +138,28 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     override fun hasNestedScrollingParent(): Boolean = nestedScrollHelper.hasNestedScrollingParent()
 
-    override fun dispatchNestedScroll(dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, offsetInWindow: IntArray?): Boolean =
-        nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
+    override fun dispatchNestedScroll(
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        offsetInWindow: IntArray?
+    ): Boolean =
+        nestedScrollHelper.dispatchNestedScroll(
+            dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
-    override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean =
-        nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
+    override fun dispatchNestedPreScroll(
+        dx: Int,
+        dy: Int,
+        consumed: IntArray?,
+        offsetInWindow: IntArray?
+    ): Boolean = nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
-    override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean =
-        nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
+    override fun dispatchNestedFling(
+        velocityX: Float,
+        velocityY: Float,
+        consumed: Boolean
+    ): Boolean = nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
@@ -163,7 +176,11 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
             canSwipeToRefresh = true // only enable if at the top and gestured finished
         }
 
-        enableSwipeRefresh(canSwipeToRefresh && clampedY && scrollY == 0 && (lastDeltaY <= 0 || nestedOffsetY == 0))
+        enableSwipeRefresh(
+            canSwipeToRefresh &&
+                clampedY &&
+                scrollY == 0 &&
+                (lastDeltaY <= 0 || nestedOffsetY == 0))
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 

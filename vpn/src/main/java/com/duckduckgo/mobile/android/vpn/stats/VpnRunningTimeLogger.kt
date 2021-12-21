@@ -26,15 +26,17 @@ import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
 @SingleInstanceIn(VpnScope::class)
-class VpnRunningTimeLogger @Inject constructor(
+class VpnRunningTimeLogger
+@Inject
+constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val vpnDatabase: VpnDatabase
 ) : VpnServiceCallbacks {
@@ -43,12 +45,13 @@ class VpnRunningTimeLogger @Inject constructor(
     private var lastSavedTimestamp = 0L
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        job += coroutineScope.launch(dispatcherProvider.io()) {
-            while (isActive) {
-                writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
-                delay(30_000)
+        job +=
+            coroutineScope.launch(dispatcherProvider.io()) {
+                while (isActive) {
+                    writeRunningTimeToDatabase(timeSinceLastRunningTimeSave())
+                    delay(30_000)
+                }
             }
-        }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {

@@ -31,7 +31,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String, skippedReport: Boolean = false)
+        fun onAppProtectionDisabled(
+            answer: Int,
+            appName: String,
+            packageName: String,
+            skippedReport: Boolean = false
+        )
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -50,7 +55,8 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_disable_app, null)
+        val rootView =
+            layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_disable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val disableLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
@@ -58,8 +64,11 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
         val radioGroup = rootView.findViewById<RadioGroup>(R.id.trackingProtectionAppRadioGroup)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
-            .setView(rootView)
+        val alertDialog =
+            MaterialAlertDialogBuilder(
+                    requireActivity(),
+                    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
+                .setView(rootView)
 
         validateBundleArguments()
         isCancelable = false
@@ -78,7 +87,8 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     private fun populateLabel(disableLabel: TextView) {
         disableLabel.text =
-            getString(R.string.atp_ExcludeAppsManuallyDisableAppLabel, getAppName()).applyBoldSpanTo(getAppName())
+            getString(R.string.atp_ExcludeAppsManuallyDisableAppLabel, getAppName())
+                .applyBoldSpanTo(getAppName())
     }
 
     private fun getPackageName(): String {
@@ -97,24 +107,20 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         return requireArguments().getString(KEY_APP_NAME)!!
     }
 
-    private fun configureListeners(
-        submitCTA: Button,
-        skipCTA: Button,
-        radioGroup: RadioGroup
-    ) {
+    private fun configureListeners(submitCTA: Button, skipCTA: Button, radioGroup: RadioGroup) {
         submitCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName())
+            listener.onAppProtectionDisabled(
+                getDialogAnswer(radioGroup), getAppName(), getPackageName())
         }
 
         skipCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName(), skippedReport = true)
+            listener.onAppProtectionDisabled(
+                getDialogAnswer(radioGroup), getAppName(), getPackageName(), skippedReport = true)
         }
 
-        radioGroup.setOnCheckedChangeListener { _, _ ->
-            submitCTA.isEnabled = true
-        }
+        radioGroup.setOnCheckedChangeListener { _, _ -> submitCTA.isEnabled = true }
     }
 
     private fun validateBundleArguments() {

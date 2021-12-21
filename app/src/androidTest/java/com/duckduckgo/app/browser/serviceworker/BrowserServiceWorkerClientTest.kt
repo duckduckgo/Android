@@ -34,8 +34,7 @@ import org.junit.Test
 @SdkSuppress(minSdkVersion = 24)
 class BrowserServiceWorkerClientTest {
 
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private val requestInterceptor: RequestInterceptor = mock()
     private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
@@ -48,33 +47,38 @@ class BrowserServiceWorkerClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestAndOriginHeaderExistThenSendItToInterceptor() = coroutinesTestRule.runBlocking {
-        val webResourceRequest: WebResourceRequest = mock()
-        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Origin" to "example.com"))
+    fun whenShouldInterceptRequestAndOriginHeaderExistThenSendItToInterceptor() =
+        coroutinesTestRule.runBlocking {
+            val webResourceRequest: WebResourceRequest = mock()
+            whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Origin" to "example.com"))
 
-        testee.shouldInterceptRequest(webResourceRequest)
+            testee.shouldInterceptRequest(webResourceRequest)
 
-        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
-    }
-
-    @Test
-    fun whenShouldInterceptRequestAndOriginHeaderDoesNotExistButRefererExistThenSendItToInterceptor() = coroutinesTestRule.runBlocking {
-        val webResourceRequest: WebResourceRequest = mock()
-        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Referer" to "example.com"))
-
-        testee.shouldInterceptRequest(webResourceRequest)
-
-        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
-    }
+            verify(requestInterceptor)
+                .shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
+        }
 
     @Test
-    fun whenShouldInterceptRequestAndNoOriginOrRefererHeadersExistThenSendNullToInterceptor() = coroutinesTestRule.runBlocking {
-        val webResourceRequest: WebResourceRequest = mock()
-        whenever(webResourceRequest.requestHeaders).thenReturn(mapOf())
+    fun whenShouldInterceptRequestAndOriginHeaderDoesNotExistButRefererExistThenSendItToInterceptor() =
+        coroutinesTestRule.runBlocking {
+            val webResourceRequest: WebResourceRequest = mock()
+            whenever(webResourceRequest.requestHeaders)
+                .thenReturn(mapOf("Referer" to "example.com"))
 
-        testee.shouldInterceptRequest(webResourceRequest)
+            testee.shouldInterceptRequest(webResourceRequest)
 
-        verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, null)
-    }
+            verify(requestInterceptor)
+                .shouldInterceptFromServiceWorker(webResourceRequest, "example.com")
+        }
 
+    @Test
+    fun whenShouldInterceptRequestAndNoOriginOrRefererHeadersExistThenSendNullToInterceptor() =
+        coroutinesTestRule.runBlocking {
+            val webResourceRequest: WebResourceRequest = mock()
+            whenever(webResourceRequest.requestHeaders).thenReturn(mapOf())
+
+            testee.shouldInterceptRequest(webResourceRequest)
+
+            verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, null)
+        }
 }

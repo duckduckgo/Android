@@ -29,12 +29,9 @@ import org.junit.Test
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private var userStageStore: UserStageStore = mock()
 

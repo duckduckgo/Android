@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface GiveFeedbackDialogFragmentComponent : AndroidInjector<GiveFeedbackDialogFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<GiveFeedbackDialogFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<GiveFeedbackDialogFragment>
 }
 
 @ContributesTo(AppScope::class)
 interface GiveFeedbackDialogFragmentComponentProvider {
-    fun provideGiveFeedbackDialogFragmentComponentFactory(): GiveFeedbackDialogFragmentComponent.Factory
+    fun provideGiveFeedbackDialogFragmentComponentFactory():
+        GiveFeedbackDialogFragmentComponent.Factory
 }
 
 @Module

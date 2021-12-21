@@ -37,18 +37,34 @@ class TermsOfServicePracticesTest(private val testCase: TermsOfServicePracticesT
         fun data(): Array<TermsOfServicePracticesTestCase> {
             return arrayOf(
                 // score and reasons are ignored
-                TermsOfServicePracticesTestCase(GOOD, TermsOfService(classification = "A", score = 0)),
-                TermsOfServicePracticesTestCase(MIXED, TermsOfService(classification = "B", score = 0)),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(classification = "C", score = 0)),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(classification = "D", score = 0)),
-
-                TermsOfServicePracticesTestCase(GOOD, TermsOfService(classification = "A", score = 1)),
-                TermsOfServicePracticesTestCase(MIXED, TermsOfService(classification = "B", score = -1)),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(classification = "C", score = 0, goodPrivacyTerms = listOf("good"))),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(classification = "D", score = 0, badPrivacyTerms = listOf("bad"))),
+                TermsOfServicePracticesTestCase(
+                    GOOD, TermsOfService(classification = "A", score = 0)),
+                TermsOfServicePracticesTestCase(
+                    MIXED, TermsOfService(classification = "B", score = 0)),
+                TermsOfServicePracticesTestCase(
+                    POOR, TermsOfService(classification = "C", score = 0)),
+                TermsOfServicePracticesTestCase(
+                    POOR, TermsOfService(classification = "D", score = 0)),
+                TermsOfServicePracticesTestCase(
+                    GOOD, TermsOfService(classification = "A", score = 1)),
+                TermsOfServicePracticesTestCase(
+                    MIXED, TermsOfService(classification = "B", score = -1)),
+                TermsOfServicePracticesTestCase(
+                    POOR,
+                    TermsOfService(
+                        classification = "C", score = 0, goodPrivacyTerms = listOf("good"))),
+                TermsOfServicePracticesTestCase(
+                    POOR,
+                    TermsOfService(
+                        classification = "D", score = 0, badPrivacyTerms = listOf("bad"))),
 
                 // class and score are ignored
-                TermsOfServicePracticesTestCase(MIXED, TermsOfService(score = 0, goodPrivacyTerms = listOf("good"), badPrivacyTerms = listOf("bad"))),
+                TermsOfServicePracticesTestCase(
+                    MIXED,
+                    TermsOfService(
+                        score = 0,
+                        goodPrivacyTerms = listOf("good"),
+                        badPrivacyTerms = listOf("bad"))),
 
                 // class and reasons are ignored
                 TermsOfServicePracticesTestCase(GOOD, TermsOfService(score = -1)),
@@ -57,20 +73,21 @@ class TermsOfServicePracticesTest(private val testCase: TermsOfServicePracticesT
                 TermsOfServicePracticesTestCase(GOOD, TermsOfService(score = -1000)),
 
                 // class is ignored, must be at least one reason of either kind
-                TermsOfServicePracticesTestCase(MIXED, TermsOfService(score = 0, goodPrivacyTerms = listOf("good"))),
-                TermsOfServicePracticesTestCase(MIXED, TermsOfService(score = 0, badPrivacyTerms = listOf("bad"))),
+                TermsOfServicePracticesTestCase(
+                    MIXED, TermsOfService(score = 0, goodPrivacyTerms = listOf("good"))),
+                TermsOfServicePracticesTestCase(
+                    MIXED, TermsOfService(score = 0, badPrivacyTerms = listOf("bad"))),
 
                 // class and reasons are ignored
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1)),
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 10)),
                 TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 100)),
-                TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1000))
-
-            )
+                TermsOfServicePracticesTestCase(POOR, TermsOfService(score = 1000)))
         }
-
     }
-
 }
 
-data class TermsOfServicePracticesTestCase(val expectedPractices: PrivacyPractices.Summary, val terms: TermsOfService)
+data class TermsOfServicePracticesTestCase(
+    val expectedPractices: PrivacyPractices.Summary,
+    val terms: TermsOfService
+)

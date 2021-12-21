@@ -24,19 +24,17 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.runBlocking
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
-import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class UserEventsDaoTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
 
@@ -46,7 +44,11 @@ class UserEventsDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .build()
         dao = db.userEventsDao()
         testee = AppUserEventsStore(dao, coroutineRule.testDispatcherProvider)
     }
@@ -57,24 +59,28 @@ class UserEventsDaoTest {
     }
 
     @Test
-    fun whenGetUserEventAndDatabaseEmptyThenReturnNull() = coroutineRule.runBlocking {
-        assertNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED))
-    }
+    fun whenGetUserEventAndDatabaseEmptyThenReturnNull() =
+        coroutineRule.runBlocking {
+            assertNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED))
+        }
 
     @Test
-    fun whenInsertingUserEventThenTimestampIsNotNull() = coroutineRule.runBlocking {
-        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+    fun whenInsertingUserEventThenTimestampIsNotNull() =
+        coroutineRule.runBlocking {
+            testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
 
-        assertNotNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
-    }
+            assertNotNull(testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
+        }
 
     @Test
-    fun whenInsertingSameUserEventThenReplaceOldTimestamp() = coroutineRule.runBlocking {
-        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
-        val timestamp = testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp
+    fun whenInsertingSameUserEventThenReplaceOldTimestamp() =
+        coroutineRule.runBlocking {
+            testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+            val timestamp = testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp
 
-        testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
+            testee.registerUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)
 
-        assertNotEquals(timestamp, testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
-    }
+            assertNotEquals(
+                timestamp, testee.getUserEvent(UserEventKey.FIRE_BUTTON_EXECUTED)?.timestamp)
+        }
 }

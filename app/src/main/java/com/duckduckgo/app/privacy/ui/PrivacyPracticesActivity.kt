@@ -31,8 +31,8 @@ import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
 import com.duckduckgo.app.tabs.tabId
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
@@ -56,7 +56,8 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
         setupClickListeners()
 
         lifecycleScope.launch {
-            viewModel.privacyPractices(intent.tabId!!)
+            viewModel
+                .privacyPractices(intent.tabId!!)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { render(it) }
         }

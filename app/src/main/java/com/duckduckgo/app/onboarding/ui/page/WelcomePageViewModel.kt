@@ -46,13 +46,17 @@ class WelcomePageViewModel(
         object DefaultOnboardingState : ViewState()
     }
 
-    val screenContent = flow {
-        if (variantManager.returningUsersNoOnboardingEnabled() || variantManager.returningUsersWidgetPromotionEnabled()) {
-            emit(ViewState.NewOrReturningUsersState)
-        } else {
-            emit(ViewState.DefaultOnboardingState)
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.DefaultOnboardingState)
+    val screenContent =
+        flow {
+                if (variantManager.returningUsersNoOnboardingEnabled() ||
+                    variantManager.returningUsersWidgetPromotionEnabled()) {
+                    emit(ViewState.NewOrReturningUsersState)
+                } else {
+                    emit(ViewState.DefaultOnboardingState)
+                }
+            }
+            .stateIn(
+                viewModelScope, SharingStarted.WhileSubscribed(), ViewState.DefaultOnboardingState)
 
     fun reduce(event: WelcomePageView.Event): Flow<WelcomePageView.State> {
         return when (event) {
@@ -91,7 +95,8 @@ class WelcomePageViewModel(
     private fun firePrimaryCtaPressed() {
         when {
             variantManager.returningUsersNoOnboardingEnabled() ||
-                variantManager.returningUsersWidgetPromotionEnabled() -> pixel.fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
+                variantManager.returningUsersWidgetPromotionEnabled() ->
+                pixel.fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
             else -> pixel.fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
         }
     }
@@ -103,8 +108,7 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
-        )
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         emit(WelcomePageView.State.Finish)
     }
@@ -116,8 +120,7 @@ class WelcomePageViewModel(
 
         pixel.fire(
             AppPixelName.DEFAULT_BROWSER_NOT_SET,
-            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
-        )
+            mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         emit(WelcomePageView.State.Finish)
     }
@@ -136,11 +139,18 @@ class WelcomePageViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return with(modelClass) {
             when {
-                isAssignableFrom(WelcomePageViewModel::class.java) -> WelcomePageViewModel(
-                    appInstallStore, context, pixel, defaultRoleBrowserDialog, onboardingStore, variantManager
-                )
-                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+                isAssignableFrom(WelcomePageViewModel::class.java) ->
+                    WelcomePageViewModel(
+                        appInstallStore,
+                        context,
+                        pixel,
+                        defaultRoleBrowserDialog,
+                        onboardingStore,
+                        variantManager)
+                else ->
+                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
-        } as T
+        } as
+            T
     }
 }

@@ -17,9 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
-import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -31,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface LocationPermissionsActivityComponent : AndroidInjector<LocationPermissionsActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<LocationPermissionsActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<LocationPermissionsActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface LocationPermissionsActivityComponentProvider {
-    fun provideLocationPermissionsActivityComponentFactory(): LocationPermissionsActivityComponent.Factory
+    fun provideLocationPermissionsActivityComponentFactory():
+        LocationPermissionsActivityComponent.Factory
 }
 
 @Module

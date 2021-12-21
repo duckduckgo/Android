@@ -26,13 +26,11 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.flow.*
 
-class PrivacyPracticesViewModel(
-    private val tabRepository: TabRepository
-) : ViewModel() {
+class PrivacyPracticesViewModel(private val tabRepository: TabRepository) : ViewModel() {
 
     data class ViewState(
         val domain: String = "",
@@ -41,28 +39,29 @@ class PrivacyPracticesViewModel(
         val badTerms: List<String> = emptyList()
     )
 
-    fun privacyPractices(tabId: String): StateFlow<ViewState> = flow {
-        tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
-            emit(
-                ViewState(
-                    domain = site.domain ?: "",
-                    practices = site.privacyPractices.summary,
-                    goodTerms = site.privacyPractices.goodReasons,
-                    badTerms = site.privacyPractices.badReasons
-                )
-            )
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
+    fun privacyPractices(tabId: String): StateFlow<ViewState> =
+        flow {
+                tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
+                    emit(
+                        ViewState(
+                            domain = site.domain ?: "",
+                            practices = site.privacyPractices.summary,
+                            goodTerms = site.privacyPractices.goodReasons,
+                            badTerms = site.privacyPractices.badReasons))
+                }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 }
 
 @ContributesMultibinding(AppScope::class)
-class PrivacyPracticesViewModelFactory @Inject constructor(
-    private val tabRepository: Provider<TabRepository>
-) : ViewModelFactoryPlugin {
+class PrivacyPracticesViewModelFactory
+@Inject
+constructor(private val tabRepository: Provider<TabRepository>) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> (PrivacyPracticesViewModel(tabRepository.get()) as T)
+                isAssignableFrom(PrivacyPracticesViewModel::class.java) ->
+                    (PrivacyPracticesViewModel(tabRepository.get()) as T)
                 else -> null
             }
         }

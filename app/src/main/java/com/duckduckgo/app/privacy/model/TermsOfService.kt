@@ -30,12 +30,10 @@ data class TermsOfService(
         get() {
 
             when (classification) {
-
                 "A" -> return GOOD
                 "B" -> return MIXED
                 "C" -> return POOR
                 "D" -> return POOR
-
             }
 
             if (goodPrivacyTerms.isNotEmpty() && badPrivacyTerms.isNotEmpty()) {
@@ -44,7 +42,8 @@ data class TermsOfService(
 
             if (score < 0) {
                 return GOOD
-            } else if (score == 0 && (goodPrivacyTerms.isNotEmpty() || badPrivacyTerms.isNotEmpty())) {
+            } else if (score == 0 &&
+                (goodPrivacyTerms.isNotEmpty() || badPrivacyTerms.isNotEmpty())) {
                 return MIXED
             } else if (score > 0) {
                 return POOR
@@ -70,5 +69,4 @@ data class TermsOfService(
 
             return derived
         }
-
 }

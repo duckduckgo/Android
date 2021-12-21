@@ -42,7 +42,8 @@ class BrokenSiteNegativeFeedbackViewModelFactory @Inject constructor() : ViewMod
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> (BrokenSiteNegativeFeedbackViewModel() as T)
+                isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) ->
+                    (BrokenSiteNegativeFeedbackViewModel() as T)
                 else -> null
             }
         }

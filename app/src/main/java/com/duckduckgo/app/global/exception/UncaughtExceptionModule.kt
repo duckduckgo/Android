@@ -24,8 +24,8 @@ import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 class UncaughtExceptionModule {
@@ -49,9 +49,13 @@ class UncaughtExceptionModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository, dispatcherProvider, appCoroutineScope)
+        return AlertingUncaughtExceptionHandler(
+            originalHandler,
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository,
+            dispatcherProvider,
+            appCoroutineScope)
     }
 
-    @Provides
-    fun rootExceptionFinder() = RootExceptionFinder()
+    @Provides fun rootExceptionFinder() = RootExceptionFinder()
 }

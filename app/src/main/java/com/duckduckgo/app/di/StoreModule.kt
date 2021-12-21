@@ -35,9 +35,9 @@ import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
 import com.duckduckgo.app.tabs.db.TabsDbSanitizer
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
-import com.duckduckgo.app.widget.FavoritesObserver
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds
@@ -48,42 +48,45 @@ import dagger.multibindings.IntoSet
 abstract class StoreModule {
 
     @Binds
-    abstract fun bindStatisticsStore(statisticsStore: StatisticsSharedPreferences): StatisticsDataStore
+    abstract fun bindStatisticsStore(
+        statisticsStore: StatisticsSharedPreferences
+    ): StatisticsDataStore
 
-    @Binds
-    abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
+    @Binds abstract fun bindThemingStore(themeDataStore: ThemingSharedPreferences): ThemingDataStore
 
     @Binds
     abstract fun bindOnboardingStore(onboardingStore: OnboardingSharedPreferences): OnboardingStore
 
     @Binds
-    abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
+    abstract fun bindTermsOfServiceStore(
+        termsOfServiceStore: TermsOfServiceRawStore
+    ): TermsOfServiceStore
 
-    @Binds
-    abstract fun bindTabReposistory(tabRepository: TabDataRepository): TabRepository
+    @Binds abstract fun bindTabReposistory(tabRepository: TabDataRepository): TabRepository
 
-    @Binds
-    abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
+    @Binds abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore
 
     @Binds
     @IntoSet
     abstract fun bindAppInstallStoreObserver(appInstallStore: AppInstallStore): LifecycleObserver
 
     @Binds
-    abstract fun bindDataClearingStore(store: UnsentForgetAllPixelStoreSharedPreferences): UnsentForgetAllPixelStore
+    abstract fun bindDataClearingStore(
+        store: UnsentForgetAllPixelStoreSharedPreferences
+    ): UnsentForgetAllPixelStore
 
     @Binds
-    abstract fun bindOfflinePixelDataStore(store: OfflinePixelCountSharedPreferences): OfflinePixelCountDataStore
+    abstract fun bindOfflinePixelDataStore(
+        store: OfflinePixelCountSharedPreferences
+    ): OfflinePixelCountDataStore
 
-    @Binds
-    abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
+    @Binds abstract fun bindUserStageStore(userStageStore: AppUserStageStore): UserStageStore
 
     @Binds
     @IntoSet
     abstract fun bindUserStageStoreObserver(userStageStore: UserStageStore): LifecycleObserver
 
-    @Binds
-    abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
+    @Binds abstract fun bindUserEventsStore(userEventsStore: AppUserEventsStore): UserEventsStore
 
     @Binds
     @IntoSet
@@ -93,6 +96,5 @@ abstract class StoreModule {
     @IntoSet
     abstract fun bindFavoritesObserver(favoritesObserver: FavoritesObserver): LifecycleObserver
 
-    @Binds
-    abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
+    @Binds abstract fun bindWidgetPreferences(store: AppWidgetThemePreferences): WidgetPreferences
 }

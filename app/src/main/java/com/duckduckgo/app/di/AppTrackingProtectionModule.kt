@@ -28,9 +28,9 @@ import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistMana
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -46,11 +46,19 @@ class AppTrackingProtectionModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): TrackingProtectionWaitlistCodeFetcher {
-        return AppTrackingProtectionWaitlistCodeFetcher(workManager, manager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
+        return AppTrackingProtectionWaitlistCodeFetcher(
+            workManager,
+            manager,
+            notification,
+            notificationSender,
+            dispatcherProvider,
+            appCoroutineScope)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     @IntoSet
-    fun providesAppTrackingProtectionCodeFetcherObserver(codeFetcher: TrackingProtectionWaitlistCodeFetcher): LifecycleObserver = codeFetcher
+    fun providesAppTrackingProtectionCodeFetcherObserver(
+        codeFetcher: TrackingProtectionWaitlistCodeFetcher
+    ): LifecycleObserver = codeFetcher
 }

@@ -23,7 +23,8 @@ import dagger.android.AndroidInjector
 class AndroidSupportInjection {
     companion object {
         inline fun <reified T : Fragment> inject(instance: T) {
-            AndroidInjector.inject(AndroidInjection.findHasDaggerInjectorForFragment(instance), instance)
+            AndroidInjector.inject(
+                AndroidInjection.findHasDaggerInjectorForFragment(instance), instance)
         }
     }
 }

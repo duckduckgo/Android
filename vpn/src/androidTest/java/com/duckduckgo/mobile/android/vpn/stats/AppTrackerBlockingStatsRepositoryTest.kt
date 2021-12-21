@@ -39,9 +39,7 @@ import org.threeten.bp.LocalDateTime
 @ExperimentalCoroutinesApi
 class AppTrackerBlockingStatsRepositoryTest {
 
-    @get:Rule
-    @Suppress("unused")
-    val coroutineRule = CoroutineTestRule()
+    @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var vpnRunningStatsDao: VpnRunningStatsDao
@@ -52,9 +50,12 @@ class AppTrackerBlockingStatsRepositoryTest {
     @Before
     fun before() {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    VpnDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         vpnRunningStatsDao = db.vpnRunningStatsDao()
         vpnTrackerDao = db.vpnTrackerDao()
         vpnPhoenixDao = db.vpnPhoenixDao()
@@ -70,7 +71,8 @@ class AppTrackerBlockingStatsRepositoryTest {
     fun whenSingleTrackerEntryAddedForTodayBucketThenBlockerReturned() = runBlocking {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
-        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
+        val vpnTrackers =
+            repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(1, vpnTrackers!!.size)
     }
@@ -80,7 +82,8 @@ class AppTrackerBlockingStatsRepositoryTest {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain)
         trackerFound(trackerDomain)
-        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
+        val vpnTrackers =
+            repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertTrackerFound(vpnTrackers, trackerDomain)
         assertEquals(2, vpnTrackers!!.size)
     }
@@ -88,7 +91,8 @@ class AppTrackerBlockingStatsRepositoryTest {
     @Test
     fun whenTrackerFoundBeforeTodayThenNotReturned() = runBlocking {
         trackerFoundYesterday()
-        val vpnTrackers = repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
+        val vpnTrackers =
+            repository.getVpnTrackers({ dateOfPreviousMidnightAsString() }).firstOrNull()
         assertNoTrackers(vpnTrackers)
     }
 
@@ -160,7 +164,14 @@ class AppTrackerBlockingStatsRepositoryTest {
         timestamp: String = bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", companyDisplayName = "", trackingApp = defaultTrackingApp)
+        val tracker =
+            VpnTracker(
+                trackerCompanyId = trackerCompanyId,
+                domain = domain,
+                timestamp = timestamp,
+                company = "",
+                companyDisplayName = "",
+                trackingApp = defaultTrackingApp)
         vpnTrackerDao.insert(tracker)
     }
 

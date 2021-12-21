@@ -31,14 +31,13 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Module
-import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.flow.*
 
-class TrackerNetworksViewModel @Inject constructor(
-    private val tabRepository: TabRepository
-) : ViewModel() {
+class TrackerNetworksViewModel @Inject constructor(private val tabRepository: TabRepository) :
+    ViewModel() {
 
     data class ViewState(
         val domain: String,
@@ -47,29 +46,34 @@ class TrackerNetworksViewModel @Inject constructor(
         val trackingEventsByNetwork: SortedMap<Entity, List<TrackingEvent>>
     )
 
-    fun trackers(tabId: String): StateFlow<ViewState> = flow {
-        tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
-            emit(updatedState(site))
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), resetState())
+    fun trackers(tabId: String): StateFlow<ViewState> =
+        flow {
+                tabRepository.retrieveSiteData(tabId).asFlow().collect { site ->
+                    emit(updatedState(site))
+                }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), resetState())
 
-    private fun updatedState(site: Site) = ViewState(
-        domain = site.domain ?: "",
-        trackerCount = site.trackerCount,
-        allTrackersBlocked = site.allTrackersBlocked,
-        trackingEventsByNetwork = distinctTrackersByEntity(site.trackingEvents)
-    )
+    private fun updatedState(site: Site) =
+        ViewState(
+            domain = site.domain ?: "",
+            trackerCount = site.trackerCount,
+            allTrackersBlocked = site.allTrackersBlocked,
+            trackingEventsByNetwork = distinctTrackersByEntity(site.trackingEvents))
 
-    private fun resetState() = ViewState(
-        domain = "",
-        trackerCount = 0,
-        allTrackersBlocked = true,
-        trackingEventsByNetwork = emptySortedTrackingEventMap()
-    )
+    private fun resetState() =
+        ViewState(
+            domain = "",
+            trackerCount = 0,
+            allTrackersBlocked = true,
+            trackingEventsByNetwork = emptySortedTrackingEventMap())
 
-    private fun distinctTrackersByEntity(trackingEvents: List<TrackingEvent>): SortedMap<Entity, List<TrackingEvent>> {
+    private fun distinctTrackersByEntity(
+        trackingEvents: List<TrackingEvent>
+    ): SortedMap<Entity, List<TrackingEvent>> {
         val data = emptySortedTrackingEventMap()
-        for (event: TrackingEvent in trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
+        for (event: TrackingEvent in
+            trackingEvents.distinctBy { Uri.parse(it.trackerUrl).baseHost }) {
             val network = event.entity ?: createEntity(event.trackerUrl)
             val events = (data[network] ?: emptyList()).toMutableList()
             events.add(event)
@@ -91,9 +95,9 @@ class TrackerNetworksViewModel @Inject constructor(
 
 @Module
 @ContributesMultibinding(AppScope::class)
-class TrackerNetworksViewModelFactory @Inject constructor(
-    private val viewModel: Provider<TrackerNetworksViewModel>
-) : ViewModelFactoryPlugin {
+class TrackerNetworksViewModelFactory
+@Inject
+constructor(private val viewModel: Provider<TrackerNetworksViewModel>) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {

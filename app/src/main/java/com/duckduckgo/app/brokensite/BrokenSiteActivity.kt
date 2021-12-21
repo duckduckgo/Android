@@ -82,24 +82,16 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
 
         brokenSites.submitButton.setOnClickListener {
-            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
+            val webViewVersion =
+                WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName
+                    ?: WEBVIEW_UNKNOWN_VERSION
             viewModel.onSubmitPressed(webViewVersion)
         }
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                it?.let { processCommand(it) }
-            }
-        )
-        viewModel.viewState.observe(
-            this,
-            Observer {
-                it?.let { render(it) }
-            }
-        )
+        viewModel.command.observe(this, Observer { it?.let { processCommand(it) } })
+        viewModel.viewState.observe(this, Observer { it?.let { render(it) } })
     }
 
     private fun processCommand(command: Command) {
@@ -114,9 +106,11 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: ViewState) {
-        val category = viewState.categorySelected?.let {
-            getString(viewState.categorySelected.category)
-        }.orEmpty()
+        val category =
+            viewState
+                .categorySelected
+                ?.let { getString(viewState.categorySelected.category) }
+                .orEmpty()
         brokenSites.categoriesSelection.setText(category)
         brokenSites.submitButton.isEnabled = viewState.submitAllowed
     }

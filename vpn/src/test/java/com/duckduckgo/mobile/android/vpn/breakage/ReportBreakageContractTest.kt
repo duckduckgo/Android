@@ -29,19 +29,30 @@ class ReportBreakageContractTest {
 
     @Test
     fun whenCreateIntentForIssueDescriptionFormThenReturnCorrectIntent() {
-        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.IssueDescriptionForm("myApp", "my.package.com"))
-        assertEquals(ReportBreakageTextFormActivity::class.java.canonicalName, intent.component?.className)
+        val intent =
+            ReportBreakageContract()
+                .createIntent(
+                    context, ReportBreakageScreen.IssueDescriptionForm("myApp", "my.package.com"))
+        assertEquals(
+            ReportBreakageTextFormActivity::class.java.canonicalName, intent.component?.className)
     }
 
     @Test
     fun whenCreateIntentForListOfInstalledAppsThenReturnCorrectIntent() {
-        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.ListOfInstalledApps)
-        assertEquals(ReportBreakageAppListActivity::class.java.canonicalName, intent.component?.className)
+        val intent =
+            ReportBreakageContract().createIntent(context, ReportBreakageScreen.ListOfInstalledApps)
+        assertEquals(
+            ReportBreakageAppListActivity::class.java.canonicalName, intent.component?.className)
     }
 
     @Test
     fun whenCreateIntentForLoginInformationThenReturnCorrectIntent() {
-        val intent = ReportBreakageContract().createIntent(context, ReportBreakageScreen.LoginInformation("myApp", "my.package.com"))
-        assertEquals(ReportBreakageSingleChoiceFormActivity::class.java.canonicalName, intent.component?.className)
+        val intent =
+            ReportBreakageContract()
+                .createIntent(
+                    context, ReportBreakageScreen.LoginInformation("myApp", "my.package.com"))
+        assertEquals(
+            ReportBreakageSingleChoiceFormActivity::class.java.canonicalName,
+            intent.component?.className)
     }
 }

@@ -21,11 +21,13 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.service.VpnQueuesTimeLogger
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
-import org.json.JSONObject
 import javax.inject.Inject
+import org.json.JSONObject
 
 @ContributesMultibinding(VpnScope::class)
-class VpnQueueCollector @Inject constructor(
+class VpnQueueCollector
+@Inject
+constructor(
     private val vpnQueues: VpnQueues,
     private val vpnQueuesTimeLogger: VpnQueuesTimeLogger
 ) : VpnStateCollectorPlugin {
@@ -50,8 +52,12 @@ class VpnQueueCollector @Inject constructor(
 
     private fun queueTimingData(): JSONObject {
         return JSONObject().apply {
-            put(TIME_SINCE_LAST_BUFFER_TO_VPN, vpnQueuesTimeLogger.millisSinceLastDeviceToNetworkWrite())
-            put(TIME_SINCE_LAST_BUFFER_TO_TUN, vpnQueuesTimeLogger.millisSinceLastNetworkToDeviceWrite())
+            put(
+                TIME_SINCE_LAST_BUFFER_TO_VPN,
+                vpnQueuesTimeLogger.millisSinceLastDeviceToNetworkWrite())
+            put(
+                TIME_SINCE_LAST_BUFFER_TO_TUN,
+                vpnQueuesTimeLogger.millisSinceLastNetworkToDeviceWrite())
             put(TIME_SINCE_LAST_PACKET_PROCESSED, vpnQueuesTimeLogger.millisSinceLastBufferRead())
         }
     }

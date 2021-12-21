@@ -28,21 +28,20 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.launch
 
 class BookmarkFoldersViewModel(
     val bookmarksRepository: BookmarksRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
-    data class ViewState(
-        val folderStructure: List<BookmarkFolderItem> = emptyList()
-    )
+    data class ViewState(val folderStructure: List<BookmarkFolderItem> = emptyList())
 
     sealed class Command {
-        class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
+        class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) :
+            BookmarkFoldersViewModel.Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -52,9 +51,15 @@ class BookmarkFoldersViewModel(
         viewState.value = ViewState()
     }
 
-    fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
+    fun fetchBookmarkFolders(
+        selectedFolderId: Long,
+        rootFolderName: String,
+        currentFolder: BookmarkFolder?
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
+            val folderStructure =
+                bookmarksRepository.getFlatFolderStructure(
+                    selectedFolderId, currentFolder, rootFolderName)
             onFolderStructureCreated(folderStructure)
         }
     }
@@ -69,19 +74,19 @@ class BookmarkFoldersViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class BookmarkFoldersViewModelFactory @Inject constructor(
+class BookmarkFoldersViewModelFactory
+@Inject
+constructor(
     private val bookmarksRepository: Provider<BookmarksRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarkFoldersViewModel::class.java) -> (
-                    BookmarkFoldersViewModel(
-                        bookmarksRepository.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
+                isAssignableFrom(BookmarkFoldersViewModel::class.java) ->
+                    (BookmarkFoldersViewModel(
+                        bookmarksRepository.get(), dispatcherProvider.get()) as
+                        T)
                 else -> null
             }
         }

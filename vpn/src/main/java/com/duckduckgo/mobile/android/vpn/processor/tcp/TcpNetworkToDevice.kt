@@ -29,6 +29,13 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpStateFlow.Event.SendRe
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_TCP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
+import java.io.IOException
+import java.nio.ByteBuffer
+import java.nio.channels.SelectionKey
+import java.nio.channels.SelectionKey.OP_CONNECT
+import java.nio.channels.Selector
+import java.nio.channels.SocketChannel
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,13 +49,6 @@ import xyz.hexene.localvpn.Packet.TCPHeader.SYN
 import xyz.hexene.localvpn.TCB
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_RECEIVED
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_SENT
-import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.SelectionKey.OP_CONNECT
-import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
-import java.util.concurrent.TimeUnit
 
 class TcpNetworkToDevice(
     private val queues: VpnQueues,
@@ -61,8 +61,9 @@ class TcpNetworkToDevice(
 ) {
 
     /**
-     * Reads data from the network when the selector tells us it has a readable key.
-     * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
+     * Reads data from the network when the selector tells us it has a readable key. When data is
+     * read, we add it to the network-to-device queue, which will result in the packet being written
+     * back to the TUN.
      */
     @Suppress("BlockingMethodInNonBlockingContext")
     fun networkToDeviceProcessing() {
@@ -78,18 +79,20 @@ class TcpNetworkToDevice(
             val key = iterator.next()
             iterator.remove()
 
-            kotlin.runCatching {
-                if (key.isValid && key.isReadable) {
-                    processRead(key)
-                } else if (key.isValid && key.isConnectable) {
-                    processConnect(key)
-                } else if (key.isValid && key.isWritable) {
-                    processWrite(key)
+            kotlin
+                .runCatching {
+                    if (key.isValid && key.isReadable) {
+                        processRead(key)
+                    } else if (key.isValid && key.isConnectable) {
+                        processConnect(key)
+                    } else if (key.isValid && key.isWritable) {
+                        processWrite(key)
+                    }
                 }
-            }.onFailure {
-                Timber.w(it, "Failure processing selected key for selector")
-                key.cancel()
-            }
+                .onFailure {
+                    Timber.w(it, "Failure processing selected key for selector")
+                    key.cancel()
+                }
         }
     }
 
@@ -118,7 +121,12 @@ class TcpNetworkToDevice(
             val channel = key.channel() as SocketChannel
             try {
                 val readBytes = channel.read(receiveBuffer)
-                Timber.d("Read %d bytes from %s bound for %s/%s", readBytes, tcb.ipAndPort, tcb.requestingAppName, tcb.requestingAppPackage)
+                Timber.d(
+                    "Read %d bytes from %s bound for %s/%s",
+                    readBytes,
+                    tcb.ipAndPort,
+                    tcb.requestingAppName,
+                    tcb.requestingAppPackage)
 
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key)
@@ -136,20 +144,23 @@ class TcpNetworkToDevice(
         }
     }
 
-    private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
+    private fun sendToNetworkToDeviceQueue(
+        packet: Packet,
+        receiveBuffer: ByteBuffer,
+        tcb: TCB,
+        readBytes: Int
+    ) {
         Timber.v(
             "Network-to-device packet %s. %d bytes. %s",
             tcb.ipAndPort,
             readBytes,
-            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
-        )
+            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient))
         packet.updateTcpBuffer(
             receiveBuffer,
             (PSH or ACK).toByte(),
             tcb.sequenceNumberToClient,
             tcb.acknowledgementNumberToClient,
-            readBytes
-        )
+            readBytes)
 
         tcb.sequenceNumberToClient += readBytes
         receiveBuffer.position(HEADER_SIZE + readBytes)
@@ -163,15 +174,15 @@ class TcpNetworkToDevice(
             tcb.ipAndPort,
             tcb.tcbState,
             TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime),
-            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
-        )
+            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient))
 
         key.cancel()
 
         TcpStateFlow.socketEndOfStream().events.forEach { event ->
             when (event) {
                 is MoveState -> tcb.updateState(event)
-                SendFin -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = true)
+                SendFin ->
+                    tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = true)
                 SendReset -> sendReset(packet, tcb)
                 is SendDelayedFin -> {
                     vpnCoroutineScope.launch {
@@ -180,7 +191,9 @@ class TcpNetworkToDevice(
                         event.events.forEach { tcb.updateState(it) }
                     }
                 }
-                else -> Timber.w("Unhandled event for %s for socket end of stream. %s", tcb.ipAndPort, event)
+                else ->
+                    Timber.w(
+                        "Unhandled event for %s for socket end of stream. %s", tcb.ipAndPort, event)
             }
         }
     }
@@ -192,8 +205,7 @@ class TcpNetworkToDevice(
             (RST or ACK).toByte(),
             tcb.sequenceNumberToClient,
             tcb.acknowledgementNumberToClient,
-            0
-        )
+            0)
         tcb.sequenceNumberToClient++
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
 
@@ -218,8 +230,7 @@ class TcpNetworkToDevice(
                     (SYN or ACK).toByte(),
                     tcb.sequenceNumberToClient,
                     tcb.acknowledgementNumberToClient,
-                    0
-                )
+                    0)
 
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
                 tcb.sequenceNumberToClient++
@@ -229,16 +240,18 @@ class TcpNetworkToDevice(
                 Timber.v("Not finished connecting yet %s", tcb.ipAndPort)
                 tcb.channel.register(selector, OP_CONNECT, tcb)
             }
-        }.onFailure {
-            Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)
-            val responseBuffer = ByteBufferPool.acquire()
-            packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
-
-            offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
-
-            tcbCloser.closeConnection(tcb)
-            healthMetricCounter.onSocketChannelConnectError()
         }
+            .onFailure {
+                Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)
+                val responseBuffer = ByteBufferPool.acquire()
+                packet.updateTcpBuffer(
+                    responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
+
+                offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
+
+                tcbCloser.closeConnection(tcb)
+                healthMetricCounter.onSocketChannelConnectError()
+            }
     }
 
     private fun offerToNetworkToDeviceQueue(buffer: ByteBuffer, tcb: TCB, packet: Packet) {
@@ -251,11 +264,10 @@ class TcpNetworkToDevice(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
             tcb.ipAndPort,
             tcb.tcbState,
-            logPacketDetails(packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
+            logPacketDetails(
+                packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
             packet.ip4Header.totalLength,
-            packet.tcpPayloadSize(false)
-        )
-
+            packet.tcpPayloadSize(false))
     }
 
     private fun endOfStream(readBytes: Int) = readBytes == -1

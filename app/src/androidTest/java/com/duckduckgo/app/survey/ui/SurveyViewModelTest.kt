@@ -31,6 +31,7 @@ import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.nhaarman.mockitokotlin2.*
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -39,17 +40,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.MockitoAnnotations
-import java.util.concurrent.TimeUnit
 
 class SurveyViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineTestRule = CoroutineTestRule()
 
     private var mockCommandObserver: Observer<Command> = mock()
 
@@ -64,7 +60,12 @@ class SurveyViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.initMocks(this)
-        testee = SurveyViewModel(mockSurveyDao, mockStatisticsStore, mockAppInstallStore, coroutineTestRule.testDispatcherProvider)
+        testee =
+            SurveyViewModel(
+                mockSurveyDao,
+                mockStatisticsStore,
+                mockAppInstallStore,
+                coroutineTestRule.testDispatcherProvider)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -87,7 +88,8 @@ class SurveyViewModelTest {
     fun whenSurveyStartedThenParametersAddedToUrl() {
         whenever(mockStatisticsStore.atb).thenReturn(Atb("123"))
         whenever(mockStatisticsStore.variant).thenReturn("abc")
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
+        whenever(mockAppInstallStore.installTimestamp)
+            .thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
 
         val captor = argumentCaptor<Command.LoadSurvey>()
         testee.start(Survey("", "https://survey.com", null, SCHEDULED))

@@ -16,9 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import xyz.hexene.localvpn.Packet
 import java.util.*
 import javax.inject.Inject
+import xyz.hexene.localvpn.Packet
 
 class TracerPacketBuilder @Inject constructor() {
 
@@ -26,5 +26,4 @@ class TracerPacketBuilder @Inject constructor() {
         val tracerId = UUID.randomUUID().toString()
         return Packet.TracerPacker(tracerId)
     }
-
 }

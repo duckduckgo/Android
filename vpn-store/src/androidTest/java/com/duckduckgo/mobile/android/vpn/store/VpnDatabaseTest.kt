@@ -25,30 +25,30 @@ import org.junit.Rule
 import org.junit.Test
 
 class VpnDatabaseTest {
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    val testHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+    val testHelper =
+        MigrationTestHelper(
+            InstrumentationRegistry.getInstrumentation(),
+            VpnDatabase::class.qualifiedName,
+            FrameworkSQLiteOpenHelperFactory())
 
     @Test
     fun whenTestingAllMigrationsThenSucceeds() {
         createDatabase(18)
 
         Room.databaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java,
-            TEST_DB_NAME
-        ).addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray()).build().apply {
-            openHelper.writableDatabase.close()
-        }
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                VpnDatabase::class.java,
+                TEST_DB_NAME)
+            .addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray())
+            .build()
+            .apply { openHelper.writableDatabase.close() }
     }
 
     private fun createDatabase(version: Int) {
-        testHelper.createDatabase(TEST_DB_NAME, version).apply {
-            close()
-        }
+        testHelper.createDatabase(TEST_DB_NAME, version).apply { close() }
     }
 
     companion object {

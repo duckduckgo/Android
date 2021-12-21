@@ -46,7 +46,10 @@ interface WebViewClientListener {
     fun dialTelephoneNumberRequested(telephoneNumber: String)
     fun goFullScreen(view: View)
     fun exitFullScreen()
-    fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
+    fun showFileChooser(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: WebChromeClient.FileChooserParams
+    )
     fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isForMainFrame: Boolean): Boolean
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun openMessageInNewTab(message: Message)

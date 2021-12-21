@@ -17,8 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -30,9 +30,7 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface AddWidgetInstructionsActivityComponent : AndroidInjector<AddWidgetInstructionsActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<AddWidgetInstructionsActivity>
@@ -40,7 +38,8 @@ interface AddWidgetInstructionsActivityComponent : AndroidInjector<AddWidgetInst
 
 @ContributesTo(AppScope::class)
 interface AddWidgetInstructionsActivityComponentProvider {
-    fun provideAddWidgetInstructionsActivityComponentFactory(): AddWidgetInstructionsActivityComponent.Factory
+    fun provideAddWidgetInstructionsActivityComponentFactory():
+        AddWidgetInstructionsActivityComponent.Factory
 }
 
 @Module

@@ -19,11 +19,11 @@ package com.duckduckgo.app.browser.tabpreview
 import android.content.Context
 import android.graphics.Bitmap
 import com.duckduckgo.app.global.file.FileDeleter
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 
 interface WebViewPreviewPersister {
 
@@ -33,7 +33,8 @@ interface WebViewPreviewPersister {
     suspend fun deletePreviewsForTab(tabId: String, currentPreviewImage: String?)
 }
 
-class FileBasedWebViewPreviewPersister(val context: Context, private val fileDeleter: FileDeleter) : WebViewPreviewPersister {
+class FileBasedWebViewPreviewPersister(val context: Context, private val fileDeleter: FileDeleter) :
+    WebViewPreviewPersister {
 
     override suspend fun deleteAll() {
         fileDeleter.deleteDirectory(previewDestinationDirectory())
@@ -41,7 +42,6 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
 
     override suspend fun save(bitmap: Bitmap, tabId: String): String {
         return withContext(Dispatchers.IO) {
-
             val previewFile = prepareDestinationFile(tabId)
             writeBytesToFile(previewFile, bitmap)
 
@@ -101,5 +101,4 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
     companion object {
         const val TAB_PREVIEW_DIRECTORY = "tabPreviews"
     }
-
 }

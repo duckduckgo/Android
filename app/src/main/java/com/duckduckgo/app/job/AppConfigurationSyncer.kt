@@ -30,11 +30,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import io.reactivex.Completable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
@@ -47,7 +47,8 @@ class AppConfigurationSyncerModule {
         workManager: WorkManager,
         appConfigurationDownloader: ConfigurationDownloader
     ): LifecycleObserver {
-        return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
+        return AppConfigurationSyncer(
+            appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
     }
 }
 
@@ -63,10 +64,10 @@ class AppConfigurationSyncer(
     fun configureDataDownloader() {
         scheduleImmediateSync()
             .subscribeOn(Schedulers.io())
-            .doAfterTerminate {
-                scheduleRegularSync()
-            }
-            .subscribe({}, { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
+            .doAfterTerminate { scheduleRegularSync() }
+            .subscribe(
+                {},
+                { Timber.w("Failed to download initial app configuration ${it.localizedMessage}") })
     }
 
     @CheckResult
@@ -78,6 +79,7 @@ class AppConfigurationSyncer(
     fun scheduleRegularSync() {
         Timber.i("Scheduling regular sync")
         val workRequest = appConfigurationSyncWorkRequestBuilder.appConfigurationWork()
-        workManager.enqueueUniquePeriodicWork(APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
+        workManager.enqueueUniquePeriodicWork(
+            APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }
 }

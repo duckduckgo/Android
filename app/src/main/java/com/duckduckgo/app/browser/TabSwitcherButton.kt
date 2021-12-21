@@ -24,11 +24,10 @@ import android.widget.RelativeLayout
 import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class TabSwitcherButton @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : RelativeLayout(context, attrs, defStyleAttr) {
+class TabSwitcherButton
+@JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    RelativeLayout(context, attrs, defStyleAttr) {
 
     private val binding: ViewTabSwitcherButtonBinding by viewBinding()
 
@@ -50,32 +49,23 @@ class TabSwitcherButton @JvmOverloads constructor(
     }
 
     fun animateCount() {
-        fadeOutCount {
-            fadeInCount()
-        }
+        fadeOutCount { fadeInCount() }
     }
 
     private fun fadeOutCount(callback: () -> Unit) {
-        val listener = object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                // otherwise on end keeps being called repeatedly
-                binding.tabCount.animate().setListener(null)
-                callback()
+        val listener =
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    // otherwise on end keeps being called repeatedly
+                    binding.tabCount.animate().setListener(null)
+                    callback()
+                }
             }
-        }
 
-        binding.tabCount.animate()
-            .setDuration(300)
-            .alpha(0.0f)
-            .setListener(listener)
-            .start()
+        binding.tabCount.animate().setDuration(300).alpha(0.0f).setListener(listener).start()
     }
 
     private fun fadeInCount() {
-        binding.tabCount.animate()
-            .setDuration(300)
-            .alpha(1.0f)
-            .start()
+        binding.tabCount.animate().setDuration(300).alpha(1.0f).start()
     }
-
 }

@@ -23,14 +23,12 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
-import javax.inject.Inject
 
-class DebugLoggingReceiver(
-    context: Context,
-    receiver: (Intent) -> Unit
-) : InternalFeatureReceiver(context, receiver) {
+class DebugLoggingReceiver(context: Context, receiver: (Intent) -> Unit) :
+    InternalFeatureReceiver(context, receiver) {
 
     override fun intentAction(): String = ACTION
 
@@ -38,14 +36,10 @@ class DebugLoggingReceiver(
         private const val ACTION = "logging"
 
         fun turnOnIntent(): Intent {
-            return Intent(ACTION).apply {
-                putExtra("turn", "on")
-            }
+            return Intent(ACTION).apply { putExtra("turn", "on") }
         }
         fun turnOffIntent(): Intent {
-            return Intent(ACTION).apply {
-                putExtra("turn", "off")
-            }
+            return Intent(ACTION).apply { putExtra("turn", "off") }
         }
 
         fun isLoggingOnIntent(intent: Intent): Boolean {
@@ -59,26 +53,27 @@ class DebugLoggingReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class DebugLoggingReceiverRegister @Inject constructor(
-    private val context: Context
-) : VpnServiceCallbacks {
+class DebugLoggingReceiverRegister @Inject constructor(private val context: Context) :
+    VpnServiceCallbacks {
 
     private var receiver: DebugLoggingReceiver? = null
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         Timber.v("Debug receiver DebugLoggingReceiver registered")
 
-        receiver = DebugLoggingReceiver(context) { intent ->
-            when {
-                DebugLoggingReceiver.isLoggingOnIntent(intent) -> {
-                    TimberExtensions.enableLogging()
+        receiver =
+            DebugLoggingReceiver(context) { intent ->
+                when {
+                    DebugLoggingReceiver.isLoggingOnIntent(intent) -> {
+                        TimberExtensions.enableLogging()
+                    }
+                    DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
+                        TimberExtensions.disableLogging()
+                    }
+                    else -> Timber.w("Debug receiver DebugLoggingReceiver unknown intent")
                 }
-                DebugLoggingReceiver.isLoggingOffIntent(intent) -> {
-                    TimberExtensions.disableLogging()
-                }
-                else -> Timber.w("Debug receiver DebugLoggingReceiver unknown intent")
             }
-        }.apply { register() }
+                .apply { register() }
     }
 
     override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {

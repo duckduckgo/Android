@@ -31,9 +31,10 @@ import javax.inject.Inject
 class EmailWaitlistWorkRequestBuilder @Inject constructor() {
 
     fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest {
-        val requestBuilder = OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
-            .setConstraints(networkAvailable())
-            .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
+        val requestBuilder =
+            OneTimeWorkRequestBuilder<EmailWaitlistWorker>()
+                .setConstraints(networkAvailable())
+                .addTag(EMAIL_WAITLIST_SYNC_WORK_TAG)
 
         if (withBigDelay) {
             requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
@@ -44,33 +45,34 @@ class EmailWaitlistWorkRequestBuilder @Inject constructor() {
         return requestBuilder.build()
     }
 
-    private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    private fun networkAvailable() =
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     companion object {
         const val EMAIL_WAITLIST_SYNC_WORK_TAG = "EmailWaitlistWorker"
     }
 }
 
-class EmailWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class EmailWaitlistWorker(private val context: Context, workerParams: WorkerParameters) :
+    CoroutineWorker(context, workerParams) {
 
-    @Inject
-    lateinit var emailManager: EmailManager
+    @Inject lateinit var emailManager: EmailManager
 
-    @Inject
-    lateinit var notificationSender: NotificationSender
+    @Inject lateinit var notificationSender: NotificationSender
 
-    @Inject
-    lateinit var notification: EmailWaitlistCodeNotification
+    @Inject lateinit var notification: EmailWaitlistCodeNotification
 
-    @Inject
-    lateinit var emailWaitlistWorkRequestBuilder: EmailWaitlistWorkRequestBuilder
+    @Inject lateinit var emailWaitlistWorkRequestBuilder: EmailWaitlistWorkRequestBuilder
 
     override suspend fun doWork(): Result {
 
         when (emailManager.fetchInviteCode()) {
             AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
-            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(notification)
-            AppEmailManager.FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork())
+            AppEmailManager.FetchCodeResult.Code ->
+                notificationSender.sendNotification(notification)
+            AppEmailManager.FetchCodeResult.NoCode ->
+                WorkManager.getInstance(context)
+                    .enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork())
         }
 
         return Result.success()
@@ -78,7 +80,9 @@ class EmailWaitlistWorker(private val context: Context, workerParams: WorkerPara
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
+class AppConfigurationWorkerInjectorPlugin
+@Inject
+constructor(
     private val emailManager: EmailManager,
     private val notificationSender: NotificationSender,
     private val notification: EmailWaitlistCodeNotification,

@@ -19,14 +19,14 @@ package com.duckduckgo.app.fire
 import android.os.SystemClock
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
+import java.util.*
+import java.util.concurrent.TimeUnit.MINUTES
+import java.util.concurrent.TimeUnit.SECONDS
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import java.util.*
-import java.util.concurrent.TimeUnit.MINUTES
-import java.util.concurrent.TimeUnit.SECONDS
 
 @RunWith(Parameterized::class)
 class DataClearerTimeKeeperTest(private val testCase: TestCase) {
@@ -42,7 +42,8 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
             fun timeNow(): () -> Long = { SystemClock.elapsedRealtime() }
 
             return arrayOf(
-                // APP_EXIT_ONLY shouldn't be passed to this method - always expected to return false regardless of other configuration/inputs
+                // APP_EXIT_ONLY shouldn't be passed to this method - always expected to return
+                // false regardless of other configuration/inputs
                 TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(5), timeNow()),
                 TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(0), timeNow()),
                 TestCase(false, APP_EXIT_ONLY, MINUTES.toMillis(-5), timeNow()),
@@ -70,22 +71,26 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
                 // will return true when duration is >= 60 mins
                 TestCase(false, APP_EXIT_OR_60_MINS, MINUTES.toMillis(59), timeNow()),
                 TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(60), timeNow()),
-                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow())
-            )
+                TestCase(true, APP_EXIT_OR_60_MINS, MINUTES.toMillis(61), timeNow()))
         }
     }
 
     @Test
     fun enoughTimePassed() {
         val timestamp = getPastTimestamp(testCase.durationBackgrounded, testCase.timeNow.invoke())
-        assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
+        assertEquals(
+            testCase.expected,
+            testee.hasEnoughTimeElapsed(
+                backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
     }
 
     private fun getPastTimestamp(millisPreviously: Long, timeNow: Long): Long {
-        return Calendar.getInstance().also {
-            it.timeInMillis = timeNow
-            it.add(Calendar.MILLISECOND, (-millisPreviously).toInt())
-        }.timeInMillis
+        return Calendar.getInstance()
+            .also {
+                it.timeInMillis = timeNow
+                it.add(Calendar.MILLISECOND, (-millisPreviously).toInt())
+            }
+            .timeInMillis
     }
 
     data class TestCase(

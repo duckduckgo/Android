@@ -30,9 +30,7 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ReceiverScope::class)
-@MergeSubcomponent(
-    scope = ReceiverScope::class
-)
+@MergeSubcomponent(scope = ReceiverScope::class)
 interface VpnHeartbeatDeviceBootMonitorComponent : AndroidInjector<VpnHeartbeatDeviceBootMonitor> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<VpnHeartbeatDeviceBootMonitor>
@@ -40,7 +38,8 @@ interface VpnHeartbeatDeviceBootMonitorComponent : AndroidInjector<VpnHeartbeatD
 
 @ContributesTo(AppScope::class)
 interface VpnHeartbeatDeviceBootMonitorComponentProvider {
-    fun provideVpnHeartbeatDeviceBootMonitorComponentFactory(): VpnHeartbeatDeviceBootMonitorComponent.Factory
+    fun provideVpnHeartbeatDeviceBootMonitorComponentFactory():
+        VpnHeartbeatDeviceBootMonitorComponent.Factory
 }
 
 @Module

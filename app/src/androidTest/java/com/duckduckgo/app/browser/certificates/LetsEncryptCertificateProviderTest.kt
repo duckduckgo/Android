@@ -27,12 +27,14 @@ class LetsEncryptCertificateProviderTest {
     private val certificateProvider =
         LetsEncryptCertificateProviderImpl(
             setOf(
-                IsrgRootX1(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
-                IsrgRootX2(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
-                LetsEncryptR3(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
-                LetsEncryptE1(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
-            )
-        )
+                IsrgRootX1(
+                    InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
+                IsrgRootX2(
+                    InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
+                LetsEncryptR3(
+                    InstrumentationRegistry.getInstrumentation().targetContext.applicationContext),
+                LetsEncryptE1(
+                    InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)))
 
     @Test
     fun whenFindByCnameAndCnameHitThenReturnCertificate() {

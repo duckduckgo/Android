@@ -33,11 +33,9 @@ import org.mockito.MockitoAnnotations
 
 @RunWith(AndroidJUnit4::class)
 class DeviceShieldOnboardingTest {
-    @Mock
-    lateinit var sharedPreferences: SharedPreferences
+    @Mock lateinit var sharedPreferences: SharedPreferences
 
-    @Mock
-    lateinit var mockContext: Context
+    @Mock lateinit var mockContext: Context
 
     lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 
@@ -45,7 +43,8 @@ class DeviceShieldOnboardingTest {
     fun setup() {
         MockitoAnnotations.initMocks(this)
 
-        whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences)
+        whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE)))
+            .thenReturn(sharedPreferences)
 
         deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(mockContext)
     }

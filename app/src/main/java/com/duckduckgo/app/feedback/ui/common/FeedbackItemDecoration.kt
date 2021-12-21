@@ -41,19 +41,35 @@ class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemD
         }
     }
 
-    private fun drawTopDivider(canvas: Canvas, child: View, params: MarginLayoutParams, parentRight: Int) {
+    private fun drawTopDivider(
+        canvas: Canvas,
+        child: View,
+        params: MarginLayoutParams,
+        parentRight: Int
+    ) {
         val horizontalSize = horizontalSizeForFullWidthDivider(parentRight)
         val verticalSize = verticalSizeForTopDivider(child, params)
         drawDivider(canvas, horizontalSize, verticalSize)
     }
 
-    private fun drawBottomDivider(canvas: Canvas, parent: RecyclerView, child: View, params: MarginLayoutParams, i: Int, parentRight: Int) {
+    private fun drawBottomDivider(
+        canvas: Canvas,
+        parent: RecyclerView,
+        child: View,
+        params: MarginLayoutParams,
+        i: Int,
+        parentRight: Int
+    ) {
         val verticalSize = verticalSizeForBottomDivider(child, params)
         val horizontalSize = determineDividerWidth(i, parent, parentRight)
         drawDivider(canvas, horizontalSize, verticalSize)
     }
 
-    private fun determineDividerWidth(i: Int, parent: RecyclerView, parentRight: Int): HorizontalSize {
+    private fun determineDividerWidth(
+        i: Int,
+        parent: RecyclerView,
+        parentRight: Int
+    ): HorizontalSize {
         return if (isLastItem(i, parent)) {
             horizontalSizeForFullWidthDivider(parentRight)
         } else {
@@ -61,14 +77,23 @@ class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemD
         }
     }
 
-    private fun drawDivider(canvas: Canvas, horizontalSize: HorizontalSize, verticalSize: VerticalSize) {
-        divider.setBounds(horizontalSize.left, verticalSize.top, horizontalSize.right, verticalSize.bottom)
+    private fun drawDivider(
+        canvas: Canvas,
+        horizontalSize: HorizontalSize,
+        verticalSize: VerticalSize
+    ) {
+        divider.setBounds(
+            horizontalSize.left, verticalSize.top, horizontalSize.right, verticalSize.bottom)
         divider.draw(canvas)
     }
 
-    private fun horizontalSizeForFullWidthDivider(right: Int): HorizontalSize = HorizontalSize(left = 0, right = right)
+    private fun horizontalSizeForFullWidthDivider(right: Int): HorizontalSize =
+        HorizontalSize(left = 0, right = right)
 
-    private fun horizontalSizeForPartialWidthDivider(parent: RecyclerView, right: Int): HorizontalSize {
+    private fun horizontalSizeForPartialWidthDivider(
+        parent: RecyclerView,
+        right: Int
+    ): HorizontalSize {
         return HorizontalSize(left = parent.paddingLeft + INDENTATION_SIZE_DP.toPx(), right = right)
     }
 
@@ -78,7 +103,10 @@ class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemD
         return VerticalSize(top = top, bottom = bottom)
     }
 
-    private fun verticalSizeForBottomDivider(child: View, params: MarginLayoutParams): VerticalSize {
+    private fun verticalSizeForBottomDivider(
+        child: View,
+        params: MarginLayoutParams
+    ): VerticalSize {
         val top = child.bottom + params.bottomMargin
         val bottom = top + divider.intrinsicHeight
         return VerticalSize(top = top, bottom = bottom)
@@ -90,7 +118,8 @@ class FeedbackItemDecoration(private val divider: Drawable) : RecyclerView.ItemD
 
     private fun isFirstItem(position: Int) = position == 0
 
-    private fun isLastItem(position: Int, parent: RecyclerView) = (position + 1) == parent.totalItemCount()
+    private fun isLastItem(position: Int, parent: RecyclerView) =
+        (position + 1) == parent.totalItemCount()
 
     private fun RecyclerView.totalItemCount() = adapter?.itemCount
 

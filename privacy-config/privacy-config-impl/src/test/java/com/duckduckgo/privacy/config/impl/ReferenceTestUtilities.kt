@@ -28,10 +28,8 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDataStore
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -51,17 +49,26 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 
 @ExperimentalCoroutinesApi
-class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: DispatcherProvider) {
+class ReferenceTestUtilities(
+    db: PrivacyConfigDatabase,
+    val dispatcherProvider: DispatcherProvider
+) {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
     var privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var drmRepository: DrmRepository = RealDrmRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestCoroutineScope(), dispatcherProvider)
-    var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository =
+        RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var contentBlockingRepository: ContentBlockingRepository =
+        RealContentBlockingRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var httpsRepository: HttpsRepository =
+        RealHttpsRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var drmRepository: DrmRepository =
+        RealDrmRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var gpcRepository: GpcRepository =
+        RealGpcRepository(mock(), db, TestCoroutineScope(), dispatcherProvider)
+    var trackerAllowlistRepository: TrackerAllowlistRepository =
+        RealTrackerAllowlistRepository(db, TestCoroutineScope(), dispatcherProvider)
 
     // Add your plugin to this list in order for it to be tested against some basic reference tests
     private fun getPrivacyFeaturePlugins(): List<PrivacyFeaturePlugin> {
@@ -70,13 +77,12 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
             ContentBlockingPlugin(contentBlockingRepository, privacyFeatureTogglesRepository),
             DrmPlugin(drmRepository, privacyFeatureTogglesRepository),
             GpcPlugin(gpcRepository, privacyFeatureTogglesRepository),
-            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository)
-        )
+            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository))
     }
 
     fun getJsonPrivacyConfig(jsonFileName: String): JsonPrivacyConfig {
-        val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(
-            JsonPrivacyConfig::class.java)
+        val jsonAdapter: JsonAdapter<JsonPrivacyConfig> =
+            moshi.adapter(JsonPrivacyConfig::class.java)
         val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(jsonFileName))
         return config!!
     }
@@ -85,11 +91,11 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
     }
 
-    internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>):
-        PluginPoint<PrivacyFeaturePlugin> {
+    internal class FakePrivacyFeaturePluginPoint(
+        private val plugins: Collection<PrivacyFeaturePlugin>
+    ) : PluginPoint<PrivacyFeaturePlugin> {
         override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
             return plugins
         }
     }
-
 }

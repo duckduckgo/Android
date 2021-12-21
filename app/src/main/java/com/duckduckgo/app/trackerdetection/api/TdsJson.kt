@@ -28,31 +28,36 @@ class TdsJson {
 
     fun jsonToEntities(): List<TdsEntity> {
         return entities.mapNotNull { (key, value) ->
-            TdsEntity(key, value.displayName.takeIf { !it.isNullOrBlank() } ?: key, value.prevalence)
+            TdsEntity(
+                key, value.displayName.takeIf { !it.isNullOrBlank() } ?: key, value.prevalence)
         }
     }
 
     fun jsonToDomainEntities(): List<TdsDomainEntity> {
         return domains.mapNotNull { (key, value) ->
-            if (value == null) null
-            else TdsDomainEntity(key, value)
+            if (value == null) null else TdsDomainEntity(key, value)
         }
     }
 
     fun jsonToTrackers(): Map<String, TdsTracker> {
-        return trackers.mapNotNull { (key, value) ->
-            val domain = value.domain ?: return@mapNotNull null
-            val default = value.default ?: return@mapNotNull null
-            val owner = value.owner ?: return@mapNotNull null
-            key to TdsTracker(domain, default, owner.name, value.categories ?: emptyList(), value.rules ?: emptyList())
-        }.toMap()
+        return trackers
+            .mapNotNull { (key, value) ->
+                val domain = value.domain ?: return@mapNotNull null
+                val default = value.default ?: return@mapNotNull null
+                val owner = value.owner ?: return@mapNotNull null
+                key to
+                    TdsTracker(
+                        domain,
+                        default,
+                        owner.name,
+                        value.categories ?: emptyList(),
+                        value.rules ?: emptyList())
+            }
+            .toMap()
     }
 }
 
-class TdsJsonEntity(
-    val displayName: String?,
-    val prevalence: Double
-)
+class TdsJsonEntity(val displayName: String?, val prevalence: Double)
 
 data class TdsJsonTracker(
     val domain: String?,
@@ -62,9 +67,7 @@ data class TdsJsonTracker(
     val rules: List<Rule>?
 )
 
-data class TdsJsonOwner(
-    val name: String
-)
+data class TdsJsonOwner(val name: String)
 
 class ActionJsonAdapter {
 

@@ -17,12 +17,12 @@
 package com.duckduckgo.app.browser.certificates.rootstore
 
 import android.net.http.SslCertificate
-import com.duckduckgo.app.browser.certificates.toX509Certificate
 import com.duckduckgo.app.browser.certificates.CertificateType
 import com.duckduckgo.app.browser.certificates.CertificateTypes
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
-import timber.log.Timber
+import com.duckduckgo.app.browser.certificates.toX509Certificate
 import java.security.cert.*
+import timber.log.Timber
 
 interface TrustedCertificateStore {
     fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState
@@ -48,7 +48,9 @@ class TrustedCertificateStoreImpl(
      * @return [UntrustedChain] when we could not validate the [sslCertificate] certificate chain
      * @return [TrustedChain] when SSL certificated chain is validated
      */
-    override fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState {
+    override fun validateSslCertificateChain(
+        sslCertificate: SslCertificate
+    ): CertificateValidationState {
         return try {
             validateSslCertificateChainInternal(sslCertificate)
             CertificateValidationState.TrustedChain
@@ -61,7 +63,10 @@ class TrustedCertificateStoreImpl(
         }
     }
 
-    @Throws(CertificateException::class, CertificateExpiredException::class, CertificateNotYetValidException::class)
+    @Throws(
+        CertificateException::class,
+        CertificateExpiredException::class,
+        CertificateNotYetValidException::class)
     private fun validateSslCertificateChainInternal(sslCertificate: SslCertificate) {
         val issuer = letsEncryptCertificateProvider.findByCname(sslCertificate.issuedBy.cName)
         issuer?.let {

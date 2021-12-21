@@ -20,8 +20,7 @@ import com.squareup.moshi.Json
 
 data class TermsOfServiceJson(
     val score: Int,
-    @field:Json(name = "class")
-    val classification: Any,
+    @field:Json(name = "class") val classification: Any,
     val match: Match
 ) {
 

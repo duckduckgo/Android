@@ -29,18 +29,17 @@ import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.show
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.download_confirmation.view.*
-import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
+import kotlinx.android.synthetic.main.download_confirmation.view.*
+import timber.log.Timber
 
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     val listener: DownloadConfirmationDialogListener
         get() = parentFragment as DownloadConfirmationDialogListener
 
-    @Inject
-    lateinit var filenameExtractor: FilenameExtractor
+    @Inject lateinit var filenameExtractor: FilenameExtractor
 
     private var file: File? = null
 
@@ -53,7 +52,11 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.download_confirmation, container, false)
         setupDownload()
         setupViews(view)
@@ -61,18 +64,21 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        file = if (!pendingDownload.isDataUrl) {
-            when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
-                is FilenameExtractor.FilenameExtractionResult.Guess -> null
-                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(pendingDownload.directory, filenameExtraction.filename)
+        file =
+            if (!pendingDownload.isDataUrl) {
+                when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
+                    is FilenameExtractor.FilenameExtractionResult.Guess -> null
+                    is FilenameExtractor.FilenameExtractionResult.Extracted ->
+                        File(pendingDownload.directory, filenameExtraction.filename)
+                }
+            } else {
+                null
             }
-        } else {
-            null
-        }
     }
 
     private fun setupViews(view: View) {
-        view.downloadMessage.text = getString(R.string.downloadConfirmationSaveFileTitle, file?.name ?: "")
+        view.downloadMessage.text =
+            getString(R.string.downloadConfirmationSaveFileTitle, file?.name ?: "")
         view.replace.setOnClickListener {
             listener.replaceExistingFile(file, pendingDownload)
             dismiss()

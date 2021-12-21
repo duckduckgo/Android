@@ -19,8 +19,8 @@ package com.duckduckgo.app.referral
 import com.duckduckgo.app.referral.ParsedReferrerResult.*
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AppInstallationReferrerParser {
 
@@ -48,7 +48,8 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         for (part in referrerParts) {
 
             Timber.v("Analysing query param part: $part")
-            if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
+            if (part.startsWith(INSTALLATION_SOURCE_KEY) &&
+                part.endsWith(INSTALLATION_SOURCE_EU_AUCTION_VALUE)) {
                 Timber.i("App installed as a result of the EU auction")
                 return EuAuctionReferrerFound()
             }
@@ -103,9 +104,14 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
 }
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
-    data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class CampaignReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class EuAuctionReferrerFound(override val fromCache: Boolean = false) :
+        ParsedReferrerResult(fromCache)
+    data class CampaignReferrerFound(
+        val campaignSuffix: String,
+        override val fromCache: Boolean = false
+    ) : ParsedReferrerResult(fromCache)
+    data class ReferrerNotFound(override val fromCache: Boolean = false) :
+        ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
     object ReferrerInitialising : ParsedReferrerResult()
 }

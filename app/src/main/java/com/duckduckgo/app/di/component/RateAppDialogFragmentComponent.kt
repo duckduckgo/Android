@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface RateAppDialogFragmentComponent : AndroidInjector<RateAppDialogFragment> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<RateAppDialogFragment>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<RateAppDialogFragment>
 }
 
 @ContributesTo(AppScope::class)

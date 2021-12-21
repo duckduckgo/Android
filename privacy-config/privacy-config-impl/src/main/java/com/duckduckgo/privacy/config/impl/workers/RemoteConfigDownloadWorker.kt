@@ -30,12 +30,13 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
-class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerParameters) :
+    CoroutineWorker(context, workerParameters) {
     lateinit var privacyConfigDownloader: PrivacyConfigDownloader
     lateinit var dispatcherProvider: DispatcherProvider
 
@@ -49,25 +50,27 @@ class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerPara
             }
         }
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)
-class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager
-) : LifecycleObserver {
+class PrivacyConfigDownloadWorkerScheduler
+@Inject
+constructor(private val workManager: WorkManager) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleRemoteConfigDownload() {
         Timber.v("Scheduling remote config worker")
-        val workerRequest = PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(12, TimeUnit.HOURS)
-            .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
+        val workerRequest =
+            PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(12, TimeUnit.HOURS)
+                .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                .build()
+        workManager.enqueueUniquePeriodicWork(
+            PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
     }
 
     companion object {
-        private const val PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG = "PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG"
+        private const val PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG =
+            "PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG"
     }
 }

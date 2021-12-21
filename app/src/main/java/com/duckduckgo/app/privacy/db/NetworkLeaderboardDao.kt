@@ -22,8 +22,7 @@ import androidx.room.*
 @Dao
 abstract class NetworkLeaderboardDao {
 
-    @Query("select count from sites_visited")
-    abstract fun sitesVisited(): LiveData<Int>
+    @Query("select count from sites_visited") abstract fun sitesVisited(): LiveData<Int>
 
     @Transaction
     open fun incrementSitesVisited() {
@@ -33,8 +32,7 @@ abstract class NetworkLeaderboardDao {
         }
     }
 
-    @Insert
-    protected abstract fun initializeSitesVisited(entity: SitesVisitedEntity)
+    @Insert protected abstract fun initializeSitesVisited(entity: SitesVisitedEntity)
 
     @Query("UPDATE sites_visited SET count = count + 1")
     protected abstract fun incrementSitesVisitedIfExists(): Int

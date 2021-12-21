@@ -31,10 +31,10 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import dagger.Lazy
@@ -50,15 +50,11 @@ import org.mockito.Mockito.verify
 @Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
 
-    @get:Rule
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    val schedulers = InstantSchedulersRule()
+    @get:Rule val schedulers = InstantSchedulersRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
 
@@ -66,9 +62,11 @@ class FireproofWebsitesViewModelTest {
 
     private lateinit var db: AppDatabase
 
-    private val commandCaptor = ArgumentCaptor.forClass(FireproofWebsitesViewModel.Command::class.java)
+    private val commandCaptor =
+        ArgumentCaptor.forClass(FireproofWebsitesViewModel.Command::class.java)
 
-    private val viewStateCaptor = ArgumentCaptor.forClass(FireproofWebsitesViewModel.ViewState::class.java)
+    private val viewStateCaptor =
+        ArgumentCaptor.forClass(FireproofWebsitesViewModel.ViewState::class.java)
 
     private val mockCommandObserver: Observer<FireproofWebsitesViewModel.Command> = mock()
 
@@ -86,17 +84,21 @@ class FireproofWebsitesViewModelTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         fireproofWebsiteDao = db.fireproofWebsiteDao()
-        viewModel = FireproofWebsitesViewModel(
-            FireproofWebsiteRepository(fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
-            coroutineRule.testDispatcherProvider,
-            mockPixel,
-            mockSettingsDataStore,
-            mockUserEventsStore
-        )
+        viewModel =
+            FireproofWebsitesViewModel(
+                FireproofWebsiteRepository(
+                    fireproofWebsiteDao, coroutineRule.testDispatcherProvider, lazyFaviconManager),
+                coroutineRule.testDispatcherProvider,
+                mockPixel,
+                mockSettingsDataStore,
+                mockUserEventsStore)
         viewModel.command.observeForever(mockCommandObserver)
         viewModel.viewState.observeForever(mockViewStateObserver)
     }
@@ -168,11 +170,12 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
-    fun whenUserEnablesLoginDetectionThenRegisterEvent() = coroutineRule.runBlocking {
-        viewModel.onUserToggleLoginDetection(true)
+    fun whenUserEnablesLoginDetectionThenRegisterEvent() =
+        coroutineRule.runBlocking {
+            viewModel.onUserToggleLoginDetection(true)
 
-        verify(mockUserEventsStore).registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
-    }
+            verify(mockUserEventsStore).registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
+        }
 
     @Test
     fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
@@ -192,7 +195,9 @@ class FireproofWebsitesViewModelTest {
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
     }
 
-    private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(instanceAssertions: T.() -> Unit = {}) {
+    private inline fun <reified T : FireproofWebsitesViewModel.Command> assertCommandIssued(
+        instanceAssertions: T.() -> Unit = {}
+    ) {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is T }
         assertNotNull(issuedCommand)

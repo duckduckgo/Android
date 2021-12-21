@@ -23,12 +23,12 @@ import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import java.util.*
+import javax.inject.Inject
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
-import java.util.*
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -38,23 +38,20 @@ interface DeviceShieldPixels {
     fun deviceShieldDisabledOnSearch()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun deviceShieldEnabledOnAppLaunch()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun deviceShieldDisabledOnAppLaunch()
 
     /**
-     * This fun will fire two pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
+     * This fun will fire two pixels unique -> fire only once ever no matter how many times we call
+     * this fun daily -> fire only once a day no matter how many times we call this fun
      */
     fun reportEnabled()
 
@@ -68,41 +65,36 @@ interface DeviceShieldPixels {
     fun reportLastDayDisableCount(count: Int)
 
     /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire three pixels unique -> fire only once ever no matter how many times we
+     * call this fun daily -> fire only once a day no matter how many times we call this fun count
+     * -> fire a pixel on every call
      */
     fun enableFromReminderNotification()
 
     /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire three pixels unique -> fire only once ever no matter how many times we
+     * call this fun daily -> fire only once a day no matter how many times we call this fun count
+     * -> fire a pixel on every call
      */
     fun enableFromOnboarding()
 
     /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire three pixels unique -> fire only once ever no matter how many times we
+     * call this fun daily -> fire only once a day no matter how many times we call this fun count
+     * -> fire a pixel on every call
      */
     fun enableFromQuickSettingsTile()
 
     /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire three pixels unique -> fire only once ever no matter how many times we
+     * call this fun daily -> fire only once a day no matter how many times we call this fun count
+     * -> fire a pixel on every call
      */
     fun enableFromSummaryTrackerActivity()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun disableFromQuickSettingsTile()
 
@@ -121,89 +113,76 @@ interface DeviceShieldPixels {
     fun didPressOnWeeklyNotification(variant: Int)
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didPressOngoingNotification()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didShowReminderNotification()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didPressReminderNotification()
 
     /**
-     * This fun will fire three pixels
-     * unique -> fire only once ever no matter how many times we call this fun
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire three pixels unique -> fire only once ever no matter how many times we
+     * call this fun daily -> fire only once a day no matter how many times we call this fun count
+     * -> fire a pixel on every call
      */
     fun didShowNewTabSummary()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didPressNewTabSummary()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didShowSummaryTrackerActivity()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun didShowDetailedTrackerActivity()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun startError()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun automaticRestart()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun suddenKillBySystem()
 
     /**
-     * This fun will fire two pixels
-     * daily -> fire only once a day no matter how many times we call this fun
-     * count -> fire a pixel on every call
+     * This fun will fire two pixels daily -> fire only once a day no matter how many times we call
+     * this fun count -> fire a pixel on every call
      */
     fun suddenKillByVpnRevoked()
 
     /** Will fire a pixel on every call */
     fun privacyReportArticleDisplayed()
 
-    /**
-     * Will fire a pixel on every call
-     */
+    /** Will fire a pixel on every call */
     fun privacyReportOnboardingFAQDisplayed()
 
     fun vpnTunInterfaceIsDown()
@@ -232,9 +211,7 @@ interface DeviceShieldPixels {
     /** Will fire when the user restores to the default protection list */
     fun launchAppTPFeedback()
 
-    /**
-     * Will fire when the user reports an app breakage
-     */
+    /** Will fire when the user reports an app breakage */
     fun sendAppBreakageReport(metadata: Map<String, String>)
 
     fun didShowReportBreakageAppList()
@@ -243,9 +220,7 @@ interface DeviceShieldPixels {
 
     fun didShowReportBreakageSingleChoiceForm()
 
-    /**
-     * Will fire when the user wants to disable the VPN
-     */
+    /** Will fire when the user wants to disable the VPN */
     fun didShowDisableTrackingProtectionDialog()
 
     fun didChooseToDisableTrackingProtectionFromDialog()
@@ -254,34 +229,24 @@ interface DeviceShieldPixels {
 
     fun didChooseToCancelTrackingProtectionDialog()
 
-    /**
-     * Will fire when the waitlist dialog is showed to the user
-     */
+    /** Will fire when the waitlist dialog is showed to the user */
     fun didShowWaitlistDialog()
 
-    /**
-     * Will fire when the user presses "notify me" CTA in the waitlist dialog
-     */
+    /** Will fire when the user presses "notify me" CTA in the waitlist dialog */
     fun didPressWaitlistDialogNotifyMe()
 
-    /**
-     * Will fire when the user presses dismisses the waitlist dialog
-     */
+    /** Will fire when the user presses dismisses the waitlist dialog */
     fun didPressWaitlistDialogDismiss()
 
-    /**
-     * Will fire when user submits a health monitor report
-     */
+    /** Will fire when user submits a health monitor report */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
-
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealDeviceShieldPixels @Inject constructor(
-    private val context: Context,
-    private val pixel: Pixel
-) : DeviceShieldPixels {
+class RealDeviceShieldPixels
+@Inject
+constructor(private val context: Context, private val pixel: Pixel) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
@@ -314,18 +279,21 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun reportLastDayEnableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_ENABLE_COUNT_DAILY, mapOf("count" to count.toString()))
+        tryToFireDailyPixel(
+            DeviceShieldPixelNames.ATP_LAST_DAY_ENABLE_COUNT_DAILY,
+            mapOf("count" to count.toString()))
     }
 
     override fun reportLastDayDisableCount(count: Int) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAST_DAY_DISABLE_COUNT_DAILY, mapOf("count" to count.toString()))
+        tryToFireDailyPixel(
+            DeviceShieldPixelNames.ATP_LAST_DAY_DISABLE_COUNT_DAILY,
+            mapOf("count" to count.toString()))
     }
 
     override fun enableFromReminderNotification() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
-        )
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_REMINDER_NOTIFICATION)
     }
@@ -333,8 +301,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
-        )
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
     }
@@ -342,8 +309,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromQuickSettingsTile() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
-        )
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE)
     }
@@ -351,8 +317,7 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun enableFromSummaryTrackerActivity() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_UNIQUE,
-            tag = FIRST_ENABLE_ENTRY_POINT_TAG
-        )
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_SUMMARY_TRACKER_ACTIVITY)
     }
@@ -369,26 +334,26 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didShowDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant)
-        )
+            String.format(
+                Locale.US, DeviceShieldPixelNames.DID_SHOW_DAILY_NOTIFICATION.pixelName, variant))
     }
 
     override fun didPressOnDailyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant)
-        )
+            String.format(
+                Locale.US, DeviceShieldPixelNames.DID_PRESS_DAILY_NOTIFICATION.pixelName, variant))
     }
 
     override fun didShowWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant)
-        )
+            String.format(
+                Locale.US, DeviceShieldPixelNames.DID_SHOW_WEEKLY_NOTIFICATION.pixelName, variant))
     }
 
     override fun didPressOnWeeklyNotification(variant: Int) {
         tryToFireDailyPixel(
-            String.format(Locale.US, DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant)
-        )
+            String.format(
+                Locale.US, DeviceShieldPixelNames.DID_PRESS_WEEKLY_NOTIFICATION.pixelName, variant))
     }
 
     override fun didPressOngoingNotification() {
@@ -514,7 +479,8 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didShowReportBreakageSingleChoiceForm() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
+        tryToFireDailyPixel(
+            DeviceShieldPixelNames.ATP_DID_SHOW_REPORT_BREAKAGE_SINGLE_CHOICE_FORM_DAILY)
     }
 
     override fun didShowDisableTrackingProtectionDialog() {
@@ -557,7 +523,10 @@ class RealDeviceShieldPixels @Inject constructor(
         pixel.fire(p, payload)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixel: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         tryToFireDailyPixel(pixel.pixelName, payload)
     }
 
@@ -567,8 +536,9 @@ class RealDeviceShieldPixels @Inject constructor(
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            this.pixel.fire(pixelName, payload)
-                .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            this.pixel.fire(pixelName, payload).also {
+                preferences.edit { putString(pixelName.appendTimestampSuffix(), now) }
+            }
         }
     }
 
@@ -577,7 +547,9 @@ class RealDeviceShieldPixels @Inject constructor(
 
         if (didExecuteAlready) return
 
-        this.pixel.fire(pixel).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        this.pixel.fire(pixel).also {
+            preferences.edit { putBoolean(tag ?: pixel.pixelName, true) }
+        }
     }
 
     private fun String.appendTimestampSuffix(): String {

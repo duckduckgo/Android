@@ -36,21 +36,19 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.global.ViewModelFactory
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.mobile.android.ui.view.show
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
-import javax.inject.Inject
 
 class DefaultBrowserPage : OnboardingPageFragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var variantManager: VariantManager
+    @Inject lateinit var variantManager: VariantManager
 
     private var userTriedToSetDDGAsDefault = false
     private var userSelectedExternalBrowser = false
@@ -128,7 +126,8 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                         }
                         is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
                             setUiForDialog()
-                            if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
+                            if (it.showInstructionsCard) showInstructionsCard()
+                            else hideInstructionsCard()
                         }
                         is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
                             hideInstructionsCard()
@@ -136,22 +135,22 @@ class DefaultBrowserPage : OnboardingPageFragment() {
                         }
                     }
                 }
-            }
-        )
+            })
 
         viewModel.command.observe(
             this,
             Observer {
                 when (it) {
-                    is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
-                    is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
+                    is DefaultBrowserPageViewModel.Command.OpenDialog ->
+                        onLaunchDefaultBrowserWithDialogClicked(it.url)
+                    is DefaultBrowserPageViewModel.Command.OpenSettings ->
+                        onLaunchDefaultBrowserSettingsClicked()
                     is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
                         hideInstructionsCard()
                         onContinuePressed()
                     }
                 }
-            }
-        )
+            })
     }
 
     private fun setUiForDialog() {
@@ -163,7 +162,8 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun setUiForSettings() {
-        defaultBrowserImage.setImageResource(R.drawable.set_as_default_browser_illustration_settings)
+        defaultBrowserImage.setImageResource(
+            R.drawable.set_as_default_browser_illustration_settings)
         browserProtectionSubtitle.setText(R.string.onboardingDefaultBrowserDescription)
         browserProtectionTitle.setText(R.string.onboardingDefaultBrowserTitle)
         launchSettingsButton.setText(R.string.defaultBrowserLetsDoIt)
@@ -171,9 +171,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun setButtonsBehaviour() {
-        launchSettingsButton.setOnClickListener {
-            viewModel.onDefaultBrowserClicked()
-        }
+        launchSettingsButton.setOnClickListener { viewModel.onDefaultBrowserClicked() }
         continueButton.setOnClickListener {
             viewModel.onContinueToBrowser(userTriedToSetDDGAsDefault)
         }
@@ -188,11 +186,12 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         val inflater = LayoutInflater.from(requireContext())
         val inflatedView = inflater.inflate(R.layout.content_onboarding_default_browser_card, null)
 
-        toast = Toast(requireContext()).apply {
-            view = inflatedView
-            setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
-            duration = Toast.LENGTH_LONG
-        }
+        toast =
+            Toast(requireContext()).apply {
+                view = inflatedView
+                setGravity(Gravity.TOP or Gravity.FILL_HORIZONTAL, 0, 0)
+                duration = Toast.LENGTH_LONG
+            }
         toast?.show()
     }
 

@@ -26,7 +26,8 @@ interface SavedSitesManager {
     suspend fun export(uri: Uri): ExportSavedSitesResult
 }
 
-class RealSavedSitesManager constructor(
+class RealSavedSitesManager
+constructor(
     private val savedSitesImporter: SavedSitesImporter,
     private val savedSitesExporter: SavedSitesExporter,
     private val pixel: Pixel
@@ -53,7 +54,9 @@ class RealSavedSitesManager constructor(
                 pixel.fire(AppPixelName.BOOKMARK_IMPORT_ERROR)
             }
             is ImportSavedSitesResult.Success -> {
-                pixel.fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(BOOKMARK_COUNT to result.savedSites.size.toString()))
+                pixel.fire(
+                    AppPixelName.BOOKMARK_IMPORT_SUCCESS,
+                    mapOf(BOOKMARK_COUNT to result.savedSites.size.toString()))
             }
         }
         return result

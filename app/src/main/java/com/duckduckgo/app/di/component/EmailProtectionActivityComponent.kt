@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface EmailProtectionActivityComponent : AndroidInjector<EmailProtectionActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<EmailProtectionActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<EmailProtectionActivity>
 }
 
 @ContributesTo(AppScope::class)

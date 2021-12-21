@@ -28,22 +28,23 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import dagger.SingleInstanceIn
+import java.util.concurrent.Executors
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 /**
  * HealthMetricCounter is used to temporarily store raw health metrics
  *
  * APIs in here allow key health events to be
- *   - recorded as they happen. e.g., a socket exception.
- *   - queried later for a given time window
+ * - recorded as they happen. e.g., a socket exception.
+ * - queried later for a given time window
  */
 @SingleInstanceIn(AppScope::class)
-class HealthMetricCounter @Inject constructor(
+class HealthMetricCounter
+@Inject
+constructor(
     val context: Context,
     @VpnCoroutineScope val coroutineScope: CoroutineScope,
     val tracerPacketRegister: TracerPacketRegister
@@ -61,9 +62,7 @@ class HealthMetricCounter @Inject constructor(
     }
 
     fun onTunPacketReceived() {
-        coroutineScope.launch(databaseDispatcher) {
-            healthStatsDao.insertEvent(TUN_READ())
-        }
+        coroutineScope.launch(databaseDispatcher) { healthStatsDao.insertEvent(TUN_READ()) }
     }
 
     fun onWrittenToDeviceToNetworkQueue() {
@@ -107,9 +106,7 @@ class HealthMetricCounter @Inject constructor(
     }
 
     fun purgeOldMetrics() {
-        coroutineScope.launch(databaseDispatcher) {
-            healthStatsDao.purgeOldMetrics()
-        }
+        coroutineScope.launch(databaseDispatcher) { healthStatsDao.purgeOldMetrics() }
     }
 
     fun getAllPacketTraces(timeWindowMillis: Long): List<TracerPacketRegister.TracerSummary> {

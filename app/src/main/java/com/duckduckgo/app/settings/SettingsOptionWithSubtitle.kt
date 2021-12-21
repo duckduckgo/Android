@@ -34,9 +34,14 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsOptionWithSubtitle)
+        val attributes =
+            context.obtainStyledAttributes(attrs, R.styleable.SettingsOptionWithSubtitle)
         setTitle(attributes.getString(R.styleable.SettingsOptionWithSubtitle_title) ?: "")
         setSubtitle(attributes.getString(R.styleable.SettingsOptionWithSubtitle_subtitle) ?: "")
         attributes.recycle()
@@ -61,5 +66,4 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
             it.recursiveEnable(enabled)
         }
     }
-
 }

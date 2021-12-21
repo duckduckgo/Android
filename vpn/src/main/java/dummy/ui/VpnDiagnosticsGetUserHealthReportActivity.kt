@@ -38,19 +38,20 @@ class VpnDiagnosticsGetUserHealthReportActivity : DuckDuckGoActivity() {
 
     private fun configureUiEventHandlers() {
         binding.doneButton.setOnClickListener {
-
-            val healthStatusValue = when (binding.userHealthSelection.checkedRadioButtonId) {
-                binding.goodHealth.id -> "good"
-                binding.badHealth.id -> "bad"
-                else -> UNDETERMINED_STATUS
-            }
+            val healthStatusValue =
+                when (binding.userHealthSelection.checkedRadioButtonId) {
+                    binding.goodHealth.id -> "good"
+                    binding.badHealth.id -> "bad"
+                    else -> UNDETERMINED_STATUS
+                }
 
             val additionalNotes = binding.userHealthNotes.text.trim().toString()
 
-            val result = Intent().also {
-                it.putExtra(RESULT_DATA_KEY_STATUS, healthStatusValue)
-                it.putExtra(RESULT_DATA_KEY_NOTES, additionalNotes)
-            }
+            val result =
+                Intent().also {
+                    it.putExtra(RESULT_DATA_KEY_STATUS, healthStatusValue)
+                    it.putExtra(RESULT_DATA_KEY_NOTES, additionalNotes)
+                }
             setResult(RESULT_OK, result)
             finish()
         }
@@ -77,5 +78,3 @@ class VpnDiagnosticsGetUserHealthReportActivity : DuckDuckGoActivity() {
         const val UNDETERMINED_STATUS = "undetermined"
     }
 }
-
-

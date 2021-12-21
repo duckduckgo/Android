@@ -34,7 +34,8 @@ class EmptyNavigationStateTest {
 
     @Test
     fun whenEmptyNavigationStateFromNavigationStateThenNavigationPropertiesAreCleared() {
-        val emptyNavigationState = EmptyNavigationState(buildState("originalUrl", "currentUrl", "titlle"))
+        val emptyNavigationState =
+            EmptyNavigationState(buildState("originalUrl", "currentUrl", "titlle"))
 
         assertEquals(emptyNavigationState.stepsToPreviousPage, 0)
         assertFalse(emptyNavigationState.canGoBack)
@@ -42,7 +43,11 @@ class EmptyNavigationStateTest {
         assertFalse(emptyNavigationState.hasNavigationHistory)
     }
 
-    private fun buildState(originalUrl: String?, currentUrl: String?, title: String? = null): WebNavigationState {
+    private fun buildState(
+        originalUrl: String?,
+        currentUrl: String?,
+        title: String? = null
+    ): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
             currentUrl = currentUrl,
@@ -51,7 +56,6 @@ class EmptyNavigationStateTest {
             canGoBack = true,
             canGoForward = true,
             hasNavigationHistory = true,
-            progress = null
-        )
+            progress = null)
     }
 }

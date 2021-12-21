@@ -37,20 +37,19 @@ import com.duckduckgo.app.browser.tabpreview.TabEntityDiffCallback.Companion.DIF
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.image.GlideApp
 import com.duckduckgo.app.global.image.GlideRequests
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherAdapter.TabViewHolder
+import com.duckduckgo.mobile.android.ui.view.show
+import java.io.File
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 class TabSwitcherAdapter(
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) :
-    ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
+) : ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -63,8 +62,7 @@ class TabSwitcherAdapter(
             title = binding.title,
             close = binding.close,
             cardContentsContainer = binding.cardContentsContainer,
-            tabUnread = binding.tabUnread
-        )
+            tabUnread = binding.tabUnread)
     }
 
     override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
@@ -91,7 +89,11 @@ class TabSwitcherAdapter(
         holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
     }
 
-    override fun onBindViewHolder(holder: TabViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: TabViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
             return
@@ -110,13 +112,9 @@ class TabSwitcherAdapter(
                 loadTabPreviewImage(tab, GlideApp.with(holder.binding.root), holder)
             }
 
-            bundle[DIFF_KEY_TITLE]?.let {
-                holder.title.text = it as String
-            }
+            bundle[DIFF_KEY_TITLE]?.let { holder.title.text = it as String }
 
-            bundle[DIFF_KEY_VIEWED]?.let {
-                updateUnreadIndicator(holder, tab)
-            }
+            bundle[DIFF_KEY_VIEWED]?.let { updateUnreadIndicator(holder, tab) }
         }
     }
 
@@ -134,25 +132,23 @@ class TabSwitcherAdapter(
             return
         }
 
-        val cachedWebViewPreview = File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
+        val cachedWebViewPreview =
+            File(webViewPreviewPersister.fullPathForFile(tab.tabId, previewFile))
         if (!cachedWebViewPreview.exists()) {
             glide.clear(holder.tabPreview)
             return
         }
 
         holder.tabPreview.show()
-        glide.load(cachedWebViewPreview)
+        glide
+            .load(cachedWebViewPreview)
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(holder.tabPreview)
     }
 
     private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
-        holder.binding.root.setOnClickListener {
-            itemClickListener.onTabSelected(tab)
-        }
-        holder.close.setOnClickListener {
-            itemClickListener.onTabDeleted(tab)
-        }
+        holder.binding.root.setOnClickListener { itemClickListener.onTabSelected(tab) }
+        holder.close.setOnClickListener { itemClickListener.onTabDeleted(tab) }
     }
 
     fun updateData(data: List<TabEntity>?) {

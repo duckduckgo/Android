@@ -20,14 +20,13 @@ import android.content.Context
 import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
-import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.*
 
-class TypeAnimationTextView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : AppCompatTextView(context, attrs, defStyleAttr), CoroutineScope {
+class TypeAnimationTextView
+@JvmOverloads
+constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+    AppCompatTextView(context, attrs, defStyleAttr), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + Job()
@@ -37,7 +36,11 @@ class TypeAnimationTextView @JvmOverloads constructor(
     var typingDelayInMs: Long = 20
     var textInDialog: Spanned? = null
 
-    fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
+    fun startTypingAnimation(
+        textDialog: String,
+        isCancellable: Boolean = true,
+        afterAnimation: () -> Unit = {}
+    ) {
         textInDialog = textDialog.html(context)
         if (isCancellable) {
             setOnClickListener {
@@ -48,16 +51,17 @@ class TypeAnimationTextView @JvmOverloads constructor(
             }
         }
 
-        typingAnimationJob = launch {
-            textInDialog?.let {
-                it.mapIndexed { index, _ ->
-                    text = it.subSequence(0, index + 1)
-                    delay(typingDelayInMs)
+        typingAnimationJob =
+            launch {
+                textInDialog?.let {
+                    it.mapIndexed { index, _ ->
+                        text = it.subSequence(0, index + 1)
+                        delay(typingDelayInMs)
+                    }
+                    delay(delayAfterAnimationInMs)
+                    afterAnimation()
                 }
-                delay(delayAfterAnimationInMs)
-                afterAnimation()
             }
-        }
     }
 
     fun hasAnimationStarted() = typingAnimationJob?.isActive == true

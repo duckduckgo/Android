@@ -20,14 +20,14 @@ import android.app.job.JobParameters
 import android.app.job.JobScheduler
 import android.app.job.JobService
 import dagger.android.AndroidInjection
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
-@Deprecated("This is the old sync service which uses JobScheduler. A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards.")
+@Deprecated(
+    "This is the old sync service which uses JobScheduler. A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards.")
 class AppConfigurationJobService : JobService() {
 
-    @Inject
-    lateinit var jobScheduler: JobScheduler
+    @Inject lateinit var jobScheduler: JobScheduler
 
     override fun onCreate() {
         AndroidInjection.inject(this)
@@ -35,7 +35,8 @@ class AppConfigurationJobService : JobService() {
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
-        Timber.i("Deprecated AppConfigurationJobService running. Unscheduling future syncs using this job")
+        Timber.i(
+            "Deprecated AppConfigurationJobService running. Unscheduling future syncs using this job")
         jobScheduler.cancel(LEGACY_APP_CONFIGURATION_JOB_ID)
         return false
     }

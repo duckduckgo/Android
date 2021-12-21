@@ -30,15 +30,16 @@ class WaitlistNotificationDialog : DialogFragment() {
     var onDialogDismissed: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setMessage(R.string.waitlistNotificationDialogDescription)
-            .setNegativeButton(R.string.waitlistNotificationDialogNoThanks) { _, _ ->
-                onNoThanksClicked()
-                dismiss()
-            }
-            .setPositiveButton(R.string.waitlistNotificationDialogNotifyMe) { _, _ ->
-                onNotifyClicked()
-            }
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setMessage(R.string.waitlistNotificationDialogDescription)
+                .setNegativeButton(R.string.waitlistNotificationDialogNoThanks) { _, _ ->
+                    onNoThanksClicked()
+                    dismiss()
+                }
+                .setPositiveButton(R.string.waitlistNotificationDialogNotifyMe) { _, _ ->
+                    onNotifyClicked()
+                }
 
         return alertBuilder.create()
     }
@@ -51,5 +52,4 @@ class WaitlistNotificationDialog : DialogFragment() {
     companion object {
         fun create(): WaitlistNotificationDialog = WaitlistNotificationDialog()
     }
-
 }

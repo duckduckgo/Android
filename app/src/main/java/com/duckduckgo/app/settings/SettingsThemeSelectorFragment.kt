@@ -39,8 +39,7 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         val currentOption: DuckDuckGoTheme =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: LIGHT
 
-        val rootView =
-            View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
+        val rootView = View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             rootView.findViewById<RadioButton>(R.id.themeSelectorSystemDefault).visibility =
@@ -48,23 +47,25 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         }
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.themeSelectorGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.settingsTheme)
-            .setPositiveButton(R.string.settingsThemeDialogSave) { _, _ ->
-                dialog?.let {
-                    val radioGroup = it.findViewById(R.id.themeSelectorGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.themeSelectorLight -> LIGHT
-                        R.id.themeSelectorDark -> DARK
-                        R.id.themeSelectorSystemDefault -> SYSTEM_DEFAULT
-                        else -> LIGHT
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setTitle(R.string.settingsTheme)
+                .setPositiveButton(R.string.settingsThemeDialogSave) { _, _ ->
+                    dialog?.let {
+                        val radioGroup = it.findViewById(R.id.themeSelectorGroup) as RadioGroup
+                        val selectedOption =
+                            when (radioGroup.checkedRadioButtonId) {
+                                R.id.themeSelectorLight -> LIGHT
+                                R.id.themeSelectorDark -> DARK
+                                R.id.themeSelectorSystemDefault -> SYSTEM_DEFAULT
+                                else -> LIGHT
+                            }
+                        val listener = activity as Listener?
+                        listener?.onThemeSelected(selectedOption)
                     }
-                    val listener = activity as Listener?
-                    listener?.onThemeSelected(selectedOption)
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -90,11 +91,9 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         fun create(selectedFireAnimation: DuckDuckGoTheme?): SettingsThemeSelectorFragment {
             val fragment = SettingsThemeSelectorFragment()
 
-            fragment.arguments = Bundle().also {
-                it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation)
-            }
+            fragment.arguments =
+                Bundle().also { it.putSerializable(DEFAULT_OPTION_EXTRA, selectedFireAnimation) }
             return fragment
         }
     }
-
 }

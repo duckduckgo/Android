@@ -42,15 +42,12 @@ class AppConfigurationDownloader(
         val surveyDownload = surveyDownloader.download()
 
         return Completable.mergeDelayError(
-            listOf(
-                tdsDownload,
-                clearLegacyLists,
-                surrogatesDownload,
-                httpsUpgradeDownload,
-                surveyDownload
-            )
-        ).doOnComplete {
-            Timber.i("Download task completed successfully")
-        }
+                listOf(
+                    tdsDownload,
+                    clearLegacyLists,
+                    surrogatesDownload,
+                    httpsUpgradeDownload,
+                    surveyDownload))
+            .doOnComplete { Timber.i("Download task completed successfully") }
     }
 }

@@ -26,37 +26,32 @@ import dummy.ui.VpnPreferences
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
-@Deprecated(
-    message = "Do not add more view models here."
-)
+@Deprecated(message = "Do not add more view models here.")
 class VpnViewModelFactory @Inject constructor() : ViewModelProvider.NewInstanceFactory() {
 
-    @Inject
-    lateinit var applicationContext: Context
+    @Inject lateinit var applicationContext: Context
 
-    @Inject
-    lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
+    @Inject lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
 
-    @Inject
-    lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
+    @Inject lateinit var webTrackersBlockedRepository: WebTrackersBlockedRepository
 
-    @Inject
-    lateinit var vpnPreferences: VpnPreferences
+    @Inject lateinit var vpnPreferences: VpnPreferences
 
     override fun <T : ViewModel> create(modelClass: Class<T>) =
         with(modelClass) {
             when {
                 isAssignableFrom(VpnControllerViewModel::class.java) -> vpnControllerViewModel()
-                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+                else ->
+                    throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
             }
-        } as T
+        } as
+            T
 
     private fun vpnControllerViewModel(): VpnControllerViewModel {
         return VpnControllerViewModel(
             applicationContext = applicationContext,
             appTrackerBlockedRepository = appTrackerBlockingStatsRepository,
             webTrackersBlockedRepository = webTrackersBlockedRepository,
-            vpnPreferences = vpnPreferences
-        )
+            vpnPreferences = vpnPreferences)
     }
 }

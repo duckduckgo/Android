@@ -27,9 +27,8 @@ interface TaskStackBuilderFactory {
 }
 
 @ContributesBinding(AppScope::class)
-class RealTaskStackBuilderFactory @Inject constructor(
-    private val context: Context
-) : TaskStackBuilderFactory {
+class RealTaskStackBuilderFactory @Inject constructor(private val context: Context) :
+    TaskStackBuilderFactory {
     override fun createTaskBuilder(): TaskStackBuilder {
         return TaskStackBuilder.create(context)
     }

@@ -17,8 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.cohort
 
 interface AtpCohortManager {
-    /**
-     * @return the AppTP cohort if it exist, [null] otherwise
-     */
+    /** @return the AppTP cohort if it exist, [null] otherwise */
     fun getCohort(): String?
 }

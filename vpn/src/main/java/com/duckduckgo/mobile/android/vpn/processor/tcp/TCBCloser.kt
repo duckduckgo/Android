@@ -17,17 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import javax.inject.Inject
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
-import javax.inject.Inject
 
 class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
 
-    /**
-     * Close the TCB connection and perform the necessary cleanup to remove it from caches
-     */
+    /** Close the TCB connection and perform the necessary cleanup to remove it from caches */
     fun closeConnection(tcb: TCB) {
         Timber.v("Closing TCB connection %s", tcb.ipAndPort)
         socketWriter.removeFromWriteQueue(tcb)
@@ -49,16 +47,23 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
             Timber.d(
                 "%s - Sending RST, %s %s, response=[seqNum=%d, ackNum=%d] - previous=[seqNum=%d, ackNum =%d, payloadSize=%d]",
                 tcb.ipAndPort,
-                tcb.requestingAppPackage, tcb.trackerHostName,
-                responseSeq, responseAck,
-                tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, payloadSize
-            )
+                tcb.requestingAppPackage,
+                tcb.trackerHostName,
+                responseSeq,
+                responseAck,
+                tcb.sequenceNumberToClient,
+                tcb.acknowledgementNumberToClient,
+                payloadSize)
 
-            tcb.referencePacket.updateTcpBuffer(buffer, (Packet.TCPHeader.RST or Packet.TCPHeader.ACK).toByte(), responseSeq, responseAck, 0)
+            tcb.referencePacket.updateTcpBuffer(
+                buffer,
+                (Packet.TCPHeader.RST or Packet.TCPHeader.ACK).toByte(),
+                responseSeq,
+                responseAck,
+                0)
         }
         queues.networkToDevice.offerFirst(buffer)
 
         closeConnection(tcb)
     }
-
 }

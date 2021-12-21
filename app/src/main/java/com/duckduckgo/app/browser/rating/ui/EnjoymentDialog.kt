@@ -26,8 +26,7 @@ import javax.inject.Inject
 
 abstract class EnjoymentDialog : DialogFragment() {
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
     val promptCount: PromptCount
         get() = PromptCount(requireArguments()[PROMPT_COUNT_BUNDLE_KEY] as Int)

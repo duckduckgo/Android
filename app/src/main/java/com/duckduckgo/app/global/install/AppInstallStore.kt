@@ -24,9 +24,9 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 interface AppInstallStore : LifecycleObserver {
     var installTimestamp: Long
@@ -44,14 +44,16 @@ fun AppInstallStore.daysInstalled(): Long {
     return TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installTimestamp)
 }
 
-class AppInstallSharedPreferences @Inject constructor(private val context: Context) : AppInstallStore {
+class AppInstallSharedPreferences @Inject constructor(private val context: Context) :
+    AppInstallStore {
     override var installTimestamp: Long
         get() = preferences.getLong(KEY_TIMESTAMP_UTC, 0L)
         set(timestamp) = preferences.edit { putLong(KEY_TIMESTAMP_UTC, timestamp) }
 
     override var widgetInstalled: Boolean
         get() = preferences.getBoolean(KEY_WIDGET_INSTALLED, false)
-        set(widgetInstalled) = preferences.edit { putBoolean(KEY_WIDGET_INSTALLED, widgetInstalled) }
+        set(widgetInstalled) =
+            preferences.edit { putBoolean(KEY_WIDGET_INSTALLED, widgetInstalled) }
 
     override var defaultBrowser: Boolean
         get() = preferences.getBoolean(KEY_DEFAULT_BROWSER, false)
@@ -59,7 +61,8 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     override var newDefaultBrowserDialogCount: Int
         get() = preferences.getInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, 0)
-        set(defaultBrowser) = preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
+        set(defaultBrowser) =
+            preferences.edit { putInt(ROLE_MANAGER_BROWSER_DIALOG_KEY, defaultBrowser) }
 
     override fun hasInstallTimestampRecorded(): Boolean = preferences.contains(KEY_TIMESTAMP_UTC)
 
@@ -76,8 +79,7 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
     }
 
     companion object {
-        @VisibleForTesting
-        const val FILENAME = "com.duckduckgo.app.install.settings"
+        @VisibleForTesting const val FILENAME = "com.duckduckgo.app.install.settings"
         const val KEY_TIMESTAMP_UTC = "INSTALL_TIMESTAMP_UTC"
         const val KEY_WIDGET_INSTALLED = "KEY_WIDGET_INSTALLED"
         const val KEY_DEFAULT_BROWSER = "KEY_DEFAULT_BROWSER"

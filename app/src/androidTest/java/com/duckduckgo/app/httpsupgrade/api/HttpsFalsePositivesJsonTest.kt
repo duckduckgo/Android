@@ -29,14 +29,16 @@ class HttpsFalsePositivesJsonTest {
     fun whenGivenValidJsonThenParsesCorrectly() {
 
         val moshi = Moshi.Builder().add(HttpsFalsePositivesJsonAdapter()).build()
-        val type = Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
+        val type =
+            Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
         val jsonAdapter: JsonAdapter<List<HttpsFalsePositiveDomain>> = moshi.adapter(type)
 
         val list = jsonAdapter.fromJson(json())!!
         assertEquals(7, list.count())
     }
 
-    private fun json(): String = """
+    private fun json(): String =
+        """
         {
             "data": [
                 "mlb.mlb.com",

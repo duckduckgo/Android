@@ -24,10 +24,10 @@ import android.webkit.WebView
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.*
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
-import timber.log.Timber
+import com.duckduckgo.app.statistics.pixels.Pixel
 import javax.inject.Inject
+import timber.log.Timber
 
 interface LongPressHandler {
     fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu)
@@ -43,10 +43,17 @@ interface LongPressHandler {
     }
 }
 
-class WebViewLongPressHandler @Inject constructor(private val context: Context, private val pixel: Pixel) : LongPressHandler {
+class WebViewLongPressHandler
+@Inject
+constructor(private val context: Context, private val pixel: Pixel) : LongPressHandler {
 
-    override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
-        menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
+    override fun handleLongPress(
+        longPressTargetType: Int,
+        longPressTargetUrl: String?,
+        menu: ContextMenu
+    ) {
+        menu.setHeaderTitle(
+            longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
 
         var menuShown = true
         when (longPressTargetType) {
@@ -75,24 +82,43 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         if (menuShown) {
             pixel.fire(LONG_PRESS)
         }
-
     }
 
     private fun addImageMenuOptions(menu: ContextMenu) {
-        menu.add(0, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, CONTEXT_MENU_ID_DOWNLOAD_IMAGE, R.string.downloadImage)
-        menu.add(0, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB, R.string.openImageInNewTab)
+        menu.add(
+            0,
+            CONTEXT_MENU_ID_DOWNLOAD_IMAGE,
+            CONTEXT_MENU_ID_DOWNLOAD_IMAGE,
+            R.string.downloadImage)
+        menu.add(
+            0,
+            CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB,
+            CONTEXT_MENU_ID_OPEN_IMAGE_IN_NEW_BACKGROUND_TAB,
+            R.string.openImageInNewTab)
     }
 
     private fun addLinkMenuOptions(menu: ContextMenu) {
-        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_TAB, R.string.openInNewTab)
-        menu.add(0, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB, R.string.openInNewBackgroundTab)
+        menu.add(
+            0,
+            CONTEXT_MENU_ID_OPEN_IN_NEW_TAB,
+            CONTEXT_MENU_ID_OPEN_IN_NEW_TAB,
+            R.string.openInNewTab)
+        menu.add(
+            0,
+            CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB,
+            CONTEXT_MENU_ID_OPEN_IN_NEW_BACKGROUND_TAB,
+            R.string.openInNewBackgroundTab)
         menu.add(0, CONTEXT_MENU_ID_COPY, CONTEXT_MENU_ID_COPY, R.string.copyUrl)
         menu.add(0, CONTEXT_MENU_ID_SHARE_LINK, CONTEXT_MENU_ID_SHARE_LINK, R.string.shareLink)
     }
 
-    private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
+    private fun isLinkSupported(longPressTargetUrl: String?) =
+        URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
 
-    override fun userSelectedMenuItem(longPressTarget: LongPressTarget, item: MenuItem): RequiredAction {
+    override fun userSelectedMenuItem(
+        longPressTarget: LongPressTarget,
+        item: MenuItem
+    ): RequiredAction {
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
                 pixel.fire(LONG_PRESS_NEW_TAB)

@@ -27,7 +27,8 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import kotlinx.android.synthetic.main.view_device_shield_report_app_breakage_entry.view.*
 
-class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {
+class ReportBreakageAppListAdapter(private val listener: Listener) :
+    RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {
 
     private val installedApps: MutableList<InstalledApp> = mutableListOf()
 
@@ -39,9 +40,13 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportBreakageAppListViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ReportBreakageAppListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
+        val view =
+            inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
         return ReportBreakageAppListViewHolder(view)
     }
 
@@ -76,7 +81,6 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
-
     }
 
     interface Listener {
@@ -85,21 +89,28 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
 }
 
 class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    fun bind(installedApp: InstalledApp, position: Int, listener: ReportBreakageAppListAdapter.Listener) {
+    fun bind(
+        installedApp: InstalledApp,
+        position: Int,
+        listener: ReportBreakageAppListAdapter.Listener
+    ) {
         itemView.deviceShieldInstalledAppEntryName.text =
-            String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)
+            String.format(
+                    itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry),
+                    installedApp.name)
                 .applyBoldSpanTo(listOf(installedApp.name))
 
-        itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
+        itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) {
+            _,
+            _ ->
             listener.onInstalledAppSelected(installedApp, position)
         }
 
         // also set the listener in the container view
-        itemView.setOnClickListener {
-            listener.onInstalledAppSelected(installedApp, position)
-        }
+        itemView.setOnClickListener { listener.onInstalledAppSelected(installedApp, position) }
 
-        val appIcon = itemView.context.packageManager.safeGetApplicationIcon(installedApp.packageName)
+        val appIcon =
+            itemView.context.packageManager.safeGetApplicationIcon(installedApp.packageName)
         itemView.deviceShieldInstalledAppEntryIcon.setImageDrawable(appIcon)
     }
 }

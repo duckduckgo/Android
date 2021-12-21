@@ -31,7 +31,8 @@ class BookmarksEntityQueryListener(
         viewModel.viewState.value?.bookmarks?.let { bookmarks ->
             viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
                 val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
-                bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
+                bookmarksAdapter.setItems(
+                    filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
                 bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
             }
         }
@@ -42,19 +43,29 @@ class BookmarksEntityQueryListener(
         return false
     }
 
-    private fun filterBookmarks(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
+    private fun filterBookmarks(
+        query: String,
+        bookmarks: List<SavedSite.Bookmark>
+    ): List<BookmarksAdapter.BookmarkItem> {
         val lowercaseQuery = query.toLowerCase()
-        return bookmarks.filter {
-            val lowercaseTitle = it.title.toLowerCase()
-            lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
-        }.map { BookmarksAdapter.BookmarkItem(it) }
+        return bookmarks
+            .filter {
+                val lowercaseTitle = it.title.toLowerCase()
+                lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
+            }
+            .map { BookmarksAdapter.BookmarkItem(it) }
     }
 
-    private fun filterBookmarkFolders(query: String, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
+    private fun filterBookmarkFolders(
+        query: String,
+        bookmarkFolders: List<BookmarkFolder>
+    ): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
         val lowercaseQuery = query.toLowerCase()
-        return bookmarkFolders.filter {
-            val lowercaseTitle = it.name.toLowerCase()
-            lowercaseTitle.contains(lowercaseQuery)
-        }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+        return bookmarkFolders
+            .filter {
+                val lowercaseTitle = it.name.toLowerCase()
+                lowercaseTitle.contains(lowercaseQuery)
+            }
+            .map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
     }
 }

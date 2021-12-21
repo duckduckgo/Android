@@ -52,11 +52,12 @@ class WebsitesAdapter(
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val sortedHeaderElements = listOf(
-        DESCRIPTION_TYPE,
-        DIVIDER_TYPE,
-        SECTION_TITLE_TYPE,
-    )
+    private val sortedHeaderElements =
+        listOf(
+            DESCRIPTION_TYPE,
+            DIVIDER_TYPE,
+            SECTION_TITLE_TYPE,
+        )
 
     private fun itemsOnTopOfList() = sortedHeaderElements.size
 
@@ -88,11 +89,12 @@ class WebsitesAdapter(
         return getItemsSize() + itemsOnTopOfList()
     }
 
-    private fun getItemsSize() = if (entries.isEmpty()) {
-        EMPTY_HINT_ITEM_SIZE
-    } else {
-        entries.size
-    }
+    private fun getItemsSize() =
+        if (entries.isEmpty()) {
+            EMPTY_HINT_ITEM_SIZE
+        } else {
+            entries.size
+        }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WebsiteViewHolder {
         Timber.d("Whitelist: onCreateViewHolder $viewType ")
@@ -115,12 +117,7 @@ class WebsitesAdapter(
             SITE_ENTRY -> {
                 val binding = ViewListSingleItemEntryBinding.inflate(inflater, parent, false)
                 WebsiteViewHolder.WebsiteItemViewHolder(
-                    inflater,
-                    binding,
-                    viewModel,
-                    lifecycleOwner,
-                    faviconManager
-                )
+                    inflater, binding, viewModel, lifecycleOwner, faviconManager)
             }
             EMPTY_STATE_TYPE -> {
                 val binding = ViewListItemEmptyHintBinding.inflate(inflater, parent, false)
@@ -158,21 +155,19 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             val listItem = binding.root
             this.entity = entity
 
-            listItem.contentDescription = context.getString(
-                R.string.fireproofWebsiteOverflowContentDescription,
-                entity.domain
-            )
+            listItem.contentDescription =
+                context.getString(
+                    R.string.fireproofWebsiteOverflowContentDescription, entity.domain)
 
             listItem.setTitle(entity.domain)
             loadFavicon(entity.domain)
-            listItem.setOverflowClickListener { anchor ->
-                showOverFlowMenu(anchor, entity)
-            }
+            listItem.setOverflowClickListener { anchor -> showOverFlowMenu(anchor, entity) }
         }
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(
+                    url = url, view = itemView.findViewById(R.id.image))
             }
         }
 
@@ -180,8 +175,12 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.edit)) { viewModel.onEditRequested(entity) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { viewModel.onDeleteRequested(entity) }
+                onMenuItemClicked(view.findViewById(R.id.edit)) {
+                    viewModel.onEditRequested(entity)
+                }
+                onMenuItemClicked(view.findViewById(R.id.delete)) {
+                    viewModel.onDeleteRequested(entity)
+                }
             }
             popupMenu.show(binding.root, anchor)
         }

@@ -30,18 +30,19 @@ import org.junit.Test
 
 class TabsDaoTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var database: AppDatabase
     private lateinit var testee: TabsDao
 
     @Before
     fun before() {
-        database = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         testee = database.tabsDao()
     }
 
@@ -57,11 +58,7 @@ class TabsDaoTest {
 
     @Test
     fun whenOnlyDeletableTabsExistTabsReturnsEmpty() {
-        val deletableTab = TabEntity(
-            tabId = "ID",
-            position = 0,
-            deletable = true
-        )
+        val deletableTab = TabEntity(tabId = "ID", position = 0, deletable = true)
         testee.insertTab(deletableTab)
 
         assertTrue(testee.tabs().isEmpty())
@@ -69,11 +66,7 @@ class TabsDaoTest {
 
     @Test
     fun whenOnlyDeletableTabsExistTabReturnsMatch() {
-        val deletableTab = TabEntity(
-            tabId = "ID",
-            position = 0,
-            deletable = true
-        )
+        val deletableTab = TabEntity(tabId = "ID", position = 0, deletable = true)
         testee.insertTab(deletableTab)
 
         assertEquals(deletableTab, testee.tab("ID"))
@@ -254,7 +247,8 @@ class TabsDaoTest {
     @Test
     fun whenSourceTabDeletedThenRelatedTabsUpdated() {
         val firstTab = TabEntity("TAB_ID", "http//updatedexample.com", position = 0)
-        val secondTab = TabEntity("TAB_ID_1", "http//updatedexample.com", position = 1, sourceTabId = "TAB_ID")
+        val secondTab =
+            TabEntity("TAB_ID_1", "http//updatedexample.com", position = 1, sourceTabId = "TAB_ID")
         testee.insertTab(firstTab)
         testee.insertTab(secondTab)
 
@@ -278,17 +272,10 @@ class TabsDaoTest {
 
     @Test
     fun whenSelectedTabMarkedAsDeletableAndPurgedThenUpdateSelection() {
-        val tab = TabEntity(
-            tabId = "TAB_ID",
-            url = "www.duckduckgo.com",
-            position = 0
-        )
-        val deletableTab = TabEntity(
-            tabId = "TAB_ID_1",
-            url = "www.duckduckgo.com",
-            position = 1,
-            deletable = true
-        )
+        val tab = TabEntity(tabId = "TAB_ID", url = "www.duckduckgo.com", position = 0)
+        val deletableTab =
+            TabEntity(
+                tabId = "TAB_ID_1", url = "www.duckduckgo.com", position = 1, deletable = true)
 
         testee.insertTab(tab)
         testee.addAndSelectTab(deletableTab)
@@ -299,11 +286,7 @@ class TabsDaoTest {
 
     @Test
     fun whenMarkTabAsDeletableThenModifyOnlyDeletableColumn() {
-        val tab = TabEntity(
-            tabId = "TAB_ID",
-            url = "www.duckduckgo.com",
-            position = 0
-        )
+        val tab = TabEntity(tabId = "TAB_ID", url = "www.duckduckgo.com", position = 0)
 
         testee.insertTab(tab)
         testee.markTabAsDeletable(tab.copy(url = "www.other.com"))
@@ -313,12 +296,8 @@ class TabsDaoTest {
 
     @Test
     fun whenUndoDeletableTabThenModifyOnlyDeletableColumn() {
-        val tab = TabEntity(
-            tabId = "TAB_ID",
-            url = "www.duckduckgo.com",
-            position = 0,
-            deletable = true
-        )
+        val tab =
+            TabEntity(tabId = "TAB_ID", url = "www.duckduckgo.com", position = 0, deletable = true)
 
         testee.insertTab(tab)
         testee.undoDeletableTab(tab.copy(url = "www.other.com"))

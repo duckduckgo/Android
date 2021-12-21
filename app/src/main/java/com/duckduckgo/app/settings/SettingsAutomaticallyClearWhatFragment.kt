@@ -35,27 +35,31 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
+        val currentOption: ClearWhatOption =
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
 
-        val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
+        val rootView =
+            View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
         updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhatGroup))
 
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
-            .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
-            .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
-                dialog?.let {
-                    val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.settingTabsOnly -> CLEAR_TABS_ONLY
-                        R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
-                        else -> CLEAR_NONE
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setView(rootView)
+                .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
+                .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
+                    dialog?.let {
+                        val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
+                        val selectedOption =
+                            when (radioGroup.checkedRadioButtonId) {
+                                R.id.settingTabsOnly -> CLEAR_TABS_ONLY
+                                R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
+                                else -> CLEAR_NONE
+                            }
+                        val listener = activity as Listener?
+                        listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
                     }
-                    val listener = activity as Listener?
-                    listener?.onAutomaticallyClearWhatOptionSelected(selectedOption)
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -81,12 +85,10 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         fun create(clearWhatSetting: ClearWhatOption?): SettingsAutomaticallyClearWhatFragment {
             val fragment = SettingsAutomaticallyClearWhatFragment()
 
-            fragment.arguments = Bundle().also {
-                it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhatSetting)
+            fragment.arguments =
+                Bundle().also { it.putSerializable(DEFAULT_OPTION_EXTRA, clearWhatSetting) }
 
-            }
             return fragment
         }
     }
-
 }

@@ -21,7 +21,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealAtpCohortManager @Inject constructor(
+class RealAtpCohortManager
+@Inject
+constructor(
     private val cohortStore: CohortStore,
     private val cohortCalculator: CohortCalculator,
 ) : AtpCohortManager {

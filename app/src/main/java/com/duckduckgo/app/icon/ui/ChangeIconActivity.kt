@@ -49,7 +49,8 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun configureRecycler() {
         binding.appIconsList.layoutManager = GridLayoutManager(this, 4)
-        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, R.dimen.changeAppIconListPadding))
+        binding.appIconsList.addItemDecoration(
+            ItemOffsetDecoration(this, R.dimen.changeAppIconListPadding))
         binding.appIconsList.adapter = iconsAdapter
     }
 
@@ -57,19 +58,9 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
         viewModel.viewState.observe(
             this,
-            Observer<ChangeIconViewModel.ViewState> { viewState ->
-                viewState?.let {
-                    render(it)
-                }
-            }
-        )
+            Observer<ChangeIconViewModel.ViewState> { viewState -> viewState?.let { render(it) } })
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.command.observe(this, Observer { processCommand(it) })
 
         viewModel.start()
     }

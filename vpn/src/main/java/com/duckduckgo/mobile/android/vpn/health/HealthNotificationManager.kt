@@ -24,44 +24,52 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.mobile.android.vpn.R
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
 class HealthNotificationManager(private val context: Context) {
 
-    suspend fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthSubmission) {
+    suspend fun showBadHealthNotification(
+        reasonsForAlert: List<String>,
+        systemHealth: SystemHealthSubmission
+    ) {
 
-        val target = Intent().also {
-            it.setClassName(context.packageName, "dummy.ui.VpnDiagnosticsActivity")
-        }
+        val target =
+            Intent().also {
+                it.setClassName(context.packageName, "dummy.ui.VpnDiagnosticsActivity")
+            }
 
-        val pendingIntent = TaskStackBuilder.create(context)
-            .addNextIntentWithParentStack(target)
-            .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent =
+            TaskStackBuilder.create(context)
+                .addNextIntentWithParentStack(target)
+                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
 
         // todo - make these do something different
         val assertGoodPendingIntent = pendingIntent
         val assertBadPendingIntent = assertGoodPendingIntent
 
-        val notification = NotificationCompat.Builder(context, "notificationid")
-            .setSmallIcon(R.drawable.ic_baseline_mood_bad_24)
-            .setContentTitle("AppTP Health Monitor")
-            .setContentText(String.format("It looks like AppTP might be in bad health."))
-            .setStyle(NotificationCompat.BigTextStyle().bigText(reasonsForAlert.joinToString(separator = "\n")))
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationManagerCompat.IMPORTANCE_HIGH)
-            .addAction(0, "All good", assertGoodPendingIntent)
-            .addAction(0, "There's a problem", assertBadPendingIntent)
-            .setOnlyAlertOnce(true)
-            .setTimeoutAfter(TimeUnit.MINUTES.toMillis(10))
-            .build()
+        val notification =
+            NotificationCompat.Builder(context, "notificationid")
+                .setSmallIcon(R.drawable.ic_baseline_mood_bad_24)
+                .setContentTitle("AppTP Health Monitor")
+                .setContentText(String.format("It looks like AppTP might be in bad health."))
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(reasonsForAlert.joinToString(separator = "\n")))
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationManagerCompat.IMPORTANCE_HIGH)
+                .addAction(0, "All good", assertGoodPendingIntent)
+                .addAction(0, "There's a problem", assertBadPendingIntent)
+                .setOnlyAlertOnce(true)
+                .setTimeoutAfter(TimeUnit.MINUTES.toMillis(10))
+                .build()
 
         withContext(Dispatchers.Main) {
             NotificationManagerCompat.from(context).let { nm ->
-
                 val channelBuilder =
-                    NotificationChannelCompat.Builder("notificationid", NotificationManagerCompat.IMPORTANCE_DEFAULT)
+                    NotificationChannelCompat.Builder(
+                            "notificationid", NotificationManagerCompat.IMPORTANCE_DEFAULT)
                         .setName("notificationid")
                 nm.createNotificationChannel(channelBuilder.build())
 
@@ -71,6 +79,7 @@ class HealthNotificationManager(private val context: Context) {
     }
 
     fun hideBadHealthNotification() {
-        NotificationManagerCompat.from(context).cancel(AppTPHealthMonitor.BAD_HEALTH_NOTIFICATION_ID)
+        NotificationManagerCompat.from(context)
+            .cancel(AppTPHealthMonitor.BAD_HEALTH_NOTIFICATION_ID)
     }
 }

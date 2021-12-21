@@ -35,8 +35,7 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
         fun userCancelled()
     }
 
-    @Inject
-    lateinit var themingDataStore: ThemingDataStore
+    @Inject lateinit var themingDataStore: ThemingDataStore
 
     private val binding: ContentFeedbackBinding by viewBinding()
 
@@ -66,8 +65,7 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
                     NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()
                     UserCancelled -> listener?.userCancelled()
                 }
-            }
-        )
+            })
     }
 
     override fun configureListeners() {

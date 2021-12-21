@@ -24,7 +24,8 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.LayoutScrollingTouchListener
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
+class BrokenSiteNegativeFeedbackFragment :
+    FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
 
     interface BrokenSiteFeedbackListener {
         fun onProvidedBrokenSiteFeedback(feedback: String, url: String?)
@@ -50,15 +51,18 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
                         listener?.onProvidedBrokenSiteFeedback(command.feedback, command.brokenSite)
                     }
                 }
-            }
-        )
+            })
     }
 
     override fun configureListeners() {
         with(binding) {
             submitFeedbackButton.doOnNextLayout {
-                brokenSiteInput.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, brokenSiteInputContainer.y.toInt()))
-                openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
+                brokenSiteInput.setOnTouchListener(
+                    LayoutScrollingTouchListener(
+                        rootScrollView, brokenSiteInputContainer.y.toInt()))
+                openEndedFeedback.setOnTouchListener(
+                    LayoutScrollingTouchListener(
+                        rootScrollView, openEndedFeedbackContainer.y.toInt()))
             }
 
             submitFeedbackButton.setOnClickListener {

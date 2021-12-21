@@ -23,16 +23,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
 abstract class LifecycleObserverPluginProviderModule {
     // we use multibinds as the list of plugins can be empty
-    @Multibinds
-    abstract fun provideLifecycleObserverPlugins(): DaggerSet<LifecycleObserver>
+    @Multibinds abstract fun provideLifecycleObserverPlugins(): DaggerSet<LifecycleObserver>
 
     @Binds
     @SingleInstanceIn(AppScope::class)
@@ -42,9 +41,9 @@ abstract class LifecycleObserverPluginProviderModule {
 }
 
 @SingleInstanceIn(AppScope::class)
-class LifecycleObserverPluginPoint @Inject constructor(
-    private val plugins: DaggerSet<LifecycleObserver>
-) : PluginPoint<LifecycleObserver> {
+class LifecycleObserverPluginPoint
+@Inject
+constructor(private val plugins: DaggerSet<LifecycleObserver>) : PluginPoint<LifecycleObserver> {
     override fun getPlugins(): Set<LifecycleObserver> {
         return plugins
     }

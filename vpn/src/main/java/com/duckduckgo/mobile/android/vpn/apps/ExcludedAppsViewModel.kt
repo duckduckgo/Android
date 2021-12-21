@@ -24,14 +24,14 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDia
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Provider
 
 class ExcludedAppsViewModel(
     private val excludedApps: TrackingProtectionAppsRepository,
@@ -44,22 +44,31 @@ class ExcludedAppsViewModel(
 
     internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
 
-    fun onAppProtectionDisabled(answer: Int = 0, appName: String, packageName: String, skippedReport: Boolean) {
+    fun onAppProtectionDisabled(
+        answer: Int = 0,
+        appName: String,
+        packageName: String,
+        skippedReport: Boolean
+    ) {
         recordManualChange(packageName)
 
         viewModelScope.launch {
             excludedApps.manuallyExcludedApp(packageName)
             if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING) {
-                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
+                command.send(
+                    Command.LaunchFeedback(
+                        ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             }
         }
     }
 
-    fun onAppProtectionEnabled(packageName: String, excludingReason: Int, needsPixel: Boolean = false) {
+    fun onAppProtectionEnabled(
+        packageName: String,
+        excludingReason: Int,
+        needsPixel: Boolean = false
+    ) {
         recordManualChange(packageName)
-        viewModelScope.launch {
-            excludedApps.manuallyEnabledApp(packageName)
-        }
+        viewModelScope.launch { excludedApps.manuallyEnabledApp(packageName) }
     }
 
     private fun recordManualChange(packageName: String) {
@@ -90,7 +99,11 @@ class ExcludedAppsViewModel(
         }
     }
 
-    fun onAppProtectionChanged(excludedAppInfo: TrackingProtectionAppInfo, position: Int, enabled: Boolean) {
+    fun onAppProtectionChanged(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int,
+        enabled: Boolean
+    ) {
         viewModelScope.launch {
             if (enabled) {
                 checkForAppProtectionEnabled(excludedAppInfo, position)
@@ -100,7 +113,10 @@ class ExcludedAppsViewModel(
         }
     }
 
-    private suspend fun checkForAppProtectionEnabled(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
+    private suspend fun checkForAppProtectionEnabled(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int
+    ) {
         if (!excludedAppInfo.isProblematic()) {
             onAppProtectionEnabled(excludedAppInfo.packageName, excludedAppInfo.knownProblem)
         } else {
@@ -116,8 +132,7 @@ class ExcludedAppsViewModel(
                 ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED,
                 appName = excludedAppInfo.name,
                 packageName = excludedAppInfo.packageName,
-                skippedReport = false
-            )
+                skippedReport = false)
         }
     }
 
@@ -135,27 +150,32 @@ class ExcludedAppsViewModel(
 }
 
 internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
+
 internal sealed class Command {
     object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
-    data class ShowEnableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) : Command()
-    data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
+    data class ShowEnableProtectionDialog(
+        val excludingReason: TrackingProtectionAppInfo,
+        val position: Int
+    ) : Command()
+    data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) :
+        Command()
 }
 
 @ContributesMultibinding(AppScope::class)
-class ExcludedAppsViewModelFactory @Inject constructor(
+class ExcludedAppsViewModelFactory
+@Inject
+constructor(
     private val deviceShieldExcludedApps: Provider<TrackingProtectionAppsRepository>,
     private val deviceShieldPixels: Provider<DeviceShieldPixels>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
-                    ExcludedAppsViewModel(
-                        deviceShieldExcludedApps.get(),
-                        deviceShieldPixels.get()
-                    ) as T
-                    )
+                isAssignableFrom(ExcludedAppsViewModel::class.java) ->
+                    (ExcludedAppsViewModel(
+                        deviceShieldExcludedApps.get(), deviceShieldPixels.get()) as
+                        T)
                 else -> null
             }
         }

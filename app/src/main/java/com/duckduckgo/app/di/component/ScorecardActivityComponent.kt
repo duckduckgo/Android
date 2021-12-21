@@ -17,9 +17,8 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.privacy.ui.ScorecardActivity
-import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
@@ -31,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface ScorecardActivityComponent : AndroidInjector<ScorecardActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<ScorecardActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<ScorecardActivity>
 }
 
 @ContributesTo(AppScope::class)

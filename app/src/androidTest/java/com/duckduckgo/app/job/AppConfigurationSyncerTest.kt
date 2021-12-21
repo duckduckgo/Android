@@ -44,7 +44,9 @@ class AppConfigurationSyncerTest {
     fun setup() {
         initializeWorkManager()
         whenever(mockDownloader.downloadTask()).thenReturn(Completable.complete())
-        testee = AppConfigurationSyncer(AppConfigurationSyncWorkRequestBuilder(), workManager, mockDownloader)
+        testee =
+            AppConfigurationSyncer(
+                AppConfigurationSyncWorkRequestBuilder(), workManager, mockDownloader)
     }
 
     @Test
@@ -71,7 +73,8 @@ class AppConfigurationSyncerTest {
     }
 
     private fun executeWorker() {
-        WorkManagerTestInitHelper.getTestDriver(context)?.setAllConstraintsMet(workManager.getSyncWork().first().id)
+        WorkManagerTestInitHelper.getTestDriver(context)
+            ?.setAllConstraintsMet(workManager.getSyncWork().first().id)
     }
 
     private fun assertWorkIsEnqueuedStatus(workInfos: List<WorkInfo>) {
@@ -84,11 +87,12 @@ class AppConfigurationSyncerTest {
     }
 
     private fun initializeWorkManager() {
-        val config = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .setWorkerFactory(testWorkerFactory())
-            .build()
+        val config =
+            Configuration.Builder()
+                .setMinimumLoggingLevel(Log.DEBUG)
+                .setExecutor(SynchronousExecutor())
+                .setWorkerFactory(testWorkerFactory())
+                .build()
 
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
         workManager = WorkManager.getInstance(context)
@@ -96,7 +100,11 @@ class AppConfigurationSyncerTest {
 
     private fun testWorkerFactory(): WorkerFactory {
         return object : WorkerFactory() {
-            override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+            override fun createWorker(
+                appContext: Context,
+                workerClassName: String,
+                workerParameters: WorkerParameters
+            ): ListenableWorker? {
                 return AppConfigurationWorker(appContext, workerParameters).also {
                     it.appConfigurationDownloader = mockDownloader
                 }

@@ -37,12 +37,14 @@ import org.junit.Test
 
 class AppDatabaseTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+    val testHelper =
+        MigrationTestHelper(
+            getInstrumentation(),
+            AppDatabase::class.qualifiedName,
+            FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
     private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
@@ -67,12 +69,14 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 2).use {
             it.execSQL("INSERT INTO `network_leaderboard` VALUES ('Network2', 'example.com')")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 3, true, migrationsProvider.MIGRATION_2_TO_3)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 3, true, migrationsProvider.MIGRATION_2_TO_3)
 
-            val count = it.query("SELECT COUNT() FROM network_leaderboard").run {
-                moveToNext()
-                getInt(0)
-            }
+            val count =
+                it.query("SELECT COUNT() FROM network_leaderboard").run {
+                    moveToNext()
+                    getInt(0)
+                }
 
             assertEquals(0, count)
         }
@@ -94,7 +98,8 @@ class AppDatabaseTest {
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
             it.execSQL("INSERT INTO `tabs` values ('tabid2', 'url', 'title') ")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 5, true, migrationsProvider.MIGRATION_4_TO_5)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 5, true, migrationsProvider.MIGRATION_4_TO_5)
 
             it.query("SELECT position FROM tabs ORDER BY position").apply {
                 moveToNext()
@@ -108,15 +113,16 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion4To5ThenTabsAreConsideredViewed() {
         testHelper.createDatabase(TEST_DB_NAME, 4).use {
-
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title') ")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 5, true, migrationsProvider.MIGRATION_4_TO_5)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 5, true, migrationsProvider.MIGRATION_4_TO_5)
 
-            val viewed = it.query("SELECT viewed FROM tabs ORDER BY position").run {
-                moveToFirst()
-                getInt(0) > 0
-            }
+            val viewed =
+                it.query("SELECT viewed FROM tabs ORDER BY position").run {
+                    moveToFirst()
+                    getInt(0) > 0
+                }
 
             assertTrue(viewed)
         }
@@ -160,15 +166,16 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion11To12ThenTabsDoNotSkipHome() {
         testHelper.createDatabase(TEST_DB_NAME, 11).use {
-
             it.execSQL("INSERT INTO `tabs` values ('tabid1', 'url', 'title', 1, 0) ")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 12, true, migrationsProvider.MIGRATION_11_TO_12)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 12, true, migrationsProvider.MIGRATION_11_TO_12)
 
-            val skipHome = it.query("SELECT skipHome FROM tabs ORDER BY position").run {
-                moveToFirst()
-                getInt(0) > 0
-            }
+            val skipHome =
+                it.query("SELECT skipHome FROM tabs ORDER BY position").run {
+                    moveToFirst()
+                    getInt(0) > 0
+                }
 
             assertFalse(skipHome)
         }
@@ -223,15 +230,17 @@ class AppDatabaseTest {
     @Test
     fun whenMigratingFromVersion18To19ThenValidationSucceedsAndRowsDeletedFromTable() {
         testHelper.createDatabase(TEST_DB_NAME, 18).use {
+            it.execSQL(
+                "INSERT INTO `UncaughtExceptionEntity` values (1, '${UncaughtExceptionSource.GLOBAL.name}', 'message') ")
 
-            it.execSQL("INSERT INTO `UncaughtExceptionEntity` values (1, '${UncaughtExceptionSource.GLOBAL.name}', 'message') ")
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 19, true, migrationsProvider.MIGRATION_18_TO_19)
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 19, true, migrationsProvider.MIGRATION_18_TO_19)
-
-            val count = it.query("SELECT COUNT() FROM UncaughtExceptionEntity").run {
-                moveToFirst()
-                getInt(0)
-            }
+            val count =
+                it.query("SELECT COUNT() FROM UncaughtExceptionEntity").run {
+                    moveToFirst()
+                    getInt(0)
+                }
 
             assertEquals(0, count)
         }
@@ -262,7 +271,8 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 22).use {
             givenUserStageIs(it, "USE_OUR_APP_NOTIFICATION")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
             val stage = getUserStage(it)
 
             assertEquals(AppStage.ESTABLISHED.name, stage)
@@ -274,7 +284,8 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 22).use {
             givenUserStageIs(it, AppStage.ESTABLISHED)
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 23, true, migrationsProvider.MIGRATION_22_TO_23)
             val stage = getUserStage(it)
 
             assertEquals(AppStage.ESTABLISHED.name, stage)
@@ -311,7 +322,8 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 28).use {
             givenUserStageIs(it, AppStage.DAX_ONBOARDING)
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 29, true, migrationsProvider.MIGRATION_28_TO_29)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 29, true, migrationsProvider.MIGRATION_28_TO_29)
             val stage = getUserStage(it)
 
             assertEquals(AppStage.ESTABLISHED.name, stage)
@@ -330,10 +342,11 @@ class AppDatabaseTest {
             it.execSQL("INSERT INTO `bookmarks` values (2,'duckduckgo','https://duckduckgo.com/') ")
             it.execSQL("INSERT INTO `bookmarks` values (3,'opensource','https://opensource.com/') ")
 
-            val bookmarkCount = it.query("select count(*) from bookmarks").run {
-                moveToFirst()
-                getInt(0)
-            }
+            val bookmarkCount =
+                it.query("select count(*) from bookmarks").run {
+                    moveToFirst()
+                    getInt(0)
+                }
 
             assertEquals(2, bookmarkCount)
         }
@@ -364,7 +377,8 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 33).use {
             givenUserStageIs(it, "USE_OUR_APP_NOTIFICATION")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
             val stage = getUserStage(it)
 
             assertEquals(AppStage.ESTABLISHED.name, stage)
@@ -376,7 +390,8 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, 33).use {
             givenUserStageIs(it, "USE_OUR_APP_ONBOARDING")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
             val stage = getUserStage(it)
 
             assertEquals(AppStage.ESTABLISHED.name, stage)
@@ -389,12 +404,14 @@ class AppDatabaseTest {
             it.execSQL("INSERT INTO `user_events` values ('USE_OUR_APP_SHORTCUT_ADDED', 1) ")
             it.execSQL("INSERT INTO `user_events` values ('USE_OUR_APP_FIREPROOF_DIALOG_SEEN', 1) ")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
 
-            val eventsCount = it.query("select count(*) from user_events").run {
-                moveToFirst()
-                getInt(0)
-            }
+            val eventsCount =
+                it.query("select count(*) from user_events").run {
+                    moveToFirst()
+                    getInt(0)
+                }
 
             assertEquals(0, eventsCount)
         }
@@ -406,12 +423,14 @@ class AppDatabaseTest {
             it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP') ")
             it.execSQL("INSERT INTO `dismissed_cta` values ('USE_OUR_APP_DELETION') ")
 
-            testHelper.runMigrationsAndValidate(TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
+            testHelper.runMigrationsAndValidate(
+                TEST_DB_NAME, 34, true, migrationsProvider.MIGRATION_33_TO_34)
 
-            val ctaCount = it.query("select count(*) from dismissed_cta").run {
-                moveToFirst()
-                getInt(0)
-            }
+            val ctaCount =
+                it.query("select count(*) from dismissed_cta").run {
+                    moveToFirst()
+                    getInt(0)
+                }
 
             assertEquals(0, ctaCount)
         }
@@ -474,29 +493,39 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }
 
-    private fun runMigrations(newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun runMigrations(
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         return testHelper.runMigrationsAndValidate(TEST_DB_NAME, newVersion, true, *migrations)
     }
 
-    private fun createDatabaseAndMigrate(originalVersion: Int, newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun createDatabaseAndMigrate(
+        originalVersion: Int,
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         createDatabase(originalVersion)
         return runMigrations(newVersion, *migrations)
     }
 
     private fun givenSharedPreferencesEmpty() {
         val sharedPreferences = mock<SharedPreferences>()
-        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE))
+            .thenReturn(sharedPreferences)
     }
 
     private fun givenUserNeverSawOnboarding() {
         val sharedPreferences = mock<SharedPreferences>()
-        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE))
+            .thenReturn(sharedPreferences)
         whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(0)
     }
 
     private fun givenUserSawOnboarding() {
         val sharedPreferences = mock<SharedPreferences>()
-        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)).thenReturn(sharedPreferences)
+        whenever(context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE))
+            .thenReturn(sharedPreferences)
         whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(1)
     }
 

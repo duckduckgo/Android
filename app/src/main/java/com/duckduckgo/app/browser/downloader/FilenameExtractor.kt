@@ -23,12 +23,10 @@ import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotG
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
-class FilenameExtractor @Inject constructor(
-    private val pixel: Pixel
-) {
+class FilenameExtractor @Inject constructor(private val pixel: Pixel) {
 
     fun extract(pendingDownload: PendingFileDownload): FilenameExtractionResult {
         val url = pendingDownload.url
@@ -42,7 +40,9 @@ class FilenameExtractor @Inject constructor(
 
         while (evaluateGuessQuality(guesses, pathSegments) != TriedAllOptions) {
             pathSegments = pathSegments.dropLast(1)
-            guesses.latestGuess = guessFilename(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
+            guesses.latestGuess =
+                guessFilename(
+                    baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
         }
 
         return bestGuess(guesses)
@@ -52,7 +52,8 @@ class FilenameExtractor @Inject constructor(
         val latestGuess = guesses.latestGuess
         val bestGuess = guesses.bestGuess
 
-        // if it contains a '.' then it's a good chance of a filetype and we can update our best guess
+        // if it contains a '.' then it's a good chance of a filetype and we can update our best
+        // guess
         if (latestGuess.contains(".") && bestGuess.isNullOrEmpty()) {
             guesses.bestGuess = latestGuess
         }
@@ -66,7 +67,8 @@ class FilenameExtractor @Inject constructor(
         val tidiedUrl = url.removeSuffix("/")
         var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
 
-        // we only want to keep the default .bin filetype on the guess if the URL actually has that too
+        // we only want to keep the default .bin filetype on the guess if the URL actually has that
+        // too
         if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {
             guessedFilename = guessedFilename.removeSuffix(DEFAULT_FILE_TYPE)
         }
@@ -107,5 +109,4 @@ class FilenameExtractor @Inject constructor(
     }
 
     data class Guesses(var latestGuess: String, var bestGuess: String? = null)
-
 }

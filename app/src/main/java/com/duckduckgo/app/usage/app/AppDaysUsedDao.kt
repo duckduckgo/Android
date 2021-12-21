@@ -24,8 +24,7 @@ import androidx.room.Query
 @Dao
 abstract class AppDaysUsedDao {
 
-    @Query("SELECT COUNT(*) from app_days_used")
-    abstract fun getNumberOfDaysAppUsed(): Long
+    @Query("SELECT COUNT(*) from app_days_used") abstract fun getNumberOfDaysAppUsed(): Long
 
     @Query("SELECT COUNT(*) from app_days_used WHERE date > :isoDate")
     abstract fun getNumberOfDaysAppUsedSince(isoDate: String): Long

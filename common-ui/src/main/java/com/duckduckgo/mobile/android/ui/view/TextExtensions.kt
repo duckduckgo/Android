@@ -33,11 +33,12 @@ fun TextView.addClickableLink(annotation: String, textSequence: CharSequence, on
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
     val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-    val clickableSpan = object : ClickableSpan() {
-        override fun onClick(widget: View) {
-            onClick()
+    val clickableSpan =
+        object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                onClick()
+            }
         }
-    }
 
     annotations?.find { it.value == annotation }?.let {
         spannableString.apply {
@@ -45,22 +46,17 @@ fun TextView.addClickableLink(annotation: String, textSequence: CharSequence, on
                 clickableSpan,
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(
                 UnderlineSpan(),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             setSpan(
-                ForegroundColorSpan(
-                    ContextCompat.getColor(context, R.color.cornflowerBlue)
-                ),
+                ForegroundColorSpan(ContextCompat.getColor(context, R.color.cornflowerBlue)),
                 fullText.getSpanStart(it),
                 fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
@@ -68,7 +64,10 @@ fun TextView.addClickableLink(annotation: String, textSequence: CharSequence, on
     movementMethod = LinkMovementMethod.getInstance()
 }
 
-fun TextView.addClickableSpan(textSequence: CharSequence, spans: List<Pair<String, ClickableSpan>>) {
+fun TextView.addClickableSpan(
+    textSequence: CharSequence,
+    spans: List<Pair<String, ClickableSpan>>
+) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
     val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -80,22 +79,17 @@ fun TextView.addClickableSpan(textSequence: CharSequence, spans: List<Pair<Strin
                     span.second,
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(
                     UnderlineSpan(),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 setSpan(
-                    ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.cornflowerBlue)
-                    ),
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.cornflowerBlue)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }

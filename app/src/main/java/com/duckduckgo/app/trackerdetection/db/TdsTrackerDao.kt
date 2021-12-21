@@ -31,15 +31,12 @@ abstract class TdsTrackerDao {
         insertAll(trackers)
     }
 
-    @Query("select * from tds_tracker")
-    abstract fun getAll(): List<TdsTracker>
+    @Query("select * from tds_tracker") abstract fun getAll(): List<TdsTracker>
 
     @Query("select * from tds_tracker where domain = :domain")
     abstract fun get(domain: String): TdsTracker?
 
-    @Query("select count(*) from tds_tracker")
-    abstract fun count(): Int
+    @Query("select count(*) from tds_tracker") abstract fun count(): Int
 
-    @Query("delete from tds_tracker")
-    abstract fun deleteAll()
+    @Query("delete from tds_tracker") abstract fun deleteAll()
 }

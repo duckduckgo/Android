@@ -19,23 +19,23 @@ package com.duckduckgo.app.bookmarks.di
 import android.content.Context
 import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
-import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.service.SavedSitesExporter
-import com.duckduckgo.app.bookmarks.service.SavedSitesImporter
-import com.duckduckgo.app.bookmarks.service.SavedSitesParser
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesManager
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesExporter
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesImporter
-import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
-import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.BookmarksDataRepository
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesDataRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesExporter
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesImporter
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesManager
+import com.duckduckgo.app.bookmarks.service.RealSavedSitesParser
+import com.duckduckgo.app.bookmarks.service.SavedSitesExporter
+import com.duckduckgo.app.bookmarks.service.SavedSitesImporter
+import com.duckduckgo.app.bookmarks.service.SavedSitesManager
+import com.duckduckgo.app.bookmarks.service.SavedSitesParser
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Lazy
@@ -56,7 +56,12 @@ class BookmarksModule {
         bookmarksRepository: BookmarksRepository,
         savedSitesParser: SavedSitesParser,
     ): SavedSitesImporter {
-        return RealSavedSitesImporter(context.contentResolver, bookmarksDao, favoritesRepository, bookmarksRepository, savedSitesParser)
+        return RealSavedSitesImporter(
+            context.contentResolver,
+            bookmarksDao,
+            favoritesRepository,
+            bookmarksRepository,
+            savedSitesParser)
     }
 
     @Provides
@@ -74,7 +79,12 @@ class BookmarksModule {
         bookmarksRepository: BookmarksRepository,
         dispatcherProvider: DispatcherProvider
     ): SavedSitesExporter {
-        return RealSavedSitesExporter(context.contentResolver, favoritesRepository, bookmarksRepository, savedSitesParser, dispatcherProvider)
+        return RealSavedSitesExporter(
+            context.contentResolver,
+            favoritesRepository,
+            bookmarksRepository,
+            savedSitesParser,
+            dispatcherProvider)
     }
 
     @Provides
@@ -89,13 +99,20 @@ class BookmarksModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
+    fun favoriteRepository(
+        favoritesDao: FavoritesDao,
+        faviconManager: Lazy<FaviconManager>
+    ): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarksRepository {
+    fun bookmarkFoldersRepository(
+        bookmarkFoldersDao: BookmarkFoldersDao,
+        bookmarksDao: BookmarksDao,
+        appDatabase: AppDatabase
+    ): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }
 }

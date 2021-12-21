@@ -51,7 +51,8 @@ class HashUtilitiesTest {
 
     companion object {
         const val helloWorldText = "Hello World!"
-        const val helloWorldSha256 = "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
+        const val helloWorldSha256 =
+            "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
         const val helloWorldSha1 = "2ef7bde608ce5404e97d5f042f95f89f1c232871"
         const val otherSha256 = "f97e9da0e3b879f0a9df979ae260a5f7e1371edb127c1862d4f861981166cdc1"
     }

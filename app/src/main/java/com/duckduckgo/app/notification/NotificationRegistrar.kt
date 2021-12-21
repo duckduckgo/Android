@@ -36,13 +36,15 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class NotificationRegistrar @Inject constructor(
+class NotificationRegistrar
+@Inject
+constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val context: Context,
     private val manager: NotificationManager,
@@ -51,46 +53,43 @@ class NotificationRegistrar @Inject constructor(
     private val pixel: Pixel
 ) : LifecycleObserver {
 
-    data class Channel(
-        val id: String,
-        @StringRes val name: Int,
-        val priority: Int
-    )
+    data class Channel(val id: String, @StringRes val name: Int, val priority: Int)
 
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
-        const val Article = 103 // 102 was used for the search notification hence using 103 moving forward
+        const val Article =
+            103 // 102 was used for the search notification hence using 103 moving forward
         const val AppFeature = 104
         const val EmailWaitlist = 106 // 105 was used for the UOA notification
     }
 
     object ChannelType {
-        val FILE_DOWNLOADING = Channel(
-            "com.duckduckgo.downloading",
-            R.string.notificationChannelFileDownloading,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
-        val FILE_DOWNLOADED = Channel(
-            "com.duckduckgo.downloaded",
-            R.string.notificationChannelFileDownloaded,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
-        val TUTORIALS = Channel(
-            "com.duckduckgo.tutorials",
-            R.string.notificationChannelTutorials,
-            NotificationManagerCompat.IMPORTANCE_DEFAULT
-        )
-        val EMAIL_WAITLIST = Channel(
-            "com.duckduckgo.email",
-            R.string.notificationChannelEmailWaitlist,
-            NotificationManagerCompat.IMPORTANCE_HIGH
-        )
-        val APP_TP_WAITLIST = Channel(
-            "com.duckduckgo.apptp",
-            R.string.atp_WaitlistActivityWaitlistTitle,
-            NotificationManagerCompat.IMPORTANCE_HIGH
-        )
+        val FILE_DOWNLOADING =
+            Channel(
+                "com.duckduckgo.downloading",
+                R.string.notificationChannelFileDownloading,
+                NotificationManagerCompat.IMPORTANCE_LOW)
+        val FILE_DOWNLOADED =
+            Channel(
+                "com.duckduckgo.downloaded",
+                R.string.notificationChannelFileDownloaded,
+                NotificationManagerCompat.IMPORTANCE_LOW)
+        val TUTORIALS =
+            Channel(
+                "com.duckduckgo.tutorials",
+                R.string.notificationChannelTutorials,
+                NotificationManagerCompat.IMPORTANCE_DEFAULT)
+        val EMAIL_WAITLIST =
+            Channel(
+                "com.duckduckgo.email",
+                R.string.notificationChannelEmailWaitlist,
+                NotificationManagerCompat.IMPORTANCE_HIGH)
+        val APP_TP_WAITLIST =
+            Channel(
+                "com.duckduckgo.apptp",
+                R.string.atp_WaitlistActivityWaitlistTitle,
+                NotificationManagerCompat.IMPORTANCE_HIGH)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -101,20 +100,22 @@ class NotificationRegistrar @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun updateNotificationStatus() {
         val systemEnabled = compatManager.areNotificationsEnabled()
-        val allChannelsEnabled = when {
-            SDK_INT >= O -> manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
-            else -> true
-        }
+        val allChannelsEnabled =
+            when {
+                SDK_INT >= O ->
+                    manager.notificationChannels.all { it.importance != IMPORTANCE_NONE }
+                else -> true
+            }
 
         updateStatus(systemEnabled && allChannelsEnabled)
     }
 
-    private val channels = listOf(
-        ChannelType.FILE_DOWNLOADING,
-        ChannelType.FILE_DOWNLOADED,
-        ChannelType.TUTORIALS,
-        ChannelType.EMAIL_WAITLIST
-    )
+    private val channels =
+        listOf(
+            ChannelType.FILE_DOWNLOADING,
+            ChannelType.FILE_DOWNLOADED,
+            ChannelType.TUTORIALS,
+            ChannelType.EMAIL_WAITLIST)
 
     private fun registerApp() {
         if (SDK_INT < O) {
@@ -126,16 +127,17 @@ class NotificationRegistrar @Inject constructor(
 
     @TargetApi(O)
     private fun configureNotificationChannels() {
-        val notificationChannels = channels.map {
-            NotificationChannel(it.id, context.getString(it.name), it.priority)
-        }
+        val notificationChannels =
+            channels.map { NotificationChannel(it.id, context.getString(it.name), it.priority) }
         manager.createNotificationChannels(notificationChannels)
     }
 
     @VisibleForTesting
     fun updateStatus(enabled: Boolean) {
         if (settingsDataStore.appNotificationsEnabled != enabled) {
-            pixel.fire(if (enabled) AppPixelName.NOTIFICATIONS_ENABLED else AppPixelName.NOTIFICATIONS_DISABLED)
+            pixel.fire(
+                if (enabled) AppPixelName.NOTIFICATIONS_ENABLED
+                else AppPixelName.NOTIFICATIONS_DISABLED)
             settingsDataStore.appNotificationsEnabled = enabled
         }
     }

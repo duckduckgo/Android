@@ -21,8 +21,8 @@ import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 
 @ContributesMultibinding(AppScope::class)
 class InternalAppHealthMonitor @Inject constructor(private val appHealthMonitor: AppHealthMonitor) :

@@ -23,12 +23,14 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import org.json.JSONObject
 import xyz.hexene.localvpn.TCB
-import javax.inject.Inject
 
 @ContributesMultibinding(VpnScope::class)
-class VpnServiceStateCollector @Inject constructor(
+class VpnServiceStateCollector
+@Inject
+constructor(
     private val context: Context,
     private val memoryCollectorPluginPoint: PluginPoint<VpnMemoryCollectorPlugin>,
     private val vpnUptimeRecorder: VpnUptimeRecorder,
@@ -44,20 +46,17 @@ class VpnServiceStateCollector @Inject constructor(
         state.put("enabled", TrackerBlockingVpnService.isServiceRunning(context).toString())
 
         // VPN memory resources state
-        val memoryState = JSONObject().apply {
-            memoryCollectorPluginPoint.getPlugins().forEach {
-                it.collectMemoryMetrics().forEach { entry ->
-                    put(entry.key, entry.value)
+        val memoryState =
+            JSONObject().apply {
+                memoryCollectorPluginPoint.getPlugins().forEach {
+                    it.collectMemoryMetrics().forEach { entry -> put(entry.key, entry.value) }
                 }
             }
-        }
         state.put("memoryUsage", memoryState)
 
         // VPN open connections per app
         val tcbs = TCB.copyTCBs()
-        val tcpConnections = tcbs
-            .filterNot { it.requestingAppPackage.isNullOrBlank() }
-            .size
+        val tcpConnections = tcbs.filterNot { it.requestingAppPackage.isNullOrBlank() }.size
         state.put("activeTcpConnections", tcpConnections)
 
         // VPN up time

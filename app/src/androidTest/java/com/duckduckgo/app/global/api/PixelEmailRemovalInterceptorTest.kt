@@ -35,14 +35,15 @@ class PixelEmailRemovalInterceptorTest {
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
             val removalExpected = PixelEmailRemovalInterceptor.pixels.contains(pixelName)
 
-            val interceptedUrl = pixelEmailRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
+            val interceptedUrl =
+                pixelEmailRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
             assertEquals(removalExpected, interceptedUrl.queryParameter("atb") == null)
             assertEquals(removalExpected, interceptedUrl.queryParameter("appVersion") == null)
         }
     }
 
     companion object {
-        private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
+        private const val PIXEL_TEMPLATE =
+            "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
     }
-
 }

@@ -25,7 +25,9 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.app.notification.model.NotificationSpec
 import javax.inject.Inject
 
-class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManagerCompat) {
+class NotificationFactory
+@Inject
+constructor(val context: Context, val manager: NotificationManagerCompat) {
 
     fun createNotification(
         specification: NotificationSpec,
@@ -33,25 +35,21 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
         cancelIntent: PendingIntent
     ): Notification {
 
-        val builder = NotificationCompat.Builder(context, specification.channel.id)
-            .setPriority(specification.channel.priority)
-            .setSmallIcon(specification.icon)
-            .setContentTitle(specification.title)
-            .setContentText(specification.description)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
-            .setColor(ContextCompat.getColor(context, specification.color))
-            .setContentIntent(launchIntent)
-            .setDeleteIntent(cancelIntent)
+        val builder =
+            NotificationCompat.Builder(context, specification.channel.id)
+                .setPriority(specification.channel.priority)
+                .setSmallIcon(specification.icon)
+                .setContentTitle(specification.title)
+                .setContentText(specification.description)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(specification.description))
+                .setColor(ContextCompat.getColor(context, specification.color))
+                .setContentIntent(launchIntent)
+                .setDeleteIntent(cancelIntent)
 
-        specification.launchButton?.let {
-            builder.addAction(specification.icon, it, launchIntent)
-        }
+        specification.launchButton?.let { builder.addAction(specification.icon, it, launchIntent) }
 
-        specification.closeButton?.let {
-            builder.addAction(specification.icon, it, cancelIntent)
-        }
+        specification.closeButton?.let { builder.addAction(specification.icon, it, cancelIntent) }
 
         return builder.build()
     }
-
 }

@@ -48,29 +48,40 @@ class PrivacyProtectionNotification(
     }
 }
 
-class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int, upgrades: Int) : NotificationSpec {
+class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int, upgrades: Int) :
+    NotificationSpec {
 
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.PrivacyProtection
     override val name = "Privacy protection"
     override val icon = R.drawable.notification_sheild_lock
-    override val launchButton: String = context.getString(R.string.privacyProtectionNotificationLaunchButton)
+    override val launchButton: String =
+        context.getString(R.string.privacyProtectionNotificationLaunchButton)
     override val closeButton: String? = null
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
     override val color: Int = R.color.cornflowerBlue
 
-    override val title: String = when {
-        trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)
-        else -> context.getString(R.string.privacyProtectionNotificationReportTitle)
-    }
+    override val title: String =
+        when {
+            trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD ->
+                context.getString(R.string.privacyProtectionNotificationDefaultTitle)
+            else -> context.getString(R.string.privacyProtectionNotificationReportTitle)
+        }
 
-    override val description: String = when {
-        trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultDescription)
-        trackers < TRACKER_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationUpgadeDescription, upgrades)
-        upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationTrackerDescription, trackers)
-        else -> context.getString(R.string.privacyProtectionNotificationBothDescription, trackers, upgrades)
-    }
+    override val description: String =
+        when {
+            trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD ->
+                context.getString(R.string.privacyProtectionNotificationDefaultDescription)
+            trackers < TRACKER_THRESHOLD ->
+                context.getString(R.string.privacyProtectionNotificationUpgadeDescription, upgrades)
+            upgrades < UPGRADE_THRESHOLD ->
+                context.getString(
+                    R.string.privacyProtectionNotificationTrackerDescription, trackers)
+            else ->
+                context.getString(
+                    R.string.privacyProtectionNotificationBothDescription, trackers, upgrades)
+        }
 
     override val pixelSuffix: String = "pp_${trackers}_$upgrades"
 

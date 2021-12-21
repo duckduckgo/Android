@@ -36,28 +36,31 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
 class DeviceShieldFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelFactory
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private lateinit var deviceShieldCtaLayout: View
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaImageView: ImageView
 
-    private inline fun <reified V : ViewModel> bindViewModel() =
-        lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+    }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         AndroidSupportInjection.inject(this)
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
 
@@ -79,11 +82,15 @@ class DeviceShieldFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // This logic is to ensure the we send the analytics exactly when the fragment is visible to the user
+        // This logic is to ensure the we send the analytics exactly when the fragment is visible to
+        // the user
         // There are couple nuances/issues
-        // 1. multiple tabs will have this fragment attached and resumed but only one will be shown to the user
-        // 2. in BrowserFragment seems to call fragment_device_shield_container.show()/hide() several times causing
-        //  this fragment to be resumed and visible for a split-second when Dax is shown (aka empty tab)
+        // 1. multiple tabs will have this fragment attached and resumed but only one will be shown
+        // to the user
+        // 2. in BrowserFragment seems to call fragment_device_shield_container.show()/hide()
+        // several times causing
+        //  this fragment to be resumed and visible for a split-second when Dax is shown (aka empty
+        // tab)
         Handler(Looper.getMainLooper()).postDelayed(200) {
             if (view?.isShown == true) {
                 deviceShieldPixels.didShowNewTabSummary()
@@ -92,16 +99,14 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewStateFlow
+        viewModel
+            .viewStateFlow
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-            .onEach { viewState ->
-                renderViewState(viewState)
-            }.launchIn(lifecycleScope)
+            .onEach { viewState -> renderViewState(viewState) }
+            .launchIn(lifecycleScope)
     }
 
-    private fun renderViewState(
-        state: PrivacyReportViewModel.PrivacyReportView.ViewState
-    ) {
+    private fun renderViewState(state: PrivacyReportViewModel.PrivacyReportView.ViewState) {
         if (state.onboardingComplete) {
             this.view?.show()
         } else {
@@ -120,30 +125,31 @@ class DeviceShieldFragment : Fragment() {
         }
     }
 
-    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
+    private fun renderTrackersBlockedWhenEnabled(
+        trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
+    ) {
         val latestAppString =
-            resources.getString(R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
-        val prefix = resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationPrefix)
-        val totalTrackers = resources.getQuantityString(
-            R.plurals.atp_TrackingAttempts,
-            trackerBlocked.trackers,
-            trackerBlocked.trackers
-        )
-        val optionalOtherAppsString = if (trackerBlocked.otherAppsSize == 0) "" else resources.getQuantityString(
-            R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps,
-            trackerBlocked.otherAppsSize,
-            trackerBlocked.otherAppsSize
-        )
+            resources.getString(
+                R.string.atp_DailyLastCompanyBlockedNotificationInApp, trackerBlocked.latestApp)
+        val prefix =
+            resources.getString(R.string.atp_WeeklyCompanyTrackersBlockedNotificationPrefix)
+        val totalTrackers =
+            resources.getQuantityString(
+                R.plurals.atp_TrackingAttempts, trackerBlocked.trackers, trackerBlocked.trackers)
+        val optionalOtherAppsString =
+            if (trackerBlocked.otherAppsSize == 0) ""
+            else
+                resources.getQuantityString(
+                    R.plurals.atp_DailyLastCompanyBlockedNotificationOptionalOtherApps,
+                    trackerBlocked.otherAppsSize,
+                    trackerBlocked.otherAppsSize)
         val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
-        val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
+        val textToStyle =
+            "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
 
-        deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
-            listOf(
-                totalTrackers,
-                latestAppString,
-                optionalOtherAppsString
-            )
-        )
+        deviceShieldCtaHeaderTextView.text =
+            textToStyle.applyBoldSpanTo(
+                listOf(totalTrackers, latestAppString, optionalOtherAppsString))
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
     }
 }

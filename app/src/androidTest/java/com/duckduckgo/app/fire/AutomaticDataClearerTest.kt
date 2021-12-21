@@ -42,13 +42,21 @@ class AutomaticDataClearerTest {
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
     private val pixel: Pixel = mock()
-    private val dataClearerForegroundAppRestartPixel = DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
+    private val dataClearerForegroundAppRestartPixel =
+        DataClearerForegroundAppRestartPixel(
+            InstrumentationRegistry.getInstrumentation().targetContext, pixel)
 
     @UiThreadTest
     @Before
     fun setup() {
         whenever(mockSettingsDataStore.hasBackgroundTimestampRecorded()).thenReturn(true)
-        testee = AutomaticDataClearer(mockWorkManager, mockSettingsDataStore, mockClearAction, mockTimeKeeper, dataClearerForegroundAppRestartPixel)
+        testee =
+            AutomaticDataClearer(
+                mockWorkManager,
+                mockSettingsDataStore,
+                mockClearAction,
+                mockTimeKeeper,
+                dataClearerForegroundAppRestartPixel)
     }
 
     private suspend fun simulateLifecycle(isFreshAppLaunch: Boolean) {
@@ -59,7 +67,8 @@ class AutomaticDataClearerTest {
     /* Clear None tests */
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -72,7 +81,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -85,7 +95,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -98,7 +109,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -111,7 +123,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -124,7 +137,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -137,7 +151,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -150,7 +165,8 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() =
+        runBlocking {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -165,393 +181,435 @@ class AutomaticDataClearerTest {
     /* Clear tabs tests */
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsCleared()
+            }
         }
-    }
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsCleared()
+            }
         }
-    }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotAppExitOnlyAndNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenNotAppExitOnlyAndNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearShouldNotClearTabs() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearShouldNotClearTabs() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyTabsNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyTabsNotCleared()
+            }
         }
-    }
 
     /* Clear Tabs and Data tests */
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOrTimerFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOrTimerFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureNotEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureNotEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureNotEnoughTimePassed()
-        configureAppNotUsedSinceLastClear()
+    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureNotEnoughTimePassed()
+            configureAppNotUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconJustChangedButAppNotUsedThenShouldNotClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
+    fun whenNotFreshAppLaunchAndIconJustChangedButAppNotUsedThenShouldNotClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
 
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureAppUsedSinceLastClear()
-        configureAppIconJustChanged()
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureAppUsedSinceLastClear()
+            configureAppIconJustChanged()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyAppIconFlagReset()
-            verifyEverythingNotCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyAppIconFlagReset()
+                verifyEverythingNotCleared()
+            }
         }
-    }
 
     @Test
-    fun whenFreshAppLaunchAndIconJustChangedButAppUsedThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = true
+    fun whenFreshAppLaunchAndIconJustChangedButAppUsedThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = true
 
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureAppUsedSinceLastClear()
-        configureAppIconJustChanged()
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureAppUsedSinceLastClear()
+            configureAppIconJustChanged()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyAppIconFlagReset()
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyAppIconFlagReset()
+                verifyEverythingCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
+    fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
 
-        configureAppIconNotChanged()
-        configureAppNotUsedSinceLastClear()
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+            configureAppIconNotChanged()
+            configureAppNotUsedSinceLastClear()
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingCleared()
+            }
         }
-    }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconNotChangedAppUsedThenShouldClear() = runBlocking<Unit> {
-        val isFreshAppLaunch = false
+    fun whenNotFreshAppLaunchAndIconNotChangedAppUsedThenShouldClear() =
+        runBlocking<Unit> {
+            val isFreshAppLaunch = false
 
-        configureAppIconNotChanged()
-        configureAppUsedSinceLastClear()
-        configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
-        configureEnoughTimePassed()
-        configureAppUsedSinceLastClear()
+            configureAppIconNotChanged()
+            configureAppUsedSinceLastClear()
+            configureUserOptions(
+                ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
+            configureEnoughTimePassed()
+            configureAppUsedSinceLastClear()
 
-        withContext(Dispatchers.Main) {
-            simulateLifecycle(isFreshAppLaunch)
-            verifyEverythingCleared()
+            withContext(Dispatchers.Main) {
+                simulateLifecycle(isFreshAppLaunch)
+                verifyEverythingCleared()
+            }
         }
-    }
 
     private fun configureUserOptions(whatOption: ClearWhatOption, whenOption: ClearWhenOption) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)

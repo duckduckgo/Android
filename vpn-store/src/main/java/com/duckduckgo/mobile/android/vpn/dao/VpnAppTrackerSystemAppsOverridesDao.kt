@@ -30,21 +30,26 @@ interface VpnAppTrackerSystemAppsOverridesDao {
     fun insertSystemAppOverrides(tracker: List<AppTrackerSystemAppOverridePackage>)
 
     @Transaction
-    fun upsertSystemAppOverrides(systemAppOverrides: List<AppTrackerSystemAppOverridePackage>, metadata: AppTrackerSystemAppOverrideListMetadata) {
+    fun upsertSystemAppOverrides(
+        systemAppOverrides: List<AppTrackerSystemAppOverridePackage>,
+        metadata: AppTrackerSystemAppOverrideListMetadata
+    ) {
         setSystemAppOverridesMetadata(metadata)
         deleteSystemAppOverrides()
         insertSystemAppOverrides(systemAppOverrides)
     }
 
-    @Query("DELETE from vpn_app_tracker_system_app_override_list")
-    fun deleteSystemAppOverrides()
+    @Query("DELETE from vpn_app_tracker_system_app_override_list") fun deleteSystemAppOverrides()
 
     @Query("SELECT * FROM vpn_app_tracker_system_app_override_list")
     fun getSystemAppOverrides(): List<AppTrackerSystemAppOverridePackage>
 
-    @Query("SELECT * from vpn_app_tracker_system_app_override_list_metadata ORDER BY id DESC LIMIT 1")
+    @Query(
+        "SELECT * from vpn_app_tracker_system_app_override_list_metadata ORDER BY id DESC LIMIT 1")
     fun getSystemAppOverridesMetadata(): AppTrackerSystemAppOverrideListMetadata?
 
     @Insert
-    fun setSystemAppOverridesMetadata(systemAppOverridesMetadata: AppTrackerSystemAppOverrideListMetadata)
+    fun setSystemAppOverridesMetadata(
+        systemAppOverridesMetadata: AppTrackerSystemAppOverrideListMetadata
+    )
 }

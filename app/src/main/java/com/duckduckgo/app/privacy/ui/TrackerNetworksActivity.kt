@@ -53,7 +53,8 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
         configureRecycler()
 
         lifecycleScope.launch {
-            viewModel.trackers(intent.tabId!!)
+            viewModel
+                .trackers(intent.tabId!!)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { render(it) }
         }
@@ -68,9 +69,14 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: TrackerNetworksViewModel.ViewState) {
         with(trackerNetworks) {
-            networksBanner.setImageResource(trackersRenderer.networksBanner(viewState.allTrackersBlocked))
+            networksBanner.setImageResource(
+                trackersRenderer.networksBanner(viewState.allTrackersBlocked))
             domain.text = viewState.domain
-            heading.text = trackersRenderer.trackersText(this@TrackerNetworksActivity, viewState.trackerCount, viewState.allTrackersBlocked)
+            heading.text =
+                trackersRenderer.trackersText(
+                    this@TrackerNetworksActivity,
+                    viewState.trackerCount,
+                    viewState.allTrackersBlocked)
             networksAdapter.updateData(viewState.trackingEventsByNetwork)
         }
     }

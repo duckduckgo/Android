@@ -30,15 +30,13 @@ abstract class UserWhitelistDao {
         insert(UserWhitelistedDomain(domain))
     }
 
-    @Delete
-    abstract fun delete(domain: UserWhitelistedDomain)
+    @Delete abstract fun delete(domain: UserWhitelistedDomain)
 
     fun delete(domain: String) {
         delete(UserWhitelistedDomain(domain))
     }
 
-    @Query("select * from user_whitelist")
-    abstract fun all(): LiveData<List<UserWhitelistedDomain>>
+    @Query("select * from user_whitelist") abstract fun all(): LiveData<List<UserWhitelistedDomain>>
 
     @Query("select count(1) > 0 from user_whitelist where domain = :domain")
     abstract fun contains(domain: String): Boolean

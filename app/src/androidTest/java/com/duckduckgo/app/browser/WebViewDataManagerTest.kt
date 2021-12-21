@@ -40,70 +40,83 @@ class WebViewDataManagerTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val mockFileDeleter: FileDeleter = mock()
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
-    private val testee = WebViewDataManager(context, WebViewSessionInMemoryStorage(), mockCookieManager, mockFileDeleter, mockWebViewHttpAuthStore)
+    private val testee =
+        WebViewDataManager(
+            context,
+            WebViewSessionInMemoryStorage(),
+            mockCookieManager,
+            mockFileDeleter,
+            mockWebViewHttpAuthStore)
 
     @Test
-    fun whenDataClearedThenWebViewHistoryCleared() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            assertTrue(webView.historyCleared)
+    fun whenDataClearedThenWebViewHistoryCleared() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                assertTrue(webView.historyCleared)
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenWebViewCacheCleared() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            assertTrue(webView.cacheCleared)
+    fun whenDataClearedThenWebViewCacheCleared() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                assertTrue(webView.cacheCleared)
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenWebViewFormDataCleared() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            assertTrue(webView.clearedFormData)
+    fun whenDataClearedThenWebViewFormDataCleared() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                assertTrue(webView.clearedFormData)
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenWebViewWebStorageCleared() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            verify(mockStorage).deleteAllData()
+    fun whenDataClearedThenWebViewWebStorageCleared() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                verify(mockStorage).deleteAllData()
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenWebViewAuthCredentialsCleared() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            verify(mockWebViewHttpAuthStore).clearHttpAuthUsernamePassword(webView)
+    fun whenDataClearedThenWebViewAuthCredentialsCleared() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                verify(mockWebViewHttpAuthStore).clearHttpAuthUsernamePassword(webView)
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenHttpAuthDatabaseCleaned() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            verify(mockWebViewHttpAuthStore).cleanHttpAuthDatabase()
+    fun whenDataClearedThenHttpAuthDatabaseCleaned() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                verify(mockWebViewHttpAuthStore).cleanHttpAuthDatabase()
+            }
         }
-    }
 
     @Test
-    fun whenDataClearedThenWebViewCookiesRemoved() = runBlocking<Unit> {
-        withContext(Dispatchers.Main) {
-            val webView = TestWebView(context)
-            testee.clearData(webView, mockStorage)
-            verify(mockCookieManager).removeExternalCookies()
+    fun whenDataClearedThenWebViewCookiesRemoved() =
+        runBlocking<Unit> {
+            withContext(Dispatchers.Main) {
+                val webView = TestWebView(context)
+                testee.clearData(webView, mockStorage)
+                verify(mockCookieManager).removeExternalCookies()
+            }
         }
-    }
 
     private class TestWebView(context: Context) : WebView(context) {
 

@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Debug
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context) {
 
@@ -66,15 +66,19 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
         nativeAllocated = Debug.getNativeHeapAllocatedSize() / BYTES_PER_MB
         nativeRemaining = Debug.getNativeHeapFreeSize() / BYTES_PER_MB
 
-        val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val activityManager =
+            applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val processMemoryStats = getMemoryPerProcess(activityManager)
 
         if (processMemoryStats.isEmpty()) {
             totalMemoryBrowserProcess = 0
             totalMemoryVpnProcess = 0
         } else {
-            totalMemoryBrowserProcess = processMemoryStats.filterNot { it.name.endsWith(":vpn") }.firstOrNull()?.memoryPssMb ?: 0
-            totalMemoryVpnProcess = processMemoryStats.firstOrNull { it.name.endsWith(":vpn") }?.memoryPssMb ?: 0
+            totalMemoryBrowserProcess =
+                processMemoryStats.filterNot { it.name.endsWith(":vpn") }.firstOrNull()?.memoryPssMb
+                    ?: 0
+            totalMemoryVpnProcess =
+                processMemoryStats.firstOrNull { it.name.endsWith(":vpn") }?.memoryPssMb ?: 0
         }
 
         maxMemoryPerApp = activityManager.largeMemoryClass
@@ -89,31 +93,28 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
         deviceLowMemoryThreshold = memoryInfo.threshold / BYTES_PER_MB
     }
 
-    private fun getMemoryPerProcess(activityManager: ActivityManager): List<ProcessMemoryConsumption> {
-        val processes: List<Pair<Int, String>> = activityManager.runningAppProcesses
-            .filterNotNull()
-            .map { Pair(it.pid, it.processName) }
+    private fun getMemoryPerProcess(
+        activityManager: ActivityManager
+    ): List<ProcessMemoryConsumption> {
+        val processes: List<Pair<Int, String>> =
+            activityManager.runningAppProcesses.filterNotNull().map { Pair(it.pid, it.processName) }
 
         val pids = IntArray(processes.size)
-        processes.forEachIndexed { index, process ->
-            pids[index] = process.first
-        }
+        processes.forEachIndexed { index, process -> pids[index] = process.first }
 
         val processMemoryInfo = activityManager.getProcessMemoryInfo(pids)
-        val processMemoryStats = processMemoryInfo.mapIndexed { index, memoryInfo ->
-            ProcessMemoryConsumption(processes[index].first, processes[index].second, memoryInfo.totalPss / 1024)
-        }
+        val processMemoryStats =
+            processMemoryInfo.mapIndexed { index, memoryInfo ->
+                ProcessMemoryConsumption(
+                    processes[index].first, processes[index].second, memoryInfo.totalPss / 1024)
+            }
 
         Timber.v("Memory per process:\n%s", processMemoryStats.joinToString(separator = "\n"))
 
         return processMemoryStats
     }
 
-    data class ProcessMemoryConsumption(
-        val pid: Int,
-        val name: String,
-        val memoryPssMb: Int
-    ) {
+    data class ProcessMemoryConsumption(val pid: Int, val name: String, val memoryPssMb: Int) {
         override fun toString(): String {
             return String.format("pid: %d, %d MB, %s", pid, memoryPssMb, name)
         }
@@ -130,11 +131,23 @@ class CurrentMemorySnapshot @Inject constructor(val applicationContext: Context)
                 "\n\nNative %.2f%%. Allocated=%d MB\nMax=%d MB, Remaining=%d MB," +
                 "\n\nDevice total %.2f%%. Allocated=%d MB\nMax=%d MB, Remaining=%d MB",
             percentageUsedWholeApp,
-            maxMemoryPerApp, maxMemoryPerApp - totalMemoryConsumed,
-            totalMemoryConsumed, totalMemoryBrowserProcess, totalMemoryVpnProcess,
-            percentageHeapUsed, heapAllocated, heapMax, heapRemaining,
-            percentageNativeUsed, nativeAllocated, nativeMax, nativeRemaining,
-            percentageDeviceUsed, deviceAllocated, deviceMax, deviceRemaining,
+            maxMemoryPerApp,
+            maxMemoryPerApp - totalMemoryConsumed,
+            totalMemoryConsumed,
+            totalMemoryBrowserProcess,
+            totalMemoryVpnProcess,
+            percentageHeapUsed,
+            heapAllocated,
+            heapMax,
+            heapRemaining,
+            percentageNativeUsed,
+            nativeAllocated,
+            nativeMax,
+            nativeRemaining,
+            percentageDeviceUsed,
+            deviceAllocated,
+            deviceMax,
+            deviceRemaining,
         )
     }
 

@@ -34,7 +34,8 @@ fun FragmentActivity.launchExternalActivity(intent: Intent) {
     if (intent.resolveActivity(packageManager) != null) {
         startActivity(intent)
     } else {
-        Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, R.string.no_compatible_third_party_app_installed, Toast.LENGTH_SHORT)
+            .show()
     }
 }
 
@@ -51,16 +52,21 @@ fun Context.launchDefaultAppActivity() {
 }
 
 fun Context.fadeTransitionConfig(): Bundle? {
-    val config = ActivityOptionsCompat.makeCustomAnimation(this, android.R.anim.fade_in, android.R.anim.fade_out)
+    val config =
+        ActivityOptionsCompat.makeCustomAnimation(
+            this, android.R.anim.fade_in, android.R.anim.fade_out)
     return config.toBundle()
 }
 
 fun FragmentActivity.toggleFullScreen() {
 
-    val newUiOptions = window.decorView.systemUiVisibility
-        .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
-        .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
-        .xor(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+    val newUiOptions =
+        window
+            .decorView
+            .systemUiVisibility
+            .xor(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+            .xor(View.SYSTEM_UI_FLAG_FULLSCREEN)
+            .xor(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
     window.decorView.systemUiVisibility = newUiOptions
 }

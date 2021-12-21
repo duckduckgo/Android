@@ -26,7 +26,8 @@ class AppFeedbackContract : ActivityResultContract<Void?, Boolean>() {
         // TODO Class.forName is not great but required to unblock ATP for now
         // We need to make bigger refactors to extract features into its own gradle modules
         // so that they are accessible from other places.
-        return Intent(context, Class.forName("com.duckduckgo.app.feedback.ui.common.FeedbackActivity"))
+        return Intent(
+            context, Class.forName("com.duckduckgo.app.feedback.ui.common.FeedbackActivity"))
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Boolean {

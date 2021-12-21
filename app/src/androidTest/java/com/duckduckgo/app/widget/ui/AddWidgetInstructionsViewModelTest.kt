@@ -36,21 +36,15 @@ import org.mockito.MockitoAnnotations
 
 class AddWidgetInstructionsViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @get:Rule
-    @Suppress("unused")
-    val schedulers = InstantSchedulersRule()
+    @get:Rule @Suppress("unused") val schedulers = InstantSchedulersRule()
 
     private lateinit var testee: AddWidgetInstructionsViewModel
 
-    @Mock
-    private lateinit var mockCommandObserver: Observer<Command>
+    @Mock private lateinit var mockCommandObserver: Observer<Command>
 
-    @Captor
-    private lateinit var commandCaptor: ArgumentCaptor<Command>
+    @Captor private lateinit var commandCaptor: ArgumentCaptor<Command>
 
     @Before
     fun before() {

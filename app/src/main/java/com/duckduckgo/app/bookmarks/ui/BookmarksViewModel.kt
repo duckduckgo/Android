@@ -19,11 +19,11 @@ package com.duckduckgo.app.bookmarks.ui
 import android.net.Uri
 import androidx.lifecycle.*
 import com.duckduckgo.app.bookmarks.model.*
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.BookmarksViewModel.Command.*
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment.EditSavedSiteListener
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
@@ -37,12 +37,12 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Provider
 
 class BookmarksViewModel(
     private val favoritesRepository: FavoritesRepository,
@@ -51,7 +51,12 @@ class BookmarksViewModel(
     private val savedSitesManager: SavedSitesManager,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider
-) : EditSavedSiteListener, AddBookmarkFolderListener, EditBookmarkFolderListener, DeleteBookmarkFolderListener, ViewModel() {
+) :
+    EditSavedSiteListener,
+    AddBookmarkFolderListener,
+    EditBookmarkFolderListener,
+    DeleteBookmarkFolderListener,
+    ViewModel() {
 
     data class ViewState(
         val enableSearch: Boolean = false,
@@ -67,9 +72,14 @@ class BookmarksViewModel(
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder, val folderBranch: BookmarkFolderBranch) : Command()
-        data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
-        data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
+        class ConfirmDeleteBookmarkFolder(
+            val bookmarkFolder: BookmarkFolder,
+            val folderBranch: BookmarkFolderBranch
+        ) : Command()
+        data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) :
+            Command()
+        data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) :
+            Command()
     }
 
     companion object {
@@ -81,24 +91,16 @@ class BookmarksViewModel(
 
     init {
         viewState.value = ViewState()
-        viewModelScope.launch {
-            favoritesRepository.favorites().collect {
-                onFavoritesChanged(it)
-            }
-        }
+        viewModelScope.launch { favoritesRepository.favorites().collect { onFavoritesChanged(it) } }
     }
 
     override fun onSavedSiteEdited(savedSite: SavedSite) {
         when (savedSite) {
             is Bookmark -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    editBookmark(savedSite)
-                }
+                viewModelScope.launch(dispatcherProvider.io()) { editBookmark(savedSite) }
             }
             is Favorite -> {
-                viewModelScope.launch(dispatcherProvider.io()) {
-                    editFavorite(savedSite)
-                }
+                viewModelScope.launch(dispatcherProvider.io()) { editFavorite(savedSite) }
             }
         }
     }
@@ -153,31 +155,23 @@ class BookmarksViewModel(
     fun importBookmarks(uri: Uri) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val result = savedSitesManager.import(uri)
-            withContext(dispatcherProvider.main()) {
-                command.value = ImportedSavedSites(result)
-            }
+            withContext(dispatcherProvider.main()) { command.value = ImportedSavedSites(result) }
         }
     }
 
     fun exportSavedSites(selectedFile: Uri) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val result = savedSitesManager.export(selectedFile)
-            withContext(dispatcherProvider.main()) {
-                command.value = ExportedSavedSites(result)
-            }
+            withContext(dispatcherProvider.main()) { command.value = ExportedSavedSites(result) }
         }
     }
 
     private suspend fun editBookmark(bookmark: Bookmark) {
-        withContext(dispatcherProvider.io()) {
-            bookmarksRepository.update(bookmark)
-        }
+        withContext(dispatcherProvider.io()) { bookmarksRepository.update(bookmark) }
     }
 
     private suspend fun editFavorite(favorite: Favorite) {
-        withContext(dispatcherProvider.io()) {
-            favoritesRepository.update(favorite)
-        }
+        withContext(dispatcherProvider.io()) { favoritesRepository.update(favorite) }
     }
 
     private fun onFavoritesChanged(favorites: List<Favorite>) {
@@ -191,7 +185,9 @@ class BookmarksViewModel(
     fun fetchBookmarksAndFolders(parentId: Long? = null) {
         viewModelScope.launch {
             bookmarksRepository.fetchBookmarksAndFolders(parentId).collect { bookmarksAndFolders ->
-                onBookmarkItemsChanged(bookmarks = bookmarksAndFolders.first, bookmarkFolders = bookmarksAndFolders.second)
+                onBookmarkItemsChanged(
+                    bookmarks = bookmarksAndFolders.first,
+                    bookmarkFolders = bookmarksAndFolders.second)
             }
         }
     }
@@ -227,12 +223,15 @@ class BookmarksViewModel(
         }
     }
 
-    private fun onBookmarkItemsChanged(bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
-        viewState.value = viewState.value?.copy(
-            bookmarks = bookmarks,
-            bookmarkFolders = bookmarkFolders,
-            enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH
-        )
+    private fun onBookmarkItemsChanged(
+        bookmarks: List<Bookmark>,
+        bookmarkFolders: List<BookmarkFolder>
+    ) {
+        viewState.value =
+            viewState.value?.copy(
+                bookmarks = bookmarks,
+                bookmarkFolders = bookmarkFolders,
+                enableSearch = bookmarks.size + bookmarkFolders.size >= MIN_ITEMS_FOR_SEARCH)
     }
 
     fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
@@ -243,7 +242,9 @@ class BookmarksViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class BookmarksViewModelFactory @Inject constructor(
+class BookmarksViewModelFactory
+@Inject
+constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val bookmarksRepository: Provider<BookmarksRepository>,
     private val faviconManager: Provider<FaviconManager>,
@@ -254,16 +255,15 @@ class BookmarksViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (
-                    BookmarksViewModel(
+                isAssignableFrom(BookmarksViewModel::class.java) ->
+                    (BookmarksViewModel(
                         favoritesRepository.get(),
                         bookmarksRepository.get(),
                         faviconManager.get(),
                         savedSitesManager.get(),
                         pixel.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
+                        dispatcherProvider.get()) as
+                        T)
                 else -> null
             }
         }

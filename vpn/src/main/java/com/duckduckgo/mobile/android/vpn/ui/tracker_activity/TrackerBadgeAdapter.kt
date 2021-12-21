@@ -56,7 +56,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_tracker_badge, parent, false)
+                val view =
+                    inflater.inflate(
+                        R.layout.view_device_shield_activity_tracker_badge, parent, false)
                 return TrackerBadgeViewHolder(view)
             }
         }
@@ -69,25 +71,33 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
-                )
+                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY))
             } else {
                 (view as ImageView).setImageResource(badge)
             }
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
-            val drawable = "$prefix$networkName"
-                .replace(" ", "_")
-                .replace(".", "")
-                .replace(",", "")
-                .toLowerCase(Locale.ROOT)
-            val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
+            val drawable =
+                "$prefix$networkName"
+                    .replace(" ", "_")
+                    .replace(".", "")
+                    .replace(",", "")
+                    .toLowerCase(Locale.ROOT)
+            val resource =
+                context.resources.getIdentifier(drawable, "drawable", context.packageName)
             return if (resource != 0) resource else null
         }
     }
 
-    private class DiffCallback(private val oldList: List<TrackerInfo>, private val newList: List<TrackerInfo>) : DiffUtil.Callback() {
+    private class DiffCallback(
+        private val oldList: List<TrackerInfo>,
+        private val newList: List<TrackerInfo>
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size

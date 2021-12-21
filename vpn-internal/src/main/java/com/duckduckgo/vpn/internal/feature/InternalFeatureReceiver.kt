@@ -22,8 +22,7 @@ import android.content.Intent
 import android.content.IntentFilter
 
 /**
- * Abstract class to create generic receivers for internal features accessible through
- * adb commands.
+ * Abstract class to create generic receivers for internal features accessible through adb commands.
  *
  * Implement the [intentAction] function and return the intent action this receiver will be
  * listening to

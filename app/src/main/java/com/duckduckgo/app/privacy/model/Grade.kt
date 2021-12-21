@@ -23,26 +23,16 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.squareup.moshi.Json
 import timber.log.Timber
 
-class Grade(
-    val https: Boolean = false,
-    val httpsAutoUpgrade: Boolean = false
-) {
+class Grade(val https: Boolean = false, val httpsAutoUpgrade: Boolean = false) {
 
     enum class Grading {
-
         A,
-
-        @Json(name = "B+")
-        B_PLUS,
+        @Json(name = "B+") B_PLUS,
         B,
-
-        @Json(name = "C+")
-        C_PLUS,
+        @Json(name = "C+") C_PLUS,
         C,
         D,
-
-        @Json(name = "D-")
-        D_MINUS,
+        @Json(name = "D-") D_MINUS,
         UNKNOWN
     }
 
@@ -56,10 +46,7 @@ class Grade(
 
     sealed class Scores {
 
-        data class ScoresAvailable(
-            val site: Score,
-            val enhanced: Score
-        ) : Scores()
+        data class ScoresAvailable(val site: Score, val enhanced: Score) : Scores()
 
         object ScoresUnavailable : Scores()
     }
@@ -72,9 +59,7 @@ class Grade(
 
     fun updateData(privacyScore: Int?, parentEntity: Entity?) {
         this.privacyScore = privacyScore
-        parentEntity?.let {
-            setParentEntity(parentEntity)
-        }
+        parentEntity?.let { setParentEntity(parentEntity) }
 
         fullSiteDetailsAvailable = true
     }
@@ -120,21 +105,21 @@ class Grade(
         val siteGrade = gradeForScore(siteTotalScore)
         val enhancedGrade = gradeForScore(enhancedTotalScore)
 
-        val site = Score(
-            grade = siteGrade,
-            httpsScore = siteHttpsScore,
-            privacyScore = privacyScore,
-            score = siteTotalScore,
-            trackerScore = siteTrackerScore
-        )
+        val site =
+            Score(
+                grade = siteGrade,
+                httpsScore = siteHttpsScore,
+                privacyScore = privacyScore,
+                score = siteTotalScore,
+                trackerScore = siteTrackerScore)
 
-        val enhanced = Score(
-            grade = enhancedGrade,
-            httpsScore = enhancedHttpsScore,
-            privacyScore = privacyScore,
-            score = enhancedTotalScore,
-            trackerScore = enhancedTrackerScore
-        )
+        val enhanced =
+            Score(
+                grade = enhancedGrade,
+                httpsScore = enhancedHttpsScore,
+                privacyScore = privacyScore,
+                score = enhancedTotalScore,
+                trackerScore = enhancedTrackerScore)
 
         return ScoresAvailable(site = site, enhanced = enhanced)
     }
@@ -154,9 +139,7 @@ class Grade(
     }
 
     private fun trackerScore(entities: Map<String, Double>): Int {
-        return entities.entries.fold(0) { acc, entry ->
-            acc + scoreFromPrevalence(entry.value)
-        }
+        return entities.entries.fold(0) { acc, entry -> acc + scoreFromPrevalence(entry.value) }
     }
 
     private fun scoreFromPrevalence(prevalence: Double): Int {
@@ -186,14 +169,11 @@ class Grade(
     }
 
     fun addEntityBlocked(entity: Entity?) {
-        entity?.let {
-            entitiesBlocked = entitiesBlocked.plus(entity.name to entity.prevalence)
-        }
+        entity?.let { entitiesBlocked = entitiesBlocked.plus(entity.name to entity.prevalence) }
     }
 
     companion object {
         const val UNKNOWN_PRIVACY_SCORE = 2
         const val MAX_PRIVACY_SCORE = 10
     }
-
 }

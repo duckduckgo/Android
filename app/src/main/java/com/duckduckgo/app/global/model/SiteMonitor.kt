@@ -42,14 +42,11 @@ class SiteMonitor(
             _uri = field.toUri()
         }
 
-    /**
-     * A read-only uri version of the url. To update, update the url
-     */
-    override val uri: Uri? get() = _uri
+    /** A read-only uri version of the url. To update, update the url */
+    override val uri: Uri?
+        get() = _uri
 
-    /**
-     * Backing field to ensure uri cannot be publicly written
-     */
+    /** Backing field to ensure uri cannot be publicly written */
     private var _uri: Uri? = url.toUri()
 
     override val https: HttpsStatus
@@ -79,7 +76,8 @@ class SiteMonitor(
     init {
         val isHttps = https != HttpsStatus.NONE
 
-        // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't penalise sites
+        // httpsAutoUpgrade is not supported yet; for now, keep it equal to isHttps and don't
+        // penalise sites
         gradeCalculator = Grade(https = isHttps, httpsAutoUpgrade = isHttps)
     }
 

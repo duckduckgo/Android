@@ -34,13 +34,9 @@ import org.junit.Test
 
 class SavedSitesParserTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var parser: RealSavedSitesParser
 
@@ -60,26 +56,29 @@ class SavedSitesParserTest {
         val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", 0)
 
         val node = TreeNode(FolderTreeItem(0, RealSavedSitesParser.BOOKMARKS_FOLDER, -1, null, 0))
-        node.add(TreeNode(FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
+        node.add(
+            TreeNode(
+                FolderTreeItem(bookmark.id, bookmark.title, bookmark.parentId, bookmark.url, 1)))
 
         val result = parser.generateHtml(node, listOf(favorite))
-        val expectedHtml = "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
-            "<!--This is an automatically generated file.\n" +
-            "It will be read and overwritten.\n" +
-            "Do Not Edit! -->\n" +
-            "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
-            "<Title>Bookmarks</Title>\n" +
-            "<H1>Bookmarks</H1>\n" +
-            "<DL><p>\n" +
-            "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo Bookmarks</H3>\n" +
-            "    <DL><p>\n" +
-            "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
-            "    </DL><p>\n" +
-            "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo Favorites</H3>\n" +
-            "    <DL><p>\n" +
-            "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
-            "    </DL><p>\n" +
-            "</DL><p>\n"
+        val expectedHtml =
+            "<!DOCTYPE NETSCAPE-Bookmark-file-1>\n" +
+                "<!--This is an automatically generated file.\n" +
+                "It will be read and overwritten.\n" +
+                "Do Not Edit! -->\n" +
+                "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=UTF-8\">\n" +
+                "<Title>Bookmarks</Title>\n" +
+                "<H1>Bookmarks</H1>\n" +
+                "<DL><p>\n" +
+                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">DuckDuckGo Bookmarks</H3>\n" +
+                "    <DL><p>\n" +
+                "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
+                "    </DL><p>\n" +
+                "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">DuckDuckGo Favorites</H3>\n" +
+                "    <DL><p>\n" +
+                "        <DT><A HREF=\"www.example.com\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">example</A>\n" +
+                "    </DL><p>\n" +
+                "</DL><p>\n"
 
         assertEquals(expectedHtml, result)
     }
@@ -134,13 +133,14 @@ class SavedSitesParserTest {
         val firstBookmark = bookmarks.first()
         assertEquals(
             "https://jupyter.duckduckgo.com/notebooks/Mobile/Android%20Monday%20Health%20Check%20(DO%20NOT%20CHANGE).ipynb",
-            firstBookmark.url
-        )
+            firstBookmark.url)
         assertEquals("Android Monday Health Check", firstBookmark.title)
 
         val lastBookmark = bookmarks.last()
         assertEquals("https://app.asana.com/0/414730916066338/598549668511654", lastBookmark.url)
-        assertEquals("Android App Development - Android Runtime Permissions Explanations - Asana", lastBookmark.title)
+        assertEquals(
+            "Android App Development - Android Runtime Permissions Explanations - Asana",
+            lastBookmark.title)
     }
 
     @Test
@@ -212,7 +212,8 @@ class SavedSitesParserTest {
                         savedSites.add(SavedSite.Favorite(0, title = title, url = link, favorites))
                         favorites++
                     } else {
-                        savedSites.add(SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
+                        savedSites.add(
+                            SavedSite.Bookmark(0, title = title, url = link, parentId = 0))
                     }
                 }
             }

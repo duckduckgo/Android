@@ -29,12 +29,9 @@ data class VpnPhoenixEntity(
 
 @Dao
 interface VpnPhoenixDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(vpnPhoenixEntity: VpnPhoenixEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(vpnPhoenixEntity: VpnPhoenixEntity)
 
-    @Query("select * from vpn_phoenix")
-    fun restarts(): List<VpnPhoenixEntity>
+    @Query("select * from vpn_phoenix") fun restarts(): List<VpnPhoenixEntity>
 
-    @Query("delete from vpn_phoenix")
-    fun delete()
+    @Query("delete from vpn_phoenix") fun delete()
 }

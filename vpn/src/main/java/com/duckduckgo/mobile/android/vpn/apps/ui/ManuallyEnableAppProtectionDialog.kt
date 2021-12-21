@@ -50,7 +50,8 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_enable_app, null)
+        val rootView =
+            layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_enable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val appName = rootView.findViewById<TextView>(R.id.trackingProtectionAppName)
@@ -58,8 +59,11 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogEnable)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogSkip)
 
-        val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
-            .setView(rootView)
+        val alertDialog =
+            MaterialAlertDialogBuilder(
+                    requireActivity(),
+                    com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
+                .setView(rootView)
 
         validateBundleArguments()
         isCancelable = false
@@ -105,10 +109,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         return requireArguments().getInt(KEY_POSITION)!!
     }
 
-    private fun configureListeners(
-        enableCTA: Button,
-        skipCTA: Button
-    ) {
+    private fun configureListeners(enableCTA: Button, skipCTA: Button) {
         enableCTA.setOnClickListener {
             dismiss()
             listener.onAppProtectionEnabled(getPackageName(), getExcludingReason())
@@ -144,7 +145,10 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         private const val KEY_EXCLUDING_REASON = "KEY_EXCLUDING_REASON"
         private const val KEY_POSITION = "KEY_POSITION"
 
-        fun instance(appInfo: TrackingProtectionAppInfo, position: Int): ManuallyEnableAppProtectionDialog {
+        fun instance(
+            appInfo: TrackingProtectionAppInfo,
+            position: Int
+        ): ManuallyEnableAppProtectionDialog {
             return ManuallyEnableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)

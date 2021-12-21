@@ -19,20 +19,17 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 interface HostnameHeaderExtractor {
 
     fun extract(payload: String): String?
-
 }
 
 class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
 
     override fun extract(payload: String): String? {
 
-        payload.split(NEWLINE_REGEX)
-            .map { it.trim() }
-            .forEach { line ->
-                if (line.startsWith(HOST_HEADER_PREFIX)) {
-                    return line.substring(HOST_HEADER_PREFIX.length)
-                }
+        payload.split(NEWLINE_REGEX).map { it.trim() }.forEach { line ->
+            if (line.startsWith(HOST_HEADER_PREFIX)) {
+                return line.substring(HOST_HEADER_PREFIX.length)
             }
+        }
 
         return null
     }
@@ -41,5 +38,4 @@ class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
         private const val HOST_HEADER_PREFIX = "Host: "
         private val NEWLINE_REGEX: Regex = "\\n".toRegex()
     }
-
 }

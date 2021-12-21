@@ -27,7 +27,9 @@ import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 
-class DeviceShieldOnboardingAdapter(val pages: List<DeviceShieldOnboardingViewModel.OnboardingPage>) : RecyclerView.Adapter<PageViewHolder>() {
+class DeviceShieldOnboardingAdapter(
+    val pages: List<DeviceShieldOnboardingViewModel.OnboardingPage>
+) : RecyclerView.Adapter<PageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PageViewHolder(parent)
 
@@ -40,15 +42,19 @@ class DeviceShieldOnboardingAdapter(val pages: List<DeviceShieldOnboardingViewMo
 
 class PageViewHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.activity_device_shield_onboarding_page, parent, false)
-    ) {
+        LayoutInflater.from(parent.context)
+            .inflate(R.layout.activity_device_shield_onboarding_page, parent, false)) {
     private val pageTitle: TextView = itemView.findViewById(R.id.onboarding_page_title)
     private val pageText: TextView = itemView.findViewById(R.id.onboarding_page_text)
     private val onboardingHeader: ImageView = itemView.findViewById(R.id.onboarding_page_image)
-    private val onboardingAnimation: LottieAnimationView = itemView.findViewById(R.id.onboarding_page_animation)
-    private val indicatorOne: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_one)
-    private val indicatorTwo: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_two)
-    private val indicatorThree: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_three)
+    private val onboardingAnimation: LottieAnimationView =
+        itemView.findViewById(R.id.onboarding_page_animation)
+    private val indicatorOne: ImageView =
+        itemView.findViewById(R.id.onboarding_active_indicator_one)
+    private val indicatorTwo: ImageView =
+        itemView.findViewById(R.id.onboarding_active_indicator_two)
+    private val indicatorThree: ImageView =
+        itemView.findViewById(R.id.onboarding_active_indicator_three)
     private val indicators: List<ImageView> = listOf(indicatorOne, indicatorTwo, indicatorThree)
 
     fun bind(page: DeviceShieldOnboardingViewModel.OnboardingPage, position: Int) {

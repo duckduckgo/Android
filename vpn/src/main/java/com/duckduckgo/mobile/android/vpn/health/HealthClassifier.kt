@@ -20,9 +20,9 @@ import android.content.Context
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.*
 import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Completed
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import timber.log.Timber
 
 class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
@@ -34,63 +34,81 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
         val percentage = percentage(queueReads, tunInputs)
 
-        rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
+        rawMetrics["tunInputsQueueReadRate"] =
+            Metric(percentage.toString(), badHealthIf { percentage < 70 })
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     fun determineHealthSocketChannelReadExceptions(readExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-readExceptions", rawMetrics)
 
-        rawMetrics["numberExceptions"] = Metric(readExceptions.toString(), badHealthIf { readExceptions >= 20 })
+        rawMetrics["numberExceptions"] =
+            Metric(readExceptions.toString(), badHealthIf { readExceptions >= 20 })
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     fun determineHealthSocketChannelWriteExceptions(writeExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-writeExceptions", rawMetrics)
 
-        rawMetrics["numberExceptions"] = Metric(writeExceptions.toString(), badHealthIf { writeExceptions >= 20 })
+        rawMetrics["numberExceptions"] =
+            Metric(writeExceptions.toString(), badHealthIf { writeExceptions >= 20 })
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     fun determineHealthSocketChannelConnectExceptions(connectExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-connectExceptions", rawMetrics)
 
-        rawMetrics["numberExceptions"] = Metric(connectExceptions.toString(), badHealthIf { connectExceptions >= 20 })
+        rawMetrics["numberExceptions"] =
+            Metric(connectExceptions.toString(), badHealthIf { connectExceptions >= 20 })
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     fun determineHealthTunWriteExceptions(numberExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tun-ioWriteExceptions", rawMetrics)
 
-        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 })
+        rawMetrics["numberExceptions"] =
+            Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 })
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
-    fun determineHealthTracerPackets(allTraces: List<TracerPacketRegister.TracerSummary>): HealthState {
+    fun determineHealthTracerPackets(
+        allTraces: List<TracerPacketRegister.TracerSummary>
+    ): HealthState {
         if (allTraces.size < 10) {
-            Timber.v("Tracer packet health: Initializing, as only %d tracers encountered", allTraces.size)
+            Timber.v(
+                "Tracer packet health: Initializing, as only %d tracers encountered",
+                allTraces.size)
             return Initializing
         }
 
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tracers", rawMetrics)
 
-        val successfulTraces = allTraces
-            .filterIsInstance<Completed>()
-            .filter { it.timeToCompleteNanos <= TimeUnit.MILLISECONDS.toNanos(300) }
+        val successfulTraces =
+            allTraces.filterIsInstance<Completed>().filter {
+                it.timeToCompleteNanos <= TimeUnit.MILLISECONDS.toNanos(300)
+            }
 
         val successRate = percentage(successfulTraces.size.toLong(), allTraces.size.toLong())
         val numberFailed = allTraces.size - successfulTraces.size
-        val meanCompletedNs = if (successfulTraces.isEmpty()) 0.0 else successfulTraces.sumOf { it.timeToCompleteNanos }.toDouble() / successfulTraces.size
+        val meanCompletedNs =
+            if (successfulTraces.isEmpty()) 0.0
+            else
+                successfulTraces.sumOf { it.timeToCompleteNanos }.toDouble() / successfulTraces.size
         val meanCompletedMs = meanCompletedNs / 1_000_000
 
         rawMetrics["successRate"] = Metric(successRate.toString(), badHealthIf { successRate < 85 })
@@ -103,10 +121,10 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
             successfulTraces.size,
             numberFailed,
             allTraces.size,
-            successRate
-        )
+            successRate)
 
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     fun determineHealthMemory(): HealthState {
@@ -116,33 +134,47 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         val memorySnapshot = CurrentMemorySnapshot(applicationContext)
 
         val percentageHeap = percentage(memorySnapshot.heapAllocated, memorySnapshot.heapMax)
-        rawMetrics["heapPercentageUsed"] = Metric(percentageHeap.percentageFormatted(), badHealthIf { percentageHeap >= 80 })
+        rawMetrics["heapPercentageUsed"] =
+            Metric(percentageHeap.percentageFormatted(), badHealthIf { percentageHeap >= 80 })
         rawMetrics["heapMax"] = Metric(memorySnapshot.heapMax.toString())
         rawMetrics["heapAllocated"] = Metric(memorySnapshot.heapAllocated.toString())
         rawMetrics["heapRemaining"] = Metric(memorySnapshot.heapRemaining.toString())
 
         val percentageNative = percentage(memorySnapshot.nativeAllocated, memorySnapshot.nativeMax)
-        rawMetrics["nativePercentageUsed"] = Metric(percentageNative.percentageFormatted(), badHealthIf { percentageNative >= 90 })
+        rawMetrics["nativePercentageUsed"] =
+            Metric(percentageNative.percentageFormatted(), badHealthIf { percentageNative >= 90 })
         rawMetrics["nativeMax"] = Metric(memorySnapshot.nativeMax.toString())
         rawMetrics["nativeAllocated"] = Metric(memorySnapshot.nativeAllocated.toString())
         rawMetrics["nativeRemaining"] = Metric(memorySnapshot.nativeRemaining.toString())
 
         val percentageDevice = memorySnapshot.percentageDeviceUsed
-        rawMetrics["devicePercentageUsed"] = Metric(percentageDevice.percentageFormatted(), badHealthIf { percentageDevice >= 90 })
+        rawMetrics["devicePercentageUsed"] =
+            Metric(percentageDevice.percentageFormatted(), badHealthIf { percentageDevice >= 90 })
         rawMetrics["deviceMax"] = Metric(memorySnapshot.deviceMax.toString())
         rawMetrics["deviceAllocated"] = Metric(memorySnapshot.deviceAllocated.toString())
         rawMetrics["deviceRemaining"] = Metric(memorySnapshot.deviceRemaining.toString())
 
         val percentageWholeApp = memorySnapshot.percentageUsedWholeApp
-        rawMetrics["totalMemoryBrowser"] = Metric(memorySnapshot.totalMemoryBrowserProcess.toString())
+        rawMetrics["totalMemoryBrowser"] =
+            Metric(memorySnapshot.totalMemoryBrowserProcess.toString())
         rawMetrics["totalMemoryVpn"] = Metric(memorySnapshot.totalMemoryVpnProcess.toString())
-        rawMetrics["totalMemoryWholeApp"] = Metric((memorySnapshot.totalMemoryVpnProcess + memorySnapshot.totalMemoryBrowserProcess).toString())
-        rawMetrics["totalWholeAppPercentageUsed"] = Metric(percentageWholeApp.percentageFormatted(), badHealthIf { percentageWholeApp >= 90 })
+        rawMetrics["totalMemoryWholeApp"] =
+            Metric(
+                (memorySnapshot.totalMemoryVpnProcess + memorySnapshot.totalMemoryBrowserProcess)
+                    .toString())
+        rawMetrics["totalWholeAppPercentageUsed"] =
+            Metric(
+                percentageWholeApp.percentageFormatted(), badHealthIf { percentageWholeApp >= 90 })
 
         rawMetrics["lowMemoryDevice"] = Metric(memorySnapshot.lowMemoryDevice.toString())
 
-        Timber.v("Memory health: %s\n%s", if (metricSummary.isInBadHealth()) "bad: %s" else "good", rawMetrics, metricSummary.badHealthReasons())
-        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+        Timber.v(
+            "Memory health: %s\n%s",
+            if (metricSummary.isInBadHealth()) "bad: %s" else "good",
+            rawMetrics,
+            metricSummary.badHealthReasons())
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary)
+        else GoodHealth(metricSummary)
     }
 
     private fun badHealthIf(function: () -> Boolean): Boolean {

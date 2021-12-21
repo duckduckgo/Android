@@ -23,25 +23,30 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 /**
- * This raw file store is temporary. Once we move to an api call to retrieve the json
- * we'll store the content in a db rather than a raw file.
+ * This raw file store is temporary. Once we move to an api call to retrieve the json we'll store
+ * the content in a db rather than a raw file.
  */
 @SingleInstanceIn(AppScope::class)
-class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, private val context: Context) : TermsOfServiceStore {
+class TermsOfServiceRawStore
+@Inject
+constructor(private val moshi: Moshi, private val context: Context) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()
     private var initialized: Boolean = false
 
     override suspend fun loadData() {
         withContext(Dispatchers.IO) {
-            val json = context.resources.openRawResource(R.raw.tosdr).bufferedReader().use { it.readText() }
+            val json =
+                context.resources.openRawResource(R.raw.tosdr).bufferedReader().use {
+                    it.readText()
+                }
             val type = Types.newParameterizedType(List::class.java, TermsOfService::class.java)
             val adapter: JsonAdapter<List<TermsOfService>> = moshi.adapter(type)
             data = adapter.fromJson(json)!!

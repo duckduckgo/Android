@@ -43,22 +43,25 @@ class AppFeatureNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(false)
-        assertTrue(testee.canShow())
-    }
+    fun whenNotificationNotSeenThenCanShowIsTrue() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(false)
+            assertTrue(testee.canShow())
+        }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
-        whenever(notificationsDao.exists(any())).thenReturn(true)
-        assertFalse(testee.canShow())
-    }
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() =
+        runBlocking<Unit> {
+            whenever(notificationsDao.exists(any())).thenReturn(true)
+            assertFalse(testee.canShow())
+        }
 
     @Test
-    fun whenBuildSpecificationSetCorrectPixelSuffix() = runBlocking<Unit> {
-        val spec = testee.buildSpecification()
-        assertEquals(PIXEL, spec.pixelSuffix)
-    }
+    fun whenBuildSpecificationSetCorrectPixelSuffix() =
+        runBlocking<Unit> {
+            val spec = testee.buildSpecification()
+            assertEquals(PIXEL, spec.pixelSuffix)
+        }
 
     companion object {
         private const val PIXEL = "pixel"

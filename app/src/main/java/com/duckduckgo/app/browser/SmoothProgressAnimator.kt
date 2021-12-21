@@ -24,7 +24,8 @@ import androidx.core.animation.addListener
 
 class SmoothProgressAnimator(private val pageLoadingIndicator: ProgressBar) {
 
-    private var progressBarAnimation: ObjectAnimator = ObjectAnimator.ofInt(pageLoadingIndicator, "progress", 0)
+    private var progressBarAnimation: ObjectAnimator =
+        ObjectAnimator.ofInt(pageLoadingIndicator, "progress", 0)
 
     fun onNewProgress(newProgress: Int, onAnimationEnd: (Animator?) -> Unit) {
         progressBarAnimation.pause()
@@ -35,7 +36,9 @@ class SmoothProgressAnimator(private val pageLoadingIndicator: ProgressBar) {
             progressBarAnimation.apply {
                 removeAllListeners()
                 setIntValues(newProgress)
-                duration = if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG else ANIM_DURATION_PROGRESS_SHORT
+                duration =
+                    if (newProgress < MIN_PROGRESS_BAR) ANIM_DURATION_PROGRESS_LONG
+                    else ANIM_DURATION_PROGRESS_SHORT
                 interpolator = AccelerateDecelerateInterpolator()
                 addListener(onEnd = onAnimationEnd)
                 start()

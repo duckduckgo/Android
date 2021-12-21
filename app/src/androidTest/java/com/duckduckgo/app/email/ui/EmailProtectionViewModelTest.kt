@@ -22,20 +22,19 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class EmailProtectionViewModelTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val mockEmailManager: EmailManager = mock()
     private val emailStateFlow = MutableStateFlow(false)
@@ -50,43 +49,46 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenEmitEmailState() = coroutineRule.runBlocking {
-        testee.viewState.test {
-            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+    fun whenViewModelCreatedThenEmitEmailState() =
+        coroutineRule.runBlocking {
+            testee.viewState.test {
+                assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
-        testee.viewState.test {
-            emailStateFlow.emit(false)
-            (awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() =
+        coroutineRule.runBlocking {
+            testee.viewState.test {
+                emailStateFlow.emit(false)
+                (awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
-        testee.viewState.test {
-            emailStateFlow.emit(true)
-            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() =
+        coroutineRule.runBlocking {
+            testee.viewState.test {
+                emailStateFlow.emit(true)
+                assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun whenFeatureIsNotSupportedThenEmitNotSupportedState() = coroutineRule.runBlocking {
-        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
-        testee.viewState.test {
-            emailStateFlow.emit(true)
-            assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.NotSupported)
+    fun whenFeatureIsNotSupportedThenEmitNotSupportedState() =
+        coroutineRule.runBlocking {
+            whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
+            testee.viewState.test {
+                emailStateFlow.emit(true)
+                assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.NotSupported)
 
-            cancelAndConsumeRemainingEvents()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-    }
-
 }

@@ -33,8 +33,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
 class RealDrmRepositoryTest {
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealDrmRepository
 
@@ -44,54 +43,48 @@ class RealDrmRepositoryTest {
     @Before
     fun before() {
         whenever(mockDatabase.drmDao()).thenReturn(mockDrmDao)
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealDrmRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenDrmDaoContainsExceptions()
 
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealDrmRepository(
+                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(drmException.toDrmException(), testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+    fun whenUpdateAllThenUpdateAllCalled() =
+        coroutineRule.runBlocking {
+            testee =
+                RealDrmRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        verify(mockDrmDao).updateAll(anyList())
-    }
+            verify(mockDrmDao).updateAll(anyList())
+        }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
-        givenDrmDaoContainsExceptions()
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-        assertEquals(1, testee.exceptions.size)
-        reset(mockDrmDao)
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+        coroutineRule.runBlocking {
+            givenDrmDaoContainsExceptions()
+            testee =
+                RealDrmRepository(
+                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+            assertEquals(1, testee.exceptions.size)
+            reset(mockDrmDao)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        assertEquals(0, testee.exceptions.size)
-    }
+            assertEquals(0, testee.exceptions.size)
+        }
 
     private fun givenDrmDaoContainsExceptions() {
         whenever(mockDrmDao.getAll()).thenReturn(listOf(drmException))

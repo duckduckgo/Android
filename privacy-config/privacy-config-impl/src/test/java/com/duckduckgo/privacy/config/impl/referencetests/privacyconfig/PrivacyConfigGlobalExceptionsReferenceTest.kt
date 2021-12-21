@@ -18,35 +18,23 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
-import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.RealUnprotectedTemporary
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
-import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
-import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
-import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
-import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -58,8 +46,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase) {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: RealContentBlocking
     private lateinit var privacyConfigPersister: RealPrivacyConfigPersister
@@ -77,9 +64,12 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
+            val referenceTest =
+                adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
             referenceJsonFile = referenceTest?.globalExceptions?.referenceConfig!!
-            return referenceTest.globalExceptions.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
+            return referenceTest.globalExceptions.tests.filterNot {
+                it.exceptPlatforms.contains("android-browser")
+            }
         }
     }
 
@@ -95,16 +85,24 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
-        givenFeatureToggleIsEnabled()
-        when(testCase.featureName) {
-            "contentBlocking" -> { testFeatureEnabledForContentBlocking() }
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() =
+        coroutineRule.runBlocking {
+            givenFeatureToggleIsEnabled()
+            when (testCase.featureName) {
+                "contentBlocking" -> {
+                    testFeatureEnabledForContentBlocking()
+                }
+            }
         }
-    }
 
     private fun testFeatureEnabledForContentBlocking() {
-        val unprotectedTemporary = RealUnprotectedTemporary(referenceTestUtilities.unprotectedTemporaryRepository)
-        testee = RealContentBlocking(referenceTestUtilities.contentBlockingRepository, mockFeatureToggle, unprotectedTemporary)
+        val unprotectedTemporary =
+            RealUnprotectedTemporary(referenceTestUtilities.unprotectedTemporaryRepository)
+        testee =
+            RealContentBlocking(
+                referenceTestUtilities.contentBlockingRepository,
+                mockFeatureToggle,
+                unprotectedTemporary)
         val isFeatureEnabled = !testee.isAnException(testCase.siteURL)
 
         assertEquals(testCase.expectFeatureEnabled, isFeatureEnabled)
@@ -117,17 +115,21 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
                 .build()
     }
 
-    private fun loadPrivacyConfig() = coroutineRule.runBlocking {
-        referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
-        privacyConfigPersister = RealPrivacyConfigPersister(
-            referenceTestUtilities.getPrivacyFeaturePluginPoint(),
-            mockTogglesRepository,
-            referenceTestUtilities.unprotectedTemporaryRepository,
-            referenceTestUtilities.privacyRepository,
-            db
-        )
-        privacyConfigPersister.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
-    }
+    private fun loadPrivacyConfig() =
+        coroutineRule.runBlocking {
+            referenceTestUtilities =
+                ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
+            privacyConfigPersister =
+                RealPrivacyConfigPersister(
+                    referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+                    mockTogglesRepository,
+                    referenceTestUtilities.unprotectedTemporaryRepository,
+                    referenceTestUtilities.privacyRepository,
+                    db)
+            privacyConfigPersister.persistPrivacyConfig(
+                referenceTestUtilities.getJsonPrivacyConfig(
+                    "reference_tests/privacyconfig/$referenceJsonFile"))
+        }
 
     private fun givenFeatureToggleIsEnabled() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
@@ -148,7 +150,5 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
         val tests: List<TestCase>
     )
 
-    data class ReferenceTest(
-        val globalExceptions: GloballExceptionsTest
-    )
+    data class ReferenceTest(val globalExceptions: GloballExceptionsTest)
 }

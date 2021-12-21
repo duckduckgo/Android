@@ -29,10 +29,18 @@ class SettingsToggleOptionWithLoadingState : FrameLayout {
     private val binding: SettingsOptionWithLoadingStateBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, com.duckduckgo.mobile.android.R.style.SettingsItem)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, com.duckduckgo.mobile.android.R.style.SettingsItem)
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsToggleOptionWithLoadingState)
+        val attributes =
+            context.obtainStyledAttributes(attrs, R.styleable.SettingsToggleOptionWithLoadingState)
         setTitle(attributes.getString(R.styleable.SettingsToggleOptionWithLoadingState_text) ?: "")
         attributes.recycle()
     }

@@ -50,14 +50,17 @@ class ProcessDetectorTest {
     }
 
     private fun assertBrowserProcess(process: DuckDuckGoProcess) {
-        assertTrue(String.format("%s isn't the expected process type", process), process is BrowserProcess)
+        assertTrue(
+            String.format("%s isn't the expected process type", process), process is BrowserProcess)
     }
 
     private fun assertVpnProcess(process: DuckDuckGoProcess) {
-        assertTrue(String.format("%s isn't the expected process type", process), process is VpnProcess)
+        assertTrue(
+            String.format("%s isn't the expected process type", process), process is VpnProcess)
     }
 
     private fun assertUnknownProcess(process: DuckDuckGoProcess) {
-        assertTrue(String.format("%s isn't the expected process type", process), process is UnknownProcess)
+        assertTrue(
+            String.format("%s isn't the expected process type", process), process is UnknownProcess)
     }
 }

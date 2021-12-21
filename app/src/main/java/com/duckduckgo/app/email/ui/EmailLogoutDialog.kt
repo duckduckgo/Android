@@ -27,18 +27,15 @@ class EmailLogoutDialog : DialogFragment() {
     var onLogout: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setMessage(R.string.emailSignOutDialogText)
-            .setTitle(getString(R.string.emailSignOutDialogTitle))
-            .setNegativeButton(R.string.emailSignOutDialogCancel) { _, _ ->
-                dismiss()
-            }
-            .setPositiveButton(R.string.emailSignOutDialogDisable) { _, _ ->
-                dialog?.let {
-                    onLogout()
+        val alertBuilder =
+            AlertDialog.Builder(requireActivity())
+                .setMessage(R.string.emailSignOutDialogText)
+                .setTitle(getString(R.string.emailSignOutDialogTitle))
+                .setNegativeButton(R.string.emailSignOutDialogCancel) { _, _ -> dismiss() }
+                .setPositiveButton(R.string.emailSignOutDialogDisable) { _, _ ->
+                    dialog?.let { onLogout() }
                 }
-            }
-            .setNegativeButton(android.R.string.cancel) { _, _ -> }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
         return alertBuilder.create()
     }
@@ -46,5 +43,4 @@ class EmailLogoutDialog : DialogFragment() {
     companion object {
         fun create(): EmailLogoutDialog = EmailLogoutDialog()
     }
-
 }

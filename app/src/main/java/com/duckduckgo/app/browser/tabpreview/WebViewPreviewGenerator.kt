@@ -32,7 +32,8 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
     override suspend fun generatePreview(webView: WebView): Bitmap {
         val fullSizeBitmap = convertWebViewToBitmap(webView)
         val scaledBitmap = scaleBitmap(fullSizeBitmap)
-        Timber.d("Full size bitmap: ${fullSizeBitmap.byteCount}, reduced size: ${scaledBitmap.byteCount}")
+        Timber.d(
+            "Full size bitmap: ${fullSizeBitmap.byteCount}, reduced size: ${scaledBitmap.byteCount}")
         return scaledBitmap
     }
 
@@ -61,8 +62,7 @@ class FileBasedWebViewPreviewGenerator : WebViewPreviewGenerator {
                 bitmap,
                 (bitmap.width * COMPRESSION_RATIO).toInt(),
                 (bitmap.height * COMPRESSION_RATIO).toInt(),
-                false
-            )
+                false)
         }
     }
 

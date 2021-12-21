@@ -27,7 +27,8 @@ import androidx.core.content.ContextCompat
 @Suppress("deprecation")
 fun String.html(context: Context): Spanned {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return fromHtml(this, FROM_HTML_MODE_COMPACT, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
+        return fromHtml(
+            this, FROM_HTML_MODE_COMPACT, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
     }
     return fromHtml(this, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
 }
@@ -46,9 +47,8 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
     val uri = Uri.parse(this)
     val host = uri.host ?: return this
 
-    return host.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }
-        ?.drop(WWW_PREFIX.length) ?: host
-
+    return host.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }?.drop(WWW_PREFIX.length)
+        ?: host
 }
 
 fun String.asLocationPermissionOrigin(): String {

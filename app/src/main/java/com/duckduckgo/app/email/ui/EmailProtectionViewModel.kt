@@ -22,23 +22,22 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
-import javax.inject.Provider
 
-class EmailProtectionViewModel(
-    private val emailManager: EmailManager
-) : ViewModel() {
+class EmailProtectionViewModel(private val emailManager: EmailManager) : ViewModel() {
 
     private val isSignedIn: StateFlow<Boolean> = emailManager.signedInFlow()
 
-    val viewState: StateFlow<ViewState> = isSignedIn.flatMapLatest { isSignedIn ->
-        emailState(isSignedIn)
-    }.stateIn(viewModelScope, WhileSubscribed(), ViewState(EmailState.SignedOut))
+    val viewState: StateFlow<ViewState> =
+        isSignedIn
+            .flatMapLatest { isSignedIn -> emailState(isSignedIn) }
+            .stateIn(viewModelScope, WhileSubscribed(), ViewState(EmailState.SignedOut))
 
     data class ViewState(val emailState: EmailState)
 
@@ -51,7 +50,9 @@ class EmailProtectionViewModel(
     private fun emailState(isSignedIn: Boolean) = flow {
         if (emailManager.isEmailFeatureSupported()) {
             if (isSignedIn) {
-                val emailAddress = emailManager.getEmailAddress() // If signed in there is always a non-null address
+                val emailAddress =
+                    emailManager
+                        .getEmailAddress() // If signed in there is always a non-null address
                 emit(ViewState(EmailState.SignedIn(emailAddress!!)))
             } else {
                 emit(ViewState(EmailState.SignedOut))
@@ -63,13 +64,16 @@ class EmailProtectionViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class EmailProtectionViewModelFactory @Inject constructor(
+class EmailProtectionViewModelFactory
+@Inject
+constructor(
     private val emailManager: Provider<EmailManager>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(EmailProtectionViewModel::class.java) -> (EmailProtectionViewModel(emailManager.get()) as T)
+                isAssignableFrom(EmailProtectionViewModel::class.java) ->
+                    (EmailProtectionViewModel(emailManager.get()) as T)
                 else -> null
             }
         }

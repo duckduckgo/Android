@@ -44,8 +44,10 @@ class BookmarkFolderStructureAdapter(
     private val maxPadding = (maxWidth - (maxWidth % paddingIncrementPx)).toInt()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
-        val binding = ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
+        val binding =
+            ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FolderViewHolder(
+            binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) {
@@ -73,9 +75,7 @@ class FolderViewHolder(
             binding.iconContainer.setBackgroundResource(R.drawable.list_item_image_background)
         }
 
-        itemView.setOnClickListener {
-            viewModel.onItemSelected(item.bookmarkFolder)
-        }
+        itemView.setOnClickListener { viewModel.onItemSelected(item.bookmarkFolder) }
     }
 
     private fun setPadding(depth: Int) {
@@ -88,11 +88,17 @@ class FolderViewHolder(
 }
 
 class BookmarkFolderStructureDiffCallback : DiffUtil.ItemCallback<BookmarkFolderItem>() {
-    override fun areItemsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
+    override fun areItemsTheSame(
+        oldItem: BookmarkFolderItem,
+        newItem: BookmarkFolderItem
+    ): Boolean {
         return oldItem.bookmarkFolder.id == newItem.bookmarkFolder.id
     }
 
-    override fun areContentsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
+    override fun areContentsTheSame(
+        oldItem: BookmarkFolderItem,
+        newItem: BookmarkFolderItem
+    ): Boolean {
         return oldItem == newItem
     }
 }

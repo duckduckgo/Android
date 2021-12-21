@@ -33,7 +33,10 @@ class SurveyDaoTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    getInstrumentation().targetContext, AppDatabase::class.java)
+                .build()
         dao = db.surveyDao()
     }
 

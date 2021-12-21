@@ -35,14 +35,15 @@ import org.junit.runner.RunWith
 class DaxDialogsJourneyTest {
 
     /**
-     * Use [ActivityScenarioRule] to create and launch the activity under test before each test,
-     * and close it after each test. This is a replacement for
-     * [androidx.test.rule.ActivityTestRule].
+     * Use [ActivityScenarioRule] to create and launch the activity under test before each test, and
+     * close it after each test. This is a replacement for [androidx.test.rule.ActivityTestRule].
      */
-    @get:Rule
-    var activityScenarioRule = activityScenarioRule<OnboardingActivity>()
+    @get:Rule var activityScenarioRule = activityScenarioRule<OnboardingActivity>()
 
-    @Test @UserJourney @FlakyTest @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N, maxSdkVersion = Build.VERSION_CODES.P)
+    @Test
+    @UserJourney
+    @FlakyTest
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.N, maxSdkVersion = Build.VERSION_CODES.P)
     fun daxDialogs_supports_default_browser_journey() {
 
         onView(isRoot()).perform(waitForView(withId(R.id.primaryCta)))
@@ -56,5 +57,4 @@ class DaxDialogsJourneyTest {
 
         onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
     }
-
 }

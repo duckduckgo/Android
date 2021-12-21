@@ -31,12 +31,15 @@ class UriStringTest {
 
     @Test
     fun whenUrlIsSubdomainThenSameOrSubdomainIsTrue() {
-        assertTrue(sameOrSubdomain("http://subdomain.example.com/index.html", "http://example.com/home.html"))
+        assertTrue(
+            sameOrSubdomain(
+                "http://subdomain.example.com/index.html", "http://example.com/home.html"))
     }
 
     @Test
     fun whenUrlIsAParentDomainThenSameOrSubdomainIsFalse() {
-        assertFalse(sameOrSubdomain("http://example.com/index.html", "http://parent.example.com/home.html"))
+        assertFalse(
+            sameOrSubdomain("http://example.com/index.html", "http://parent.example.com/home.html"))
     }
 
     @Test
@@ -57,7 +60,8 @@ class UriStringTest {
 
     @Test
     fun whenGivenLongWellFormedUrlThenIsWebUrlIsTrue() {
-        val input = "http://www.veganchic.com/products/Camo-High-Top-Sneaker-by-The-Critical-Slide-Societ+80758-0180.html"
+        val input =
+            "http://www.veganchic.com/products/Camo-High-Top-Sneaker-by-The-Critical-Slide-Societ+80758-0180.html"
         assertTrue(isWebUrl(input))
     }
 
@@ -268,7 +272,8 @@ class UriStringTest {
 
     @Test
     fun whenParamsAreValidContainsEncodedUriThenIsWebUrlIsTrue() {
-        assertTrue(isWebUrl("https://m.facebook.com/?refsrc=https%3A%2F%2Fwww.facebook.com%2F&_rdr"))
+        assertTrue(
+            isWebUrl("https://m.facebook.com/?refsrc=https%3A%2F%2Fwww.facebook.com%2F&_rdr"))
     }
 
     @Test
@@ -290,5 +295,4 @@ class UriStringTest {
     fun whenGivenNumberThenIsWebUrlIsFalse() {
         assertFalse(isWebUrl("33"))
     }
-
 }

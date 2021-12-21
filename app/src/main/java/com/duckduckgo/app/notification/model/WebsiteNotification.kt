@@ -20,8 +20,8 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 
@@ -55,8 +55,7 @@ open class WebsiteNotificationSpecification(
     @StringRes titleRes: Int,
     @StringRes descriptionRes: Int,
     override val pixelSuffix: String
-) :
-    NotificationSpec {
+) : NotificationSpec {
     override val bundle: Bundle = Bundle().apply { putString(WEBSITE_KEY, url) }
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.Article

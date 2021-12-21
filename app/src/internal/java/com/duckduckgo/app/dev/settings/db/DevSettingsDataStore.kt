@@ -28,7 +28,8 @@ interface DevSettingsDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore {
+class DevSettingsSharedPreferences @Inject constructor(private val context: Context) :
+    DevSettingsDataStore {
     override var nextTdsEnabled: Boolean
         get() = preferences.getBoolean(KEY_NEXT_TDS_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_NEXT_TDS_ENABLED, enabled) }

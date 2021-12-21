@@ -37,35 +37,29 @@ import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
+import java.io.File
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import org.threeten.bp.zone.ZoneRulesProvider
 import timber.log.Timber
-import java.io.File
-import javax.inject.Inject
 
 open class DuckDuckGoApplication : HasDaggerInjector, Application() {
 
-    @Inject
-    lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
+    @Inject lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
+
+    @Inject lateinit var vpnUncaughtExceptionHandler: VpnUncaughtExceptionHandler
+
+    @Inject lateinit var referralStateListener: AppInstallationReferrerStateListener
+
+    @Inject lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
 
     @Inject
-    lateinit var vpnUncaughtExceptionHandler: VpnUncaughtExceptionHandler
+    lateinit var activityLifecycleCallbacks:
+        PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
 
-    @Inject
-    lateinit var referralStateListener: AppInstallationReferrerStateListener
+    @Inject @AppCoroutineScope lateinit var appCoroutineScope: CoroutineScope
 
-    @Inject
-    lateinit var lifecycleObserverPluginPoint: PluginPoint<LifecycleObserver>
-
-    @Inject
-    lateinit var activityLifecycleCallbacks: PluginPoint<com.duckduckgo.app.global.ActivityLifecycleCallbacks>
-
-    @Inject
-    @AppCoroutineScope
-    lateinit var appCoroutineScope: CoroutineScope
-
-    @Inject
-    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
+    @Inject lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
 
     private val processDetector = ProcessDetector()
 
@@ -97,14 +91,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
             lifecycleObserverPluginPoint.getPlugins().forEach {
-                Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
+                Timber.d(
+                    "Registering application lifecycle observer: ${it.javaClass.canonicalName}")
                 addObserver(it)
             }
         }
 
-        appCoroutineScope.launch {
-            referralStateListener.initialiseReferralRetrieval()
-        }
+        appCoroutineScope.launch { referralStateListener.initialiseReferralRetrieval() }
     }
 
     private fun setupActivityLifecycleCallbacks() {
@@ -115,8 +108,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         when (currentProcess) {
             is VpnProcess -> configureUncaughtExceptionHandlerVpn()
             is DuckDuckGoProcess.BrowserProcess -> configureUncaughtExceptionHandlerBrowser()
-            else -> Timber.w("Unknown process: Not configuring uncaught exception handler for %s", currentProcess)
-
+            else ->
+                Timber.w(
+                    "Unknown process: Not configuring uncaught exception handler for %s",
+                    currentProcess)
         }
     }
 
@@ -124,9 +119,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         Thread.setDefaultUncaughtExceptionHandler(alertingUncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
-                Timber.w(throwable, "An exception happened inside RxJava code but no subscriber was still around to handle it")
+                Timber.w(
+                    throwable,
+                    "An exception happened inside RxJava code but no subscriber was still around to handle it")
             } else {
-                alertingUncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
+                alertingUncaughtExceptionHandler.uncaughtException(
+                    Thread.currentThread(), throwable)
             }
         }
     }
@@ -148,25 +146,31 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
     }
 
     protected open fun configureDependencyInjection() {
-        daggerAppComponent = DaggerAppComponent.builder()
-            .application(this)
-            .applicationCoroutineScope(applicationCoroutineScope)
-            .build()
+        daggerAppComponent =
+            DaggerAppComponent.builder()
+                .application(this)
+                .applicationCoroutineScope(applicationCoroutineScope)
+                .build()
         daggerAppComponent.inject(this)
     }
 
     // vtodo - Work around for https://crbug.com/558377
-    // AndroidInjection.inject(this) creates a new instance of the DuckDuckGoApplication (because we are in a new process)
+    // AndroidInjection.inject(this) creates a new instance of the DuckDuckGoApplication (because we
+    // are in a new process)
     // This has several disadvantages:
     //   1. our app is of massive size, because we are duplicating our Dagger graph
-    //   2. we are hitting this bug in https://crbug.com/558377, because some of the injected dependencies may eventually
+    //   2. we are hitting this bug in https://crbug.com/558377, because some of the injected
+    // dependencies may eventually
     //      depend in something webview-related
     //
-    // We need to override getDir and getCacheDir so that the webview does not share the same data dir across processes
-    // This is hacky hacky but should be OK for now as we don't use the webview in the VPN, it is just an issue with
+    // We need to override getDir and getCacheDir so that the webview does not share the same data
+    // dir across processes
+    // This is hacky hacky but should be OK for now as we don't use the webview in the VPN, it is
+    // just an issue with
     // injecting/creating dependencies
     //
-    // A proper fix should be to create a VpnServiceComponent that just provide the dependencies needed by the VPN, which would
+    // A proper fix should be to create a VpnServiceComponent that just provide the dependencies
+    // needed by the VPN, which would
     // also help with memory
     override fun getDir(name: String?, mode: Int): File {
         val dir = super.getDir(name, mode)
@@ -197,18 +201,17 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
     private fun initializeDateLibrary() {
         AndroidThreeTen.init(this)
         // Query the ZoneRulesProvider so that it is loaded on a background coroutine
-        GlobalScope.launch(Dispatchers.IO) {
-            ZoneRulesProvider.getAvailableZoneIds()
-        }
+        GlobalScope.launch(Dispatchers.IO) { ZoneRulesProvider.getAvailableZoneIds() }
     }
 
     /**
-     * Implementation of [HasDaggerInjector.daggerFactoryFor].
-     * Similar to what dagger-android does, The [DuckDuckGoApplication] gets the [DuckDuckGoApplication.injectorFactoryMap]
-     * from DI. This holds all the Dagger factories for Android types, like Activities that we create. See [BookmarksActivityComponent.Factory]
-     * as an example.
+     * Implementation of [HasDaggerInjector.daggerFactoryFor]. Similar to what dagger-android does,
+     * The [DuckDuckGoApplication] gets the [DuckDuckGoApplication.injectorFactoryMap] from DI. This
+     * holds all the Dagger factories for Android types, like Activities that we create. See
+     * [BookmarksActivityComponent.Factory] as an example.
      *
-     * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
+     * This method will return the [AndroidInjector.Factory] for the given key passed in as
+     * parameter.
      */
     override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
         return injectorFactoryMap[key]
@@ -216,7 +219,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
                 """
                 Could not find the dagger component for ${key.simpleName}.
                 You probably forgot to create the ${key.simpleName}Component
-                """.trimIndent()
-            )
+                """.trimIndent())
     }
 }

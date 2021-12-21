@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface AppTPCompanyTrackersActivityComponent : AndroidInjector<AppTPCompanyTrackersActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<AppTPCompanyTrackersActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<AppTPCompanyTrackersActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface AppTPCompanyTrackersActivityComponentProvider {
-    fun provideAppTPCompanyTrackersActivityComponentFactory(): AppTPCompanyTrackersActivityComponent.Factory
+    fun provideAppTPCompanyTrackersActivityComponentFactory():
+        AppTPCompanyTrackersActivityComponent.Factory
 }
 
 @Module

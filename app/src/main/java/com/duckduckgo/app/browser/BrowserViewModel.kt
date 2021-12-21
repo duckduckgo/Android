@@ -46,13 +46,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Provider
-import kotlin.coroutines.CoroutineContext
 
 class BrowserViewModel(
     private val tabRepository: TabRepository,
@@ -63,7 +63,8 @@ class BrowserViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
     private val pixel: Pixel,
     private val userEventsStore: UserEventsStore
-) : AppEnjoymentDialogFragment.Listener,
+) :
+    AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
     ViewModel(),
@@ -72,9 +73,7 @@ class BrowserViewModel(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main
 
-    data class ViewState(
-        val hideWebContent: Boolean = true
-    )
+    data class ViewState(val hideWebContent: Boolean = true)
 
     sealed class Command {
         object Refresh : Command()
@@ -86,9 +85,8 @@ class BrowserViewModel(
         data class ShowAppFeedbackPrompt(val promptCount: PromptCount) : Command()
     }
 
-    var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
-        it.value = ViewState()
-    }
+    var viewState: MutableLiveData<ViewState> =
+        MutableLiveData<ViewState>().also { it.value = ViewState() }
 
     private val currentViewState: ViewState
         get() = viewState.value!!
@@ -97,36 +95,38 @@ class BrowserViewModel(
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private var dataClearingObserver = Observer<ApplicationClearDataState> {
-        it?.let { state ->
-            when (state) {
-                ApplicationClearDataState.INITIALIZING -> {
-                    Timber.i("App clear state initializing")
-                    viewState.value = currentViewState.copy(hideWebContent = true)
-                }
-                ApplicationClearDataState.FINISHED -> {
-                    Timber.i("App clear state finished")
-                    viewState.value = currentViewState.copy(hideWebContent = false)
+    private var dataClearingObserver =
+        Observer<ApplicationClearDataState> {
+            it?.let { state ->
+                when (state) {
+                    ApplicationClearDataState.INITIALIZING -> {
+                        Timber.i("App clear state initializing")
+                        viewState.value = currentViewState.copy(hideWebContent = true)
+                    }
+                    ApplicationClearDataState.FINISHED -> {
+                        Timber.i("App clear state finished")
+                        viewState.value = currentViewState.copy(hideWebContent = false)
+                    }
                 }
             }
         }
-    }
 
-    private val appEnjoymentObserver = Observer<AppEnjoymentPromptOptions> {
-        it?.let { promptType ->
-            when (promptType) {
-                is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
-                    command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
-                    command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
-                }
-                is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
-                    command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+    private val appEnjoymentObserver =
+        Observer<AppEnjoymentPromptOptions> {
+            it?.let { promptType ->
+                when (promptType) {
+                    is AppEnjoymentPromptOptions.ShowEnjoymentPrompt -> {
+                        command.value = Command.ShowAppEnjoymentPrompt(promptType.promptCount)
+                    }
+                    is AppEnjoymentPromptOptions.ShowRatingPrompt -> {
+                        command.value = Command.ShowAppRatingPrompt(promptType.promptCount)
+                    }
+                    is AppEnjoymentPromptOptions.ShowFeedbackPrompt -> {
+                        command.value = Command.ShowAppFeedbackPrompt(promptType.promptCount)
+                    }
                 }
             }
         }
-    }
 
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
@@ -140,18 +140,18 @@ class BrowserViewModel(
         }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, sourceTabId: String? = null, skipHome: Boolean = false): String {
+    suspend fun onOpenInNewTabRequested(
+        query: String,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false
+    ): String {
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
                 skipHome = skipHome,
-                sourceTabId = sourceTabId
-            )
+                sourceTabId = sourceTabId)
         } else {
-            tabRepository.add(
-                url = queryUrlConverter.convertQueryToUrl(query),
-                skipHome = skipHome
-            )
+            tabRepository.add(url = queryUrlConverter.convertQueryToUrl(query), skipHome = skipHome)
         }
     }
 
@@ -173,9 +173,10 @@ class BrowserViewModel(
     }
 
     /**
-     * To ensure the best UX, we might not want to show anything to the user while the clear is taking place.
-     * This method will await until the ApplicationClearDataState.FINISHED event is received before observing for other changes
-     * The effect of this delay is that we won't show old tabs if they are in the process of deleting them.
+     * To ensure the best UX, we might not want to show anything to the user while the clear is
+     * taking place. This method will await until the ApplicationClearDataState.FINISHED event is
+     * received before observing for other changes The effect of this delay is that we won't show
+     * old tabs if they are in the process of deleting them.
      */
     fun awaitClearDataFinishedNotification() {
         dataClearer.dataClearerState.observeForever(dataClearingObserver)
@@ -242,7 +243,9 @@ class BrowserViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class BrowserViewModelFactory @Inject constructor(
+class BrowserViewModelFactory
+@Inject
+constructor(
     val tabRepository: Provider<TabRepository>,
     val queryUrlConverter: Provider<QueryUrlConverter>,
     val dataClearer: Provider<DataClearer>,
@@ -255,7 +258,17 @@ class BrowserViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), userEventsStore.get()) as T
+                isAssignableFrom(BrowserViewModel::class.java) ->
+                    BrowserViewModel(
+                        tabRepository.get(),
+                        queryUrlConverter.get(),
+                        dataClearer.get(),
+                        appEnjoymentPromptEmitter.get(),
+                        appEnjoymentUserEventRecorder.get(),
+                        dispatchers,
+                        pixel.get(),
+                        userEventsStore.get()) as
+                        T
                 else -> null
             }
         }

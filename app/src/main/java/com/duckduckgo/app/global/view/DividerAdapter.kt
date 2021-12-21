@@ -23,7 +23,8 @@ import com.duckduckgo.app.browser.databinding.ViewItemDividerBinding
 
 class DividerAdapter : RecyclerView.Adapter<DividerAdapter.DividerViewHolder>() {
 
-    class DividerViewHolder(binding: ViewItemDividerBinding) : RecyclerView.ViewHolder(binding.root)
+    class DividerViewHolder(binding: ViewItemDividerBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DividerViewHolder {
         val inflater = LayoutInflater.from(parent.context)

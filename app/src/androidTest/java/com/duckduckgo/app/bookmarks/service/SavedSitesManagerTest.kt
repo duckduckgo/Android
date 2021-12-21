@@ -23,8 +23,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -33,13 +33,9 @@ import org.junit.Test
 
 class SavedSitesManagerTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private var importer: SavedSitesImporter = mock()
     private var exporter: SavedSitesExporter = mock()
@@ -55,22 +51,30 @@ class SavedSitesManagerTest {
     fun whenBookmarksImportSucceedsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
         val importedBookmarks = listOf(aBookmark())
-        whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedBookmarks))
+        whenever(importer.import(someUri))
+            .thenReturn(ImportSavedSitesResult.Success(importedBookmarks))
 
         testee.import(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedBookmarks.size.toString()))
+        verify(pixel)
+            .fire(
+                AppPixelName.BOOKMARK_IMPORT_SUCCESS,
+                mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedBookmarks.size.toString()))
     }
 
     @Test
     fun whenFavoritesImportSucceedsThenPixelIsSent() = runBlocking {
         val someUri = Uri.parse("")
         val importedFavorites = listOf(aFavorite())
-        whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedFavorites))
+        whenever(importer.import(someUri))
+            .thenReturn(ImportSavedSitesResult.Success(importedFavorites))
 
         testee.import(someUri)
 
-        verify(pixel).fire(AppPixelName.BOOKMARK_IMPORT_SUCCESS, mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedFavorites.size.toString()))
+        verify(pixel)
+            .fire(
+                AppPixelName.BOOKMARK_IMPORT_SUCCESS,
+                mapOf(Pixel.PixelParameter.BOOKMARK_COUNT to importedFavorites.size.toString()))
     }
 
     @Test

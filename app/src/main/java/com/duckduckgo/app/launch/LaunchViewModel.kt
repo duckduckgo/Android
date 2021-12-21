@@ -25,16 +25,15 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.withTimeoutOrNull
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 
 class LaunchViewModel(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener
-) :
-    ViewModel() {
+) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -67,14 +66,19 @@ class LaunchViewModel(
 }
 
 @ContributesMultibinding(AppScope::class)
-class LaunchViewModelFactory @Inject constructor(
+class LaunchViewModelFactory
+@Inject
+constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val appInstallationReferrerStateListener: Provider<AppInstallationReferrerStateListener>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore.get(), appInstallationReferrerStateListener.get()) as T)
+                isAssignableFrom(LaunchViewModel::class.java) ->
+                    (LaunchViewModel(
+                        userStageStore.get(), appInstallationReferrerStateListener.get()) as
+                        T)
                 else -> null
             }
         }

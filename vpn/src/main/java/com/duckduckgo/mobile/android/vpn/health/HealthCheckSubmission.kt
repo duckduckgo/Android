@@ -16,9 +16,15 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-data class HealthCheckSubmission(val userReport: UserHealthSubmission, val systemReport: SystemHealthSubmission)
+data class HealthCheckSubmission(
+    val userReport: UserHealthSubmission,
+    val systemReport: SystemHealthSubmission
+)
 
-data class SystemHealthSubmission(val isBadHealth: Boolean, val rawMetrics: List<RawMetricsSubmission>)
+data class SystemHealthSubmission(
+    val isBadHealth: Boolean,
+    val rawMetrics: List<RawMetricsSubmission>
+)
 
 data class RawMetricsSubmission(val name: String, val metrics: Map<String, Metric> = emptyMap()) {
 
@@ -28,11 +34,7 @@ data class RawMetricsSubmission(val name: String, val metrics: Map<String, Metri
 
     fun badHealthReasons(): List<String> {
         val badHealthReasons = mutableListOf<String>()
-        metrics
-            .filter { it.value.isBadState == true }
-            .forEach {
-                badHealthReasons.add(it.key)
-            }
+        metrics.filter { it.value.isBadState == true }.forEach { badHealthReasons.add(it.key) }
         return badHealthReasons
     }
 }

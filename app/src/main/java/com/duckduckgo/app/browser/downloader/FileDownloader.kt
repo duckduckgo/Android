@@ -28,8 +28,7 @@ import javax.inject.Inject
 
 interface FileDownloader {
 
-    @WorkerThread
-    fun download(pending: PendingFileDownload, callback: FileDownloadListener)
+    @WorkerThread fun download(pending: PendingFileDownload, callback: FileDownloadListener)
 
     data class PendingFileDownload(
         val url: String,
@@ -51,7 +50,9 @@ interface FileDownloader {
     }
 }
 
-class AndroidFileDownloader @Inject constructor(
+class AndroidFileDownloader
+@Inject
+constructor(
     private val dataUriDownloader: DataUriDownloader,
     private val networkFileDownloader: NetworkFileDownloader
 ) : FileDownloader {
@@ -66,9 +67,11 @@ class AndroidFileDownloader @Inject constructor(
     }
 }
 
-val PendingFileDownload.isDataUrl get() = URLUtil.isDataUrl(url)
+val PendingFileDownload.isDataUrl
+    get() = URLUtil.isDataUrl(url)
 
-val PendingFileDownload.isNetworkUrl get() = URLUtil.isNetworkUrl(url)
+val PendingFileDownload.isNetworkUrl
+    get() = URLUtil.isNetworkUrl(url)
 
 sealed class DownloadFailReason {
 
@@ -79,6 +82,7 @@ sealed class DownloadFailReason {
     object ConnectionRefused : DownloadFailReason()
 
     companion object {
-        val DOWNLOAD_MANAGER_SETTINGS_URI: Uri = Uri.parse("package:com.android.providers.downloads")
+        val DOWNLOAD_MANAGER_SETTINGS_URI: Uri =
+            Uri.parse("package:com.android.providers.downloads")
     }
 }

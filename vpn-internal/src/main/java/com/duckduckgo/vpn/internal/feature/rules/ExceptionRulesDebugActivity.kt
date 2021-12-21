@@ -30,22 +30,20 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.duckduckgo.vpn.internal.databinding.ActivityExceptionRulesDebugBinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTrackerListener {
 
-    @Inject
-    lateinit var vpnDatabase: VpnDatabase
+    @Inject lateinit var vpnDatabase: VpnDatabase
 
-    @Inject
-    lateinit var exclusionRulesRepository: ExclusionRulesRepository
+    @Inject lateinit var exclusionRulesRepository: ExclusionRulesRepository
 
     private val binding: ActivityExceptionRulesDebugBinding by viewBinding()
 
@@ -59,12 +57,11 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
         binding.appRule.isVisible = false
         binding.progress.isVisible = true
 
-        vpnDatabase.vpnAppTrackerBlockingDao()
+        vpnDatabase
+            .vpnAppTrackerBlockingDao()
             .getTrackerExceptionRulesFlow()
             .combine(refreshTickerChannel.asStateFlow()) { trackers, _ -> trackers }
-            .map { rules ->
-                rules to getAppTrackers()
-            }
+            .map { rules -> rules to getAppTrackers() }
             .onStart { startRefreshTicker() }
             .flowOn(Dispatchers.IO)
             .onEach { it ->
@@ -75,24 +72,27 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
 
                 // re-build the screen
                 appTrackers.forEach { installAppTracker ->
-                    val appView = RuleAppView(this).apply {
-                        appIcon = packageManager.safeGetApplicationIcon(installAppTracker.packageName)
-                        appName = installAppTracker.name.orEmpty()
-                    }
+                    val appView =
+                        RuleAppView(this).apply {
+                            appIcon =
+                                packageManager.safeGetApplicationIcon(installAppTracker.packageName)
+                            appName = installAppTracker.name.orEmpty()
+                        }
                     binding.appRule.addView(appView)
                     installAppTracker.blockedDomains.forEach { domain ->
-                        val domainView = RuleTrackerView(this).apply {
-                            this.domain = domain
-                            this.isChecked = rules.containsRule(installAppTracker.packageName, domain)
-                            this.ruleTrackerListener = this@ExceptionRulesDebugActivity
-                            tag = "${installAppTracker.packageName}_$domain"
-                        }
+                        val domainView =
+                            RuleTrackerView(this).apply {
+                                this.domain = domain
+                                this.isChecked =
+                                    rules.containsRule(installAppTracker.packageName, domain)
+                                this.ruleTrackerListener = this@ExceptionRulesDebugActivity
+                                tag = "${installAppTracker.packageName}_$domain"
+                            }
                         appView.addTrackerView(domainView)
                     }
                 }
                 binding.appRule.isVisible = true
                 binding.progress.isVisible = false
-
             }
             .flowOn(Dispatchers.Main)
             .launchIn(lifecycleScope)
@@ -104,13 +104,17 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
     }
 
     private fun getAppTrackers(): List<InstalledAppTrackers> {
-        return packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return packageManager
+            .getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .map { InstalledApp(it.packageName, packageManager.getApplicationLabel(it).toString()) }
             .map {
-                val blockedTrackers = vpnDatabase.vpnTrackerDao().getTrackersForApp(it.packageName)
-                    .map { tracker -> tracker.domain }
-                    .toSortedSet() // dedup
+                val blockedTrackers =
+                    vpnDatabase
+                        .vpnTrackerDao()
+                        .getTrackersForApp(it.packageName)
+                        .map { tracker -> tracker.domain }
+                        .toSortedSet() // dedup
                 InstalledAppTrackers(it.packageName, it.name, blockedTrackers)
             }
             .filter { it.blockedDomains.isNotEmpty() }
@@ -118,27 +122,30 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
             .toList()
     }
 
-    private fun List<AppTrackerExceptionRule>.containsRule(packageName: String, domain: String): Boolean {
+    private fun List<AppTrackerExceptionRule>.containsRule(
+        packageName: String,
+        domain: String
+    ): Boolean {
         forEach { exclusionRule ->
-            if (exclusionRule.rule == domain && exclusionRule.packageNames.contains(packageName)) return true
+            if (exclusionRule.rule == domain && exclusionRule.packageNames.contains(packageName))
+                return true
         }
 
         return false
     }
 
     private fun PackageManager.safeGetApplicationIcon(packageName: String): Drawable? {
-        return runCatching {
-            getApplicationIcon(packageName)
-        }.getOrNull()
+        return runCatching { getApplicationIcon(packageName) }.getOrNull()
     }
 
     private fun startRefreshTicker() {
-        refreshTickerJob += lifecycleScope.launch {
-            while (isActive) {
-                refreshTickerChannel.emit(System.currentTimeMillis())
-                delay(TimeUnit.SECONDS.toMillis(5))
+        refreshTickerJob +=
+            lifecycleScope.launch {
+                while (isActive) {
+                    refreshTickerChannel.emit(System.currentTimeMillis())
+                    delay(TimeUnit.SECONDS.toMillis(5))
+                }
             }
-        }
     }
 
     override fun onTrackerClicked(view: View, enabled: Boolean) {

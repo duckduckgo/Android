@@ -37,7 +37,9 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee =
+            OnboardingPageManagerWithTrackerBlocking(
+                defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -58,25 +60,29 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
 
     companion object {
 
-        private val otherVariant = Variant(key = "variant", features = listOf(), filterBy = { true })
+        private val otherVariant =
+            Variant(key = "variant", features = listOf(), filterBy = { true })
 
         @JvmStatic
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): Array<TestCase> {
-            return arrayOf(
-                TestCase(false, 1, otherVariant),
-                TestCase(true, 2, otherVariant)
-            )
+            return arrayOf(TestCase(false, 1, otherVariant), TestCase(true, 2, otherVariant))
         }
     }
 
     private fun configureDeviceSupportsDefaultBrowser() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration())
+            .thenReturn(true)
     }
 
     private fun configureDeviceDoesNotSupportDefaultBrowser() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration())
+            .thenReturn(false)
     }
 
-    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int, val variant: Variant)
+    data class TestCase(
+        val defaultBrowserPage: Boolean,
+        val expectedPageCount: Int,
+        val variant: Variant
+    )
 }

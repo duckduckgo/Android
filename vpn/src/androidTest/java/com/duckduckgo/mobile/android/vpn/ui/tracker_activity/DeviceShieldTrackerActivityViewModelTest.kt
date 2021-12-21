@@ -33,6 +33,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import dummy.ui.VpnPreferences
+import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -41,15 +42,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
 class DeviceShieldTrackerActivityViewModelTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var db: VpnDatabase
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
@@ -65,43 +63,42 @@ class DeviceShieldTrackerActivityViewModelTest {
     fun setup() {
         db = createInMemoryDb()
 
-        defaultTracker = VpnTracker(
-            trackerCompanyId = 1,
-            company = "Google LLC",
-            companyDisplayName = "Google",
-            trackingApp = TrackingApp("app.foo.com", "Foo app"),
-            domain = "doubleclick.net"
-        )
+        defaultTracker =
+            VpnTracker(
+                trackerCompanyId = 1,
+                company = "Google LLC",
+                companyDisplayName = "Google",
+                trackingApp = TrackingApp("app.foo.com", "Foo app"),
+                domain = "doubleclick.net")
 
-        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit {
+            clear()
+        }
         vpnPreferences = VpnPreferences(context)
 
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
-        viewModel = DeviceShieldTrackerActivityViewModel(
-            InstrumentationRegistry.getInstrumentation().context,
-            deviceShieldPixels,
-            vpnPreferences,
-            appTrackerBlockingStatsRepository,
-            CoroutineTestRule().testDispatcherProvider
-        )
+        viewModel =
+            DeviceShieldTrackerActivityViewModel(
+                InstrumentationRegistry.getInstrumentation().context,
+                deviceShieldPixels,
+                vpnPreferences,
+                appTrackerBlockingStatsRepository,
+                CoroutineTestRule().testDispatcherProvider)
     }
 
     @Test
     fun whenGetTrackingAppCountThenReturnTrackingCount() = runBlocking {
-        val tracker = VpnTracker(
-            trackerCompanyId = 1,
-            company = "Google LLC",
-            companyDisplayName = "Google",
-            trackingApp = TrackingApp("app.foo.com", "Foo app"),
-            domain = "doubleclick.net"
-        )
+        val tracker =
+            VpnTracker(
+                trackerCompanyId = 1,
+                company = "Google LLC",
+                companyDisplayName = "Google",
+                trackingApp = TrackingApp("app.foo.com", "Foo app"),
+                domain = "doubleclick.net")
 
         db.vpnTrackerDao().insert(defaultTracker)
-        db.vpnTrackerDao().insert(
-            defaultTracker.copy(
-                trackingApp = TrackingApp("app.bar.com", "bar app")
-            )
-        )
+        db.vpnTrackerDao()
+            .insert(defaultTracker.copy(trackingApp = TrackingApp("app.bar.com", "bar app")))
         db.vpnTrackerDao().insert(tracker.copy(domain = "facebook.com"))
 
         val count = viewModel.getTrackingAppsCount().take(1).toList()
@@ -113,7 +110,8 @@ class DeviceShieldTrackerActivityViewModelTest {
         db.vpnTrackerDao().insert(defaultTracker)
         db.vpnTrackerDao().insert(defaultTracker)
         db.vpnTrackerDao().insert(defaultTracker.copy(domain = "facebook.com"))
-        db.vpnTrackerDao().insert(defaultTracker.copy(trackingApp = TrackingApp("app.bar.com", "Bar app")))
+        db.vpnTrackerDao()
+            .insert(defaultTracker.copy(trackingApp = TrackingApp("app.bar.com", "Bar app")))
 
         val count = viewModel.getBlockedTrackersCount().take(1).toList()
         assertEquals(TrackerCount(4), count.first())
@@ -122,9 +120,11 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Test
     fun whenLaunchAppTrackersViewEventThenCommandIsLaunchAppTrackers() = runBlocking {
         viewModel.commands().test {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
+            viewModel.onViewEvent(
+                DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -133,9 +133,11 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Test
     fun whenLaunchBetaInstructionsViewEventThenCommandIsLaunchBetaInstructions() = runBlocking {
         viewModel.commands().test {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
+            viewModel.onViewEvent(
+                DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchBetaInstructions)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -144,9 +146,11 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Test
     fun whenLaunchDeviceShieldFAQViewEventThenCommandIsLaunchDeviceShieldFAQ() = runBlocking {
         viewModel.commands().test {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
+            viewModel.onViewEvent(
+                DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -157,7 +161,8 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -166,9 +171,11 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Test
     fun whenLaunchMostRecentActivityViewEventThenCommandIsLaunchMostRecentActivity() = runBlocking {
         viewModel.commands().test {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
+            viewModel.onViewEvent(
+                DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -180,7 +187,8 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTPToggleSwitched(true)
 
             verify(deviceShieldPixels).enableFromSummaryTrackerActivity()
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -192,7 +200,9 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTPToggleSwitched(false)
 
             verifyZeroInteractions(deviceShieldPixels)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
+            assertEquals(
+                DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog,
+                awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -213,9 +223,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            VpnDatabase::class.java
-        )
+                InstrumentationRegistry.getInstrumentation().targetContext, VpnDatabase::class.java)
             .allowMainThreadQueries()
             .build()
     }

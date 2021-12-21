@@ -24,16 +24,14 @@ import com.duckduckgo.feature.toggles.impl.FeatureCustomConfigPluginPoint
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
+import dagger.multibindings.Multibinds
 
 @Module
 @ContributesTo(AppScope::class)
 abstract class FeatureTogglesBindingModule {
 
-    @Multibinds
-    abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
-
+    @Multibinds abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
 }
 
 @Module
@@ -42,7 +40,9 @@ class FeatureTogglesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideFeatureTogglesPluginPoint(toggles: DaggerSet<FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
+    fun provideFeatureTogglesPluginPoint(
+        toggles: DaggerSet<FeatureTogglesPlugin>
+    ): PluginPoint<FeatureTogglesPlugin> {
         return FeatureCustomConfigPluginPoint(toggles)
     }
 }

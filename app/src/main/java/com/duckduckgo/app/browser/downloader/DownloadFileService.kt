@@ -22,7 +22,5 @@ import retrofit2.http.Url
 
 interface DownloadFileService {
 
-    @HEAD
-    fun getFileDetails(@Url urlString: String): Call<Void>?
-
+    @HEAD fun getFileDetails(@Url urlString: String): Call<Void>?
 }

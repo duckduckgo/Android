@@ -28,9 +28,7 @@ import dagger.SingleInstanceIn
 @SingleInstanceIn(AppScope::class)
 interface HttpsBloomFilterSpecDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(specification: HttpsBloomFilterSpec)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) fun insert(specification: HttpsBloomFilterSpec)
 
-    @Query("select * from https_bloom_filter_spec limit 1")
-    fun get(): HttpsBloomFilterSpec?
+    @Query("select * from https_bloom_filter_spec limit 1") fun get(): HttpsBloomFilterSpec?
 }

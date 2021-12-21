@@ -35,7 +35,8 @@ abstract class PrivacyProtectionCountDao {
     open fun incrementUpgradeCount() {
         val changedRows = incrementUpgradeCountIfExists()
         if (changedRows == 0) {
-            initialiseCounts(PrivacyProtectionCountsEntity(blockedTrackerCount = 0, upgradeCount = 1))
+            initialiseCounts(
+                PrivacyProtectionCountsEntity(blockedTrackerCount = 0, upgradeCount = 1))
         }
     }
 
@@ -43,7 +44,8 @@ abstract class PrivacyProtectionCountDao {
     open fun incrementBlockedTrackerCount() {
         val changedRows = incrementBlockedTrackerCountIfExists()
         if (changedRows == 0) {
-            initialiseCounts(PrivacyProtectionCountsEntity(blockedTrackerCount = 1, upgradeCount = 0))
+            initialiseCounts(
+                PrivacyProtectionCountsEntity(blockedTrackerCount = 1, upgradeCount = 0))
         }
     }
 
@@ -53,6 +55,5 @@ abstract class PrivacyProtectionCountDao {
     @Query("UPDATE privacy_protection_count SET upgrade_count = upgrade_count + 1")
     protected abstract fun incrementUpgradeCountIfExists(): Int
 
-    @Insert
-    abstract fun initialiseCounts(entity: PrivacyProtectionCountsEntity)
+    @Insert abstract fun initialiseCounts(entity: PrivacyProtectionCountsEntity)
 }

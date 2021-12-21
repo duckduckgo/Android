@@ -21,12 +21,14 @@ import android.os.Handler
 import android.os.Looper
 import android.os.ResultReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 private const val INVALID_NOTIFICATION_VARIANT = -1
 
-class ReminderNotificationPressedHandler @Inject constructor(
+class ReminderNotificationPressedHandler
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
@@ -35,7 +37,9 @@ class ReminderNotificationPressedHandler @Inject constructor(
     }
 }
 
-class OngoingNotificationPressedHandler @Inject constructor(
+class OngoingNotificationPressedHandler
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
     override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
@@ -44,7 +48,9 @@ class OngoingNotificationPressedHandler @Inject constructor(
     }
 }
 
-class WeeklyNotificationPressedHandler @Inject constructor(
+class WeeklyNotificationPressedHandler
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 
@@ -60,7 +66,9 @@ class WeeklyNotificationPressedHandler @Inject constructor(
     }
 }
 
-class DailyNotificationPressedHandler @Inject constructor(
+class DailyNotificationPressedHandler
+@Inject
+constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
 

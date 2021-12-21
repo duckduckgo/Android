@@ -45,10 +45,7 @@ class InstantSchedulersRule : TestRule {
 
                 RxJavaPlugins.reset()
                 RxAndroidPlugins.reset()
-
             }
-
         }
     }
-
 }

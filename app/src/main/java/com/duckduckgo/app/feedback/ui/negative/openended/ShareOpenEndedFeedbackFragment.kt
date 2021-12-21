@@ -30,10 +30,15 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.sub
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
+class ShareOpenEndedFeedbackFragment :
+    FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
 
     interface OpenEndedFeedbackListener {
-        fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String)
+        fun userProvidedNegativeOpenEndedFeedback(
+            mainReason: MainReason,
+            subReason: SubReason?,
+            feedback: String
+        )
         fun userProvidedPositiveOpenEndedFeedback(feedback: String)
         fun userCancelled()
     }
@@ -59,14 +64,14 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
                         listener?.userCancelled()
                     }
                     is Command.ExitAndSubmitNegativeFeedback -> {
-                        listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
+                        listener?.userProvidedNegativeOpenEndedFeedback(
+                            command.mainReason, command.subReason, command.feedback)
                     }
                     is Command.ExitAndSubmitPositiveFeedback -> {
                         listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
                     }
                 }
-            }
-        )
+            })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -123,7 +128,9 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
     override fun configureListeners() {
         with(binding) {
             rootScrollView.doOnNextLayout {
-                binding.openEndedFeedback.setOnTouchListener(LayoutScrollingTouchListener(rootScrollView, openEndedFeedbackContainer.y.toInt()))
+                binding.openEndedFeedback.setOnTouchListener(
+                    LayoutScrollingTouchListener(
+                        rootScrollView, openEndedFeedbackContainer.y.toInt()))
             }
 
             submitFeedbackButton.setOnClickListener {
@@ -131,7 +138,8 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
                 if (isPositiveFeedback) {
                     viewModel.userSubmittingPositiveFeedback(openEndedComment)
                 } else {
-                    viewModel.userSubmittingNegativeFeedback(mainReason!!, subReason, openEndedComment)
+                    viewModel.userSubmittingNegativeFeedback(
+                        mainReason!!, subReason, openEndedComment)
                 }
             }
         }
@@ -143,24 +151,26 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
         private const val SUB_REASON_EXTRA = "SUB_REASON_EXTRA"
         private const val IS_POSITIVE_FEEDBACK_EXTRA = "IS_POSITIVE_FEEDBACK_EXTRA"
 
-        fun instanceNegativeFeedback(mainReason: MainReason, subReason: SubReason?): ShareOpenEndedFeedbackFragment {
+        fun instanceNegativeFeedback(
+            mainReason: MainReason,
+            subReason: SubReason?
+        ): ShareOpenEndedFeedbackFragment {
             val fragment = ShareOpenEndedFeedbackFragment()
-            fragment.arguments = Bundle().also {
-                it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)
-                it.putSerializable(MAIN_REASON_EXTRA, mainReason)
+            fragment.arguments =
+                Bundle().also {
+                    it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)
+                    it.putSerializable(MAIN_REASON_EXTRA, mainReason)
 
-                if (subReason != null) {
-                    it.putSerializable(SUB_REASON_EXTRA, subReason)
+                    if (subReason != null) {
+                        it.putSerializable(SUB_REASON_EXTRA, subReason)
+                    }
                 }
-            }
             return fragment
         }
 
         fun instancePositiveFeedback(): ShareOpenEndedFeedbackFragment {
             val fragment = ShareOpenEndedFeedbackFragment()
-            fragment.arguments = Bundle().also {
-                it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, true)
-            }
+            fragment.arguments = Bundle().also { it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, true) }
             return fragment
         }
     }

@@ -26,7 +26,13 @@ class TermsOfServiceListAdapter {
         val tos = ArrayList<TermsOfService>()
         for (entry in json) {
             val classification = entry.value.classification as? String
-            tos.add(TermsOfService(entry.key, entry.value.score, classification, entry.value.match.good, entry.value.match.bad))
+            tos.add(
+                TermsOfService(
+                    entry.key,
+                    entry.value.score,
+                    classification,
+                    entry.value.match.good,
+                    entry.value.match.bad))
         }
         return tos
     }

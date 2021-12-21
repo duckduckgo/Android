@@ -48,7 +48,11 @@ class PrivacyPracticesTest {
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java).build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .build()
         entityDao = db.tdsEntityDao()
         domainEntityDao = db.tdsDomainEntityDao()
         entityLookup = TdsEntityLookup(entityDao, domainEntityDao)
@@ -62,43 +66,35 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlButNoParentEntityThenStillHasScore() = runBlocking {
-        whenever(mockTermsStore.terms).thenReturn(
-            listOf(
-                TermsOfService("example.com", classification = "D")
-            )
-        )
+        whenever(mockTermsStore.terms)
+            .thenReturn(listOf(TermsOfService("example.com", classification = "D")))
 
         assertEquals(10, testee.privacyPracticesFor("http://www.example.com").score)
     }
 
     @Test
     fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() = runBlocking {
-        whenever(mockTermsStore.terms).thenReturn(
-            listOf(
-                TermsOfService("sibling1.com", classification = "A"),
-                TermsOfService("sibling2.com", classification = "B"),
-                TermsOfService("sibling3.com", classification = "C"),
-                TermsOfService("sibling4.com", classification = "D")
-            )
-        )
+        whenever(mockTermsStore.terms)
+            .thenReturn(
+                listOf(
+                    TermsOfService("sibling1.com", classification = "A"),
+                    TermsOfService("sibling2.com", classification = "B"),
+                    TermsOfService("sibling3.com", classification = "C"),
+                    TermsOfService("sibling4.com", classification = "D")))
 
         entityDao.insertAll(
             listOf(
                 TdsEntity("Network Inc", "Network", 0.0),
                 TdsEntity("Network Inc", "Network", 0.0),
                 TdsEntity("Network Inc", "Network", 0.0),
-                TdsEntity("Network Inc", "Network", 0.0)
-            )
-        )
+                TdsEntity("Network Inc", "Network", 0.0)))
 
         domainEntityDao.insertAll(
             listOf(
                 TdsDomainEntity("sibling1.com", "Network Inc"),
                 TdsDomainEntity("sibling2.com", "Network Inc"),
                 TdsDomainEntity("sibling3.com", "Network Inc"),
-                TdsDomainEntity("sibling4.com", "Network Inc")
-            )
-        )
+                TdsDomainEntity("sibling4.com", "Network Inc")))
 
         testee.loadData()
 
@@ -107,8 +103,11 @@ class PrivacyPracticesTest {
 
     @Test
     fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runBlocking {
-        whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
-        val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
+        whenever(mockTermsStore.terms)
+            .thenReturn(listOf(TermsOfService("example.com", classification = "A")))
+        val expected =
+            Practices(
+                score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
     }
 

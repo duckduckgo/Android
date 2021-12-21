@@ -28,11 +28,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -60,7 +60,8 @@ class ScorecardActivity : DuckDuckGoActivity() {
         setupToolbar(toolbar)
 
         lifecycleScope.launch {
-            viewModel.scoreCard(intent.tabId!!)
+            viewModel
+                .scoreCard(intent.tabId!!)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { render(it) }
         }
@@ -76,10 +77,15 @@ class ScorecardActivity : DuckDuckGoActivity() {
             practices.setDrawableEnd(viewState.practices.successFailureIcon())
             beforeGrade.setDrawableEnd(viewState.beforeGrade.smallIcon())
             afterGrade.setDrawableEnd(viewState.afterGrade.smallIcon())
-            trackers.text = trackersRenderer.trackersText(context, viewState.trackerCount, viewState.allTrackersBlocked)
+            trackers.text =
+                trackersRenderer.trackersText(
+                    context, viewState.trackerCount, viewState.allTrackersBlocked)
             trackers.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.trackerCount))
-            majorNetworks.text = trackersRenderer.majorNetworksText(context, viewState.majorNetworkCount, viewState.allTrackersBlocked)
-            majorNetworks.setDrawableEnd(trackersRenderer.successFailureIcon(viewState.majorNetworkCount))
+            majorNetworks.text =
+                trackersRenderer.majorNetworksText(
+                    context, viewState.majorNetworkCount, viewState.allTrackersBlocked)
+            majorNetworks.setDrawableEnd(
+                trackersRenderer.successFailureIcon(viewState.majorNetworkCount))
             showIsMemberOfMajorNetwork(viewState.showIsMemberOfMajorNetwork)
             showEnhancedGrade(viewState.showEnhancedGrade)
         }
@@ -95,7 +101,14 @@ class ScorecardActivity : DuckDuckGoActivity() {
             } else {
                 protectionsTemporarilyDisabled.gone()
                 heading.show()
-                heading.text = upgradeRenderer.heading(this@ScorecardActivity, viewState.beforeGrade, viewState.afterGrade, viewState.privacyOn).html(this@ScorecardActivity)
+                heading.text =
+                    upgradeRenderer
+                        .heading(
+                            this@ScorecardActivity,
+                            viewState.beforeGrade,
+                            viewState.afterGrade,
+                            viewState.privacyOn)
+                        .html(this@ScorecardActivity)
             }
         }
     }

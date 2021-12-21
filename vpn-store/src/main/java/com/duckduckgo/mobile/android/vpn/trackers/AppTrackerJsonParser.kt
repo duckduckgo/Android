@@ -23,33 +23,39 @@ class AppTrackerJsonParser {
 
     companion object {
 
-        fun parseAppTrackerJson(moshi: Moshi, json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
-            val adapter: JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
+        fun parseAppTrackerJson(
+            moshi: Moshi,
+            json: String
+        ): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+            val adapter: JsonAdapter<JsonAppBlockingList> =
+                moshi.adapter(JsonAppBlockingList::class.java)
             val parsed = adapter.fromJson(json)
             val appTrackers = parseAppTrackers(parsed)
             val appPackages = parseAppPackages(parsed)
             return Pair(appTrackers, appPackages)
         }
 
-        fun parseAppTrackers(parsed: JsonAppBlockingList?) = parsed?.trackers.orEmpty()
-            .filter { !it.value.isCdn }
-            .mapValues {
-                AppTracker(
-                    hostname = it.key,
-                    trackerCompanyId = it.value.owner.name.hashCode(),
-                    owner = it.value.owner,
-                    app = it.value.app,
-                    isCdn = it.value.isCdn
-                )
-            }.map { it.value }
+        fun parseAppTrackers(parsed: JsonAppBlockingList?) =
+            parsed
+                ?.trackers
+                .orEmpty()
+                .filter { !it.value.isCdn }
+                .mapValues {
+                    AppTracker(
+                        hostname = it.key,
+                        trackerCompanyId = it.value.owner.name.hashCode(),
+                        owner = it.value.owner,
+                        app = it.value.app,
+                        isCdn = it.value.isCdn)
+                }
+                .map { it.value }
 
         fun parseAppPackages(response: JsonAppBlockingList?): List<AppTrackerPackage> {
-            return response?.packageNames.orEmpty()
-                .mapValues {
-                    AppTrackerPackage(packageName = it.key, entityName = it.value)
-                }.map { it.value }
+            return response
+                ?.packageNames
+                .orEmpty()
+                .mapValues { AppTrackerPackage(packageName = it.key, entityName = it.value) }
+                .map { it.value }
         }
-
     }
-
 }

@@ -37,12 +37,14 @@ class AppEnjoymentUserEventDatabaseRecorder(
 
     override fun onUserEnjoyingApp(promptCount: PromptCount) {
         Timber.i("User is enjoying app; asking for rating")
-        appEnjoymentPromptEmitter.promptType.value = AppEnjoymentPromptOptions.ShowRatingPrompt(promptCount)
+        appEnjoymentPromptEmitter.promptType.value =
+            AppEnjoymentPromptOptions.ShowRatingPrompt(promptCount)
     }
 
     override fun onUserNotEnjoyingApp(promptCount: PromptCount) {
         Timber.i("User is not enjoying app; asking for feedback")
-        appEnjoymentPromptEmitter.promptType.value = AppEnjoymentPromptOptions.ShowFeedbackPrompt(promptCount)
+        appEnjoymentPromptEmitter.promptType.value =
+            AppEnjoymentPromptOptions.ShowFeedbackPrompt(promptCount)
     }
 
     override suspend fun onUserSelectedToRateApp(promptCount: PromptCount) {

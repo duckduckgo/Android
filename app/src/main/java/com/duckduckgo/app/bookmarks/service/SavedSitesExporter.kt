@@ -24,10 +24,10 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.TreeNode
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import kotlinx.coroutines.withContext
 
 interface SavedSitesExporter {
     suspend fun export(uri: Uri): ExportSavedSitesResult
@@ -48,12 +48,8 @@ class RealSavedSitesExporter(
 ) : SavedSitesExporter {
 
     override suspend fun export(uri: Uri): ExportSavedSitesResult {
-        val favorites = withContext(dispatcher.io()) {
-            favoritesRepository.favoritesSync()
-        }
-        val treeStructure = withContext(dispatcher.io()) {
-            getTreeFolderStructure()
-        }
+        val favorites = withContext(dispatcher.io()) { favoritesRepository.favoritesSync() }
+        val treeStructure = withContext(dispatcher.io()) { getTreeFolderStructure() }
         val html = savedSitesParser.generateHtml(treeStructure, favorites)
         return storeHtml(uri, html)
     }
@@ -87,12 +83,23 @@ class RealSavedSitesExporter(
         return node
     }
 
-    private fun populateNode(parentNode: TreeNode<FolderTreeItem>, parentId: Long, currentDepth: Int) {
+    private fun populateNode(
+        parentNode: TreeNode<FolderTreeItem>,
+        parentId: Long,
+        currentDepth: Int
+    ) {
 
         val bookmarkFolders = bookmarksRepository.getBookmarkFoldersByParentId(parentId)
 
         bookmarkFolders.forEach { bookmarkFolder ->
-            val childNode = TreeNode(FolderTreeItem(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId, null, currentDepth))
+            val childNode =
+                TreeNode(
+                    FolderTreeItem(
+                        bookmarkFolder.id,
+                        bookmarkFolder.name,
+                        bookmarkFolder.parentId,
+                        null,
+                        currentDepth))
             parentNode.add(childNode)
             populateNode(childNode, bookmarkFolder.id, currentDepth + 1)
         }
@@ -101,7 +108,10 @@ class RealSavedSitesExporter(
 
         bookmarks.forEach { bookmark ->
             bookmark.title?.let { title ->
-                val childNode = TreeNode(FolderTreeItem(bookmark.id, title, bookmark.parentId, bookmark.url, currentDepth))
+                val childNode =
+                    TreeNode(
+                        FolderTreeItem(
+                            bookmark.id, title, bookmark.parentId, bookmark.url, currentDepth))
                 parentNode.add(childNode)
             }
         }

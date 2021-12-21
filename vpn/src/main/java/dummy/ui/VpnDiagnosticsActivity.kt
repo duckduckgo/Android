@@ -221,8 +221,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                     getString(R.string.atp_ConnectionStatus, networkInfo.vpn.toString())
                 binding.networkAvailable.text =
                     getString(
-                        R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString()
-                    )
+                        R.string.atp_NetworkAvailable, networkInfo.connectedToInternet.toString())
                 binding.runningTime.text = runningTimeFormatted
                 binding.appTrackersBlockedText.text =
                     String.format("App %s", appTrackersBlockedFormatted)

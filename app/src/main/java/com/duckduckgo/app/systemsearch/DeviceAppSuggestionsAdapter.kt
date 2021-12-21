@@ -24,9 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.databinding.ItemDeviceAppSuggestionBinding
 import com.duckduckgo.app.systemsearch.DeviceAppSuggestionsAdapter.DeviceAppViewHolder
 
-class DeviceAppSuggestionsAdapter(
-    private val clickListener: (DeviceApp) -> Unit
-) : RecyclerView.Adapter<DeviceAppViewHolder>() {
+class DeviceAppSuggestionsAdapter(private val clickListener: (DeviceApp) -> Unit) :
+    RecyclerView.Adapter<DeviceAppViewHolder>() {
     private var deviceApps: List<DeviceApp> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceAppViewHolder {
@@ -39,9 +38,7 @@ class DeviceAppSuggestionsAdapter(
         holder.apply {
             val app = deviceApps[position]
             binding.title.text = app.shortName
-            binding.root.setOnClickListener {
-                clickListener(app)
-            }
+            binding.root.setOnClickListener { clickListener(app) }
             try {
                 val drawable = app.retrieveIcon(binding.icon.context.packageManager)
                 binding.icon.setImageDrawable(drawable)
@@ -62,8 +59,6 @@ class DeviceAppSuggestionsAdapter(
         notifyDataSetChanged()
     }
 
-    class DeviceAppViewHolder(
-        val binding: ItemDeviceAppSuggestionBinding
-    ) : RecyclerView.ViewHolder(binding.root)
-
+    class DeviceAppViewHolder(val binding: ItemDeviceAppSuggestionBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

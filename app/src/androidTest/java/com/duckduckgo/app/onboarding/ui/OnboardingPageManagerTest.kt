@@ -33,7 +33,9 @@ class OnboardingPageManagerTest {
 
     @Before
     fun setup() {
-        testee = OnboardingPageManagerWithTrackerBlocking(defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
+        testee =
+            OnboardingPageManagerWithTrackerBlocking(
+                defaultRoleBrowserDialog, onboardingPageBuilder, mockDefaultBrowserDetector)
     }
 
     @Test
@@ -101,10 +103,12 @@ class OnboardingPageManagerTest {
     }
 
     private fun configureDeviceSupportsDefaultBrowser() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration())
+            .thenReturn(true)
     }
 
     private fun configureDeviceDoesNotSupportDefaultBrowser() {
-        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
+        whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration())
+            .thenReturn(false)
     }
 }

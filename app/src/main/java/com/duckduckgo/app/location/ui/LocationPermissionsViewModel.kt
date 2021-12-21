@@ -29,9 +29,9 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.launch
 
 class LocationPermissionsViewModel(
     private val locationPermissionsRepository: LocationPermissionsRepository,
@@ -57,8 +57,10 @@ class LocationPermissionsViewModel(
     val viewState: LiveData<ViewState> = _viewState
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val locationPermissions: LiveData<List<LocationPermissionEntity>> = locationPermissionsRepository.getLocationPermissionsAsync()
-    private val locationPermissionsObserver = Observer<List<LocationPermissionEntity>> { onLocationPermissionsEntitiesChanged(it!!) }
+    private val locationPermissions: LiveData<List<LocationPermissionEntity>> =
+        locationPermissionsRepository.getLocationPermissionsAsync()
+    private val locationPermissionsObserver =
+        Observer<List<LocationPermissionEntity>> { onLocationPermissionsEntitiesChanged(it!!) }
 
     override fun onCleared() {
         super.onCleared()
@@ -66,22 +68,19 @@ class LocationPermissionsViewModel(
     }
 
     init {
-        _viewState.value = ViewState(
-            locationPermissionEnabled = settingsDataStore.appLocationPermission
-        )
+        _viewState.value =
+            ViewState(locationPermissionEnabled = settingsDataStore.appLocationPermission)
         locationPermissions.observeForever(locationPermissionsObserver)
     }
 
     fun loadLocationPermissions(systemLocationPermissionEnabled: Boolean) {
-        _viewState.value = _viewState.value?.copy(
-            systemLocationPermissionGranted = systemLocationPermissionEnabled
-        )
+        _viewState.value =
+            _viewState.value?.copy(
+                systemLocationPermissionGranted = systemLocationPermissionEnabled)
     }
 
     private fun onLocationPermissionsEntitiesChanged(entities: List<LocationPermissionEntity>) {
-        _viewState.value = _viewState.value?.copy(
-            locationPermissionEntities = entities
-        )
+        _viewState.value = _viewState.value?.copy(locationPermissionEntities = entities)
     }
 
     fun onDeleteRequested(entity: LocationPermissionEntity) {
@@ -109,7 +108,10 @@ class LocationPermissionsViewModel(
         _viewState.value = _viewState.value?.copy(locationPermissionEnabled = enabled)
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
                 pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
@@ -127,16 +129,16 @@ class LocationPermissionsViewModel(
             }
             else -> {
                 geoLocationPermissions.clear(domain)
-                viewModelScope.launch {
-                    locationPermissionsRepository.deletePermission(domain)
-                }
+                viewModelScope.launch { locationPermissionsRepository.deletePermission(domain) }
             }
         }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
-class LocationPermissionsViewModelFactory @Inject constructor(
+class LocationPermissionsViewModelFactory
+@Inject
+constructor(
     private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
     private val geoLocationPermissions: Provider<GeoLocationPermissions>,
     private val dispatcherProvider: Provider<DispatcherProvider>,
@@ -146,7 +148,14 @@ class LocationPermissionsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository.get(), geoLocationPermissions.get(), dispatcherProvider.get(), settingsDataStore.get(), pixel.get()) as T)
+                isAssignableFrom(LocationPermissionsViewModel::class.java) ->
+                    (LocationPermissionsViewModel(
+                        locationPermissionsRepository.get(),
+                        geoLocationPermissions.get(),
+                        dispatcherProvider.get(),
+                        settingsDataStore.get(),
+                        pixel.get()) as
+                        T)
                 else -> null
             }
         }

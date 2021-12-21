@@ -45,49 +45,41 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
         get() = SupervisorJob() + Dispatchers.Main
 
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
+    @Inject lateinit var clearPersonalDataAction: ClearDataAction
 
-    @Inject
-    lateinit var gridViewColumnCalculator: GridViewColumnCalculator
+    @Inject lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
-    @Inject
-    lateinit var webViewPreviewPersister: WebViewPreviewPersister
+    @Inject lateinit var webViewPreviewPersister: WebViewPreviewPersister
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
+    @Inject lateinit var ctaViewModel: CtaViewModel
 
-    @Inject
-    lateinit var faviconManager: FaviconManager
+    @Inject lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var userEventsStore: UserEventsStore
+    @Inject lateinit var userEventsStore: UserEventsStore
 
-    @Inject
-    @AppCoroutineScope
-    lateinit var appCoroutineScope: CoroutineScope
+    @Inject @AppCoroutineScope lateinit var appCoroutineScope: CoroutineScope
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
-    private val tabsAdapter: TabSwitcherAdapter by lazy { TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager) }
+    private val tabsAdapter: TabSwitcherAdapter by lazy {
+        TabSwitcherAdapter(this, webViewPreviewPersister, this, faviconManager)
+    }
 
     // we need to scroll to show selected tab, but only if it is the first time loading the tabs.
     private var firstTimeLoadingTabsList = true
@@ -118,21 +110,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureRecycler() {
-        val numberColumns = gridViewColumnCalculator.calculateNumberOfColumns(TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
+        val numberColumns =
+            gridViewColumnCalculator.calculateNumberOfColumns(
+                TAB_GRID_COLUMN_WIDTH_DP, TAB_GRID_MAX_COLUMN_COUNT)
         val layoutManager = GridLayoutManager(this, numberColumns)
         tabsRecycler.layoutManager = layoutManager
         tabsRecycler.adapter = tabsAdapter
 
-        val swipeListener = ItemTouchHelper(
-            SwipeToCloseTabListener(
-                tabsAdapter, numberColumns,
-                object : SwipeToCloseTabListener.OnTabSwipedListener {
-                    override fun onSwiped(tab: TabEntity) {
-                        onTabDeleted(tab)
-                    }
-                }
-            )
-        )
+        val swipeListener =
+            ItemTouchHelper(
+                SwipeToCloseTabListener(
+                    tabsAdapter,
+                    numberColumns,
+                    object : SwipeToCloseTabListener.OnTabSwipedListener {
+                        override fun onSwiped(tab: TabEntity) {
+                            onTabDeleted(tab)
+                        }
+                    }))
         swipeListener.attachToRecyclerView(tabsRecycler)
 
         tabGridItemDecorator = TabGridItemDecorator(this, selectedTabId)
@@ -140,26 +134,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(
-            this,
-            Observer<List<TabEntity>> {
-                render(it)
-            }
-        )
+        viewModel.tabs.observe(this, Observer<List<TabEntity>> { render(it) })
         viewModel.deletableTabs.observe(
             this,
             {
                 if (it.isNotEmpty()) {
                     onDeletableTab(it.last())
                 }
-            }
-        )
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+            })
+        viewModel.command.observe(this, Observer { processCommand(it) })
     }
 
     private fun render(tabs: List<TabEntity>) {
@@ -200,15 +183,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun onFire() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
-        val dialog = FireDialog(
-            context = this,
-            clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
-            pixel = pixel,
-            settingsDataStore = settingsDataStore,
-            userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope
-        )
+        val dialog =
+            FireDialog(
+                context = this,
+                clearPersonalDataAction = clearPersonalDataAction,
+                ctaViewModel = ctaViewModel,
+                pixel = pixel,
+                settingsDataStore = settingsDataStore,
+                userEventsStore = userEventsStore,
+                appCoroutineScope = appCoroutineScope)
         dialog.show()
     }
 
@@ -238,29 +221,32 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             .setAction(R.string.tabClosedUndo) {
                 // noop, handled in onDismissed callback
             }
-            .addCallback(object : Snackbar.Callback() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    when (event) {
-                        // handle the UNDO action here as we only have one
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> launch { viewModel.purgeDeletableTabs() }
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
-                        BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> { /* noop */
+            .addCallback(
+                object : Snackbar.Callback() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        when (event) {
+                            // handle the UNDO action here as we only have one
+                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION ->
+                                launch { viewModel.undoDeletableTab(tab) }
+                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
+                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT ->
+                                launch { viewModel.purgeDeletableTabs() }
+                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE,
+                            BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL -> {
+                                /* noop */
+                            }
                         }
                     }
-                }
-            })
-            .apply { view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text).maxLines = 1 }
+                })
+            .apply {
+                view.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    .maxLines = 1
+            }
             .show()
     }
 
     private fun closeAllTabs() {
-        launch {
-            viewModel.tabs.value?.forEach {
-                viewModel.onTabDeleted(it)
-            }
-        }
+        launch { viewModel.tabs.value?.forEach { viewModel.onTabDeleted(it) } }
     }
 
     private fun showSettings() {

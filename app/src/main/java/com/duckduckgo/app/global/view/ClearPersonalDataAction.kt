@@ -36,10 +36,12 @@ import timber.log.Timber
 
 interface ClearDataAction {
 
-    @WorkerThread
-    suspend fun clearTabsAsync(appInForeground: Boolean)
+    @WorkerThread suspend fun clearTabsAsync(appInForeground: Boolean)
 
-    suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean): Unit?
+    suspend fun clearTabsAndAllDataAsync(
+        appInForeground: Boolean,
+        shouldFireDataClearPixel: Boolean
+    ): Unit?
     fun setAppUsedSinceLastClearFlag(appUsedSinceLastClear: Boolean)
     fun killProcess()
     fun killAndRestartProcess(notifyDataCleared: Boolean)
@@ -67,7 +69,10 @@ class ClearPersonalDataAction(
         System.exit(0)
     }
 
-    override suspend fun clearTabsAndAllDataAsync(appInForeground: Boolean, shouldFireDataClearPixel: Boolean) {
+    override suspend fun clearTabsAndAllDataAsync(
+        appInForeground: Boolean,
+        shouldFireDataClearPixel: Boolean
+    ) {
         withContext(Dispatchers.IO) {
             cookieManager.flush()
             geoLocationPermissions.clearAllButFireproofed()
@@ -75,9 +80,7 @@ class ClearPersonalDataAction(
             clearTabsAsync(appInForeground)
         }
 
-        withContext(Dispatchers.Main) {
-            clearDataAsync(shouldFireDataClearPixel)
-        }
+        withContext(Dispatchers.Main) { clearDataAsync(shouldFireDataClearPixel) }
 
         Timber.i("Finished clearing everything")
     }

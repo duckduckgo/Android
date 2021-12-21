@@ -24,7 +24,8 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
-class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedback_positive_landing) {
+class PositiveFeedbackLandingFragment :
+    FeedbackFragment(R.layout.content_feedback_positive_landing) {
 
     interface PositiveFeedbackLandingListener {
         fun userSelectedToRateApp()
@@ -39,8 +40,7 @@ class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedba
     private val listener: PositiveFeedbackLandingListener?
         get() = activity as PositiveFeedbackLandingListener
 
-    @Inject
-    lateinit var playStoreUtils: PlayStoreUtils
+    @Inject lateinit var playStoreUtils: PlayStoreUtils
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(
@@ -58,13 +58,14 @@ class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedba
                         listener?.userSelectedToGiveFeedback()
                     }
                 }
-            }
-        )
+            })
     }
 
     override fun configureListeners() {
         binding.rateAppButton.setOnClickListener { viewModel.userSelectedToRateApp() }
-        binding.shareFeedbackButton.setOnClickListener { viewModel.userSelectedToProvideFeedbackDetails() }
+        binding.shareFeedbackButton.setOnClickListener {
+            viewModel.userSelectedToProvideFeedbackDetails()
+        }
         binding.cancelButton.setOnClickListener { viewModel.userFinishedGivingPositiveFeedback() }
     }
 

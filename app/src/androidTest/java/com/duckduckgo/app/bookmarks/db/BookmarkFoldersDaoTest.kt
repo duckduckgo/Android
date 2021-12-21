@@ -33,35 +33,36 @@ import org.junit.Test
 
 class BookmarkFoldersDaoTest {
 
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @get:Rule @Suppress("unused") var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var db: AppDatabase
     private lateinit var bookmarksDao: BookmarksDao
     private lateinit var bookmarkFoldersDao: BookmarkFoldersDao
 
-    private val bookmarkFolderList = listOf(
-        BookmarkFolderEntity(id = 1, name = "name", parentId = 0),
-        BookmarkFolderEntity(id = 2, name = "another name", parentId = 1),
-        BookmarkFolderEntity(id = 3, name = "subfolder name", parentId = 1)
-    )
+    private val bookmarkFolderList =
+        listOf(
+            BookmarkFolderEntity(id = 1, name = "name", parentId = 0),
+            BookmarkFolderEntity(id = 2, name = "another name", parentId = 1),
+            BookmarkFolderEntity(id = 3, name = "subfolder name", parentId = 1))
 
-    private val bookmarksList = listOf(
-        BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
-        BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 3),
-        BookmarkEntity(id = 3, title = "bookmark title", url = "www.bar.example.com", parentId = 3)
-    )
+    private val bookmarksList =
+        listOf(
+            BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
+            BookmarkEntity(
+                id = 2, title = "another title", url = "www.foo.example.com", parentId = 3),
+            BookmarkEntity(
+                id = 3, title = "bookmark title", url = "www.bar.example.com", parentId = 3))
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
-            .allowMainThreadQueries()
-            .build()
+        db =
+            Room.inMemoryDatabaseBuilder(
+                    InstrumentationRegistry.getInstrumentation().targetContext,
+                    AppDatabase::class.java)
+                .allowMainThreadQueries()
+                .build()
         bookmarkFoldersDao = db.bookmarkFoldersDao()
         bookmarksDao = db.bookmarksDao()
     }
@@ -76,7 +77,13 @@ class BookmarkFoldersDaoTest {
         val bookmarkFolderEntity = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         bookmarkFoldersDao.insert(bookmarkFolderEntity)
         val list = bookmarkFoldersDao.getBookmarkFolders().first()
-        assertEquals(listOf(BookmarkFolder(bookmarkFolderEntity.id, bookmarkFolderEntity.name, bookmarkFolderEntity.parentId)), list)
+        assertEquals(
+            listOf(
+                BookmarkFolder(
+                    bookmarkFolderEntity.id,
+                    bookmarkFolderEntity.name,
+                    bookmarkFolderEntity.parentId)),
+            list)
     }
 
     @Test
@@ -105,7 +112,8 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulatedByParentId() = runBlocking {
+    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulatedByParentId() =
+        runBlocking {
         bookmarkFoldersDao.insertList(bookmarkFolderList)
         bookmarksDao.insertList(bookmarksList)
 

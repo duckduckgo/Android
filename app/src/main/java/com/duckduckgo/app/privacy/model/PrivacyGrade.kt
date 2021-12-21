@@ -17,7 +17,6 @@
 package com.duckduckgo.app.privacy.model
 
 enum class PrivacyGrade {
-
     A,
     B_PLUS,
     B,

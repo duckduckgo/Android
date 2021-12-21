@@ -36,27 +36,23 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.*
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 interface DataClearer {
     val dataClearerState: LiveData<ApplicationClearDataState>
     var isFreshAppLaunch: Boolean
 }
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = DataClearer::class
-)
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = BrowserLifecycleObserver::class
-)
+@ContributesBinding(scope = AppScope::class, boundType = DataClearer::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = BrowserLifecycleObserver::class)
 @SingleInstanceIn(AppScope::class)
-class AutomaticDataClearer @Inject constructor(
+class AutomaticDataClearer
+@Inject
+constructor(
     private val workManager: WorkManager,
     private val settingsDataStore: SettingsDataStore,
     private val clearDataAction: ClearDataAction,
@@ -69,17 +65,14 @@ class AutomaticDataClearer @Inject constructor(
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + clearJob
 
-    override val dataClearerState: MutableLiveData<ApplicationClearDataState> = MutableLiveData<ApplicationClearDataState>().also {
-        it.postValue(INITIALIZING)
-    }
+    override val dataClearerState: MutableLiveData<ApplicationClearDataState> =
+        MutableLiveData<ApplicationClearDataState>().also { it.postValue(INITIALIZING) }
 
     override var isFreshAppLaunch = true
 
     override fun onOpen(isFreshLaunch: Boolean) {
         isFreshAppLaunch = isFreshLaunch
-        launch {
-            onAppForegroundedAsync()
-        }
+        launch { onAppForegroundedAsync() }
     }
 
     @UiThread
@@ -129,8 +122,10 @@ class AutomaticDataClearer @Inject constructor(
         val clearWhenOption = settingsDataStore.automaticallyClearWhenOption
         val clearWhatOption = settingsDataStore.automaticallyClearWhatOption
 
-        if (clearWhatOption == ClearWhatOption.CLEAR_NONE || clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-            Timber.d("No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
+        if (clearWhatOption == ClearWhatOption.CLEAR_NONE ||
+            clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
+            Timber.d(
+                "No background timer required for current configuration: $clearWhatOption / $clearWhenOption")
         } else {
             scheduleBackgroundTimerToTriggerClear(clearWhenOption.durationMilliseconds())
         }
@@ -145,12 +140,14 @@ class AutomaticDataClearer @Inject constructor(
 
     private fun scheduleBackgroundTimerToTriggerClear(durationMillis: Long) {
         workManager.also {
-            val workRequest = OneTimeWorkRequestBuilder<DataClearingWorker>()
-                .setInitialDelay(durationMillis, TimeUnit.MILLISECONDS)
-                .addTag(DataClearingWorker.WORK_REQUEST_TAG)
-                .build()
+            val workRequest =
+                OneTimeWorkRequestBuilder<DataClearingWorker>()
+                    .setInitialDelay(durationMillis, TimeUnit.MILLISECONDS)
+                    .addTag(DataClearingWorker.WORK_REQUEST_TAG)
+                    .build()
             it.enqueue(workRequest)
-            Timber.i("Work request scheduled, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app. job id: ${workRequest.id}")
+            Timber.i(
+                "Work request scheduled, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app. job id: ${workRequest.id}")
         }
     }
 
@@ -162,21 +159,19 @@ class AutomaticDataClearer @Inject constructor(
         when (clearWhat) {
             ClearWhatOption.CLEAR_TABS_ONLY -> {
 
-                withContext(Dispatchers.IO) {
-                    clearDataAction.clearTabsAsync(true)
-                }
+                withContext(Dispatchers.IO) { clearDataAction.clearTabsAsync(true) }
 
                 withContext(Dispatchers.Main) {
                     Timber.i("Notifying listener that clearing has finished")
                     dataClearerState.value = FINISHED
                 }
             }
-
             ClearWhatOption.CLEAR_TABS_AND_DATA -> {
                 val processNeedsRestarted = !isFreshAppLaunch
                 Timber.i("App is in foreground; restart needed? $processNeedsRestarted")
 
-                clearDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = false)
+                clearDataAction.clearTabsAndAllDataAsync(
+                    appInForeground = true, shouldFireDataClearPixel = false)
 
                 Timber.i("All data now cleared, will restart process? $processNeedsRestarted")
                 if (processNeedsRestarted) {
@@ -195,7 +190,11 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean, appIconChanged: Boolean): Boolean {
+    private fun shouldClearData(
+        cleanWhenOption: ClearWhenOption,
+        appUsedSinceLastClear: Boolean,
+        appIconChanged: Boolean
+    ): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
         if (!appUsedSinceLastClear) {
@@ -216,7 +215,8 @@ class AutomaticDataClearer @Inject constructor(
         }
 
         if (cleanWhenOption == ClearWhenOption.APP_EXIT_ONLY) {
-            Timber.d("This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data")
+            Timber.d(
+                "This is NOT a fresh app launch, and the configuration is for app exit only. Not clearing the data")
             return false
         }
         if (!settingsDataStore.hasBackgroundTimestampRecorded()) {
@@ -224,13 +224,12 @@ class AutomaticDataClearer @Inject constructor(
             return false
         }
 
-        val enoughTimePassed = dataClearerTimeKeeper.hasEnoughTimeElapsed(
-            backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
-            clearWhenOption = cleanWhenOption
-        )
+        val enoughTimePassed =
+            dataClearerTimeKeeper.hasEnoughTimeElapsed(
+                backgroundedTimestamp = settingsDataStore.appBackgroundedTimestamp,
+                clearWhenOption = cleanWhenOption)
         Timber.d("Has enough time passed to trigger the data clear? $enoughTimePassed")
 
         return enoughTimePassed
     }
-
 }

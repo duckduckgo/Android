@@ -41,16 +41,24 @@ class TrackerDetectorClientTypeTest {
     private var mockContentBlocking: ContentBlocking = mock()
     private var mockTrackerAllowlist: TrackerAllowlist = mock()
 
-    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+    private var testee =
+        TrackerDetectorImpl(
+            mockEntityLookup,
+            mockUserWhitelistDao,
+            mockContentBlocking,
+            mockTrackerAllowlist,
+            mockWebTrackersBlockedDao)
 
     @Before
     fun before() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
+        AndroidThreeTen.init(
+            InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
 
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
 
         whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any())).thenReturn(Client.Result(true))
-        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any())).thenReturn(Client.Result(false))
+        whenever(mockBlockingClient.matches(eq(Url.UNLISTED), any()))
+            .thenReturn(Client.Result(false))
         whenever(mockBlockingClient.name).thenReturn(Client.ClientName.TDS)
         testee.addClient(mockBlockingClient)
     }

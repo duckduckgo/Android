@@ -25,15 +25,17 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.io.ByteArrayInputStream
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.ByteArrayInputStream
-import javax.inject.Inject
 
 @WorkerThread
 @ContributesMultibinding(AppScope::class)
-class ResourceSurrogateLoader @Inject constructor(
+class ResourceSurrogateLoader
+@Inject
+constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val resourceSurrogates: ResourceSurrogates,
     private val surrogatesDataStore: ResourceSurrogateDataStore
@@ -74,7 +76,6 @@ class ResourceSurrogateLoader @Inject constructor(
         val functionBuilder = StringBuilder()
 
         existingLines.forEach {
-
             if (it.startsWith("#")) {
                 return@forEach
             }
@@ -85,9 +86,7 @@ class ResourceSurrogateLoader @Inject constructor(
                     ruleName = this[0]
                     mimeType = this[1]
                 }
-                with(ruleName.split("/")) {
-                    scriptId = this.last()
-                }
+                with(ruleName.split("/")) { scriptId = this.last() }
                 Timber.d("Found new surrogate rule: $scriptId - $ruleName - $mimeType")
                 nextLineIsNewRule = false
                 return@forEach
@@ -99,9 +98,7 @@ class ResourceSurrogateLoader @Inject constructor(
                         scriptId = scriptId,
                         name = ruleName,
                         mimeType = mimeType,
-                        jsFunction = functionBuilder.toString()
-                    )
-                )
+                        jsFunction = functionBuilder.toString()))
 
                 functionBuilder.setLength(0)
 
@@ -118,9 +115,10 @@ class ResourceSurrogateLoader @Inject constructor(
     }
 
     private fun readExistingLines(bytes: ByteArray): List<String> {
-        val existingLines = ByteArrayInputStream(bytes).bufferedReader().use { reader ->
-            reader.readLines().toMutableList()
-        }
+        val existingLines =
+            ByteArrayInputStream(bytes).bufferedReader().use { reader ->
+                reader.readLines().toMutableList()
+            }
 
         if (existingLines.isNotEmpty() && existingLines.last().isNotBlank()) {
             existingLines.add("")

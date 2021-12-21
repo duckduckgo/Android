@@ -22,15 +22,25 @@ import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 
-class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
+class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) :
+    Client {
 
     override fun matches(url: String, documentUrl: String): Client.Result {
-        val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
+        val tracker =
+            trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
-        return Client.Result(matches = matches.shouldBlock, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.surrogate)
+        return Client.Result(
+            matches = matches.shouldBlock,
+            entityName = tracker.ownerName,
+            categories = tracker.categories,
+            surrogate = matches.surrogate)
     }
 
-    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): MatchedResult {
+    private fun matchesTrackerEntry(
+        tracker: TdsTracker,
+        url: String,
+        documentUrl: String
+    ): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {

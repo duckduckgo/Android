@@ -28,6 +28,7 @@ class PagerAdapter(fragmentManager: FragmentManager, private val viewModel: Onbo
     }
 
     override fun getItem(position: Int): OnboardingPageFragment {
-        return viewModel.getItem(position) ?: throw IllegalArgumentException("No items exists at position $position")
+        return viewModel.getItem(position)
+            ?: throw IllegalArgumentException("No items exists at position $position")
     }
 }

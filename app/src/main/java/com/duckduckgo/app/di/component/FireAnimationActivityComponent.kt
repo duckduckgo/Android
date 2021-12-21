@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface FireAnimationActivityComponent : AndroidInjector<FireAnimationActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<FireAnimationActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<FireAnimationActivity>
 }
 
 @ContributesTo(AppScope::class)

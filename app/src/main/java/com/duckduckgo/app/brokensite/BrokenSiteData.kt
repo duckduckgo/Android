@@ -30,9 +30,15 @@ data class BrokenSiteData(
     companion object {
         fun fromSite(site: Site?): BrokenSiteData {
             val events = site?.trackingEvents
-            val blockedTrackers = events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
+            val blockedTrackers =
+                events?.map { Uri.parse(it.trackerUrl).host }.orEmpty().distinct().joinToString(",")
             val upgradedHttps = site?.upgradedHttps ?: false
-            val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
+            val surrogates =
+                site?.surrogates
+                    ?.map { Uri.parse(it.name).baseHost }
+                    .orEmpty()
+                    .distinct()
+                    .joinToString(",")
             val url = site?.url.orEmpty()
             return BrokenSiteData(url, blockedTrackers, surrogates, upgradedHttps)
         }

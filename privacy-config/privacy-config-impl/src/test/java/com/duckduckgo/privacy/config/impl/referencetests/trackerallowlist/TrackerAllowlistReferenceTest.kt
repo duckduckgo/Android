@@ -51,7 +51,8 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             return adapter.fromJson(
-                FileUtilities.loadText("reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
+                FileUtilities.loadText(
+                    "reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
                 ?: emptyList()
         }
     }
@@ -87,7 +88,8 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             moshi.adapter(TrackerAllowlistEntity::class.java)
         val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
         val jsonObject: JSONObject =
-            FileUtilities.getJsonObjectFromFile("reference_tests/trackerallowlist/tracker_allowlist_reference.json")
+            FileUtilities.getJsonObjectFromFile(
+                "reference_tests/trackerallowlist/tracker_allowlist_reference.json")
 
         jsonObject.keys().forEach {
             val allowlistEntity = jsonAdapter.fromJson(jsonObject.get(it).toString())

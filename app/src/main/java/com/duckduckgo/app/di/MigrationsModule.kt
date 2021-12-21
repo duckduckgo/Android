@@ -24,15 +24,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
+import dagger.multibindings.Multibinds
 
 @Module
 @ContributesTo(AppScope::class)
 abstract class MigrationsPluginProviderModule {
     // we use multibinds as the list of plugins can be empty
-    @Multibinds
-    abstract fun provideMigrationsPlugins(): DaggerSet<MigrationPlugin>
+    @Multibinds abstract fun provideMigrationsPlugins(): DaggerSet<MigrationPlugin>
 
     @Binds
     @SingleInstanceIn(AppScope::class)

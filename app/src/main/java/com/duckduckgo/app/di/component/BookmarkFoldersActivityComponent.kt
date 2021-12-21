@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface BookmarkFoldersActivityComponent : AndroidInjector<BookmarkFoldersActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<BookmarkFoldersActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<BookmarkFoldersActivity>
 }
 
 @ContributesTo(AppScope::class)

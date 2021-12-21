@@ -54,18 +54,18 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.activityRecyclerView.adapter = itemsAdapter
 
         lifecycleScope.launch {
-            viewModel.getTrackersForAppFromDate(
-                date,
-                packageName
-            )
+            viewModel
+                .getTrackersForAppFromDate(date, packageName)
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
                     findViewById<TextView>(R.id.tracking_attempts).text =
-                        resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttemptsTitle, it.totalTrackingAttempts, it.totalTrackingAttempts)
+                        resources.getQuantityString(
+                            R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
+                            it.totalTrackingAttempts,
+                            it.totalTrackingAttempts)
                     itemsAdapter.updateData(it.trackingCompanies)
                 }
         }
-
     }
 
     override fun onBackPressed() {
@@ -82,7 +82,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         private const val EXTRA_APP_NAME = "EXTRA_APP_NAME"
         private const val EXTRA_DATE = "EXTRA_DATE"
 
-        fun intent(context: Context, packageName: String, appDisplayName: String, bucket: String): Intent {
+        fun intent(
+            context: Context,
+            packageName: String,
+            appDisplayName: String,
+            bucket: String
+        ): Intent {
             val intent = Intent(context, AppTPCompanyTrackersActivity::class.java)
             intent.putExtra(EXTRA_PACKAGE_NAME, packageName)
             intent.putExtra(EXTRA_APP_NAME, appDisplayName)
@@ -90,5 +95,4 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             return intent
         }
     }
-
 }

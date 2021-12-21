@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface GlobalPrivacyControlActivityComponent : AndroidInjector<GlobalPrivacyControlActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<GlobalPrivacyControlActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<GlobalPrivacyControlActivity>
 }
 
 @ContributesTo(AppScope::class)
 interface GlobalPrivacyControlActivityComponentProvider {
-    fun provideGlobalPrivacyControlActivityComponentFactory(): GlobalPrivacyControlActivityComponent.Factory
+    fun provideGlobalPrivacyControlActivityComponentFactory():
+        GlobalPrivacyControlActivityComponent.Factory
 }
 
 @Module

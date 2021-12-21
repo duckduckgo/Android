@@ -23,8 +23,8 @@ import android.os.Build
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import timber.log.Timber
 import javax.inject.Inject
+import timber.log.Timber
 
 class DefaultBrowserNavigator @Inject constructor() {
 
@@ -44,5 +44,4 @@ class DefaultBrowserNavigator @Inject constructor() {
         intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
         fragment.startActivityForResult(intent, requestCode)
     }
-
 }

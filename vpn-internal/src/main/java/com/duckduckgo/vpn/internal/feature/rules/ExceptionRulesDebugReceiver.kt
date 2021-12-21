@@ -25,19 +25,18 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * This receiver allows to add exclusion rules to appTP
  *
  * $ adb shell am broadcast -a rule --es app <package.id> --es domain <the.tracker.domain>
  *
- * where `--es app <id>` is the app package ID
- * where `--es domain <domain>` is the tracker domain
+ * where `--es app <id>` is the app package ID where `--es domain <domain>` is the tracker domain
  */
 class ExceptionRulesDebugReceiver(
     context: Context,
@@ -67,7 +66,9 @@ class ExceptionRulesDebugReceiver(
 }
 
 @ContributesMultibinding(AppScope::class)
-class ExceptionRulesDebugReceiverRegister @Inject constructor(
+class ExceptionRulesDebugReceiverRegister
+@Inject
+constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
 ) : VpnServiceCallbacks {

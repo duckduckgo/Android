@@ -33,7 +33,8 @@ interface WidgetCapabilities {
 
 class AppWidgetCapabilities @Inject constructor(val context: Context) : WidgetCapabilities {
 
-    override val supportsStandardWidgetAdd: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    override val supportsStandardWidgetAdd: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 
     override val supportsAutomaticWidgetAdd: Boolean
         get() = context.supportsAutomaticWidgetAdd
@@ -43,13 +44,18 @@ class AppWidgetCapabilities @Inject constructor(val context: Context) : WidgetCa
 }
 
 val Context.supportsAutomaticWidgetAdd: Boolean
-    get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported
+    get() =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported
 
 val Context.hasInstalledWidgets: Boolean
     get() {
         val manager = AppWidgetManager.getInstance(this)
-        val hasDarkWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidget::class.java)).any()
-        val hasLightWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidgetLight::class.java)).any()
-        val hasSearchAndFavoritesWidget = manager.getAppWidgetIds(ComponentName(this, SearchAndFavoritesWidget::class.java)).any()
+        val hasDarkWidget =
+            manager.getAppWidgetIds(ComponentName(this, SearchWidget::class.java)).any()
+        val hasLightWidget =
+            manager.getAppWidgetIds(ComponentName(this, SearchWidgetLight::class.java)).any()
+        val hasSearchAndFavoritesWidget =
+            manager.getAppWidgetIds(ComponentName(this, SearchAndFavoritesWidget::class.java)).any()
         return hasDarkWidget || hasLightWidget || hasSearchAndFavoritesWidget
     }

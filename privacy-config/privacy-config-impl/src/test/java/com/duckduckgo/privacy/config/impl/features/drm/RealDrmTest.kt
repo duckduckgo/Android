@@ -26,10 +26,10 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealDrmTest {
@@ -58,7 +58,11 @@ class RealDrmTest {
         giveFeatureIsEnabled()
         givenUrlIsInExceptionList()
 
-        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissions =
+            arrayOf(
+                PermissionRequest.RESOURCE_MIDI_SYSEX,
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val url = "https://open.spotify.com"
 
         val value = testee.getDrmPermissionsForRequest(url, permissions)
@@ -71,7 +75,11 @@ class RealDrmTest {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
 
-        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissions =
+            arrayOf(
+                PermissionRequest.RESOURCE_MIDI_SYSEX,
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val url = "https://test.com"
 
         val value = testee.getDrmPermissionsForRequest(url, permissions)
@@ -90,11 +98,15 @@ class RealDrmTest {
     }
 
     private fun giveFeatureIsEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName()), any()))
+            .thenReturn(true)
     }
 
     private fun givenUrlIsInExceptionList() {
-        val exceptions = CopyOnWriteArrayList<DrmException>().apply { add(DrmException("open.spotify.com", "my reason here")) }
+        val exceptions =
+            CopyOnWriteArrayList<DrmException>().apply {
+                add(DrmException("open.spotify.com", "my reason here"))
+            }
         whenever(mockDrmRepository.exceptions).thenReturn(exceptions)
     }
 

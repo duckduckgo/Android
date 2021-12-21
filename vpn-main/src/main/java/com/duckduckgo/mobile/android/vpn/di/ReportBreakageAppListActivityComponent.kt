@@ -30,9 +30,7 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface ReportBreakageAppListActivityComponent : AndroidInjector<ReportBreakageAppListActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<ReportBreakageAppListActivity>
@@ -40,7 +38,8 @@ interface ReportBreakageAppListActivityComponent : AndroidInjector<ReportBreakag
 
 @ContributesTo(AppScope::class)
 interface ReportBreakageAppListActivityComponentProvider {
-    fun provideReportBreakageAppListActivityComponentFactory(): ReportBreakageAppListActivityComponent.Factory
+    fun provideReportBreakageAppListActivityComponentFactory():
+        ReportBreakageAppListActivityComponent.Factory
 }
 
 @Module

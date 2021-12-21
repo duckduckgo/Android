@@ -22,6 +22,7 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertFalse
@@ -29,14 +30,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
 
 @Suppress("RemoveExplicitTypeArguments")
 class SecondaryPromptDeciderTest {
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
+    @ExperimentalCoroutinesApi @get:Rule var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: SecondaryPromptDecider
 
@@ -44,34 +42,39 @@ class SecondaryPromptDeciderTest {
     private val mockAppEnjoymentRepository: AppEnjoymentRepository = mock()
 
     @Before
-    fun setup() = runBlocking<Unit> {
-        testee = SecondaryPromptDecider(mockAppDaysUsedRepository, mockAppEnjoymentRepository)
-        whenever(mockAppEnjoymentRepository.dateUserDismissedFirstPrompt()).thenReturn(Date())
-        whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
-    }
+    fun setup() =
+        runBlocking<Unit> {
+            testee = SecondaryPromptDecider(mockAppDaysUsedRepository, mockAppEnjoymentRepository)
+            whenever(mockAppEnjoymentRepository.dateUserDismissedFirstPrompt()).thenReturn(Date())
+            whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
+        }
 
     @Test
-    fun whenUserHasUsedTheAppForAWhileSinceSeeingFirstPromptThenTheySeeSecondPrompt() = runBlocking<Unit> {
-        configureLotsOfAppUsage()
-        assertTrue(testee.shouldShowPrompt())
-    }
+    fun whenUserHasUsedTheAppForAWhileSinceSeeingFirstPromptThenTheySeeSecondPrompt() =
+        runBlocking<Unit> {
+            configureLotsOfAppUsage()
+            assertTrue(testee.shouldShowPrompt())
+        }
 
     @Test
-    fun whenUserHasNotUsedTheAppMuchSinceSeeingFirstPromptThenTheyDoNotSeeSecondPrompt() = runBlocking<Unit> {
-        whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
-        configureNotALotOfAppUsage()
-        assertFalse(testee.shouldShowPrompt())
-    }
+    fun whenUserHasNotUsedTheAppMuchSinceSeeingFirstPromptThenTheyDoNotSeeSecondPrompt() =
+        runBlocking<Unit> {
+            whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
+            configureNotALotOfAppUsage()
+            assertFalse(testee.shouldShowPrompt())
+        }
 
     @Test
-    fun whenUserHasAlreadyRatedOrGaveFeedbackThenTheyDoNoSeeASecondPromptEvenAfterALotOfUsage() = runBlocking<Unit> {
-        whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(false)
-        configureLotsOfAppUsage()
-        assertFalse(testee.shouldShowPrompt())
-    }
+    fun whenUserHasAlreadyRatedOrGaveFeedbackThenTheyDoNoSeeASecondPromptEvenAfterALotOfUsage() =
+        runBlocking<Unit> {
+            whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(false)
+            configureLotsOfAppUsage()
+            assertFalse(testee.shouldShowPrompt())
+        }
 
     private suspend fun configureLotsOfAppUsage() {
-        whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(any())).thenReturn(Long.MAX_VALUE)
+        whenever(mockAppDaysUsedRepository.getNumberOfDaysAppUsedSinceDate(any()))
+            .thenReturn(Long.MAX_VALUE)
     }
 
     private suspend fun configureNotALotOfAppUsage() {

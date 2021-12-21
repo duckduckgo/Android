@@ -48,9 +48,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     class CheckboxComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
-    class InfoPanelComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
+    class InfoPanelComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
     @SuppressLint("ShowToast")
     class SnackbarComponentViewHolder(parent: ViewGroup) :

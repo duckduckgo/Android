@@ -23,14 +23,13 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
+import javax.inject.Inject
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class LaunchBridgeActivity : DuckDuckGoActivity() {
 
-    @Inject
-    lateinit var variantManager: VariantManager
+    @Inject lateinit var variantManager: VariantManager
 
     private val viewModel: LaunchViewModel by bindViewModel()
 
@@ -44,12 +43,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.command.observe(this, Observer { processCommand(it) })
     }
 
     private fun processCommand(it: LaunchViewModel.Command?) {

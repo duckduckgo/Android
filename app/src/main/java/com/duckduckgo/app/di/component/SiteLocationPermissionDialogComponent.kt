@@ -30,17 +30,15 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(FragmentScope::class)
-@MergeSubcomponent(
-    scope = FragmentScope::class
-)
+@MergeSubcomponent(scope = FragmentScope::class)
 interface SiteLocationPermissionDialogComponent : AndroidInjector<SiteLocationPermissionDialog> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<SiteLocationPermissionDialog>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<SiteLocationPermissionDialog>
 }
 
 @ContributesTo(AppScope::class)
 interface SiteLocationPermissionDialogComponentProvider {
-    fun provideSiteLocationPermissionDialogComponentFactory(): SiteLocationPermissionDialogComponent.Factory
+    fun provideSiteLocationPermissionDialogComponentFactory():
+        SiteLocationPermissionDialogComponent.Factory
 }
 
 @Module

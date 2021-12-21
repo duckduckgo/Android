@@ -66,46 +66,35 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
-    @Inject
-    lateinit var settingsDataStore: SettingsDataStore
+    @Inject lateinit var settingsDataStore: SettingsDataStore
 
-    @Inject
-    lateinit var clearPersonalDataAction: ClearDataAction
+    @Inject lateinit var clearPersonalDataAction: ClearDataAction
 
-    @Inject
-    lateinit var dataClearer: DataClearer
+    @Inject lateinit var dataClearer: DataClearer
 
-    @Inject
-    lateinit var pixel: Pixel
+    @Inject lateinit var pixel: Pixel
 
-    @Inject
-    lateinit var playStoreUtils: PlayStoreUtils
+    @Inject lateinit var playStoreUtils: PlayStoreUtils
 
-    @Inject
-    lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
+    @Inject lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
 
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
+    @Inject lateinit var ctaViewModel: CtaViewModel
 
-    @Inject
-    lateinit var variantManager: VariantManager
+    @Inject lateinit var variantManager: VariantManager
 
-    @Inject
-    lateinit var userEventsStore: UserEventsStore
+    @Inject lateinit var userEventsStore: UserEventsStore
 
-    @Inject
-    @AppCoroutineScope
-    lateinit var appCoroutineScope: CoroutineScope
+    @Inject @AppCoroutineScope lateinit var appCoroutineScope: CoroutineScope
 
     private var currentTab: BrowserTabFragment? = null
 
@@ -123,28 +112,25 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private var openMessageInNewTabJob: Job? = null
 
-    @VisibleForTesting
-    var destroyedByBackPress: Boolean = false
+    @VisibleForTesting var destroyedByBackPress: Boolean = false
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
         intent?.sanitize()
-        Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
+        Timber.i(
+            "onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
         val newInstanceState = if (dataClearer.isFreshAppLaunch) null else savedInstanceState
-        instanceStateBundles = CombinedInstanceState(originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
+        instanceStateBundles =
+            CombinedInstanceState(
+                originalInstanceState = savedInstanceState, newInstanceState = newInstanceState)
 
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
-        viewModel.viewState.observe(
-            this,
-            Observer {
-                renderer.renderBrowserViewState(it)
-            }
-        )
+        viewModel.viewState.observe(this, Observer { renderer.renderBrowserViewState(it) })
         viewModel.awaitClearDataFinishedNotification()
     }
 
@@ -175,7 +161,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
+    private fun openNewTab(
+        tabId: String,
+        url: String? = null,
+        skipHome: Boolean
+    ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         addOrReplaceNewTab(fragment, tabId)
@@ -216,9 +206,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
-        currentTab?.let {
-            transaction.hide(it)
-        }
+        currentTab?.let { transaction.hide(it) }
         transaction.show(fragment)
         transaction.commit()
         currentTab = fragment
@@ -246,9 +234,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
         if (intent.getBooleanExtra(PERFORM_FIRE_ON_ENTRY_EXTRA, false)) {
 
-            Timber.i("Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
+            Timber.i(
+                "Clearing everything as a result of $PERFORM_FIRE_ON_ENTRY_EXTRA flag being set")
             appCoroutineScope.launch {
-                clearPersonalDataAction.clearTabsAndAllDataAsync(appInForeground = true, shouldFireDataClearPixel = true)
+                clearPersonalDataAction.clearTabsAndAllDataAsync(
+                    appInForeground = true, shouldFireDataClearPixel = true)
                 clearPersonalDataAction.setAppUsedSinceLastClearFlag(false)
                 clearPersonalDataAction.killAndRestartProcess(notifyDataCleared = false)
             }
@@ -293,25 +283,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
-        viewModel.selectedTab.observe(
-            this,
-            Observer {
-                if (it != null) selectTab(it)
-            }
-        )
+        viewModel.command.observe(this, Observer { processCommand(it) })
+        viewModel.selectedTab.observe(this, Observer { if (it != null) selectTab(it) })
         viewModel.tabs.observe(
             this,
             Observer {
                 clearStaleTabs(it)
                 launch { viewModel.onTabsUpdated(it) }
-            }
-        )
+            })
     }
 
     private fun removeObservers() {
@@ -325,9 +304,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             return
         }
 
-        val stale = supportFragmentManager
-            .fragments.mapNotNull { it as? BrowserTabFragment }
-            .filter { fragment -> updatedTabs.none { it.tabId == fragment.tabId } }
+        val stale =
+            supportFragmentManager.fragments.mapNotNull { it as? BrowserTabFragment }.filter {
+                fragment ->
+                updatedTabs.none { it.tabId == fragment.tabId }
+            }
 
         if (stale.isNotEmpty()) {
             removeTabs(stale)
@@ -340,9 +321,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
             is Query -> currentTab?.submitQuery(command.query)
             is Refresh -> currentTab?.onRefreshRequested()
             is Command.LaunchPlayStore -> launchPlayStore()
-            is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentPrompt(AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
-            is Command.ShowAppRatingPrompt -> showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
-            is Command.ShowAppFeedbackPrompt -> showAppEnjoymentPrompt(GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppEnjoymentPrompt ->
+                showAppEnjoymentPrompt(
+                    AppEnjoymentDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppRatingPrompt ->
+                showAppEnjoymentPrompt(RateAppDialogFragment.create(command.promptCount, viewModel))
+            is Command.ShowAppFeedbackPrompt ->
+                showAppEnjoymentPrompt(
+                    GiveFeedbackDialogFragment.create(command.promptCount, viewModel))
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
         }
     }
@@ -353,24 +339,23 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun launchPrivacyDashboard() {
         currentTab?.tabId?.let {
-            startActivityForResult(PrivacyDashboardActivity.intent(this, it), DASHBOARD_REQUEST_CODE)
+            startActivityForResult(
+                PrivacyDashboardActivity.intent(this, it), DASHBOARD_REQUEST_CODE)
         }
     }
 
     fun launchFire() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING)
-        val dialog = FireDialog(
-            context = this,
-            clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
-            pixel = pixel,
-            settingsDataStore = settingsDataStore,
-            userEventsStore = userEventsStore,
-            appCoroutineScope = appCoroutineScope
-        )
-        dialog.clearStarted = {
-            removeObservers()
-        }
+        val dialog =
+            FireDialog(
+                context = this,
+                clearPersonalDataAction = clearPersonalDataAction,
+                ctaViewModel = ctaViewModel,
+                pixel = pixel,
+                settingsDataStore = settingsDataStore,
+                userEventsStore = userEventsStore,
+                appCoroutineScope = appCoroutineScope)
+        dialog.clearStarted = { removeObservers() }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
             if (dialog.ctaVisible) {
@@ -389,17 +374,16 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     fun openInNewTab(query: String, sourceTabId: String?) {
-        launch {
-            viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
-        }
+        launch { viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId) }
     }
 
     fun openMessageInNewTab(message: Message, sourceTabId: String?) {
-        openMessageInNewTabJob = launch {
-            val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false)
-            fragment.messageFromPreviousTab = message
-        }
+        openMessageInNewTabJob =
+            launch {
+                val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
+                val fragment = openNewTab(tabId, null, false)
+                fragment.messageFromPreviousTab = message
+            }
     }
 
     fun launchSettings() {
@@ -438,14 +422,14 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     private fun hideMockupOmnibar() {
         // Delaying this code to avoid race condition when fragment and activity recreated
-        Handler().postDelayed(
-            {
-                if (this::toolbarMockupBinding.isInitialized) {
-                    toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
-                }
-            },
-            300
-        )
+        Handler()
+            .postDelayed(
+                {
+                    if (this::toolbarMockupBinding.isInitialized) {
+                        toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                    }
+                },
+                300)
     }
 
     companion object {
@@ -493,7 +477,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
 
         private fun showWebContent() {
-            Timber.d("BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
+            Timber.d(
+                "BrowserActivity can now start displaying web content. instance state is $instanceStateBundles")
             configureObservers()
             binding.clearingInProgressView.gone()
 
@@ -504,8 +489,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 return
             }
 
-            if (!processedOriginalIntent && instanceStateBundles?.originalInstanceState == null && !intent.launchedFromRecents) {
-                Timber.i("Original instance state is null, so will inspect intent for actions to take. $intent")
+            if (!processedOriginalIntent &&
+                instanceStateBundles?.originalInstanceState == null &&
+                !intent.launchedFromRecents) {
+                Timber.i(
+                    "Original instance state is null, so will inspect intent for actions to take. $intent")
                 launchNewSearchOrQuery(intent)
                 processedOriginalIntent = true
             }
@@ -513,10 +501,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private val Intent.launchedFromRecents: Boolean
-        get() = (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
+        get() =
+            (flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) ==
+                Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY
 
     private fun showAppEnjoymentPrompt(prompt: DialogFragment) {
-        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)?.dismiss()
+        (supportFragmentManager.findFragmentByTag(APP_ENJOYMENT_DIALOG_TAG) as? DialogFragment)
+            ?.dismiss()
         prompt.show(supportFragmentManager, APP_ENJOYMENT_DIALOG_TAG)
     }
 
@@ -530,6 +521,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         playStoreUtils.launchPlayStore()
     }
 
-    private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
-
+    private data class CombinedInstanceState(
+        val originalInstanceState: Bundle?,
+        val newInstanceState: Bundle?
+    )
 }

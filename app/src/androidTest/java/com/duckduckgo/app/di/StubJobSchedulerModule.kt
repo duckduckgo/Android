@@ -26,10 +26,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-@ContributesTo(
-    scope = AppScope::class,
-    replaces = [JobsModule::class]
-)
+@ContributesTo(scope = AppScope::class, replaces = [JobsModule::class])
 class StubJobSchedulerModule {
 
     @SingleInstanceIn(AppScope::class)
@@ -47,7 +44,6 @@ class StubJobSchedulerModule {
             override fun getAllPendingJobs(): MutableList<JobInfo> = mutableListOf()
 
             override fun getPendingJob(jobId: Int): JobInfo? = null
-
         }
     }
 }

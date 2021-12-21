@@ -46,19 +46,21 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
+import java.util.*
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
-import dagger.SingleInstanceIn
-import kotlin.coroutines.CoroutineContext
 
 @SingleInstanceIn(AppScope::class)
-class CtaViewModel @Inject constructor(
+class CtaViewModel
+@Inject
+constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
     private val surveyDao: SurveyDao,
@@ -83,13 +85,12 @@ class CtaViewModel @Inject constructor(
     @FlowPreview
     @ExperimentalCoroutinesApi
     val showFireButtonPulseAnimation: Flow<Boolean> =
-        isFireButtonPulseAnimationFlowEnabled.asFlow()
-            .flatMapLatest {
-                when (it) {
-                    true -> getShowFireButtonPulseAnimationFlow()
-                    false -> flowOf(false)
-                }
+        isFireButtonPulseAnimationFlowEnabled.asFlow().flatMapLatest {
+            when (it) {
+                true -> getShowFireButtonPulseAnimationFlow()
+                false -> flowOf(false)
             }
+        }
 
     private var activeSurvey: Survey? = null
 
@@ -100,8 +101,7 @@ class CtaViewModel @Inject constructor(
             CtaId.DAX_DIALOG_TRACKERS_FOUND,
             CtaId.DAX_DIALOG_NETWORK,
             CtaId.DAX_FIRE_BUTTON,
-            CtaId.DAX_END
-        )
+            CtaId.DAX_END)
     }
 
     suspend fun dismissPulseAnimation() {
@@ -125,10 +125,11 @@ class CtaViewModel @Inject constructor(
 
     fun onCtaShown(cta: Cta) {
         cta.shownPixel?.let {
-            val canSendPixel = when (cta) {
-                is DaxCta -> cta.canSendShownPixel()
-                else -> true
-            }
+            val canSendPixel =
+                when (cta) {
+                    is DaxCta -> cta.canSendShownPixel()
+                    else -> true
+                }
             if (canSendPixel) {
                 pixel.fire(it, cta.pixelShownParameters())
             }
@@ -153,9 +154,7 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onUserDismissedCta(cta: Cta) {
         withContext(dispatchers.io()) {
-            cta.cancelPixel?.let {
-                pixel.fire(it, cta.pixelCancelParameters())
-            }
+            cta.cancelPixel?.let { pixel.fire(it, cta.pixelCancelParameters()) }
 
             if (cta is HomePanelCta.Survey) {
                 activeSurvey = null
@@ -169,9 +168,7 @@ class CtaViewModel @Inject constructor(
     }
 
     fun onUserClickCtaOkButton(cta: Cta) {
-        cta.okPixel?.let {
-            pixel.fire(it, cta.pixelOkParameters())
-        }
+        cta.okPixel?.let { pixel.fire(it, cta.pixelOkParameters()) }
     }
 
     suspend fun onUserClickFireproofExperimentButton(isAutoFireproofingEnabled: Boolean, cta: Cta) {
@@ -179,15 +176,10 @@ class CtaViewModel @Inject constructor(
         if (cta !is DaxBubbleCta.DaxFireproofCta) return
 
         withContext(dispatchers.io()) {
-
             if (isAutoFireproofingEnabled) {
-                cta.okPixel?.let {
-                    pixel.fire(it, cta.pixelOkParameters())
-                }
+                cta.okPixel?.let { pixel.fire(it, cta.pixelOkParameters()) }
             } else {
-                cta.cancelPixel?.let {
-                    pixel.fire(it, cta.pixelCancelParameters())
-                }
+                cta.cancelPixel?.let { pixel.fire(it, cta.pixelCancelParameters()) }
             }
 
             dismissedCtaDao.insert(DismissedCta(cta.ctaId))
@@ -196,7 +188,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, favoritesOnboarding: Boolean = false, locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(
+        dispatcher: CoroutineContext,
+        isBrowserShowing: Boolean,
+        site: Site? = null,
+        favoritesOnboarding: Boolean = false,
+        locale: Locale = Locale.getDefault()
+    ): Cta? {
         surveyCta(locale)?.let {
             return it
         }
@@ -242,12 +240,19 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) getWidgetAuto() else AddWidgetInstructions
+    private fun getWidget(): HomePanelCta =
+        if (widgetCapabilities.supportsAutomaticWidgetAdd) getWidgetAuto()
+        else AddWidgetInstructions
 
-    private fun getWidgetAuto() = if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser) AddReturningUsersWidgetAuto else AddWidgetAuto
+    private fun getWidgetAuto() =
+        if (variantManager.returningUsersWidgetPromotionEnabled() &&
+            onboardingStore.userMarkedAsReturningUser)
+            AddReturningUsersWidgetAuto
+        else AddWidgetAuto
 
     private fun getWidgetCta(): HomePanelCta? {
-        if (variantManager.returningUsersNoOnboardingEnabled() && onboardingStore.userMarkedAsReturningUser) {
+        if (variantManager.returningUsersNoOnboardingEnabled() &&
+            onboardingStore.userMarkedAsReturningUser) {
             onboardingStore.countNewTabForReturningUser++
             if (onboardingStore.hasReachedThresholdToShowWidgetForReturningUser()) {
                 return getWidget()
@@ -279,7 +284,9 @@ class CtaViewModel @Inject constructor(
 
         val showOnDay = survey.daysInstalled?.toLong()
         val daysInstalled = appInstallStore.daysInstalled()
-        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) || showOnDay == daysInstalled || showOnDay == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED) {
+        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) ||
+            showOnDay == daysInstalled ||
+            showOnDay == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED) {
             return Survey(survey)
         }
         return null
@@ -293,23 +300,29 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
+    private suspend fun canShowDaxIntroCta(): Boolean =
+        daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
 
     @WorkerThread
-    private suspend fun canShowDaxFireproofCta(): Boolean = variantManager.isFireproofExperimentEnabled() &&
+    private suspend fun canShowDaxFireproofCta(): Boolean =
+        variantManager.isFireproofExperimentEnabled() &&
+            daxOnboardingActive() &&
+            !daxDialogEndShown() &&
+            !daxDialogFireproofShown() &&
+            daxDialogIntroShown() &&
+            !settingsDataStore.hideTips &&
+            userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null
+
+    @WorkerThread
+    private suspend fun canShowDaxCtaEndOfJourney(): Boolean =
         daxOnboardingActive() &&
-        !daxDialogEndShown() &&
-        !daxDialogFireproofShown() &&
-        daxDialogIntroShown() &&
-        !settingsDataStore.hideTips &&
-        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null
-
-    @WorkerThread
-    private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
-        !daxDialogEndShown() &&
-        daxDialogIntroShown() &&
-        !hideTips() &&
-        (daxDialogNetworkShown() || daxDialogOtherShown() || daxDialogSerpShown() || daxDialogTrackersFoundShown())
+            !daxDialogEndShown() &&
+            daxDialogIntroShown() &&
+            !hideTips() &&
+            (daxDialogNetworkShown() ||
+                daxDialogOtherShown() ||
+                daxDialogSerpShown() ||
+                daxDialogTrackersFoundShown())
 
     private suspend fun canShowDaxDialogCta(): Boolean {
         if (!daxOnboardingActive() || hideTips()) {
@@ -328,7 +341,6 @@ class CtaViewModel @Inject constructor(
         }
 
         nonNullSite.let {
-
             if (duckDuckGoUrlDetector.isDuckDuckGoEmailUrl(it.url)) {
                 return null
             }
@@ -336,8 +348,10 @@ class CtaViewModel @Inject constructor(
             // Is major network
             if (it.entity != null) {
                 it.entity?.let { entity ->
-                    if (!daxDialogNetworkShown() && DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
-                        return DaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, entity.displayName, host)
+                    if (!daxDialogNetworkShown() &&
+                        DaxDialogCta.mainTrackerNetworks.contains(entity.displayName)) {
+                        return DaxDialogCta.DaxMainNetworkCta(
+                            onboardingStore, appInstallStore, entity.displayName, host)
                     }
                 }
             }
@@ -347,9 +361,15 @@ class CtaViewModel @Inject constructor(
             }
 
             // Trackers blocked
-            return if (!daxDialogTrackersFoundShown() && !isSerpUrl(it.url) && it.orderedTrackingEntities().isNotEmpty()) {
-                DaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
-            } else if (!isSerpUrl(it.url) && !daxDialogOtherShown() && !daxDialogTrackersFoundShown() && !daxDialogNetworkShown()) {
+            return if (!daxDialogTrackersFoundShown() &&
+                !isSerpUrl(it.url) &&
+                it.orderedTrackingEntities().isNotEmpty()) {
+                DaxDialogCta.DaxTrackersBlockedCta(
+                    onboardingStore, appInstallStore, it.orderedTrackingEntities(), host)
+            } else if (!isSerpUrl(it.url) &&
+                !daxDialogOtherShown() &&
+                !daxDialogTrackersFoundShown() &&
+                !daxDialogNetworkShown()) {
                 DaxDialogCta.DaxNoSerpCta(onboardingStore, appInstallStore)
             } else {
                 null
@@ -367,47 +387,55 @@ class CtaViewModel @Inject constructor(
 
     private fun daxDialogOtherShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_OTHER)
 
-    private fun daxDialogTrackersFoundShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
+    private fun daxDialogTrackersFoundShown(): Boolean =
+        dismissedCtaDao.exists(CtaId.DAX_DIALOG_TRACKERS_FOUND)
 
     private fun daxDialogNetworkShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_DIALOG_NETWORK)
 
-    private fun daxDialogFireEducationShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
+    private fun daxDialogFireEducationShown(): Boolean =
+        dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON)
 
-    private fun pulseFireButtonShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
+    private fun pulseFireButtonShown(): Boolean =
+        dismissedCtaDao.exists(CtaId.DAX_FIRE_BUTTON_PULSE)
 
     private fun isSerpUrl(url: String): Boolean = url.contains(DaxDialogCta.SERP)
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
-    private suspend fun pulseAnimationDisabled(): Boolean = !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()
+    private suspend fun pulseAnimationDisabled(): Boolean =
+        !daxOnboardingActive() ||
+            pulseFireButtonShown() ||
+            daxDialogFireEducationShown() ||
+            hideTips()
 
     private suspend fun allOnboardingCtasShown(): Boolean {
         return withContext(dispatchers.io()) {
-            requiredDaxOnboardingCtas.all {
-                dismissedCtaDao.exists(it)
-            }
+            requiredDaxOnboardingCtas.all { dismissedCtaDao.exists(it) }
         }
     }
 
-    private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs.distinctUntilChanged()
-        .map { tabs ->
+    private fun forceStopFireButtonPulseAnimationFlow() =
+        tabRepository.flowTabs.distinctUntilChanged().map { tabs ->
             if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
             return@map false
         }
 
     @ExperimentalCoroutinesApi
-    private fun getShowFireButtonPulseAnimationFlow(): Flow<Boolean> = dismissedCtaDao.dismissedCtas()
-        .combine(forceStopFireButtonPulseAnimationFlow(), ::Pair)
-        .onEach { (_, forceStopAnimation) ->
-            withContext(dispatchers.io()) {
-                if (pulseAnimationDisabled()) {
-                    isFireButtonPulseAnimationFlowEnabled.send(false)
-                }
-                if (forceStopAnimation) {
-                    dismissPulseAnimation()
+    private fun getShowFireButtonPulseAnimationFlow(): Flow<Boolean> =
+        dismissedCtaDao
+            .dismissedCtas()
+            .combine(forceStopFireButtonPulseAnimationFlow(), ::Pair)
+            .onEach { (_, forceStopAnimation) ->
+                withContext(dispatchers.io()) {
+                    if (pulseAnimationDisabled()) {
+                        isFireButtonPulseAnimationFlowEnabled.send(false)
+                    }
+                    if (forceStopAnimation) {
+                        dismissPulseAnimation()
+                    }
                 }
             }
-        }.shouldShowPulseAnimation()
+            .shouldShowPulseAnimation()
 
     private fun Flow<Pair<List<DismissedCta>, Boolean>>.shouldShowPulseAnimation(): Flow<Boolean> {
         return this.map { (dismissedCtaDao, forceStopAnimation) ->

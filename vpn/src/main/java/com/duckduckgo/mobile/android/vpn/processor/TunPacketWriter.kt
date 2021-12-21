@@ -26,14 +26,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import timber.log.Timber
-import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 
-class TunPacketWriter @AssistedInject constructor(
+class TunPacketWriter
+@AssistedInject
+constructor(
     @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
     private val tracerPacketRegister: TracerPacketRegister,
@@ -53,7 +55,8 @@ class TunPacketWriter @AssistedInject constructor(
 
         running = true
 
-        // writing back data to the TUN; this means packet from the network flowing back to apps on the device
+        // writing back data to the TUN; this means packet from the network flowing back to apps on
+        // the device
         val vpnOutput = FileOutputStream(tunInterface.fileDescriptor).channel
 
         vpnOutput.use { vpnOutput ->

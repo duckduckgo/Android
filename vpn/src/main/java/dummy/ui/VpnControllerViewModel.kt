@@ -37,8 +37,12 @@ class VpnControllerViewModel(
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
-        return appTrackerBlockedRepository.getRunningTimeMillis(startTime)
-            .map { timeRunning -> VpnRunningStatus(timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext)) }
+        return appTrackerBlockedRepository
+            .getRunningTimeMillis(startTime)
+            .map { timeRunning ->
+                VpnRunningStatus(
+                    timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext))
+            }
             .asLiveData()
     }
 
@@ -47,15 +51,17 @@ class VpnControllerViewModel(
     }
 
     fun getAppTrackerBlockedUpdates(startTime: () -> String): LiveData<AppTrackersBlocked> {
-        return appTrackerBlockedRepository.getVpnTrackers(startTime).map {
-            AppTrackersBlocked(it)
-        }.asLiveData()
+        return appTrackerBlockedRepository
+            .getVpnTrackers(startTime)
+            .map { AppTrackersBlocked(it) }
+            .asLiveData()
     }
 
     fun getWebTrackerBlockedUpdates(startTime: () -> String): LiveData<WebTrackersBlocked> {
-        return webTrackersBlockedRepository.get(startTime).map {
-            WebTrackersBlocked(it)
-        }.asLiveData()
+        return webTrackersBlockedRepository
+            .get(startTime)
+            .map { WebTrackersBlocked(it) }
+            .asLiveData()
     }
 
     fun getVpnState(): LiveData<VpnState> {
@@ -71,15 +77,12 @@ class VpnControllerViewModel(
         fun byCompany(): Map<Int, List<VpnTracker>> {
             return trackerList.groupBy { it.trackerCompanyId }
         }
-
     }
 
     data class WebTrackersBlocked(val trackerList: List<WebTrackerBlocked>) {
 
         fun byCompany(): Map<String, List<WebTrackerBlocked>> {
             return trackerList.groupBy { it.trackerCompany }
-
         }
-
     }
 }

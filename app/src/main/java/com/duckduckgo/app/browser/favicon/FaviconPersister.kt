@@ -22,16 +22,21 @@ import android.graphics.BitmapFactory
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.sha256
+import java.io.File
+import java.io.FileOutputStream
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
 
 interface FaviconPersister {
     fun faviconFile(directory: String, subFolder: String, domain: String): File?
     suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File?
-    suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String)
+    suspend fun copyToDirectory(
+        file: File,
+        directory: String,
+        newSubfolder: String,
+        newFilename: String
+    )
     suspend fun deleteAll(directory: String)
     suspend fun deletePersistedFavicon(domain: String)
     suspend fun deleteFaviconsForSubfolder(directory: String, subFolder: String, domain: String?)
@@ -56,14 +61,24 @@ class FileBasedFaviconPersister(
         }
     }
 
-    override suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String) {
+    override suspend fun copyToDirectory(
+        file: File,
+        directory: String,
+        newSubfolder: String,
+        newFilename: String
+    ) {
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
             file.copyTo(persistedFile, overwrite = true)
         }
     }
 
-    override suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+    override suspend fun store(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String
+    ): File? {
         return withContext(dispatcherProvider.io() + NonCancellable) {
             writeToDisk(directory, subFolder, bitmap, domain)
         }
@@ -74,7 +89,11 @@ class FileBasedFaviconPersister(
         fileDeleter.deleteFilesFromDirectory(directoryToDelete, listOf(filename(domain)))
     }
 
-    override suspend fun deleteFaviconsForSubfolder(directory: String, subFolder: String, domain: String?) {
+    override suspend fun deleteFaviconsForSubfolder(
+        directory: String,
+        subFolder: String,
+        domain: String?
+    ) {
         val directoryToDelete = directoryForFavicon(directory, subFolder)
 
         if (domain == null) {
@@ -102,7 +121,12 @@ class FileBasedFaviconPersister(
     }
 
     @Synchronized
-    private fun writeToDisk(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+    private fun writeToDisk(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String
+    ): File? {
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
         if (existingFile.exists()) {
@@ -147,5 +171,4 @@ class FileBasedFaviconPersister(
         const val FAVICON_PERSISTED_DIR = "favicons"
         const val NO_SUBFOLDER = ""
     }
-
 }

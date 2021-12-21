@@ -28,9 +28,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import timber.log.Timber
-import xyz.hexene.localvpn.Packet
-import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
@@ -38,6 +35,9 @@ import java.nio.channels.Selector
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
+import timber.log.Timber
+import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.TCB
 
 interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
@@ -46,14 +46,11 @@ interface TcpSocketWriter {
 }
 
 @SingleInstanceIn(VpnScope::class)
-@ContributesBinding(
-    scope = VpnScope::class,
-    boundType = TcpSocketWriter::class
-)
-class RealTcpSocketWriter @Inject constructor(
-    @TcpNetworkSelector private val selector: Selector,
-    private val queues: VpnQueues
-) : TcpSocketWriter, VpnMemoryCollectorPlugin {
+@ContributesBinding(scope = VpnScope::class, boundType = TcpSocketWriter::class)
+class RealTcpSocketWriter
+@Inject
+constructor(@TcpNetworkSelector private val selector: Selector, private val queues: VpnQueues) :
+    TcpSocketWriter, VpnMemoryCollectorPlugin {
 
     // added an initial capacity based on what I observed from the low memory pixels we send
     private val writeQueue = ConcurrentHashMap<TCB, Deque<PendingWriteData>>(10)
@@ -61,15 +58,22 @@ class RealTcpSocketWriter @Inject constructor(
     override fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean) {
         val queue = pendingWriteData.tcb.writeQueue()
         if (skipQueue) queue.addFirst(pendingWriteData) else queue.add(pendingWriteData)
-        Timber.v("Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue", queue.size, getLogLabel(pendingWriteData.tcb), writeQueue.keys.size)
+        Timber.v(
+            "Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue",
+            queue.size,
+            getLogLabel(pendingWriteData.tcb),
+            writeQueue.keys.size)
     }
 
     override fun removeFromWriteQueue(tcb: TCB) {
         writeQueue.remove(tcb)
-        Timber.v("Removed from write queue: there are %d TCB instances in the write queue", writeQueue.keys.size)
+        Timber.v(
+            "Removed from write queue: there are %d TCB instances in the write queue",
+            writeQueue.keys.size)
     }
 
-    private fun getLogLabel(tcb: TCB) = "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
+    private fun getLogLabel(tcb: TCB) =
+        "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
 
     @Synchronized
     private fun TCB.writeQueue(): Deque<PendingWriteData> {
@@ -92,8 +96,7 @@ class RealTcpSocketWriter @Inject constructor(
                 tcb.ipAndPort,
                 writeData.payloadSize,
                 writeData.ackNumber,
-                writeData.seqNumber
-            )
+                writeData.seqNumber)
 
             val payloadBuffer = writeData.payloadBuffer
             val payloadSize = writeData.payloadSize
@@ -106,10 +109,12 @@ class RealTcpSocketWriter @Inject constructor(
                 Timber.v("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
                 fullyWritten(tcb, writeData, connectionParams)
             } else {
-                Timber.w("Partial write. %d bytes remaining to be written for %s", payloadBuffer.remaining(), getLogLabel(tcb))
+                Timber.w(
+                    "Partial write. %d bytes remaining to be written for %s",
+                    payloadBuffer.remaining(),
+                    getLogLabel(tcb))
                 partiallyWritten(writeData, bytesWritten, payloadBuffer, payloadSize)
             }
-
         } while (writeQueue.isNotEmpty())
 
         Timber.v("Nothing more to write, switching to read mode")
@@ -118,8 +123,17 @@ class RealTcpSocketWriter @Inject constructor(
         tcb.channel.register(selector, OP_READ, tcb)
     }
 
-    private fun partiallyWritten(writeData: PendingWriteData, bytesWritten: Int, payloadBuffer: ByteBuffer, payloadSize: Int) {
-        Timber.e("Partially written data. %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
+    private fun partiallyWritten(
+        writeData: PendingWriteData,
+        bytesWritten: Int,
+        payloadBuffer: ByteBuffer,
+        payloadSize: Int
+    ) {
+        Timber.e(
+            "Partially written data. %d bytes written. %d bytes remain out of %d",
+            bytesWritten,
+            payloadBuffer.remaining(),
+            payloadSize)
 
         addToWriteQueue(writeData, skipQueue = true)
 
@@ -127,7 +141,11 @@ class RealTcpSocketWriter @Inject constructor(
         writeData.socket.register(selector, OP_WRITE or OP_READ, writeData.tcb)
     }
 
-    private fun fullyWritten(tcb: TCB, writeData: PendingWriteData, connectionParams: TcpConnectionParams) {
+    private fun fullyWritten(
+        tcb: TCB,
+        writeData: PendingWriteData,
+        connectionParams: TcpConnectionParams
+    ) {
         tcb.acknowledgementNumberToClient = writeData.ackNumber
         tcb.acknowledgementNumberToServer = writeData.seqNumber
 
@@ -140,8 +158,7 @@ class RealTcpSocketWriter @Inject constructor(
             seqToClient,
             tcb.acknowledgementNumberToClient,
             ackToServer,
-            seqAckDiff
-        )
+            seqAckDiff)
 
         val responseBuffer = connectionParams.responseBuffer
 
@@ -150,8 +167,7 @@ class RealTcpSocketWriter @Inject constructor(
             Packet.TCPHeader.ACK.toByte(),
             tcb.sequenceNumberToClient,
             tcb.acknowledgementNumberToClient,
-            0
-        )
+            0)
         queues.networkToDevice.offer(responseBuffer)
     }
 
@@ -160,7 +176,8 @@ class RealTcpSocketWriter @Inject constructor(
 
         val writeQueueSize = writeQueue.size
 
-        // take this opportunity to remove any TCBs which were evicted from the TCB cache and haven't been cleaned up yet
+        // take this opportunity to remove any TCBs which were evicted from the TCB cache and
+        // haven't been cleaned up yet
         removeEvictedTCBs()
 
         return mutableMapOf<String, String>().apply {
@@ -180,5 +197,7 @@ class RealTcpSocketWriter @Inject constructor(
 abstract class TcpSocketWriterModule {
     @Binds
     @IntoSet
-    abstract fun bindTcpSocketWriterMemoryCollector(tcpSocketWriter: TcpSocketWriter): VpnMemoryCollectorPlugin
+    abstract fun bindTcpSocketWriterMemoryCollector(
+        tcpSocketWriter: TcpSocketWriter
+    ): VpnMemoryCollectorPlugin
 }

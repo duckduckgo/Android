@@ -135,7 +135,11 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, null)
     }
 
-    private fun getWebResourceResponse(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): WebResourceResponse? {
+    private fun getWebResourceResponse(
+        request: WebResourceRequest,
+        documentUrl: String?,
+        webViewClientListener: WebViewClientListener?
+    ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.blocked == true) {
             trackingEvent.surrogateId?.let { surrogateId ->
@@ -143,7 +147,8 @@ class WebViewRequestInterceptor(
                 if (surrogate.responseAvailable) {
                     Timber.d("Surrogate found for ${request.url}")
                     webViewClientListener?.surrogateDetected(surrogate)
-                    return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
+                    return WebResourceResponse(
+                        surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
                 }
             }
 
@@ -156,14 +161,14 @@ class WebViewRequestInterceptor(
     }
 
     private fun getHeaders(request: WebResourceRequest): Map<String, String> {
-        return request.requestHeaders.apply {
-            putAll(gpc.getHeaders(request.url.toString()))
-        }
+        return request.requestHeaders.apply { putAll(gpc.getHeaders(request.url.toString())) }
     }
 
     private fun shouldAddGcpHeaders(request: WebResourceRequest): Boolean {
         val existingHeaders = request.requestHeaders
-        return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
+        return (request.isForMainFrame &&
+            request.method == "GET" &&
+            gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }
 
     private suspend fun requestWasInTheStack(url: Uri, webView: WebView): Boolean {
@@ -197,7 +202,11 @@ class WebViewRequestInterceptor(
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun trackingEvent(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): TrackingEvent? {
+    private fun trackingEvent(
+        request: WebResourceRequest,
+        documentUrl: String?,
+        webViewClientListener: WebViewClientListener?
+    ): TrackingEvent? {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {

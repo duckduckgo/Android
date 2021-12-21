@@ -30,12 +30,9 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @SingleInstanceIn(ActivityScope::class)
-@MergeSubcomponent(
-    scope = ActivityScope::class
-)
+@MergeSubcomponent(scope = ActivityScope::class)
 interface DeviceShieldFAQActivityComponent : AndroidInjector<DeviceShieldFAQActivity> {
-    @Subcomponent.Factory
-    interface Factory : AndroidInjector.Factory<DeviceShieldFAQActivity>
+    @Subcomponent.Factory interface Factory : AndroidInjector.Factory<DeviceShieldFAQActivity>
 }
 
 @ContributesTo(AppScope::class)

@@ -27,7 +27,8 @@ class ConflatedJob {
 
     private var job: Job? = null
 
-    val isActive get() = job?.isActive ?: false
+    val isActive
+        get() = job?.isActive ?: false
 
     @Synchronized
     operator fun plusAssign(newJob: Job) {

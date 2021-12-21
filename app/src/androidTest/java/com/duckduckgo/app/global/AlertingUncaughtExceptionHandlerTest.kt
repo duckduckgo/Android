@@ -21,13 +21,13 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
+import java.io.InterruptedIOException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.InterruptedIOException
 
 @ExperimentalCoroutinesApi
 class AlertingUncaughtExceptionHandlerTest {
@@ -37,59 +37,64 @@ class AlertingUncaughtExceptionHandlerTest {
     private val mockPixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+    @get:Rule val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
-        testee = AlertingUncaughtExceptionHandler(
-            mockDefaultExceptionHandler,
-            mockPixelCountDataStore,
-            mockUncaughtExceptionRepository,
-            coroutineTestRule.testDispatcherProvider,
-            TestCoroutineScope()
-        )
+        testee =
+            AlertingUncaughtExceptionHandler(
+                mockDefaultExceptionHandler,
+                mockPixelCountDataStore,
+                mockUncaughtExceptionRepository,
+                coroutineTestRule.testDispatcherProvider,
+                TestCoroutineScope())
     }
 
     @Test
-    fun whenExceptionIsNotInIgnoreListThenCrashRecordedInDatabase() = coroutineTestRule.testDispatcher.runBlockingTest {
-        testee.uncaughtException(Thread.currentThread(), NullPointerException("Deliberate"))
-        advanceUntilIdle()
+    fun whenExceptionIsNotInIgnoreListThenCrashRecordedInDatabase() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            testee.uncaughtException(Thread.currentThread(), NullPointerException("Deliberate"))
+            advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository).recordUncaughtException(any(), eq(UncaughtExceptionSource.GLOBAL))
-    }
-
-    @Test
-    fun whenExceptionIsNotInIgnoreListThenDefaultExceptionHandlerCalled() = coroutineTestRule.testDispatcher.runBlockingTest {
-        val exception = NullPointerException("Deliberate")
-        testee.uncaughtException(Thread.currentThread(), exception)
-        advanceUntilIdle()
-
-        verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
-    }
+            verify(mockUncaughtExceptionRepository)
+                .recordUncaughtException(any(), eq(UncaughtExceptionSource.GLOBAL))
+        }
 
     @Test
-    fun whenExceptionIsInterruptedIoExceptionThenCrashNotRecorded() = coroutineTestRule.testDispatcher.runBlockingTest {
-        testee.uncaughtException(Thread.currentThread(), InterruptedIOException("Deliberate"))
-        advanceUntilIdle()
+    fun whenExceptionIsNotInIgnoreListThenDefaultExceptionHandlerCalled() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            val exception = NullPointerException("Deliberate")
+            testee.uncaughtException(Thread.currentThread(), exception)
+            advanceUntilIdle()
 
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
-    }
-
-    @Test
-    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() = coroutineTestRule.testDispatcher.runBlockingTest {
-        testee.uncaughtException(Thread.currentThread(), InterruptedException("Deliberate"))
-        advanceUntilIdle()
-
-        verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
-    }
+            verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
+        }
 
     @Test
-    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() = coroutineTestRule.testDispatcher.runBlockingTest {
-        val exception = InterruptedIOException("Deliberate")
-        testee.uncaughtException(Thread.currentThread(), exception)
-        advanceUntilIdle()
+    fun whenExceptionIsInterruptedIoExceptionThenCrashNotRecorded() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            testee.uncaughtException(Thread.currentThread(), InterruptedIOException("Deliberate"))
+            advanceUntilIdle()
 
-        verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
-    }
+            verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
+        }
+
+    @Test
+    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            testee.uncaughtException(Thread.currentThread(), InterruptedException("Deliberate"))
+            advanceUntilIdle()
+
+            verify(mockUncaughtExceptionRepository, never()).recordUncaughtException(any(), any())
+        }
+
+    @Test
+    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() =
+        coroutineTestRule.testDispatcher.runBlockingTest {
+            val exception = InterruptedIOException("Deliberate")
+            testee.uncaughtException(Thread.currentThread(), exception)
+            advanceUntilIdle()
+
+            verify(mockDefaultExceptionHandler).uncaughtException(any(), eq(exception))
+        }
 }

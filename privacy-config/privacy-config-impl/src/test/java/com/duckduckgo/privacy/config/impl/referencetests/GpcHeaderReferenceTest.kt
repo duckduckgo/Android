@@ -59,8 +59,12 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText("reference_tests/gpc/tests.json"))
-            return referenceTest?.gpcHeader?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
+            val referenceTest =
+                adapter.fromJson(FileUtilities.loadText("reference_tests/gpc/tests.json"))
+            return referenceTest?.gpcHeader?.tests?.filterNot {
+                it.exceptPlatforms.contains("android-browser")
+            }
+                ?: emptyList()
         }
     }
 
@@ -72,7 +76,12 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         whenever(resources.openRawResource(any())).thenReturn("".byteInputStream())
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(testCase.gpcUserSettingOn)
         mockGpcPrivacyConfig()
-        gpc = RealGpc(context, mockFeatureToggle, mockGpcRepository, RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
+        gpc =
+            RealGpc(
+                context,
+                mockFeatureToggle,
+                mockGpcRepository,
+                RealUnprotectedTemporary(mockUnprotectedTemporaryRepository))
     }
 
     @Test
@@ -87,8 +96,11 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
 
     private fun mockGpcPrivacyConfig() {
         val gpcExceptions = mutableListOf<GpcException>()
-        val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
-        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText("reference_tests/gpc/config_reference.json"))
+        val jsonAdapter: JsonAdapter<JsonPrivacyConfig> =
+            moshi.adapter(JsonPrivacyConfig::class.java)
+        val config: JsonPrivacyConfig? =
+            jsonAdapter.fromJson(
+                FileUtilities.loadText("reference_tests/gpc/config_reference.json"))
         val gpcAdapter: JsonAdapter<GpcFeature> = moshi.adapter(GpcFeature::class.java)
         val gpcFeature: GpcFeature? = gpcAdapter.fromJson(config?.features?.get("gpc").toString())
 
@@ -97,11 +109,14 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         }
 
         val isEnabled = gpcFeature?.state == "enabled"
-        val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
+        val exceptionsUnprotectedTemporary =
+            CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
 
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), isEnabled)).thenReturn(isEnabled)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), isEnabled))
+            .thenReturn(isEnabled)
         whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))
-        whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptionsUnprotectedTemporary)
+        whenever(mockUnprotectedTemporaryRepository.exceptions)
+            .thenReturn(exceptionsUnprotectedTemporary)
     }
 
     data class TestCase(
@@ -115,13 +130,7 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         val exceptPlatforms: List<String>
     )
 
-    data class GpcHeaderTest(
-        val name: String,
-        val desc: String,
-        val tests: List<TestCase>
-    )
+    data class GpcHeaderTest(val name: String, val desc: String, val tests: List<TestCase>)
 
-    data class ReferenceTest(
-        val gpcHeader: GpcHeaderTest
-    )
+    data class ReferenceTest(val gpcHeader: GpcHeaderTest)
 }
