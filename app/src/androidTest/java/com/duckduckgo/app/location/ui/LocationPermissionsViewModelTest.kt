@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
@@ -30,7 +31,6 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.nhaarman.mockitokotlin2.atLeastOnce
@@ -39,6 +39,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -152,7 +153,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserDeletesLocationPermissionThenViewStateIsUpdated() = coroutineRule.runBlocking {
+    fun whenUserDeletesLocationPermissionThenViewStateIsUpdated() = runTest {
         givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
 
         viewModel.loadLocationPermissions(true)
@@ -165,7 +166,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserDeletesLocationPermissionThenGeoLocationPermissionDeletesDomain() = coroutineRule.runBlocking {
+    fun whenUserDeletesLocationPermissionThenGeoLocationPermissionDeletesDomain() = runTest {
         val domain = "domain.com"
         givenLocationPermission(LocationPermissionType.ALLOW_ONCE, domain)
 
@@ -187,7 +188,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesLocationPermissionsThenViewStateUpdated() = coroutineRule.runBlocking {
+    fun whenUserTogglesLocationPermissionsThenViewStateUpdated() = runTest {
         viewModel.loadLocationPermissions(true)
         viewModel.onLocationPermissionToggled(true)
 
@@ -203,21 +204,21 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenUserDisablesLocationPermissionThenAllPermissionsAreCleared() = coroutineRule.runBlocking {
+    fun whenUserDisablesLocationPermissionThenAllPermissionsAreCleared() = runTest {
         viewModel.onLocationPermissionToggled(false)
 
         Mockito.verify(mockGeoLocationPermissions).clearAll()
     }
 
     @Test
-    fun whenUserEnablesLocationPermissionThenPermissionsAreNotModified() = coroutineRule.runBlocking {
+    fun whenUserEnablesLocationPermissionThenPermissionsAreNotModified() = runTest {
         viewModel.onLocationPermissionToggled(true)
 
         Mockito.verifyNoMoreInteractions(mockGeoLocationPermissions)
     }
 
     @Test
-    fun whenUserEditsLocationPermissionThenViewStateIsUpdated() = coroutineRule.runBlocking {
+    fun whenUserEditsLocationPermissionThenViewStateIsUpdated() = runTest {
         givenLocationPermission(LocationPermissionType.ALLOW_ONCE, "domain.com")
 
         viewModel.loadLocationPermissions(true)
@@ -233,7 +234,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenAllowAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+    fun whenAllowAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = runTest {
         val domain = "example.com"
 
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ALWAYS)
@@ -244,7 +245,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenAllowOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = coroutineRule.runBlocking {
+    fun whenAllowOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = runTest {
         val domain = "example.com"
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.ALLOW_ONCE)
 
@@ -254,7 +255,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenDenyOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = coroutineRule.runBlocking {
+    fun whenDenyOncePermissionsIsGrantedThenGeoLocationPermissionIsClearedAndRemovedFromDb() = runTest {
         val domain = "example.com"
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ONCE)
 
@@ -264,7 +265,7 @@ class LocationPermissionsViewModelTest {
     }
 
     @Test
-    fun whenDenyAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = coroutineRule.runBlocking {
+    fun whenDenyAlwaysPermissionsIsGrantedThenGeoLocationPermissionIsAllowed() = runTest {
         val domain = "example.com"
         viewModel.onSiteLocationPermissionSelected(domain, LocationPermissionType.DENY_ALWAYS)
 

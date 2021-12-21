@@ -25,12 +25,14 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class ClearDataNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -45,21 +47,21 @@ class ClearDataNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() = runBlocking<Unit> {
+    fun whenNotificationNotSeenAndOptionNotSetThenCanShowIsTrue() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationNotSeenButOptionAlreadySetThenCanShowIsFalse() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_TABS_ONLY)
         assertFalse(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationAlreadySeenAndOptionNotSetThenCanShowIsFalse() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         whenever(settingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         assertFalse(testee.canShow())

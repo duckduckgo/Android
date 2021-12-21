@@ -30,6 +30,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -40,6 +41,7 @@ import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class TabSwitcherViewModelTest {
 
     @get:Rule
@@ -82,7 +84,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
+    fun whenNewTabRequestedThenRepositoryNotifiedAndSwitcherClosed() = runTest {
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -90,7 +92,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runBlocking<Unit> {
+    fun whenTabSelectedThenRepositoryNotifiedAndSwitcherClosed() = runTest {
         testee.onTabSelected(TabEntity("abc", "", "", position = 0))
         verify(mockTabRepository).select(eq("abc"))
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
@@ -98,14 +100,14 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenTabDeletedThenRepositoryNotified() = runBlocking<Unit> {
+    fun whenTabDeletedThenRepositoryNotified() = runTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onTabDeleted(entity)
         verify(mockTabRepository).delete(entity)
     }
 
     @Test
-    fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runBlocking {
+    fun whenOnMarkTabAsDeletableThenCallMarkDeletable() = runTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.onMarkTabAsDeletable(entity)
 
@@ -113,7 +115,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenUndoDeletableTabThenUndoDeletable() = runBlocking {
+    fun whenUndoDeletableTabThenUndoDeletable() = runTest {
         val entity = TabEntity("abc", "", "", position = 0)
         testee.undoDeletableTab(entity)
 
@@ -121,14 +123,14 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runBlocking {
+    fun whenPurgeDeletableTabsThenCallRepositoryPurgeDeletableTabs() = runTest {
         testee.purgeDeletableTabs()
 
         verify(mockTabRepository).purgeDeletableTabs()
     }
 
     @Test
-    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runBlocking {
+    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runTest {
         val tab = TabEntity("ID", position = 0)
 
         val expectedTabs = listOf(listOf(), listOf(tab))
@@ -142,7 +144,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runBlocking {
+    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runTest {
         val tab = TabEntity("ID", position = 0)
 
         testee.deletableTabs.observeForever {

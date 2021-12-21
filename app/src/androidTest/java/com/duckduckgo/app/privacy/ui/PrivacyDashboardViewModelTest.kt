@@ -38,13 +38,14 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyDashboardViewModelTest {
 
     @get:Rule
@@ -68,7 +69,7 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestScope(), coroutineRule.testDispatcherProvider)
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model

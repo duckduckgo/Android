@@ -48,7 +48,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 
 @ExperimentalCoroutinesApi
 class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: DispatcherProvider) {
@@ -56,12 +56,12 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
     var privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var drmRepository: DrmRepository = RealDrmRepository(db, TestCoroutineScope(), dispatcherProvider)
-    var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestCoroutineScope(), dispatcherProvider)
-    var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestCoroutineScope(), dispatcherProvider)
+    var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestScope(), dispatcherProvider)
+    var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestScope(), dispatcherProvider)
+    var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestScope(), dispatcherProvider)
+    var drmRepository: DrmRepository = RealDrmRepository(db, TestScope(), dispatcherProvider)
+    var gpcRepository: GpcRepository = RealGpcRepository(mock(), db, TestScope(), dispatcherProvider)
+    var trackerAllowlistRepository: TrackerAllowlistRepository = RealTrackerAllowlistRepository(db, TestScope(), dispatcherProvider)
 
     // Add your plugin to this list in order for it to be tested against some basic reference tests
     private fun getPrivacyFeaturePlugins(): List<PrivacyFeaturePlugin> {

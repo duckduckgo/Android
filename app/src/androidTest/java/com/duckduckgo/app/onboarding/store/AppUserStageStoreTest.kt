@@ -17,11 +17,12 @@
 package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.test.runTest
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -36,7 +37,7 @@ class AppUserStageStoreTest {
     private val testee = AppUserStageStore(userStageDao, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenGetUserAppStageThenReturnCurrentStage() = coroutineRule.runBlocking {
+    fun whenGetUserAppStageThenReturnCurrentStage() = runTest {
         givenCurrentStage(AppStage.DAX_ONBOARDING)
 
         val userAppStage = testee.getUserAppStage()
@@ -45,7 +46,7 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenStageNewCompletedThenStageDaxOnboardingReturned() = coroutineRule.runBlocking {
+    fun whenStageNewCompletedThenStageDaxOnboardingReturned() = runTest {
         givenCurrentStage(AppStage.NEW)
 
         val nextStage = testee.stageCompleted(AppStage.NEW)
@@ -54,7 +55,7 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenStageDaxOnboardingCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
+    fun whenStageDaxOnboardingCompletedThenStageEstablishedReturned() = runTest {
         givenCurrentStage(AppStage.DAX_ONBOARDING)
 
         val nextStage = testee.stageCompleted(AppStage.DAX_ONBOARDING)
@@ -63,7 +64,7 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenStageEstablishedCompletedThenStageEstablishedReturned() = coroutineRule.runBlocking {
+    fun whenStageEstablishedCompletedThenStageEstablishedReturned() = runTest {
         givenCurrentStage(AppStage.ESTABLISHED)
 
         val nextStage = testee.stageCompleted(AppStage.ESTABLISHED)
@@ -72,7 +73,7 @@ class AppUserStageStoreTest {
     }
 
     @Test
-    fun whenMoveToStageThenUpdateUserStageInDao() = coroutineRule.runBlocking {
+    fun whenMoveToStageThenUpdateUserStageInDao() = runTest {
         testee.moveToStage(AppStage.DAX_ONBOARDING)
         verify(userStageDao).updateUserStage(AppStage.DAX_ONBOARDING)
     }

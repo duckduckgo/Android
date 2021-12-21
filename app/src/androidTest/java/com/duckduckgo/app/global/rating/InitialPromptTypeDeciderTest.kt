@@ -22,12 +22,14 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class InitialPromptTypeDeciderTest {
 
@@ -40,7 +42,7 @@ class InitialPromptTypeDeciderTest {
     private val mockOnboardingStore: OnboardingStore = mock()
 
     @Before
-    fun setup() = runBlocking<Unit> {
+    fun setup() = runTest {
 
         testee = InitialPromptTypeDecider(
             playStoreUtils = mockPlayStoreUtils,
@@ -58,19 +60,19 @@ class InitialPromptTypeDeciderTest {
     }
 
     @Test
-    fun whenPlayNotInstalledThenNoPromptShown() = runBlocking<Unit> {
+    fun whenPlayNotInstalledThenNoPromptShown() = runTest {
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(false)
         assertPromptNotShown(testee.determineInitialPromptType())
     }
 
     @Test
-    fun whenNotEnoughSearchesMadeThenNoPromptShown() = runBlocking<Unit> {
+    fun whenNotEnoughSearchesMadeThenNoPromptShown() = runTest {
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(0)
         assertPromptNotShown(testee.determineInitialPromptType())
     }
 
     @Test
-    fun whenEnoughSearchesMadeAndFirstPromptNotShownBeforeThenShouldShowFirstPrompt() = runBlocking<Unit> {
+    fun whenEnoughSearchesMadeAndFirstPromptNotShownBeforeThenShouldShowFirstPrompt() = runTest {
         whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
         val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
@@ -78,7 +80,7 @@ class InitialPromptTypeDeciderTest {
     }
 
     @Test
-    fun whenEnoughSearchesMadeAndFirstPromptShownBeforeThenShouldShowSecondPrompt() = runBlocking<Unit> {
+    fun whenEnoughSearchesMadeAndFirstPromptShownBeforeThenShouldShowSecondPrompt() = runTest {
         whenever(mockInitialPromptDecider.shouldShowPrompt()).thenReturn(false)
         whenever(mockSecondaryPromptDecider.shouldShowPrompt()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
@@ -87,7 +89,7 @@ class InitialPromptTypeDeciderTest {
     }
 
     @Test
-    fun whenUsersMarkedAsReturningUserThenNoPromptShown() = runBlocking {
+    fun whenUsersMarkedAsReturningUserThenNoPromptShown() = runTest {
         whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
         assertPromptNotShown(testee.determineInitialPromptType())
     }

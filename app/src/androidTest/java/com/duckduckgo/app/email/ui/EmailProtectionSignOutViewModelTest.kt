@@ -18,9 +18,9 @@ package com.duckduckgo.app.email.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.ui.EmailProtectionSignOutViewModel.Command.*
-import com.duckduckgo.app.runBlocking
 import org.junit.Rule
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.*
@@ -47,7 +47,7 @@ class EmailProtectionSignOutViewModelTest {
     }
 
     @Test
-    fun whenOnSignOutButtonClickedThenEmitSignOutCommand() = coroutineRule.runBlocking {
+    fun whenOnSignOutButtonClickedThenEmitSignOutCommand() = runTest {
         testee.commands.test {
             testee.onSignOutButtonClicked()
             assertEquals(SignOut, awaitItem())

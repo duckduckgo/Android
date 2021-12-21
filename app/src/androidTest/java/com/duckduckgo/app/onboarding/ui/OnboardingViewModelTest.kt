@@ -22,7 +22,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -45,7 +45,7 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun whenOnboardingDoneThenCompleteStage() = runBlockingTest {
+    fun whenOnboardingDoneThenCompleteStage() = runTest {
         testee.onOnboardingDone()
         verify(userStageStore).stageCompleted(AppStage.NEW)
     }

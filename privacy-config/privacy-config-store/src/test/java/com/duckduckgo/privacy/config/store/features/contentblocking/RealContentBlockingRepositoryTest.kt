@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.store.features.contentblocking
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toContentBlockingException
@@ -25,13 +24,16 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.test.TestCoroutineScope
-import org.junit.Assert.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
+@ExperimentalCoroutinesApi
 class RealContentBlockingRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -52,7 +54,7 @@ class RealContentBlockingRepositoryTest {
 
         testee =
             RealContentBlockingRepository(
-                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(
             contentBlockingException.toContentBlockingException(), testee.exceptions.first())
@@ -60,10 +62,10 @@ class RealContentBlockingRepositoryTest {
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() =
-        coroutineRule.runBlocking {
+        runTest {
             testee =
                 RealContentBlockingRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
             testee.updateAll(listOf())
 
@@ -72,11 +74,11 @@ class RealContentBlockingRepositoryTest {
 
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() =
-        coroutineRule.runBlocking {
+        runTest {
             givenContentBlockingDaoContainsExceptions()
             testee =
                 RealContentBlockingRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
             assertEquals(1, testee.exceptions.size)
             reset(mockContentBlockingDao)
 

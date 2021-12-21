@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
@@ -29,7 +31,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
+class ReportBreakageSingleChoiceFormViewModel(private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()) : ViewModel() {
 
     private var selectedChoice: Choice? = null
 
@@ -48,7 +50,7 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
 
     internal fun onChoiceSelected(choice: Choice) {
         selectedChoice = choice.copy(isSelected = true)
-        viewModelScope.launch { refreshTickerChannel.emit(System.currentTimeMillis()) }
+        viewModelScope.launch(dispatcherProvider.main()) { refreshTickerChannel.emit(System.currentTimeMillis()) }
     }
 
     private fun List<Choice>.update(newValue: Choice?): List<Choice> {
@@ -58,7 +60,7 @@ class ReportBreakageSingleChoiceFormViewModel : ViewModel() {
     }
 
     fun onSubmitChoices() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.main()) {
             selectedChoice?.let {
                 command.send(ReportBreakageSingleChoiceFormView.Command.SubmitChoice(it))
             }

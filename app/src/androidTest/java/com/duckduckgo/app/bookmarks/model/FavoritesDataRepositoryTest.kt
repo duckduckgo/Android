@@ -20,12 +20,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.bookmarks.db.FavoriteEntity
 import com.duckduckgo.app.bookmarks.db.FavoritesDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
@@ -129,7 +129,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteDeletedThenDatabaseUpdated() = coroutineRule.runBlocking {
+    fun whenFavoriteDeletedThenDatabaseUpdated() = runTest {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         givenFavorite(favorite)
 
@@ -140,7 +140,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenUserHasFavoritesThenReturnTrue() = coroutineRule.runBlocking {
+    fun whenUserHasFavoritesThenReturnTrue() = runTest {
         val favorite = Favorite(1, "Favorite", "http://favexample.com", 1)
         givenFavorite(favorite)
 
@@ -148,7 +148,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = coroutineRule.runBlocking {
+    fun whenFavoriteByUrlRequestedAndAvailableThenReturnFavorite() = runTest {
         val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
         val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
 
@@ -161,7 +161,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = coroutineRule.runBlocking {
+    fun whenFavoriteByUrlRequestedAndNotAvailableThenReturnNull() = runTest {
         val favorite = Favorite(id = 1, title = "title", url = "www.website.com", position = 1)
         val otherFavorite = Favorite(id = 2, title = "other title", url = "www.other-website.com", position = 2)
 
@@ -174,7 +174,7 @@ class FavoritesDataRepositoryTest {
     }
 
     @Test
-    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = coroutineRule.runBlocking {
+    fun whenFavoriteByUrlRequestedAndNoFavoritesAvailableThenReturnNull() = runTest {
         val result = repository.favorite("www.test.com")
 
         assertNull(result)

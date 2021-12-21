@@ -24,12 +24,14 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyProtectionNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -44,13 +46,13 @@ class PrivacyProtectionNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking<Unit> {
+    fun whenNotificationNotSeenThenCanShowIsTrue() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         assertFalse(testee.canShow())
     }

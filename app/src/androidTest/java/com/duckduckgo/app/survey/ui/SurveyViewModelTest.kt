@@ -41,6 +41,7 @@ import org.junit.Test
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
 class SurveyViewModelTest {
 
     @get:Rule

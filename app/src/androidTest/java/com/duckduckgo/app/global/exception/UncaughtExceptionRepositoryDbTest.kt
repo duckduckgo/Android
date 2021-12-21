@@ -23,11 +23,12 @@ import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class UncaughtExceptionRepositoryDbTest {
 
     @get:Rule
@@ -54,24 +55,24 @@ class UncaughtExceptionRepositoryDbTest {
     }
 
     @Test
-    fun whenLatestExceptionIsNullThenReturnTrue() = runBlocking {
+    fun whenLatestExceptionIsNullThenReturnTrue() = runTest {
         whenever(uncaughtExceptionDao.getLatestException()).thenReturn(null)
         assertTrue(testee.isNotDuplicate(entity.copy(timestamp = 1500)))
     }
 
     @Test
-    fun whenIsBelowTimeThresholdAndSameExceptionThenReturnFalseAndUpdateTimestamp() = runBlocking {
+    fun whenIsBelowTimeThresholdAndSameExceptionThenReturnFalseAndUpdateTimestamp() = runTest {
         assertFalse(testee.isNotDuplicate(entity.copy(timestamp = 1500)))
         verify(uncaughtExceptionDao).update(entity.copy(timestamp = 1500))
     }
 
     @Test
-    fun whenIsAboveTimeThresholdAndSameExceptionThenReturnTrue() = runBlocking {
+    fun whenIsAboveTimeThresholdAndSameExceptionThenReturnTrue() = runTest {
         assertTrue(testee.isNotDuplicate(entity.copy(timestamp = 2001)))
     }
 
     @Test
-    fun whenIsDifferentExceptionThenReturnTrue() = runBlocking {
+    fun whenIsDifferentExceptionThenReturnTrue() = runTest {
         assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", timestamp = 1500)))
         assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", timestamp = 1500)))
         assertTrue(testee.isNotDuplicate(entity.copy(exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
