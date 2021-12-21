@@ -18,8 +18,8 @@ package com.duckduckgo.app.accessibility
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -41,7 +41,7 @@ class AccessibilitySettingsViewModelTest {
     private val testee = AccessibilitySettingsViewModel(accessibilitySettings)
 
     @Test
-    fun whenViewModelCreatedThenDefaultViewStateEmitted() = coroutineRule.runBlocking {
+    fun whenViewModelCreatedThenDefaultViewStateEmitted() = runTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = false,
             appFontSize = 100f,
@@ -54,7 +54,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenViewModelStartedThenViewStateEmitted() = coroutineRule.runBlocking {
+    fun whenViewModelStartedThenViewStateEmitted() = runTest {
         val viewState = AccessibilitySettingsViewModel.ViewState(
             overrideSystemFontSize = true,
             appFontSize = 150f,
@@ -73,7 +73,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenForceZoomEnabledThenViewStateEmitted() = coroutineRule.runBlocking {
+    fun whenForceZoomEnabledThenViewStateEmitted() = runTest {
         val viewState = defaultViewState()
         whenever(accessibilitySettings.forceZoom).thenReturn(true)
 
@@ -86,7 +86,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenForceZoomEnabledThenSettingsUpdated() = coroutineRule.runBlocking {
+    fun whenForceZoomEnabledThenSettingsUpdated() = runTest {
         whenever(accessibilitySettings.forceZoom).thenReturn(true)
 
         testee.onForceZoomChanged(true)
@@ -96,7 +96,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenOverrideSystemFontSizeEnabledThenViewStateEmitted() = coroutineRule.runBlocking {
+    fun whenOverrideSystemFontSizeEnabledThenViewStateEmitted() = runTest {
         val viewState = defaultViewState()
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
 
@@ -109,7 +109,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenOverrideSystemFontSizeEnabledThenSettingsUpdated() = coroutineRule.runBlocking {
+    fun whenOverrideSystemFontSizeEnabledThenSettingsUpdated() = runTest {
         whenever(accessibilitySettings.overrideSystemFontSize).thenReturn(true)
 
         testee.onSystemFontSizeChanged(true)
@@ -119,7 +119,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenFontSizeChangedThenViewStateEmitted() = coroutineRule.runBlocking {
+    fun whenFontSizeChangedThenViewStateEmitted() = runTest {
         val viewState = defaultViewState()
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)
 
@@ -132,7 +132,7 @@ class AccessibilitySettingsViewModelTest {
     }
 
     @Test
-    fun whenFontSizeChangedThenSettingsUpdated() = coroutineRule.runBlocking {
+    fun whenFontSizeChangedThenSettingsUpdated() = runTest {
         whenever(accessibilitySettings.appFontSize).thenReturn(150f)
 
         testee.onFontSizeChanged(150f)

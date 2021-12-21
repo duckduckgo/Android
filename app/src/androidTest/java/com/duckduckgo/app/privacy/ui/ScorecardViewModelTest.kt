@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
@@ -28,7 +29,6 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -36,6 +36,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -71,7 +72,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
+    fun whenNoDataThenDefaultValuesAreUsed() = runTest {
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
         testee.scoreCard("1").test {
@@ -91,7 +92,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() = coroutineTestRule.runBlocking {
+    fun whenSiteGradesAreUpdatedThenViewModelGradesAreUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -105,7 +106,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
+    fun whenSiteHttpsStatusIsUpdatedThenViewModelIsUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -117,7 +118,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
+    fun whenTrackerCountIsUpdatedThenCountIsUpdatedInViewModel() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -129,7 +130,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() = coroutineTestRule.runBlocking {
+    fun whenMajorNetworkCountIsUpdatedThenCountIsUpdatedInViewModel() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -141,7 +142,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
+    fun whenAllBlockedUpdatedToFalseThenViewModelIsUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -153,7 +154,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() = coroutineTestRule.runBlocking {
+    fun whenAllBlockedUpdatedToTrueThenViewModelIsUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -165,7 +166,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() = coroutineTestRule.runBlocking {
+    fun whenTermsAreUpdatedThenPracticesAreUpdatedInViewModel() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -178,7 +179,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() = coroutineTestRule.runBlocking {
+    fun whenIsMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsTrue() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -190,7 +191,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
+    fun whenIsNotMemberOfMajorNetworkThenShowIsMemberOfMajorNetworkIsFalse() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -202,7 +203,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() = coroutineTestRule.runBlocking {
+    fun whenIsNotMemberOfAnyNetworkThenShowIsMemberOfMajorNetworkIsFalse() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -214,7 +215,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() = coroutineTestRule.runBlocking {
+    fun whenSiteHasDifferentBeforeAndImprovedGradeThenShowEnhancedGradeIsTrue() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -226,7 +227,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() = coroutineTestRule.runBlocking {
+    fun whenSiteHasSameBeforeAndImprovedGradeThenShowEnhancedGradeIsFalse() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -238,7 +239,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() = coroutineTestRule.runBlocking {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenReturnTrue() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
         whenever(contentBlocking.isAnException(any())).thenReturn(true)
@@ -251,7 +252,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
+    fun whenOnSiteChangedAndSiteIsInContentBlockingExceptionListThenPrivacyOnIsFalse() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
         whenever(userWhitelistDao.contains(any())).thenReturn(true)
@@ -265,7 +266,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() = coroutineTestRule.runBlocking {
+    fun whenOnSiteChangedAndSiteIsNotInContentBlockingExceptionListThenPrivacyOnIsFalse() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
         whenever(userWhitelistDao.contains(any())).thenReturn(false)
@@ -279,7 +280,7 @@ class ScorecardViewModelTest {
     }
 
     @Test
-    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() = coroutineTestRule.runBlocking {
+    fun whenOnSiteChangedAndSiteIsNotInUserAllowListAndNotInContentBlockingExceptionListThenPrivacyOnIsTrue() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
         whenever(userWhitelistDao.contains(any())).thenReturn(false)

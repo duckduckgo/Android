@@ -18,7 +18,7 @@ package com.duckduckgo.app.waitlist.trackerprotection.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.nhaarman.mockitokotlin2.mock
@@ -49,7 +49,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
     }
 
     @Test
-    fun whenUserSuccessfullyRedeemsCodeThenViewStateisRedeemed() = coroutineRule.runBlocking {
+    fun whenUserSuccessfullyRedeemsCodeThenViewStateisRedeemed() = runTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Redeemed)
 
         viewModel.viewState.test {
@@ -61,7 +61,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
     }
 
     @Test
-    fun whenUserRedeemsInvalidCodeThenViewStateisInvalidCode() = coroutineRule.runBlocking {
+    fun whenUserRedeemsInvalidCodeThenViewStateisInvalidCode() = runTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.InvalidCode)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
@@ -72,7 +72,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
     }
 
     @Test
-    fun whenUserRedeemsAlreadyRedeemedCodeThenViewStateisInvalidCode() = coroutineRule.runBlocking {
+    fun whenUserRedeemsAlreadyRedeemedCodeThenViewStateisInvalidCode() = runTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.AlreadyRedeemed)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")
@@ -83,7 +83,7 @@ class AppTPWaitlistRedeemCodeViewModelTest {
     }
 
     @Test
-    fun whenRedeemCodeFailsThenViewStateIsGeneralError() = coroutineRule.runBlocking {
+    fun whenRedeemCodeFailsThenViewStateIsGeneralError() = runTest {
         whenever(manager.redeemCode("1234")).thenReturn(RedeemCodeResult.Failure)
         viewModel.viewState.test {
             viewModel.redeemCode("1234")

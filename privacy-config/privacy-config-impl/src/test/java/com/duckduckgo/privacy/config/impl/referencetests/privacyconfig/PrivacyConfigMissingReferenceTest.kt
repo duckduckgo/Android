@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
@@ -32,6 +31,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -86,7 +86,7 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
         verify(referenceTestUtilities.privacyFeatureTogglesRepository, never()).insert(PrivacyFeatureToggles(testCase.featureName, true))

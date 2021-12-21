@@ -23,7 +23,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -31,6 +31,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
+@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class SecondaryPromptDeciderTest {
 
@@ -44,27 +45,27 @@ class SecondaryPromptDeciderTest {
     private val mockAppEnjoymentRepository: AppEnjoymentRepository = mock()
 
     @Before
-    fun setup() = runBlocking<Unit> {
+    fun setup() = runTest {
         testee = SecondaryPromptDecider(mockAppDaysUsedRepository, mockAppEnjoymentRepository)
         whenever(mockAppEnjoymentRepository.dateUserDismissedFirstPrompt()).thenReturn(Date())
         whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
     }
 
     @Test
-    fun whenUserHasUsedTheAppForAWhileSinceSeeingFirstPromptThenTheySeeSecondPrompt() = runBlocking<Unit> {
+    fun whenUserHasUsedTheAppForAWhileSinceSeeingFirstPromptThenTheySeeSecondPrompt() = runTest {
         configureLotsOfAppUsage()
         assertTrue(testee.shouldShowPrompt())
     }
 
     @Test
-    fun whenUserHasNotUsedTheAppMuchSinceSeeingFirstPromptThenTheyDoNotSeeSecondPrompt() = runBlocking<Unit> {
+    fun whenUserHasNotUsedTheAppMuchSinceSeeingFirstPromptThenTheyDoNotSeeSecondPrompt() = runTest {
         whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(true)
         configureNotALotOfAppUsage()
         assertFalse(testee.shouldShowPrompt())
     }
 
     @Test
-    fun whenUserHasAlreadyRatedOrGaveFeedbackThenTheyDoNoSeeASecondPromptEvenAfterALotOfUsage() = runBlocking<Unit> {
+    fun whenUserHasAlreadyRatedOrGaveFeedbackThenTheyDoNoSeeASecondPromptEvenAfterALotOfUsage() = runTest {
         whenever(mockAppEnjoymentRepository.canUserBeShownSecondPrompt()).thenReturn(false)
         configureLotsOfAppUsage()
         assertFalse(testee.shouldShowPrompt())

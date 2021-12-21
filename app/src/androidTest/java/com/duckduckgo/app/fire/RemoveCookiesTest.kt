@@ -21,7 +21,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -32,7 +32,7 @@ class RemoveCookiesTest {
     private val removeCookies = RemoveCookies(cookieManagerRemover, selectiveCookieRemover)
 
     @Test
-    fun whenSelectiveCookieRemoverSucceedsThenNoMoreInteractions() = runBlockingTest {
+    fun whenSelectiveCookieRemoverSucceedsThenNoMoreInteractions() = runTest {
         selectiveCookieRemover.succeeds()
 
         removeCookies.removeCookies()
@@ -41,7 +41,7 @@ class RemoveCookiesTest {
     }
 
     @Test
-    fun whenSelectiveCookieRemoverFailsThenFallbackToCookieManagerRemover() = runBlockingTest {
+    fun whenSelectiveCookieRemoverFailsThenFallbackToCookieManagerRemover() = runTest {
         selectiveCookieRemover.fails()
 
         removeCookies.removeCookies()

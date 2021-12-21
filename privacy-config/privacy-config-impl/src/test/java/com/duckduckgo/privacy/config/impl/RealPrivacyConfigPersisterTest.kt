@@ -20,7 +20,6 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
@@ -35,15 +34,18 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigPersisterTest {
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -82,12 +84,12 @@ class RealPrivacyConfigPersisterTest {
         privacyRepository = RealPrivacyConfigRepository(db)
         unprotectedTemporaryRepository =
             RealUnprotectedTemporaryRepository(
-                db, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                db, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenPersistPrivacyConfigThenDeleteAllTogglesPreviouslyStored() =
-        coroutineRule.runBlocking {
+        runTest {
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
             verify(mockTogglesRepository).deleteAll()
@@ -95,7 +97,7 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigThenUpdateAllUnprotectedTemporaryExceptions() =
-        coroutineRule.runBlocking {
+        runTest {
             assertEquals(0, unprotectedTemporaryRepository.exceptions.size)
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
@@ -105,7 +107,7 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndPluginMatchesFeatureNameThenStoreCalled() =
-        coroutineRule.runBlocking {
+        runTest {
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
             val plugin = pluginPoint.getPlugins().first() as FakePrivacyFeaturePlugin
@@ -114,7 +116,7 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsLowerThanPreviousOneStoredThenDoNothing() =
-        coroutineRule.runBlocking {
+        runTest {
             privacyRepository.insert(PrivacyConfig(version = 3, readme = "readme"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
@@ -125,7 +127,7 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsEqualsThanPreviousOneStoredThenDoNothing() =
-        coroutineRule.runBlocking {
+        runTest {
             privacyRepository.insert(PrivacyConfig(version = 2, readme = "readme"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
@@ -136,7 +138,7 @@ class RealPrivacyConfigPersisterTest {
 
     @Test
     fun whenPersistPrivacyConfigAndVersionIsHigherThanPreviousOneStoredThenStoreNewConfig() =
-        coroutineRule.runBlocking {
+        runTest {
             privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme"))
 
             testee.persistPrivacyConfig(getJsonPrivacyConfig())

@@ -17,17 +17,22 @@
 package com.duckduckgo.privacy.config.impl.plugins
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import org.junit.Assert.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyFeatureTogglesPluginTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -41,12 +46,13 @@ class PrivacyFeatureTogglesPluginTest {
     }
 
     @Test
-    fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() =
-        coroutineRule.runBlocking { assertNull(testee.isEnabled(NonPrivacyFeature(), true)) }
+    fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() = runTest {
+        assertNull(testee.isEnabled(NonPrivacyFeature(), true)) 
+    }
 
     @Test
     fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnTrueWhenEnabled() =
-        coroutineRule.runBlocking {
+        runTest {
             givenPrivacyFeatureIsEnabled()
 
             val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
@@ -56,7 +62,7 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnFalseWhenDisabled() =
-        coroutineRule.runBlocking {
+        runTest {
             givenPrivacyFeatureIsDisabled()
 
             val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
@@ -66,7 +72,7 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledAndFeatureIsPrivacyFeatureThenReturnDefaultValueIfFeatureDoesNotExist() =
-        coroutineRule.runBlocking {
+        runTest {
             val defaultValue = true
             givenPrivacyFeatureReturnsDefaultValue(defaultValue)
 

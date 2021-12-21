@@ -29,7 +29,6 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -39,13 +38,9 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemS
 import com.nhaarman.mockitokotlin2.*
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
+import kotlinx.coroutines.test.*
+import org.junit.*
 import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
 import org.mockito.Mockito.verify
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -91,7 +86,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldNotShowThenViewIsNotVisibleAndUnexpanded() = runBlockingTest {
+    fun whenOnboardingShouldNotShowThenViewIsNotVisibleAndUnexpanded() = runTest {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.resetViewState()
 
@@ -101,7 +96,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingShouldShowThenViewIsVisibleAndUnexpanded() = runBlockingTest {
+    fun whenOnboardingShouldShowThenViewIsVisibleAndUnexpanded() = runTest {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
 
@@ -111,25 +106,14 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenDatabaseIsSlowThenIntroducingTextDoesNotCrashTheApp() = coroutineRule.runBlocking {
-        (coroutineRule.testDispatcherProvider.io() as TestCoroutineDispatcher).pauseDispatcher()
-        testee =
-            SystemSearchViewModel(givenEmptyUserStageStore(), mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
-        testee.resetViewState()
-        testee.userUpdatedQuery("test")
-
-        // no crash
-    }
-
-    @Test
-    fun whenOnboardingShownThenPixelSent() = runBlockingTest {
+    fun whenOnboardingShownThenPixelSent() = runTest {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.resetViewState()
         verify(mockPixel).fire(INTERSTITIAL_ONBOARDING_SHOWN)
     }
 
     @Test
-    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpandedAndPixelSent() = runBlockingTest {
+    fun whenOnboardingIsUnexpandedAndUserPressesToggleThenItIsExpandedAndPixelSent() = runTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle()
 
@@ -139,7 +123,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpandedAndPixelSent() = runBlockingTest {
+    fun whenOnboardingIsExpandedAndUserPressesToggleThenItIsUnexpandedAndPixelSent() = runTest {
         whenOnboardingShowing()
         testee.userTappedOnboardingToggle() // first press to expand
         testee.userTappedOnboardingToggle() // second press to minimize
@@ -150,7 +134,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenOnboardingIsDismissedThenViewHiddenPixelSentAndOnboardingStoreNotified() = runBlockingTest {
+    fun whenOnboardingIsDismissedThenViewHiddenPixelSentAndOnboardingStoreNotified() = runTest {
         whenOnboardingShowing()
         testee.userDismissedOnboarding()
 
@@ -161,7 +145,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserUpdatesQueryThenViewStateUpdated() = coroutineRule.runBlocking {
+    fun whenUserUpdatesQueryThenViewStateUpdated() = runTest {
         testee.userUpdatedQuery(QUERY)
 
         val newViewState = testee.resultsViewState.value as SystemSearchResultsViewState
@@ -171,7 +155,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = coroutineRule.runBlocking {
+    fun whenUserAddsSpaceToQueryThenViewStateMatchesAndSpaceTrimmedFromAutocomplete() = runTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery("$QUERY ")
 
@@ -182,7 +166,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = coroutineRule.runBlocking {
+    fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = runTest {
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
@@ -193,7 +177,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = coroutineRule.runBlocking {
+    fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = runTest {
         doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
@@ -201,7 +185,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserClearsQueryThenViewStateReset() = coroutineRule.runBlocking {
+    fun whenUserClearsQueryThenViewStateReset() = runTest {
         testee.userUpdatedQuery(QUERY)
         testee.userRequestedClear()
 
@@ -209,7 +193,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = coroutineRule.runBlocking {
+    fun whenUsersUpdatesWithBlankQueryThenViewStateReset() = runTest {
         testee.userUpdatedQuery(QUERY)
         testee.userUpdatedQuery(BLANK_QUERY)
 
@@ -240,7 +224,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenOnboardingCompleted() = coroutineRule.runBlocking {
+    fun whenUserSubmitsQueryThenOnboardingCompleted() = runTest {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
@@ -270,18 +254,18 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserTapsDaxThenOnboardingCompleted() = coroutineRule.runBlocking {
+    fun whenUserTapsDaxThenOnboardingCompleted() = runTest {
         testee.userTappedDax()
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
     }
 
     @Test
-    fun whenViewModelCreatedThenAppsRefreshed() = coroutineRule.runBlocking {
+    fun whenViewModelCreatedThenAppsRefreshed() = runTest {
         verify(mockDeviceAppLookup).refreshAppList()
     }
 
     @Test
-    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = coroutineRule.runBlocking {
+    fun whenUserSelectsAppThatCannotBeFoundThenAppsRefreshedAndUserMessageShown() = runTest {
         testee.appNotFound(deviceApp)
         verify(mockDeviceAppLookup, times(2)).refreshAppList()
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -345,7 +329,7 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = coroutineRule.runBlocking {
+    fun whenQuickAccessDeleteRequestedThenRepositoryUpdated() = runTest {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
 
         testee.onDeleteQuickAccessItemRequested(QuickAccessFavorite(savedSite))

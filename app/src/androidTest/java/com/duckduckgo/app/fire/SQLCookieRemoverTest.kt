@@ -30,7 +30,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -38,6 +40,7 @@ import org.junit.Test
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+@ExperimentalCoroutinesApi
 class SQLCookieRemoverTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -56,7 +59,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenCookiesStoredAndRemoveExecutedThenResultTrue() = runBlocking {
+    fun whenCookiesStoredAndRemoveExecutedThenResultTrue() = runTest {
         givenDatabaseWithCookies()
         val sqlCookieRemover = givenSQLCookieRemover()
 
@@ -66,7 +69,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenNoCookiesStoredAndRemoveExecutedThenResultTrue() = runBlocking {
+    fun whenNoCookiesStoredAndRemoveExecutedThenResultTrue() = runTest {
         val sqlCookieRemover = givenSQLCookieRemover()
 
         val success = sqlCookieRemover.removeCookies()
@@ -75,7 +78,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenUserHasFireproofWebsitesAndRemoveExecutedThenResultTrue() = runBlocking {
+    fun whenUserHasFireproofWebsitesAndRemoveExecutedThenResultTrue() = runTest {
         val sqlCookieRemover = givenSQLCookieRemover()
         givenDatabaseWithCookies()
         givenFireproofWebsitesStored()
@@ -86,7 +89,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenDatabasePathNotFoundThenPixelFired() = runBlocking {
+    fun whenDatabasePathNotFoundThenPixelFired() = runTest {
         val mockDatabaseLocator = mock<DatabaseLocator> {
             on { getDatabasePath() } doReturn ""
         }
@@ -98,7 +101,7 @@ class SQLCookieRemoverTest {
     }
 
     @Test
-    fun whenUnableToOpenDatabaseThenPixelFiredAndSaveOfflineCount() = runBlocking {
+    fun whenUnableToOpenDatabaseThenPixelFiredAndSaveOfflineCount() = runTest {
         val mockDatabaseLocator = mock<DatabaseLocator> {
             on { getDatabasePath() } doReturn "fakePath"
         }

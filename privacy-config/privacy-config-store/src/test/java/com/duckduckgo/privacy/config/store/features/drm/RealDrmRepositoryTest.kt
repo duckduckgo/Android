@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.config.store.features.drm
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toDrmException
@@ -25,14 +24,17 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.test.TestCoroutineScope
-import org.junit.Assert.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
+@ExperimentalCoroutinesApi
 class RealDrmRepositoryTest {
+
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
@@ -44,33 +46,20 @@ class RealDrmRepositoryTest {
     @Before
     fun before() {
         whenever(mockDatabase.drmDao()).thenReturn(mockDrmDao)
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
     }
 
     @Test
-    fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
+    fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() = runTest {
         givenDrmDaoContainsExceptions()
 
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
 
         assertEquals(drmException.toDrmException(), testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+    fun whenUpdateAllThenUpdateAllCalled() = runTest {
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
 
         testee.updateAll(listOf())
 
@@ -78,13 +67,9 @@ class RealDrmRepositoryTest {
     }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() = runTest {
         givenDrmDaoContainsExceptions()
-        testee = RealDrmRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee = RealDrmRepository(mockDatabase, this, coroutineRule.testDispatcherProvider)
         assertEquals(1, testee.exceptions.size)
         reset(mockDrmDao)
 

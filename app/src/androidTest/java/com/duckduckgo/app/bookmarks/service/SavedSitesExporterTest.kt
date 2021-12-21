@@ -30,12 +30,13 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import java.io.File
 import dagger.Lazy
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 
+@ExperimentalCoroutinesApi
 class SavedSitesExporterTest {
 
     @get:Rule
@@ -77,7 +78,7 @@ class SavedSitesExporterTest {
     }
 
     @Test
-    fun whenSomeBookmarksExistThenExportingSucceeds() = runBlocking {
+    fun whenSomeBookmarksExistThenExportingSucceeds() = runTest {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
@@ -91,7 +92,7 @@ class SavedSitesExporterTest {
     }
 
     @Test
-    fun whenFileDoesNotExistThenExportingFails() = runBlocking {
+    fun whenFileDoesNotExistThenExportingFails() = runTest {
         val bookmark = BookmarkEntity(id = 1, title = "example", url = "www.example.com", parentId = 0)
         bookmarksDao.insert(bookmark)
 
@@ -103,14 +104,14 @@ class SavedSitesExporterTest {
     }
 
     @Test
-    fun whenNoSavedSitesExistThenNothingIsExported() = runBlocking {
+    fun whenNoSavedSitesExistThenNothingIsExported() = runTest {
         val localUri = Uri.parse("whatever")
         val result = exporter.export(localUri)
         assertTrue(result is ExportSavedSitesResult.NoSavedSitesExported)
     }
 
     @Test
-    fun whenSomeFavoritesExistThenExportingSucceeds() = runBlocking {
+    fun whenSomeFavoritesExistThenExportingSucceeds() = runTest {
         val favorite = SavedSite.Favorite(id = 1, title = "example", url = "www.example.com", position = 0)
         favoritesRepository.insert(favorite)
 
@@ -124,7 +125,7 @@ class SavedSitesExporterTest {
     }
 
     @Test
-    fun whenGetTreeStructureThenReturnTraversableTree() = runBlocking {
+    fun whenGetTreeStructureThenReturnTraversableTree() = runTest {
         val root = BookmarkFolderEntity(id = 0, name = "DuckDuckGo Bookmarks", parentId = -1)
         val parentFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         val childFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)

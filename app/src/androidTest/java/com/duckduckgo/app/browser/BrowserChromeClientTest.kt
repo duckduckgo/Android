@@ -30,19 +30,22 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.privacy.config.api.Drm
 import com.nhaarman.mockitokotlin2.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 
+@ExperimentalCoroutinesApi
 class BrowserChromeClientTest {
 
     private lateinit var testee: BrowserChromeClient
@@ -54,13 +57,16 @@ class BrowserChromeClientTest {
     private lateinit var mockDrm: Drm
     private val fakeView = View(getInstrumentation().targetContext)
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     @ExperimentalCoroutinesApi
     @UiThreadTest
     @Before
     fun setup() {
         mockUncaughtExceptionRepository = mock()
         mockDrm = mock()
-        testee = BrowserChromeClient(mockUncaughtExceptionRepository, mockDrm, TestCoroutineScope())
+        testee = BrowserChromeClient(mockUncaughtExceptionRepository, mockDrm, TestScope(), coroutineTestRule.testDispatcherProvider)
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
@@ -98,7 +104,7 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenCustomViewShownThrowsExceptionThenRecordException() = runBlocking {
+    fun whenCustomViewShownThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.goFullScreen(any())).thenThrow(exception)
         testee.onShowCustomView(fakeView, null)
@@ -106,13 +112,13 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() {
+    fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() = runTest {
         testee.onHideCustomView()
         verify(mockWebViewClientListener).exitFullScreen()
     }
 
     @Test
-    fun whenHideCustomViewThrowsExceptionThenRecordException() = runBlocking {
+    fun whenHideCustomViewThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.exitFullScreen()).thenThrow(exception)
         testee.onHideCustomView()
@@ -135,7 +141,7 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnProgressChangedThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
         testee.onProgressChanged(webView, 10)
@@ -172,7 +178,7 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenOnReceivedTitleThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnReceivedTitleThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.titleReceived(anyString())).thenThrow(exception)
         testee.onReceivedTitle(webView, "")
@@ -186,10 +192,12 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenShowFileChooserThrowsExceptionThenRecordException() = runBlocking {
-        val exception = RuntimeException()
+    fun whenShowFileChooserThrowsExceptionThenRecordException() = runTest {
+        val exception = RuntimeException("deliberate")
+
         whenever(mockWebViewClientListener.showFileChooser(any(), any())).thenThrow(exception)
-        assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
+        testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams)
+
         verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
         verify(mockFilePathCallback).onReceiveValue(null)
     }

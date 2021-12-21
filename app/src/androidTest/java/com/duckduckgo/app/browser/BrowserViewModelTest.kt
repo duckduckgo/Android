@@ -30,13 +30,12 @@ import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -106,7 +105,7 @@ class BrowserViewModelTest {
 
         testee.command.observeForever(mockCommandObserver)
 
-        runBlocking<Unit> {
+        runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
             whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
         }
@@ -120,21 +119,21 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+    fun whenNewTabRequestedThenTabAddedToRepository() = runTest {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested()
         verify(mockTabRepository).add()
     }
 
     @Test
-    fun whenNewTabRequestedFromSourceTabThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+    fun whenNewTabRequestedFromSourceTabThenTabAddedToRepositoryWithSourceTabId() = runTest {
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
         testee.onNewTabRequested("sourceTabId")
         verify(mockTabRepository).addFromSourceTab(sourceTabId = "sourceTabId")
     }
 
     @Test
-    fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runBlocking<Unit> {
+    fun whenOpenInNewTabRequestedThenTabAddedToRepository() = runTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
@@ -143,7 +142,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenInNewTabRequestedWithSourceTabIdThenTabAddedToRepositoryWithSourceTabId() = runBlocking<Unit> {
+    fun whenOpenInNewTabRequestedWithSourceTabIdThenTabAddedToRepositoryWithSourceTabId() = runTest {
         val url = "http://example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         whenever(mockTabRepository.liveSelectedTab).doReturn(MutableLiveData())
@@ -152,13 +151,13 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runBlocking<Unit> {
+    fun whenTabsUpdatedAndNoTabsThenDefaultTabAddedToRepository() = runTest {
         testee.onTabsUpdated(ArrayList())
         verify(mockTabRepository).addDefaultTab()
     }
 
     @Test
-    fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runBlocking {
+    fun whenTabsUpdatedWithTabsThenNewTabNotLaunched() = runTest {
         testee.onTabsUpdated(listOf(TabEntity(TAB_ID, "", "", skipHome = false, viewed = true, position = 0)))
         verify(mockCommandObserver, never()).onChanged(any())
     }
@@ -196,7 +195,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenShortcutThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+    fun whenOpenShortcutThenSelectByUrlOrNewTab() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenShortcut(url)
@@ -212,7 +211,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenFavoriteThenSelectByUrlOrNewTab() = coroutinesTestRule.runBlocking {
+    fun whenOpenFavoriteThenSelectByUrlOrNewTab() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenFavoriteFromWidget(url)
@@ -220,7 +219,7 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun whenOpenFavoriteFromWidgetThenFirePixel() = coroutinesTestRule.runBlocking {
+    fun whenOpenFavoriteFromWidgetThenFirePixel() = runTest {
         val url = "example.com"
         whenever(mockOmnibarEntryConverter.convertQueryToUrl(url)).thenReturn(url)
         testee.onOpenFavoriteFromWidget(url)

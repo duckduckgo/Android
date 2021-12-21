@@ -54,7 +54,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Before
@@ -63,6 +63,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
 
@@ -191,7 +192,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
     private fun initialiseResourceSurrogates() {
         val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        val resourceSurrogateLoader = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
+        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
         val surrogatesFile = FileUtilities.loadText("reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)

@@ -18,13 +18,14 @@ package com.duckduckgo.app.notification.model
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.duckduckgo.app.runBlocking
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -48,21 +49,21 @@ class EmailWaitlistCodeNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenAndSendNotificationIsTrueThenReturnTrue() = coroutineTestRule.runBlocking {
+    fun whenNotificationNotSeenAndSendNotificationIsTrueThenReturnTrue() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockEmailDataStore.sendNotification).thenReturn(true)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationNotSeenAndSendNotificationIsFalseThenReturnFalse() = coroutineTestRule.runBlocking {
+    fun whenNotificationNotSeenAndSendNotificationIsFalseThenReturnFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(false)
         whenever(mockEmailDataStore.sendNotification).thenReturn(false)
         assertFalse(testee.canShow())
     }
 
     @Test
-    fun whenNotificationSeenThenReturnFalse() = coroutineTestRule.runBlocking {
+    fun whenNotificationSeenThenReturnFalse() = runTest {
         whenever(mockNotificationsDao.exists(any())).thenReturn(true)
         whenever(mockEmailDataStore.sendNotification).thenReturn(true)
         assertFalse(testee.canShow())

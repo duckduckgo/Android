@@ -30,12 +30,14 @@ import com.duckduckgo.app.trackerdetection.model.TdsDomainEntity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyPracticesTest {
 
     private lateinit var db: AppDatabase
@@ -61,7 +63,7 @@ class PrivacyPracticesTest {
     }
 
     @Test
-    fun whenUrlButNoParentEntityThenStillHasScore() = runBlocking {
+    fun whenUrlButNoParentEntityThenStillHasScore() = runTest {
         whenever(mockTermsStore.terms).thenReturn(
             listOf(
                 TermsOfService("example.com", classification = "D")
@@ -72,7 +74,7 @@ class PrivacyPracticesTest {
     }
 
     @Test
-    fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() = runBlocking {
+    fun whenUrlHasParentEntityThenItsScoreIsWorstInNetwork() = runTest {
         whenever(mockTermsStore.terms).thenReturn(
             listOf(
                 TermsOfService("sibling1.com", classification = "A"),
@@ -106,14 +108,14 @@ class PrivacyPracticesTest {
     }
 
     @Test
-    fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runBlocking {
+    fun whenUrlHasMatchingEntityWithTermsThenPracticesAreReturned() = runTest {
         whenever(mockTermsStore.terms).thenReturn(listOf(TermsOfService("example.com", classification = "A")))
         val expected = Practices(score = 0, summary = GOOD, goodReasons = emptyList(), badReasons = emptyList())
         assertEquals(expected, testee.privacyPracticesFor("http://www.example.com"))
     }
 
     @Test
-    fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() = runBlocking {
+    fun whenInitialisedWithEmptyTermsStoreAndEntityListThenReturnsUnknownForUrl() = runTest {
         assertEquals(PrivacyPractices.UNKNOWN, testee.privacyPracticesFor("http://www.example.com"))
     }
 }

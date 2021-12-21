@@ -18,9 +18,9 @@ package com.duckduckgo.app.waitlist.trackerprotection
 
 import androidx.work.WorkManager
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
@@ -29,7 +29,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,12 +55,12 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
             mockNotification,
             mockNotificationSender,
             coroutineRule.testDispatcherProvider,
-            TestCoroutineScope()
+            TestScope()
         )
     }
 
     @Test
-    fun whenFetchingInviteCodeAndCodeAlreadyExistedThenWorkIsCancelled() = coroutineRule.runBlocking {
+    fun whenFetchingInviteCodeAndCodeAlreadyExistedThenWorkIsCancelled() = runTest {
         whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.CodeExisted)
         whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
         testee.fetchInviteCode()
@@ -68,7 +68,7 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenCodeIsFetchedThenWorkIsCancelledAndNotificationIsSent() = coroutineRule.runBlocking {
+    fun whenCodeIsFetchedThenWorkIsCancelledAndNotificationIsSent() = runTest {
         whenever(waitlistManager.fetchInviteCode()).thenReturn(FetchCodeResult.Code)
         testee.fetchInviteCode()
         whenever(workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)).thenReturn(mock())
