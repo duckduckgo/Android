@@ -28,7 +28,7 @@ data class JsonRemoteMessagingConfig(
 data class JsonRemoteMessage(
     val id: String,
     val messageType: String,
-    val content: JSONObject?,
+    val content: JsonContent,
     val exclusionRules: List<Int>?,
     val matchingRules: List<Int>?
 )
@@ -40,9 +40,27 @@ sealed class JsonMessageContent {
     data class BigTwoActions(val titleText: String, val descriptionText: String, val placeholder: String, val primaryActionText: String, val primaryAction: JsonMessageAction, val secondaryActionText: String, val secondaryAction: JsonMessageAction) : JsonMessageContent()
 }
 
+data class JsonContent(
+    val titleText: String,
+    val descriptionText: String,
+    val placeholder: String,
+    val primaryActionText: String,
+    val primaryAction: JsonMessageAction,
+    val secondaryActionText: String,
+    val secondaryAction: JsonMessageAction
+)
+
 data class JsonMatchingRule(
     val id: Int,
-    val attributes: Map<String, JSONObject?>
+    val attributes: Map<String, JsonMatchingAttribute>
+)
+
+data class JsonMatchingAttribute(
+    val value: Any?,
+    val min: Any?,
+    val max: Any?,
+    val since: Any?,
+    val fallback: Boolean?
 )
 
 data class JsonMessageAction(

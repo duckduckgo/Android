@@ -112,13 +112,22 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigJsonParser(
-        messagePluginPoint: PluginPoint<MessagePlugin>,
-        matchingAttributePluginPoint: PluginPoint<MatchingAttributePlugin>
+        jsonRemoteMessageMapper: JsonRemoteMessageMapper,
+        jsonRulesMapper: JsonRulesMapper
     ): RemoteMessagingConfigJsonParser {
-        return RemoteMessagingConfigJsonParser(
-            messagePluginPoint,
-            matchingAttributePluginPoint
-        )
+        return RemoteMessagingConfigJsonParser(jsonRemoteMessageMapper, jsonRulesMapper)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesJsonRemoteMessageMapper(): JsonRemoteMessageMapper {
+        return JsonRemoteMessageMapper()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesJsonRulesMapper(): JsonRulesMapper {
+        return JsonRulesMapper()
     }
 
     @Provides

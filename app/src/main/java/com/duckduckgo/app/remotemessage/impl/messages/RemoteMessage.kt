@@ -22,7 +22,7 @@ import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribut
 
 data class RemoteConfig(
     val messages: List<RemoteMessage>,
-    val rules: Map<Int, List<MatchingAttribute?>>
+    val rules: Map<Int, List<MatchingAttribute>>
 )
 
 data class RemoteMessage(

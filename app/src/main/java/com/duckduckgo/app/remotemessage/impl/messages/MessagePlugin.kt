@@ -16,42 +16,80 @@
 
 package com.duckduckgo.app.remotemessage.impl.messages
 
-import com.duckduckgo.app.remotemessage.impl.JsonMessageAction
-import com.duckduckgo.app.remotemessage.impl.JsonMessageContent
-import com.duckduckgo.app.remotemessage.impl.MessagePlugin
+import com.duckduckgo.app.remotemessage.impl.*
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.moshi.*
-import timber.log.Timber
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 class SmallMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "small"
+    override val type = "small"
 
-    override fun parse(key: String, json: String) = parse<JsonMessageContent.Small>(key, json, featureName)
+    override fun parse(key: String, jsonContent: JsonContent) = mapOrNull(key) {
+        Content.Small(
+            titleText = jsonContent.titleText,
+            descriptionText = jsonContent.descriptionText
+        )
+    }
 }
 
 @ContributesMultibinding(AppScope::class)
 class MediumMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "medium"
+    override val type = "medium"
 
-    override fun parse(key: String, json: String) = parse<JsonMessageContent.Medium>(key, json, featureName)
+    override fun parse(key: String, jsonContent: JsonContent) = mapOrNull(key) {
+        Content.Medium(
+            titleText = jsonContent.titleText,
+            descriptionText = jsonContent.descriptionText,
+            placeholder = jsonContent.placeholder
+        )
+    }
 }
 
 @ContributesMultibinding(AppScope::class)
 class BigSingleActionMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "big_single_action"
+    override val type = "big_single_action"
 
-    override fun parse(key: String, json: String) = parse<JsonMessageContent.BigSingleAction>(key, json, featureName)
+    override fun parse(key: String, jsonContent: JsonContent) = mapOrNull(key) {
+        Content.BigSingleAction(
+            titleText = jsonContent.titleText,
+            descriptionText = jsonContent.descriptionText,
+            placeholder = jsonContent.placeholder,
+            primaryActionText = jsonContent.primaryActionText,
+            primaryAction = jsonContent.primaryAction.toAction()
+        )
+    }
 }
 
 @ContributesMultibinding(AppScope::class)
 class BigTwoActionsMessage @Inject constructor() : MessagePlugin {
-    private val featureName = "big_two_action"
+    override val type = "big_two_action"
 
-    override fun parse(key: String, json: String) = parse<JsonMessageContent.BigTwoActions>(key, json, featureName)
+    override fun parse(key: String, jsonContent: JsonContent) = mapOrNull(key) {
+        Content.BigTwoActions(
+            titleText = jsonContent.titleText,
+            descriptionText = jsonContent.descriptionText,
+            placeholder = jsonContent.placeholder,
+            primaryActionText = jsonContent.primaryActionText,
+            primaryAction = jsonContent.primaryAction.toAction(),
+            secondaryActionText = jsonContent.secondaryActionText,
+            secondaryAction = jsonContent.secondaryAction.toAction()
+        )
+    }
 }
+
+private fun JsonMessageAction.toAction(): Action {
+    return when(this.type) {
+        "url" -> Action.Url(this.value)
+        "dismiss" -> Action.Dismiss
+        "playstore" -> Action.PlayStore(this.value)
+        else -> throw IllegalArgumentException("Unknown Action Type")
+    }
+}
+
+private fun MessagePlugin.mapOrNull(key: String, block: () -> Content) = if (type == key) block() else null
 
 private inline fun <reified T : JsonMessageContent> parse(key: String, json: String, featureName: String): T? {
     if (key == featureName) {

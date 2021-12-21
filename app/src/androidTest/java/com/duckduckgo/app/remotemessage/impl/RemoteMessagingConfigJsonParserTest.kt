@@ -25,7 +25,7 @@ import com.duckduckgo.app.remotemessage.impl.messages.*
 import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.Moshi
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 
@@ -42,8 +42,8 @@ class RemoteMessagingConfigJsonParserTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonParser(
-            messagesPluginPoint = getMessagePluginPoint(),
-            matchingAttributesPluginPoint = getMatchingAttributePluginPoint()
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRulesMapper = JsonRulesMapper()
         )
 
         val config = testee.map(result)
@@ -134,13 +134,13 @@ class RemoteMessagingConfigJsonParserTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonParser(
-            messagesPluginPoint = getMessagePluginPoint(),
-            matchingAttributesPluginPoint = getMatchingAttributePluginPoint()
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRulesMapper = JsonRulesMapper()
         )
 
         val config = testee.map(result)
 
-        assertEquals(2, config.messages.size)
+        assertEquals(1, config.messages.size)
         assertEquals(2, config.rules.size)
 
         val unknown = Unknown(fallback = true)
@@ -158,8 +158,8 @@ class RemoteMessagingConfigJsonParserTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonParser(
-            messagesPluginPoint = getMessagePluginPoint(),
-            matchingAttributesPluginPoint = getMatchingAttributePluginPoint()
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRulesMapper = JsonRulesMapper()
         )
 
         val config = testee.map(result)
@@ -178,40 +178,27 @@ class RemoteMessagingConfigJsonParserTest {
         )
         assertEquals(smallMessage, config.messages[0])
 
-        assertEquals(1, config.rules.size)
+        assertEquals(2, config.rules.size)
         assertEquals(3, config.rules[6]?.size)
 
-        val matchingAttr = listOf(Locale(fallback = null), Api(fallback = true), WebView(fallback = false))
+        val matchingAttr = listOf(Unknown(fallback = null), Unknown(fallback = true), Unknown(fallback = false))
         assertEquals(matchingAttr, config.rules[6])
     }
 
-    private fun getMessagePluginPoint(): PluginPoint<MessagePlugin> {
-        return MessagePluginPoint(setOf(SmallMessage(), MediumMessage(), BigSingleActionMessage(), BigTwoActionsMessage()))
-    }
+    @Test
+    fun whenMatchingAttributeUnknownNoFallbackThenFallbackToFail() = coroutineRule.runBlocking {
+        val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
+        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
+        val result = jsonAdapter.fromJson(jsonString)!!
 
-    private fun getMatchingAttributePluginPoint(): PluginPoint<MatchingAttributePlugin> =
-        MatchingAttributePluginPoint(
-            setOf(
-                LocaleAttribute(),
-                ApiMatchingAttribute(),
-                WebViewMatchingAttribute(),
-                FlavorMatchingAttribute(),
-                AppIdMatchingAttribute(),
-                AppVersionMatchingAttribute(),
-                AtbMatchingAttribute(),
-                AppAtbMatchingAttribute(),
-                SearchAtbMatchingAttribute(),
-                ExpVariantMatchingAttribute(),
-                InstalledGPlayMatchingAttribute(),
-                DefaultBrowserMatchingAttribute(),
-                EmailEnabledMatchingAttribute(),
-                WidgetAddedMatchingAttribute(),
-                SearchCountMatchingAttribute(),
-                BookmarksMatchingAttribute(),
-                FavoritesMatchingAttribute(),
-                AppThemeMatchingAttribute(),
-                DaysSinceInstalledMatchingAttribute(),
-                DaysUsedSinceMatchingAttribute()
-            )
+        val testee = RemoteMessagingConfigJsonParser(
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRulesMapper = JsonRulesMapper()
         )
+
+        val config = testee.map(result)
+
+        assertEquals(Unknown(fallback = false), config.rules[7]?.first())
+    }
 }
