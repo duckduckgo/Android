@@ -23,7 +23,11 @@ import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
