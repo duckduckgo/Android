@@ -32,35 +32,11 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     override fun configureUI() {
         setToolbarTitle(getString(R.string.editFolder))
+        showAddFolderMenu = true
         arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
             binding.titleInput.setText((it as BookmarkFolder).name)
         }
         configureFieldVisibility()
-    }
-
-    override fun configureClickListeners() {
-        binding.savedSiteLocation.setOnClickListener {
-            arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
-                if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
-                    launcher.launch(
-                        BookmarkFoldersActivity.intent(
-                            requireContext(),
-                            it,
-                            arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
-                            showAddFolderMenu = true
-                        )
-                    )
-                } else {
-                    launcher.launch(
-                        BookmarkFoldersActivity.intent(
-                            requireContext(),
-                            it,
-                            showAddFolderMenu = true
-                        )
-                    )
-                }
-            }
-        }
     }
 
     private fun configureFieldVisibility() {

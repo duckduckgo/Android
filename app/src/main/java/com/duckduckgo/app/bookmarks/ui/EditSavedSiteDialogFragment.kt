@@ -20,10 +20,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.view.View
 import android.widget.EditText
-import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.TextChangedWatcher
 
@@ -44,6 +42,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
+        showAddFolderMenu = true
 
         populateFields(binding.titleInput, binding.urlInput, binding.savedSiteLocation)
 
@@ -78,31 +77,6 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
                 listener?.onSavedSiteEdited(
                     savedSite.copy(title = updatedTitle, url = updatedUrl)
                 )
-            }
-        }
-    }
-
-    override fun configureClickListeners() {
-        binding.savedSiteLocation.setOnClickListener {
-            arguments?.getLong(BookmarkFoldersActivity.KEY_BOOKMARK_FOLDER_ID)?.let {
-                if (arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) != null) {
-                    launcher.launch(
-                        BookmarkFoldersActivity.intent(
-                            requireContext(),
-                            it,
-                            arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER) as BookmarkFolder,
-                            showAddFolderMenu = true
-                        )
-                    )
-                } else {
-                    launcher.launch(
-                        BookmarkFoldersActivity.intent(
-                            requireContext(),
-                            it,
-                            showAddFolderMenu = true
-                        )
-                    )
-                }
             }
         }
     }

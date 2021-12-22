@@ -28,8 +28,11 @@ import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_ID
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_BOOKMARK_FOLDER_NAME
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
@@ -41,7 +44,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
-    abstract fun configureClickListeners()
 
     private var _binding: DialogFragmentSavedSiteBinding? = null
     protected val binding get() = _binding!!
@@ -51,6 +53,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
 
     private var initialParentFolderId: Long? = null
     private var folderChanged = false
+
+    var showAddFolderMenu: Boolean = false
 
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
         result.data?.let { data ->
@@ -133,6 +137,27 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         toolbar.setNavigationIcon(R.drawable.ic_back_24)
         toolbar.setNavigationOnClickListener {
             dismiss()
+        }
+    }
+
+    private fun configureClickListeners() {
+        binding.savedSiteLocation.setOnClickListener {
+            context?.let { context ->
+                arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
+                    if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder,
+                                showAddFolderMenu
+                            )
+                        )
+                    } else {
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = showAddFolderMenu))
+                    }
+                }
+            }
         }
     }
 
