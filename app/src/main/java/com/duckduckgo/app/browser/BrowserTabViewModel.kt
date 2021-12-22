@@ -197,7 +197,6 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
-        val bookmarkFolder: BookmarkFolder? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
         val canFireproofSite: Boolean = false,
