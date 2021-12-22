@@ -35,6 +35,8 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         val percentage = percentage(queueReads, tunInputs)
 
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
+        rawMetrics["tunInputs"] = Metric(tunInputs.toString())
+        rawMetrics["queueReads"] = Metric(queueReads.toString())
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }

@@ -126,15 +126,13 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             val topLevelSubmission = HealthCheckSubmission(userReport, currentSystemHealthReport)
 
             val json = jsonAdapter.toJson(topLevelSubmission)
+            Timber.w("Sending health report\n%s", json)
+
             val encodedData =
                 Base64.encodeToString(
-                    json.toByteArray(),
-                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    json.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
                 )
-
             deviceShieldPixels.sendHealthMonitorReport(mapOf("data" to encodedData))
-
-            Timber.w("Sending health report\n%s", json)
         }
     }
 
