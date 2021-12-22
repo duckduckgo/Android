@@ -138,6 +138,11 @@
                 android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
 
             <TextView
+                android:id="@+id/downloadsPopupMenuItem"
+                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
+                android:text="@string/downloadsMenuItem" />
+
+            <TextView
                 android:id="@+id/settingsPopupMenuItem"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
                 android:text="@string/settingsMenuItemTitle"

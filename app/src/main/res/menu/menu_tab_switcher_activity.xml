@@ -42,6 +42,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/downloads"
+        android:title="@string/downloadsMenuItemTitle"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/settings"
         android:title="@string/settingsMenuItemTitle"
         app:showAsAction="never" />

@@ -459,7 +459,7 @@
     <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continue</string>
+    <string name="downloadConfirmationContinue">Save to Downloads</string>
     <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
     <string name="downloadConfirmationReplaceOldFileText">Replace</string>

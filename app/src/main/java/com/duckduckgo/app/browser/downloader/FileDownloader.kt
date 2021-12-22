@@ -20,8 +20,8 @@ import android.net.Uri
 import android.os.Environment
 import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
-import com.duckduckgo.app.browser.downloader.FileDownloader.FileDownloadListener
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.downloads.DownloadCallback
 import java.io.File
 import java.io.Serializable
 import javax.inject.Inject
@@ -29,9 +29,9 @@ import javax.inject.Inject
 interface FileDownloader {
 
     @WorkerThread
-    fun download(
+    suspend fun download(
         pending: PendingFileDownload,
-        callback: FileDownloadListener
+        callback: DownloadCallback
     )
 
     data class PendingFileDownload(
@@ -42,28 +42,6 @@ interface FileDownloader {
         val userAgent: String,
         val directory: File = Environment.getExternalStoragePublicDirectory(subfolder)
     ) : Serializable
-
-    interface FileDownloadListener {
-        fun downloadStartedDataUri()
-        fun downloadStartedNetworkFile()
-        fun downloadFinishedDataUri(
-            file: File,
-            mimeType: String?
-        )
-
-        fun downloadFinishedNetworkFile(
-            file: File,
-            mimeType: String?
-        )
-
-        fun downloadFailed(
-            message: String,
-            downloadFailReason: DownloadFailReason
-        )
-
-        fun downloadCancelled()
-        fun downloadOpened()
-    }
 }
 
 class AndroidFileDownloader @Inject constructor(
@@ -72,14 +50,14 @@ class AndroidFileDownloader @Inject constructor(
 ) : FileDownloader {
 
     @WorkerThread
-    override fun download(
+    override suspend fun download(
         pending: PendingFileDownload,
-        callback: FileDownloadListener
+        callback: DownloadCallback
     ) {
         when {
             pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.downloadFailed("Not supported", DownloadFailReason.UnsupportedUrlType)
+            else -> callback.onFailure(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
         }
     }
 }

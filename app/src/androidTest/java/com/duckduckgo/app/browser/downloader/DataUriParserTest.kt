@@ -28,7 +28,7 @@ class DataUriParserTest {
 
     @Before
     fun setup() {
-        testee = DataUriParser()
+        testee = DataUriParser(DataUriSuffixParser())
     }
 
     @Test

@@ -18,29 +18,40 @@ package com.duckduckgo.app.browser.downloader
 
 import android.app.DownloadManager
 import android.content.Context
-import android.content.pm.PackageManager.*
+import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED
+import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
 import android.webkit.CookieManager
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadCallback
+import com.duckduckgo.app.downloads.model.DownloadItem
+import com.duckduckgo.app.downloads.model.DownloadStatus.STARTED
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService
+    private val fileService: DownloadFileService,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) {
 
-    fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+    suspend fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         Timber.d("Start download for ${pendingDownload.url}.")
 
         if (!downloadManagerAvailable()) {
-            Timber.d("Download manager not available, end downloading ${pendingDownload.url}.")
-            callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
+            callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.DownloadManagerDisabled)
             return
         }
 
@@ -56,7 +67,7 @@ class NetworkFileDownloader @Inject constructor(
         }
     }
 
-    private fun requestHeaders(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+    private fun requestHeaders(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         Timber.d("Make a HEAD request for ${pendingDownload.url} as there are no values for Content-Disposition or Content-Type.")
 
         fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
@@ -88,18 +99,21 @@ class NetworkFileDownloader @Inject constructor(
                     )
                 }
 
-                downloadFile(updatedPendingDownload, callback)
+                appCoroutineScope.launch(dispatchers.io()) {
+                    downloadFile(updatedPendingDownload, callback)
+                }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
-                callback.downloadFailed(context.getString(R.string.downloadsErrorMessage), DownloadFailReason.ConnectionRefused)
-                return
+                appCoroutineScope.launch(dispatchers.io()) {
+                    callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
+                }
             }
         })
     }
 
-    private fun downloadFile(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+    private suspend fun downloadFile(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         when (val extractionResult = filenameExtractor.extract(pendingDownload)) {
             is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(pendingDownload, extractionResult.filename, callback)
             is FilenameExtractor.FilenameExtractionResult.Guess -> downloadFile(pendingDownload, extractionResult.bestGuess, callback)
@@ -115,25 +129,52 @@ class NetworkFileDownloader @Inject constructor(
         }
     }
 
-    private fun downloadFile(
+    private suspend fun downloadFile(
         pendingDownload: PendingFileDownload,
         guessedFileName: String,
-        callback: FileDownloader.FileDownloadListener
+        callback: DownloadCallback
     ) {
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
             addRequestHeader("User-Agent", pendingDownload.userAgent)
             addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
-            setMimeType(pendingDownload.mimeType)
+            setMimeType(fixedApkMimeType(mimeType = pendingDownload.mimeType, fileName = guessedFileName))
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
-        manager?.enqueue(request)
-        callback.downloadStartedNetworkFile()
+        (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.let { manager ->
+            val downloadId = manager.enqueue(request)
+            callback.onStart(
+                DownloadItem(
+                    id = 0,
+                    downloadId = downloadId,
+                    downloadStatus = STARTED,
+                    fileName = guessedFileName,
+                    contentLength = 0,
+                    filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
+                    createdAt = DatabaseDateFormatter.timestamp()
+                )
+            )
+        }
+    }
+
+    private fun fixedApkMimeType(mimeType: String?, fileName: String): String? {
+        // There are cases when APKs are downloaded with generic mime types such as the examples below.
+        // Content-Type:
+        // "application/octet-stream"
+        // "application/unknown"
+        // "binary/octet-stream"
+        // When this happens the OS can't install the APK when the user taps on the download notification.
+        // Passing the correct "application/vnd.android.package-archive" mime type to the Download Manager resolves the issue.
+        if (fileName.lowercase().endsWith(ANDROID_APK_SUFFIX)) {
+            return ANDROID_APK_MIME_TYPE
+        }
+        return mimeType
     }
 
     companion object {
         private const val DOWNLOAD_MANAGER_PACKAGE = "com.android.providers.downloads"
+        private const val ANDROID_APK_MIME_TYPE = "application/vnd.android.package-archive"
+        private const val ANDROID_APK_SUFFIX = ".apk"
     }
 }

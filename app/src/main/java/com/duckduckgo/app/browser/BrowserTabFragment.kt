@@ -23,7 +23,6 @@ import android.app.ActivityOptions
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
@@ -47,7 +46,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -68,7 +66,6 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -157,6 +154,7 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import android.webkit.URLUtil
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
@@ -170,11 +168,14 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.downloads.DownloadsFileActions
+import com.duckduckgo.app.downloads.FileDownloadCallback
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
@@ -183,6 +184,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
+import kotlinx.coroutines.flow.cancellable
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -291,6 +293,9 @@ class BrowserTabFragment :
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
+    lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
     lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
 
     @Inject
@@ -331,9 +336,12 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
+    private val downloadMessagesJob = ConflatedJob()
+
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome, favoritesOnboarding)
+        launchDownloadMessagesJob()
         viewModel
     }
 
@@ -619,6 +627,54 @@ class BrowserTabFragment :
         addTabsObserver()
     }
 
+    private fun processFileDownloadedCommand(command: FileDownloadCallback.DownloadCommand) {
+        when (command) {
+            is FileDownloadCallback.DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
+            is FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
+            is FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+        }
+    }
+
+    private fun downloadStarted(command: FileDownloadCallback.DownloadCommand.ShowDownloadStartedMessage) {
+        if (command.showNotification) {
+            fileDownloadNotificationManager.showDownloadInProgressNotification()
+        }
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)?.show()
+    }
+
+    private fun downloadFailed(command: FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage) {
+        if (command.showNotification) {
+            fileDownloadNotificationManager.showDownloadFailedNotification()
+        }
+        if (command.showEnableDownloadManagerAction) {
+            view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+                ?.apply {
+                    this.setAction(R.string.enable) {
+                        showDownloadManagerAppSettings()
+                    }
+                }
+                ?.show()
+        } else {
+            view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)?.show()
+        }
+    }
+
+    private fun downloadSucceeded(command: FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage) {
+        if (command.showNotification) {
+            fileDownloadNotificationManager.showDownloadFinishedNotification(command.fileName, command.filePath.toUri(), command.mimeType)
+        }
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
+            ?.apply {
+                this.setAction(R.string.downloadsDownloadFinishedActionName) {
+                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
+                    if (!result) {
+                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+            ?.show()
+    }
+
     private fun addTabsObserver() {
         viewModel.tabs.observe(
             viewLifecycleOwner,
@@ -800,7 +856,6 @@ class BrowserTabFragment :
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
-            is DownloadCommand -> processDownloadCommand(it)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
@@ -854,34 +909,6 @@ class BrowserTabFragment :
             val url = it.url ?: return
             launch {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
-            }
-        }
-    }
-
-    private fun processDownloadCommand(it: DownloadCommand) {
-        when (it) {
-            is DownloadCommand.ScanMediaFiles -> {
-                context?.applicationContext?.let { context ->
-                    MediaScannerConnection.scanFile(context, arrayOf(it.file.absolutePath), null, null)
-                }
-            }
-            is DownloadCommand.ShowDownloadFinishedNotification -> {
-                fileDownloadNotificationManager.showDownloadFinishedNotification(it.file.name, it.file.absolutePath.toUri(), it.mimeType)
-            }
-            DownloadCommand.ShowDownloadInProgressNotification -> {
-                fileDownloadNotificationManager.showDownloadInProgressNotification()
-            }
-            is DownloadCommand.ShowDownloadFailedNotification -> {
-                fileDownloadNotificationManager.showDownloadFailedNotification()
-
-                val snackbar = toolbar.makeSnackbarWithNoBottomInset(R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
-                if (it.reason == DownloadFailReason.DownloadManagerDisabled) {
-                    snackbar.setText(it.message)
-                    snackbar.setAction(getString(R.string.enable)) {
-                        showDownloadManagerAppSettings()
-                    }
-                }
-                snackbar.show()
             }
         }
     }
@@ -1682,12 +1709,29 @@ class BrowserTabFragment :
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (hidden) {
-            viewModel.onViewHidden()
-            webView?.onPause()
-        } else {
-            webView?.onResume()
-            viewModel.onViewVisible()
+        when {
+            hidden -> onTabHidden()
+            else -> onTabVisible()
+        }
+    }
+
+    private fun onTabHidden() {
+        viewModel.onViewHidden()
+        downloadMessagesJob.cancel()
+        webView?.onPause()
+    }
+
+    private fun onTabVisible() {
+        webView?.onResume()
+        launchDownloadMessagesJob()
+        viewModel.onViewVisible()
+    }
+
+    private fun launchDownloadMessagesJob() {
+        downloadMessagesJob += lifecycleScope.launch {
+            viewModel.downloadCommands().cancellable().collect {
+                processFileDownloadedCommand(it)
+            }
         }
     }
 
@@ -1753,7 +1797,7 @@ class BrowserTabFragment :
         )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation)
+            downloadFile(requestUserConfirmation && !URLUtil.isDataUrl(url))
         } else {
             requestWriteStoragePermission()
         }
@@ -1824,7 +1868,7 @@ class BrowserTabFragment :
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Write external storage permission granted")
-                    downloadFile(requestUserConfirmation = false)
+                    downloadFile(requestUserConfirmation = true)
                 } else {
                     Timber.i("Write external storage permission refused")
                     toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
@@ -2069,6 +2113,10 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.brokenSitePopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
+                }
+                onMenuItemClicked(view.downloadsPopupMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+                    browserActivity?.launchDownloads()
                 }
                 onMenuItemClicked(view.settingsPopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
@@ -2665,32 +2713,6 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    override fun openExistingFile(file: File?) {
-        if (file == null) {
-            Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val intent = context?.let { createIntentToOpenFile(it, file) }
-        activity?.packageManager?.let { packageManager ->
-            if (intent?.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                Timber.e("No suitable activity found")
-                Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun replaceExistingFile(
-        file: File?,
-        pendingFileDownload: PendingFileDownload
-    ) {
-        Timber.i("Deleting existing file: $file")
-        runCatching { file?.delete() }
-        continueDownload(pendingFileDownload)
-    }
-
     private fun showDownloadManagerAppSettings() {
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -2700,17 +2722,6 @@ class BrowserTabFragment :
             Timber.w(e, "Could not open DownloadManager settings")
             toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
         }
-    }
-
-    private fun createIntentToOpenFile(
-        context: Context,
-        file: File
-    ): Intent? {
-        val uri = FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
-        val mime = activity?.contentResolver?.getType(uri) ?: return null
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, mime)
-        return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

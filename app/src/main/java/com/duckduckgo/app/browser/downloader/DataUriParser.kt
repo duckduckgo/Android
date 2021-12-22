@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import android.webkit.MimeTypeMap
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult.ParsedDataUri
 import java.util.*
 import javax.inject.Inject
 
-class DataUriParser @Inject constructor() {
+class DataUriParser @Inject constructor(
+    private val dataUriSuffixParser: DataUriSuffixParser
+) {
 
     fun generate(url: String): ParseResult {
         val result = MIME_TYPE_REGEX.find(url)
@@ -34,19 +35,11 @@ class DataUriParser @Inject constructor() {
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
         val data = result.groupValues[REGEX_GROUP_DATA]
 
-        val suffix = determineSuffix(mimeType)
+        val suffix = dataUriSuffixParser.parseSuffix(mimeType, url, data)
         val filename = UUID.randomUUID().toString()
         val generatedFilename = GeneratedFilename(name = filename, fileType = suffix)
 
         return ParsedDataUri(fileTypeGeneral, fileTypeSpecific, data, mimeType, generatedFilename)
-    }
-
-    private fun determineSuffix(mimeType: String): String {
-
-        // MimeTypeMap returns the wrong value for "jpeg" types on Lollipop
-        if (mimeType == "image/jpeg") return "jpg"
-
-        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
     }
 
     companion object {

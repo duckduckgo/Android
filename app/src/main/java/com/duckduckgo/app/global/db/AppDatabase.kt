@@ -28,6 +28,8 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.downloads.db.DownloadEntity
+import com.duckduckgo.app.downloads.db.DownloadsDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.global.events.db.UserEventEntity
@@ -62,9 +64,10 @@ import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
+import java.util.*
 
 @Database(
-    exportSchema = true, version = 42,
+    exportSchema = true, version = 43,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -94,7 +97,8 @@ import com.duckduckgo.app.usage.search.SearchCountEntity
         LocationPermissionEntity::class,
         PixelEntity::class,
         WebTrackerBlocked::class,
-        AuthCookieAllowedDomainEntity::class
+        AuthCookieAllowedDomainEntity::class,
+        DownloadEntity::class
     ]
 )
 
@@ -141,6 +145,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
+    abstract fun downloadsDao(): DownloadsDao
 }
 
 @Suppress("PropertyName")
@@ -552,6 +557,16 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `downloads` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, downloadId INTEGER NOT NULL, " +
+                    "downloadStatus INTEGER NOT NULL, fileName TEXT NOT NULL, contentLength INTEGER NOT NULL, " +
+                    "filePath TEXT NOT NULL, createdAt TEXT NOT NULL)"
+            )
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -618,7 +633,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_38_TO_39,
             MIGRATION_39_TO_40,
             MIGRATION_40_TO_41,
-            MIGRATION_41_TO_42
+            MIGRATION_41_TO_42,
+            MIGRATION_42_TO_43
         )
 
     @Deprecated(

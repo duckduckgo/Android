@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.Trie
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor(
@@ -44,7 +45,7 @@ class FilenameExtractor @Inject constructor(
             guesses.latestGuess = guessFilename(baseUrl + "/" + pathSegments.rebuildUrl(), contentDisposition, mimeType)
         }
 
-        return bestGuess(guesses)
+        return bestGuess(guesses, pendingDownload.directory)
     }
 
     private fun evaluateGuessQuality(
@@ -81,13 +82,13 @@ class FilenameExtractor @Inject constructor(
         return guessedFilename
     }
 
-    private fun bestGuess(guesses: Guesses): FilenameExtractionResult {
+    private fun bestGuess(guesses: Guesses, directory: File): FilenameExtractionResult {
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
             pixel.fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
-            return FilenameExtractionResult.Guess(guess)
+            return FilenameExtractionResult.Guess(handleDuplicates(guess, directory))
         }
-        return FilenameExtractionResult.Extracted(guess)
+        return FilenameExtractionResult.Extracted(handleDuplicates(guess, directory))
     }
 
     private fun pathSegments(url: String): List<String> {
@@ -96,6 +97,32 @@ class FilenameExtractor @Inject constructor(
 
     private fun List<String>.rebuildUrl(): String {
         return joinToString(separator = "/")
+    }
+
+    private fun handleDuplicates(filename: String, directory: File): String {
+        var fullPathFile = File(directory, filename)
+        if (fullPathFile.exists()) {
+            fullPathFile = addCountSuffix(fullPathFile, directory)
+        }
+        return fullPathFile.name
+    }
+
+    private fun addCountSuffix(file: File, directory: File): File {
+        var count = 1
+        val filename = file.name
+        var fullPathFile: File
+        do {
+            val countIndex = filename.lastIndexOf("-$count.")
+            val dotIndex = filename.lastIndexOf('.')
+            val index = if (countIndex >= 0) countIndex else dotIndex
+            fullPathFile = when {
+                index < 0 -> File(directory, "$filename-$count")
+                else -> File(directory, "${filename.substring(0, index)}-$count${filename.substring(index)}")
+            }
+            count++
+        } while (fullPathFile.exists())
+
+        return fullPathFile
     }
 
     companion object {
