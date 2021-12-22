@@ -306,6 +306,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockDownloadCallback: DownloadCallback
 
     @Mock
+    private lateinit var mockDownloadCallback: DownloadCallback
+
+    @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
     @Mock

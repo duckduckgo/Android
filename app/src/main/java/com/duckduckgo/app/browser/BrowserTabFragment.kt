@@ -182,7 +182,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import javax.inject.Provider
 import kotlinx.coroutines.flow.cancellable
 
 @InjectWith(FragmentScope::class)
