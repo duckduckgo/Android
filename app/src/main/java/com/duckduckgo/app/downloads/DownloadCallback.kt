@@ -25,12 +25,9 @@ import com.duckduckgo.app.browser.downloader.DownloadFailReason.DataUriParseExce
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.DownloadManagerDisabled
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.Other
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.UnsupportedUrlType
-import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.model.DownloadItem
 import com.duckduckgo.app.downloads.model.DownloadStatus
 import com.duckduckgo.app.downloads.model.DownloadsRepository
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope

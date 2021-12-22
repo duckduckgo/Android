@@ -67,6 +67,7 @@ class FileDownloadBroadcastReceiver @Inject constructor(
             val cursor = downloadManager?.query(query)
             if (cursor?.moveToFirst() == true) {
                 val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+
                 when (cursor.getInt(index)) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         Timber.d("Download completed with success.")
