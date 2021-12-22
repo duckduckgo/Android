@@ -25,9 +25,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadCallback
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -43,7 +42,7 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class FileDownloadBroadcastReceiver @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel,
+    private val callback: DownloadCallback,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
@@ -63,14 +62,22 @@ class FileDownloadBroadcastReceiver @Inject constructor(
             val cursor = downloadManager?.query(query)
             if (cursor?.moveToFirst() == true) {
                 val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+                val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+
                 when (cursor.getInt(index)) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         Timber.d("Download completed with success.")
-                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+                        if (downloadId != null && downloadId > 0) {
+                            val totalSizeIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                            val size = if (totalSizeIndex > 0) cursor.getLong(totalSizeIndex) else 0
+                            callback.onSuccess(downloadId = downloadId, contentLength = size)
+                        }
                     }
                     DownloadManager.STATUS_FAILED -> {
                         Timber.d("Download completed, but failed.")
-                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+                        if (downloadId != null && downloadId > 0) {
+                            callback.onFailure(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+                        }
                     }
                 }
             }

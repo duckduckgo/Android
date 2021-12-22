@@ -20,102 +20,53 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/dialogBgColor"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
     app:layout_behavior="@string/bottom_sheet_behavior">
-
 
     <TextView
         android:id="@+id/downloadMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif"
-        android:paddingStart="24dp"
-        android:paddingTop="17dp"
-        android:paddingEnd="24dp"
-        android:textColor="?attr/normalTextColor"
-        android:textSize="16sp"
-        android:textStyle="normal"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
+        android:textColor="?attr/callToActionSubtitleColor"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Save sample-file.pdf ?" />
+        tools:text="sample-file.pdf" />
 
-
-    <LinearLayout
-        android:id="@+id/downloadActions"
+    <TextView
+        android:id="@+id/continueDownload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/downloadMessage">
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="20dp"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
+        android:text="@string/downloadConfirmationContinue"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
+        app:drawableStartCompat="@drawable/ic_download_brownish"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/downloadMessage" />
 
-        <TextView
-            android:id="@+id/openWith"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:drawableStart="@drawable/ic_open_brownish_24dp"
-            android:drawablePadding="24dp"
-            android:fontFamily="sans-serif"
-            android:paddingStart="24dp"
-            android:paddingTop="24dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="17dp"
-            android:text="@string/downloadConfirmationOpenFileText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/replace"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:drawableStart="@drawable/ic_replace_brownish_24dp"
-            android:drawablePadding="24dp"
-            android:fontFamily="sans-serif"
-            android:paddingStart="24dp"
-            android:paddingTop="24dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="17dp"
-            android:text="@string/downloadConfirmationReplaceOldFileText"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/continueDownload"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:drawableStart="@drawable/ic_file_brownish_24dp"
-            android:drawablePadding="24dp"
-            android:fontFamily="sans-serif"
-            android:paddingStart="24dp"
-            android:paddingTop="24dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="17dp"
-            android:text="@string/downloadConfirmationContinue"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal" />
-
-        <TextView
-            android:id="@+id/cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:drawableStart="@drawable/ic_cancel_brownish_24dp"
-            android:drawablePadding="24dp"
-            android:fontFamily="sans-serif"
-            android:paddingStart="24dp"
-            android:paddingTop="17dp"
-            android:paddingEnd="24dp"
-            android:paddingBottom="24dp"
-            android:text="@string/fireCancel"
-            android:textColor="?attr/normalTextColor"
-            android:textSize="16sp"
-            android:textStyle="normal"
-            tools:ignore="UnusedAttribute" />
-    </LinearLayout>
-
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="20dp"
+        android:paddingStart="18dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
+        android:text="@string/fireCancel"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
+        app:drawableStartCompat="@drawable/ic_cancel_brownish"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/continueDownload" />
 </androidx.constraintlayout.widget.ConstraintLayout>
