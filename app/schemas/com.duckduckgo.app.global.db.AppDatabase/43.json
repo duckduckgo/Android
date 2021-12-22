@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 43,
-    "identityHash": "0cc22a3533c5f39712e0650da33815d4",
+    "identityHash": "9dddb353fa099d886faebb44501a74ab",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -968,68 +968,12 @@
         },
         "indices": [],
         "foreignKeys": []
-      },
-      {
-        "tableName": "downloads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `downloadId` INTEGER NOT NULL, `downloadStatus` INTEGER NOT NULL, `fileName` TEXT NOT NULL, `contentLength` INTEGER NOT NULL, `filePath` TEXT NOT NULL, `createdAt` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "downloadId",
-            "columnName": "downloadId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "downloadStatus",
-            "columnName": "downloadStatus",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fileName",
-            "columnName": "fileName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "contentLength",
-            "columnName": "contentLength",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "filePath",
-            "columnName": "filePath",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "createdAt",
-            "columnName": "createdAt",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0cc22a3533c5f39712e0650da33815d4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9dddb353fa099d886faebb44501a74ab')"
     ]
   }
 }

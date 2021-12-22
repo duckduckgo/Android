@@ -70,9 +70,6 @@ import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmat
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
-import com.duckduckgo.app.browser.downloader.DownloadFailReason
-import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -168,7 +165,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.downloads.DownloadsFileActions
-import com.duckduckgo.app.downloads.FileDownloadCallback
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -181,6 +177,10 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadFailReason
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
 
@@ -622,19 +622,19 @@ class BrowserTabFragment :
         addTabsObserver()
     }
 
-    private fun processFileDownloadedCommand(command: FileDownloadCallback.DownloadCommand) {
+    private fun processFileDownloadedCommand(command: DownloadCommand) {
         when (command) {
-            is FileDownloadCallback.DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
-            is FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
-            is FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
+            is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
+            is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
         }
     }
 
-    private fun downloadStarted(command: FileDownloadCallback.DownloadCommand.ShowDownloadStartedMessage) {
+    private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
         view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), 750)?.show()
     }
 
-    private fun downloadFailed(command: FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage) {
+    private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
         val downloadFailedSnackbar = when {
             command.showEnableDownloadManagerAction ->
                 view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
@@ -648,7 +648,7 @@ class BrowserTabFragment :
         view?.postDelayed({ downloadFailedSnackbar ?.show() }, 1500L)
     }
 
-    private fun downloadSucceeded(command: FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage) {
+    private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
         val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {

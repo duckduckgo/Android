@@ -178,6 +178,9 @@ dependencies {
     implementation project(path: ':voice-search-api')
     implementation project(path: ':voice-search-impl')
 
+    implementation project(path: ':downloads-api')
+    implementation project(path: ':downloads-impl')
+
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
 

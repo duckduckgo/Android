@@ -76,6 +76,11 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.impl.AndroidFileDownloader
+import com.duckduckgo.downloads.impl.DataUriDownloader
+import com.duckduckgo.downloads.impl.DownloadFileService
+import com.duckduckgo.downloads.impl.NetworkFileDownloader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -356,7 +361,9 @@ class BrowserModule {
     }
 
     @Provides
-    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
+    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(
+        DownloadFileService::class.java
+    )
 
     @Provides
     fun fileDownloader(

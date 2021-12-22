@@ -63,7 +63,6 @@ class DownloadsFileActions @Inject constructor(private val appBuildConfig: AppBu
         val fileUri = getFilePathUri(applicationContext, file)
         return Intent().apply {
             setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
-            // TODO setDataAndType(fileUri, "application/vnd.android.package-archive") handle APKs (is this needed?)
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }

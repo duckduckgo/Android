@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -51,9 +52,9 @@ class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: 
     companion object {
         private const val PIXEL_OS_SUFFIX = "_android"
         private val OS_VERSION_PIXELS = listOf(
-            AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED.pixelName,
-            AppPixelName.DOWNLOAD_REQUEST_FAILED.pixelName,
-            AppPixelName.DOWNLOAD_REQUEST_STARTED.pixelName,
+            DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED.pixelName,
+            DownloadsPixelName.DOWNLOAD_REQUEST_FAILED.pixelName,
+            DownloadsPixelName.DOWNLOAD_REQUEST_STARTED.pixelName,
             StatisticsPixelName.APPLICATION_CRASH.pixelName,
             StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName
         )
