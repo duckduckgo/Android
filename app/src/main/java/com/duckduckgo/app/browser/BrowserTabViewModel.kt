@@ -1025,12 +1025,10 @@ class BrowserTabViewModel(
     private suspend fun updateBookmarkAndFavoriteState(url: String) {
         val bookmark = getBookmark(url)
         val favorite = getFavorite(url)
-        val bookmarkFolder = getBookmarkFolder(bookmark)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(
                 bookmark = bookmark,
-                favorite = favorite,
-                bookmarkFolder = bookmarkFolder
+                favorite = favorite
             )
         }
     }
@@ -1488,7 +1486,7 @@ class BrowserTabViewModel(
         val url = url ?: return
         viewModelScope.launch {
             val bookmark = currentBrowserViewState().bookmark
-            val bookmarkFolder = currentBrowserViewState().bookmarkFolder
+            val bookmarkFolder = getBookmarkFolder(bookmark)
             if (bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
                 onEditSavedSiteRequested(bookmark, bookmarkFolder)
@@ -1509,8 +1507,7 @@ class BrowserTabViewModel(
         val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
-            browserViewState.value =
-                currentBrowserViewState().copy(bookmark = savedBookmark, bookmarkFolder = bookmarkFolder)
+            browserViewState.value = currentBrowserViewState().copy(bookmark = savedBookmark)
         }
     }
 
@@ -1643,17 +1640,9 @@ class BrowserTabViewModel(
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
         }
-        val bookmarkFolder = getBookmarkFolder(bookmark)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(
-                bookmark = bookmark,
-                bookmarkFolder = bookmarkFolder
-            )
-            command.value = ShowSavedSiteAddedConfirmation(
-                SavedSiteChangedViewState(
-                    bookmark,
-                    bookmarkFolder
-                )
+                bookmark = bookmark
             )
         }
     }
