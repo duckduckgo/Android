@@ -25,8 +25,8 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi

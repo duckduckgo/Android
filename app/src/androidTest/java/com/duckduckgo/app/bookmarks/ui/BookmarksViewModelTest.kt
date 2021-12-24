@@ -28,7 +28,7 @@ import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf

@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.exception
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi

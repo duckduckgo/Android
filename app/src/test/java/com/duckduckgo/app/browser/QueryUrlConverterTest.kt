@@ -23,9 +23,9 @@ import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

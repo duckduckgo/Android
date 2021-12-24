@@ -19,10 +19,10 @@ package com.duckduckgo.app.email
 import android.webkit.WebView
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before

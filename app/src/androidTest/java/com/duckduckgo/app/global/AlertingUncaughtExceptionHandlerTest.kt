@@ -21,7 +21,7 @@ import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle

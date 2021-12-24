@@ -25,7 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -57,7 +57,7 @@ class JsLoginDetectorTest {
         whenever(settingsDataStore.appLoginDetection).thenReturn(false)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.onEvent(WebNavigationEvent.OnPageStarted(webView))
-        verifyZeroInteractions(webView)
+        verifyNoInteractions(webView)
     }
 
     @UiThreadTest
@@ -68,7 +68,7 @@ class JsLoginDetectorTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest()
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
-        verifyZeroInteractions(webView)
+        verifyNoInteractions(webView)
     }
 
     @UiThreadTest
@@ -100,7 +100,7 @@ class JsLoginDetectorTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("POST", "")
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
-        verifyZeroInteractions(webView)
+        verifyNoInteractions(webView)
     }
 
     @UiThreadTest
@@ -111,7 +111,7 @@ class JsLoginDetectorTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("GET")
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
-        verifyZeroInteractions(webView)
+        verifyNoInteractions(webView)
     }
 
     private fun aWebResourceRequest(

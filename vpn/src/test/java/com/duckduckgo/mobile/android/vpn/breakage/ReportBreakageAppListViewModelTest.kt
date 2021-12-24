@@ -22,8 +22,8 @@ import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

@@ -20,8 +20,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test

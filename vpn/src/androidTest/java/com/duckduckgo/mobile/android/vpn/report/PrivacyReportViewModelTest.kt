@@ -32,7 +32,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking

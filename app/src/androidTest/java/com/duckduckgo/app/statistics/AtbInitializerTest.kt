@@ -19,9 +19,9 @@ package com.duckduckgo.app.statistics
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

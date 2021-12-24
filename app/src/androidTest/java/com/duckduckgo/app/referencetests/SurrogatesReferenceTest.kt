@@ -49,7 +49,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi

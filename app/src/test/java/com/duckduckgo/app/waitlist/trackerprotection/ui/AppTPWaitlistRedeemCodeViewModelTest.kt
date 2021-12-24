@@ -21,8 +21,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.junit.Assert.assertEquals

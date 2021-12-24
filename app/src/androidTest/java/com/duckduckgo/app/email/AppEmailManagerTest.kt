@@ -29,11 +29,11 @@ import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.api.WaitlistResponse
 import com.duckduckgo.app.email.api.WaitlistStatusResponse
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first

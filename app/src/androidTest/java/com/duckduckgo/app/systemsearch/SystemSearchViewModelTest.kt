@@ -35,7 +35,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.LaunchDuckDuckGo
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import io.reactivex.Observable
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*

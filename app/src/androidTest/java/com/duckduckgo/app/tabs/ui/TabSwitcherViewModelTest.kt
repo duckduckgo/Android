@@ -25,7 +25,7 @@ import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -68,7 +68,7 @@ class TabSwitcherViewModelTest {
     @ExperimentalCoroutinesApi
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         runBlocking {
             whenever(mockTabRepository.flowDeletableTabs)
                 .thenReturn(repoDeletableTabs.consumeAsFlow())

@@ -18,8 +18,8 @@ package com.duckduckgo.app.job
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

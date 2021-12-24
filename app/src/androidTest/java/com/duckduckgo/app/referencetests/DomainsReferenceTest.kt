@@ -50,8 +50,8 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi

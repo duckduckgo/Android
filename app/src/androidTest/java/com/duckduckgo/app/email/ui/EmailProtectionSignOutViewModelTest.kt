@@ -22,7 +22,7 @@ import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.ui.EmailProtectionSignOutViewModel.Command.*
 import org.junit.Rule
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.junit.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

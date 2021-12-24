@@ -33,7 +33,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -88,7 +88,7 @@ class BrowserViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         doReturn(MutableLiveData<AppEnjoymentPromptOptions>()).whenever(mockAppEnjoymentPromptEmitter).promptType
 

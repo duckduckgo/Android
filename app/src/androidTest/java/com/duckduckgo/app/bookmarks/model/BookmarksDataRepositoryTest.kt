@@ -22,7 +22,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

@@ -29,9 +29,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.take
@@ -41,6 +38,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -191,7 +191,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
 
-            verifyZeroInteractions(deviceShieldPixels)
+            verifyNoInteractions(deviceShieldPixels)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
 
             cancelAndConsumeRemainingEvents()

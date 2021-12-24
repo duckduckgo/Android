@@ -20,7 +20,7 @@ import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -102,7 +102,7 @@ class WebViewCookieManagerTest {
             testee.removeExternalCookies()
         }
 
-        verifyZeroInteractions(removeCookieStrategy)
+        verifyNoInteractions(removeCookieStrategy)
     }
 
     private fun givenCookieManagerWithCookies(vararg cookies: Cookie) {

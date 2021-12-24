@@ -21,29 +21,30 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
 
 @ObsoleteCoroutinesApi
@@ -81,7 +82,7 @@ class WelcomePageViewModelTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
 

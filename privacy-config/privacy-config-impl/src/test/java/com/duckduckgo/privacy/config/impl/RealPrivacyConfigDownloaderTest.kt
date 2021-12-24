@@ -21,9 +21,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject

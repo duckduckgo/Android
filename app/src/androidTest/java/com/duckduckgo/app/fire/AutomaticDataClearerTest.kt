@@ -26,7 +26,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

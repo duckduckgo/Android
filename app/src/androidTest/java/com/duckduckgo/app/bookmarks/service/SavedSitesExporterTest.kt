@@ -28,7 +28,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertTrue
 import java.io.File

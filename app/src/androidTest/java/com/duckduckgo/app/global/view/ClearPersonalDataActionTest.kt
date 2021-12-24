@@ -25,10 +25,10 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before

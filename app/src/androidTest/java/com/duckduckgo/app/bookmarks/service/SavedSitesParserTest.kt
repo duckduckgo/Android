@@ -20,9 +20,9 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.bookmarks.model.*
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest

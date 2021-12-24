@@ -35,8 +35,8 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.mock
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

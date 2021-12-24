@@ -31,7 +31,7 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

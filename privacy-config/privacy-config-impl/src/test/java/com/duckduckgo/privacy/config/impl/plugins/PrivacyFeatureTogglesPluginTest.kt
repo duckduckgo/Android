@@ -20,8 +20,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

@@ -26,7 +26,7 @@ import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFormatError
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest

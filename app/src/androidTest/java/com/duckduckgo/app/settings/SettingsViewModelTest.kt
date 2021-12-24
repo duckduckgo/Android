@@ -42,7 +42,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistMana
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.android.synthetic.main.content_settings_general.view.*
 import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi

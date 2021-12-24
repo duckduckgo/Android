@@ -22,8 +22,8 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
-import com.nhaarman.mockitokotlin2.lastValue
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.lastValue
+import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -54,7 +54,7 @@ class AddWidgetInstructionsViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         testee = AddWidgetInstructionsViewModel()
         testee.command.observeForever(mockCommandObserver)
     }

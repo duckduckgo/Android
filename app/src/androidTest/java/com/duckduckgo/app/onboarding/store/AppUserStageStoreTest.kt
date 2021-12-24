@@ -18,9 +18,9 @@ package com.duckduckgo.app.onboarding.store
 
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals

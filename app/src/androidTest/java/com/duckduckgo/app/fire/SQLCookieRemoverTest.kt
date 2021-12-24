@@ -28,7 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
