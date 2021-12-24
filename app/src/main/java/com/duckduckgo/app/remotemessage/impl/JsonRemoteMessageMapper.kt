@@ -21,7 +21,6 @@ import com.duckduckgo.app.remotemessage.impl.messages.Content
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
 import timber.log.Timber
 
-
 class JsonRemoteMessageMapper {
     private val smallMapper: (JsonContent) -> Content = { jsonContent ->
         Content.Small(
