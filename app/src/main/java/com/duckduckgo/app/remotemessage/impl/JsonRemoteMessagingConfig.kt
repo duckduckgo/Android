@@ -46,11 +46,11 @@ data class JsonMatchingRule(
 )
 
 data class JsonMatchingAttribute(
-    val value: Any?,
-    val min: Any?,
-    val max: Any?,
-    val since: Any?,
-    val fallback: Boolean?
+    val value: Any? = null,
+    val min: Any? = null,
+    val max: Any? = null,
+    val since: Any? = null,
+    val fallback: Boolean? = null
 )
 
 data class JsonMessageAction(

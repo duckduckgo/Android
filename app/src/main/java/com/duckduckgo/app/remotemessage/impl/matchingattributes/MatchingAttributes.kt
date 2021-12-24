@@ -40,7 +40,7 @@ sealed class MatchingAttribute {
     data class Favorites(override val min: Int = -1, override val max: Int = -1, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
     data class AppTheme(override val value: String = "", val fallback: Boolean? = null) : MatchingAttribute(), StringMatchingAttribute
     data class DaysSinceInstalled(override val min: Int = -1, override val max: Int = -1, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
-    data class DaysUsedSince(override val since: Date, override val value: Int, val fallback: Boolean? = null) : MatchingAttribute(), DateMatchingAttribute
+    data class DaysUsedSince(override val since: String, override val value: Int, val fallback: Boolean? = null) : MatchingAttribute(), DateMatchingAttribute
     data class Unknown(val fallback: Boolean? = null) : MatchingAttribute()
 }
 
@@ -67,6 +67,6 @@ interface StringArrayMatchingAttribute {
 }
 
 interface DateMatchingAttribute {
-    val since: Date
+    val since: String
     val value: Int
 }
