@@ -34,7 +34,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.privacy.config.api.Drm
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -160,7 +160,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnCreateWindowWithoutUserGestureThenNewTabNotOpened() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
-        verifyZeroInteractions(mockWebViewClientListener)
+        verifyNoInteractions(mockWebViewClientListener)
     }
 
     @Test

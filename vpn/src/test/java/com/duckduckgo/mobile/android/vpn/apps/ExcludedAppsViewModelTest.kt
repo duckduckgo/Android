@@ -24,14 +24,14 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDia
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog.Companion.STOPPED_WORKING
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen.IssueDescriptionForm
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.verifyNoInteractions
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -60,7 +60,7 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport = false)
 
-        verifyZeroInteractions(deviceShieldPixels)
+        verifyNoInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
@@ -91,7 +91,7 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 0)
 
-        verifyZeroInteractions(deviceShieldPixels)
+        verifyNoInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 

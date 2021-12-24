@@ -30,7 +30,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -64,7 +64,7 @@ class SurveyViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         testee = SurveyViewModel(mockSurveyDao, mockStatisticsStore, mockAppInstallStore, coroutineTestRule.testDispatcherProvider)
         testee.command.observeForever(mockCommandObserver)
     }

@@ -24,7 +24,7 @@ import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import junit.framework.TestCase.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before

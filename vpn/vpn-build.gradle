@@ -110,8 +110,7 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:_"
 
     // Testing dependencies
-    testImplementation Testing.mockito.kotlin
-    testImplementation Testing.mockito.core
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
@@ -124,8 +123,8 @@ dependencies {
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
 
-    androidTestImplementation Testing.mockito.android
-    androidTestImplementation Testing.mockito.kotlin
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     testImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':common-test')

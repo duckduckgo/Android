@@ -22,8 +22,8 @@ import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MOVIES
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.DDG_MUSIC
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.FILES
 import com.duckduckgo.app.systemsearch.DeviceAppLookupTest.AppName.LIVE_DDG
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

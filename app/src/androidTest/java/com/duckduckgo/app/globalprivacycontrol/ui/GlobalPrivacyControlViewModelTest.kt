@@ -24,10 +24,10 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.lastValue
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.lastValue
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
