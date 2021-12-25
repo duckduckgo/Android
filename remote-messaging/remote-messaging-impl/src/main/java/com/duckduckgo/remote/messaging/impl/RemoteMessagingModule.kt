@@ -20,7 +20,9 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonParser
+import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigProcessor
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigProcessor
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
@@ -76,22 +78,22 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigProcessor(
-        remoteMessagingConfigJsonParser: RemoteMessagingConfigJsonParser,
+        remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
-            remoteMessagingConfigJsonParser,
+            remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository
         )
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigJsonParser(
+    fun providesRemoteMessagingConfigJsonMapper(
         jsonRemoteMessageMapper: JsonRemoteMessageMapper,
         jsonRulesMapper: JsonRulesMapper
-    ): RemoteMessagingConfigJsonParser {
-        return RemoteMessagingConfigJsonParser(jsonRemoteMessageMapper, jsonRulesMapper)
+    ): RemoteMessagingConfigJsonMapper {
+        return RemoteMessagingConfigJsonMapper(jsonRemoteMessageMapper, jsonRulesMapper)
     }
 
     @Provides

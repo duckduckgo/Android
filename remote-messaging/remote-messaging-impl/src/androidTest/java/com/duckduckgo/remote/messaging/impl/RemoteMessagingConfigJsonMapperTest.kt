@@ -20,7 +20,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.*
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
 import com.duckduckgo.app.remotemessage.impl.messages.*
 import com.duckduckgo.app.runBlocking
@@ -32,7 +31,7 @@ import org.junit.Test
 import java.io.BufferedReader
 import java.io.InputStream
 
-class RemoteMessagingConfigJsonParserTest {
+class RemoteMessagingConfigJsonMapperTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -45,7 +44,7 @@ class RemoteMessagingConfigJsonParserTest {
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
-        val testee = RemoteMessagingConfigJsonParser(
+        val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
@@ -137,7 +136,7 @@ class RemoteMessagingConfigJsonParserTest {
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
-        val testee = RemoteMessagingConfigJsonParser(
+        val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
@@ -161,7 +160,7 @@ class RemoteMessagingConfigJsonParserTest {
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
-        val testee = RemoteMessagingConfigJsonParser(
+        val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
@@ -196,7 +195,7 @@ class RemoteMessagingConfigJsonParserTest {
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
-        val testee = RemoteMessagingConfigJsonParser(
+        val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )

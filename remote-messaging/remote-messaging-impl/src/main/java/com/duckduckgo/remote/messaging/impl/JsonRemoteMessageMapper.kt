@@ -24,38 +24,38 @@ import timber.log.Timber
 class JsonRemoteMessageMapper {
     private val smallMapper: (JsonContent) -> Content = { jsonContent ->
         Content.Small(
-            titleText = jsonContent.titleText,
-            descriptionText = jsonContent.descriptionText
+            titleText = jsonContent.titleText.failIfEmpty(),
+            descriptionText = jsonContent.descriptionText.failIfEmpty()
         )
     }
 
     private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
         Content.Medium(
-            titleText = jsonContent.titleText,
-            descriptionText = jsonContent.descriptionText,
-            placeholder = jsonContent.placeholder
+            titleText = jsonContent.titleText.failIfEmpty(),
+            descriptionText = jsonContent.descriptionText.failIfEmpty(),
+            placeholder = jsonContent.placeholder.failIfEmpty()
         )
     }
 
     private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonContent ->
         Content.BigSingleAction(
-            titleText = jsonContent.titleText,
-            descriptionText = jsonContent.descriptionText,
-            placeholder = jsonContent.placeholder,
-            primaryActionText = jsonContent.primaryActionText,
-            primaryAction = jsonContent.primaryAction.toAction()
+            titleText = jsonContent.titleText.failIfEmpty(),
+            descriptionText = jsonContent.descriptionText.failIfEmpty(),
+            placeholder = jsonContent.placeholder.failIfEmpty(),
+            primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
+            primaryAction = jsonContent.primaryAction!!.toAction()
         )
     }
 
     private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent ->
         Content.BigTwoActions(
-            titleText = jsonContent.titleText,
-            descriptionText = jsonContent.descriptionText,
-            placeholder = jsonContent.placeholder,
-            primaryActionText = jsonContent.primaryActionText,
-            primaryAction = jsonContent.primaryAction.toAction(),
-            secondaryActionText = jsonContent.secondaryActionText,
-            secondaryAction = jsonContent.secondaryAction.toAction()
+            titleText = jsonContent.titleText.failIfEmpty(),
+            descriptionText = jsonContent.descriptionText.failIfEmpty(),
+            placeholder = jsonContent.placeholder.failIfEmpty(),
+            primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
+            primaryAction = jsonContent.primaryAction!!.toAction(),
+            secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
+            secondaryAction = jsonContent.secondaryAction!!.toAction()
         )
     }
 
@@ -84,14 +84,14 @@ class JsonRemoteMessageMapper {
         Pair("playstore", playStoreActionMapper)
     )
 
-    fun map(jsonMessages: List<JsonRemoteMessage>) = jsonMessages.mapNotNull { it.map() }
+    fun map(jsonMessages: List<JsonRemoteMessage>): List<RemoteMessage> = jsonMessages.mapNotNull { it.map() }
 
     private fun JsonRemoteMessage.map(): RemoteMessage? {
         return runCatching {
             RemoteMessage(
-                id = this.id,
-                messageType = this.messageType,
-                content = this.content.mapToContent(this.messageType),
+                id = this.id.failIfEmpty(),
+                messageType = this.messageType.failIfEmpty(),
+                content = this.content!!.mapToContent(this.messageType),
                 matchingRules = this.matchingRules.orEmpty(),
                 exclusionRules = this.exclusionRules.orEmpty()
             )
@@ -107,4 +107,6 @@ class JsonRemoteMessageMapper {
     private fun JsonMessageAction.toAction(): Action {
         return actionMappers[this.type]?.invoke(this) ?: throw IllegalArgumentException("Unknown Action Type")
     }
+
+    private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
 }

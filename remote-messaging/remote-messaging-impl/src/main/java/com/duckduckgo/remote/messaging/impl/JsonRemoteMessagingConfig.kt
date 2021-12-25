@@ -25,19 +25,19 @@ data class JsonRemoteMessagingConfig(
 data class JsonRemoteMessage(
     val id: String,
     val messageType: String,
-    val content: JsonContent,
+    val content: JsonContent?,
     val exclusionRules: List<Int>?,
     val matchingRules: List<Int>?
 )
 
 data class JsonContent(
-    val titleText: String,
-    val descriptionText: String,
-    val placeholder: String,
-    val primaryActionText: String,
-    val primaryAction: JsonMessageAction,
-    val secondaryActionText: String,
-    val secondaryAction: JsonMessageAction
+    val titleText: String = "",
+    val descriptionText: String = "",
+    val placeholder: String = "",
+    val primaryActionText: String = "",
+    val primaryAction: JsonMessageAction? = null,
+    val secondaryActionText: String = "",
+    val secondaryAction: JsonMessageAction? = null
 )
 
 data class JsonMatchingRule(

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonParser
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import timber.log.Timber
@@ -27,7 +27,7 @@ interface RemoteMessagingConfigProcessor {
 }
 
 class RealRemoteMessagingConfigProcessor(
-    private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonParser,
+    private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository
 ) : RemoteMessagingConfigProcessor {
 
@@ -36,10 +36,13 @@ class RealRemoteMessagingConfigProcessor(
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
-        // if (currentVersion != newVersion) {
-        if (true) {
+        if (true) {// if (currentVersion != newVersion) {
+            //parse
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
+            //TODO: evaluate
+            //update version
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
+            //TODO: add/store/replace message
         } else {
             Timber.i("RMF: skip, same version")
         }

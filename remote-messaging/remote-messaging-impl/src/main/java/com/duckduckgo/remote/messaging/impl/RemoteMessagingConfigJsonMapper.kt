@@ -22,7 +22,7 @@ import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
 import timber.log.Timber
 
-class RemoteMessagingConfigJsonParser(
+class RemoteMessagingConfigJsonMapper(
     private val jsonRemoteMessageMapper: JsonRemoteMessageMapper,
     private val jsonRulesMapper: JsonRulesMapper
 ) {
