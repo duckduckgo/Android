@@ -19,6 +19,9 @@ package com.duckduckgo.app.remotemessage.impl
 import com.duckduckgo.app.remotemessage.impl.messages.Action
 import com.duckduckgo.app.remotemessage.impl.messages.Content
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.JsonContent
+import com.duckduckgo.remote.messaging.impl.JsonMessageAction
+import com.duckduckgo.remote.messaging.impl.JsonRemoteMessage
 import timber.log.Timber
 
 class JsonRemoteMessageMapper {

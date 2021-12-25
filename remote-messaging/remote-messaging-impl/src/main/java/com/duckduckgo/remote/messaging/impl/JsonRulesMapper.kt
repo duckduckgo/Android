@@ -17,8 +17,9 @@
 package com.duckduckgo.app.remotemessage.impl
 
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.JsonMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.JsonMatchingRule
 import timber.log.Timber
-import java.util.*
 
 class JsonRulesMapper {
 

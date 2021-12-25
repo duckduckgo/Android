@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
 
-import retrofit2.http.GET
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
-interface RemoteMessagingService {
-    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    suspend fun config(): JsonRemoteMessagingConfig
+dependencies {
+    implementation AndroidX.room.ktx
+    kapt AndroidX.room.compiler
 }

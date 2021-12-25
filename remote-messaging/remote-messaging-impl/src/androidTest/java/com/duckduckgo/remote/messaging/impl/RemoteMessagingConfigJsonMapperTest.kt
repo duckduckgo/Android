@@ -18,7 +18,6 @@ package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
-import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
 import com.duckduckgo.app.remotemessage.impl.messages.*

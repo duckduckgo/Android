@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessage
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aBigSingleActionJsonMessage

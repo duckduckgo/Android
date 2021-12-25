@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
+import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
+import com.duckduckgo.app.remotemessage.impl.RealRemoteMessagingConfigDownloader
+import com.duckduckgo.app.remotemessage.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigProcessor
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonMapper
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigProcessor
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
@@ -110,7 +110,7 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
+    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository {
         return LocalRemoteMessagingConfigRepository(database)
     }
 

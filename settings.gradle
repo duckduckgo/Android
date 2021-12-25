@@ -22,7 +22,9 @@ include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'
 
+include ':remote-messaging-api'
 include ':remote-messaging-impl'
+include ':remote-messaging-store'
 
 include ':common-test'
 
@@ -31,7 +33,9 @@ project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
 project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
 project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
+project(':remote-messaging-api').projectDir = new File('remote-messaging/remote-messaging-api')
 project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
+project(':remote-messaging-store').projectDir = new File('remote-messaging/remote-messaging-store')
 
 rootProject.children.each { subproject ->
 
@@ -72,3 +76,5 @@ buildCache {
     }
 }
 include ':remote-messaging-impl'
+include ':remote-messaging-store'
+include ':remote-messaging-api'

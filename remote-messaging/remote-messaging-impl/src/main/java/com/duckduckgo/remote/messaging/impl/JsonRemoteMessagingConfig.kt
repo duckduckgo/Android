@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
 data class JsonRemoteMessagingConfig(
     val version: Long,

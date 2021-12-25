@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl
+package com.duckduckgo.remote.messaging.store
 
-import retrofit2.http.GET
+import org.junit.Test
 
-interface RemoteMessagingService {
-    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    suspend fun config(): JsonRemoteMessagingConfig
+import org.junit.Assert.*
+
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+class ExampleUnitTest {
+    @Test
+    fun addition_isCorrect() {
+        assertEquals(4, 2 + 2)
+    }
 }
