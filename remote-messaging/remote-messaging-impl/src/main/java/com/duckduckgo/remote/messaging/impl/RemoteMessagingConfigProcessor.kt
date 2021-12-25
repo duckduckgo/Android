@@ -17,8 +17,8 @@
 package com.duckduckgo.app.remotemessage.impl
 
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
-import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfig
-import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import timber.log.Timber
 
 interface RemoteMessagingConfigProcessor {

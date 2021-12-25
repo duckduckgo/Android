@@ -19,7 +19,7 @@ package com.duckduckgo.app.remotemessage.impl
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.app.remotemessage.RemoteMessagingConfigDownloadWorker
+import com.duckduckgo.remote.messaging.RemoteMessagingConfigDownloadWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

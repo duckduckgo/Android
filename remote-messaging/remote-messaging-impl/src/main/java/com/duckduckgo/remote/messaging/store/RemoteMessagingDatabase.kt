@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.store
 
-import retrofit2.http.GET
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
-interface RemoteMessagingService {
-    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
-    suspend fun config(): JsonRemoteMessagingConfig
+@Database(
+    exportSchema = true, version = 1,
+    entities = [
+        RemoteMessagingConfig::class
+    ]
+)
+abstract class RemoteMessagingDatabase : RoomDatabase() {
+    abstract fun remoteMessagingConfigDao(): RemoteMessagingConfigDao
 }
+
+val ALL_MIGRATIONS = emptyArray<Migration>()

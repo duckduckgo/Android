@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.store
+package com.duckduckgo.remote.messaging.store
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

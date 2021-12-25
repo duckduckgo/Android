@@ -22,6 +22,8 @@ include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'
 
+include ':remote-messaging-impl'
+
 include ':common-test'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
@@ -29,6 +31,7 @@ project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
 project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
 project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
+project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
 
 rootProject.children.each { subproject ->
 
@@ -68,3 +71,4 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
+include ':remote-messaging-impl'

@@ -19,12 +19,12 @@ package com.duckduckgo.app.remotemessage.impl
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
-import com.duckduckgo.app.remotemessage.store.ALL_MIGRATIONS
-import com.duckduckgo.app.remotemessage.store.LocalRemoteMessagingConfigRepository
-import com.duckduckgo.app.remotemessage.store.RemoteMessagingConfigRepository
-import com.duckduckgo.app.remotemessage.store.RemoteMessagingDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
+import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
+import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import dagger.Module
@@ -56,7 +56,8 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        //val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val moshi = Moshi.Builder().build()
         val retrofit = Retrofit.Builder()
             .baseUrl(AppUrl.Url.API)
             .client(okHttpClient)

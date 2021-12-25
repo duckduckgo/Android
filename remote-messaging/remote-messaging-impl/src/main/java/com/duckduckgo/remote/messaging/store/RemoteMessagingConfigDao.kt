@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.store
+package com.duckduckgo.remote.messaging.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import androidx.room.migration.Migration
-import com.duckduckgo.privacy.config.store.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
-@TypeConverters(
-    RuleTypeConverter::class,
-)
-@Database(
-    exportSchema = true, version = 1,
-    entities = [
-        RemoteMessagingConfig::class
-    ]
-)
-abstract class RemoteMessagingDatabase : RoomDatabase() {
-    abstract fun remoteMessagingConfigDao(): RemoteMessagingConfigDao
+@Dao
+abstract class RemoteMessagingConfigDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(privacyConfig: RemoteMessagingConfig)
+
+    @Query("select * from remote_messaging LIMIT 1")
+    abstract fun get(): RemoteMessagingConfig?
+
+    @Query("delete from remote_messaging")
+    abstract fun delete()
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()

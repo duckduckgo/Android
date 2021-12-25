@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.store
+package com.duckduckgo.remote.messaging.impl
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
+import retrofit2.http.GET
 
-@Dao
-abstract class RemoteMessagingConfigDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(privacyConfig: RemoteMessagingConfig)
-
-    @Query("select * from remote_messaging LIMIT 1")
-    abstract fun get(): RemoteMessagingConfig?
-
-    @Query("delete from remote_messaging")
-    abstract fun delete()
+interface RemoteMessagingService {
+    @GET("https://staticcdn.duckduckgo.com/remotemessaging/config/v1/android-config.json")
+    suspend fun config(): JsonRemoteMessagingConfig
 }

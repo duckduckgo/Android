@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.app.remotemessage.impl.JsonMatchingAttribute
+import com.duckduckgo.app.remotemessage.impl.JsonMatchingRule
+import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.remotemessage.impl
 
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
 import timber.log.Timber
 
 interface RemoteMessagingConfigDownloader {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage
+package com.duckduckgo.remote.messaging
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle

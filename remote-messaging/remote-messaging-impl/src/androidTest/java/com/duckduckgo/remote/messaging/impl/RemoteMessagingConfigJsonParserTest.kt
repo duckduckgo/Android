@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
+import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
+import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
+import com.duckduckgo.app.remotemessage.impl.RemoteMessagingConfigJsonParser
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.*
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
 import com.duckduckgo.app.remotemessage.impl.messages.*
 import com.duckduckgo.app.runBlocking
-import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.Moshi
+import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
+import java.io.BufferedReader
+import java.io.InputStream
 
 class RemoteMessagingConfigJsonParserTest {
 
@@ -37,7 +41,8 @@ class RemoteMessagingConfigJsonParserTest {
     @Test
     fun whenJsonParseThenRemoteConfigReturned() = coroutineRule.runBlocking {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config.json")
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        //val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
@@ -129,7 +134,7 @@ class RemoteMessagingConfigJsonParserTest {
     @Test
     fun whenJsonHasUnknownItemsThenMessageNotParsed() = coroutineRule.runBlocking {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_unsupported_items.json")
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
@@ -153,7 +158,7 @@ class RemoteMessagingConfigJsonParserTest {
     @Test
     fun whenJsonMalformedThenMessageNotParsed() = coroutineRule.runBlocking {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
@@ -188,7 +193,7 @@ class RemoteMessagingConfigJsonParserTest {
     @Test
     fun whenMatchingAttributeUnknownNoFallbackThenFallbackToFail() = coroutineRule.runBlocking {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
-        val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
 
@@ -200,5 +205,23 @@ class RemoteMessagingConfigJsonParserTest {
         val config = testee.map(result)
 
         assertEquals(Unknown(fallback = false), config.rules[7]?.first())
+    }
+}
+
+object FileUtilities {
+
+    fun loadText(resourceName: String): String = readResource(resourceName).use { it.readText() }
+
+    private fun readResource(resourceName: String): BufferedReader {
+        return javaClass.classLoader!!.getResource(resourceName).openStream().bufferedReader()
+    }
+
+    fun loadResource(resourceName: String): InputStream {
+        return javaClass.classLoader!!.getResource(resourceName).openStream()
+    }
+
+    fun getJsonObjectFromFile(filename: String): JSONObject {
+        val json = loadText(filename)
+        return JSONObject(json)
     }
 }

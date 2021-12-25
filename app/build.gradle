@@ -140,6 +140,8 @@ dependencies {
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
 
+    implementation project(path: ':remote-messaging-impl')
+
     implementation AndroidX.legacy.supportV4
     debugImplementation Square.leakCanary.android
 
