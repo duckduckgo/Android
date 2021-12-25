@@ -16,8 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
+import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

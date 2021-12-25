@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl
+package com.duckduckgo.remote.messaging.impl.mappers
 
-import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
-import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
-import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
+import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import timber.log.Timber
 
 class RemoteMessagingConfigJsonMapper(

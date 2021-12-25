@@ -16,8 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
-import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
+import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aBigSingleActionJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aBigTwoActionJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleAction
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl.mappers
 
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.JsonMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.JsonMatchingRule
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import timber.log.Timber
 
 class JsonRulesMapper {

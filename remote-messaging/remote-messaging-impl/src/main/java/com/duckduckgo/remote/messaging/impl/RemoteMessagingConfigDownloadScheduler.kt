@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging
+package com.duckduckgo.remote.messaging.impl
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.remotemessage.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.withContext

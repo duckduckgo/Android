@@ -17,11 +17,15 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
-import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
-import com.duckduckgo.app.remotemessage.impl.messages.*
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.*
 import com.duckduckgo.app.runBlocking
+import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.impl.models.Action
+import com.duckduckgo.remote.messaging.impl.models.Content
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
+import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
 import com.squareup.moshi.Moshi
 import org.json.JSONObject
 import org.junit.Assert.*

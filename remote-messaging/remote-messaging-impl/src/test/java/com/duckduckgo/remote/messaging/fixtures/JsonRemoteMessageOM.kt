@@ -16,9 +16,9 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
-import com.duckduckgo.remote.messaging.impl.JsonContent
-import com.duckduckgo.remote.messaging.impl.JsonMessageAction
-import com.duckduckgo.remote.messaging.impl.JsonRemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.JsonContent
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 
 object JsonRemoteMessageOM {
     private fun jsonMessageAction(

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl
+package com.duckduckgo.remote.messaging.impl.network
 
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import retrofit2.http.GET
 
 interface RemoteMessagingService {

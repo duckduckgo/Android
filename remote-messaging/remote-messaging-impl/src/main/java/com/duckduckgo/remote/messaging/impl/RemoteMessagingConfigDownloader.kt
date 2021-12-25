@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigProcessor
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
+import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import timber.log.Timber
 
 interface RemoteMessagingConfigDownloader {

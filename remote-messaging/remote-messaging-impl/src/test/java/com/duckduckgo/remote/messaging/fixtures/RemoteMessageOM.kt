@@ -16,9 +16,9 @@
 
 package com.duckduckgo.remote.messaging.fixtures
 
-import com.duckduckgo.app.remotemessage.impl.messages.Action
-import com.duckduckgo.app.remotemessage.impl.messages.Content
-import com.duckduckgo.app.remotemessage.impl.messages.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.Action
+import com.duckduckgo.remote.messaging.impl.models.Content
+import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
 
 object RemoteMessageOM {
     fun urlAction(

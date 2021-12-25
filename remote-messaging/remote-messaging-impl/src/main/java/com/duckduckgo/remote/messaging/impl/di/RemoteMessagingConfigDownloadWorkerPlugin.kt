@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl
+package com.duckduckgo.remote.messaging.impl.di
 
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.remote.messaging.RemoteMessagingConfigDownloadWorker
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloadWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

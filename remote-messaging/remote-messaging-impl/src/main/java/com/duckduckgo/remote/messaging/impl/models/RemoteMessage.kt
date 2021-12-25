@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.remotemessage.impl.messages
-
-import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute
+package com.duckduckgo.remote.messaging.impl.models
 
 data class RemoteConfig(
     val messages: List<RemoteMessage>,
