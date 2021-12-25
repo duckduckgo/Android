@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonParser
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository

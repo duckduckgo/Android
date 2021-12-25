@@ -20,7 +20,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessageMapper
 import com.duckduckgo.app.remotemessage.impl.JsonRemoteMessagingConfig
 import com.duckduckgo.app.remotemessage.impl.JsonRulesMapper
-import com.duckduckgo.app.remotemessage.impl.RemoteMessagingConfigJsonParser
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.*
 import com.duckduckgo.app.remotemessage.impl.matchingattributes.MatchingAttribute.*
 import com.duckduckgo.app.remotemessage.impl.messages.*
@@ -126,7 +125,7 @@ class RemoteMessagingConfigJsonParserTest {
         assertEquals(locale2MA, config.rules[6]?.first())
         assertEquals(1, config.rules[6]?.size)
 
-        val defaultBrowserMA = MatchingAttribute.DefaultBrowser(value = true, fallback = null)
+        val defaultBrowserMA = DefaultBrowser(value = true, fallback = null)
         assertEquals(defaultBrowserMA, config.rules[7]?.first())
         assertEquals(1, config.rules[7]?.size)
     }
@@ -151,7 +150,7 @@ class RemoteMessagingConfigJsonParserTest {
         val unknown = Unknown(fallback = true)
         assertEquals(unknown, config.rules[6]!![0])
 
-        val defaultBrowser = MatchingAttribute.DefaultBrowser(value = true, fallback = null)
+        val defaultBrowser = DefaultBrowser(value = true, fallback = null)
         assertEquals(defaultBrowser, config.rules[7]!![0])
     }
 
@@ -186,7 +185,7 @@ class RemoteMessagingConfigJsonParserTest {
         assertEquals(2, config.rules.size)
         assertEquals(3, config.rules[6]?.size)
 
-        val matchingAttr = listOf(Unknown(fallback = null), Unknown(fallback = true), Unknown(fallback = false))
+        val matchingAttr = listOf(Locale(), Api(fallback = true), WebView(fallback = false))
         assertEquals(matchingAttr, config.rules[6])
     }
 
@@ -204,7 +203,7 @@ class RemoteMessagingConfigJsonParserTest {
 
         val config = testee.map(result)
 
-        assertEquals(Unknown(fallback = false), config.rules[7]?.first())
+        assertEquals(Unknown(), config.rules[7]?.first())
     }
 }
 

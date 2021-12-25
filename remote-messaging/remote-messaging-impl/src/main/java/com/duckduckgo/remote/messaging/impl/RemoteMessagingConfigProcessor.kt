@@ -17,6 +17,7 @@
 package com.duckduckgo.app.remotemessage.impl
 
 import com.duckduckgo.app.remotemessage.impl.messages.RemoteConfig
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigJsonParser
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import timber.log.Timber
