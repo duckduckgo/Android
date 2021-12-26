@@ -27,6 +27,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
     api project(path: ':remote-messaging-store')
+    api project(path: ':browser-api')
 
     implementation KotlinX.coroutines.core
     androidTestImplementation (KotlinX.coroutines.test) {
@@ -46,6 +47,7 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
 
     androidTestImplementation project(path: ':common-test')
     androidTestImplementation AndroidX.archCore.testing

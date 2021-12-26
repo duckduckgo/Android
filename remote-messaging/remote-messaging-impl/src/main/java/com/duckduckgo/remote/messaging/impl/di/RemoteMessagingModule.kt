@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.di.scopes.AppScope
@@ -113,8 +114,10 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigMatcher(): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher()
+    fun providesRemoteMessagingConfigMatcher(
+        deviceProperties: DeviceProperties
+    ): RemoteMessagingConfigMatcher {
+        return RemoteMessagingConfigMatcher(deviceProperties)
     }
 
     @Provides
