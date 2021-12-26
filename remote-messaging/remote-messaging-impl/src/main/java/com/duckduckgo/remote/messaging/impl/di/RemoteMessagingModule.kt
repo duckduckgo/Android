@@ -21,11 +21,8 @@ import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigProcessor
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigProcessor
+import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
@@ -83,11 +80,13 @@ class DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
-        remoteMessagingConfigRepository: RemoteMessagingConfigRepository
+        remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
+        remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
-            remoteMessagingConfigRepository
+            remoteMessagingConfigRepository,
+            remoteMessagingConfigMatcher
         )
     }
 
@@ -110,6 +109,12 @@ class DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesJsonRulesMapper(): JsonRulesMapper {
         return JsonRulesMapper()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagingConfigMatcher(): RemoteMessagingConfigMatcher {
+        return RemoteMessagingConfigMatcher()
     }
 
     @Provides
