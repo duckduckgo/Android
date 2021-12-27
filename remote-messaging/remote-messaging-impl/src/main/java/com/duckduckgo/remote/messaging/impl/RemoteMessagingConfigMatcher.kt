@@ -29,33 +29,47 @@ class RemoteMessagingConfigMatcher(
         val rules = remoteConfig.rules
 
         remoteConfig.messages.forEach { message ->
-            val matchingRules = message.matchingRules
+            val matchingRules = if (message.matchingRules.isEmpty()) return message else message.matchingRules
 
-            if (matchingRules.isEmpty()) return message
+            val result = matchingRules.evaluateMatchingRules(rules)
 
-            val matchRule = matchingRules.find { rule ->
-                val failedAttribute = rules[rule]?.find { !evaluateAttribute(it) }
-                Timber.i("RMF: first failed attribute $failedAttribute")
-                failedAttribute == null
-            }
-
-            Timber.i("RMF: matchedRule $matchRule")
-            if (matchRule != null) return message
+            if (result == Result.Match) return message
         }
 
         return null
     }
 
-    private fun evaluateAttribute(matchingAttribute: MatchingAttribute): Boolean {
+    private fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): Result {
+        var result: Result = Result.Match
+
+        for (rule in this) {
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.Match
+            result = Result.Match
+
+            for (attr in attributes) {
+                result = evaluateAttribute(attr)
+                if (result == Result.Fail || result == Result.Skip) {
+                    Timber.i("RMF: first failed attribute $attr")
+                    break
+                }
+            }
+
+            if (result == Result.Skip) return result
+        }
+
+        return result
+    }
+
+    private fun evaluateAttribute(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> {
                 if ((matchingAttribute.min.defaultValue() || deviceProperties.osApiLevel() >= matchingAttribute.min) &&
                     (matchingAttribute.max.defaultValue() || deviceProperties.osApiLevel() <= matchingAttribute.max)
                 ) {
-                    return true
+                    return true.toResult()
                 }
 
-                return false
+                return false.toResult()
             }
             is MatchingAttribute.AppAtb -> TODO()
             is MatchingAttribute.AppId -> TODO()
@@ -73,12 +87,14 @@ class RemoteMessagingConfigMatcher(
             is MatchingAttribute.InstalledGPlay -> TODO()
             is MatchingAttribute.Locale -> {
                 val locales = matchingAttribute.value
-                if (locales.contains(deviceProperties.deviceLocale().toString())) return true
-                return false
+                if (locales.contains(deviceProperties.deviceLocale().toString())) return true.toResult()
+                return false.toResult()
             }
             is MatchingAttribute.SearchAtb -> TODO()
             is MatchingAttribute.SearchCount -> TODO()
-            is MatchingAttribute.Unknown -> TODO()
+            is MatchingAttribute.Unknown -> {
+                return matchingAttribute.fallback.toResult()
+            }
             is MatchingAttribute.WebView -> {
                 val deviceWebView = deviceProperties.webView()
                 Timber.i("RMF: device WV: $deviceWebView")
@@ -86,14 +102,28 @@ class RemoteMessagingConfigMatcher(
                 if ((matchingAttribute.min.defaultValue() || deviceWebView >= matchingAttribute.min) &&
                     (matchingAttribute.max.defaultValue() || deviceWebView <= matchingAttribute.max)
                 ) {
-                    return true
+                    return true.toResult()
                 }
 
-                return false
+                return false.toResult()
             }
             is MatchingAttribute.WidgetAdded -> TODO()
         }
     }
+
+    private fun Boolean?.toResult(): Result {
+        return when (this) {
+            true -> Result.Match
+            false -> Result.Fail
+            null -> Result.Skip
+        }
+    }
+}
+
+sealed class Result {
+    object Match : Result()
+    object Fail : Result()
+    object Skip : Result()
 }
 
 private fun String.defaultValue() = this.isEmpty()

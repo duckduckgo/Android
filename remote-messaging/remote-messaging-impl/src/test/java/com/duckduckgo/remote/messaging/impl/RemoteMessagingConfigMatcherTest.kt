@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import timber.log.Timber
 import java.util.*
+import kotlin.math.exp
 import kotlin.math.min
 
 class RemoteMessagingConfigMatcherTest {
@@ -140,7 +141,7 @@ class RemoteMessagingConfigMatcherTest {
 
     @Test
     fun whenDeviceMatchesWebViewVersionThenReturnFirstMatch() {
-        givenDeviceProperties(webView = "80")
+        givenDeviceProperties(webView = "96.0.4664.104")
         val expectedMessage = aMediumMessage(matchingRules = listOf(1))
 
         val message = testee.evaluate(
@@ -189,6 +190,54 @@ class RemoteMessagingConfigMatcherTest {
         )
 
         assertNull(message)
+    }
+
+    @Test
+    fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() {
+        givenDeviceProperties(locale = Locale.US, apiLevel = 23)
+        val expectedMessage = aMediumMessage(matchingRules = listOf(1, 2))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(expectedMessage),
+                rules = mapOf(
+                    Pair(1, listOf(MatchingAttribute.Api(max = 19))),
+                    Pair(2, listOf(MatchingAttribute.Locale(value = listOf("en_US"))))
+                )
+            )
+        )
+
+        assertEquals(expectedMessage, message)
+    }
+
+    @Test
+    fun whenUnknownRuleFailsThenReturnNull() {
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aSmallMessage(matchingRules = listOf(1)), aMediumMessage(matchingRules = listOf(1))),
+                rules = mapOf(
+                    Pair(1, listOf(MatchingAttribute.Unknown(fallback = false)))
+                )
+            )
+        )
+
+        assertNull(message)
+    }
+
+    @Test
+    fun whenUnknownRuleMatchesThenReturnFirstMatch() {
+        val expectedMessage = aSmallMessage(matchingRules = listOf(1))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(expectedMessage, aMediumMessage(matchingRules = listOf(1))),
+                rules = mapOf(
+                    Pair(1, listOf(MatchingAttribute.Unknown(fallback = true)))
+                )
+            )
+        )
+
+        assertEquals(expectedMessage, message)
     }
 
     @Test

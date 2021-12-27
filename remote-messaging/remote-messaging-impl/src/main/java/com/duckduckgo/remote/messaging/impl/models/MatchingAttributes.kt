@@ -51,7 +51,7 @@ sealed class MatchingAttribute {
     ) : MatchingAttribute(), RangeIntMatchingAttribute
 
     data class DaysUsedSince(override val since: String, override val value: Int, val fallback: Boolean? = null) : MatchingAttribute(), DateMatchingAttribute
-    data class Unknown(val fallback: Boolean? = null) : MatchingAttribute()
+    data class Unknown(val fallback: Boolean?) : MatchingAttribute()
 }
 
 interface RangeIntMatchingAttribute {
