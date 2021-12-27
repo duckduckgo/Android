@@ -48,13 +48,13 @@ class RemoteMessagingConfigMatcher(
 
             for (attr in attributes) {
                 result = evaluateAttribute(attr)
-                if (result == Result.Fail || result == Result.Skip) {
+                if (result == Result.Fail || result == Result.NextMessage) {
                     Timber.i("RMF: first failed attribute $attr")
                     break
                 }
             }
 
-            if (result == Result.Skip) return result
+            if (result == Result.NextMessage) return result
         }
 
         return result
@@ -115,7 +115,7 @@ class RemoteMessagingConfigMatcher(
         return when (this) {
             true -> Result.Match
             false -> Result.Fail
-            null -> Result.Skip
+            null -> Result.NextMessage
         }
     }
 }
@@ -123,7 +123,7 @@ class RemoteMessagingConfigMatcher(
 sealed class Result {
     object Match : Result()
     object Fail : Result()
-    object Skip : Result()
+    object NextMessage : Result()
 }
 
 private fun String.defaultValue() = this.isEmpty()
