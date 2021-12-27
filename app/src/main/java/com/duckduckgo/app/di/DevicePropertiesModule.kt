@@ -17,7 +17,9 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
+import com.duckduckgo.app.global.store.AndroidAppProperties
 import com.duckduckgo.app.global.store.AndroidDeviceProperties
+import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -32,5 +34,11 @@ class DevicePropertiesModule {
     @SingleInstanceIn(AppScope::class)
     fun providesDeviceProperties(appContext: Context): DeviceProperties {
         return AndroidDeviceProperties(appContext)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesAppProperties(): AppProperties {
+        return AndroidAppProperties()
     }
 }

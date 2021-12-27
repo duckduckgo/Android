@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
@@ -23,7 +24,8 @@ import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
-    val deviceProperties: DeviceProperties
+    val deviceProperties: DeviceProperties,
+    val appProperties: AppProperties
 ) {
     fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules
