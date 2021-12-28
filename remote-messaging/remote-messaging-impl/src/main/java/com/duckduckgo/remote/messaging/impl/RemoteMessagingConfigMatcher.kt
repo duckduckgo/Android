@@ -25,7 +25,7 @@ import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
     val deviceProperties: DeviceProperties,
-    val appProperties: AppProperties
+    val androidAppAttributeMatcher: AndroidAppAttributeMatcher
 ) {
     fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules
@@ -73,47 +73,26 @@ class RemoteMessagingConfigMatcher(
 
                 return false.toResult()
             }
-            is MatchingAttribute.AppAtb -> TODO()
-            is MatchingAttribute.AppId -> {
-                return (matchingAttribute.value == appProperties.appId()).toResult()
-            }
+            is MatchingAttribute.AppAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.AppId -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppTheme -> TODO()
-            is MatchingAttribute.AppVersion -> {
-                if ((matchingAttribute.min.defaultValue() || appProperties.appVersion() >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || appProperties.appVersion() <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
-            }
-            is MatchingAttribute.Atb -> {
-                return (matchingAttribute.value == appProperties.appId()).toResult()
-            }
+            is MatchingAttribute.AppVersion -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.Atb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Bookmarks -> TODO()
             is MatchingAttribute.DaysSinceInstalled -> TODO()
             is MatchingAttribute.DaysUsedSince -> TODO()
             is MatchingAttribute.DefaultBrowser -> TODO()
             is MatchingAttribute.EmailEnabled -> TODO()
-            is MatchingAttribute.ExpVariant -> {
-                return (matchingAttribute.value == appProperties.expVariant()).toResult()
-            }
+            is MatchingAttribute.ExpVariant -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Favorites -> TODO()
-            is MatchingAttribute.Flavor -> {
-                if (matchingAttribute.value.contains(appProperties.flavor())) return true.toResult()
-                return false.toResult()
-            }
-            is MatchingAttribute.InstalledGPlay -> {
-                return (matchingAttribute.value == appProperties.installedGPlay()).toResult()
-            }
+            is MatchingAttribute.Flavor -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.InstalledGPlay -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Locale -> {
                 val locales = matchingAttribute.value
                 if (locales.contains(deviceProperties.deviceLocale().toString())) return true.toResult()
                 return false.toResult()
             }
-            is MatchingAttribute.SearchAtb -> {
-                return (matchingAttribute.value == appProperties.searchAtb()).toResult()
-            }
+            is MatchingAttribute.SearchAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.SearchCount -> TODO()
             is MatchingAttribute.Unknown -> {
                 return matchingAttribute.fallback.toResult()
@@ -131,6 +110,54 @@ class RemoteMessagingConfigMatcher(
                 return false.toResult()
             }
             is MatchingAttribute.WidgetAdded -> TODO()
+        }
+    }
+
+    private fun Boolean?.toResult(): Result {
+        return when (this) {
+            true -> Result.Match
+            false -> Result.Fail
+            null -> Result.NextMessage
+        }
+    }
+}
+
+class AndroidAppAttributeMatcher(
+    val appProperties: AppProperties
+) {
+    fun evaluate(matchingAttribute: MatchingAttribute): Result {
+        when (matchingAttribute) {
+            is MatchingAttribute.Flavor -> {
+                if (matchingAttribute.value.contains(appProperties.flavor())) return true.toResult()
+                return false.toResult()
+            }
+            is MatchingAttribute.AppId -> {
+                return (matchingAttribute.value == appProperties.appId()).toResult()
+            }
+            is MatchingAttribute.AppVersion -> {
+                if ((matchingAttribute.min.defaultValue() || appProperties.appVersion() >= matchingAttribute.min) &&
+                    (matchingAttribute.max.defaultValue() || appProperties.appVersion() <= matchingAttribute.max)
+                ) {
+                    return true.toResult()
+                }
+                return false.toResult()
+            }
+            is MatchingAttribute.Atb -> {
+                return (matchingAttribute.value == appProperties.atb()).toResult()
+            }
+            is MatchingAttribute.AppAtb -> {
+                return (matchingAttribute.value == appProperties.appAtb()).toResult()
+            }
+            is MatchingAttribute.SearchAtb -> {
+                return (matchingAttribute.value == appProperties.searchAtb()).toResult()
+            }
+            is MatchingAttribute.ExpVariant -> {
+                return (matchingAttribute.value == appProperties.expVariant()).toResult()
+            }
+            is MatchingAttribute.InstalledGPlay -> {
+                return (matchingAttribute.value == appProperties.installedGPlay()).toResult()
+            }
+            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
 

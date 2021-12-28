@@ -117,14 +117,22 @@ class DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
         deviceProperties: DeviceProperties,
-        appProperties: AppProperties
+        androidAppAttributeMatcher: AndroidAppAttributeMatcher
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(deviceProperties, appProperties)
+        return RemoteMessagingConfigMatcher(deviceProperties, androidAppAttributeMatcher)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository {
+    fun providesAndroidAppAttributeMatcher(
+        appProperties: AppProperties
+    ): AndroidAppAttributeMatcher {
+        return AndroidAppAttributeMatcher(appProperties)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
         return LocalRemoteMessagingConfigRepository(database)
     }
 

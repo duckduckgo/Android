@@ -19,6 +19,9 @@ package com.duckduckgo.app.di
 import android.content.Context
 import com.duckduckgo.app.global.store.AndroidAppProperties
 import com.duckduckgo.app.global.store.AndroidDeviceProperties
+import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.di.scopes.AppScope
@@ -38,7 +41,15 @@ class DevicePropertiesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesAppProperties(): AppProperties {
-        return AndroidAppProperties()
+    fun providesAppProperties(
+        variantManager: VariantManager,
+        playStoreUtils: PlayStoreUtils,
+        statisticsStore: StatisticsDataStore
+    ): AppProperties {
+        return AndroidAppProperties(
+            variantManager,
+            playStoreUtils,
+            statisticsStore
+        )
     }
 }

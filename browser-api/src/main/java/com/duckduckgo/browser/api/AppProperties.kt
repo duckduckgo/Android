@@ -16,8 +16,6 @@
 
 package com.duckduckgo.browser.api
 
-import java.util.*
-
 interface AppProperties {
     fun flavor(): String
     fun appId(): String
