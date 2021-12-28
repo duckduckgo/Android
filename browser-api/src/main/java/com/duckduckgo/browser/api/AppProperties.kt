@@ -20,11 +20,11 @@ import java.util.*
 
 interface AppProperties {
     fun flavor(): String
-    fun appId(): Int
+    fun appId(): String
     fun appVersion(): String
     fun atb(): String
     fun appAtb(): String
     fun searchAtb(): String
     fun expVariant(): String
-    fun installedGPlay(): String
+    fun installedGPlay(): Boolean
 }

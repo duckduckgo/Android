@@ -74,25 +74,46 @@ class RemoteMessagingConfigMatcher(
                 return false.toResult()
             }
             is MatchingAttribute.AppAtb -> TODO()
-            is MatchingAttribute.AppId -> TODO()
+            is MatchingAttribute.AppId -> {
+                return (matchingAttribute.value == appProperties.appId()).toResult()
+            }
             is MatchingAttribute.AppTheme -> TODO()
-            is MatchingAttribute.AppVersion -> TODO()
-            is MatchingAttribute.Atb -> TODO()
+            is MatchingAttribute.AppVersion -> {
+                if ((matchingAttribute.min.defaultValue() || appProperties.appVersion() >= matchingAttribute.min) &&
+                    (matchingAttribute.max.defaultValue() || appProperties.appVersion() <= matchingAttribute.max)
+                ) {
+                    return true.toResult()
+                }
+
+                return false.toResult()
+            }
+            is MatchingAttribute.Atb -> {
+                return (matchingAttribute.value == appProperties.appId()).toResult()
+            }
             is MatchingAttribute.Bookmarks -> TODO()
             is MatchingAttribute.DaysSinceInstalled -> TODO()
             is MatchingAttribute.DaysUsedSince -> TODO()
             is MatchingAttribute.DefaultBrowser -> TODO()
             is MatchingAttribute.EmailEnabled -> TODO()
-            is MatchingAttribute.ExpVariant -> TODO()
+            is MatchingAttribute.ExpVariant -> {
+                return (matchingAttribute.value == appProperties.expVariant()).toResult()
+            }
             is MatchingAttribute.Favorites -> TODO()
-            is MatchingAttribute.Flavor -> TODO()
-            is MatchingAttribute.InstalledGPlay -> TODO()
+            is MatchingAttribute.Flavor -> {
+                if (matchingAttribute.value.contains(appProperties.flavor())) return true.toResult()
+                return false.toResult()
+            }
+            is MatchingAttribute.InstalledGPlay -> {
+                return (matchingAttribute.value == appProperties.installedGPlay()).toResult()
+            }
             is MatchingAttribute.Locale -> {
                 val locales = matchingAttribute.value
                 if (locales.contains(deviceProperties.deviceLocale().toString())) return true.toResult()
                 return false.toResult()
             }
-            is MatchingAttribute.SearchAtb -> TODO()
+            is MatchingAttribute.SearchAtb -> {
+                return (matchingAttribute.value == appProperties.searchAtb()).toResult()
+            }
             is MatchingAttribute.SearchCount -> TODO()
             is MatchingAttribute.Unknown -> {
                 return matchingAttribute.fallback.toResult()

@@ -16,45 +16,49 @@
 
 package com.duckduckgo.app.global.store
 
-import android.content.Context
-import android.os.Build
-import androidx.webkit.WebViewCompat
+import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.browser.BuildConfig.APPLICATION_ID
+import com.duckduckgo.app.browser.BuildConfig.FLAVOR
+import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.browser.api.DeviceProperties
-import java.util.*
 
 class AndroidAppProperties(
+    private val variantManager: VariantManager,
+    private val playStoreUtils: PlayStoreUtils,
+    private val statisticsStore: StatisticsDataStore
 ) : AppProperties {
 
     override fun flavor(): String {
-        TODO("Not yet implemented")
+        return FLAVOR
     }
 
-    override fun appId(): Int {
-        TODO("Not yet implemented")
+    override fun appId(): String {
+        return APPLICATION_ID
     }
 
     override fun appVersion(): String {
-        TODO("Not yet implemented")
+        return BuildConfig.VERSION_NAME
     }
 
     override fun atb(): String {
-        TODO("Not yet implemented")
+        return statisticsStore.atb?.version.orEmpty()
     }
 
     override fun appAtb(): String {
-        TODO("Not yet implemented")
+        return statisticsStore.appRetentionAtb.orEmpty()
     }
 
     override fun searchAtb(): String {
-        TODO("Not yet implemented")
+        return statisticsStore.searchRetentionAtb.orEmpty()
     }
 
     override fun expVariant(): String {
-        TODO("Not yet implemented")
+        return variantManager.getVariant().key
     }
 
-    override fun installedGPlay(): String {
-        TODO("Not yet implemented")
+    override fun installedGPlay(): Boolean {
+        return playStoreUtils.installedFromPlayStore()
     }
 }
