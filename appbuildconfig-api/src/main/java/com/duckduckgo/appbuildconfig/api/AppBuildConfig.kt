@@ -23,6 +23,9 @@ interface AppBuildConfig {
     val versionCode: Int
     val versionName: String
     val flavor: BuildFlavor
+    val sdkString: String
+    val manufacturer: String
+    val model: String
 }
 
 enum class BuildFlavor {

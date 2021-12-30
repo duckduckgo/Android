@@ -63,9 +63,9 @@ class BrokenSiteSubmitter(
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to appBuildConfig.versionName,
                 ATB_KEY to atbWithVariant(),
-                OS_KEY to Build.VERSION.SDK_INT.toString(),
-                MANUFACTURER_KEY to Build.MANUFACTURER,
-                MODEL_KEY to Build.MODEL,
+                OS_KEY to appBuildConfig.sdkString,
+                MANUFACTURER_KEY to appBuildConfig.manufacturer,
+                MODEL_KEY to appBuildConfig.model,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled

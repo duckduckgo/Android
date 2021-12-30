@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -70,11 +71,12 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     private val mockStatisticsDataStore: StatisticsDataStore = mock()
 
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
-        val encodedParams = listOf("surrogates", "blockedTrackers")
-        val onlyExistParams = listOf("manufacturer", "os", "model")
+        val encodedParamsList = listOf("siteUrl", "os")
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
@@ -89,7 +91,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = BrokenSiteSubmitter(mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel, TestScope(), coroutineRule.testDispatcherProvider)
+        testee = BrokenSiteSubmitter(mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel, TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -98,6 +100,9 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
     @Test
     fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
+        whenever(mockAppBuildConfig.sdkString).thenReturn(testCase.os)
+        whenever(mockAppBuildConfig.manufacturer).thenReturn(testCase.manufacturer)
+        whenever(mockAppBuildConfig.model).thenReturn(testCase.model)
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(testCase.gpcEnabled)
         whenever(mockTdsMetadataDao.eTag()).thenReturn(testCase.blocklistVersion)
@@ -116,23 +121,26 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
         testee.submitBrokenSiteFeedback(brokenSite)
 
-        val expectedParamsCaptor = argumentCaptor<Map<String, String>>()
-        val expectedEncodedParamsCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), expectedParamsCaptor.capture(), expectedEncodedParamsCaptor.capture())
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val encodedParamsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(AppPixelName.BROKEN_SITE_REPORT.pixelName), paramsCaptor.capture(), encodedParamsCaptor.capture())
 
-        val expectedParams = expectedParamsCaptor.firstValue
-        val expectedEncodedParams = expectedEncodedParamsCaptor.firstValue
+        val params = paramsCaptor.firstValue
+        val encodedParams = encodedParamsCaptor.firstValue
 
         testCase.expectReportURLParams.forEach { param ->
             if (encodedParams.contains(param.name)) {
-                assertTrue(expectedEncodedParams.containsKey(param.name))
-                assertEquals(param.value, expectedEncodedParams[param.name])
+                assertTrue(encodedParams.containsKey(param.name))
+                assertEquals(param.value, encodedParams[param.name])
             }
             else {
-                assertTrue(expectedParams.containsKey(param.name))
-                if (!onlyExistParams.contains(param.name)) {
-                    assertEquals(param.value, URLEncoder.encode(expectedParams[param.name], "UTF-8"))
+                val result = if (encodedParamsList.contains(param.name)) {
+                    URLEncoder.encode(params[param.name], "UTF-8")
+                } else {
+                    params[param.name]
                 }
+                assertTrue(params.containsKey(param.name))
+                assertEquals(param.value, result)
             }
         }
     }

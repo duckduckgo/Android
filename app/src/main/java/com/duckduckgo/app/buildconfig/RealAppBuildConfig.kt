@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.buildconfig
 
+import android.os.Build
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
@@ -38,4 +39,7 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
             "play" -> BuildFlavor.PLAY
             else -> throw IllegalStateException("Unknown app flavor")
         }
+    override val manufacturer: String = Build.MANUFACTURER
+    override val model: String = Build.MODEL
+    override val sdkString: String = Build.VERSION.SDK_INT.toString()
 }
