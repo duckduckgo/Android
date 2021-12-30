@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.statistics.config
 
-import com.duckduckgo.app.statistics.BuildConfig
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 
 /**
  * If you want to configure the statistics library, have your app extend this listener
@@ -27,8 +27,8 @@ interface StatisticsLibraryConfig {
     fun shouldFirePixelsAsDev(): Boolean
 }
 
-class DefaultStatisticsLibraryConfig : StatisticsLibraryConfig {
+class DefaultStatisticsLibraryConfig(private val appBuildConfig: AppBuildConfig) : StatisticsLibraryConfig {
     override fun shouldFirePixelsAsDev(): Boolean {
-        return BuildConfig.DEBUG
+        return appBuildConfig.isDebug
     }
 }
