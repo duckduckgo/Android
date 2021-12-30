@@ -99,7 +99,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var surrogateTests: SurrogateTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(javaClass.classLoader!!, "reference_tests/domain_matching_tests.json")
+            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(SurrogatesReferenceTest::class.java.classLoader!!, "reference_tests/domain_matching_tests.json")
 
             jsonObject.keys().forEach {
                 if (it == "surrogateTests") {

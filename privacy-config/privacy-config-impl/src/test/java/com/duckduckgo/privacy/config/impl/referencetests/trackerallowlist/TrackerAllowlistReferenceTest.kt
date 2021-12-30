@@ -16,9 +16,9 @@
 
 package com.duckduckgo.privacy.config.impl.referencetests.trackerallowlist
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
@@ -51,7 +51,7 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             return adapter.fromJson(
-                FileUtilities.loadText("reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
+                FileUtilities.loadText(TrackerAllowlistReferenceTest::class.java.classLoader!!, "reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
                 ?: emptyList()
         }
     }
@@ -87,7 +87,7 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
             moshi.adapter(TrackerAllowlistEntity::class.java)
         val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
         val jsonObject: JSONObject =
-            FileUtilities.getJsonObjectFromFile("reference_tests/trackerallowlist/tracker_allowlist_reference.json")
+            FileUtilities.getJsonObjectFromFile(javaClass.classLoader!!, "reference_tests/trackerallowlist/tracker_allowlist_reference.json")
 
         jsonObject.keys().forEach {
             val allowlistEntity = jsonAdapter.fromJson(jsonObject.get(it).toString())

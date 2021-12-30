@@ -60,7 +60,7 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/privacyconfig/tests.json"))
+            val referenceTest = adapter.fromJson(FileUtilities.loadText(PrivacyConfigMissingReferenceTest::class.java.classLoader!!, "reference_tests/privacyconfig/tests.json"))
             referenceJsonFile = referenceTest?.missingFeature?.referenceConfig!!
             return referenceTest.missingFeature.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
         }

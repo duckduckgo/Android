@@ -59,7 +59,7 @@ class GpcHeaderReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/gpc/tests.json"))
+            val referenceTest = adapter.fromJson(FileUtilities.loadText(GpcHeaderReferenceTest::class.java.classLoader!!, "reference_tests/gpc/tests.json"))
             return referenceTest?.gpcHeader?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
     }
