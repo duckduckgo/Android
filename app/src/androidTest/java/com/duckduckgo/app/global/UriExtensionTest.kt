@@ -191,9 +191,9 @@ class UriExtensionTest {
     }
 
     @Test
-    fun whenGettingAbsoluteStringThenDoNotReturnQueryParameters() {
+    fun whenGettingAbsoluteStringThenDoNotReturnQueryOrPathParameters() {
         val absoluteString = Uri.parse("https://example.com/test?q=example/#1/anotherrandomcode").absoluteString
-        assertEquals("https://example.com/test", absoluteString)
+        assertEquals("https://example.com/", absoluteString)
     }
 
     @Test

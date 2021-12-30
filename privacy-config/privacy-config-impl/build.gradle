@@ -65,6 +65,9 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
 }
 
 android {

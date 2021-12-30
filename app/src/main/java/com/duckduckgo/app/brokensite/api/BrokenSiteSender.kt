@@ -16,9 +16,13 @@
 
 package com.duckduckgo.app.brokensite.api
 
+import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.absoluteString
+import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -28,7 +32,6 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,16 +46,18 @@ class BrokenSiteSubmitter(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+        val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
-        appCoroutineScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
-                SITE_URL_KEY to brokenSite.siteUrl,
+                SITE_URL_KEY to absoluteUrl,
                 UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to BuildConfig.VERSION_NAME,
@@ -71,8 +76,12 @@ class BrokenSiteSubmitter(
             runCatching {
                 pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
-                .onSuccess { Timber.v("Feedback submission succeeded") }
-                .onFailure { Timber.w(it, "Feedback submission failed") }
+                .onSuccess {
+                    Timber.v("Feedback submission succeeded")
+                }
+                .onFailure {
+                    Timber.w(it, "Feedback submission failed")
+                }
         }
     }
 

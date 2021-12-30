@@ -58,7 +58,7 @@ val Uri.hasIpHost: Boolean
 
 val Uri.absoluteString: String
     get() {
-        return "$scheme://$host$path"
+        return "$scheme://$host/"
     }
 
 fun Uri.toStringDropScheme(): String {
