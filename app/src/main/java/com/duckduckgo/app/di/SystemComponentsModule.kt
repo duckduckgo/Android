@@ -30,14 +30,15 @@ import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppListProvider
 import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import dagger.SingleInstanceIn
 
 @Module
 class SystemComponentsModule {
@@ -55,8 +56,8 @@ class SystemComponentsModule {
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
 
     @Provides
-    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator): IconModifier =
-        AppIconModifier(context, appShortcutCreator)
+    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): IconModifier =
+        AppIconModifier(context, appShortcutCreator, appBuildConfig)
 
     @Provides
     fun animatorLoader(

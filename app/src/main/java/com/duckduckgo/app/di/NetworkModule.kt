@@ -39,6 +39,7 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
@@ -46,6 +47,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -57,7 +59,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 import java.io.File
 import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 class NetworkModule {
@@ -134,9 +135,10 @@ class NetworkModule {
     @Provides
     fun apiRequestInterceptor(
         context: Context,
-        userAgentProvider: UserAgentProvider
+        userAgentProvider: UserAgentProvider,
+        appBuildConfig: AppBuildConfig
     ): ApiRequestInterceptor {
-        return ApiRequestInterceptor(context, userAgentProvider)
+        return ApiRequestInterceptor(context, userAgentProvider, appBuildConfig)
     }
 
     @Provides
@@ -182,9 +184,10 @@ class NetworkModule {
         gpc: Gpc,
         featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appBuildConfig: AppBuildConfig,
         dispatcherProvider: DispatcherProvider
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope, dispatcherProvider)
+        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope, appBuildConfig, dispatcherProvider)
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
@@ -197,9 +200,10 @@ class NetworkModule {
         apiKeyMapper: SubReasonApiMapper,
         statisticsStore: StatisticsDataStore,
         pixel: Pixel,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appBuildConfig: AppBuildConfig
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope)
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =

@@ -20,6 +20,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,6 +41,7 @@ class InitialPromptTypeDeciderTest {
     private val mockInitialPromptDecider: ShowPromptDecider = mock()
     private val mockSecondaryPromptDecider: ShowPromptDecider = mock()
     private val mockOnboardingStore: OnboardingStore = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun setup() = runTest {
@@ -50,13 +52,15 @@ class InitialPromptTypeDeciderTest {
             initialPromptDecider = mockInitialPromptDecider,
             secondaryPromptDecider = mockSecondaryPromptDecider,
             context = InstrumentationRegistry.getInstrumentation().targetContext,
-            onboardingStore = mockOnboardingStore
+            onboardingStore = mockOnboardingStore,
+            appBuildConfig = mockAppBuildConfig
         )
 
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
         whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
         whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(false)
+        whenever(mockAppBuildConfig.isDebug).thenReturn(true)
     }
 
     @Test
