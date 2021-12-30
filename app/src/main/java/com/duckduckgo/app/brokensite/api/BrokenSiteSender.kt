@@ -76,12 +76,8 @@ class BrokenSiteSubmitter(
             runCatching {
                 pixel.fire(AppPixelName.BROKEN_SITE_REPORT.pixelName, params, encodedParams)
             }
-                .onSuccess {
-                    Timber.v("Feedback submission succeeded")
-                }
-                .onFailure {
-                    Timber.w(it, "Feedback submission failed")
-                }
+                .onSuccess { Timber.v("Feedback submission succeeded") }
+                .onFailure { Timber.w(it, "Feedback submission failed") }
         }
     }
 
