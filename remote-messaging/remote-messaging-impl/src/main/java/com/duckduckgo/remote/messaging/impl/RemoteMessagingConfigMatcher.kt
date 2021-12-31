@@ -16,8 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.browser.api.DeviceProperties
+import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.Result
+import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
@@ -89,113 +91,4 @@ class RemoteMessagingConfigMatcher(
             }
         }
     }
-
-    private fun Boolean?.toResult(): Result {
-        return when (this) {
-            true -> Result.Match
-            false -> Result.Fail
-            null -> Result.NextMessage
-        }
-    }
 }
-
-class DeviceAttributeMatcher(
-    val deviceProperties: DeviceProperties
-) {
-    fun evaluate(matchingAttribute: MatchingAttribute): Result {
-        when (matchingAttribute) {
-            is MatchingAttribute.Api -> {
-                if ((matchingAttribute.min.defaultValue() || deviceProperties.osApiLevel() >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || deviceProperties.osApiLevel() <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
-            }
-            is MatchingAttribute.Locale -> {
-                val locales = matchingAttribute.value
-                if (locales.contains(deviceProperties.deviceLocale().toString())) return true.toResult()
-                return false.toResult()
-            }
-            is MatchingAttribute.WebView -> {
-                val deviceWebView = deviceProperties.webView()
-                Timber.i("RMF: device WV: $deviceWebView")
-
-                if ((matchingAttribute.min.defaultValue() || deviceWebView >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || deviceWebView <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
-            }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
-        }
-    }
-
-    private fun Boolean?.toResult(): Result {
-        return when (this) {
-            true -> Result.Match
-            false -> Result.Fail
-            null -> Result.NextMessage
-        }
-    }
-}
-
-class AndroidAppAttributeMatcher(
-    val appProperties: AppProperties
-) {
-    fun evaluate(matchingAttribute: MatchingAttribute): Result {
-        when (matchingAttribute) {
-            is MatchingAttribute.Flavor -> {
-                if (matchingAttribute.value.contains(appProperties.flavor())) return true.toResult()
-                return false.toResult()
-            }
-            is MatchingAttribute.AppId -> {
-                return (matchingAttribute.value == appProperties.appId()).toResult()
-            }
-            is MatchingAttribute.AppVersion -> {
-                if ((matchingAttribute.min.defaultValue() || appProperties.appVersion() >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || appProperties.appVersion() <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-                return false.toResult()
-            }
-            is MatchingAttribute.Atb -> {
-                return (matchingAttribute.value == appProperties.atb()).toResult()
-            }
-            is MatchingAttribute.AppAtb -> {
-                return (matchingAttribute.value == appProperties.appAtb()).toResult()
-            }
-            is MatchingAttribute.SearchAtb -> {
-                return (matchingAttribute.value == appProperties.searchAtb()).toResult()
-            }
-            is MatchingAttribute.ExpVariant -> {
-                return (matchingAttribute.value == appProperties.expVariant()).toResult()
-            }
-            is MatchingAttribute.InstalledGPlay -> {
-                return (matchingAttribute.value == appProperties.installedGPlay()).toResult()
-            }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
-        }
-    }
-
-    private fun Boolean?.toResult(): Result {
-        return when (this) {
-            true -> Result.Match
-            false -> Result.Fail
-            null -> Result.NextMessage
-        }
-    }
-}
-
-sealed class Result {
-    object Match : Result()
-    object Fail : Result()
-    object NextMessage : Result()
-}
-
-private fun String.defaultValue() = this.isEmpty()
-private fun Int.defaultValue() = this == -1
