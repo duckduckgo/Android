@@ -20,6 +20,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -34,13 +36,14 @@ import dagger.SingleInstanceIn
 class AndroidWorkScheduler @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val notificationScheduler: AndroidNotificationScheduler,
-    private val jobCleaner: JobCleaner
+    private val jobCleaner: JobCleaner,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun scheduleWork() {
         Timber.v("Scheduling work")
-        appCoroutineScope.launch {
+        appCoroutineScope.launch(dispatcherProvider.default()) {
             jobCleaner.cleanDeprecatedJobs()
             notificationScheduler.scheduleNextNotification()
         }

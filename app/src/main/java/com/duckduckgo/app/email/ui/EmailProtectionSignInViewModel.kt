@@ -53,6 +53,7 @@ class EmailProtectionSignInViewModel(
 
     sealed class Command {
         data class OpenUrl(val url: String) : Command()
+        data class OpenUrlInBrowserTab(val url: String) : Command()
         object ShowErrorMessage : Command()
         object ShowNotificationDialog : Command()
     }
@@ -67,13 +68,13 @@ class EmailProtectionSignInViewModel(
 
     fun haveAnInviteCode() {
         viewModelScope.launch {
-            commandChannel.send(Command.OpenUrl(url = "$SIGN_UP_URL${emailManager.getInviteCode()}"))
+            commandChannel.send(Command.OpenUrlInBrowserTab(url = "$SIGN_UP_URL${emailManager.getInviteCode()}"))
         }
     }
 
     fun getStarted() {
         viewModelScope.launch {
-            commandChannel.send(Command.OpenUrl(url = "$GET_STARTED_URL${emailManager.getInviteCode()}"))
+            commandChannel.send(Command.OpenUrlInBrowserTab(url = "$GET_STARTED_URL${emailManager.getInviteCode()}"))
         }
     }
 

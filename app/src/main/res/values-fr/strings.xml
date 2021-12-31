@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">La confidentialité des e-mails, simplifiée.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie. <a href=\"\"><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie. <a href=\"\"><b>En savoir plus</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Vous êtes sur la liste !</string>

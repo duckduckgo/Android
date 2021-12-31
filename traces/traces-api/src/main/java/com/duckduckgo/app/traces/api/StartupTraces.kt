@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.autocomplete
+package com.duckduckgo.app.traces.api
 
-import android.content.Context
-import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.statistics.VariantManager
-import dagger.Module
-import dagger.Provides
-
-@Module
-class BrowserAutoCompleteModule {
-
-    @Provides
-    fun settingsDataStore(context: Context, variantManager: VariantManager): SettingsDataStore = SettingsSharedPreferences(context, variantManager)
-
+interface StartupTraces {
+    var isTraceEnabled: Boolean
 }

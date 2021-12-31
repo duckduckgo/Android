@@ -19,7 +19,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

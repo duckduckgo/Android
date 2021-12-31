@@ -17,6 +17,8 @@
 package com.duckduckgo.app.fire
 
 import android.database.sqlite.SQLiteDatabase
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -26,7 +28,7 @@ interface DatabaseCleaner {
     suspend fun changeJournalModeToDelete(databasePath: String): Boolean
 }
 
-class DatabaseCleanerHelper : DatabaseCleaner {
+class DatabaseCleanerHelper(private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()) : DatabaseCleaner {
 
     override suspend fun cleanDatabase(databasePath: String): Boolean {
         return executeCommand("VACUUM", databasePath)
@@ -37,7 +39,7 @@ class DatabaseCleanerHelper : DatabaseCleaner {
     }
 
     private suspend fun executeCommand(command: String, databasePath: String): Boolean {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatcherProvider.io()) {
             if (databasePath.isNotEmpty()) {
                 var commandExecuted = false
                 openReadableDatabase(databasePath)?.use { db ->

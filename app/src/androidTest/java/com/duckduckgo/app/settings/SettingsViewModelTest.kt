@@ -20,12 +20,11 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.BuildConfig
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
@@ -34,6 +33,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -42,9 +42,7 @@ import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistMana
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.nhaarman.mockitokotlin2.*
-import kotlinx.android.synthetic.main.content_settings_general.view.*
-import kotlinx.android.synthetic.main.settings_automatically_clear_what_fragment.view.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
@@ -97,10 +95,11 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboardingStore
 
+    @Mock
+    private lateinit var mockAppBuildConfig: AppBuildConfig
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
-
-    private lateinit var commandCaptor: KArgumentCaptor<Command>
 
     @Before
     fun before() {
@@ -118,6 +117,7 @@ class SettingsViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
+            mockAppBuildConfig
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -127,6 +127,8 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockAppBuildConfig.versionName).thenReturn("name")
+        whenever(mockAppBuildConfig.versionCode).thenReturn(1)
     }
 
     @Test
@@ -136,7 +138,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+    fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
@@ -149,7 +151,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = coroutineTestRule.runBlocking {
+    fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(false)
         testee.start()
@@ -161,7 +163,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = coroutineTestRule.runBlocking {
+    fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
         testee.start()
@@ -173,7 +175,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartNotCalledYetThenViewStateInitialisedDefaultValues() = coroutineTestRule.runBlocking {
+    fun whenStartNotCalledYetThenViewStateInitialisedDefaultValues() = runTest {
         testee.viewState().test {
             val value = awaitItem()
             assertTrue(value.loading)
@@ -187,7 +189,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartCalledThenLoadingSetToFalse() = coroutineTestRule.runBlocking {
+    fun whenStartCalledThenLoadingSetToFalse() = runTest {
         testee.start()
         testee.viewState().test {
             val value = awaitItem()
@@ -198,11 +200,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenStartCalledThenVersionSetCorrectly() = coroutineTestRule.runBlocking {
+    fun whenStartCalledThenVersionSetCorrectly() = runTest {
         testee.start()
         testee.viewState().test {
             val value = expectMostRecentItem()
-            val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name (1)"
             assertTrue(value.version.startsWith(expectedStartString))
 
             cancelAndConsumeRemainingEvents()
@@ -216,7 +218,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeSettingsClickedThenCommandIsLaunchThemeSettingsIsSent() = runTest {
         testee.commands().test {
             testee.userRequestedToChangeTheme()
 
@@ -227,7 +229,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedThenDataStoreIsUpdatedAndUpdateThemeCommandIsSent() = runTest {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
             testee.onThemeSelected(DuckDuckGoTheme.DARK)
@@ -262,7 +264,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = coroutineTestRule.runBlocking {
+    fun whenThemeChangedButThemeWasAlreadySetThenDoNothing() = runTest {
         testee.commands().test {
             givenThemeSelected(DuckDuckGoTheme.LIGHT)
             testee.onThemeSelected(DuckDuckGoTheme.LIGHT)
@@ -277,7 +279,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenDefaultBrowserTogglesOffThenLaunchDefaultBrowserCommandIsSent() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
             testee.onDefaultBrowserToggled(false)
@@ -289,7 +291,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = coroutineTestRule.runBlocking {
+    fun whenDefaultBrowserTogglesOnThenLaunchDefaultBrowserCommandIsSent() = runTest {
         testee.commands().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
             testee.onDefaultBrowserToggled(true)
@@ -302,7 +304,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenDefaultBrowserTogglesOnAndBrowserWasAlreadyDefaultThenLaunchDefaultBrowserCommandIsNotSent() =
-        coroutineTestRule.runBlocking {
+        runTest {
             testee.commands().test {
                 whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
                 testee.onDefaultBrowserToggled(true)
@@ -359,7 +361,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() = coroutineTestRule.runBlocking {
+    fun whenLeaveFeedBackRequestedThenCommandIsLaunchFeedback() = runTest {
         testee.commands().test {
             testee.userRequestedToSendFeedback()
 
@@ -370,7 +372,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() = coroutineTestRule.runBlocking {
+    fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() = runTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
         testee.start()
 
@@ -382,7 +384,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() = coroutineTestRule.runBlocking {
+    fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() = runTest {
         testee.viewState().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
             testee.start()
@@ -394,7 +396,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenBrowserDetectorIndicatesDefaultCannotBeSetThenFlagToShowSettingIsFalse() = coroutineTestRule.runBlocking {
+    fun whenBrowserDetectorIndicatesDefaultCannotBeSetThenFlagToShowSettingIsFalse() = runTest {
         testee.viewState().test {
             whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
             testee.start()
@@ -406,7 +408,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenBrowserDetectorIndicatesDefaultCanBeSetThenFlagToShowSettingIsTrue() = coroutineTestRule.runBlocking {
+    fun whenBrowserDetectorIndicatesDefaultCanBeSetThenFlagToShowSettingIsTrue() = runTest {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
         testee.start()
         testee.viewState().test {
@@ -417,7 +419,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenWhitelistSelectedThenPixelIsSentAndWhitelistLaunched() = coroutineTestRule.runBlocking {
+    fun whenWhitelistSelectedThenPixelIsSentAndWhitelistLaunched() = runTest {
         testee.commands().test {
             testee.onManageWhitelistSelected()
 
@@ -429,10 +431,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() = coroutineTestRule.runBlocking {
+    fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() = runTest {
         testee.start()
         testee.viewState().test {
-            val expectedStartString = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name (1)"
             assertEquals(expectedStartString, awaitItem().version)
 
             cancelAndConsumeRemainingEvents()
@@ -440,12 +442,12 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenVariantIsSetThenVariantKeyIncludedInSettings() = coroutineTestRule.runBlocking {
+    fun whenVariantIsSetThenVariantKeyIncludedInSettings() = runTest {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab", filterBy = { true }))
         testee.start()
 
         testee.viewState().test {
-            val expectedStartString = "${BuildConfig.VERSION_NAME} ab (${BuildConfig.VERSION_CODE})"
+            val expectedStartString = "name ab (1)"
             assertEquals(expectedStartString, awaitItem().version)
 
             cancelAndConsumeRemainingEvents()
@@ -453,7 +455,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenChangeIconRequestedThenCommandIsChangeIcon() = coroutineTestRule.runBlocking {
+    fun whenChangeIconRequestedThenCommandIsChangeIcon() = runTest {
         testee.commands().test {
             testee.userRequestedToChangeIcon()
 
@@ -464,7 +466,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenFireAnimationSettingClickedThenCommandIsLaunchFireAnimationSettings() = coroutineTestRule.runBlocking {
+    fun whenFireAnimationSettingClickedThenCommandIsLaunchFireAnimationSettings() = runTest {
         testee.commands().test {
             testee.userRequestedToChangeFireAnimation()
 
@@ -482,7 +484,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenNewFireAnimationSelectedThenUpdateViewState() = coroutineTestRule.runBlocking {
+    fun whenNewFireAnimationSelectedThenUpdateViewState() = runTest {
         val expectedAnimation = FireAnimation.HeroAbstract
         testee.onFireAnimationSelected(expectedAnimation)
 
@@ -531,7 +533,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControl() = coroutineTestRule.runBlocking {
+    fun whenOnGlobalPrivacyControlClickedThenCommandIsLaunchGlobalPrivacyControl() = runTest {
         testee.commands().test {
             testee.onGlobalPrivacyControlClicked()
 
@@ -542,7 +544,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialog() = coroutineTestRule.runBlocking {
+    fun whenOnAutomaticallyClearWhatClickedEmitCommandShowClearWhatDialog() = runTest {
         testee.commands().test {
             testee.onAutomaticallyClearWhatClicked()
 
@@ -553,7 +555,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnAutomaticallyClearWhenClickedEmitCommandShowClearWhenDialog() = coroutineTestRule.runBlocking {
+    fun whenOnAutomaticallyClearWhenClickedEmitCommandShowClearWhenDialog() = runTest {
         testee.commands().test {
             testee.onAutomaticallyClearWhenClicked()
 
@@ -564,7 +566,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = coroutineTestRule.runBlocking {
+    fun whenUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
 
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
@@ -579,7 +581,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = coroutineTestRule.runBlocking {
+    fun whenUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
 
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
@@ -594,7 +596,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = coroutineTestRule.runBlocking {
+    fun whenUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
         testee.commands().test {
 
             whenever(appTPWaitlistManager.didJoinBeta()).thenReturn(false)
@@ -608,7 +610,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = coroutineTestRule.runBlocking {
+    fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
             whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
@@ -622,7 +624,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = coroutineTestRule.runBlocking {
+    fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
             whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.JoinedQueue(false))
@@ -636,7 +638,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedThenEmitCommandLaunchEmailProtection() = coroutineTestRule.runBlocking {
+    fun whenOnEmailProtectionSettingClickedThenEmitCommandLaunchEmailProtection() = runTest {
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 

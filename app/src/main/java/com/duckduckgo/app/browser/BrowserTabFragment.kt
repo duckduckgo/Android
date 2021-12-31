@@ -158,7 +158,9 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import android.content.pm.ResolveInfo
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
 
@@ -257,6 +259,9 @@ class BrowserTabFragment :
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     var messageFromPreviousTab: Message? = null
 
@@ -644,7 +649,7 @@ class BrowserTabFragment :
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent, null, false)
+                openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
@@ -693,7 +698,13 @@ class BrowserTabFragment :
                 openAppLink(it.appLink)
             }
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
+                openExternalDialog(
+                    intent = it.nonHttpAppLink.intent,
+                    fallbackUrl = it.nonHttpAppLink.fallbackUrl,
+                    fallbackIntent = it.nonHttpAppLink.fallbackIntent,
+                    useFirstActivityFound = false,
+                    headers = it.headers
+                )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -940,6 +951,7 @@ class BrowserTabFragment :
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
+        fallbackIntent: Intent? = null,
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap()
     ) {
@@ -948,23 +960,40 @@ class BrowserTabFragment :
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
-                if (fallbackUrl != null) {
-                    webView?.loadUrl(fallbackUrl, headers)
-                } else {
-                    showToast(R.string.unableToOpenLink)
+                when {
+                    fallbackIntent != null -> {
+                        val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
+                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound)
+                    }
+                    fallbackUrl != null -> {
+                        webView?.loadUrl(fallbackUrl, headers)
+                    }
+                    else -> {
+                        showToast(R.string.unableToOpenLink)
+                    }
                 }
             } else {
-                if (activities.size == 1 || useFirstActivityFound) {
-                    val activity = activities.first()
-                    val appTitle = activity.loadLabel(pm)
-                    Timber.i("Exactly one app available for intent: $appTitle")
-                    launchExternalAppDialog(it) { it.startActivity(intent) }
-                } else {
-                    val title = getString(R.string.openExternalApp)
-                    val intentChooser = Intent.createChooser(intent, title)
-                    launchExternalAppDialog(it) { it.startActivity(intentChooser) }
-                }
+                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound)
             }
+        }
+    }
+
+    private fun launchDialogForIntent(
+        context: Context,
+        pm: PackageManager?,
+        intent: Intent,
+        activities: List<ResolveInfo>,
+        useFirstActivityFound: Boolean
+    ) {
+        if (activities.size == 1 || useFirstActivityFound) {
+            val activity = activities.first()
+            val appTitle = activity.loadLabel(pm)
+            Timber.i("Exactly one app available for intent: $appTitle")
+            launchExternalAppDialog(context) { context.startActivity(intent) }
+        } else {
+            val title = getString(R.string.openExternalApp)
+            val intentChooser = Intent.createChooser(intent, title)
+            launchExternalAppDialog(context) { context.startActivity(intentChooser) }
         }
     }
 
@@ -1266,7 +1295,7 @@ class BrowserTabFragment :
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
         }
 
-        if (BuildConfig.DEBUG) {
+        if (appBuildConfig.isDebug) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
     }
@@ -2443,7 +2472,7 @@ class BrowserTabFragment :
     }
 
     private fun createIntentToOpenFile(context: Context, file: File): Intent? {
-        val uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+        val uri = FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
         val mime = activity?.contentResolver?.getType(uri) ?: return null
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, mime)

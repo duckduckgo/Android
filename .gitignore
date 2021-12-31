@@ -56,3 +56,5 @@ app/internal/
 
 build-cache
 report
+
+.DS_Store

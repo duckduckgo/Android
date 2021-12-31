@@ -111,6 +111,7 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
         const val SPACE = " "
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
+        val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
         val sitesThatOmitApplication = listOf(
             "cvs.com",
@@ -145,6 +146,8 @@ class DefaultUserAgentModule {
     @Provides
     @Named("defaultUserAgent")
     fun provideDefaultUserAgent(context: Context): String {
-        return WebSettings.getDefaultUserAgent(context)
+        return runCatching {
+            WebSettings.getDefaultUserAgent(context)
+        }.getOrDefault(UserAgentProvider.fallbackDefaultUA)
     }
 }

@@ -610,7 +610,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, <br/> fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
