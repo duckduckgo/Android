@@ -116,10 +116,10 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        deviceProperties: DeviceProperties,
+        deviceAttributeMatcher: DeviceAttributeMatcher,
         androidAppAttributeMatcher: AndroidAppAttributeMatcher
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(deviceProperties, androidAppAttributeMatcher)
+        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher)
     }
 
     @Provides
@@ -128,6 +128,14 @@ class DataSourceModule {
         appProperties: AppProperties
     ): AndroidAppAttributeMatcher {
         return AndroidAppAttributeMatcher(appProperties)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesDeviceAttributeMatcher(
+        deviceProperties: DeviceProperties
+    ): DeviceAttributeMatcher{
+        return DeviceAttributeMatcher(deviceProperties)
     }
 
     @Provides

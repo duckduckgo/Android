@@ -24,7 +24,7 @@ import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
-    val deviceProperties: DeviceProperties,
+    val deviceAttributeMatcher: DeviceAttributeMatcher,
     val androidAppAttributeMatcher: AndroidAppAttributeMatcher
 ) {
     fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
@@ -64,15 +64,7 @@ class RemoteMessagingConfigMatcher(
 
     private fun evaluateAttribute(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
-            is MatchingAttribute.Api -> {
-                if ((matchingAttribute.min.defaultValue() || deviceProperties.osApiLevel() >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || deviceProperties.osApiLevel() <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
-            }
+            is MatchingAttribute.Api -> return deviceAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppId -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppTheme -> TODO()
@@ -87,15 +79,44 @@ class RemoteMessagingConfigMatcher(
             is MatchingAttribute.Favorites -> TODO()
             is MatchingAttribute.Flavor -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.InstalledGPlay -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.Locale -> return deviceAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.SearchAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.SearchCount -> TODO()
+            is MatchingAttribute.WebView -> return deviceAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.WidgetAdded -> TODO()
+            is MatchingAttribute.Unknown -> {
+                return matchingAttribute.fallback.toResult()
+            }
+        }
+    }
+
+    private fun Boolean?.toResult(): Result {
+        return when (this) {
+            true -> Result.Match
+            false -> Result.Fail
+            null -> Result.NextMessage
+        }
+    }
+}
+
+class DeviceAttributeMatcher(
+    val deviceProperties: DeviceProperties
+) {
+    fun evaluate(matchingAttribute: MatchingAttribute): Result {
+        when (matchingAttribute) {
+            is MatchingAttribute.Api -> {
+                if ((matchingAttribute.min.defaultValue() || deviceProperties.osApiLevel() >= matchingAttribute.min) &&
+                    (matchingAttribute.max.defaultValue() || deviceProperties.osApiLevel() <= matchingAttribute.max)
+                ) {
+                    return true.toResult()
+                }
+
+                return false.toResult()
+            }
             is MatchingAttribute.Locale -> {
                 val locales = matchingAttribute.value
                 if (locales.contains(deviceProperties.deviceLocale().toString())) return true.toResult()
                 return false.toResult()
-            }
-            is MatchingAttribute.SearchAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.SearchCount -> TODO()
-            is MatchingAttribute.Unknown -> {
-                return matchingAttribute.fallback.toResult()
             }
             is MatchingAttribute.WebView -> {
                 val deviceWebView = deviceProperties.webView()
@@ -109,7 +130,7 @@ class RemoteMessagingConfigMatcher(
 
                 return false.toResult()
             }
-            is MatchingAttribute.WidgetAdded -> TODO()
+            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
 
