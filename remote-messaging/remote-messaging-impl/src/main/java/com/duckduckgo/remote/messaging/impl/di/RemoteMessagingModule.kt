@@ -26,6 +26,8 @@ import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
@@ -134,7 +136,7 @@ class DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesDeviceAttributeMatcher(
         deviceProperties: DeviceProperties
-    ): DeviceAttributeMatcher{
+    ): DeviceAttributeMatcher {
         return DeviceAttributeMatcher(deviceProperties)
     }
 
