@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.browser.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import java.util.*
 
-dependencies {
-    api project(path: ':common-ui')
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
+interface UserBrowserProperties {
+    fun appTheme(): DuckDuckGoTheme
+    suspend fun bookmarks(): Long
+    suspend fun favorites(): Long
+    fun daysSinceInstalled(): Long
+    suspend fun daysUsedSince(since: Date): Long
+    fun defaultBrowser(): Boolean
+    fun emailEnabled(): Boolean
+    fun searchCount(): Long
+    fun widgetAdded(): Boolean
 }
