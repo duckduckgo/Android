@@ -21,6 +21,7 @@ import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.DeviceProperties
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.di.scopes.AppScope
@@ -28,6 +29,7 @@ import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
@@ -119,9 +121,10 @@ class DataSourceModule {
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
         deviceAttributeMatcher: DeviceAttributeMatcher,
-        androidAppAttributeMatcher: AndroidAppAttributeMatcher
+        androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+        userAttributeMatcher: UserAttributeMatcher
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher)
+        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
     }
 
     @Provides
@@ -138,6 +141,14 @@ class DataSourceModule {
         deviceProperties: DeviceProperties
     ): DeviceAttributeMatcher {
         return DeviceAttributeMatcher(deviceProperties)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesUserAttributeMatcher(
+        userBrowserProperties: UserBrowserProperties
+    ): UserAttributeMatcher {
+        return UserAttributeMatcher(userBrowserProperties)
     }
 
     @Provides

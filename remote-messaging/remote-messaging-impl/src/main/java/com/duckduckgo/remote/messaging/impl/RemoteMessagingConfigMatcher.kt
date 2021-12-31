@@ -16,10 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.Result
-import com.duckduckgo.remote.messaging.impl.matchers.toResult
+import com.duckduckgo.remote.messaging.impl.matchers.*
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
@@ -27,9 +24,10 @@ import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
     val deviceAttributeMatcher: DeviceAttributeMatcher,
-    val androidAppAttributeMatcher: AndroidAppAttributeMatcher
+    val androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+    val userAttributeMatcher: UserAttributeMatcher
 ) {
-    fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
+    suspend fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules
 
         remoteConfig.messages.forEach { message ->
@@ -43,7 +41,7 @@ class RemoteMessagingConfigMatcher(
         return null
     }
 
-    private fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): Result {
+    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): Result {
         var result: Result = Result.Match
 
         for (rule in this) {
@@ -64,28 +62,28 @@ class RemoteMessagingConfigMatcher(
         return result
     }
 
-    private fun evaluateAttribute(matchingAttribute: MatchingAttribute): Result {
+    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> return deviceAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppId -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.AppTheme -> TODO()
+            is MatchingAttribute.AppTheme -> return userAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppVersion -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Atb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Bookmarks -> TODO()
-            is MatchingAttribute.DaysSinceInstalled -> TODO()
-            is MatchingAttribute.DaysUsedSince -> TODO()
-            is MatchingAttribute.DefaultBrowser -> TODO()
-            is MatchingAttribute.EmailEnabled -> TODO()
+            is MatchingAttribute.Bookmarks -> return userAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.DaysSinceInstalled -> return userAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.DaysUsedSince -> return userAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.DefaultBrowser -> return userAttributeMatcher.evaluate(matchingAttribute)
+            is MatchingAttribute.EmailEnabled -> return userAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.ExpVariant -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Favorites -> TODO()
+            is MatchingAttribute.Favorites -> return userAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Flavor -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.InstalledGPlay -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Locale -> return deviceAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.SearchAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.SearchCount -> TODO()
+            is MatchingAttribute.SearchCount -> return userAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.WebView -> return deviceAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.WidgetAdded -> TODO()
+            is MatchingAttribute.WidgetAdded -> return userAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.Unknown -> {
                 return matchingAttribute.fallback.toResult()
             }

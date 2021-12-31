@@ -16,6 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import java.util.*
+
 sealed class MatchingAttribute {
     data class Locale(override val value: List<String> = emptyList(), val fallback: Boolean? = null) : MatchingAttribute(), StringArrayMatchingAttribute
     data class Api(override val min: Int = -1, override val max: Int = -1, val fallback: Boolean? = null) : MatchingAttribute(), RangeIntMatchingAttribute
@@ -50,7 +52,7 @@ sealed class MatchingAttribute {
         override val min: Int = -1, override val max: Int = -1, val fallback: Boolean? = null
     ) : MatchingAttribute(), RangeIntMatchingAttribute
 
-    data class DaysUsedSince(override val since: String, override val value: Int, val fallback: Boolean? = null) : MatchingAttribute(), DateMatchingAttribute
+    data class DaysUsedSince(override val since: Date, override val value: Int, val fallback: Boolean? = null) : MatchingAttribute(), DateMatchingAttribute
     data class Unknown(val fallback: Boolean?) : MatchingAttribute()
 }
 
@@ -77,6 +79,6 @@ interface StringArrayMatchingAttribute {
 }
 
 interface DateMatchingAttribute {
-    val since: String
+    val since: Date
     val value: Int
 }
