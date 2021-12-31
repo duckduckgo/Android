@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
@@ -26,9 +27,8 @@ import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.SavedSitesManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -80,7 +80,7 @@ class BookmarksViewModelTest {
     }
 
     @Before
-    fun before() = coroutineRule.runBlocking {
+    fun before() = runTest {
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
 
         whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
@@ -93,21 +93,21 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkInsertedThenDaoUpdated() = coroutineRule.runBlocking {
+    fun whenBookmarkInsertedThenDaoUpdated() = runTest {
         testee.insert(bookmark)
 
         verify(bookmarksRepository).insert(bookmark)
     }
 
     @Test
-    fun whenFavoriteInsertedThenRepositoryUpdated() = coroutineRule.runBlocking {
+    fun whenFavoriteInsertedThenRepositoryUpdated() = runTest {
         testee.insert(favorite)
 
         verify(favoritesRepository).insert(favorite)
     }
 
     @Test
-    fun whenBookmarkDeleteRequestedThenDaoUpdated() = coroutineRule.runBlocking {
+    fun whenBookmarkDeleteRequestedThenDaoUpdated() = runTest {
         testee.onDeleteSavedSiteRequested(bookmark)
 
         verify(faviconManager).deletePersistedFavicon(bookmark.url)
@@ -115,21 +115,21 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = coroutineRule.runBlocking {
+    fun whenFavoriteDeleteRequestedThenDeleteFromRepository() = runTest {
         testee.onDeleteSavedSiteRequested(favorite)
 
         verify(favoritesRepository).delete(favorite)
     }
 
     @Test
-    fun whenBookmarkEditedThenDaoUpdated() = coroutineRule.runBlocking {
+    fun whenBookmarkEditedThenDaoUpdated() = runTest {
         testee.onSavedSiteEdited(bookmark)
 
         verify(bookmarksRepository).update(bookmark)
     }
 
     @Test
-    fun whenFavoriteEditedThenRepositoryUpdated() = coroutineRule.runBlocking {
+    fun whenFavoriteEditedThenRepositoryUpdated() = runTest {
         testee.onSavedSiteEdited(favorite)
 
         verify(favoritesRepository).update(favorite)
@@ -169,7 +169,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFavoritesChangedThenObserverNotified() = coroutineRule.runBlocking {
+    fun whenFavoritesChangedThenObserverNotified() = runTest {
         whenever(favoritesRepository.favorites()).thenReturn(
             flow {
                 emit(emptyList<SavedSite.Favorite>())
@@ -191,7 +191,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() = coroutineRule.runBlocking {
+    fun whenFetchBookmarksAndFoldersThenUpdateStateWithCollectedBookmarksAndFolders() = runTest {
         val parentId = 1L
 
         testee.fetchBookmarksAndFolders(parentId = parentId)
@@ -210,7 +210,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkFolderAddedThenCallInsertOnRepository() = coroutineRule.runBlocking {
+    fun whenBookmarkFolderAddedThenCallInsertOnRepository() = runTest {
         testee.onBookmarkFolderAdded(bookmarkFolder)
 
         verify(bookmarksRepository).insert(bookmarkFolder)
@@ -225,14 +225,14 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = coroutineRule.runBlocking {
+    fun whenBookmarkFolderUpdatedThenCallUpdateOnRepository() = runTest {
         testee.onBookmarkFolderUpdated(bookmarkFolder)
 
         verify(bookmarksRepository).update(bookmarkFolder)
     }
 
     @Test
-    fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = coroutineRule.runBlocking {
+    fun whenDeleteEmptyBookmarkFolderRequestedThenDeleteFolderAndIssueConfirmDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
@@ -249,7 +249,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = coroutineRule.runBlocking {
+    fun whenDeleteNonEmptyBookmarkFolderRequestedThenIssueDeleteBookmarkFolderCommand() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))
@@ -264,7 +264,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = coroutineRule.runBlocking {
+    fun whenInsertRecentlyDeletedBookmarksAndFoldersThenInsertCachedFolderBranch() = runTest {
         val bookmarkFolderBranch = BookmarkFolderBranch(
             listOf(bookmarkEntity),
             listOf(BookmarkFolderEntity(bookmarkFolder.id, bookmarkFolder.name, bookmarkFolder.parentId))

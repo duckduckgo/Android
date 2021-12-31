@@ -20,16 +20,19 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.BuildConfig
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import javax.inject.Inject
 
-class VpnPreferences @Inject constructor(private val applicationContext: Context) {
+class VpnPreferences @Inject constructor(
+    private val applicationContext: Context,
+    private val appBuildConfig: AppBuildConfig
+) {
 
     fun updateDebugLoggingPreference(enabled: Boolean) {
         prefs().edit { putBoolean(PREFS_KEY_DEBUG_LOGGING, enabled) }
     }
 
-    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, BuildConfig.DEBUG)
+    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, appBuildConfig.isDebug)
 
     fun useCustomDnsServer(dnsServer: Boolean) {
         prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }

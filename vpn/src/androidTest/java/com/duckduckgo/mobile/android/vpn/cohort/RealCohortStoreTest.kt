@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.cohort
 import androidx.test.platform.app.InstrumentationRegistry
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -52,7 +52,7 @@ class RealCohortStoreTest {
 
     @Test
     fun whenInitialCohortFirstCalledThenStoreInitialCohort() {
-        (cohortStore as RealCohortStore).onVpnStarted(TestCoroutineScope())
+        (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertEquals(LocalDate.now(), cohortStore.getCohortStoredLocalDate())
     }
@@ -62,7 +62,7 @@ class RealCohortStoreTest {
         val date = LocalDate.now().plusDays(3)
         cohortStore.setCohortLocalDate(date)
 
-        (cohortStore as RealCohortStore).onVpnStarted(TestCoroutineScope())
+        (cohortStore as RealCohortStore).onVpnStarted(TestScope())
 
         assertEquals(date, cohortStore.getCohortStoredLocalDate())
     }

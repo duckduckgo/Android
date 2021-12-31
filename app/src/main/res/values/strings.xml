@@ -589,7 +589,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address, without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>

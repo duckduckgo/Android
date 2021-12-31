@@ -14,6 +14,7 @@ include ':statistics'
 include ':common'
 include ':common-ui'
 include ':app-store'
+include ':appbuildconfig-api'
 
 include ':feature-toggles-api'
 include ':feature-toggles-impl'
@@ -21,6 +22,9 @@ include ':feature-toggles-impl'
 include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'
+
+include ':traces-api'
+include ':traces-impl'
 
 include ':remote-messaging-api'
 include ':remote-messaging-impl'
@@ -36,6 +40,9 @@ project(':privacy-config-store').projectDir = new File('privacy-config/privacy-c
 project(':remote-messaging-api').projectDir = new File('remote-messaging/remote-messaging-api')
 project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
 project(':remote-messaging-store').projectDir = new File('remote-messaging/remote-messaging-store')
+
+project(':traces-api').projectDir = new File('traces/traces-api')
+project(':traces-impl').projectDir = new File('traces/traces-impl')
 
 rootProject.children.each { subproject ->
 
@@ -75,6 +82,3 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
-include ':remote-messaging-impl'
-include ':remote-messaging-store'
-include ':remote-messaging-api'

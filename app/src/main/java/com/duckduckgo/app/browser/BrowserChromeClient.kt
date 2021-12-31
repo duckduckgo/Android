@@ -20,13 +20,11 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Message
 import android.view.View
-import android.webkit.GeolocationPermissions
-import android.webkit.PermissionRequest
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebView
+import android.webkit.*
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.privacy.config.api.Drm
@@ -38,7 +36,8 @@ import javax.inject.Inject
 class BrowserChromeClient @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val drm: Drm,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -57,7 +56,7 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.goFullScreen(view)
 
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
                 throw e
             }
@@ -70,7 +69,7 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.exitFullScreen()
             customView = null
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, HIDE_CUSTOM_VIEW)
                 throw e
             }
@@ -84,7 +83,7 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)
                 throw e
             }
@@ -110,7 +109,7 @@ class BrowserChromeClient @Inject constructor(
         try {
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, RECEIVED_PAGE_TITLE)
                 throw e
             }
@@ -122,13 +121,14 @@ class BrowserChromeClient @Inject constructor(
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
             true
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            // cancel the request using the documented way
+            filePathCallback.onReceiveValue(null)
+
+            appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_FILE_CHOOSER)
                 throw e
             }
 
-            // cancel the request using the documented way
-            filePathCallback.onReceiveValue(null)
             true
         }
     }

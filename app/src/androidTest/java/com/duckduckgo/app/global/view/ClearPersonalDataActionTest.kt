@@ -25,14 +25,16 @@ import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.runBlocking
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class ClearPersonalDataActionTest {
 
@@ -63,49 +65,49 @@ class ClearPersonalDataActionTest {
     }
 
     @Test
-    fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runBlocking<Unit> {
+    fun whenClearCalledWithPixelIncrementSetToTrueThenPixelCountIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = true)
         verify(mockClearingUnsentForgetAllPixelStore).incrementCount()
     }
 
     @Test
-    fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runBlocking<Unit> {
+    fun whenClearCalledWithPixelIncrementSetToFalseThenPixelCountNotIncremented() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockClearingUnsentForgetAllPixelStore, never()).incrementCount()
     }
 
     @Test
-    fun whenClearCalledThenDataManagerClearsSessions() = runBlocking<Unit> {
+    fun whenClearCalledThenDataManagerClearsSessions() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockDataManager).clearWebViewSessions()
     }
 
     @Test
-    fun whenClearCalledThenDataManagerClearsData() = runBlocking<Unit> {
+    fun whenClearCalledThenDataManagerClearsData() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockDataManager).clearData(any(), any())
     }
 
     @Test
-    fun whenClearCalledThenAppCacheClearerClearsCache() = runBlocking<Unit> {
+    fun whenClearCalledThenAppCacheClearerClearsCache() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockAppCacheClearer).clearCache()
     }
 
     @Test
-    fun whenClearCalledThenTabsCleared() = runBlocking<Unit> {
+    fun whenClearCalledThenTabsCleared() = runTest {
         testee.clearTabsAndAllDataAsync(false, false)
         verify(mockTabRepository).deleteAll()
     }
 
     @Test
-    fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runBlocking<Unit> {
+    fun whenClearCalledThenGeoLocationPermissionsAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockGeoLocationPermissions).clearAllButFireproofed()
     }
 
     @Test
-    fun whenClearCalledThenThirdPartyCookieSitesAreCleared() = runBlocking<Unit> {
+    fun whenClearCalledThenThirdPartyCookieSitesAreCleared() = runTest {
         testee.clearTabsAndAllDataAsync(appInForeground = false, shouldFireDataClearPixel = false)
         verify(mockThirdPartyCookieManager).clearAllData()
     }

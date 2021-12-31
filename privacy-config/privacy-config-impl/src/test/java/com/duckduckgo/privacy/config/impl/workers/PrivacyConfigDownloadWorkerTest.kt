@@ -20,16 +20,18 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class PrivacyConfigDownloadWorkerTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -46,7 +48,7 @@ class PrivacyConfigDownloadWorkerTest {
 
     @Test
     fun whenDoWorkIfDownloadReturnsTrueThenReturnSuccess() =
-        coroutineRule.runBlocking {
+        runTest {
             whenever(mockPrivacyConfigDownloader.download()).thenReturn(true)
 
             val worker =
@@ -61,7 +63,7 @@ class PrivacyConfigDownloadWorkerTest {
 
     @Test
     fun whenDoWorkIfDownloadReturnsFalseThenReturnRetry() =
-        coroutineRule.runBlocking {
+        runTest {
             whenever(mockPrivacyConfigDownloader.download()).thenReturn(false)
 
             val worker =

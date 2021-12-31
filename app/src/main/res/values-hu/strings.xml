@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/> anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.logindetection
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Test
 
 class LoginDetectionJavascriptInterfaceTest {

@@ -27,4 +27,6 @@
     <string name="devSettingsScreenMajorFetch" translatable="false">Major via fetch</string>
     <string name="devSettingsScreenMajorFetchSubtitle" translatable="false">Check Facebook is blocked</string>
     <string name="devSettingsScreenTdsWait" translatable="false">Please wait while we download the tds version</string>
+    <string name="devStartupTracing" translatable="false">Start-up tracing</string>
+    <string name="devStartupTracingByline" translatable="false">Enable/disable start-up tracing</string>
 </resources>

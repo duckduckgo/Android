@@ -21,16 +21,18 @@ package com.duckduckgo.app.notification.model
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.db.NotificationDao
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.runBlocking
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class WebsiteNotificationTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -44,25 +46,25 @@ class WebsiteNotificationTest {
     }
 
     @Test
-    fun whenNotificationNotSeenThenCanShowIsTrue() = runBlocking<Unit> {
+    fun whenNotificationNotSeenThenCanShowIsTrue() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(false)
         assertTrue(testee.canShow())
     }
 
     @Test
-    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runBlocking<Unit> {
+    fun whenNotificationAlreadySeenThenCanShowIsFalse() = runTest {
         whenever(notificationsDao.exists(any())).thenReturn(true)
         assertFalse(testee.canShow())
     }
 
     @Test
-    fun whenBuildSpecificationSetCorrectUrl() = runBlocking<Unit> {
+    fun whenBuildSpecificationSetCorrectUrl() = runTest {
         val spec = testee.buildSpecification()
         assertEquals(URL, spec.bundle.get(WebsiteNotificationSpecification.WEBSITE_KEY))
     }
 
     @Test
-    fun whenBuildSpecificationSetCorrectPixelSuffix() = runBlocking<Unit> {
+    fun whenBuildSpecificationSetCorrectPixelSuffix() = runTest {
         val spec = testee.buildSpecification()
         assertEquals(PIXEL, spec.pixelSuffix)
     }
