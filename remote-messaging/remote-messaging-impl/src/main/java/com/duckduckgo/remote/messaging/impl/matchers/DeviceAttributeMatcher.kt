@@ -26,6 +26,8 @@ class DeviceAttributeMatcher(
     fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> {
+                if (matchingAttribute == MatchingAttribute.Api()) return Result.Fail
+
                 if ((matchingAttribute.min.defaultValue() || deviceProperties.osApiLevel() >= matchingAttribute.min) &&
                     (matchingAttribute.max.defaultValue() || deviceProperties.osApiLevel() <= matchingAttribute.max)
                 ) {
@@ -40,18 +42,37 @@ class DeviceAttributeMatcher(
                 return false.toResult()
             }
             is MatchingAttribute.WebView -> {
+                if (matchingAttribute == MatchingAttribute.WebView()) return Result.Fail
+
                 val deviceWebView = deviceProperties.webView()
                 Timber.i("RMF: device WV: $deviceWebView")
+                if (!deviceWebView.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
 
-                if ((matchingAttribute.min.defaultValue() || deviceWebView >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || deviceWebView <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
+                val webViewVersion = deviceWebView.split(".").filter { it.isNotEmpty() }
+                val minWebViewVersion = matchingAttribute.min.split(".").filter { it.isNotEmpty() }
+                val maxWebViewVersion = matchingAttribute.max.split(".").filter { it.isNotEmpty() }
 
-                return false.toResult()
+                if (webViewVersion.isEmpty()) return false.toResult()
+                if (webViewVersion.compareTo(minWebViewVersion) <= -1) return false.toResult()
+                if (webViewVersion.compareTo(maxWebViewVersion) >= 1) return false.toResult()
+
+                return true.toResult()
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
+    }
+
+    private fun List<String>.compareTo(other: List<String>): Int {
+        val otherSize = other.size
+
+        for (index in this.indices) {
+            if (index > otherSize-1 ) return 0
+            val value = this[index]
+            if (value.isEmpty()) return 0
+            if (value < other[index]) return -1
+            if (value > other[index]) return 1
+        }
+
+        return 0
     }
 }
