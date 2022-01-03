@@ -22,7 +22,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.PromptCount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -30,6 +30,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 @Suppress("RemoveExplicitTypeArguments")
 class AppEnjoymentDatabaseRepositoryTest {
 
@@ -58,66 +59,66 @@ class AppEnjoymentDatabaseRepositoryTest {
     }
 
     @Test
-    fun whenFirstCreatedThenPrompt1CanBeShown() = runBlocking<Unit> {
+    fun whenFirstCreatedThenPrompt1CanBeShown() = runTest {
         assertTrue(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserGaveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
+    fun whenUserGaveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runTest {
         testee.onUserSelectedToGiveFeedback(FIRST_PROMPT)
         assertFalse(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserDeclinedToGiveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
+    fun whenUserDeclinedToGiveFeedbackForPrompt1ThenPrompt1CannotBeShown() = runTest {
         testee.onUserDeclinedToGiveFeedback(FIRST_PROMPT)
         assertFalse(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserGaveRatingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
+    fun whenUserGaveRatingForPrompt1ThenPrompt1CannotBeShown() = runTest {
         testee.onUserSelectedToRateApp(FIRST_PROMPT)
         assertFalse(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserDeclinedRatingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
+    fun whenUserDeclinedRatingForPrompt1ThenPrompt1CannotBeShown() = runTest {
         testee.onUserDeclinedToRateApp(FIRST_PROMPT)
         assertFalse(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt1ThenPrompt1CannotBeShown() = runBlocking<Unit> {
+    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt1ThenPrompt1CannotBeShown() = runTest {
         testee.onUserDeclinedToSayIfEnjoyingApp(FIRST_PROMPT)
         assertFalse(testee.canUserBeShownFirstPrompt())
     }
 
     @Test
-    fun whenUserGaveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
+    fun whenUserGaveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runTest {
         testee.onUserSelectedToGiveFeedback(SECOND_PROMPT)
         assertFalse(testee.canUserBeShownSecondPrompt())
     }
 
     @Test
-    fun whenUserDeclinedToGiveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
+    fun whenUserDeclinedToGiveFeedbackForPrompt2ThenPrompt2CannotBeShownAgain() = runTest {
         testee.onUserDeclinedToGiveFeedback(SECOND_PROMPT)
         assertFalse(testee.canUserBeShownSecondPrompt())
     }
 
     @Test
-    fun whenUserGaveRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
+    fun whenUserGaveRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runTest {
         testee.onUserSelectedToRateApp(SECOND_PROMPT)
         assertFalse(testee.canUserBeShownSecondPrompt())
     }
 
     @Test
-    fun whenUserDeclinedRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
+    fun whenUserDeclinedRatingForPrompt2ThenPrompt2CannotBeShownAgain() = runTest {
         testee.onUserDeclinedToRateApp(SECOND_PROMPT)
         assertFalse(testee.canUserBeShownSecondPrompt())
     }
 
     @Test
-    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt2ThenPrompt2CannotBeShownAgain() = runBlocking<Unit> {
+    fun whenUserDeclinedToSayWhetherEnjoyingForPrompt2ThenPrompt2CannotBeShownAgain() = runTest {
         testee.onUserDeclinedToSayIfEnjoyingApp(SECOND_PROMPT)
         assertFalse(testee.canUserBeShownSecondPrompt())
     }

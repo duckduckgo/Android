@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

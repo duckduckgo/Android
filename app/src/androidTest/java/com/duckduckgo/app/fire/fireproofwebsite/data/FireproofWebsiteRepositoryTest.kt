@@ -20,14 +20,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -67,38 +68,38 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteEmptyThenNoEntityIsCreated() = runTest {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
-    fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteInvalidThenNoEntityIsCreated() = runTest {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("aa1111")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
-    fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteWithSchemaThenNoEntityIsCreated() = runTest {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("https://aa1111.com")
         assertNull(fireproofWebsiteEntity)
     }
 
     @Test
-    fun whenFireproofWebsiteIsValidThenEntityCreated() = coroutineRule.runBlocking {
+    fun whenFireproofWebsiteIsValidThenEntityCreated() = runTest {
         val fireproofWebsiteEntity = fireproofWebsiteRepository.fireproofWebsite("example.com")
         assertEquals(FireproofWebsiteEntity("example.com"), fireproofWebsiteEntity)
     }
 
     @Test
-    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = coroutineRule.runBlocking {
+    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = runTest {
         givenFireproofWebsiteDomain("example.com", "example2.com")
         val fireproofWebsiteEntities = fireproofWebsiteRepository.getFireproofWebsites().blockingObserve()!!
         assertEquals(fireproofWebsiteEntities.size, 2)
     }
 
     @Test
-    fun whenRemoveFireproofWebsiteThenItemRemovedFromDatabase() = coroutineRule.runBlocking {
+    fun whenRemoveFireproofWebsiteThenItemRemovedFromDatabase() = runTest {
         givenFireproofWebsiteDomain("example.com", "example2.com")
 
         fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
@@ -108,7 +109,7 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() = coroutineRule.runBlocking {
+    fun whenRemoveFireproofWebsiteThenDeletePersistedFavicon() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
         fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity("example.com"))
@@ -117,7 +118,7 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() = coroutineRule.runBlocking {
+    fun whenFireproofWebsitesCountByDomainAndNoWebsitesMatchThenReturnZero() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
         val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("test.com")
@@ -126,7 +127,7 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() = coroutineRule.runBlocking {
+    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
         val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")

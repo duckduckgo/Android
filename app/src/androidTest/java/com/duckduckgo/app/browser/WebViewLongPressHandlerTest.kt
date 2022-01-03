@@ -23,10 +23,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -56,7 +56,7 @@ class WebViewLongPressHandlerTest {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         testee = WebViewLongPressHandler(context, mockPixel)
     }
 

@@ -22,8 +22,8 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before

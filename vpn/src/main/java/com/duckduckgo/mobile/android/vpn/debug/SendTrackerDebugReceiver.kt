@@ -20,8 +20,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -53,12 +53,13 @@ import javax.inject.Inject
 @SingleInstanceIn(VpnScope::class)
 class SendTrackerDebugReceiver @Inject constructor(
     private val context: Context,
+    private val appBuildConfig: AppBuildConfig,
     private val vpnDatabase: VpnDatabase,
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     private fun register() {
         unregister()
-        if (!BuildConfig.DEBUG) {
+        if (!appBuildConfig.isDebug) {
             Timber.i("Will not register SendTrackerDebugReceiver, not in DEBUG mode")
             return
         }

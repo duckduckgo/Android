@@ -23,8 +23,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Test
 
 class DataClearerForegroundAppRestartPixelTest {

@@ -65,12 +65,14 @@ class NetworkFileDownloader @Inject constructor(
                         }
                     }
                 } else {
+                    // TODO [Improve downloads] This is not a connection failed error, but a non-[200..300) response code.
                     Timber.d("Connection failed ${response.errorBody()}")
                     callback.downloadFailed("Connection failed", DownloadFailReason.ConnectionRefused)
                 }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
+                // TODO [Improve downloads] This is a connection failed, the reason provided is misleading.
                 callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
                 return
             }

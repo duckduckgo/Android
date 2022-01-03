@@ -29,13 +29,14 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
-import dagger.SingleInstanceIn
 
 @Module
 class RatingModule {
@@ -73,9 +74,10 @@ class RatingModule {
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
         context: Context,
-        onboardingStore: OnboardingStore
+        onboardingStore: OnboardingStore,
+        appBuildConfig: AppBuildConfig
     ): PromptTypeDecider {
-        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore)
+        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore, appBuildConfig)
     }
 
     @Provides
