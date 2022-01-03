@@ -43,6 +43,8 @@ constructor(
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
 
+    private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
+
     suspend fun getTrackersForAppFromDate(date: String, packageName: String): Flow<ViewState> =
         withContext(dispatchers.io()) {
             return@withContext statsRepository
@@ -70,9 +72,18 @@ constructor(
 
         trackerCompany.forEach { data ->
             val trackerCompanyName = data.value[0].tracker.company
+
             val trackerCompanyDisplayName = data.value[0].tracker.companyDisplayName
-            val trackingSignals = data.value[0].trackerEntity.signals
+            val signals = data.value[0].trackerEntity.signals
             val timestamp = data.value[0].tracker.timestamp
+
+            val trackingSignals = if (trackerCompanies.containsKey(trackerCompanyName)){
+                trackerCompanies.get(trackerCompanyName)!!
+            } else {
+                val randomTrackingSignals = mapTrackingSignals(signals)
+                trackerCompanies.put(trackerCompanyName, randomTrackingSignals)
+                randomTrackingSignals
+            }
 
             sourceData.add(
                 CompanyTrackingDetails(
@@ -80,13 +91,13 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals(trackingSignals)))
+                    trackingSignals = trackingSignals))
         }
 
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
+    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {1111111
         val originalTrackingSignals = signals.map { TrackingSignal.fromTag(it) }
         val randomElements = originalTrackingSignals.asSequence().shuffled().toList()
         return randomElements.distinctBy { it.signalDisplayName }
