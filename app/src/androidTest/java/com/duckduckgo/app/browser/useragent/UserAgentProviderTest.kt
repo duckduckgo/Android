@@ -17,8 +17,8 @@
 package com.duckduckgo.app.browser.useragent
 
 import com.duckduckgo.app.global.device.DeviceInfo
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test

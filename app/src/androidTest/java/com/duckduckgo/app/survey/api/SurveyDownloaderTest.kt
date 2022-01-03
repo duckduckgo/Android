@@ -23,7 +23,7 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before

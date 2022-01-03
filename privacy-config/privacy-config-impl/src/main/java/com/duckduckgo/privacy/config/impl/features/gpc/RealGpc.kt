@@ -93,6 +93,7 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
 
         private val headerConsumers = listOf(
             "nytimes.com",
+            "washingtonpost.com",
             "globalprivacycontrol.org",
             "global-privacy-control.glitch.me"
         )

@@ -69,6 +69,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDebugLogging()
         setupBugReport()
         setupDeleteTrackingHistory()
+        setupViewDiagnosticsView()
     }
 
     override fun onDestroy() {
@@ -80,6 +81,13 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.deleteTrackingHistory.setOnClickListener {
             sendBroadcast(DeleteTrackersDebugReceiver.createIntent())
             Snackbar.make(binding.root, "Tracking history deleted", Snackbar.LENGTH_LONG).show()
+        }
+    }
+
+    private fun setupViewDiagnosticsView() {
+        binding.viewDiagnostics.setOnClickListener {
+            val i = Intent().also { it.setClassName(packageName, "dummy.ui.VpnDiagnosticsActivity") }
+            startActivity(i)
         }
     }
 

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackerallowlist
+package com.duckduckgo.privacy.config.impl.referencetests.trackerallowlist
 
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.privacy.config.impl.features.trackerallowlist.RealTrackerAllowlist
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -35,7 +36,7 @@ import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class RealTrackerAllowlistTest(private val testCase: TestCase) {
+class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
 
     private val mockTrackerAllowlistRepository: TrackerAllowlistRepository = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
@@ -50,7 +51,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             return adapter.fromJson(
-                FileUtilities.loadText("json/tracker_allowlist_matching_tests.json"))
+                FileUtilities.loadText("reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
                 ?: emptyList()
         }
     }
@@ -86,7 +87,7 @@ class RealTrackerAllowlistTest(private val testCase: TestCase) {
             moshi.adapter(TrackerAllowlistEntity::class.java)
         val exceptions = CopyOnWriteArrayList<TrackerAllowlistEntity>()
         val jsonObject: JSONObject =
-            FileUtilities.getJsonObjectFromFile("json/tracker_allowlist_reference.json")
+            FileUtilities.getJsonObjectFromFile("reference_tests/trackerallowlist/tracker_allowlist_reference.json")
 
         jsonObject.keys().forEach {
             val allowlistEntity = jsonAdapter.fromJson(jsonObject.get(it).toString())

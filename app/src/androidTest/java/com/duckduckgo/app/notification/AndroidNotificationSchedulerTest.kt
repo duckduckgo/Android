@@ -29,16 +29,17 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
 import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import kotlin.reflect.jvm.jvmName
 
+@ExperimentalCoroutinesApi
 class AndroidNotificationSchedulerTest {
 
     @ExperimentalCoroutinesApi
@@ -75,7 +76,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationClearDataCanShowThenPrivacyNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -84,7 +85,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCanShowButClearDataCannotThenPrivacyNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(true)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
@@ -93,7 +94,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationCannotShowAndClearNotificationCanShowThenClearNotificationIsScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
@@ -102,7 +103,7 @@ class AndroidNotificationSchedulerTest {
     }
 
     @Test
-    fun whenPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runBlocking<Unit> {
+    fun whenPrivacyNotificationAndClearNotificationCannotShowThenNoNotificationScheduled() = runTest {
         whenever(privacyNotification.canShow()).thenReturn(false)
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()

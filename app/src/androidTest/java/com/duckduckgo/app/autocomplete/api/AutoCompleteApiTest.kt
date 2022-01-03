@@ -21,7 +21,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Assert.*
