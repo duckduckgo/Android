@@ -17,20 +17,22 @@
 package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.reset
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.test.TestCoroutineScope
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 
+@ExperimentalCoroutinesApi
 class RealUnprotectedTemporaryRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -45,7 +47,7 @@ class RealUnprotectedTemporaryRepositoryTest {
         whenever(mockDatabase.unprotectedTemporaryDao()).thenReturn(mockUnprotectedTemporaryDao)
         testee =
             RealUnprotectedTemporaryRepository(
-                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -54,17 +56,17 @@ class RealUnprotectedTemporaryRepositoryTest {
 
         testee =
             RealUnprotectedTemporaryRepository(
-                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(unprotectedTemporaryException, testee.exceptions.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() =
-        coroutineRule.runBlocking {
+        runTest {
             testee =
                 RealUnprotectedTemporaryRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
             testee.updateAll(listOf())
 
@@ -73,11 +75,11 @@ class RealUnprotectedTemporaryRepositoryTest {
 
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() =
-        coroutineRule.runBlocking {
+        runTest {
             givenUnprotectedTemporaryDaoContainsExceptions()
             testee =
                 RealUnprotectedTemporaryRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
             assertEquals(1, testee.exceptions.size)
             reset(mockUnprotectedTemporaryDao)
 

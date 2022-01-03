@@ -20,8 +20,8 @@ import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

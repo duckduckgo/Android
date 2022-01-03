@@ -18,8 +18,9 @@
 
 package com.duckduckgo.app.referencetests
 
-import android.util.Base64
-import android.webkit.*
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
@@ -49,20 +50,23 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+@ExperimentalCoroutinesApi
 @RunWith(Parameterized::class)
 class DomainsReferenceTest(private val testCase: TestCase) {
 
@@ -191,7 +195,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
 
     private fun initialiseResourceSurrogates() {
         val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        val resourceSurrogateLoader = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
+        val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
         val surrogatesFile = FileUtilities.loadText("reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)

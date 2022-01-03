@@ -21,11 +21,12 @@ import com.duckduckgo.app.global.AlertingUncaughtExceptionHandler
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 class UncaughtExceptionModule {
@@ -46,10 +47,11 @@ class UncaughtExceptionModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         dispatcherProvider: DispatcherProvider,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appBuildConfig: AppBuildConfig
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository, dispatcherProvider, appCoroutineScope)
+        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository, dispatcherProvider, appCoroutineScope, appBuildConfig)
     }
 
     @Provides

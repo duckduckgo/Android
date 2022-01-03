@@ -19,12 +19,12 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import junit.framework.TestCase.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Before
@@ -70,12 +70,12 @@ class BookmarkFoldersViewModelTest {
     }
 
     @Before
-    fun before() = coroutineRule.runBlocking {
+    fun before() = runTest {
         whenever(bookmarksRepository.getFlatFolderStructure(anyLong(), any(), anyString())).thenReturn(folderStructure)
     }
 
     @Test
-    fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = coroutineRule.runBlocking {
+    fun whenFetchBookmarkFoldersThenCallRepoAndUpdateViewState() = runTest {
         val selectedFolderId = 0L
         val rootFolderName = "Bookmarks"
         val folder = BookmarkFolder(2, "a folder", 1)
@@ -90,7 +90,7 @@ class BookmarkFoldersViewModelTest {
     }
 
     @Test
-    fun whenItemSelectedThenIssueSelectFolderCommand() = coroutineRule.runBlocking {
+    fun whenItemSelectedThenIssueSelectFolderCommand() = runTest {
         val folder = BookmarkFolder(2, "a folder", 1)
 
         testee.onItemSelected(folder)

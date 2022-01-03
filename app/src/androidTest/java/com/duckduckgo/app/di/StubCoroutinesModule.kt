@@ -23,7 +23,9 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @Module
 @ContributesTo(
     scope = AppScope::class,

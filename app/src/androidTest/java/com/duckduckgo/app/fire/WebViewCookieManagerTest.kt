@@ -19,10 +19,11 @@ package com.duckduckgo.app.fire
 import android.webkit.CookieManager
 import android.webkit.ValueCallback
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.test.runTest
+import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
@@ -55,7 +56,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesRemovedThenInternalCookiesRecreated() = coroutineRule.runBlocking {
+    fun whenCookiesRemovedThenInternalCookiesRecreated() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -66,7 +67,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenRemoveCookiesExecuted() = coroutineRule.runBlocking {
+    fun whenCookiesStoredThenRemoveCookiesExecuted() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -77,7 +78,7 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = coroutineRule.runBlocking {
+    fun whenCookiesStoredThenFlushBeforeAndAfterInteractingWithCookieManager() = runTest {
         givenCookieManagerWithCookies(ddgCookie, externalHostCookie)
 
         withContext(Dispatchers.Main) {
@@ -94,14 +95,14 @@ class WebViewCookieManagerTest {
     }
 
     @Test
-    fun whenNoCookiesThenRemoveProcessNotExecuted() = coroutineRule.runBlocking {
+    fun whenNoCookiesThenRemoveProcessNotExecuted() = runTest {
         givenCookieManagerWithCookies()
 
         withContext(Dispatchers.Main) {
             testee.removeExternalCookies()
         }
 
-        verifyZeroInteractions(removeCookieStrategy)
+        verifyNoInteractions(removeCookieStrategy)
     }
 
     private fun givenCookieManagerWithCookies(vararg cookies: Cookie) {

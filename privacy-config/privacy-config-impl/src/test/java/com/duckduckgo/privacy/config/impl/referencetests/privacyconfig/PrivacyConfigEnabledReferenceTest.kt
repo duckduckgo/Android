@@ -18,7 +18,6 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
@@ -26,11 +25,12 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -84,7 +84,7 @@ class PrivacyConfigEnabledReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = coroutineRule.runBlocking {
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
         verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(PrivacyFeatureToggles(testCase.featureName, testCase.expectFeatureEnabled))

@@ -146,7 +146,7 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
                 throw e
             }
@@ -173,7 +173,7 @@ class BrowserWebViewClient(
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
                 throw e
             }
@@ -192,7 +192,7 @@ class BrowserWebViewClient(
             }
             flushCookies()
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
@@ -266,7 +266,7 @@ class BrowserWebViewClient(
                 super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
                 throw e
             }

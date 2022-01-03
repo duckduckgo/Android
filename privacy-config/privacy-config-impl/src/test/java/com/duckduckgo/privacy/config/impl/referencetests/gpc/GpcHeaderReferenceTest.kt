@@ -32,9 +32,9 @@ import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.toGpcException
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import java.util.concurrent.CopyOnWriteArrayList

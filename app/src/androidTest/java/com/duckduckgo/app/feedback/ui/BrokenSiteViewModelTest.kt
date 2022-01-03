@@ -9,8 +9,8 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -42,7 +42,7 @@ class BrokenSiteViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
