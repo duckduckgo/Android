@@ -9,7 +9,9 @@ spotless {
         indentWithSpaces()
     }
     kotlin {
-        ktlint().userData(mapOf('indent_size' to '2', 'continuation_indent_size' to '2'))
+        target("*/src/**/*.kt")
+        tlint().userData([max_line_length: "150"], [indent_size: "4"], [insert_final_newline: "true"])
+    }
     format 'xml', {
         target '**/*.xml'
         indentWithSpaces()
