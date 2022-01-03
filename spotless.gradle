@@ -9,10 +9,7 @@ spotless {
         indentWithSpaces()
     }
     kotlin {
-        ktfmt().dropboxStyle()
-        trimTrailingWhitespace()
-        indentWithSpaces()
-    }
+        ktlint().userData(mapOf('indent_size' to '2', 'continuation_indent_size' to '2'))
     format 'xml', {
         target '**/*.xml'
         indentWithSpaces()

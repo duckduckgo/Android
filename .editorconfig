@@ -67,7 +67,10 @@ ij_xml_space_inside_empty_tag = false
 ij_xml_text_wrap = normal
 ij_xml_use_custom_settings = true
 
-[{*.kt,*.kts}]
+[*.{kt,kts}]
+indent_size = 4
+insert_final_newline = true
+max_line_length = 150
 ij_kotlin_align_in_columns_case_branch = false
 ij_kotlin_align_multiline_binary_operation = false
 ij_kotlin_align_multiline_extends_list = false
