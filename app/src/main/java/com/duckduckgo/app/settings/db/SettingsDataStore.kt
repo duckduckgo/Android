@@ -19,13 +19,16 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface SettingsDataStore {
 
@@ -62,7 +65,12 @@ interface SettingsDataStore {
     fun clearAppBackgroundTimestamp()
 }
 
-class SettingsSharedPreferences constructor(private val context: Context, private val variantManager: VariantManager) : SettingsDataStore {
+@ContributesBinding(AppScope::class)
+class SettingsSharedPreferences @Inject constructor(
+    private val context: Context,
+    private val variantManager: VariantManager,
+    private val appBuildConfig: AppBuildConfig
+) : SettingsDataStore {
 
     private val fireAnimationMapper = FireAnimationPrefsMapper()
 
@@ -101,7 +109,7 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
 
     override var appIcon: AppIcon
         get() {
-            val componentName = preferences.getString(KEY_APP_ICON, DEFAULT_ICON.componentName) ?: return DEFAULT_ICON
+            val componentName = preferences.getString(KEY_APP_ICON, defaultIcon().componentName) ?: return defaultIcon()
             return AppIcon.from(componentName)
         }
         set(appIcon) = preferences.edit(commit = true) { putString(KEY_APP_ICON, appIcon.componentName) }
@@ -187,10 +195,17 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
+    private fun defaultIcon(): AppIcon {
+        return if (appBuildConfig.isDebug) {
+            AppIcon.BLUE
+        } else {
+            AppIcon.DEFAULT
+        }
+    }
+
     companion object {
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
-        const val KEY_THEME = "THEME"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
         const val KEY_LOGIN_DETECTION_ENABLED = "KEY_LOGIN_DETECTION_ENABLED"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
@@ -207,13 +222,6 @@ class SettingsSharedPreferences constructor(private val context: Context, privat
         const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
         const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
-
-        private val DEFAULT_ICON = if (BuildConfig.DEBUG) {
-            AppIcon.BLUE
-        } else {
-            AppIcon.DEFAULT
-        }
-        const val KEY_SEARCH_NOTIFICATION = "SEARCH_NOTIFICATION"
     }
 
     private class FireAnimationPrefsMapper {

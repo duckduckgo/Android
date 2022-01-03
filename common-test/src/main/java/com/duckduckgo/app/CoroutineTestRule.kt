@@ -25,16 +25,16 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
 @ExperimentalCoroutinesApi
-class CoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) :
-    TestWatcher() {
+class CoroutineTestRule(val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(TestCoroutineScheduler())) : TestWatcher() {
 
-    val testDispatcherProvider =
-        object : DispatcherProvider {
-            override fun default(): CoroutineDispatcher = testDispatcher
-            override fun io(): CoroutineDispatcher = testDispatcher
-            override fun main(): CoroutineDispatcher = testDispatcher
-            override fun unconfined(): CoroutineDispatcher = testDispatcher
-        }
+    val testScope = TestScope(testDispatcher)
+
+    val testDispatcherProvider = object : DispatcherProvider {
+        override fun default(): CoroutineDispatcher = testDispatcher
+        override fun io(): CoroutineDispatcher = testDispatcher
+        override fun main(): CoroutineDispatcher = testDispatcher
+        override fun unconfined(): CoroutineDispatcher = testDispatcher
+    }
 
     override fun starting(description: Description?) {
         super.starting(description)
@@ -44,10 +44,5 @@ class CoroutineTestRule(val testDispatcher: TestCoroutineDispatcher = TestCorout
     override fun finished(description: Description?) {
         super.finished(description)
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 }
-
-@ExperimentalCoroutinesApi
-fun CoroutineTestRule.runBlocking(block: suspend TestCoroutineScope.() -> Unit) =
-    this.testDispatcher.runBlockingTest { block() }

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.Command.Exit
@@ -30,6 +29,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +43,8 @@ class FeedbackViewModel(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val appBuildConfig: AppBuildConfig,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -148,7 +149,7 @@ class FeedbackViewModel(
             return true
         }
 
-        if (BuildConfig.DEBUG) {
+        if (appBuildConfig.isDebug) {
             Timber.i("Not installed from the Play Store but it is DEBUG; will treat as if installed from Play Store")
             return true
         }
@@ -309,12 +310,20 @@ data class UpdateViewCommand(
 class FeedbackViewModelFactory @Inject constructor(
     private val playStoreUtils: Provider<PlayStoreUtils>,
     private val feedbackSubmitter: Provider<FeedbackSubmitter>,
-    private val appCoroutineScope: Provider<CoroutineScope>
+    private val appCoroutineScope: Provider<CoroutineScope>,
+    private val appBuildConfig: Provider<AppBuildConfig>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils.get(), feedbackSubmitter.get(), appCoroutineScope.get()) as T)
+                isAssignableFrom(FeedbackViewModel::class.java) -> (
+                    FeedbackViewModel(
+                        playStoreUtils.get(),
+                        feedbackSubmitter.get(),
+                        appCoroutineScope.get(),
+                        appBuildConfig.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

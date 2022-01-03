@@ -20,21 +20,23 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowAdd
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.ShowWhitelistFormatError
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class WhitelistViewModelTest {
 
     @ExperimentalCoroutinesApi
@@ -51,10 +53,10 @@ class WhitelistViewModelTest {
     private val mockCommandObserver: Observer<Command> = mock()
     private var commandCaptor: KArgumentCaptor<Command> = argumentCaptor()
 
-    private val testee by lazy { WhitelistViewModel(mockDao, TestCoroutineScope(), coroutineRule.testDispatcherProvider) }
+    private val testee by lazy { WhitelistViewModel(mockDao, TestScope(), coroutineRule.testDispatcherProvider) }
 
     @Before
-    fun before() = coroutineRule.runBlocking {
+    fun before() = runTest {
         liveData.value = emptyList()
         whenever(mockDao.all()).thenReturn(liveData)
         testee.command.observeForever(mockCommandObserver)

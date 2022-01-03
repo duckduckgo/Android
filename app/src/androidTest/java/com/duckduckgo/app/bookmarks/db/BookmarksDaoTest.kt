@@ -23,13 +23,14 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class BookmarksDaoTest {
 
     @get:Rule
@@ -57,7 +58,7 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarkDeleteThenItIsNoLongerInTheList() = runBlocking {
+    fun whenBookmarkDeleteThenItIsNoLongerInTheList() = runTest {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         dao.delete(bookmark)
@@ -66,7 +67,7 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarksDeletedThenTheyAreNoLongerInTheList() = runBlocking {
+    fun whenBookmarksDeletedThenTheyAreNoLongerInTheList() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
             BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
@@ -78,7 +79,7 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarkAddedThenItIsInList() = runBlocking {
+    fun whenBookmarkAddedThenItIsInList() = runTest {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         val list = dao.getBookmarks().first()
@@ -86,7 +87,7 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarksAddedThenTheyAreInTheList() = runBlocking {
+    fun whenBookmarksAddedThenTheyAreInTheList() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0),
             BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 0)
@@ -97,7 +98,7 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenBookmarksAddedThenTheyAreInTheListByParentId() = runBlocking {
+    fun whenBookmarksAddedThenTheyAreInTheListByParentId() = runTest {
         val bookmarks = listOf(
             BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1),
             BookmarkEntity(id = 2, title = "another title", url = "www.foo.example.com", parentId = 1)
@@ -109,21 +110,21 @@ class BookmarksDaoTest {
     }
 
     @Test
-    fun whenInInitialStateThenTheBookmarksAreEmpty() = runBlocking {
+    fun whenInInitialStateThenTheBookmarksAreEmpty() = runTest {
         val list = dao.getBookmarks().first()
         assertNotNull(list)
         assertTrue(list.isEmpty())
     }
 
     @Test
-    fun whenBookmarksExistThenReturnTrue() = runBlocking {
+    fun whenBookmarksExistThenReturnTrue() = runTest {
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 0)
         dao.insert(bookmark)
         assertTrue(dao.hasBookmarks())
     }
 
     @Test
-    fun whenBookmarkAreEmptyThenReturnFalse() = runBlocking {
+    fun whenBookmarkAreEmptyThenReturnFalse() = runTest {
         assertFalse(dao.hasBookmarks())
     }
 

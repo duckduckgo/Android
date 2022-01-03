@@ -69,15 +69,16 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import dagger.SingleInstanceIn
 import javax.inject.Provider
 
 @Module
@@ -138,8 +139,8 @@ class BrowserModule {
     }
 
     @Provides
-    fun defaultWebBrowserCapability(context: Context): DefaultBrowserDetector {
-        return AndroidDefaultBrowserDetector(context)
+    fun defaultWebBrowserCapability(context: Context, appBuildConfig: AppBuildConfig): DefaultBrowserDetector {
+        return AndroidDefaultBrowserDetector(context, appBuildConfig)
     }
 
     @Provides

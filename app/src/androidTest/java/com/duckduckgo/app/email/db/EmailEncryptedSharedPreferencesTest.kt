@@ -18,11 +18,11 @@ package com.duckduckgo.app.email.db
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -44,14 +44,14 @@ class EmailEncryptedSharedPreferencesTest {
     }
 
     @Test
-    fun whenNextAliasEqualsValueThenValueIsSentToNextAliasChannel() = coroutineRule.runBlocking {
+    fun whenNextAliasEqualsValueThenValueIsSentToNextAliasChannel() = runTest {
         testee.nextAlias = "test"
 
         assertEquals("test", testee.nextAlias)
     }
 
     @Test
-    fun whenNextAliasEqualsNullThenNullIsSentToNextAliasChannel() = coroutineRule.runBlocking {
+    fun whenNextAliasEqualsNullThenNullIsSentToNextAliasChannel() = runTest {
         testee.nextAlias = null
 
         assertNull(testee.nextAlias)

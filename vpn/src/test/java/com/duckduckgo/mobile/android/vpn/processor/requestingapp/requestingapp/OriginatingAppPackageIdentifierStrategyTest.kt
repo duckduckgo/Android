@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp.requestingapp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.ConnectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifier
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Test
 import xyz.hexene.localvpn.Packet
 import java.net.InetAddress

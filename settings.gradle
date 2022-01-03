@@ -14,6 +14,7 @@ include ':statistics'
 include ':common'
 include ':common-ui'
 include ':app-store'
+include ':appbuildconfig-api'
 
 include ':feature-toggles-api'
 include ':feature-toggles-impl'

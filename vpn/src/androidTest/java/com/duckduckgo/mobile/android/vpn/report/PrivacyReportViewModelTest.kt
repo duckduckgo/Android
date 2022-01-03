@@ -22,6 +22,7 @@ import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
@@ -32,7 +33,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -41,6 +42,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDateTime
 import kotlin.time.ExperimentalTime
 
@@ -57,6 +59,7 @@ class PrivacyReportViewModelTest {
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private val deviceShieldPixels: DeviceShieldPixels = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
     private val onboardingStore = mock<DeviceShieldOnboardingStore>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -68,10 +71,12 @@ class PrivacyReportViewModelTest {
     fun before() {
         prepareDb()
 
+        whenever(appBuildConfig.isDebug).thenReturn(true)
+
         repository = AppTrackerBlockingStatsRepository(db)
 
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        vpnPreferences = VpnPreferences(context)
+        vpnPreferences = VpnPreferences(context, appBuildConfig)
 
         testee = PrivacyReportViewModel(repository, deviceShieldPixels, onboardingStore, context)
     }
