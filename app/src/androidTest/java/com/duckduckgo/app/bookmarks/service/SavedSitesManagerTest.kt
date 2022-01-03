@@ -22,15 +22,16 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class SavedSitesManagerTest {
 
     @get:Rule
@@ -52,7 +53,7 @@ class SavedSitesManagerTest {
     }
 
     @Test
-    fun whenBookmarksImportSucceedsThenPixelIsSent() = runBlocking {
+    fun whenBookmarksImportSucceedsThenPixelIsSent() = runTest {
         val someUri = Uri.parse("")
         val importedBookmarks = listOf(aBookmark())
         whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedBookmarks))
@@ -63,7 +64,7 @@ class SavedSitesManagerTest {
     }
 
     @Test
-    fun whenFavoritesImportSucceedsThenPixelIsSent() = runBlocking {
+    fun whenFavoritesImportSucceedsThenPixelIsSent() = runTest {
         val someUri = Uri.parse("")
         val importedFavorites = listOf(aFavorite())
         whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Success(importedFavorites))
@@ -74,7 +75,7 @@ class SavedSitesManagerTest {
     }
 
     @Test
-    fun whenSavedSitesImportFailsThenPixelIsSent() = runBlocking {
+    fun whenSavedSitesImportFailsThenPixelIsSent() = runTest {
         val someUri = Uri.parse("")
         whenever(importer.import(someUri)).thenReturn(ImportSavedSitesResult.Error(Exception()))
 
@@ -84,7 +85,7 @@ class SavedSitesManagerTest {
     }
 
     @Test
-    fun whenSavedSitesExportSucceedsThenPixelIsSent() = runBlocking {
+    fun whenSavedSitesExportSucceedsThenPixelIsSent() = runTest {
         val someUri = Uri.parse("")
         whenever(exporter.export(someUri)).thenReturn(ExportSavedSitesResult.Success)
 
@@ -94,7 +95,7 @@ class SavedSitesManagerTest {
     }
 
     @Test
-    fun whenSavedSitesExportFailsThenPixelIsSent() = runBlocking {
+    fun whenSavedSitesExportFailsThenPixelIsSent() = runTest {
         val someUri = Uri.parse("")
         whenever(exporter.export(someUri)).thenReturn(ExportSavedSitesResult.Error(Exception()))
 

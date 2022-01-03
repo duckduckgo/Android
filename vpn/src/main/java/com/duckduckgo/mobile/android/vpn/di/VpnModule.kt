@@ -20,6 +20,7 @@ import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.*
@@ -94,8 +95,8 @@ class VpnModule {
 
     @SingleInstanceIn(VpnScope::class)
     @Provides
-    fun providesPacketPersister(vpnDatabase: VpnDatabase): PacketPersister {
-        return if (BuildConfig.DEBUG) {
+    fun providesPacketPersister(vpnDatabase: VpnDatabase, appBuildConfig: AppBuildConfig): PacketPersister {
+        return if (appBuildConfig.isDebug) {
             RoomPacketPersister(vpnDatabase)
         } else {
             DummyPacketPersister()

@@ -268,6 +268,12 @@ interface DeviceShieldPixels {
      * Will fire when the user presses dismisses the waitlist dialog
      */
     fun didPressWaitlistDialogDismiss()
+
+    /**
+     * Will fire when user submits a health monitor report
+     */
+    fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -537,6 +543,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didPressWaitlistDialogDismiss() {
         firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
+    }
+
+    override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
     }
 
     private fun suddenKill() {

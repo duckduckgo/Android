@@ -16,12 +16,12 @@
 
 package com.duckduckgo.app.fire
 
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
@@ -32,16 +32,16 @@ class RemoveCookiesTest {
     private val removeCookies = RemoveCookies(cookieManagerRemover, selectiveCookieRemover)
 
     @Test
-    fun whenSelectiveCookieRemoverSucceedsThenNoMoreInteractions() = runBlockingTest {
+    fun whenSelectiveCookieRemoverSucceedsThenNoMoreInteractions() = runTest {
         selectiveCookieRemover.succeeds()
 
         removeCookies.removeCookies()
 
-        verifyZeroInteractions(cookieManagerRemover)
+        verifyNoInteractions(cookieManagerRemover)
     }
 
     @Test
-    fun whenSelectiveCookieRemoverFailsThenFallbackToCookieManagerRemover() = runBlockingTest {
+    fun whenSelectiveCookieRemoverFailsThenFallbackToCookieManagerRemover() = runTest {
         selectiveCookieRemover.fails()
 
         removeCookies.removeCookies()

@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.state
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +49,7 @@ class BrowserApplicationStateInfoTest {
     fun whenActivityCreatedThenNoop() {
         browserApplicationStateInfo.onActivityCreated(activity, null)
 
-        verifyZeroInteractions(observer)
+        verifyNoInteractions(observer)
     }
 
     @Test

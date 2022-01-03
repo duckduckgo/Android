@@ -21,10 +21,10 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.DrawableRes
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.IconModifier.Companion.QUALIFIER
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import javax.inject.Inject
 
 interface IconModifier {
@@ -78,7 +78,8 @@ enum class AppIcon(
 
 class AppIconModifier @Inject constructor(
     private val context: Context,
-    private val appShortcutCreator: AppShortcutCreator
+    private val appShortcutCreator: AppShortcutCreator,
+    private val appBuildConfig: AppBuildConfig
 ) : IconModifier {
 
     override fun changeIcon(previousIcon: AppIcon, newIcon: AppIcon) {
@@ -102,7 +103,7 @@ class AppIconModifier @Inject constructor(
 
     private fun setComponentState(context: Context, componentName: String, componentState: Int) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(BuildConfig.APPLICATION_ID, componentName),
+            ComponentName(appBuildConfig.applicationId, componentName),
             componentState, PackageManager.DONT_KILL_APP
         )
     }

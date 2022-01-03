@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.duckduckgo.vpn.internal">
+    package="com.duckduckgo.vpn.internal">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
-        <activity android:name=".feature.rules.ExceptionRulesDebugActivity">
-        </activity>
+        <activity android:name=".feature.rules.ExceptionRulesDebugActivity" />
         <activity
             android:name=".feature.VpnInternalSettingsActivity"
             android:process=":vpn"
-            android:label="@string/vpnDevSettingsTitle"/>
+            android:label="@string/vpnDevSettingsTitle" />
+
     </application>
 
 </manifest>

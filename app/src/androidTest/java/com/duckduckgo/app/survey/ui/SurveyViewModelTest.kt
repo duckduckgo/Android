@@ -21,7 +21,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -30,7 +29,8 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
-import com.nhaarman.mockitokotlin2.*
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -41,6 +41,7 @@ import org.junit.Test
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
 class SurveyViewModelTest {
 
     @get:Rule
@@ -59,12 +60,19 @@ class SurveyViewModelTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
 
+    private var mockAppBuildConfig: AppBuildConfig = mock()
+
     private lateinit var testee: SurveyViewModel
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
-        testee = SurveyViewModel(mockSurveyDao, mockStatisticsStore, mockAppInstallStore, coroutineTestRule.testDispatcherProvider)
+        MockitoAnnotations.openMocks(this)
+
+        whenever(mockAppBuildConfig.versionName).thenReturn("name")
+
+        testee = SurveyViewModel(
+            mockSurveyDao, mockStatisticsStore, mockAppInstallStore, mockAppBuildConfig, coroutineTestRule.testDispatcherProvider
+        )
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -98,7 +106,7 @@ class SurveyViewModelTest {
         assertEquals("abc", loadedUri.getQueryParameter("var"))
         assertEquals("2", loadedUri.getQueryParameter("delta"))
         assertEquals("${Build.VERSION.SDK_INT}", loadedUri.getQueryParameter("av"))
-        assertEquals(BuildConfig.VERSION_NAME, loadedUri.getQueryParameter("ddgv"))
+        assertEquals("name", loadedUri.getQueryParameter("ddgv"))
         assertEquals(Build.MANUFACTURER, loadedUri.getQueryParameter("man"))
         assertEquals(Build.MODEL, loadedUri.getQueryParameter("mo"))
     }
