@@ -58,13 +58,15 @@ constructor(
         val lastTrackerBlockedAgo =
             if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
-                )
+                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp))
             } else {
                 ""
             }
 
-        val trackerCompany = trackerData.sortedByDescending { it.trackerEntity.score }.groupBy { it.tracker.trackerCompanyId }
+        val trackerCompany =
+            trackerData.sortedByDescending { it.trackerEntity.score }.groupBy {
+                it.tracker.trackerCompanyId
+            }
 
         trackerCompany.forEach { data ->
             val trackerCompanyName = data.value[0].tracker.company
@@ -78,16 +80,16 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = mapTrackingSignals(trackingSignals)
-                )
-            )
+                    trackingSignals = mapTrackingSignals(trackingSignals)))
         }
 
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
     private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
-        return signals.map { TrackingSignal.fromTag(it) }
+        val originalTrackingSignals = signals.map { TrackingSignal.fromTag(it) }
+        val randomElements = originalTrackingSignals.asSequence().shuffled().toList()
+        return randomElements.distinctBy { it.signalDisplayName }
     }
 
     data class ViewState(
