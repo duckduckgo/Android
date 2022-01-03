@@ -18,6 +18,8 @@ package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import timber.log.Timber
+import java.util.*
 
 class AndroidAppAttributeMatcher(
     val appProperties: AppProperties
@@ -25,19 +27,29 @@ class AndroidAppAttributeMatcher(
     fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
-                if (matchingAttribute.value.contains(appProperties.flavor())) return true.toResult()
-                return false.toResult()
+                matchingAttribute.value.find { it.equals(appProperties.flavor(), true) } ?: return false.toResult()
+                return true.toResult()
             }
             is MatchingAttribute.AppId -> {
                 return (matchingAttribute.value == appProperties.appId()).toResult()
             }
             is MatchingAttribute.AppVersion -> {
-                if ((matchingAttribute.min.defaultValue() || appProperties.appVersion() >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || appProperties.appVersion() <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-                return false.toResult()
+                if (matchingAttribute == MatchingAttribute.AppVersion()) return Result.Fail
+
+                val appVersion = appProperties.appVersion()
+                Timber.i("RMF: device WV: $appVersion")
+                if (!appVersion.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
+
+
+                val appVersionParts = appVersion.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+                val minAppVersionParts = matchingAttribute.min.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+                val maxAppVersionParts = matchingAttribute.max.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+
+                if (appVersionParts.isEmpty()) return false.toResult()
+                if (appVersionParts.compareTo(minAppVersionParts) <= -1) return false.toResult()
+                if (appVersionParts.compareTo(maxAppVersionParts) >= 1) return false.toResult()
+
+                return true.toResult()
             }
             is MatchingAttribute.Atb -> {
                 return (matchingAttribute.value == appProperties.atb()).toResult()
@@ -56,5 +68,18 @@ class AndroidAppAttributeMatcher(
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
+    }
+    
+    private fun List<Int>.compareTo(other: List<Int>): Int {
+        val otherSize = other.size
+
+        for (index in this.indices) {
+            if (index > otherSize-1 ) return 0
+            val value = this[index]
+            if (value < other[index]) return -1
+            if (value > other[index]) return 1
+        }
+
+        return 0
     }
 }
