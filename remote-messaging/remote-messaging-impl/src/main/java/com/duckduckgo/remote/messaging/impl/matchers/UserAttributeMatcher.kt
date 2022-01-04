@@ -25,7 +25,7 @@ class UserAttributeMatcher(
     suspend fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.AppTheme -> {
-                return (matchingAttribute.value == userBrowserProperties.appTheme().toString()).toResult()
+                return matchingAttribute.value.equals(userBrowserProperties.appTheme().toString(), ignoreCase = true).toResult()
             }
             is MatchingAttribute.Bookmarks -> {
                 val bookmarks = userBrowserProperties.bookmarks()

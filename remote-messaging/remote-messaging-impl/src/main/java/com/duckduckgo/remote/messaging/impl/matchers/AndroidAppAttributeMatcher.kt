@@ -69,7 +69,7 @@ class AndroidAppAttributeMatcher(
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
-    
+
     private fun List<Int>.compareTo(other: List<Int>): Int {
         val otherSize = other.size
 
