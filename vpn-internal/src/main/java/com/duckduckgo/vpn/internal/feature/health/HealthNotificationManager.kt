@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.health
+package com.duckduckgo.vpn.internal.feature.health
 
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
@@ -23,14 +23,23 @@ import android.content.Intent
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.mobile.android.vpn.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.health.SystemHealthData
+import com.duckduckgo.vpn.internal.R
+import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class HealthNotificationManager(private val context: Context) {
+interface HealthNotificationManager {
+    fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthData)
 
-    suspend fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthSubmission) {
+    fun hideBadHealthNotification()
+}
+
+@ContributesBinding(AppScope::class)
+class RealHealthNotificationManager @Inject constructor(private val context: Context) : HealthNotificationManager {
+
+    override fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthData) {
 
         val target = Intent().also {
             it.setClassName(context.packageName, "dummy.ui.VpnDiagnosticsActivity")
@@ -57,20 +66,22 @@ class HealthNotificationManager(private val context: Context) {
             .setTimeoutAfter(TimeUnit.MINUTES.toMillis(10))
             .build()
 
-        withContext(Dispatchers.Main) {
-            NotificationManagerCompat.from(context).let { nm ->
+        NotificationManagerCompat.from(context).let { nm ->
 
-                val channelBuilder =
-                    NotificationChannelCompat.Builder("notificationid", NotificationManagerCompat.IMPORTANCE_DEFAULT)
-                        .setName("notificationid")
-                nm.createNotificationChannel(channelBuilder.build())
+            val channelBuilder =
+                NotificationChannelCompat.Builder("notificationid", NotificationManagerCompat.IMPORTANCE_DEFAULT)
+                    .setName("notificationid")
+            nm.createNotificationChannel(channelBuilder.build())
 
-                nm.notify(AppTPHealthMonitor.BAD_HEALTH_NOTIFICATION_ID, notification)
-            }
+            nm.notify(BAD_HEALTH_NOTIFICATION_ID, notification)
         }
     }
 
-    fun hideBadHealthNotification() {
-        NotificationManagerCompat.from(context).cancel(AppTPHealthMonitor.BAD_HEALTH_NOTIFICATION_ID)
+    override fun hideBadHealthNotification() {
+        NotificationManagerCompat.from(context).cancel(BAD_HEALTH_NOTIFICATION_ID)
+    }
+
+    companion object {
+        const val BAD_HEALTH_NOTIFICATION_ID = 9890
     }
 }
