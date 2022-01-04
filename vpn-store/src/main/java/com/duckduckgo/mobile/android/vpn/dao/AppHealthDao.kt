@@ -20,7 +20,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType
 
 @Dao
 interface AppHealthDao {
@@ -28,9 +30,17 @@ interface AppHealthDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(appHealthState: AppHealthState)
 
-    @Query("SELECT * from app_health_state ORDER BY localtime DESC LIMIT 1")
-    fun latestHealthState(): AppHealthState?
+    @Transaction
+    fun remove(type: HealthEventType): AppHealthState? {
+        return latestHealthState(type)?.also { clear(type) }
+    }
+
+    @Query("SELECT * from app_health_state where type=:type ORDER BY localtime DESC LIMIT 1")
+    fun latestHealthState(type: HealthEventType): AppHealthState?
+
+    @Query("delete from app_health_state where type=:type")
+    fun clear(type: HealthEventType)
 
     @Query("delete from app_health_state")
-    fun clear()
+    fun clearAll()
 }
