@@ -46,13 +46,29 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
     override fun onBindViewHolder(holder: CompanyDetailsViewHolder, position: Int) {
         val companyTrackingDetails = items[position]
-        holder.bind(companyTrackingDetails)
+        holder.bind(companyTrackingDetails){ expanded ->
+            items.forEachIndexed { index, companyDetails ->
+                companyDetails.takeIf { it.companyName == companyTrackingDetails.companyName}?.let {
+                    items[index] = it.copy(expanded = expanded)
+                }
+            }
+        }
     }
 
     override fun getItemCount() = items.size
 
     suspend fun updateData(data: List<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>) {
-        val newData = data
+        val newData = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()
+        data.forEach { updateDataItem ->
+            val existingItem = items.find { it.companyName == updateDataItem.companyName }
+            val itemToAdd = if (existingItem != null){
+                existingItem.copy(trackingAttempts = updateDataItem.trackingAttempts)
+            } else {
+                updateDataItem
+            }
+
+            newData.add(itemToAdd)
+        }
         val oldData = items
         val diffResult = withContext(Dispatchers.IO) {
             DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
@@ -99,26 +115,29 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
         var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
         var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
 
-        fun bind(trackerInfo: AppTPCompanyTrackersViewModel.CompanyTrackingDetails) {
-            val badge = badgeIcon(view.context, trackerInfo.companyName)
+        fun bind(companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails, onExpanded: (Boolean)-> Unit) {
+            val badge = badgeIcon(view.context, companyDetails.companyName)
             if (badge == null) {
                 badgeImage.setImageDrawable(
                     TextDrawable.builder()
                         .beginConfig()
                         .fontSize(50)
                         .endConfig()
-                        .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
+                        .buildRound(companyDetails.companyName.take(1), Color.DKGRAY)
                 )
             } else {
                 badgeImage.setImageResource(badge)
             }
 
+            companyName.text = companyDetails.companyDisplayName
+            trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, companyDetails.trackingAttempts, companyDetails.trackingAttempts)
+
             val inflater = LayoutInflater.from(view.context)
             topSignalsLayout.removeAllViews()
             bottomSignalsLayout.removeAllViews()
 
-            val topSignals = trackerInfo.trackingSignals.take(TOP_SIGNALS)
-            val bottomSignals = trackerInfo.trackingSignals.drop(TOP_SIGNALS)
+            val topSignals = companyDetails.trackingSignals.take(TOP_SIGNALS)
+            val bottomSignals = companyDetails.trackingSignals.drop(TOP_SIGNALS)
 
             topSignals.forEach {
                 val topSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, topSignalsLayout, false) as Chip
@@ -139,21 +158,34 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
                 showMore.gone()
             }
 
-            companyName.text = trackerInfo.companyDisplayName
-            trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, trackerInfo.trackingAttempts, trackerInfo.trackingAttempts)
             showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
             showMore.setOnClickListener {
                 if (!bottomSignalsLayout.isVisible) {
-                    bottomSignalsLayout.show()
-                    showMore.gone()
-                    showLess.show()
+                    showMore()
+                    onExpanded.invoke(true)
                 }
             }
             showLess.setOnClickListener {
-                bottomSignalsLayout.gone()
-                showMore.show()
-                showLess.gone()
+                showLess()
+                onExpanded.invoke(false)
             }
+            if (companyDetails.expanded) {
+                showMore()
+            } else {
+                showLess()
+            }
+        }
+
+        private fun showMore(){
+            bottomSignalsLayout.show()
+            showMore.gone()
+            showLess.show()
+        }
+
+        private fun showLess(){
+            bottomSignalsLayout.gone()
+            showMore.show()
+            showLess.gone()
         }
 
         private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {

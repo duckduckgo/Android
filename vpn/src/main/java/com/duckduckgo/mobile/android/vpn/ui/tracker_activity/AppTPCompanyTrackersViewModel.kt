@@ -113,7 +113,8 @@ constructor(
         val companyDisplayName: String,
         val trackingAttempts: Int,
         val timestamp: String,
-        val trackingSignals: List<TrackingSignal>
+        val trackingSignals: List<TrackingSignal>,
+        val expanded: Boolean = false
     )
 }
 
