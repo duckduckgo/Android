@@ -45,7 +45,7 @@
                 style="@style/Widget.DuckDuckGo.InfoPanel"
                 app:panelBackground="@drawable/background_yellow_tooltip"
                 app:panelDrawable="@drawable/ic_alert_color_24"
-                app:panelText="@string/atp_ExceptionRulesPanel"
+                app:panelText="@string/exceptionRulesPanelTitle"
                 android:layout_margin="16dp"/>
 
 
