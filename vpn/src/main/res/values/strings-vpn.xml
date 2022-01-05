@@ -274,4 +274,6 @@
     <string name="atp_DisableConfirmationDisableAllApps">Disable for all apps</string>
     <string name="atp_DisableConfirmationCancel">Cancel</string>
 
+    <!--  App Tracking Protection Exception Rules Screen -->
+    <string name="atp_ExceptionRulesPanel">Exclusion rules defaults will be restored automatically when VPN is turned OFF and back ON</string>
 </resources>
