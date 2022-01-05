@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
@@ -28,10 +29,8 @@ import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesDataStore
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
-import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -77,7 +76,7 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
     fun getJsonPrivacyConfig(jsonFileName: String): JsonPrivacyConfig {
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(
             JsonPrivacyConfig::class.java)
-        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(jsonFileName))
+        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, jsonFileName))
         return config!!
     }
 
