@@ -53,7 +53,7 @@
         "blocklistVersion": "abc123",
         "manufacturer": "IBM",
         "model": "305 RAMAC",
-        "os": "OS/2",
+        "os": "12",
         "gpcEnabled": true,
         "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
         "expectReportURLParams": [
@@ -65,7 +65,7 @@
           {"name": "surrogates", "value": "surrogate.domain.test"},
           {"name": "manufacturer", "value": "IBM"},
           {"name": "model", "value": "305 RAMAC"},
-          {"name": "os", "value": "OS%2F2"},
+          {"name": "os", "value": "12"},
           {"name": "gpc", "value": "true"}
         ],
         "exceptPlatforms": [

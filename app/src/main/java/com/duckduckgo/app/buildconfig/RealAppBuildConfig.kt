@@ -39,7 +39,7 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
             "play" -> BuildFlavor.PLAY
             else -> throw IllegalStateException("Unknown app flavor")
         }
+    override val sdkInt: Int = Build.VERSION.SDK_INT
     override val manufacturer: String = Build.MANUFACTURER
     override val model: String = Build.MODEL
-    override val sdkString: String = Build.VERSION.SDK_INT.toString()
 }

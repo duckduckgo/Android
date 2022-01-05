@@ -52,6 +52,7 @@ import org.mockito.kotlin.verify
 import org.robolectric.ParameterizedRobolectricTestRunner
 import java.net.URLEncoder
 
+@ExperimentalCoroutinesApi
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class BrokenSitesReferenceTest(private val testCase: TestCase) {
 
@@ -76,7 +77,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     private lateinit var testee: BrokenSiteSubmitter
 
     companion object {
-        val encodedParamsList = listOf("siteUrl", "os")
+        val encodedParamsList = listOf("siteUrl")
         private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
 
@@ -99,8 +100,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
-        whenever(mockAppBuildConfig.sdkString).thenReturn(testCase.os)
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() {
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(testCase.os?.toInt() ?: 1)
         whenever(mockAppBuildConfig.manufacturer).thenReturn(testCase.manufacturer)
         whenever(mockAppBuildConfig.model).thenReturn(testCase.model)
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)

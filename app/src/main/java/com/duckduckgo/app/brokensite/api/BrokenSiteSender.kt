@@ -63,7 +63,7 @@ class BrokenSiteSubmitter(
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
                 APP_VERSION_KEY to appBuildConfig.versionName,
                 ATB_KEY to atbWithVariant(),
-                OS_KEY to appBuildConfig.sdkString,
+                OS_KEY to appBuildConfig.sdkInt.toString(),
                 MANUFACTURER_KEY to appBuildConfig.manufacturer,
                 MODEL_KEY to appBuildConfig.model,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
