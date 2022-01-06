@@ -10,7 +10,7 @@ spotless {
     }
     kotlin {
         target("*/src/**/*.kt")
-        tlint().userData([max_line_length: "150"], [indent_size: "4"], [insert_final_newline: "true"])
+        ktlint().userData([max_line_length: "150"], [indent_size: "4"], [insert_final_newline: "true"])
     }
     format 'xml', {
         target '**/*.xml'
