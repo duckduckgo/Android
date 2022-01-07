@@ -30,12 +30,13 @@ import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
-import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class UrlExtractingWebViewClientTest {
@@ -79,7 +80,7 @@ class UrlExtractingWebViewClientTest {
             dosDetector,
             gpc,
             thirdPartyCookieManager,
-            TestCoroutineScope(),
+            TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
             accessibilityManager,

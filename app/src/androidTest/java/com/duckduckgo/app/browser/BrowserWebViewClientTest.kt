@@ -402,7 +402,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = coroutinesTestRule.runBlocking {
+    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
@@ -411,7 +411,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = coroutinesTestRule.runBlocking {
+    fun whenTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         val mockWebView = mock<WebView>()
@@ -420,7 +420,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenCloakedTrackingLinkDetectedAndIsForMainFrameThenHandleCloakedTrackingLink() = coroutinesTestRule.runBlocking {
+    fun whenCloakedTrackingLinkDetectedAndIsForMainFrameThenHandleCloakedTrackingLink() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
@@ -428,7 +428,7 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenCloakedTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = coroutinesTestRule.runBlocking {
+    fun whenCloakedTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))

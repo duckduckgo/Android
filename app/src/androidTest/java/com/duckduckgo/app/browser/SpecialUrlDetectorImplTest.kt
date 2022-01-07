@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
-import com.nhaarman.mockitokotlin2.*
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue

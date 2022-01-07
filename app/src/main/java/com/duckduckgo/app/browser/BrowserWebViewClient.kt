@@ -145,7 +145,7 @@ open class BrowserWebViewClient(
                     false
                 }
                 is SpecialUrlDetector.UrlType.ExtractedTrackingLink -> {
-                    if (request.isForMainFrame) {
+                    if (isForMainFrame) {
                         Timber.d("Tracking link detection: Loading extracted URL: ${urlType.extractedUrl}")
                         webView.loadUrl(urlType.extractedUrl)
                         return true
@@ -153,7 +153,7 @@ open class BrowserWebViewClient(
                     false
                 }
                 is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                    if (request.isForMainFrame) {
+                    if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.handleCloakedTrackingLink(urlType.trackingUrl)
                             return true

@@ -21,12 +21,17 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
 class JsUrlExtractorTest {
@@ -46,7 +51,7 @@ class JsUrlExtractorTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenAddUrlExtractionThenJSInterfaceAdded() = coroutinesTestRule.runBlocking {
+    fun whenAddUrlExtractionThenJSInterfaceAdded() = runTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val onUrlExtracted = mock<(extractedUrl: String?) -> Unit>()
         testee.addUrlExtraction(webView, onUrlExtracted)
@@ -56,7 +61,7 @@ class JsUrlExtractorTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
-    fun whenPageStartedEventThenUrlExtractionJSInjected() = coroutinesTestRule.runBlocking {
+    fun whenPageStartedEventThenUrlExtractionJSInjected() = runTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.injectUrlExtractionJS(webView)
         verify(webView).evaluateJavascript(any(), anyOrNull())
