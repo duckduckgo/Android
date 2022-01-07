@@ -18,12 +18,16 @@
     <!-- Developer settings -->
     <string name="devSettingsTitle" translatable="false">Developer Settings</string>
     <string name="devSettingsSubtitle" translatable="false">Features useful for devs and debugging</string>
+    <string name="devSettingsScreenPrivacySection" translatable="false">PRIVACY</string>
+    <string name="devSettingsScreenGeneralSection" translatable="false">GENERAL</string>
     <string name="devSettingsScreenTitle" translatable="false">Welcome to the Developer Settings</string>
     <string name="devSettingsScreenTdsVersion" translatable="false">TDS version</string>
     <string name="devSettingsScreenTdsVersionSubtitle" translatable="false">Use next TDS version</string>
     <string name="devSettingsScreenTdsWait" translatable="false">Please wait while we download the tds version</string>
     <string name="devStartupTracing" translatable="false">Start-up tracing</string>
     <string name="devStartupTracingByline" translatable="false">Enable/disable start-up tracing</string>
+    <string name="devSettingsTriggerAnr" translatable="false">Trigger ANR</string>
+    <string name="devSettingsTriggerAnrSubtitle" translatable="false">Click here to trigger an ANR in the app</string>
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle" translatable="false">Audit Settings</string>
     <string name="auditSettingsSubtitle" translatable="false">Features useful for doing our privacy audit</string>
