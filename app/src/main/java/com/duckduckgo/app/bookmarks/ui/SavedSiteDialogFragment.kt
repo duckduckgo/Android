@@ -177,7 +177,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
         binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
             (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
-            (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
+                (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
 
     private val titleTextWatcher = object : TextChangedWatcher() {
