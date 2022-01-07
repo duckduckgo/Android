@@ -16,16 +16,13 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkException
-import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.*
@@ -33,6 +30,9 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -60,7 +60,7 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val test = adapter.fromJson(FileUtilities.loadText("reference_tests/tracking_link_detection_matching_tests.json"))
+            val test = adapter.fromJson(FileUtilities.loadText(AmpKeywordReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_matching_tests.json"))
             return test?.ampKeywords?.tests ?: emptyList()
         }
     }
@@ -79,7 +79,7 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> = moshi.adapter(TrackingLinkDetectionFeature::class.java)
         val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
         val ampLinkKeywords = CopyOnWriteArrayList<String>()
-        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("reference_tests/tracking_link_detection_reference.json")
+        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(AmpKeywordReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_reference.json")
 
         jsonObject.keys().forEach {
             val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonObject.get(it).toString())

@@ -16,15 +16,15 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class TrackingLinkDetectionPluginTest {
 
@@ -50,7 +50,7 @@ class TrackingLinkDetectionPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingLinkDetectionAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/tracking_link_detection.json")
+        val jsonString = FileUtilities.loadText(TrackingLinkDetectionPluginTest::class.java.classLoader!!, "json/tracking_link_detection.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -59,7 +59,7 @@ class TrackingLinkDetectionPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingLinkDetectionAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/tracking_link_detection_disabled.json")
+        val jsonString = FileUtilities.loadText(TrackingLinkDetectionPluginTest::class.java.classLoader!!, "json/tracking_link_detection_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -68,7 +68,7 @@ class TrackingLinkDetectionPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingLinkDetectionThenUpdateAllExistingValues() {
-        val jsonString = FileUtilities.loadText("json/tracking_link_detection.json")
+        val jsonString = FileUtilities.loadText(TrackingLinkDetectionPluginTest::class.java.classLoader!!, "json/tracking_link_detection.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
