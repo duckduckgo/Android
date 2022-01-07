@@ -1,21 +1,4 @@
-# IntelliJ allows to export the code style in the .editorconfig format. These are the settings
-# from the most recent settings for SquareAndroid from here:
-#
-# https://github.com/square/java-code-styles
-#
-# Every time someone changes Square's code style we should update the config here, too. These
-# settings override the selected code style. This means nobody needs to import the code style
-# anymore and we can change settings for all developers here at once.
-#
-# Some keys were manually changed:
-#   * insert_final_newline (is false, changed to true, expected by KtLint)
-#   * ktlint_ignore_back_ticked_identifier (enabled, see comment below)
-#   * root (see comment below)
-
-# Tells tools to stop searching upwards.
-root = true
-
-[*]
+[*.{kt,kts}]
 charset = utf-8
 end_of_line = lf
 indent_size = 4
@@ -29,48 +12,6 @@ ij_formatter_on_tag = @formatter:on
 ij_formatter_tags_enabled = false
 ij_smart_tabs = false
 ij_wrap_on_typing = false
-
-
-# Back-ticked method names are allowed to exceed the line length. That's especially helpful for
-# test methods with descriptive names.
-# ktlint_ignore_back_ticked_identifier = true
-
-[.editorconfig]
-ij_editorconfig_align_group_field_declarations = false
-ij_editorconfig_space_after_colon = false
-ij_editorconfig_space_after_comma = true
-ij_editorconfig_space_before_colon = false
-ij_editorconfig_space_before_comma = false
-ij_editorconfig_spaces_around_assignment_operators = true
-
-[*.json]
-ij_continuation_indent_size = 2
-tab_width = 2
-indent_size = 2
-
-[*.xml]
-ij_xml_align_attributes = false
-ij_xml_align_text = false
-ij_xml_attribute_wrap = normal
-ij_xml_block_comment_at_first_column = true
-ij_xml_keep_blank_lines = 2
-ij_xml_keep_indents_on_empty_lines = false
-ij_xml_keep_line_breaks = true
-ij_xml_keep_line_breaks_in_text = true
-ij_xml_keep_whitespaces = false
-ij_xml_keep_whitespaces_around_cdata = preserve
-ij_xml_keep_whitespaces_inside_cdata = false
-ij_xml_line_comment_at_first_column = true
-ij_xml_space_after_tag_name = false
-ij_xml_space_around_equals_in_attribute = false
-ij_xml_space_inside_empty_tag = false
-ij_xml_text_wrap = normal
-ij_xml_use_custom_settings = true
-
-[*.{kt,kts}]
-indent_size = 4
-insert_final_newline = true
-max_line_length = 150
 ij_kotlin_align_in_columns_case_branch = false
 ij_kotlin_align_multiline_binary_operation = false
 ij_kotlin_align_multiline_extends_list = false
