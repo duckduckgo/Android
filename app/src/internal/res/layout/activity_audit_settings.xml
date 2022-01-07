@@ -36,67 +36,47 @@
             android:orientation="vertical"
             android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
-            android:layout_marginTop="32dp"
-            android:layout_marginStart="@dimen/settingsItemHorizontalPadding"
-            android:layout_marginEnd="@dimen/settingsItemHorizontalPadding"
-            android:layout_marginBottom="8dp"
-            android:text="@string/devSettingsScreenTitle"
-            android:textColor="?attr/settingsMinorTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            <TextView
+                android:id="@+id/privacyAuditTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auditSettingsScreenPrivacyAuditSection" />
 
-        <View
-            style="@style/SettingsGroupDivider"/>
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/step1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/auditStep1Title"
+                app:subtitle="@string/auditStep1Subtitle" />
 
-        <TextView
-            android:id="@+id/privacyAuditTitle"
-            style="@style/SettingsSectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auditSettingsScreenPrivacyAuditSection" />
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/step2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/auditStep2Title"
+                app:subtitle="@string/auditStep2Subtitle" />
 
-        <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-            android:id="@+id/step1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/auditStep1Title"
-            app:subtitle="@string/auditStep1Subtitle" />
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/step3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/auditStep3Title"
+                app:subtitle="@string/auditStep3Subtitle" />
 
-        <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-            android:id="@+id/step2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/auditStep2Title"
-            app:subtitle="@string/auditStep2Subtitle" />
+            <TextView
+                android:id="@+id/refTestsTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/auditSettingsScreenRefTestsSection" />
 
-        <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-            android:id="@+id/step3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/auditStep3Title"
-            app:subtitle="@string/auditStep3Subtitle" />
-
-        <View
-            style="@style/SettingsGroupDivider"/>
-
-        <TextView
-            android:id="@+id/refTestsTitle"
-            style="@style/SettingsSectionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/auditSettingsScreenRefTestsSection" />
-
-        <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-            android:id="@+id/requestBlocking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/requestBlockingTitle"
-            app:subtitle="@string/requestBlockingSubtitle" />
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/requestBlocking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/requestBlockingTitle"
+                app:subtitle="@string/requestBlockingSubtitle" />
 
             <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
                 android:id="@+id/requestBlockingDisabled"
@@ -105,12 +85,12 @@
                 app:title="@string/requestBlockingDisabledTitle"
                 app:subtitle="@string/requestBlockingDisabledSubtitle" />
 
-        <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-            android:id="@+id/httpsUpgrades"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="@string/httpsUpgradesTitle"
-            app:subtitle="@string/httpsUpgradesSubtitle" />
+            <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
+                android:id="@+id/httpsUpgrades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/httpsUpgradesTitle"
+                app:subtitle="@string/httpsUpgradesSubtitle" />
 
             <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
                 android:id="@+id/fireButtonStore"

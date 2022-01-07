@@ -20,7 +20,6 @@
     <string name="devSettingsSubtitle" translatable="false">Features useful for devs and debugging</string>
     <string name="devSettingsScreenPrivacySection" translatable="false">PRIVACY</string>
     <string name="devSettingsScreenGeneralSection" translatable="false">GENERAL</string>
-    <string name="devSettingsScreenTitle" translatable="false">Welcome to the Developer Settings</string>
     <string name="devSettingsScreenTdsVersion" translatable="false">TDS version</string>
     <string name="devSettingsScreenTdsVersionSubtitle" translatable="false">Use next TDS version</string>
     <string name="devSettingsScreenTdsWait" translatable="false">Please wait while we download the tds version</string>
