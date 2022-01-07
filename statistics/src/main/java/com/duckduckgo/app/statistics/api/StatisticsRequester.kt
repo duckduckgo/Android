@@ -76,7 +76,8 @@ class StatisticsRequester(
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")
-                })
+                }
+            )
     }
 
     private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean =
@@ -105,7 +106,8 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
                 },
-                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") })
+                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -130,7 +132,8 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
                 },
-                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") })
+                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") }
+            )
     }
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {

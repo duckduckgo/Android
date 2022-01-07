@@ -18,7 +18,6 @@ package com.duckduckgo.app.tabs.ui
 
 import android.content.Context
 import com.duckduckgo.mobile.android.ui.view.toDp
-import com.duckduckgo.mobile.android.ui.view.toDp
 import com.duckduckgo.mobile.android.ui.view.toPx
 import kotlin.math.min
 

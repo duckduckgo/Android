@@ -47,7 +47,11 @@ interface AppEnjoymentDao {
     @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_TO_PARTICIPATE AND promptCount = :promptCount")
     fun hasUserDeclinedToSayWhetherEnjoying(promptCount: Int): Boolean
 
-    @Query("SELECT timestamp FROM app_enjoyment WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK OR eventType=$TYPE_DECLINED_TO_PARTICIPATE ORDER BY timestamp DESC LIMIT 1")
+    @Query(
+        "SELECT timestamp FROM app_enjoyment " +
+            "WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK OR eventType=$TYPE_DECLINED_TO_PARTICIPATE " +
+            "ORDER BY timestamp DESC LIMIT 1"
+    )
     fun latestDateUserDeclinedRatingOrFeedback(): Long?
 }
 

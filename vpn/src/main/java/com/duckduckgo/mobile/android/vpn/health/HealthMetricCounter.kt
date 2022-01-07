@@ -31,7 +31,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
 

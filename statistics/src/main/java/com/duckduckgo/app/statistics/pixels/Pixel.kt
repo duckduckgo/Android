@@ -145,7 +145,8 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                     Timber.w(
                         it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
                     )
-                })
+                }
+            )
     }
 
     /**
@@ -181,6 +182,7 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                     Timber.w(
                         it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
                     )
-                })
+                }
+            )
     }
 }

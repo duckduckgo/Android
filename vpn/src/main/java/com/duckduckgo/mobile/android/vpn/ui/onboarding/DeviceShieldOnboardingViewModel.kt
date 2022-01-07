@@ -73,10 +73,12 @@ class DeviceShieldOnboardingViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (DeviceShieldOnboardingViewModel(
-                    deviceShieldPixels,
-                    deviceShieldOnboardingStore
-                ) as T)
+                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (
+                    DeviceShieldOnboardingViewModel(
+                        deviceShieldPixels,
+                        deviceShieldOnboardingStore
+                    ) as T
+                    )
                 else -> null
             }
         }

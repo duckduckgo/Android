@@ -154,7 +154,10 @@ class UdpPacketProcessor @AssistedInject constructor(
         try {
             val payloadBuffer = packet.backingBuffer ?: return
 
-            Timber.d("App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
+            Timber.d(
+                "App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} " +
+                    "bytes to ${connectionInfo.destinationAddress}"
+            )
 
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)

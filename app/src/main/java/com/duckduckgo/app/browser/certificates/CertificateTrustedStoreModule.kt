@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.certificates
 
 import android.content.Context
-import com.duckduckgo.app.browser.certificates.rootstore.*
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides

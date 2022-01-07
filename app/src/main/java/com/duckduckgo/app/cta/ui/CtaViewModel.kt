@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
-import com.duckduckgo.app.cta.ui.HomePanelCta.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -254,7 +253,8 @@ class CtaViewModel @Inject constructor(
     private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) getWidgetAuto() else AddWidgetInstructions
 
     private fun getWidgetAuto() =
-        if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser) AddReturningUsersWidgetAuto else AddWidgetAuto
+        if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser)
+            AddReturningUsersWidgetAuto else AddWidgetAuto
 
     private fun getWidgetCta(): HomePanelCta? {
         if (variantManager.returningUsersNoOnboardingEnabled() && onboardingStore.userMarkedAsReturningUser) {
@@ -289,7 +289,9 @@ class CtaViewModel @Inject constructor(
 
         val showOnDay = survey.daysInstalled?.toLong()
         val daysInstalled = appInstallStore.daysInstalled()
-        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) || showOnDay == daysInstalled || showOnDay == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED) {
+        if ((showOnDay == null && daysInstalled >= SURVEY_DEFAULT_MIN_DAYS_INSTALLED) ||
+            showOnDay == daysInstalled || showOnDay == SURVEY_NO_MIN_DAYS_INSTALLED_REQUIRED
+        ) {
             return Survey(survey)
         }
         return null

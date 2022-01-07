@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.certificates
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.certificates.rootstore.*
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -150,7 +150,10 @@ class AutomaticDataClearer @Inject constructor(
                 .addTag(DataClearingWorker.WORK_REQUEST_TAG)
                 .build()
             it.enqueue(workRequest)
-            Timber.i("Work request scheduled, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app. job id: ${workRequest.id}")
+            Timber.i(
+                "Work request scheduled, ${durationMillis}ms from now, " +
+                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}"
+            )
         }
     }
 

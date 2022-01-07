@@ -19,7 +19,6 @@ package com.duckduckgo.app.fire
 import android.database.sqlite.SQLiteDatabase
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 

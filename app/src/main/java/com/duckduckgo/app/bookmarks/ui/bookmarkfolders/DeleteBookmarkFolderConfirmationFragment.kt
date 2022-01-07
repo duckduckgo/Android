@@ -39,7 +39,9 @@ class DeleteBookmarkFolderConfirmationFragment : DialogFragment() {
         AlertDialog.Builder(requireContext())
             .setMessage(getMessageString())
             .setTitle(R.string.delete)
-            .setPositiveButton(R.string.delete) { _, _ -> listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder) }
+            .setPositiveButton(R.string.delete) { _, _ ->
+                listener?.onBookmarkFolderDeleted(arguments?.getSerializable(BOOKMARK_FOLDER_KEY) as BookmarkFolder)
+            }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .create()
 

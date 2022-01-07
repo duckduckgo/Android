@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.webkit.WebBackForwardList
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
 interface WebNavigationState {

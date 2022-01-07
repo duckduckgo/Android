@@ -179,8 +179,14 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list` (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)")
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list`" +
+                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))"
+                )
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata`" +
+                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)"
+                )
             }
         }
 

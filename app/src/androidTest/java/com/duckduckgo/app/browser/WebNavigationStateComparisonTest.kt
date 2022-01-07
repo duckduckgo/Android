@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -85,7 +84,7 @@ class WebNavigationStateComparisonTest {
     }
 
     @Test
-    fun whenPreviousContainsAnOriginalUrlAndCurrentUrlAndLatestContainsSameOriginalUrlAndDifferentCurrentUrlWithSameHostThenCompareReturnsUrlUpdated() {
+    fun whenPrevContainsAnOriginalUrlAndCurrentUrlAndLatestContainsSameOriginalUrlAndDifferentCurrentUrlWithSameHostThenCompareReturnsUrlUpdated() {
         val previousState = buildState("http://same.com", "http://same.com/previous")
         val latestState = buildState("http://same.com", "http://same.com/latest")
         assertEquals(UrlUpdated("http://same.com/latest"), latestState.compare(previousState))

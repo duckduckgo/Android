@@ -94,11 +94,13 @@ class ChangeIconViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(
-                    settingsDataStore.get(),
-                    appIconModifier.get(),
-                    pixel.get()
-                ) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (
+                    ChangeIconViewModel(
+                        settingsDataStore.get(),
+                        appIconModifier.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

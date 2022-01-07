@@ -36,7 +36,7 @@ import javax.inject.Inject
     boundType = VpnServiceCallbacks::class
 )
 @SingleInstanceIn(VpnScope::class)
-class VpnServiceHeartbeatImpl @Inject constructor(
+class VpnServiceHeartbeat @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider

@@ -57,7 +57,8 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
     fun createNotificationNewTrackerFound(trackersBlocked: List<VpnTracker>): DeviceShieldNotification {
         val numberOfApps = trackersBlocked.distinctBy { it.trackingApp.packageId }
-        if (trackersBlocked.isEmpty() || numberOfApps.isEmpty()) return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.atp_OnNoTrackersNotificationHeader)))
+        if (trackersBlocked.isEmpty() || numberOfApps.isEmpty())
+            return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.atp_OnNoTrackersNotificationHeader)))
 
         val prefix = resources.getString(R.string.atp_OnNotificationPrefix)
         val numberOfAppsString = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberOfApps.size, numberOfApps.size)
@@ -87,7 +88,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
             val trackerCount = appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.size
-            Timber.v("createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is ${trackers.size}. Notification type: $dailyNotificationType")
+            Timber.v(
+                "createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is " +
+                    "${trackers.size}. Notification type: $dailyNotificationType"
+            )
 
             if (trackers.isEmpty()) {
                 return DeviceShieldNotification(hidden = true)
@@ -156,9 +160,9 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             Timber.v(
                 "createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${
-                    wordsToBold.joinToString(
-                        separator = ", "
-                    )
+                wordsToBold.joinToString(
+                    separator = ", "
+                )
                 }}"
             )
             return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))

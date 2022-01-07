@@ -69,13 +69,22 @@ class RealSavedSitesParser : SavedSitesParser {
                 { node ->
                     if (node.value.url == null) {
                         if (node.value.depth == 0) {
-                            appendLine("    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>")
+                            appendLine(
+                                "    <DT><H3 ADD_DATE=\"1618844074\" " +
+                                    "LAST_MODIFIED=\"1618844074\" PERSONAL_TOOLBAR_FOLDER=\"true\">${node.value.name}</H3>"
+                            )
                         } else {
-                            appendLine(getTabString(node.value.depth) + "    <DT><H3 ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>")
+                            appendLine(
+                                getTabString(node.value.depth) + "    <DT><H3 ADD_DATE=\"1618844074\" " +
+                                    "LAST_MODIFIED=\"1618844074\">${node.value.name}</H3>"
+                            )
                         }
                         appendLine(getTabString(node.value.depth) + "    <DL><p>")
                     } else {
-                        appendLine(getTabString(node.value.depth) + "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" LAST_MODIFIED=\"1618844074\">${node.value.name}</A>")
+                        appendLine(
+                            getTabString(node.value.depth) + "    <DT><A HREF=\"${node.value.url}\" ADD_DATE=\"1618844074\" " +
+                                "LAST_MODIFIED=\"1618844074\">${node.value.name}</A>"
+                        )
                     }
                 },
                 { node ->

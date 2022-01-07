@@ -149,13 +149,15 @@ class LocationPermissionsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(
-                    locationPermissionsRepository.get(),
-                    geoLocationPermissions.get(),
-                    dispatcherProvider.get(),
-                    settingsDataStore.get(),
-                    pixel.get()
-                ) as T)
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (
+                    LocationPermissionsViewModel(
+                        locationPermissionsRepository.get(),
+                        geoLocationPermissions.get(),
+                        dispatcherProvider.get(),
+                        settingsDataStore.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

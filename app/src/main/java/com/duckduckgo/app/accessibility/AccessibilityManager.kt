@@ -32,7 +32,10 @@ class AppAccessibilityManager(val accessibilitySettingsDataStore: AccessibilityS
         url: String?
     ) {
         if (accessibilitySettingsDataStore.forceZoom) {
-            webView.loadUrl("javascript:document.getElementsByName('viewport')[0].setAttribute('content', 'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');")
+            webView.loadUrl(
+                "javascript:document.getElementsByName('viewport')[0].setAttribute('content', " +
+                    "'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');"
+            )
         }
     }
 }

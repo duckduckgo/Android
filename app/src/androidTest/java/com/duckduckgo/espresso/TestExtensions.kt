@@ -41,7 +41,8 @@ fun waitForView(
         override fun getDescription(): String {
             val matcherDescription = StringDescription()
             viewMatcher.describeTo(matcherDescription)
-            return "wait for a specific view <$matcherDescription> to be ${if (waitForDisplayed) "displayed" else "not displayed during $timeout millis."}"
+            return "wait for a specific view <$matcherDescription>" +
+                " to be ${if (waitForDisplayed) "displayed" else "not displayed during $timeout millis."}"
         }
 
         override fun perform(

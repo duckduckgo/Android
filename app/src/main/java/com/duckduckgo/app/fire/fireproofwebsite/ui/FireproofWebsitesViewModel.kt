@@ -119,13 +119,15 @@ class FireproofWebsitesViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (FireproofWebsitesViewModel(
-                    fireproofWebsiteRepository.get(),
-                    dispatcherProvider.get(),
-                    pixel.get(),
-                    settingsDataStore.get(),
-                    userEventsStore.get()
-                ) as T)
+                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (
+                    FireproofWebsitesViewModel(
+                        fireproofWebsiteRepository.get(),
+                        dispatcherProvider.get(),
+                        pixel.get(),
+                        settingsDataStore.get(),
+                        userEventsStore.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

@@ -64,11 +64,13 @@ class OnboardingViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(OnboardingViewModel::class.java) -> (OnboardingViewModel(
-                    userStageStore.get(),
-                    pageLayoutManager.get(),
-                    dispatchers.get()
-                ) as T)
+                isAssignableFrom(OnboardingViewModel::class.java) -> (
+                    OnboardingViewModel(
+                        userStageStore.get(),
+                        pageLayoutManager.get(),
+                        dispatchers.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

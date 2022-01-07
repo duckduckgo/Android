@@ -162,7 +162,8 @@ class SystemSearchViewModel(
         return Observable.zip(
             autoComplete.autoComplete(query),
             Observable.just(deviceAppLookup.query(query)),
-            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult>
+            { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
                 SystemSearchResult(autocompleteResult, appsResult)
             }
         )
