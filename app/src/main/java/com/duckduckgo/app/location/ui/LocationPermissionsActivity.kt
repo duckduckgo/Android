@@ -126,7 +126,10 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
         super.onDestroy()
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         viewModel.onSiteLocationPermissionSelected(domain, permission)
     }
 
@@ -134,6 +137,5 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
         fun intent(context: Context): Intent {
             return Intent(context, LocationPermissionsActivity::class.java)
         }
-
     }
 }

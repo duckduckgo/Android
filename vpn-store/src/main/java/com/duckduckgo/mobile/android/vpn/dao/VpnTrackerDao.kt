@@ -40,25 +40,40 @@ interface VpnTrackerDao {
     fun getLatestTracker(): Flow<VpnTracker?>
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
-    fun getTrackersBetween(startTime: String, endTime: String): Flow<List<VpnTracker>>
+    fun getTrackersBetween(
+        startTime: String,
+        endTime: String
+    ): Flow<List<VpnTracker>>
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
-    fun getTrackersBetweenSync(startTime: String, endTime: String): List<VpnTracker>
+    fun getTrackersBetweenSync(
+        startTime: String,
+        endTime: String
+    ): List<VpnTracker>
 
     @Query("DELETE FROM vpn_tracker WHERE timestamp < :startTime")
     fun deleteOldDataUntil(startTime: String)
 
     @Query("SELECT COUNT(*) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
-    fun getTrackersCountBetween(startTime: String, endTime: String): Flow<Int>
+    fun getTrackersCountBetween(
+        startTime: String,
+        endTime: String
+    ): Flow<Int>
 
     @Query("SELECT COUNT(DISTINCT packageId) FROM vpn_tracker WHERE timestamp >= :startTime AND timestamp < :endTime")
-    fun getTrackingAppsCountBetween(startTime: String, endTime: String): Flow<Int>
+    fun getTrackingAppsCountBetween(
+        startTime: String,
+        endTime: String
+    ): Flow<Int>
 
     @Query("SELECT strftime('%Y-%m-%d', timestamp) bucket, * FROM vpn_tracker WHERE timestamp >= :startTime order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
     fun getPagedTrackersSince(startTime: String): Flow<List<BucketizedVpnTracker>>
 
     @Query("SELECT * FROM vpn_tracker WHERE timestamp LIKE :date || '%' AND packageId = :appPackage order by timestamp DESC limit $MAX_NUMBER_OF_TRACKERS_IN_QUERY_RESULTS")
-    fun getTrackersForAppFromDate(date: String, appPackage: String): Flow<List<VpnTracker>>
+    fun getTrackersForAppFromDate(
+        date: String,
+        appPackage: String
+    ): Flow<List<VpnTracker>>
 
     @Query("SELECT * from vpn_tracker WHERE packageId = :appPackage")
     fun getTrackersForApp(appPackage: String): List<VpnTracker>

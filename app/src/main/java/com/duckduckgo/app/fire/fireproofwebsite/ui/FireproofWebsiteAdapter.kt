@@ -72,7 +72,10 @@ class FireproofWebsiteAdapter(
 
     var loginDetectionEnabled: Boolean = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FireproofWebSiteViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FireproofWebSiteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
@@ -126,7 +129,10 @@ class FireproofWebsiteAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: FireproofWebSiteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: FireproofWebSiteViewHolder,
+        position: Int
+    ) {
         when (holder) {
             is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
                 holder.bind(loginDetectionEnabled)
@@ -229,14 +235,16 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             }
         }
 
-        private fun showOverFlowMenu(anchor: View, entity: FireproofWebsiteEntity) {
+        private fun showOverFlowMenu(
+            anchor: View,
+            entity: FireproofWebsiteEntity
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             }
             popupMenu.show(binding.root, anchor)
-
         }
 
         private fun deleteEntity(entity: FireproofWebsiteEntity) {

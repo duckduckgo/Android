@@ -195,7 +195,11 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean, appIconChanged: Boolean): Boolean {
+    private fun shouldClearData(
+        cleanWhenOption: ClearWhenOption,
+        appUsedSinceLastClear: Boolean,
+        appIconChanged: Boolean
+    ): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
         if (!appUsedSinceLastClear) {
@@ -232,5 +236,4 @@ class AutomaticDataClearer @Inject constructor(
 
         return enoughTimePassed
     }
-
 }

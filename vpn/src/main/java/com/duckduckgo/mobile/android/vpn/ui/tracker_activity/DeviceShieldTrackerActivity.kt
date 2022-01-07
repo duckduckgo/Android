@@ -148,7 +148,11 @@ class DeviceShieldTrackerActivity :
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             when (resultCode) {
                 RESULT_OK -> {
@@ -334,7 +338,11 @@ class DeviceShieldTrackerActivity :
         }
     }
 
-    private fun addClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit): SpannableString {
+    private fun addClickableLink(
+        annotation: String,
+        text: CharSequence,
+        onClick: () -> Unit
+    ): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -463,11 +471,13 @@ class DeviceShieldTrackerActivity :
         private const val REQUEST_ASK_VPN_PERMISSION = 101
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
-        fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
+        fun intent(
+            context: Context,
+            onLaunchCallback: ResultReceiver? = null
+        ): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
         }
     }
-
 }

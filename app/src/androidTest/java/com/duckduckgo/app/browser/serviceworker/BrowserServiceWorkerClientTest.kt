@@ -76,5 +76,4 @@ class BrowserServiceWorkerClientTest {
 
         verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, null)
     }
-
 }

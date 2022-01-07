@@ -130,7 +130,10 @@ class DetectOriginatingAppPackageLegacy(
         }
     }
 
-    private data class SearchFile(val filename: String, val pattern: Pattern)
+    private data class SearchFile(
+        val filename: String,
+        val pattern: Pattern
+    )
 
     companion object {
         private const val fileNameTcpV4 = "proc/net/tcp"
@@ -145,5 +148,4 @@ class DetectOriginatingAppPackageLegacy(
         fun ipv4RegexPattern(): Pattern = Pattern.compile(regex(8), regexFlags)
         fun ipv6RegexPattern(): Pattern = Pattern.compile(regex(32), regexFlags)
     }
-
 }

@@ -58,7 +58,10 @@ class ThemingSharedPreferences @Inject constructor(private val context: Context)
                 DuckDuckGoTheme.DARK -> THEME_DARK
             }
 
-        fun themeFrom(value: String?, defValue: DuckDuckGoTheme) =
+        fun themeFrom(
+            value: String?,
+            defValue: DuckDuckGoTheme
+        ) =
             when (value) {
                 THEME_LIGHT -> DuckDuckGoTheme.LIGHT
                 THEME_DARK -> DuckDuckGoTheme.DARK

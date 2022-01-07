@@ -51,7 +51,8 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             return adapter.fromJson(
-                FileUtilities.loadText("reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json"))
+                FileUtilities.loadText("reference_tests/trackerallowlist/tracker_allowlist_matching_tests.json")
+            )
                 ?: emptyList()
         }
     }
@@ -59,8 +60,10 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     @Test
     fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() {
         whenever(
-                mockFeatureToggle.isFeatureEnabled(
-                    PrivacyFeatureName.TrackerAllowlistFeatureName(), true))
+            mockFeatureToggle.isFeatureEnabled(
+                PrivacyFeatureName.TrackerAllowlistFeatureName(), true
+            )
+        )
             .thenReturn(true)
         mockAllowlist()
 
@@ -72,8 +75,10 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     @Test
     fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() {
         whenever(
-                mockFeatureToggle.isFeatureEnabled(
-                    PrivacyFeatureName.TrackerAllowlistFeatureName(), true))
+            mockFeatureToggle.isFeatureEnabled(
+                PrivacyFeatureName.TrackerAllowlistFeatureName(), true
+            )
+        )
             .thenReturn(false)
         mockAllowlist()
 

@@ -16,11 +16,20 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-data class HealthCheckSubmission(val userReport: UserHealthSubmission, val systemReport: SystemHealthSubmission)
+data class HealthCheckSubmission(
+    val userReport: UserHealthSubmission,
+    val systemReport: SystemHealthSubmission
+)
 
-data class SystemHealthSubmission(val isBadHealth: Boolean, val rawMetrics: List<RawMetricsSubmission>)
+data class SystemHealthSubmission(
+    val isBadHealth: Boolean,
+    val rawMetrics: List<RawMetricsSubmission>
+)
 
-data class RawMetricsSubmission(val name: String, val metrics: Map<String, Metric> = emptyMap()) {
+data class RawMetricsSubmission(
+    val name: String,
+    val metrics: Map<String, Metric> = emptyMap()
+) {
 
     fun isInBadHealth(): Boolean {
         return metrics.count { it.value.isBadState == true } > 0
@@ -37,7 +46,10 @@ data class RawMetricsSubmission(val name: String, val metrics: Map<String, Metri
     }
 }
 
-data class Metric(val value: String, val isBadState: Boolean? = null) {
+data class Metric(
+    val value: String,
+    val isBadState: Boolean? = null
+) {
 
     override fun toString(): String {
         if (isBadState == null) return value
@@ -45,4 +57,7 @@ data class Metric(val value: String, val isBadState: Boolean? = null) {
     }
 }
 
-data class UserHealthSubmission(val state: String, val notes: String? = null)
+data class UserHealthSubmission(
+    val state: String,
+    val notes: String? = null
+)

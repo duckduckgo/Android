@@ -100,16 +100,19 @@ interface Pixel {
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun enqueueFire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun enqueueFire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
@@ -140,7 +143,8 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                 { Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters") },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                    )
                 })
     }
 
@@ -170,11 +174,13 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
             .subscribe(
                 {
                     Timber.v(
-                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters"
+                    )
                 },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
+                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                    )
                 })
     }
 }

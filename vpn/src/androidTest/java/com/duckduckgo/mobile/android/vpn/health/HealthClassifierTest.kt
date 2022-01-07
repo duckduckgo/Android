@@ -196,7 +196,11 @@ class HealthClassifierTest {
         assertTrue(String.format("Expected Initializing but was %s", this.javaClass.simpleName), (this) is Initializing)
     }
 
-    private fun configureTracers(numberInvalid: Int, numberSlowTracers: Int, totalTracers: Int) {
+    private fun configureTracers(
+        numberInvalid: Int,
+        numberSlowTracers: Int,
+        totalTracers: Int
+    ) {
         for (i in 0 until numberInvalid) {
             tracers.add(anInvalidTracer())
         }

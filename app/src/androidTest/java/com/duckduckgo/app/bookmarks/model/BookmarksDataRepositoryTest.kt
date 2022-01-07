@@ -126,7 +126,13 @@ class BookmarksDataRepositoryTest {
         val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         repository.update(bookmarkFolder)
 
-        verify(mockBookmarkFoldersDao).update(BookmarkFolderEntity(id = bookmarkFolder.id, name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
+        verify(mockBookmarkFoldersDao).update(
+            BookmarkFolderEntity(
+                id = bookmarkFolder.id,
+                name = bookmarkFolder.name,
+                parentId = bookmarkFolder.parentId
+            )
+        )
     }
 
     @Test
@@ -184,7 +190,10 @@ class BookmarksDataRepositoryTest {
 
         val bookmarksAndFolders = repository.fetchBookmarksAndFolders(null)
 
-        assertEquals(listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(
+            listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)),
+            bookmarksAndFolders.first().first
+        )
         assertEquals(listOf(BookmarkFolder(folder.id, folder.name, folder.parentId, numBookmarks = 1)), bookmarksAndFolders.first().second)
     }
 
@@ -201,7 +210,10 @@ class BookmarksDataRepositoryTest {
 
         val bookmarksAndFolders = repository.fetchBookmarksAndFolders(2)
 
-        assertEquals(listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(
+            listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)),
+            bookmarksAndFolders.first().first
+        )
         assertEquals(listOf(BookmarkFolder(childFolder.id, childFolder.name, childFolder.parentId)), bookmarksAndFolders.first().second)
     }
 

@@ -30,7 +30,11 @@ class DeviceShieldOnboardingViewModel(
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 ) : ViewModel() {
 
-    data class OnboardingPage(val imageHeader: Int, val title: Int, val text: Int)
+    data class OnboardingPage(
+        val imageHeader: Int,
+        val title: Int,
+        val text: Int
+    )
 
     val pages = listOf(
         OnboardingPage(
@@ -59,7 +63,6 @@ class DeviceShieldOnboardingViewModel(
         Timber.i("App Tracking Protection, is now enabled")
         deviceShieldPixels.enableFromOnboarding()
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -70,7 +73,10 @@ class DeviceShieldOnboardingViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (DeviceShieldOnboardingViewModel(deviceShieldPixels, deviceShieldOnboardingStore) as T)
+                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (DeviceShieldOnboardingViewModel(
+                    deviceShieldPixels,
+                    deviceShieldOnboardingStore
+                ) as T)
                 else -> null
             }
         }

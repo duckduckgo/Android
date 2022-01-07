@@ -49,7 +49,10 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
      * is called from an Activity with daggerInject=false, you'll probably need to call
      * daggerInject() directly.
      */
-    fun onCreate(savedInstanceState: Bundle?, daggerInject: Boolean = true) {
+    fun onCreate(
+        savedInstanceState: Bundle?,
+        daggerInject: Boolean = true
+    ) {
         if (daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(themingDataStore.theme)
         super.onCreate(savedInstanceState)

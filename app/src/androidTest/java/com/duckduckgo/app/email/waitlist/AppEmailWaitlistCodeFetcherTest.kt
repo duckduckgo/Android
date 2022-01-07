@@ -65,7 +65,14 @@ class AppEmailWaitlistCodeFetcherTest {
     @Before
     fun before() {
         initializeWorkManager()
-        testee = AppEmailWaitlistCodeFetcher(workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestScope())
+        testee = AppEmailWaitlistCodeFetcher(
+            workManager,
+            mockEmailManager,
+            mockNotification,
+            mockNotificationSender,
+            coroutineRule.testDispatcherProvider,
+            TestScope()
+        )
     }
 
     @Test

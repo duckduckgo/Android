@@ -97,7 +97,11 @@ class WebViewActivity : DuckDuckGoActivity() {
         const val URL_EXTRA = "URL_EXTRA"
         const val TITLE_EXTRA = "TITLE_EXTRA"
 
-        fun intent(context: Context, urlExtra: String, titleExtra: String): Intent {
+        fun intent(
+            context: Context,
+            urlExtra: String,
+            titleExtra: String
+        ): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
             intent.putExtra(URL_EXTRA, urlExtra)
             intent.putExtra(TITLE_EXTRA, titleExtra)

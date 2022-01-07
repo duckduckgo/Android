@@ -175,7 +175,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         tdsDomainEntityDao = db.tdsDomainEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
-        trackerDetector = TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+        trackerDetector =
+            TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
 
         val json = FileUtilities.loadText("reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -198,7 +199,10 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         resourceSurrogates.loadSurrogates(surrogates)
     }
 
-    private fun assertRedirectCorrectlyDone(response: WebResourceResponse?, expectedRedirect: String) {
+    private fun assertRedirectCorrectlyDone(
+        response: WebResourceResponse?,
+        expectedRedirect: String
+    ) {
         val result = response?.let {
             val test = String(it.data.readBytes()).trim()
             val base64String = Base64.encodeToString(test.toByteArray(), Base64.NO_WRAP)

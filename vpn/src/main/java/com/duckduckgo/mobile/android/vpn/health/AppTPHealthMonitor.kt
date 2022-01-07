@@ -156,14 +156,20 @@ class AppTPHealthMonitor @Inject constructor(
         return state
     }
 
-    private fun sampleTracerPackets(timeWindowMillis: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleTracerPackets(
+        timeWindowMillis: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val allTraces = healthMetricCounter.getAllPacketTraces(timeWindowMillis)
         val state = healthClassifier.determineHealthTracerPackets(allTraces)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleTunReadQueueReadRate(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleTunReadQueueReadRate(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
         val readFromNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
 
@@ -172,28 +178,40 @@ class AppTPHealthMonitor @Inject constructor(
         return state
     }
 
-    private fun sampleSocketReadExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleSocketReadExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val readExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelReadExceptions(readExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleSocketWriteExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleSocketWriteExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val writeExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_WRITE_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelWriteExceptions(writeExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleSocketConnectExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleSocketConnectExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val connectExceptions = healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthSocketChannelConnectExceptions(connectExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
 
-    private fun sampleTunWriteExceptions(timeWindow: Long, healthAlerts: HealthRule): HealthState {
+    private fun sampleTunWriteExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions)
         healthAlerts.updateAlert(state)
@@ -290,7 +308,10 @@ class AppTPHealthMonitor @Inject constructor(
         this.simulatedGoodHealth = goodHealth
     }
 
-    private abstract class HealthRule(open val name: String, open var samplesToWaitBeforeAlerting: Int = 4) {
+    private abstract class HealthRule(
+        open val name: String,
+        open var samplesToWaitBeforeAlerting: Int = 4
+    ) {
         var badHealthSampleCount: Int = 0
 
         fun recordBadHealthSample() {
@@ -306,5 +327,4 @@ class AppTPHealthMonitor @Inject constructor(
             return badHealthSampleCount >= samplesToWaitBeforeAlerting
         }
     }
-
 }

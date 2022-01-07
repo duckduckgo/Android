@@ -46,5 +46,4 @@ class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppT
     override fun canUseEncryption(): Boolean {
         return false
     }
-
 }

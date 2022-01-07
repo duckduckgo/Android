@@ -72,11 +72,11 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
 
         testee = RealPrivacyConfigPersister(
-                referenceTestUtilities.getPrivacyFeaturePluginPoint(),
-                mockTogglesRepository,
-                referenceTestUtilities.unprotectedTemporaryRepository,
-                referenceTestUtilities.privacyRepository,
-                db
+            referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+            mockTogglesRepository,
+            referenceTestUtilities.unprotectedTemporaryRepository,
+            referenceTestUtilities.privacyRepository,
+            db
         )
     }
 

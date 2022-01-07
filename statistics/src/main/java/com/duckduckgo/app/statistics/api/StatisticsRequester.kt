@@ -51,7 +51,8 @@ class StatisticsRequester(
             val storedAtb = store.atb
             if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
                 Timber.d(
-                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
+                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour"
+                )
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = VariantManager.DEFAULT_VARIANT.key
             }

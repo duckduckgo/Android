@@ -54,7 +54,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 
-data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
+data class SystemSearchResult(
+    val autocomplete: AutoCompleteResult,
+    val deviceApps: List<DeviceApp>
+)
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,

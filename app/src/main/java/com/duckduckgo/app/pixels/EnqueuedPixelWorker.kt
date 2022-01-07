@@ -46,7 +46,10 @@ class EnqueuedPixelWorker @Inject constructor(
 
     private var launchedByFireAction: Boolean = false
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event
+    ) {
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleWorker(workManager)
             launchedByFireAction = isLaunchByFireAction()
@@ -82,7 +85,10 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 
-    class RealEnqueuedPixelWorker(val context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
+    class RealEnqueuedPixelWorker(
+        val context: Context,
+        parameters: WorkerParameters
+    ) : CoroutineWorker(context, parameters) {
         lateinit var pixel: Pixel
         lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -111,7 +117,6 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 }
-
 
 @ContributesMultibinding(AppScope::class)
 class EnqueuedPixelWorkerInjectorPlugin @Inject constructor(

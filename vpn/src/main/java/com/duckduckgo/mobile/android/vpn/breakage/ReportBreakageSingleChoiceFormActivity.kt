@@ -43,7 +43,10 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     private val viewModel: ReportBreakageSingleChoiceFormViewModel by bindViewModel()
 
     private val adapter = ReportBreakageSingleChoiceFormAdapter(object : ReportBreakageSingleChoiceFormAdapter.Listener {
-        override fun onChoiceSelected(choice: Choice, position: Int) {
+        override fun onChoiceSelected(
+            choice: Choice,
+            position: Int
+        ) {
             viewModel.onChoiceSelected(choice)
         }
     })
@@ -70,7 +73,8 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     }
 
     fun setupViews() {
-        binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.appBreakageFormDisclaimer.text =
+            HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.reportBreakageChoicesRecycler.adapter = adapter
         binding.ctaNextFormSubmit.setOnClickListener {
             viewModel.onSubmitChoices()
@@ -97,7 +101,11 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
 
     private fun submitChoice(choice: Choice) {
         val intent = Intent().apply {
-            IssueReport(appName = brokenApp?.appName, appPackageId = brokenApp?.appPackageId, loginInfo = getString(choice.questionStringRes)).addToIntent(this)
+            IssueReport(
+                appName = brokenApp?.appName,
+                appPackageId = brokenApp?.appPackageId,
+                loginInfo = getString(choice.questionStringRes)
+            ).addToIntent(this)
         }
         setResult(RESULT_OK, intent)
         finish()
@@ -111,7 +119,10 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     companion object {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
-        fun intent(context: Context, brokenApp: BrokenApp): Intent {
+        fun intent(
+            context: Context,
+            brokenApp: BrokenApp
+        ): Intent {
             return Intent(context, ReportBreakageSingleChoiceFormActivity::class.java).apply {
                 putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }

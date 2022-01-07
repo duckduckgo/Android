@@ -133,7 +133,8 @@ class RealGpcTest {
         givenFeatureAndGpcAreEnabled()
 
         assertFalse(
-            testee.canUrlAddHeaders(VALID_CONSUMER_URL, mapOf(GPC_HEADER to GPC_HEADER_VALUE)))
+            testee.canUrlAddHeaders(VALID_CONSUMER_URL, mapOf(GPC_HEADER to GPC_HEADER_VALUE))
+        )
     }
 
     @Test

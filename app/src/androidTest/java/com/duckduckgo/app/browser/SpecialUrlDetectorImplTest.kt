@@ -94,9 +94,18 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+                listOf(
+                    buildAppResolveInfo(),
+                    buildBrowserResolveInfo(),
+                    ResolveInfo()
+                )
+            )
             val type = testee.determineType("https://example.com")
-            verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
+            verify(mockPackageManager).queryIntentActivities(
+                argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
+                eq(PackageManager.GET_RESOLVED_FILTER)
+            )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
             assertEquals("https://example.com", appLinkType.uriString)
@@ -109,9 +118,19 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(listOf(buildAppResolveInfo(), buildAppResolveInfo(), buildBrowserResolveInfo(), ResolveInfo()))
+            whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+                listOf(
+                    buildAppResolveInfo(),
+                    buildAppResolveInfo(),
+                    buildBrowserResolveInfo(),
+                    ResolveInfo()
+                )
+            )
             val type = testee.determineType("https://example.com")
-            verify(mockPackageManager).queryIntentActivities(argThat { hasCategory(Intent.CATEGORY_BROWSABLE) }, eq(PackageManager.GET_RESOLVED_FILTER))
+            verify(mockPackageManager).queryIntentActivities(
+                argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
+                eq(PackageManager.GET_RESOLVED_FILTER)
+            )
             assertTrue(type is AppLink)
             val appLinkType = type as AppLink
             assertEquals("https://example.com", appLinkType.uriString)

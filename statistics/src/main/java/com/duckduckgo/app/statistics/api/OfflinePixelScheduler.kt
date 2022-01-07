@@ -52,7 +52,10 @@ class OfflinePixelScheduler @Inject constructor(
         workManager.enqueue(request)
     }
 
-    open class OfflinePixelWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    open class OfflinePixelWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
 
         lateinit var offlinePixelSender: OfflinePixelSender
 

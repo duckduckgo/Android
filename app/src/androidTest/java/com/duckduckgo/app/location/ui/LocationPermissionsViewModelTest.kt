@@ -273,7 +273,10 @@ class LocationPermissionsViewModelTest {
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
-    private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {
+    private fun givenLocationPermission(
+        permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE,
+        vararg domain: String
+    ) {
         domain.forEach {
             locationPermissionsDao.insert(LocationPermissionEntity(domain = it, permission = permission))
         }

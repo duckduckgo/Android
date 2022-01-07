@@ -22,17 +22,26 @@ import com.duckduckgo.app.tabs.model.TabEntity
 
 class TabEntityDiffCallback : DiffUtil.ItemCallback<TabEntity>() {
 
-    override fun areItemsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
+    override fun areItemsTheSame(
+        oldItem: TabEntity,
+        newItem: TabEntity
+    ): Boolean {
         return oldItem.tabId == newItem.tabId
     }
 
-    override fun areContentsTheSame(oldItem: TabEntity, newItem: TabEntity): Boolean {
+    override fun areContentsTheSame(
+        oldItem: TabEntity,
+        newItem: TabEntity
+    ): Boolean {
         return oldItem.tabPreviewFile == newItem.tabPreviewFile &&
             oldItem.viewed == newItem.viewed &&
             oldItem.title == newItem.title
     }
 
-    override fun getChangePayload(oldItem: TabEntity, newItem: TabEntity): Bundle {
+    override fun getChangePayload(
+        oldItem: TabEntity,
+        newItem: TabEntity
+    ): Bundle {
 
         val diffBundle = Bundle()
 

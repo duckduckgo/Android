@@ -40,7 +40,6 @@ class PredefinedGradeUnavailableTest(private val testCase: GradeTestCase) {
             } else {
                 grade.addEntityNotBlocked(tracker.parentEntity)
             }
-
         }
 
         Timber.d("testCase ${testCase.url}")

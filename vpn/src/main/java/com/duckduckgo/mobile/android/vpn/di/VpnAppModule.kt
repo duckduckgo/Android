@@ -61,5 +61,4 @@ class VpnAppModule {
     fun providesResources(context: Context): Resources {
         return context.resources
     }
-
 }

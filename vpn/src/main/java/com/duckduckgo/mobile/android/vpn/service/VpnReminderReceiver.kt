@@ -41,7 +41,10 @@ class VpnReminderReceiver : BroadcastReceiver() {
     @Inject
     lateinit var reminderManager: VpnReminderReceiverManager
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         AndroidInjection.inject(this, context)
 
         Timber.i("VpnReminderReceiver onReceive ${intent.action}")
@@ -58,7 +61,6 @@ class VpnReminderReceiver : BroadcastReceiver() {
             pendingResult?.finish()
         }
     }
-
 }
 
 fun goAsync(

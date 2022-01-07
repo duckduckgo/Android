@@ -44,7 +44,8 @@ class AutomaticDataClearerTest {
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
     private val pixel: Pixel = mock()
-    private val dataClearerForegroundAppRestartPixel = DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
+    private val dataClearerForegroundAppRestartPixel =
+        DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
 
     @UiThreadTest
     @Before
@@ -555,7 +556,10 @@ class AutomaticDataClearerTest {
         }
     }
 
-    private fun configureUserOptions(whatOption: ClearWhatOption, whenOption: ClearWhenOption) {
+    private fun configureUserOptions(
+        whatOption: ClearWhatOption,
+        whenOption: ClearWhenOption
+    ) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(whatOption)
     }

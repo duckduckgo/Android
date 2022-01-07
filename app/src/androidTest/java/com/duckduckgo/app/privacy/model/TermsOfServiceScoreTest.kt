@@ -47,9 +47,10 @@ class TermsOfServiceScoreTest(private val testCase: TermsOfServiceScoreTestCase)
 
             )
         }
-
     }
-
 }
 
-data class TermsOfServiceScoreTestCase(val expectedScore: Int, val terms: TermsOfService)
+data class TermsOfServiceScoreTestCase(
+    val expectedScore: Int,
+    val terms: TermsOfService
+)

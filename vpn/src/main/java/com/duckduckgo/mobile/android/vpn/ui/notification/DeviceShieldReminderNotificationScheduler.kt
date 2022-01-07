@@ -54,7 +54,10 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         enableReminderReceiver()
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         when (vpnStopReason) {
             is VpnStopReason.SelfStop -> onVPNManuallyStopped()
             else -> onVPNUndesiredStop()

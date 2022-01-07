@@ -52,7 +52,5 @@ class DeviceShieldFAQActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, DeviceShieldFAQActivity::class.java)
         }
-
     }
-
 }

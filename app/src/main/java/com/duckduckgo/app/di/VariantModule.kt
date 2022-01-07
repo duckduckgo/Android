@@ -30,10 +30,12 @@ class VariantModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager =
+    fun variantManager(
+        statisticsDataStore: StatisticsDataStore,
+        weightedRandomizer: WeightedRandomizer
+    ): VariantManager =
         ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
 
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
-
 }

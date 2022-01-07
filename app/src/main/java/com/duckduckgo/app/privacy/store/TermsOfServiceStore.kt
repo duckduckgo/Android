@@ -22,5 +22,4 @@ import com.duckduckgo.app.privacy.model.TermsOfService
 interface TermsOfServiceStore : DataLoadable {
 
     val terms: List<TermsOfService>
-
 }

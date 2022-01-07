@@ -44,7 +44,10 @@ class VpnServiceStateLogger @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         coroutineScope.launch(dispatcherProvider.io()) {
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.DISABLED))
         }

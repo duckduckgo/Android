@@ -74,7 +74,10 @@ class LaunchViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(userStageStore.get(), appInstallationReferrerStateListener.get()) as T)
+                isAssignableFrom(LaunchViewModel::class.java) -> (LaunchViewModel(
+                    userStageStore.get(),
+                    appInstallationReferrerStateListener.get()
+                ) as T)
                 else -> null
             }
         }

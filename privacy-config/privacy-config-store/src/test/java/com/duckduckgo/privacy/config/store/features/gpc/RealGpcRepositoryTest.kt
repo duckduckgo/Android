@@ -51,7 +51,8 @@ class RealGpcRepositoryTest {
                 mockGpcDataStore,
                 mockDatabase,
                 TestScope(),
-                coroutineRule.testDispatcherProvider)
+                coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -63,7 +64,8 @@ class RealGpcRepositoryTest {
                 mockGpcDataStore,
                 mockDatabase,
                 TestScope(),
-                coroutineRule.testDispatcherProvider)
+                coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(gpcException.toGpcException(), testee.exceptions.first())
     }
@@ -76,7 +78,8 @@ class RealGpcRepositoryTest {
                     mockGpcDataStore,
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider)
+                    coroutineRule.testDispatcherProvider
+                )
 
             testee.updateAll(listOf())
 
@@ -92,7 +95,8 @@ class RealGpcRepositoryTest {
                     mockGpcDataStore,
                     mockDatabase,
                     TestScope(),
-                    coroutineRule.testDispatcherProvider)
+                    coroutineRule.testDispatcherProvider
+                )
             assertEquals(1, testee.exceptions.size)
             reset(mockGpcDao)
 

@@ -40,13 +40,20 @@ class InfoPanel : FrameLayout {
     private val binding: ViewInfoPanelBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(
         context,
         attrs,
         R.style.Widget_DuckDuckGo_InfoPanel
     )
 
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.InfoPanel)
         setText(attributes.getString(R.styleable.InfoPanel_panelText) ?: "")
         setImageResource(
@@ -71,7 +78,11 @@ class InfoPanel : FrameLayout {
         binding.infoPanelText.text = text
     }
 
-    fun setClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit) {
+    fun setClickableLink(
+        annotation: String,
+        text: CharSequence,
+        onClick: () -> Unit
+    ) {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -115,5 +126,4 @@ class InfoPanel : FrameLayout {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.infoPanelImage.setImageDrawable(drawable)
     }
-
 }

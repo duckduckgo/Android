@@ -26,5 +26,4 @@ interface TrackerListService {
 
     @GET("/contentblocking/trackers-unprotected-temporary.txt")
     fun temporaryWhitelist(): Call<String>
-
 }

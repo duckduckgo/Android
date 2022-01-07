@@ -72,7 +72,10 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return ReferrerNotFound()
     }
 
-    private fun extractCampaignNameSuffix(part: String, prefix: String): ParsedReferrerResult {
+    private fun extractCampaignNameSuffix(
+        part: String,
+        prefix: String
+    ): ParsedReferrerResult {
         Timber.i("Found target campaign name prefix $prefix in $part")
         val suffix = stripCampaignName(part, prefix)
 
@@ -86,7 +89,10 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return CampaignReferrerFound(condensedSuffix)
     }
 
-    private fun stripCampaignName(fullCampaignName: String, prefix: String): String {
+    private fun stripCampaignName(
+        fullCampaignName: String,
+        prefix: String
+    ): String {
         return fullCampaignName.substringAfter(prefix, "")
     }
 
@@ -104,7 +110,11 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
     data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class CampaignReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class CampaignReferrerFound(
+        val campaignSuffix: String,
+        override val fromCache: Boolean = false
+    ) : ParsedReferrerResult(fromCache)
+
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
     object ReferrerInitialising : ParsedReferrerResult()

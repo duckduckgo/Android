@@ -63,7 +63,10 @@ class VpnServiceHeartbeatImpl @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
             VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")

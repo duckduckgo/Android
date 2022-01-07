@@ -84,8 +84,10 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         givenFeatureToggleIsEnabled()
-        when(testCase.featureName) {
-            "contentBlocking" -> { testFeatureEnabledForContentBlocking() }
+        when (testCase.featureName) {
+            "contentBlocking" -> {
+                testFeatureEnabledForContentBlocking()
+            }
         }
     }
 

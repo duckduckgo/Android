@@ -29,7 +29,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-private data class Cookie(val url: String, val value: String)
+private data class Cookie(
+    val url: String,
+    val value: String
+)
 
 @ExperimentalCoroutinesApi
 class WebViewCookieManagerTest {

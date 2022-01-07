@@ -45,5 +45,4 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             return Intent(context, AboutDuckDuckGoActivity::class.java)
         }
     }
-
 }

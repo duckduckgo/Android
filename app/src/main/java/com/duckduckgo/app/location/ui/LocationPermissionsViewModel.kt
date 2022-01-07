@@ -109,7 +109,10 @@ class LocationPermissionsViewModel(
         _viewState.value = _viewState.value?.copy(locationPermissionEnabled = enabled)
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
                 pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
@@ -146,7 +149,13 @@ class LocationPermissionsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository.get(), geoLocationPermissions.get(), dispatcherProvider.get(), settingsDataStore.get(), pixel.get()) as T)
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(
+                    locationPermissionsRepository.get(),
+                    geoLocationPermissions.get(),
+                    dispatcherProvider.get(),
+                    settingsDataStore.get(),
+                    pixel.get()
+                ) as T)
                 else -> null
             }
         }

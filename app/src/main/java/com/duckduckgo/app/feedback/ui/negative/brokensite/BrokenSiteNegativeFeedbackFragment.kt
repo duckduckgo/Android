@@ -27,7 +27,11 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
 
     interface BrokenSiteFeedbackListener {
-        fun onProvidedBrokenSiteFeedback(feedback: String, url: String?)
+        fun onProvidedBrokenSiteFeedback(
+            feedback: String,
+            url: String?
+        )
+
         fun userCancelled()
     }
 

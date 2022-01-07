@@ -273,7 +273,6 @@ interface DeviceShieldPixels {
      * Will fire when user submits a health monitor report
      */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
-
 }
 
 @ContributesBinding(AppScope::class)
@@ -553,15 +552,24 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
 
-    private fun firePixel(p: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun firePixel(
+        p: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         pixel.fire(p, payload)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixel: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         tryToFireDailyPixel(pixel.pixelName, payload)
     }
 
-    private fun tryToFireDailyPixel(pixelName: String, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap()
+    ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
@@ -572,7 +580,10 @@ class RealDeviceShieldPixels @Inject constructor(
         }
     }
 
-    private fun tryToFireUniquePixel(pixel: DeviceShieldPixelNames, tag: String? = null) {
+    private fun tryToFireUniquePixel(
+        pixel: DeviceShieldPixelNames,
+        tag: String? = null
+    ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return

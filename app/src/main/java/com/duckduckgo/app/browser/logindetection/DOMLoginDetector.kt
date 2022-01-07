@@ -28,13 +28,20 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface DOMLoginDetector {
-    fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit)
+    fun addLoginDetection(
+        webView: WebView,
+        onLoginDetected: () -> Unit
+    )
+
     fun onEvent(event: WebNavigationEvent)
 }
 
 sealed class WebNavigationEvent {
     data class OnPageStarted(val webView: WebView) : WebNavigationEvent()
-    data class ShouldInterceptRequest(val webView: WebView, val request: WebResourceRequest) : WebNavigationEvent()
+    data class ShouldInterceptRequest(
+        val webView: WebView,
+        val request: WebResourceRequest
+    ) : WebNavigationEvent()
 }
 
 class JsLoginDetector @Inject constructor(private val settingsDataStore: SettingsDataStore) :
@@ -42,7 +49,10 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
     private val javaScriptDetector = JavaScriptDetector()
     private val loginPathRegex = Regex("login|sign-in|signin|session")
 
-    override fun addLoginDetection(webView: WebView, onLoginDetected: () -> Unit) {
+    override fun addLoginDetection(
+        webView: WebView,
+        onLoginDetected: () -> Unit
+    ) {
         webView.addJavascriptInterface(LoginDetectionJavascriptInterface { onLoginDetected() }, JAVASCRIPT_INTERFACE_NAME)
     }
 

@@ -58,7 +58,8 @@ class RealDrmTest {
         giveFeatureIsEnabled()
         givenUrlIsInExceptionList()
 
-        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissions =
+            arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val url = "https://open.spotify.com"
 
         val value = testee.getDrmPermissionsForRequest(url, permissions)
@@ -71,7 +72,8 @@ class RealDrmTest {
         giveFeatureIsEnabled()
         givenUrlIsNotInExceptionList()
 
-        val permissions = arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
+        val permissions =
+            arrayOf(PermissionRequest.RESOURCE_MIDI_SYSEX, PermissionRequest.RESOURCE_VIDEO_CAPTURE, PermissionRequest.RESOURCE_AUDIO_CAPTURE)
         val url = "https://test.com"
 
         val value = testee.getDrmPermissionsForRequest(url, permissions)

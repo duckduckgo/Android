@@ -29,7 +29,11 @@ abstract class OnboardingPageFragment : Fragment() {
     @LayoutRes
     abstract fun layoutResource(): Int
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? =
         inflater.inflate(layoutResource(), container, false)
 
     fun onContinuePressed() {

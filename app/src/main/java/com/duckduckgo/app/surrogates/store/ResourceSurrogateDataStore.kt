@@ -42,5 +42,4 @@ class ResourceSurrogateDataStore @Inject constructor(private val context: Contex
     companion object {
         private const val FILENAME = "surrogates.js"
     }
-
 }

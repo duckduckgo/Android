@@ -30,7 +30,6 @@ interface AppInstallationReferrerStateListener {
     companion object {
         const val MAX_REFERRER_WAIT_TIME_MS = 1_500L
     }
-
 }
 
 @SingleInstanceIn(AppScope::class)

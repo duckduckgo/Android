@@ -21,7 +21,10 @@ import android.webkit.JavascriptInterface
 class BlobConverterJavascriptInterface(private val onBlobConverted: (url: String, mimeType: String) -> Unit) {
 
     @JavascriptInterface
-    fun convertBlobToDataUri(dataUrl: String, contentType: String) {
+    fun convertBlobToDataUri(
+        dataUrl: String,
+        contentType: String
+    ) {
         onBlobConverted(dataUrl, contentType)
     }
 

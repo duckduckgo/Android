@@ -74,7 +74,10 @@ class TrackerDataLoader @Inject constructor(
         persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
     }
 
-    fun persistTds(eTag: String, tdsJson: TdsJson) {
+    fun persistTds(
+        eTag: String,
+        tdsJson: TdsJson
+    ) {
         appDatabase.runInTransaction {
             tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())

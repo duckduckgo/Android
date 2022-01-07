@@ -42,7 +42,11 @@ class EmptyNavigationStateTest {
         assertFalse(emptyNavigationState.hasNavigationHistory)
     }
 
-    private fun buildState(originalUrl: String?, currentUrl: String?, title: String? = null): WebNavigationState {
+    private fun buildState(
+        originalUrl: String?,
+        currentUrl: String?,
+        title: String? = null
+    ): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
             currentUrl = currentUrl,

@@ -119,7 +119,10 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         @VisibleForTesting
-        internal fun prepopulateAppTrackerBlockingList(context: Context, vpnDatabase: VpnDatabase) {
+        internal fun prepopulateAppTrackerBlockingList(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
                 .use { it.readText() }
                 .also {
@@ -132,7 +135,10 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         @VisibleForTesting
-        internal fun prepopulateAppTrackerExclusionList(context: Context, vpnDatabase: VpnDatabase) {
+        internal fun prepopulateAppTrackerExclusionList(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.app_tracker_app_exclusion_list).bufferedReader()
                 .use { it.readText() }
                 .also {
@@ -141,7 +147,10 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun prepopulateAppTrackerExceptionRules(context: Context, vpnDatabase: VpnDatabase) {
+        private fun prepopulateAppTrackerExceptionRules(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.app_tracker_exception_rules).bufferedReader()
                 .use { it.readText() }
                 .also { json ->

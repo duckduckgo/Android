@@ -92,5 +92,4 @@ class InitialPromptDeciderTest {
         whenever(mockAppEnjoymentRepository.canUserBeShownFirstPrompt()).thenReturn(false)
         assertFalse(testee.shouldShowPrompt())
     }
-
 }

@@ -28,7 +28,10 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.N)
-class BrowserServiceWorkerClient(private val requestInterceptor: RequestInterceptor, private val uncaughtExceptionRepository: UncaughtExceptionRepository) : ServiceWorkerClient() {
+class BrowserServiceWorkerClient(
+    private val requestInterceptor: RequestInterceptor,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+) : ServiceWorkerClient() {
 
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {

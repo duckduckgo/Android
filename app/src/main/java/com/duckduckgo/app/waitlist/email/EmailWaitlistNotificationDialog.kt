@@ -51,5 +51,4 @@ class WaitlistNotificationDialog : DialogFragment() {
     companion object {
         fun create(): WaitlistNotificationDialog = WaitlistNotificationDialog()
     }
-
 }

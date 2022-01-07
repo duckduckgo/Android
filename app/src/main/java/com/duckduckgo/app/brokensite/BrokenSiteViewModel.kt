@@ -35,7 +35,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
+class BrokenSiteViewModel(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender
+) : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -71,7 +74,12 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(
+        url: String,
+        blockedTrackers: String,
+        surrogates: String,
+        upgradedHttps: Boolean
+    ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
@@ -107,7 +115,10 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     @VisibleForTesting
-    fun getBrokenSite(url: String, webViewVersion: String): BrokenSite {
+    fun getBrokenSite(
+        url: String,
+        webViewVersion: String
+    ): BrokenSite {
         val category = categories[viewValue.indexSelected]
         val absoluteUrl = Uri.parse(url).absoluteString
         return BrokenSite(

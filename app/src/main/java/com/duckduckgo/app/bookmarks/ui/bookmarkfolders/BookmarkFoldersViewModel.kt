@@ -52,7 +52,11 @@ class BookmarkFoldersViewModel(
         viewState.value = ViewState()
     }
 
-    fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
+    fun fetchBookmarkFolders(
+        selectedFolderId: Long,
+        rootFolderName: String,
+        currentFolder: BookmarkFolder?
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
             onFolderStructureCreated(folderStructure)

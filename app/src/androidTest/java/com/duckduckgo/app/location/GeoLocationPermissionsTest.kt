@@ -158,7 +158,10 @@ class GeoLocationPermissionsTest {
         }
     }
 
-    private fun givenLocationPermissionsDomain(domain: String, permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS) {
+    private fun givenLocationPermissionsDomain(
+        domain: String,
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+    ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }
 }

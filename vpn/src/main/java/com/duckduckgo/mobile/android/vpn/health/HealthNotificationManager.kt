@@ -30,7 +30,10 @@ import java.util.concurrent.TimeUnit
 
 class HealthNotificationManager(private val context: Context) {
 
-    suspend fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthSubmission) {
+    suspend fun showBadHealthNotification(
+        reasonsForAlert: List<String>,
+        systemHealth: SystemHealthSubmission
+    ) {
 
         val target = Intent().also {
             it.setClassName(context.packageName, "dummy.ui.VpnDiagnosticsActivity")

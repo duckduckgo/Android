@@ -23,7 +23,10 @@ import javax.inject.Inject
 
 class FileChooserIntentBuilder @Inject constructor() {
 
-    fun intent(acceptTypes: Array<String>, canChooseMultiple: Boolean = false): Intent {
+    fun intent(
+        acceptTypes: Array<String>,
+        canChooseMultiple: Boolean = false
+    ): Intent {
         return Intent(Intent.ACTION_GET_CONTENT).also {
             it.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             configureSelectableFileTypes(it, acceptTypes)
@@ -68,7 +71,10 @@ class FileChooserIntentBuilder @Inject constructor() {
         return null
     }
 
-    private fun configureSelectableFileTypes(intent: Intent, acceptTypes: Array<String>) {
+    private fun configureSelectableFileTypes(
+        intent: Intent,
+        acceptTypes: Array<String>
+    ) {
         intent.type = "*/*"
 
         val acceptedMimeTypes = mutableSetOf<String>()
@@ -85,7 +91,10 @@ class FileChooserIntentBuilder @Inject constructor() {
         }
     }
 
-    private fun configureAllowMultipleFile(intent: Intent, canChooseMultiple: Boolean) {
+    private fun configureAllowMultipleFile(
+        intent: Intent,
+        canChooseMultiple: Boolean
+    ) {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, canChooseMultiple)
     }
 }

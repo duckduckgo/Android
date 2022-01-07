@@ -34,7 +34,11 @@ import java.security.cert.X509Certificate
 
 @GlideModule
 class GlobalGlideModule : AppGlideModule() {
-    override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
+    override fun registerComponents(
+        context: Context,
+        glide: Glide,
+        registry: Registry
+    ) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
             try {
                 Timber.d("Registering OkHttp-based ModelLoader for GlideUrl")

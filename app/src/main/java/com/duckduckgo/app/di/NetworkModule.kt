@@ -109,7 +109,10 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("api")
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun apiRetrofit(
+        @Named("api") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -122,7 +125,10 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
-    fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun nonCachingRetrofit(
+        @Named("nonCaching") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)

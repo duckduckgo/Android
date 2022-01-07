@@ -102,7 +102,10 @@ class HealthMetricCounter @Inject constructor(
         }
     }
 
-    fun getStat(type: SimpleEvent, recentTimeThresholdMillis: Long): Long {
+    fun getStat(
+        type: SimpleEvent,
+        recentTimeThresholdMillis: Long
+    ): Long {
         return healthStatsDao.eventCount(type.type, recentTimeThresholdMillis)
     }
 

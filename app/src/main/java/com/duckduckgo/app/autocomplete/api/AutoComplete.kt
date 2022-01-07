@@ -39,10 +39,17 @@ interface AutoComplete {
     )
 
     sealed class AutoCompleteSuggestion(open val phrase: String) {
-        data class AutoCompleteSearchSuggestion(override val phrase: String, val isUrl: Boolean) :
+        data class AutoCompleteSearchSuggestion(
+            override val phrase: String,
+            val isUrl: Boolean
+        ) :
             AutoCompleteSuggestion(phrase)
 
-        data class AutoCompleteBookmarkSuggestion(override val phrase: String, val title: String, val url: String) :
+        data class AutoCompleteBookmarkSuggestion(
+            override val phrase: String,
+            val title: String,
+            val url: String
+        ) :
             AutoCompleteSuggestion(phrase)
     }
 }
@@ -114,13 +121,19 @@ class AutoCompleteApi @Inject constructor(
             .onErrorReturn { emptyList() }
             .toObservable()
 
-    private fun rankBookmarks(query: String, bookmarks: List<BookmarkEntity>): List<SavedSite> {
+    private fun rankBookmarks(
+        query: String,
+        bookmarks: List<BookmarkEntity>
+    ): List<SavedSite> {
         return bookmarks.asSequence()
             .map { SavedSite.Bookmark(it.id, it.title ?: "", it.url, it.parentId) }
             .sortByRank(query)
     }
 
-    private fun rankFavorites(query: String, favorites: List<SavedSite.Favorite>): List<SavedSite> {
+    private fun rankFavorites(
+        query: String,
+        favorites: List<SavedSite.Favorite>
+    ): List<SavedSite> {
         return favorites.asSequence().sortByRank(query)
     }
 
@@ -134,7 +147,10 @@ class AutoCompleteApi @Inject constructor(
             .toList()
     }
 
-    private fun scoreTitle(rankedBookmark: RankedBookmark, query: String): RankedBookmark {
+    private fun scoreTitle(
+        rankedBookmark: RankedBookmark,
+        query: String
+    ): RankedBookmark {
         if (rankedBookmark.savedSite.title.startsWith(query, ignoreCase = true)) {
             rankedBookmark.score += 200
         } else if (rankedBookmark.savedSite.title.contains(" $query", ignoreCase = true)) {
@@ -144,7 +160,10 @@ class AutoCompleteApi @Inject constructor(
         return rankedBookmark
     }
 
-    private fun scoreTokens(rankedBookmark: RankedBookmark, query: String): RankedBookmark {
+    private fun scoreTokens(
+        rankedBookmark: RankedBookmark,
+        query: String
+    ): RankedBookmark {
         val savedSite = rankedBookmark.savedSite
         val domain = savedSite.url.toUri().baseHost
         val tokens = query.split(" ")
@@ -165,7 +184,6 @@ class AutoCompleteApi @Inject constructor(
             } else if (savedSite.title.startsWith(tokens.first(), ignoreCase = true)) {
                 rankedBookmark.score += 50
             }
-
         } else if (savedSite.url.redactSchemeAndWwwSubDomain().startsWith(tokens.first().trimEnd { it == '/' }, ignoreCase = true)) {
             rankedBookmark.score += 300
         }

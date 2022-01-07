@@ -38,7 +38,10 @@ class DatabaseCleanerHelper(private val dispatcherProvider: DispatcherProvider =
         return executeCommand("PRAGMA journal_mode=DELETE", databasePath)
     }
 
-    private suspend fun executeCommand(command: String, databasePath: String): Boolean {
+    private suspend fun executeCommand(
+        command: String,
+        databasePath: String
+    ): Boolean {
         return withContext(dispatcherProvider.io()) {
             if (databasePath.isNotEmpty()) {
                 var commandExecuted = false

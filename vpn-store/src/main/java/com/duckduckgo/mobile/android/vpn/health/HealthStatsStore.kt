@@ -69,10 +69,13 @@ interface HealthStatDao {
     fun insertEvent(event: SimpleEvent)
 
     @Query("SELECT count(*) FROM SimpleEvent WHERE timestamp >= :timestamp AND type=:type")
-    fun eventCount(type: String, timestamp: Long): Long
+    fun eventCount(
+        type: String,
+        timestamp: Long
+    ): Long
 
     @Query(
         "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)",
     )
-    fun purgeOldMetrics(maxNumberToKeep:Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
+    fun purgeOldMetrics(maxNumberToKeep: Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
 }

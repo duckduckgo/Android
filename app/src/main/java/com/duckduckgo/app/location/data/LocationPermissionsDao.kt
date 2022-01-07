@@ -43,5 +43,4 @@ interface LocationPermissionsDao {
 
     @Delete
     fun delete(locationPermissionEntity: LocationPermissionEntity): Int
-
 }

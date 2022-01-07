@@ -126,7 +126,12 @@ class WebNavigationStateComparisonTest {
         assertEquals(Other, latestState.compare(previousState))
     }
 
-    private fun buildState(originalUrl: String?, currentUrl: String?, title: String? = null, newProgress: Int? = null): WebNavigationState {
+    private fun buildState(
+        originalUrl: String?,
+        currentUrl: String?,
+        title: String? = null,
+        newProgress: Int? = null
+    ): WebNavigationState {
         return TestNavigationState(
             originalUrl = originalUrl,
             currentUrl = currentUrl,

@@ -125,5 +125,4 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
         private const val SHORTCUT_ID_NEW_TAB = "newTab"
         private const val SHORTCUT_ID_SHOW_BOOKMARKS = "showBookmarks"
     }
-
 }

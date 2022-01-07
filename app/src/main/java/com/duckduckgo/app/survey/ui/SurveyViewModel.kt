@@ -125,7 +125,12 @@ class SurveyViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(surveyDao.get(), statisticsStore.get(), appInstallStore.get(), appBuildConfig.get()) as T)
+                isAssignableFrom(SurveyViewModel::class.java) -> (SurveyViewModel(
+                    surveyDao.get(),
+                    statisticsStore.get(),
+                    appInstallStore.get(),
+                    appBuildConfig.get()
+                ) as T)
                 else -> null
             }
         }

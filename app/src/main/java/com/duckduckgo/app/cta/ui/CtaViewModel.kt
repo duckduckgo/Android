@@ -174,7 +174,10 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onUserClickFireproofExperimentButton(isAutoFireproofingEnabled: Boolean, cta: Cta) {
+    suspend fun onUserClickFireproofExperimentButton(
+        isAutoFireproofingEnabled: Boolean,
+        cta: Cta
+    ) {
 
         if (cta !is DaxBubbleCta.DaxFireproofCta) return
 
@@ -196,7 +199,13 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun refreshCta(dispatcher: CoroutineContext, isBrowserShowing: Boolean, site: Site? = null, favoritesOnboarding: Boolean = false, locale: Locale = Locale.getDefault()): Cta? {
+    suspend fun refreshCta(
+        dispatcher: CoroutineContext,
+        isBrowserShowing: Boolean,
+        site: Site? = null,
+        favoritesOnboarding: Boolean = false,
+        locale: Locale = Locale.getDefault()
+    ): Cta? {
         surveyCta(locale)?.let {
             return it
         }
@@ -244,7 +253,8 @@ class CtaViewModel @Inject constructor(
 
     private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) getWidgetAuto() else AddWidgetInstructions
 
-    private fun getWidgetAuto() = if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser) AddReturningUsersWidgetAuto else AddWidgetAuto
+    private fun getWidgetAuto() =
+        if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser) AddReturningUsersWidgetAuto else AddWidgetAuto
 
     private fun getWidgetCta(): HomePanelCta? {
         if (variantManager.returningUsersNoOnboardingEnabled() && onboardingStore.userMarkedAsReturningUser) {
@@ -379,7 +389,8 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun daxOnboardingActive(): Boolean = userStageStore.daxOnboardingActive()
 
-    private suspend fun pulseAnimationDisabled(): Boolean = !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()
+    private suspend fun pulseAnimationDisabled(): Boolean =
+        !daxOnboardingActive() || pulseFireButtonShown() || daxDialogFireEducationShown() || hideTips()
 
     private suspend fun allOnboardingCtasShown(): Boolean {
         return withContext(dispatchers.io()) {

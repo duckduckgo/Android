@@ -200,5 +200,4 @@ class BrokenSiteViewModelTest {
         private const val url = "http://example.com"
         private const val message = "Feedback message"
     }
-
 }

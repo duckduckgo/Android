@@ -99,12 +99,14 @@ class PrivacyPracticesViewModelTest {
         }
     }
 
-    private fun site(url: String = "", privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN): Site {
+    private fun site(
+        url: String = "",
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         return site
     }
-
 }

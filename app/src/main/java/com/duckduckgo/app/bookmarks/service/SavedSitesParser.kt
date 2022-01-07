@@ -21,8 +21,15 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
 interface SavedSitesParser {
-    fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String
-    suspend fun parseHtml(document: Document, bookmarksRepository: BookmarksRepository): List<SavedSite>
+    fun generateHtml(
+        folderTree: FolderTree,
+        favorites: List<SavedSite.Favorite>
+    ): String
+
+    suspend fun parseHtml(
+        document: Document,
+        bookmarksRepository: BookmarksRepository
+    ): List<SavedSite>
 }
 
 class RealSavedSitesParser : SavedSitesParser {
@@ -32,7 +39,10 @@ class RealSavedSitesParser : SavedSitesParser {
         const val BOOKMARKS_FOLDER = "DuckDuckGo Bookmarks"
     }
 
-    override fun generateHtml(folderTree: FolderTree, favorites: List<SavedSite.Favorite>): String {
+    override fun generateHtml(
+        folderTree: FolderTree,
+        favorites: List<SavedSite.Favorite>
+    ): String {
 
         if (folderTree.isEmpty() && favorites.isEmpty()) {
             return ""

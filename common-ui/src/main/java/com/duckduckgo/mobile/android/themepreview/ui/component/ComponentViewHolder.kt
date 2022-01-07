@@ -69,7 +69,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     companion object {
-        fun create(parent: ViewGroup, viewType: Int): ComponentViewHolder {
+        fun create(
+            parent: ViewGroup,
+            viewType: Int
+        ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
                 BUTTON -> ButtonComponentViewHolder(parent)
                 TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
@@ -82,7 +85,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             }
         }
 
-        private fun inflate(parent: ViewGroup, layout: Int): View {
+        private fun inflate(
+            parent: ViewGroup,
+            layout: Int
+        ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }
     }

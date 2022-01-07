@@ -42,7 +42,10 @@ abstract class EmailProtectionFragment(@LayoutRes contentLayoutId: Int = 0) : Fr
         configureUi()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
         configureViewModelObservers()
     }

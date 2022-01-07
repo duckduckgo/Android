@@ -89,7 +89,10 @@ class ReportBreakageAppListViewModelTest {
         viewModel.getInstalledApps().test {
             protectedAppsChannel.send(listOf(appWithoutIssues))
             assertEquals(
-                ReportBreakageAppListView.State(listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)), false),
+                ReportBreakageAppListView.State(
+                    listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)),
+                    false
+                ),
                 awaitItem()
             )
         }

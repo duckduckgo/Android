@@ -36,7 +36,10 @@ class VpnUptimeRecorder @Inject constructor() : VpnServiceCallbacks {
         vpnStartTime.set(SystemClock.elapsedRealtime())
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         vpnStartTime.set(0)
     }
 

@@ -71,11 +71,11 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
         referenceTestUtilities = ReferenceTestUtilities(db, coroutineRule.testDispatcherProvider)
 
         testee = RealPrivacyConfigPersister(
-                referenceTestUtilities.getPrivacyFeaturePluginPoint(),
-                mockTogglesRepository,
-                referenceTestUtilities.unprotectedTemporaryRepository,
-                referenceTestUtilities.privacyRepository,
-                db
+            referenceTestUtilities.getPrivacyFeaturePluginPoint(),
+            mockTogglesRepository,
+            referenceTestUtilities.unprotectedTemporaryRepository,
+            referenceTestUtilities.privacyRepository,
+            db
         )
     }
 
@@ -88,7 +88,12 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
-        verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(PrivacyFeatureToggles(testCase.featureName, testCase.expectFeatureEnabled))
+        verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(
+            PrivacyFeatureToggles(
+                testCase.featureName,
+                testCase.expectFeatureEnabled
+            )
+        )
     }
 
     private fun prepareDb() {

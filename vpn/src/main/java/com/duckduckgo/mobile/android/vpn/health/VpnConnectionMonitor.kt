@@ -57,7 +57,10 @@ class VpnConnectionMonitor @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         when (vpnStopReason) {
             VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("TUN monitor: VPN stopped due to error or revoked")
             VpnStopReason.SelfStop -> {

@@ -180,7 +180,11 @@ class DeviceShieldReminderNotificationSchedulerTest {
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
             .setInitialDelay(5, TimeUnit.HOURS)
             .build()
-        workManager.enqueueUniquePeriodicWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
+        workManager.enqueueUniquePeriodicWork(
+            VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
     }
 
     private fun assertWorkersAreNotEnqueued(tag: String) {
@@ -202,7 +206,11 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     private fun testWorkerFactory(): WorkerFactory {
         return object : WorkerFactory() {
-            override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker? {
+            override fun createWorker(
+                appContext: Context,
+                workerClassName: String,
+                workerParameters: WorkerParameters
+            ): ListenableWorker? {
                 return VpnReminderNotificationWorker(appContext, workerParameters).also {
                     it.vpnReminderReceiverManager = mockVpnReminderReceiverManager
                 }

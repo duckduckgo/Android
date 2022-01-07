@@ -33,7 +33,11 @@ interface WebNavigationState {
 }
 
 sealed class WebNavigationStateChange {
-    data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
+    data class NewPage(
+        val url: String,
+        val title: String?
+    ) : WebNavigationStateChange()
+
     data class UrlUpdated(val url: String) : WebNavigationStateChange()
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
@@ -74,7 +78,10 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
     return Other
 }
 
-data class WebViewNavigationState(private val stack: WebBackForwardList, override val progress: Int? = null) : WebNavigationState {
+data class WebViewNavigationState(
+    private val stack: WebBackForwardList,
+    override val progress: Int? = null
+) : WebNavigationState {
 
     override val originalUrl: String? = stack.originalUrl
 

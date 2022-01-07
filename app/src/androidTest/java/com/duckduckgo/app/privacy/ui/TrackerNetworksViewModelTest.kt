@@ -136,7 +136,10 @@ class TrackerNetworksViewModelTest {
         }
     }
 
-    private fun site(url: String = "", trackingEvents: List<TrackingEvent> = emptyList()): Site {
+    private fun site(
+        url: String = "",
+        trackingEvents: List<TrackingEvent> = emptyList()
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
@@ -157,5 +160,4 @@ class TrackerNetworksViewModelTest {
 
         fun tracker(number: Int): String = String.format(TRACKER, number)
     }
-
 }
