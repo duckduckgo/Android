@@ -73,7 +73,6 @@ class DeviceShieldTrackerActivity :
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
-
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 

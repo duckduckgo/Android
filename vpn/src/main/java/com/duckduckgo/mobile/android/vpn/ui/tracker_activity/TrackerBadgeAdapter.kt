@@ -26,12 +26,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompany
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import java.util.*
 
 class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadgeViewHolder>() {
 
-    private var trackers = mutableListOf<TrackerInfo>()
+    private var trackers = mutableListOf<TrackerCompany>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerBadgeViewHolder {
         return TrackerBadgeViewHolder.create(parent)
@@ -43,7 +44,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     override fun getItemCount() = trackers.size
 
-    fun updateData(newData: List<TrackerInfo>) {
+    fun updateData(newData: List<TrackerCompany>) {
         val oldData = trackers
         val newData = newData
         val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
@@ -61,8 +62,12 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
         }
 
-        fun bind(trackerInfo: TrackerInfo) {
-            val badge = badgeIcon(view.context, trackerInfo.companyName)
+        fun bind(trackerInfo: TrackerCompany) {
+            when (trackerInfo){
+                is TrackerCompany.Badge -> {}
+                else -> {}
+            }
+            val badge = badgeIcon(view.context, trackerInfo.TrackerCompany)
             if (badge == null) {
                 (view as ImageView).setImageDrawable(
                     TextDrawable.builder()
@@ -85,6 +90,8 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
             return if (resource != 0) resource else null
         }
+
+        private fun bind
     }
 
     private class DiffCallback(private val oldList: List<TrackerInfo>, private val newList: List<TrackerInfo>) : DiffUtil.Callback() {

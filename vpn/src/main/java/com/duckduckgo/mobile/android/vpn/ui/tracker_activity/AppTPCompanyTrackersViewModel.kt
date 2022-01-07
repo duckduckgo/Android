@@ -97,7 +97,7 @@ constructor(
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
     }
 
-    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {1111111
+    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
         val originalTrackingSignals = signals.map { TrackingSignal.fromTag(it) }
         val randomElements = originalTrackingSignals.asSequence().shuffled().toList()
         return randomElements.distinctBy { it.signalDisplayName }
