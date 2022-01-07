@@ -43,54 +43,18 @@
     <View
         style="@style/SettingsGroupDivider"/>
 
-    <TextView
-        android:id="@+id/privacyTitle"
-        style="@style/SettingsSectionTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/devSettingsScreenPrivacySection"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/enableAppStartupTrace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:toggleTitle="@string/devStartupTracing"
-        app:toggleSubTitle="@string/devStartupTracingByline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/privacyTitle" />
+        app:toggleSubTitle="@string/devStartupTracingByline" />
 
     <com.duckduckgo.app.settings.SettingsToggleOptionWithSubtitle
         android:id="@+id/nextTdsEnabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
-        app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/enableAppStartupTrace" />
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/privacyTest1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/devSettingsScreenMajorScript"
-        app:subtitle="@string/devSettingsScreenMajorScriptSubtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nextTdsEnabled"/>
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/privacyTest2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/devSettingsScreenMajorFetch"
-        app:subtitle="@string/devSettingsScreenMajorFetchSubtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/privacyTest1"/>
+        app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle" />
 
 </LinearLayout>

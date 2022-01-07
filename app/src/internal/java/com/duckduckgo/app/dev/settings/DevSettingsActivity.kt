@@ -53,18 +53,12 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        configureUiEventHandlers()
         observeViewModel()
     }
 
     override fun onStart() {
         super.onStart()
         viewModel.start()
-    }
-
-    private fun configureUiEventHandlers() {
-        binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
-        binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
     }
 
     private fun observeViewModel() {
@@ -86,7 +80,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.GoToUrl -> goToUrl(it.url)
             else -> TODO()
         }
     }
