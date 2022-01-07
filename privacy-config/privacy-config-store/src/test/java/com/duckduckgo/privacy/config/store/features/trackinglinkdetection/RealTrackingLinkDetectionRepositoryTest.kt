@@ -17,18 +17,18 @@
 package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.*
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.reset
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import junit.framework.TestCase.assertEquals
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class RealTrackingLinkDetectionRepositoryTest {
 
@@ -45,7 +45,7 @@ class RealTrackingLinkDetectionRepositoryTest {
         whenever(mockDatabase.trackingLinkDetectionDao()).thenReturn(mockTrackingLinkDetectionDao)
         testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
-            TestCoroutineScope(),
+            TestScope(),
             coroutineRule.testDispatcherProvider
         )
     }
@@ -56,7 +56,7 @@ class RealTrackingLinkDetectionRepositoryTest {
 
         testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
-            TestCoroutineScope(),
+            TestScope(),
             coroutineRule.testDispatcherProvider
         )
 
@@ -66,10 +66,10 @@ class RealTrackingLinkDetectionRepositoryTest {
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
+    fun whenUpdateAllThenUpdateAllCalled() = runTest {
         testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
-            TestCoroutineScope(),
+            TestScope(),
             coroutineRule.testDispatcherProvider
         )
 
@@ -79,12 +79,12 @@ class RealTrackingLinkDetectionRepositoryTest {
     }
 
     @Test
-    fun whenUpdateAllThenPreviousValuesAreCleared() = coroutineRule.runBlocking {
+    fun whenUpdateAllThenPreviousValuesAreCleared() = runTest {
         givenTrackingLinkDetectionDaoContainsEntities()
 
         testee = RealTrackingLinkDetectionRepository(
             mockDatabase,
-            TestCoroutineScope(),
+            TestScope(),
             coroutineRule.testDispatcherProvider
         )
         assertEquals(1, testee.exceptions.size)
