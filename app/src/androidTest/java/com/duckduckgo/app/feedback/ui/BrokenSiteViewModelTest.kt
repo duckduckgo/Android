@@ -11,9 +11,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkInfo
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.junit.After
@@ -23,6 +20,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 class BrokenSiteViewModelTest {
 
@@ -49,10 +47,8 @@ class BrokenSiteViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
-        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockTrackingLinkDetector)
         MockitoAnnotations.openMocks(this)
-        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
+        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockTrackingLinkDetector)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -201,7 +197,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -211,7 +207,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -223,7 +219,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 

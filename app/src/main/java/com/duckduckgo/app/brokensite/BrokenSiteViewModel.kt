@@ -20,7 +20,6 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
@@ -33,7 +32,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -119,11 +117,11 @@ class BrokenSiteViewModel(
     }
 
     @VisibleForTesting
-    fun getBrokenSite(webViewVersion: String): BrokenSite {
+    fun getBrokenSite(urlString: String, webViewVersion: String): BrokenSite {
         val category = categories[viewValue.indexSelected]
         return BrokenSite(
             category = category.key,
-            siteUrl = url,
+            siteUrl = urlString,
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
