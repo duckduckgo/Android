@@ -160,9 +160,9 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             Timber.v(
                 "createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${
-                    wordsToBold.joinToString(
-                        separator = ", "
-                    )
+                wordsToBold.joinToString(
+                    separator = ", "
+                )
                 }}"
             )
             return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))

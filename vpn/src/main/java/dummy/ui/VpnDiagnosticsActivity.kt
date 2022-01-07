@@ -464,8 +464,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 .getNetworkCapabilities(this)
                 ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
                 connectivityManager
-                    .getNetworkCapabilities(this)
-                    ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
+                .getNetworkCapabilities(this)
+                ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
         } else {
             isConnectedLegacy(this)
         }

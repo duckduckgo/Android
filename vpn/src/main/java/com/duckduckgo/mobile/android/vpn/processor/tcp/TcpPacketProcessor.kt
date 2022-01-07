@@ -210,15 +210,16 @@ constructor(
             acknowledgementNumber: Long?
         ): String {
             with(packet.tcpHeader) {
-                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
+                return "\tflags:[ ${isSYN.printFlag("SYN")}" +
+                    "${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
                     isRST.printFlag(
                         "RST"
                     )
-                }${
+                    }${
                     isURG.printFlag(
                         "URG"
                     )
-                }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
+                    }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
             }
         }
 
