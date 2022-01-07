@@ -32,14 +32,14 @@ class TdsDomainEntityJsonTest {
 
     @Test
     fun whenFormatIsValidThenDomainEntitiesAreCreated() {
-        val json = loadText("json/tds_domain_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_domain_entities.json")
         val domains = jsonAdapter.fromJson(json)!!.jsonToDomainEntities()
         assertEquals(3, domains.count())
     }
 
     @Test
     fun whenFormatIsValidThenDomainEntitiesAreConvertedCorrectly() {
-        val json = loadText("json/tds_domain_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_domain_entities.json")
         val domains = jsonAdapter.fromJson(json)!!.jsonToDomainEntities()
         val domain = domains.first()
         assertEquals(TdsDomainEntity("truoptik.com", "21 Productions Inc"), domain)
@@ -47,7 +47,7 @@ class TdsDomainEntityJsonTest {
 
     @Test
     fun whenValueIsNullThenDomainEntitiesNotCreated() {
-        val json = loadText("json/tds_domain_entities_null_value.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_domain_entities_null_value.json")
         val domains = jsonAdapter.fromJson(json)!!.jsonToDomainEntities()
         assertEquals(2, domains.count())
         assertNull(domains.firstOrNull { it.domain == "33across.com" })

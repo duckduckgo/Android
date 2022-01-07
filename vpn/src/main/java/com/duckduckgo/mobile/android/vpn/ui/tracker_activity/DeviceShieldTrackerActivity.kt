@@ -25,14 +25,12 @@ import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.SpannedString
-import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -40,6 +38,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
@@ -82,8 +81,8 @@ class DeviceShieldTrackerActivity :
 
     private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
     private lateinit var ctaTrackerFaq: View
-    private lateinit var deviceShieldEnabledLabel: TextView
-    private lateinit var deviceShieldDisabledLabel: TextView
+    private lateinit var deviceShieldEnabledLabel: InfoPanel
+    private lateinit var deviceShieldDisabledLabel: InfoPanel
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
@@ -318,21 +317,19 @@ class DeviceShieldTrackerActivity :
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityEnabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityDisabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }

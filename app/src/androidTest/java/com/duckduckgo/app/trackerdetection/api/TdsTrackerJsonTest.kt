@@ -33,14 +33,14 @@ class TdsTrackerJsonTest {
 
     @Test
     fun whenFormatIsValidThenTrackersAreCreated() {
-        val json = loadText("json/tds_trackers.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_trackers.json")
         val trackers = jsonAdapter.fromJson(json)!!.jsonToTrackers()
         assertEquals(3, trackers.count())
     }
 
     @Test
     fun whenFormatIsValidThenBasicElementsAreConvertedCorrectly() {
-        val json = loadText("json/tds_trackers.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_trackers.json")
         val trackers = jsonAdapter.fromJson(json)!!.jsonToTrackers()
         val tracker = trackers["1dmp.io"]
         assertEquals(TdsTracker("1dmp.io", BLOCK, "CleverDATA LLC", listOf("Advertising"), arrayListOf()), tracker)
@@ -48,7 +48,7 @@ class TdsTrackerJsonTest {
 
     @Test
     fun whenTrackerHasInvalidDefaultActionThenTrackerNotCreated() {
-        val json = loadText("json/tds_trackers_action_invalid.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_trackers_action_invalid.json")
         val jsonTrackers = jsonAdapter.fromJson(json)!!
         val trackers = jsonTrackers.jsonToTrackers()
         assertEquals(2, trackers.count())
@@ -57,7 +57,7 @@ class TdsTrackerJsonTest {
 
     @Test
     fun whenTrackerIsMissingDefaultActionThenTrackerNotCreated() {
-        val json = loadText("json/tds_trackers_action_missing.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_trackers_action_missing.json")
         val trackers = jsonAdapter.fromJson(json)!!.jsonToTrackers()
         assertEquals(2, trackers.count())
         assertFalse(trackers.containsKey("1dmp.io"))

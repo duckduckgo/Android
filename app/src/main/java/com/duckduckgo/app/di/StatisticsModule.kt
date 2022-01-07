@@ -95,8 +95,9 @@ class StatisticsModule {
     fun offlinePixelSender(
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        pixelSender: PixelSender
-    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender)
+        pixelSender: PixelSender,
+        offlinePixels: DaggerSet<OfflinePixel>
+    ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender, offlinePixels)
 
     @Provides
     fun deviceInfo(context: Context): DeviceInfo = ContextDeviceInfo(context)

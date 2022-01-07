@@ -25,7 +25,6 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
@@ -104,7 +103,7 @@ class BrokenSiteViewModel(
 
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
-            val brokenSite = getBrokenSite(url, webViewVersion)
+            val brokenSite = getBrokenSite(webViewVersion)
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
@@ -115,15 +114,11 @@ class BrokenSiteViewModel(
     }
 
     @VisibleForTesting
-    fun getBrokenSite(
-        url: String,
-        webViewVersion: String
-    ): BrokenSite {
+    fun getBrokenSite(webViewVersion: String): BrokenSite {
         val category = categories[viewValue.indexSelected]
-        val absoluteUrl = Uri.parse(url).absoluteString
         return BrokenSite(
             category = category.key,
-            siteUrl = absoluteUrl,
+            siteUrl = url,
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,

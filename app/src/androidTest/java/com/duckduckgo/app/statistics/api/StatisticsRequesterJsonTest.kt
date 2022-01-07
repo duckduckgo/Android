@@ -319,7 +319,7 @@ class StatisticsRequesterJsonTest {
         responseCode: Int = 200
     ) {
         val response = MockResponse()
-            .setBody(loadText("$JSON_DIR/$filename"))
+            .setBody(loadText(StatisticsRequesterJsonTest::class.java.classLoader!!, "$JSON_DIR/$filename"))
             .setResponseCode(responseCode)
 
         queueResponse(response)

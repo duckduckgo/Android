@@ -80,7 +80,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
-                else -> { TODO() }
+                else -> {
+                    TODO()
+                }
             }
         }
 

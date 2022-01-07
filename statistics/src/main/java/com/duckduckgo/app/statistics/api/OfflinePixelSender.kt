@@ -26,9 +26,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.di.DaggerSet
 import io.reactivex.Completable
 import io.reactivex.Completable.*
-import javax.inject.Inject
 import kotlin.reflect.KMutableProperty0
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -37,12 +37,11 @@ import timber.log.Timber
  * Most pixels are "send and forget" however we sometimes need to guarantee that a pixel will be
  * sent. In those cases we schedule them to happen as part of our app data sync.
  */
-class OfflinePixelSender
-@Inject
-constructor(
+class OfflinePixelSender constructor(
     private val offlineCountCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val pixelSender: PixelSender
+    private val pixelSender: PixelSender,
+    private val offlinePixels: DaggerSet<OfflinePixel>,
 ) {
 
     fun sendOfflinePixels(): Completable {
@@ -55,7 +54,8 @@ constructor(
                 sendCookieDatabaseOpenErrorPixel(),
                 sendCookieDatabaseDeleteErrorPixel(),
                 sendCookieDatabaseCorruptedErrorPixel(),
-                sendUncaughtExceptionsPixel()
+                sendUncaughtExceptionsPixel(),
+                *offlinePixels.map { it.send() }.toTypedArray()
             )
         )
     }

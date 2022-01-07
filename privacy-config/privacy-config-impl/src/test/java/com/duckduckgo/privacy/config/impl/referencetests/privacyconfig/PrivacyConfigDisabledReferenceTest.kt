@@ -18,7 +18,7 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -59,7 +59,12 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
+            val referenceTest = adapter.fromJson(
+                FileUtilities.loadText(
+                    PrivacyConfigDisabledReferenceTest::class.java.classLoader!!,
+                    "reference_tests/privacyconfig/tests.json"
+                )
+            )
             referenceJsonFile = referenceTest?.featuresDisabled?.referenceConfig!!
             return referenceTest.featuresDisabled.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
         }

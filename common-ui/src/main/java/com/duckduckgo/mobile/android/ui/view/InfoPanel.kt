@@ -23,6 +23,7 @@ import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.SpannedString
+import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
@@ -80,12 +81,12 @@ class InfoPanel : FrameLayout {
 
     fun setClickableLink(
         annotation: String,
-        text: CharSequence,
+        fullText: CharSequence,
         onClick: () -> Unit
     ) {
-        val fullText = text as SpannedString
-        val spannableString = SpannableString(fullText)
-        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
+        val spannedText = fullText as SpannedString
+        val spannableString = SpannableString(spannedText)
+        val annotations = spannedText.getSpans(0, spannedText.length, Annotation::class.java)
         val clickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 onClick()
@@ -116,7 +117,10 @@ class InfoPanel : FrameLayout {
                 )
             }
         }
-        binding.infoPanelText.text = spannableString
+        binding.infoPanelText.apply {
+            text = spannableString
+            movementMethod = LinkMovementMethod.getInstance()
+        }
     }
 
     /**

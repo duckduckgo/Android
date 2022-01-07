@@ -18,8 +18,9 @@ package com.duckduckgo.app.statistics.api
 
 import android.content.Context
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -28,16 +29,26 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class OfflinePixelScheduler @Inject constructor(
     private val workManager: WorkManager
-) : LifecycleObserver {
+) : LifecycleEventObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleOfflinePixels() {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event
+    ) {
+        if (event == Lifecycle.Event.ON_CREATE) {
+            scheduleOfflinePixels()
+        }
+    }
+
+    private fun scheduleOfflinePixels() {
 
         Timber.v("Scheduling offline pixels to be sent")
-        workManager.cancelAllWorkByTag(WORK_REQUEST_TAG)
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -49,7 +60,7 @@ class OfflinePixelScheduler @Inject constructor(
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_INTERVAL, BACKOFF_TIME_UNIT)
             .build()
 
-        workManager.enqueue(request)
+        workManager.enqueueUniquePeriodicWork(WORK_REQUEST_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
     open class OfflinePixelWorker(
@@ -58,7 +69,6 @@ class OfflinePixelScheduler @Inject constructor(
     ) : CoroutineWorker(context, params) {
 
         lateinit var offlinePixelSender: OfflinePixelSender
-
         override suspend fun doWork(): Result {
             return try {
                 offlinePixelSender

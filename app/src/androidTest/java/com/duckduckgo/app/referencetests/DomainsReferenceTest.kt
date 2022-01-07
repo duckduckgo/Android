@@ -102,7 +102,10 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var domainTests: DomainTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile("reference_tests/domain_matching_tests.json")
+            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
+                DomainsReferenceTest::class.java.classLoader!!,
+                "reference_tests/domain_matching_tests.json"
+            )
 
             jsonObject.keys().forEach {
                 if (it == "domainTests") {
@@ -181,7 +184,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
         trackerDetector =
             TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
 
-        val json = FileUtilities.loadText("reference_tests/tracker_radar_reference.json")
+        val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
         val tdsJson = adapter.fromJson(json)!!
         val trackers = tdsJson.jsonToTrackers().values.toList()
@@ -197,7 +200,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private fun initialiseResourceSurrogates() {
         val dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
         val resourceSurrogateLoader = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
-        val surrogatesFile = FileUtilities.loadText("reference_tests/surrogates.txt").toByteArray()
+        val surrogatesFile = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/surrogates.txt").toByteArray()
         val surrogates = resourceSurrogateLoader.convertBytes(surrogatesFile)
         resourceSurrogates.loadSurrogates(surrogates)
     }
