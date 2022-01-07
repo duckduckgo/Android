@@ -71,21 +71,17 @@ class WelcomePage : OnboardingPageFragment() {
         buildScreenContent()
         scheduleWelcomeAnimation()
         setSkipAnimationListener()
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         lifecycleScope.launch {
             events.asFlow()
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     private fun buildScreenContent() {

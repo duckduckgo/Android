@@ -17,19 +17,20 @@
 package com.duckduckgo.app.global.api
 
 import android.content.Context
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
 class ApiRequestInterceptor(
     context: Context,
-    private val userAgentProvider: UserAgentProvider
+    private val userAgentProvider: UserAgentProvider,
+    private val appBuildConfig: AppBuildConfig
 ) : Interceptor {
 
     private val userAgent: String by lazy {
-        "ddg_android/${BuildConfig.VERSION_NAME} (${context.applicationInfo.packageName}; Android API ${android.os.Build.VERSION.SDK_INT})"
+        "ddg_android/${appBuildConfig.versionName} (${context.applicationInfo.packageName}; Android API ${android.os.Build.VERSION.SDK_INT})"
     }
 
     override fun intercept(chain: Interceptor.Chain): Response {

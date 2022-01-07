@@ -19,6 +19,8 @@ package com.duckduckgo.app.dev.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
@@ -44,6 +46,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onNextTdsToggled(isChecked)
     }
 
+    private val startupTraceToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onStartupTraceToggled(isChecked)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -61,6 +67,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
         binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
+        binding.triggerAnr.setOnClickListener {
+            Handler(Looper.getMainLooper()).post {
+                Thread.sleep(10000)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -69,6 +80,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                 }
             }.launchIn(lifecycleScope)
 

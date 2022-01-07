@@ -53,7 +53,7 @@ class VpnAppModule {
     fun provideAppTrackerLoader(
         vpnDatabase: VpnDatabase
     ): AppTrackerRepository {
-        return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao())
+        return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
 
     @Provides

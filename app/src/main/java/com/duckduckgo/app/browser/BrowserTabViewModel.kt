@@ -2186,6 +2186,7 @@ class BrowserTabViewModel(
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
+            pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
             fileDownloader.download(
                 pendingFileDownload,
                 object : FileDownloader.FileDownloadListener {
@@ -2196,6 +2197,7 @@ class BrowserTabViewModel(
                     }
 
                     override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                        // TODO [Improve downloads] This is unused.
                         Timber.i("downloadFinished network file")
                     }
 
@@ -2207,12 +2209,15 @@ class BrowserTabViewModel(
 
                     override fun downloadFinishedDataUri(file: File, mimeType: String?) {
                         Timber.i("downloadFinished data uri")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
                         command.postValue(DownloadCommand.ScanMediaFiles(file))
                         command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
                     }
 
                     override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                        // TODO [Improve downloads] This used only when DownloadManager is not involved.
                         Timber.w("Failed to download file [$message]")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
                         command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
                     }
 

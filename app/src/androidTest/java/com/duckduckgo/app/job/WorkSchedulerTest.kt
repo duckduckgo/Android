@@ -16,15 +16,22 @@
 
 package com.duckduckgo.app.job
 
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.notification.AndroidNotificationScheduler
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class WorkSchedulerTest {
+
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private val notificationScheduler: AndroidNotificationScheduler = mock()
     private val jobCleaner: JobCleaner = mock()
@@ -33,15 +40,11 @@ class WorkSchedulerTest {
 
     @Before
     fun before() {
-        testee = AndroidWorkScheduler(
-            TestCoroutineScope(),
-            notificationScheduler,
-            jobCleaner
-        )
+        testee = AndroidWorkScheduler(TestScope(), notificationScheduler, jobCleaner, coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun schedulesNextNotificationAndCleansDeprecatedJobs() = runBlocking<Unit> {
+    fun schedulesNextNotificationAndCleansDeprecatedJobs() = runTest {
         testee.scheduleWork()
 
         verify(notificationScheduler).scheduleNextNotification()

@@ -28,9 +28,9 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
+import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
-import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.N)
 class DeviceShieldTileService : TileService() {
@@ -69,9 +69,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun launchActivity(activityClass: Class<*>) {
-        val intent = Intent(this, activityClass).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val intent = Intent(this, activityClass).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
         startActivityAndCollapse(intent)
     }
 
@@ -81,20 +79,24 @@ class DeviceShieldTileService : TileService() {
     }
 
     override fun onStopListening() {
-        super.onStopListening()
         stopPollingDeviceShieldState()
+        super.onStopListening()
     }
 
     private fun pollDeviceShieldState() {
-        deviceShieldStatePollingJob = serviceScope.launch {
-            while (isActive) {
-                val isDeviceShieldEnabled = TrackerBlockingVpnService.isServiceRunning(this@DeviceShieldTileService)
-                val tile = qsTile
-                tile.state = if (isDeviceShieldEnabled) STATE_ACTIVE else STATE_INACTIVE
-                tile.updateTile()
-                delay(1_000)
+        deviceShieldStatePollingJob =
+            serviceScope.launch {
+                while (isActive) {
+                    val tile = qsTile
+                    tile?.let {
+                        val isDeviceShieldEnabled =
+                            TrackerBlockingVpnService.isServiceRunning(this@DeviceShieldTileService)
+                        it.state = if (isDeviceShieldEnabled) STATE_ACTIVE else STATE_INACTIVE
+                        it.updateTile()
+                    }
+                    delay(1_000)
+                }
             }
-        }
     }
 
     private fun stopPollingDeviceShieldState() {

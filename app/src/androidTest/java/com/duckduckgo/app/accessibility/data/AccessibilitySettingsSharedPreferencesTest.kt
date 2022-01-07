@@ -20,11 +20,11 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences.Companion.FONT_SIZE_DEFAULT
-import com.duckduckgo.app.runBlocking
 import junit.framework.Assert.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -40,7 +40,7 @@ class AccessibilitySettingsSharedPreferencesTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val testee = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+    private val testee = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
     @After
     fun after() {
@@ -105,7 +105,7 @@ class AccessibilitySettingsSharedPreferencesTest {
     }
 
     @Test
-    fun whenValuesChangedThenNewChangesEmitted() = coroutineRule.runBlocking {
+    fun whenValuesChangedThenNewChangesEmitted() = runTest {
         var accessibilitySetting = AccessibilitySettings(false, 100f, false)
 
         testee.settingsFlow().test {

@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverridePackage
 import com.squareup.anvil.annotations.ContributesBinding
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -40,6 +41,11 @@ data class AppTrackerBlocklist(
 data class AppTrackerExclusionList(
     val etag: ETag = ETag.InvalidETag,
     val excludedPackages: List<AppTrackerExcludedPackage> = listOf()
+)
+
+data class AppTrackerSystemAppOverrideList(
+    val etag: ETag = ETag.InvalidETag,
+    val overridePackages: List<AppTrackerSystemAppOverridePackage> = listOf()
 )
 
 data class AppTrackerRuleList(
@@ -58,6 +64,9 @@ interface AppTrackerListDownloader {
 
     @WorkerThread
     fun downloadAppTrackerExclusionList(): AppTrackerExclusionList
+
+    @WorkerThread
+    fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList
 
     @WorkerThread
     fun downloadAppTrackerExceptionRules(): AppTrackerRuleList
@@ -121,6 +130,29 @@ class RealAppTrackerListDownloader @Inject constructor(
         Timber.d("Received the app tracker exclusion list, size: ${exclusionList.size}")
 
         return AppTrackerExclusionList(etag = ETag.ValidETag(eTag), excludedPackages = exclusionList)
+    }
+
+    override fun downloadSystemAppOverrideList(): AppTrackerSystemAppOverrideList {
+        Timber.d("Downloading the app tracker system app overrides list...")
+        val response = runCatching {
+            appTrackerListService.appTrackerSystemAppsOverrides().execute()
+        }.getOrElse {
+            Timber.w("Error downloading system app overrides list: $it")
+            Response.error(400, "".toResponseBody(null))
+        }
+
+        if (!response.isSuccessful) {
+            Timber.e("Fail to download the app system app overrides list, error code: ${response.code()}")
+            return AppTrackerSystemAppOverrideList()
+        }
+
+        val eTag = response.headers().extractETag()
+        val systemAppOverrides = response.body()?.rules.orEmpty()
+                .map { AppTrackerSystemAppOverridePackage(it) }
+
+        Timber.d("Received the app system app overrides list, size: ${systemAppOverrides.size}")
+
+        return AppTrackerSystemAppOverrideList(etag = ETag.ValidETag(eTag), overridePackages = systemAppOverrides)
     }
 
     override fun downloadAppTrackerExceptionRules(): AppTrackerRuleList {

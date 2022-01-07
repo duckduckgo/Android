@@ -21,10 +21,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +41,7 @@ class ShortcutReceiverTest {
     @Before
     fun before() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        testee = ShortcutReceiver(context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestCoroutineScope())
+        testee = ShortcutReceiver(context, mockPixel, coroutinesTestRule.testDispatcherProvider, TestScope())
     }
 
     @Test

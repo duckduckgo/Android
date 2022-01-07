@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGT
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
 import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
 import org.junit.Assert.assertEquals
@@ -132,7 +133,7 @@ class SpecialUrlDetectorImplTest {
     fun whenAppLinkCheckedOnApiLessThan24ThenReturnWebType() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             val type = testee.determineType("https://example.com")
-            verifyZeroInteractions(mockPackageManager)
+            verifyNoInteractions(mockPackageManager)
             assertTrue(type is Web)
         }
     }

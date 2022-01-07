@@ -18,9 +18,12 @@ package com.duckduckgo.app.accessibility
 
 import android.webkit.WebView
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.nhaarman.mockitokotlin2.*
-import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 class AppAccessibilityManagerTest {
 
@@ -45,7 +48,7 @@ class AppAccessibilityManagerTest {
 
         appAccessibilityManager.onPageFinished(webView, "http://example.com")
 
-        verifyZeroInteractions(webView)
+        verifyNoInteractions(webView)
     }
 
     private fun forceZoom(enabled: Boolean) {

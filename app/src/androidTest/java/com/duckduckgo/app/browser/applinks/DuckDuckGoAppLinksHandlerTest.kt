@@ -17,9 +17,9 @@
 package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import junit.framework.TestCase.*
 import org.junit.Before
 import org.junit.Test
@@ -55,7 +55,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledAndIsNotForMainFrameThenReturnFalse() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             assertFalse(testee.handleAppLink(isForMainFrame = false, urlString = "foo.com", launchAppLink = mockCallback, shouldHaltWebNavigation = true, appLinksEnabled = true))
-            verifyZeroInteractions(mockCallback)
+            verifyNoInteractions(mockCallback)
         }
     }
 
@@ -63,7 +63,7 @@ class DuckDuckGoAppLinksHandlerTest {
     fun whenAppLinkHandledOnApiLessThan24ThenReturnFalse() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             assertFalse(testee.handleAppLink(isForMainFrame = false, urlString = "foo.com", launchAppLink = mockCallback, shouldHaltWebNavigation = true, appLinksEnabled = true))
-            verifyZeroInteractions(mockCallback)
+            verifyNoInteractions(mockCallback)
         }
     }
 
@@ -122,7 +122,7 @@ class DuckDuckGoAppLinksHandlerTest {
             testee.previousUrl = "foo.example.com"
             assertFalse(testee.handleAppLink(isForMainFrame = true, urlString = "example.com", launchAppLink = mockCallback, shouldHaltWebNavigation = true, appLinksEnabled = true))
             assertEquals("foo.example.com", testee.previousUrl)
-            verifyZeroInteractions(mockCallback)
+            verifyNoInteractions(mockCallback)
         }
     }
 

@@ -40,7 +40,7 @@ dependencies {
     kapt AndroidX.room.compiler
 
     testImplementation Testing.junit4
-    testImplementation Testing.mockito.kotlin
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

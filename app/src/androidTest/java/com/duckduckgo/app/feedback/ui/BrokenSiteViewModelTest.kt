@@ -14,6 +14,8 @@ import com.duckduckgo.privacy.config.api.TrackingLinkInfo
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -49,6 +51,8 @@ class BrokenSiteViewModelTest {
     fun before() {
         MockitoAnnotations.initMocks(this)
         testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockTrackingLinkDetector)
+        MockitoAnnotations.openMocks(this)
+        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -197,7 +201,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -207,7 +211,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -219,7 +223,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
