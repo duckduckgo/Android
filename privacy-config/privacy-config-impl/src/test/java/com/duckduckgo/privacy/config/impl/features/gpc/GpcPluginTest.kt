@@ -25,7 +25,7 @@ import org.mockito.kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyList
 
 class GpcPluginTest {
     lateinit var testee: GpcPlugin
@@ -67,12 +67,12 @@ class GpcPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptions() {
+    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptionsAndHeaders() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/gpc.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockGpcRepository).updateAll(ArgumentMatchers.anyList())
+        verify(mockGpcRepository).updateAll(anyList(), anyList())
     }
 
     companion object {

@@ -21,6 +21,7 @@ import android.content.res.Resources
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -51,10 +52,13 @@ class RealGpcTest {
     fun setup() {
         val exceptions =
             CopyOnWriteArrayList<GpcException>().apply { add(GpcException(EXCEPTION_URL)) }
+        val headers =
+            CopyOnWriteArrayList<GpcHeaderEnabledSite>().apply { add(GpcHeaderEnabledSite(VALID_CONSUMER_URL)) }
         whenever(mockContext.resources).thenReturn(mockResources)
         whenever(mockResources.openRawResource(any()))
             .thenReturn(ByteArrayInputStream("".toByteArray()))
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
+        whenever(mockGpcRepository.headerEnabledSites).thenReturn(headers)
 
         testee =
             RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
