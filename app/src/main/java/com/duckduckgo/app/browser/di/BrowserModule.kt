@@ -141,39 +141,23 @@ class BrowserModule {
     fun urlExtractingWebViewClient(
         webViewHttpAuthStore: WebViewHttpAuthStore,
         trustedCertificateStore: TrustedCertificateStore,
-        requestRewriter: RequestRewriter,
-        specialUrlDetector: SpecialUrlDetector,
         requestInterceptor: RequestInterceptor,
-        offlinePixelCountDataStore: OfflinePixelCountDataStore,
-        uncaughtExceptionRepository: UncaughtExceptionRepository,
         cookieManager: CookieManager,
-        loginDetector: DOMLoginDetector,
-        dosDetector: DosDetector,
         gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        emailInjector: EmailInjector,
-        accessibilityManager: AccessibilityManager,
         urlExtractor: DOMUrlExtractor
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
-            requestRewriter,
-            specialUrlDetector,
             requestInterceptor,
-            offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
             cookieManager,
-            loginDetector,
-            dosDetector,
             gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            emailInjector,
-            accessibilityManager,
             urlExtractor
         )
     }
