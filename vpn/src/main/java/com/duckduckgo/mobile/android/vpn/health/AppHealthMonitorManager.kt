@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.vpn.internal.feature.health
+package com.duckduckgo.mobile.android.vpn.health
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -25,8 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class InternalAppHealthMonitor @Inject constructor(private val appHealthMonitor: AppHealthMonitor) :
-    VpnServiceCallbacks {
+class AppHealthMonitorManager @Inject constructor(private val appHealthMonitor: AppHealthMonitor) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         appHealthMonitor.startMonitoring()
