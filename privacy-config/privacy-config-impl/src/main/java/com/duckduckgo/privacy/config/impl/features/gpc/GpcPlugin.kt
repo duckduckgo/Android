@@ -47,7 +47,7 @@ class GpcPlugin @Inject constructor(
             gpcFeature?.exceptions?.map {
                 gpcExceptions.add(GpcExceptionEntity(it.domain))
             }
-            gpcFeature?.settings?.hpcHeaderEnabledSites?.map {
+            gpcFeature?.settings?.gpcHeaderEnabledSites?.map {
                 gpcHeaders.add(GpcHeaderEnabledSiteEntity(it.domain))
             }
             gpcRepository.updateAll(gpcExceptions, gpcHeaders)

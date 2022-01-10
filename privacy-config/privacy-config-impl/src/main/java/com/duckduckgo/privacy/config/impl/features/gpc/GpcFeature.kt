@@ -21,4 +21,4 @@ import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 
 data class GpcFeature(val state: String, val exceptions: List<GpcExceptionEntity>, val settings: GpcSettings)
 
-data class GpcSettings(val hpcHeaderEnabledSites: List<GpcHeaderEnabledSiteEntity>)
+data class GpcSettings(val gpcHeaderEnabledSites: List<GpcHeaderEnabledSiteEntity>)
