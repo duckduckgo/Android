@@ -113,24 +113,24 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
     fun determineHealthMemory(): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
-        val metricSummary = RawMetricsSubmission("memory", rawMetrics)
+        val metricSummary = RawMetricsSubmission("memory", rawMetrics, redacted = true)
 
         val memorySnapshot = CurrentMemorySnapshot(applicationContext)
 
         val percentageHeap = percentage(memorySnapshot.heapAllocated, memorySnapshot.heapMax)
-        rawMetrics["heapPercentageUsed"] = Metric(percentageHeap.percentageFormatted(), badHealthIf { percentageHeap >= 80 })
+        rawMetrics["heapPercentageUsed"] = Metric(percentageHeap.percentageFormatted(), badHealthIf { percentageHeap >= 95 })
         rawMetrics["heapMax"] = Metric(memorySnapshot.heapMax.toString())
         rawMetrics["heapAllocated"] = Metric(memorySnapshot.heapAllocated.toString())
         rawMetrics["heapRemaining"] = Metric(memorySnapshot.heapRemaining.toString())
 
         val percentageNative = percentage(memorySnapshot.nativeAllocated, memorySnapshot.nativeMax)
-        rawMetrics["nativePercentageUsed"] = Metric(percentageNative.percentageFormatted(), badHealthIf { percentageNative >= 90 })
+        rawMetrics["nativePercentageUsed"] = Metric(percentageNative.percentageFormatted(), badHealthIf { percentageNative >= 95 })
         rawMetrics["nativeMax"] = Metric(memorySnapshot.nativeMax.toString())
         rawMetrics["nativeAllocated"] = Metric(memorySnapshot.nativeAllocated.toString())
         rawMetrics["nativeRemaining"] = Metric(memorySnapshot.nativeRemaining.toString())
 
         val percentageDevice = memorySnapshot.percentageDeviceUsed
-        rawMetrics["devicePercentageUsed"] = Metric(percentageDevice.percentageFormatted(), badHealthIf { percentageDevice >= 90 })
+        rawMetrics["devicePercentageUsed"] = Metric(percentageDevice.percentageFormatted(), badHealthIf { percentageDevice >= 95 })
         rawMetrics["deviceMax"] = Metric(memorySnapshot.deviceMax.toString())
         rawMetrics["deviceAllocated"] = Metric(memorySnapshot.deviceAllocated.toString())
         rawMetrics["deviceRemaining"] = Metric(memorySnapshot.deviceRemaining.toString())
@@ -139,7 +139,7 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         rawMetrics["totalMemoryBrowser"] = Metric(memorySnapshot.totalMemoryBrowserProcess.toString())
         rawMetrics["totalMemoryVpn"] = Metric(memorySnapshot.totalMemoryVpnProcess.toString())
         rawMetrics["totalMemoryWholeApp"] = Metric((memorySnapshot.totalMemoryVpnProcess + memorySnapshot.totalMemoryBrowserProcess).toString())
-        rawMetrics["totalWholeAppPercentageUsed"] = Metric(percentageWholeApp.percentageFormatted(), badHealthIf { percentageWholeApp >= 90 })
+        rawMetrics["totalWholeAppPercentageUsed"] = Metric(percentageWholeApp.percentageFormatted(), badHealthIf { percentageWholeApp >= 95 })
 
         rawMetrics["lowMemoryDevice"] = Metric(memorySnapshot.lowMemoryDevice.toString())
 

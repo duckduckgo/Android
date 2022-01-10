@@ -7,6 +7,10 @@
             android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"
             android:label="@string/devSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.app.audit.AuditSettingsActivity"
+            android:label="@string/auditSettingsTitle"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
     </application>
 
 </manifest>

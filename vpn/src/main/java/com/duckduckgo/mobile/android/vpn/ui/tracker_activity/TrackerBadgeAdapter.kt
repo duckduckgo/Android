@@ -22,17 +22,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompany
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import java.util.*
 
 class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadgeViewHolder>() {
 
-    private var trackers = mutableListOf<TrackerCompany>()
+    private var trackers = mutableListOf<TrackerCompanyBadge>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerBadgeViewHolder {
         return TrackerBadgeViewHolder.create(parent)
@@ -44,7 +44,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     override fun getItemCount() = trackers.size
 
-    fun updateData(newData: List<TrackerCompany>) {
+    fun updateData(newData: List<TrackerCompanyBadge>) {
         val oldData = trackers
         val newData = newData
         val diffResult = DiffCallback(oldData, newData).run { DiffUtil.calculateDiff(this) }
@@ -62,12 +62,16 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
         }
 
-        fun bind(trackerInfo: TrackerCompany) {
+        fun bind(trackerInfo: TrackerCompanyBadge) {
             when (trackerInfo){
-                is TrackerCompany.Badge -> {}
-                else -> {}
+                is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
+                is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
             }
-            val badge = badgeIcon(view.context, trackerInfo.TrackerCompany)
+
+        }
+
+        private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {
+            val badge = badgeIcon(view.context, trackerInfo.companyName)
             if (badge == null) {
                 (view as ImageView).setImageDrawable(
                     TextDrawable.builder()
@@ -91,16 +95,30 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             return if (resource != 0) resource else null
         }
 
-        private fun bind
+        private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
+            (view as ImageView).setImageDrawable(
+                TextDrawable.builder()
+                    .beginConfig()
+                    .fontSize(35)
+                    .textColor(ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.gray90))
+                    .endConfig()
+                    .buildRound("+${trackerInfo.amount}", ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.gray20)))
+        }
     }
 
-    private class DiffCallback(private val oldList: List<TrackerInfo>, private val newList: List<TrackerInfo>) : DiffUtil.Callback() {
+    private class DiffCallback(private val oldList: List<TrackerCompanyBadge>, private val newList: List<TrackerCompanyBadge>) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].companyName == newList[newItemPosition].companyName
+            val oldItem = oldList[oldItemPosition]
+            val newItem = newList[newItemPosition]
+            if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company){
+                return oldItem.companyName == newItem.companyName
+            } else {
+                return false
+            }
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

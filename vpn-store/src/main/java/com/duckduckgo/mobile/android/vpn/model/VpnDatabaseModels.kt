@@ -38,7 +38,7 @@ data class VpnTracker(
 
 data class BucketizedVpnTracker(
     val bucket: String,
-    @Embedded val vpnTracker: VpnTracker
+    @Embedded val trackerCompanySignal: VpnTrackerCompanySignal
 )
 
 @Entity(tableName = "vpn_state")

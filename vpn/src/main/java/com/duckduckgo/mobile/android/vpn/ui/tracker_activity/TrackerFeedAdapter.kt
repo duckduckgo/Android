@@ -158,7 +158,7 @@ class TrackerFeedAdapter @Inject constructor(
         fun bind(tracker: TrackerFeedItem.TrackerFeedData?, onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit) {
             tracker?.let { item ->
                 with(activityMessage) {
-                    val companies = resources.getQuantityString(R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackers.size, tracker.trackers.size)
+                    val companies = resources.getQuantityString(R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackingCompanyBadges.size, tracker.trackingCompanyBadges.size)
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
@@ -182,7 +182,7 @@ class TrackerFeedAdapter @Inject constructor(
                 with(trackerBadgesView) {
                     // click through recyvlerview
                     suppressLayout(false)
-                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackers)
+                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
                     suppressLayout(true)
                 }
                 itemView.setOnClickListener {

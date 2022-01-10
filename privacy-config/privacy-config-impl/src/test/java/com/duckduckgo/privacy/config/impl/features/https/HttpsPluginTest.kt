@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.https
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -50,7 +50,7 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/https.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -59,7 +59,7 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/https_disabled.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -68,7 +68,7 @@ class HttpsPluginTest {
 
     @Test
     fun whenFeatureNameMatchesHttpsThenUpdateAllExistingExceptions() {
-        val jsonString = FileUtilities.loadText("json/https.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

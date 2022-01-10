@@ -53,7 +53,7 @@ class PredefinedGradeAvailableTest(private val testCase: GradeTestCase) {
         @JvmStatic
         @Parameterized.Parameters
         fun data(): Array<GradeTestCase> {
-            val json = FileUtilities.loadText("privacy-grade/test/data/grade-cases.json")
+            val json = FileUtilities.loadText(PredefinedGradeAvailableTest::class.java.classLoader!!, "privacy-grade/test/data/grade-cases.json")
             val moshi = Moshi.Builder().build()
             val jsonAdapter = moshi.adapter<Array<JsonGradeTestCase>>(Array<JsonGradeTestCase>::class.java)
             return jsonAdapter.fromJson(json)!!

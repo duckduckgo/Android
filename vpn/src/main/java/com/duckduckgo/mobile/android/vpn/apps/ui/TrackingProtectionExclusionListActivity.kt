@@ -115,9 +115,6 @@ class TrackingProtectionExclusionListActivity :
                 REPORT_ISSUES_ANNOTATION,
                 getText(R.string.atp_ActivityDisabledLabel)
             ) { launchFeedback() }
-            setOnClickListener {
-                launchFeedback()
-            }
         }
         setupRecycler()
     }

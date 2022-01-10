@@ -23,7 +23,7 @@ sealed class TrackerFeedItem(open val id: Int) {
         override val id: Int,
         val bucket: String,
         val trackingApp: TrackingApp,
-        val trackers: List<TrackerCompany>,
+        val trackingCompanyBadges: List<TrackerCompanyBadge>,
         val trackersTotalCount: Int,
         val timestamp: String,
         val displayTimestamp: String
@@ -36,14 +36,13 @@ sealed class TrackerFeedItem(open val id: Int) {
     data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
 }
 
-sealed class TrackerCompany(){
-    data class Badge(
+sealed class TrackerCompanyBadge(){
+    data class Company(
         val companyName: String,
         val companyDisplayName: String,
-        val timestamp: String
-    ): TrackerCompany()
+    ): TrackerCompanyBadge()
     data class Extra(
         val amount: Int
-    ): TrackerCompany()
+    ): TrackerCompanyBadge()
 }
 

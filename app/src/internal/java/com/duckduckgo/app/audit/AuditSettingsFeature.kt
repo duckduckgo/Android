@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.vpn.internal.feature.health
+package com.duckduckgo.app.audit
 
+import android.content.Context
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class InternalAppHealthMonitor @Inject constructor(private val appHealthMonitor: AppHealthMonitor) :
-    VpnServiceCallbacks {
-
-    override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        appHealthMonitor.startMonitoring()
+class AuditSettingsFeature @Inject constructor(private val context: Context) : InternalFeaturePlugin {
+    override fun internalFeatureTitle(): String {
+        return context.getString(R.string.auditSettingsTitle)
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
-        appHealthMonitor.stopMonitoring()
+    override fun internalFeatureSubtitle(): String {
+        return context.getString(R.string.auditSettingsSubtitle)
+    }
+
+    override fun onInternalFeatureClicked(activityContext: Context) {
+        activityContext.startActivity(AuditSettingsActivity.intent(activityContext))
     }
 }

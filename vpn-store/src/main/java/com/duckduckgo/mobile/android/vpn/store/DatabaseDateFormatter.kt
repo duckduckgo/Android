@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
+import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -34,6 +35,12 @@ class DatabaseDateFormatter {
 
         fun timestamp(date: LocalDateTime = LocalDateTime.now()): String {
             return FORMATTER_SECONDS.format(date)
+        }
+
+        fun duration(start: String, end: String = FORMATTER_SECONDS.format(LocalDateTime.now())): Duration {
+            val startTime = LocalDateTime.parse(start, FORMATTER_SECONDS)
+            val endTime = LocalDateTime.parse(end, FORMATTER_SECONDS)
+            return Duration.between(startTime, endTime)
         }
     }
 }

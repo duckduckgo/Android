@@ -17,6 +17,7 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -39,14 +40,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
                 android:id="@+id/exclusionListAppsWithIssuesLabel"
-                style="@style/DeviceShield.PrivacyReport.Label.Yellow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:padding="16dp"
-                android:text="Exclusion rules defaults will be restored automatically when VPN is turned OFF and back ON" />
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                app:panelBackground="@drawable/background_yellow_tooltip"
+                app:panelDrawable="@drawable/ic_alert_color_24"
+                app:panelText="@string/exceptionRulesPanelTitle"
+                android:layout_margin="16dp"/>
+
 
             <LinearLayout
                 android:id="@+id/appRule"

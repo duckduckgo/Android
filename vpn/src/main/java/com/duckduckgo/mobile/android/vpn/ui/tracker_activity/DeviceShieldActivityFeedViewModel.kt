@@ -26,7 +26,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -42,6 +42,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val timeDiffFormatter: TimeDiffFormatter
 ) : ViewModel() {
+
+    private val MAX_BADGES_TO_DISPLAY = 2
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
@@ -80,49 +82,51 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         perSessionData.values.forEach { sessionTrackers ->
             coroutineContext.ensureActive()
 
-            val perAppData = sessionTrackers.groupBy { it.vpnTracker.trackingApp.packageId }
+            val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
             var firstInBucket = true
 
             perAppData.values.forEach { appTrackers ->
-                val item = appTrackers.sortedByDescending { it.vpnTracker.timestamp }.first()
+                val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
 
                 var totalTrackerCount = 0
-                val perTrackerData = appTrackers.groupBy { it.vpnTracker.company }
-                val trackerList = mutableListOf<TrackerInfo>()
+                val perTrackerData = appTrackers.groupBy { it.trackerCompanySignal.tracker.company }
+                val trackingCompanyInfo = mutableListOf<TrackingCompanyInfo>()
                 perTrackerData.forEach { trackerBucket ->
-                    val trackerCompanyName = trackerBucket.value.first().vpnTracker.company
-                    val trackerCompanyDisplayName = trackerBucket.value.first().vpnTracker.companyDisplayName
+                    val trackerCompanyName = trackerBucket.value.first().trackerCompanySignal.tracker.company
+                    val trackerCompanyDisplayName = trackerBucket.value.first().trackerCompanySignal.tracker.companyDisplayName
                     val timestamp =
-                        trackerBucket.value.sortedByDescending { it.vpnTracker.timestamp }.first().vpnTracker.timestamp
-                    trackerList.add(
-                        TrackerInfo(
+                        trackerBucket.value.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first().trackerCompanySignal.tracker.timestamp
+                    val trackeCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
+                    trackingCompanyInfo.add(
+                        TrackingCompanyInfo(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
-                            timestamp = timestamp
+                            timestamp = timestamp,
+                            companyPrevalence = trackeCompanyPrevalence
                         )
                     )
                     totalTrackerCount += trackerBucket.value.size
                 }
 
                 if (firstInBucket && showHeadings) {
-                    sourceData.add(TrackerFeedItem.TrackerFeedItemHeader(item.vpnTracker.timestamp))
+                    sourceData.add(TrackerFeedItem.TrackerFeedItemHeader(item.trackerCompanySignal.tracker.timestamp))
                         .also { firstInBucket = false }
                 }
 
                 sourceData.add(
                     TrackerFeedItem.TrackerFeedData(
-                        id = item.bucket.hashCode() + item.vpnTracker.trackingApp.packageId.hashCode(),
+                        id = item.bucket.hashCode() + item.trackerCompanySignal.tracker.trackingApp.packageId.hashCode(),
                         bucket = item.bucket,
                         trackingApp = TrackingApp(
-                            item.vpnTracker.trackingApp.packageId,
-                            item.vpnTracker.trackingApp.appDisplayName
+                            item.trackerCompanySignal.tracker.trackingApp.packageId,
+                            item.trackerCompanySignal.tracker.trackingApp.appDisplayName
                         ),
                         trackersTotalCount = totalTrackerCount,
-                        trackers = trackerList.sortedByDescending { it.timestamp },
-                        timestamp = item.vpnTracker.timestamp,
+                        trackingCompanyBadges = mapTrackingCompanies(trackingCompanyInfo),
+                        timestamp = item.trackerCompanySignal.tracker.timestamp,
                         displayTimestamp = timeDiffFormatter.formatTimePassed(
                             LocalDateTime.now(),
-                            LocalDateTime.parse(item.vpnTracker.timestamp)
+                            LocalDateTime.parse(item.trackerCompanySignal.tracker.timestamp)
                         )
                     )
                 )
@@ -131,6 +135,25 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
 
         return sourceData
     }
+
+    private fun mapTrackingCompanies(trackingCompanyInfo: MutableList<TrackingCompanyInfo>): List<TrackerCompanyBadge> {
+        val trackingBadges = mutableListOf<TrackerCompanyBadge>()
+        val trackingCompanies = trackingCompanyInfo.sortedByDescending { it.companyPrevalence }
+        if (trackingCompanies.size > MAX_BADGES_TO_DISPLAY){
+            val visibleBadges = trackingCompanies.take(MAX_BADGES_TO_DISPLAY)
+            visibleBadges.forEach {
+                trackingBadges.add(TrackerCompanyBadge.Company(it.companyName, it.companyDisplayName))
+            }
+            trackingBadges.add(TrackerCompanyBadge.Extra(trackingCompanies.size - MAX_BADGES_TO_DISPLAY))
+        } else {
+            trackingCompanies.forEach {
+                trackingBadges.add(TrackerCompanyBadge.Company(it.companyName, it.companyDisplayName))
+            }
+        }
+        return trackingBadges
+    }
+
+    data class TrackingCompanyInfo(val companyName: String, val companyDisplayName: String, val timestamp: String, val companyPrevalence: Int)
 
     data class TimeWindow(val value: Long, val unit: TimeUnit) {
         fun asString(): String {
