@@ -399,6 +399,7 @@ class BrowserTabViewModel(
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
+    private var isProcessingAmpLink = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1001,6 +1002,7 @@ class BrowserTabViewModel(
                 lastTrackingInfo.destinationUrl = url
             }
         }
+        finishProcessingAmpLink()
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1140,7 +1142,7 @@ class BrowserTabViewModel(
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
-        val visualProgress = if (newProgress < FIXED_PROGRESS) {
+        val visualProgress = if (newProgress < FIXED_PROGRESS || isProcessingAmpLink) {
             FIXED_PROGRESS
         } else {
             newProgress
@@ -1149,7 +1151,7 @@ class BrowserTabViewModel(
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
         val showLoadingGrade = progress.privacyOn || isLoading
-        privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+        privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading || isProcessingAmpLink, showEmptyGrade = showLoadingGrade || isProcessingAmpLink)
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -2259,7 +2261,16 @@ class BrowserTabViewModel(
     }
 
     override fun handleCloakedTrackingLink(initialUrl: String) {
+        isProcessingAmpLink = true
         command.value = ExtractUrlFromTrackingLink(initialUrl)
+    }
+
+    override fun startProcessingAmpLink() {
+        isProcessingAmpLink = true
+    }
+
+    private fun finishProcessingAmpLink() {
+        isProcessingAmpLink = false
     }
 
     fun updateLastTrackingLink(url: String) {
