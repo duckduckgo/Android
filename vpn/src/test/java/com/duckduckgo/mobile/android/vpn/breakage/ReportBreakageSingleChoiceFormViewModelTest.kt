@@ -18,9 +18,10 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageSingleChoiceFormViewModel.Companion.CHOICES
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -38,11 +39,11 @@ class ReportBreakageSingleChoiceFormViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = ReportBreakageSingleChoiceFormViewModel()
+        viewModel = ReportBreakageSingleChoiceFormViewModel(coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenGetChoicesAndNoSelectedChoiceThenReturnChoicesState() = coroutineRule.runBlocking {
+    fun whenGetChoicesAndNoSelectedChoiceThenReturnChoicesState() = runTest {
         viewModel.getChoices().test {
             val expectedChoices = ReportBreakageSingleChoiceFormView.State(CHOICES, false)
 
@@ -53,7 +54,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
     }
 
     @Test
-    fun whenGetChoicesAndChoiceSelectedThenReturnChoicesState() = coroutineRule.runBlocking {
+    fun whenGetChoicesAndChoiceSelectedThenReturnChoicesState() = runTest {
         val selectedChoice = CHOICES.first().copy(isSelected = true)
         viewModel.onChoiceSelected(selectedChoice)
         viewModel.getChoices().test {
@@ -69,7 +70,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
     }
 
     @Test
-    fun whenOnChoiceSelectedThenEmitUpdatedChoices() = coroutineRule.runBlocking {
+    fun whenOnChoiceSelectedThenEmitUpdatedChoices() = runTest {
         viewModel.getChoices().test {
             val selectedChoice = CHOICES.first().copy(isSelected = true)
             viewModel.onChoiceSelected(selectedChoice)
@@ -90,7 +91,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
     }
 
     @Test
-    fun whenOnSubmitChoicesAndNoChoiceSelectedThenEmitNoEvent() = coroutineRule.runBlocking {
+    fun whenOnSubmitChoicesAndNoChoiceSelectedThenEmitNoEvent() = runTest {
         viewModel.commands().test {
             viewModel.onSubmitChoices()
 
@@ -99,7 +100,7 @@ class ReportBreakageSingleChoiceFormViewModelTest {
     }
 
     @Test
-    fun whenOnSubmitChoicesAndChoiceSelectedThenEmitSubmitChoiceCommand() = coroutineRule.runBlocking {
+    fun whenOnSubmitChoicesAndChoiceSelectedThenEmitSubmitChoiceCommand() = runTest {
         val selectedChoice = CHOICES.first().copy(isSelected = true)
         viewModel.onChoiceSelected(selectedChoice)
 

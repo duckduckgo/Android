@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Process
 import androidx.annotation.RequiresApi
 import timber.log.Timber
 import java.net.InetSocketAddress
@@ -37,7 +38,12 @@ class DetectOriginatingAppPackageModern(
     }
 
     private fun getConnectionOwnerUid(connectionInfo: ConnectionInfo, source: InetSocketAddress, destination: InetSocketAddress): Int {
-        return connectivityManager.getConnectionOwnerUid(connectionInfo.protocolNumber, source, destination)
+        return try {
+            connectivityManager.getConnectionOwnerUid(connectionInfo.protocolNumber, source, destination)
+        } catch (t:Throwable) {
+            Timber.e(t, "Error getting connection owner UID")
+            Process.INVALID_UID
+        }
     }
 
     private fun getPackageIdForUid(uid: Int): String {

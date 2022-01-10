@@ -26,11 +26,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_V
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import io.reactivex.Completable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import org.junit.Before
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 
@@ -41,7 +40,7 @@ class OfflinePixelSenderTest {
     private var mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private var mockPixel: PixelSender = mock()
 
-    private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel)
+    private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel, setOf())
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
@@ -50,18 +49,13 @@ class OfflinePixelSenderTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    @Before
-    fun before() {
+    @Test
+    fun whenSendUncaughtExceptionsPixelThenTimestampFormattedToUtc() = runTest {
         val exceptionEntity = UncaughtExceptionEntity(1, UncaughtExceptionSource.GLOBAL, "test", "version", 1588167165000)
 
-        runBlocking<Unit> {
-            whenever(mockPixel.sendPixel(any(), any(), any())).thenReturn(Completable.complete())
-            whenever(mockUncaughtExceptionRepository.getExceptions()).thenReturn(listOf(exceptionEntity))
-        }
-    }
+        whenever(mockPixel.sendPixel(any(), any(), any())).thenReturn(Completable.complete())
+        whenever(mockUncaughtExceptionRepository.getExceptions()).thenReturn(listOf(exceptionEntity))
 
-    @Test
-    fun whenSendUncaughtExceptionsPixelThenTimestampFormattedToUtc() {
         val params = mapOf(
             EXCEPTION_MESSAGE to "test",
             EXCEPTION_APP_VERSION to "version",

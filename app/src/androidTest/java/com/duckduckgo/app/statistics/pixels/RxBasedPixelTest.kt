@@ -19,10 +19,10 @@ package com.duckduckgo.app.statistics.pixels
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import io.reactivex.Completable
 import org.junit.Rule
 import org.junit.Test

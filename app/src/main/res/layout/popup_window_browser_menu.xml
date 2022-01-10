@@ -33,6 +33,7 @@
             style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
             android:contentDescription="@string/back"
             android:src="@drawable/ic_back_24"
+            android:background="@drawable/ripple_top_left_rounded"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -52,6 +53,7 @@
             style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_refresh"
+            android:background="@drawable/ripple_top_right_rounded"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -138,7 +140,8 @@
             <TextView
                 android:id="@+id/settingsPopupMenuItem"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/settingsMenuItemTitle" />
+                android:text="@string/settingsMenuItemTitle"
+                android:background="@drawable/ripple_bottom_rounded" />
 
         </LinearLayout>
 

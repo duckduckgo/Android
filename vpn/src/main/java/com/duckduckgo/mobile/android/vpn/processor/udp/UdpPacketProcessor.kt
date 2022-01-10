@@ -163,9 +163,14 @@ class UdpPacketProcessor @AssistedInject constructor(
 
                 packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
             }
-        } catch (e: IOException) {
-            Timber.w("Network write error writing to $cacheKey")
-            channelCache.remove(cacheKey)
+        } catch (e: Exception) {
+            when (e) {
+                is IOException, is IllegalArgumentException -> {
+                    Timber.w("Network write error writing to $cacheKey")
+                    channelCache.remove(cacheKey)
+                }
+                else -> throw e
+            }
         }
     }
 

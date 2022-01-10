@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
@@ -48,12 +49,18 @@ class VpnAppModule {
         return VpnDatabase.getInstance(context)
     }
 
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAppHealthDatabase(context: Context): AppHealthDatabase {
+        return AppHealthDatabase.create(context)
+    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAppTrackerLoader(
         vpnDatabase: VpnDatabase
     ): AppTrackerRepository {
-        return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao())
+        return RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())
     }
 
     @Provides

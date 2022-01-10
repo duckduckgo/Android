@@ -19,8 +19,8 @@ package com.duckduckgo.app.fire
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.test.platform.app.InstrumentationRegistry
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.junit.Assert.assertTrue
 import org.junit.Test
 

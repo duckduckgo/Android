@@ -17,21 +17,23 @@
 package com.duckduckgo.privacy.config.store.features.trackerallowlist
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.reset
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.test.TestCoroutineScope
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
 
+@ExperimentalCoroutinesApi
 class RealTrackerAllowlistRepositoryTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -46,7 +48,7 @@ class RealTrackerAllowlistRepositoryTest {
         whenever(mockDatabase.trackerAllowlistDao()).thenReturn(mockTrackerAllowlistDao)
         testee =
             RealTrackerAllowlistRepository(
-                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @Test
@@ -55,17 +57,17 @@ class RealTrackerAllowlistRepositoryTest {
 
         testee =
             RealTrackerAllowlistRepository(
-                mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
         assertEquals(trackerAllowlistEntity, testee.exceptions.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() =
-        coroutineRule.runBlocking {
+        runTest {
             testee =
                 RealTrackerAllowlistRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
 
             testee.updateAll(listOf())
 
@@ -74,11 +76,11 @@ class RealTrackerAllowlistRepositoryTest {
 
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() =
-        coroutineRule.runBlocking {
+        runTest {
             givenHttpsDaoContainsExceptions()
             testee =
                 RealTrackerAllowlistRepository(
-                    mockDatabase, TestCoroutineScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
             assertEquals(1, testee.exceptions.size)
             reset(mockTrackerAllowlistDao)
 

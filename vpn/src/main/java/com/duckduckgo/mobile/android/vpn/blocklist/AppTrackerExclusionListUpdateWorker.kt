@@ -26,6 +26,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExclusionListMetadata
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerSystemAppOverrideListMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -39,30 +40,73 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
-            Timber.d("Updating the app tracker exclusion list")
-            val exclusionList = appTrackerListDownloader.downloadAppTrackerExclusionList()
+            val exclusionListResult = updateExclusionList()
+            val sysAppOverridesListResult = updateSystemAppOverrides()
 
-            when (exclusionList.etag) {
-                is ETag.ValidETag -> {
-                    val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag
-                    val updatedEtag = exclusionList.etag.value
+            val success = Result.success()
+            if (exclusionListResult != success) {
+                Timber.w("Failed downloading exclution or system app override lists, scheduling a retry")
+                return@withContext Result.retry()
+            }
 
-                    if (updatedEtag == currentEtag) {
-                        Timber.v("Downloaded exclusion list has same eTag, noop")
-                        return@withContext Result.success()
-                    }
+            return@withContext success
+        }
+    }
 
-                    Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
-                    vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
+    private suspend fun updateSystemAppOverrides(): Result {
+        Timber.d("Updating the app system app overrides list")
 
-                    TrackerBlockingVpnService.restartVpnService(applicationContext)
+        val sysAppsOverrides = appTrackerListDownloader.downloadSystemAppOverrideList()
 
-                    return@withContext Result.success()
+        when (sysAppsOverrides.etag) {
+            is ETag.ValidETag -> {
+                val currentEtag = vpnDatabase.vpnSystemAppsOverridesDao().getSystemAppOverridesMetadata()?.eTag
+                val updatedEtag = sysAppsOverrides.etag.value
+
+                if (updatedEtag == currentEtag) {
+                    Timber.v("Downloaded system app overrides has same eTag, noop")
+                    return Result.success()
                 }
-                else -> {
-                    Timber.w("Received app tracker exclusion list with invalid eTag")
-                    return@withContext Result.retry()
+
+                Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
+                vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
+                        sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag))
+
+                TrackerBlockingVpnService.restartVpnService(applicationContext)
+
+                return Result.success()
+            }
+            else -> {
+                Timber.w("Received app tracker exclusion list with invalid eTag")
+                return Result.retry()
+            }
+        }
+    }
+
+    private suspend fun updateExclusionList(): Result {
+        Timber.d("Updating the app tracker exclusion list")
+        val exclusionList = appTrackerListDownloader.downloadAppTrackerExclusionList()
+
+        when (exclusionList.etag) {
+            is ETag.ValidETag -> {
+                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getExclusionListMetadata()?.eTag
+                val updatedEtag = exclusionList.etag.value
+
+                if (updatedEtag == currentEtag) {
+                    Timber.v("Downloaded exclusion list has same eTag, noop")
+                    return Result.success()
                 }
+
+                Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
+                vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
+
+                TrackerBlockingVpnService.restartVpnService(applicationContext)
+
+                return Result.success()
+            }
+            else -> {
+                Timber.w("Received app tracker exclusion list with invalid eTag")
+                return Result.retry()
             }
         }
     }
@@ -80,7 +124,7 @@ class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
             .addTag(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
             .build()
-        workManager.enqueueUniquePeriodicWork(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+        workManager.enqueueUniquePeriodicWork(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
     }
 
     companion object {

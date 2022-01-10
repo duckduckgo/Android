@@ -96,6 +96,13 @@
                 android:text="Delete Tracking History"
             />
 
+            <TextView
+                android:id="@+id/viewDiagnostics"
+                style="@style/SettingsItemClickable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="View Diagnostics Data"/>
+
         </LinearLayout>
 
     </ScrollView>
