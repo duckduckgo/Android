@@ -48,7 +48,7 @@ class GpcPlugin @Inject constructor(
                 gpcExceptions.add(GpcExceptionEntity(it.domain))
             }
             gpcFeature?.settings?.gpcHeaderEnabledSites?.map {
-                gpcHeaders.add(GpcHeaderEnabledSiteEntity(it.domain))
+                gpcHeaders.add(GpcHeaderEnabledSiteEntity(it))
             }
             gpcRepository.updateAll(gpcExceptions, gpcHeaders)
             val isEnabled = gpcFeature?.state == "enabled"
