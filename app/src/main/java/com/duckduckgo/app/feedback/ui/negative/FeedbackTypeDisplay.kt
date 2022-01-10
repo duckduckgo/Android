@@ -18,12 +18,18 @@ package com.duckduckgo.app.feedback.ui.negative
 
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.CustomizationSubReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.CustomizationSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.OTHER
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.PerformanceSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SearchNotGoodEnoughSubReasons.*
+import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 
 fun MainReason.displayText(): FeedbackTypeDisplay.FeedbackTypeMainReasonDisplay? = FeedbackTypeDisplay.mainReasons[this]
 

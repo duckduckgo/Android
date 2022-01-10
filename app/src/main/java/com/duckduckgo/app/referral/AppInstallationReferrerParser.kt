@@ -16,6 +16,9 @@
 
 package com.duckduckgo.app.referral
 
+import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber

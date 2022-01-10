@@ -20,6 +20,13 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.Command.Exit
+import com.duckduckgo.app.feedback.ui.common.FragmentState.InitialAppEnjoymentClarifier
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackMainReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackSubReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeOpenEndedFeedback
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeWebSitesBrokenFeedback
+import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveFeedbackFirstStep
+import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveShareFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
@@ -50,7 +57,7 @@ class FeedbackViewModel(
     val updateViewCommand: SingleLiveEvent<UpdateViewCommand> = SingleLiveEvent()
 
     init {
-        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
+        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = FragmentState.InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
     }
 
     private val currentViewState: UpdateViewCommand
@@ -58,12 +65,12 @@ class FeedbackViewModel(
 
     fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
         val newState = when (mainReason) {
-            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.WEBSITES_NOT_LOADING -> NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
-            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.MISSING_BROWSING_FEATURES -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.WEBSITES_NOT_LOADING -> FragmentState.NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.SEARCH_NOT_GOOD_ENOUGH -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.APP_IS_SLOW_OR_BUGGY -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.OTHER -> FragmentState.NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
         }
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
