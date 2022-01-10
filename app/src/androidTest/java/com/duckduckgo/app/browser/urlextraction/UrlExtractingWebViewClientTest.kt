@@ -20,15 +20,10 @@ import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.email.EmailInjector
-import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -46,21 +41,12 @@ class UrlExtractingWebViewClientTest {
 
     private lateinit var testee: UrlExtractingWebViewClient
 
-    private val requestRewriter: RequestRewriter = mock()
-    private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
-    private val listener: WebViewClientListener = mock()
     private val cookieManager: CookieManager = mock()
-    private val loginDetector: DOMLoginDetector = mock()
-    private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private val dosDetector: DosDetector = DosDetector()
     private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
     private val webViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
-    private val emailInjector: EmailInjector = mock()
-    private val accessibilityManager: AccessibilityManager = mock()
     private val urlExtractor: DOMUrlExtractor = mock()
     private val mockWebView: WebView = mock()
 
@@ -70,20 +56,12 @@ class UrlExtractingWebViewClientTest {
         testee = UrlExtractingWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
-            requestRewriter,
-            specialUrlDetector,
             requestInterceptor,
-            offlinePixelCountDataStore,
-            uncaughtExceptionRepository,
             cookieManager,
-            loginDetector,
-            dosDetector,
             gpc,
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
-            emailInjector,
-            accessibilityManager,
             urlExtractor
         )
     }
