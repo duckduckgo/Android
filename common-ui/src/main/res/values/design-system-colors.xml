@@ -23,6 +23,8 @@
 
     <color name="primaryIconColor">@color/gray95</color>
 
+    <color name="secondaryBgColor">@color/gray20</color>
+
     <color name="primaryButtonDefaultTextColor">@color/white</color>
     <color name="primaryButtonHoverTextColor">@color/white</color>
     <color name="primaryButtonPressedTextColor">@color/white</color>

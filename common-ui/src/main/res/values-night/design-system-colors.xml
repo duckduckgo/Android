@@ -22,4 +22,6 @@
     <color name="secondaryTextColor">@color/gray20</color>
 
     <color name="primaryIconColor">@color/gray20</color>
+
+    <color name="secondaryBgColor">@color/gray95</color>
 </resources>
