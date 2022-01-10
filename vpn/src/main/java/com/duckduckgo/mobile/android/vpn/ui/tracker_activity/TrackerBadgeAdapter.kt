@@ -100,9 +100,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                 TextDrawable.builder()
                     .beginConfig()
                     .fontSize(35)
-                    .textColor(ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.primaryTextColor))
+                    .textColor(ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.accentTextColor))
                     .endConfig()
-                    .buildRound("+${trackerInfo.amount}", ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.secondaryBgColor)))
+                    .buildRound("+${trackerInfo.amount}", ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.accentIconColor)))
         }
     }
 

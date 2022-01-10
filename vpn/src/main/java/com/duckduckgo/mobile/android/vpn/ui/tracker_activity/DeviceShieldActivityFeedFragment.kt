@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +57,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             adapter = trackerFeedAdapter
+            addItemDecoration(TrackerActivityFeedItemDecorator(ContextCompat.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.default_list_divider)!!))
         }
 
         lifecycleScope.launch {

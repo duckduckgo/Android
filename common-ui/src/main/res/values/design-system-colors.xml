@@ -19,11 +19,12 @@
     <!-- Day / Light theme colors -->
     <color name="primaryTextColor">@color/gray90</color>
     <color name="secondaryTextColor">@color/gray70</color>
+    <color name="accentTextColor">@color/gray70</color>
     <color name="disabledColor">#59000000</color>
+    <color name="splitterBg">@color/gray25</color>
 
-    <color name="primaryIconColor">@color/gray95</color>
-
-    <color name="secondaryBgColor">@color/gray20</color>
+    <color name="primaryIconColor">@color/gray40</color>
+    <color name="accentIconColor">@color/gray30</color>
 
     <color name="primaryButtonDefaultTextColor">@color/white</color>
     <color name="primaryButtonHoverTextColor">@color/white</color>
@@ -39,10 +40,15 @@
 
     <color name="green50">#4CBA3C</color>
 
-    <color name="gray90">#222222</color>
-    <color name="gray70">#666666</color>
-    <color name="gray20">#EEEEEE</color>
     <color name="gray95">#494949</color>
+    <color name="gray90">#222222</color>
+    <color name="gray85">#333333</color>
+    <color name="gray80">#444444</color>
+    <color name="gray70">#666666</color>
+    <color name="gray40">#CCCCCC</color>
+    <color name="gray30">#DDDDDD</color>
+    <color name="gray25">#E5E5E5</color>
+    <color name="gray20">#EEEEEE</color>
 
     <color name="blue50">#3969EF</color>
     <color name="blue60">#2B55CA</color>
