@@ -16,30 +16,33 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import android.os.Build
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.Result
+import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import timber.log.Timber
-import java.util.*
-import kotlin.math.exp
-import kotlin.math.min
 
 class RemoteMessagingConfigMatcherTest {
 
-    private val deviceProperties: DeviceProperties = mock()
-    private val testee = RemoteMessagingConfigMatcher(deviceProperties)
+    private val deviceAttributeMatcher: DeviceAttributeMatcher = mock()
+    private val androidAppAttributeMatcher: AndroidAppAttributeMatcher = mock()
+    private val userAttributeMatcher: UserAttributeMatcher = mock()
 
-    private val printlnTree = object: Timber.Tree() {
+    private val testee = RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
+
+    private val printlnTree = object : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
             println("$tag: $message")
         }
@@ -57,31 +60,41 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenEmptyConfigThenReturnNull() {
+    fun whenEmptyConfigThenReturnNull() = runBlocking {
         val message = testee.evaluate(RemoteConfig(emptyList(), emptyMap()))
 
         assertNull(message)
     }
 
     @Test
-    fun whenNoMatchingRulesThenReturnFirstMessage() {
+    fun whenNoMatchingRulesThenReturnFirstMessage() = runBlocking {
         val remoteMessage = aSmallMessage()
+
         val message = testee.evaluate(RemoteConfig(listOf(remoteMessage), emptyMap()))
 
         assertEquals(remoteMessage, message)
     }
 
     @Test
-    fun whenDeviceMatchesLocaleThenReturnFirstMatch() {
-        givenDeviceProperties(locale = Locale.US)
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
+    fun whenNotExistingRuleThenReturnMessage() = runBlocking {
+        val remoteMessage = aSmallMessage(matchingRules = listOf(1))
+
+        val message = testee.evaluate(RemoteConfig(listOf(remoteMessage), emptyMap()))
+
+        assertEquals(remoteMessage, message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesThenReturnFirstMatch() = runBlocking {
+        val matchingAttributes = listOf(MatchingAttribute.Api(max = 19))
+        given(matchingAttributes = matchingAttributes)
+        val rules = mapOf(Pair(1, matchingAttributes))
+        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
 
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Locale(value = listOf("en_US"))))
-                )
+                rules = rules
             )
         )
 
@@ -89,33 +102,16 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenDeviceDoesNotMatchLocaleThenReturnNull() {
-        givenDeviceProperties(locale = Locale.FRANCE)
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
+    fun whenDeviceMatchesMessageRulesForMultipleMessagesThenReturnFirstMatch() = runBlocking {
+        val matchingAttributes = listOf(MatchingAttribute.Api(max = 19))
+        given(matchingAttributes = matchingAttributes)
+        val rules = mapOf(Pair(1, matchingAttributes))
+        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
 
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Locale(value = listOf("en_US"))))
-                )
-            )
-        )
-
-        assertNull(message)
-    }
-
-    @Test
-    fun whenDeviceMatchesOsApiLevelThenReturnFirstMatch() {
-        givenDeviceProperties(apiLevel = 21)
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
-
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Api(min = 19)))
-                )
+                messages = listOf(expectedMessage, aSmallMessage(matchingRules = rules.keys.toList())),
+                rules = rules
             )
         )
 
@@ -123,16 +119,15 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenDeviceDoesNotMatchOsApiLevelThenReturnNull() {
-        givenDeviceProperties(apiLevel = 21)
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
+    fun whenDeviceDoesNotMatchMessageRulesThenReturnNull() = runBlocking {
+        val failingAttributes = listOf(MatchingAttribute.Api(max = 19))
+        given(failingAttributes = failingAttributes)
+        val rules = mapOf(Pair(1, failingAttributes))
 
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Api(max = 19)))
-                )
+                messages = listOf(aSmallMessage(matchingRules = rules.keys.toList()), aMediumMessage(matchingRules = rules.keys.toList())),
+                rules = rules
             )
         )
 
@@ -140,16 +135,20 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenDeviceMatchesWebViewVersionThenReturnFirstMatch() {
-        givenDeviceProperties(webView = "96.0.4664.104")
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
+    fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() = runBlocking {
+        val matchingAttributes = listOf(MatchingAttribute.Locale(value = listOf("en_US")))
+        val failingAttributes = listOf(MatchingAttribute.Api(max = 19))
+        given(matchingAttributes = matchingAttributes, failingAttributes = failingAttributes)
+        val rules = mapOf(
+            Pair(1, failingAttributes),
+            Pair(2, matchingAttributes)
+        )
+        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
 
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.WebView(max = "80")))
-                )
+                rules = rules
             )
         )
 
@@ -157,61 +156,7 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenDeviceDoesNotMatchWebViewVersionThenReturnNull() {
-        givenDeviceProperties(webView = "80")
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1))
-
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.WebView(max = "70")))
-                )
-            )
-        )
-
-        assertNull(message)
-    }
-
-    @Test
-    fun whenDeviceDoesNotMatchMessageRulesThenReturnNull() {
-        givenDeviceProperties(
-            locale = Locale.ENGLISH,
-            apiLevel = 21,
-            webView = "80"
-        )
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(aSmallMessage(matchingRules = listOf(1)), aMediumMessage(matchingRules = listOf(1))),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Api(max = 19)))
-                )
-            )
-        )
-
-        assertNull(message)
-    }
-
-    @Test
-    fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() {
-        givenDeviceProperties(locale = Locale.US, apiLevel = 23)
-        val expectedMessage = aMediumMessage(matchingRules = listOf(1, 2))
-
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Api(max = 19))),
-                    Pair(2, listOf(MatchingAttribute.Locale(value = listOf("en_US"))))
-                )
-            )
-        )
-
-        assertEquals(expectedMessage, message)
-    }
-
-    @Test
-    fun whenUnknownRuleFailsThenReturnNull() {
+    fun whenUnknownRuleFailsThenReturnNull() = runBlocking {
         val message = testee.evaluate(
             RemoteConfig(
                 messages = listOf(aSmallMessage(matchingRules = listOf(1)), aMediumMessage(matchingRules = listOf(1))),
@@ -225,7 +170,7 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenUnknownRuleMatchesThenReturnFirstMatch() {
+    fun whenUnknownRuleMatchesThenReturnFirstMatch() = runBlocking {
         val expectedMessage = aSmallMessage(matchingRules = listOf(1))
 
         val message = testee.evaluate(
@@ -241,17 +186,24 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenThen() {
+    fun whenThen() = runBlocking {
         val message = testee.evaluate(RemoteConfig(emptyList(), emptyMap()))
     }
 
-    private fun givenDeviceProperties(
-        locale: Locale = Locale.getDefault(),
-        apiLevel: Int =  Build.VERSION.SDK_INT,
-        webView: String = ""
+    private suspend fun given(
+        matchingAttributes: List<MatchingAttribute> = emptyList(),
+        failingAttributes: List<MatchingAttribute> = emptyList()
     ) {
-        whenever(deviceProperties.deviceLocale()).thenReturn(locale)
-        whenever(deviceProperties.osApiLevel()).thenReturn(apiLevel)
-        whenever(deviceProperties.webView()).thenReturn(webView)
+        matchingAttributes.forEach {
+            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
+            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
+            whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
+        }
+
+        failingAttributes.forEach {
+            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
+            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
+            whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
+        }
     }
 }

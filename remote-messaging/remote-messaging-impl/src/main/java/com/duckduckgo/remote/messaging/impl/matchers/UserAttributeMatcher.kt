@@ -17,7 +17,9 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.remote.messaging.impl.models.DateMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 
 class UserAttributeMatcher(
     val userBrowserProperties: UserBrowserProperties
@@ -25,66 +27,45 @@ class UserAttributeMatcher(
     suspend fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.AppTheme -> {
-                return matchingAttribute.value.equals(userBrowserProperties.appTheme().toString(), ignoreCase = true).toResult()
+                return matchingAttribute.matches(userBrowserProperties.appTheme().toString())
             }
             is MatchingAttribute.Bookmarks -> {
-                val bookmarks = userBrowserProperties.bookmarks()
-                if ((matchingAttribute.min.defaultValue() || bookmarks >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || bookmarks <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
+                return matchingAttribute.matches(userBrowserProperties.bookmarks().toInt())
             }
             is MatchingAttribute.DaysSinceInstalled -> {
-                val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
-                if ((matchingAttribute.min.defaultValue() || daysSinceInstalled >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || daysSinceInstalled <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
+                return matchingAttribute.matches(userBrowserProperties.daysSinceInstalled().toInt())
             }
             is MatchingAttribute.DaysUsedSince -> {
                 val daysUsedSince = userBrowserProperties.daysUsedSince(matchingAttribute.since)
-                if ((matchingAttribute.value.defaultValue() || daysUsedSince == matchingAttribute.value.toLong())) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
+                return matchingAttribute.matches(daysUsedSince.toInt())
             }
             is MatchingAttribute.DefaultBrowser -> {
-                return (matchingAttribute.value == userBrowserProperties.defaultBrowser()).toResult()
+                return matchingAttribute.matches(userBrowserProperties.defaultBrowser())
             }
             is MatchingAttribute.EmailEnabled -> {
-                return (matchingAttribute.value == userBrowserProperties.emailEnabled()).toResult()
+                return matchingAttribute.matches(userBrowserProperties.emailEnabled())
             }
             is MatchingAttribute.Favorites -> {
-                val favorites = userBrowserProperties.favorites()
-                if ((matchingAttribute.min.defaultValue() || favorites >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || favorites <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
+                return matchingAttribute.matches(userBrowserProperties.favorites().toInt())
             }
             is MatchingAttribute.SearchCount -> {
-                val searchCount = userBrowserProperties.searchCount()
-                if ((matchingAttribute.min.defaultValue() || searchCount >= matchingAttribute.min) &&
-                    (matchingAttribute.max.defaultValue() || searchCount <= matchingAttribute.max)
-                ) {
-                    return true.toResult()
-                }
-
-                return false.toResult()
+                return matchingAttribute.matches(userBrowserProperties.searchCount().toInt())
             }
             is MatchingAttribute.WidgetAdded -> {
-                return (matchingAttribute.value == userBrowserProperties.widgetAdded()).toResult()
+                return matchingAttribute.matches(userBrowserProperties.widgetAdded())
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
+}
+
+fun DateMatchingAttribute.matches(value: Int): Result {
+    if ((this.value.defaultValue() || value == this.value)) {
+        return true.toResult()
+    }
+    return false.toResult()
+}
+
+fun StringMatchingAttribute.matches(value: String): Result {
+    return this.value.equals(value, ignoreCase = true).toResult()
 }

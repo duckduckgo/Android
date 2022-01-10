@@ -17,7 +17,10 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.AppProperties
+import com.duckduckgo.remote.messaging.impl.models.BooleanMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
 import timber.log.Timber
 import java.util.*
 
@@ -27,59 +30,50 @@ class AndroidAppAttributeMatcher(
     fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
-                matchingAttribute.value.find { it.equals(appProperties.flavor(), true) } ?: return false.toResult()
-                return true.toResult()
+                return matchingAttribute.matches(appProperties.flavor())
             }
             is MatchingAttribute.AppId -> {
-                return (matchingAttribute.value == appProperties.appId()).toResult()
+                return matchingAttribute.matches(appProperties.appId())
             }
             is MatchingAttribute.AppVersion -> {
                 if (matchingAttribute == MatchingAttribute.AppVersion()) return Result.Fail
-
-                val appVersion = appProperties.appVersion()
-                Timber.i("RMF: device WV: $appVersion")
-                if (!appVersion.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
-
-
-                val appVersionParts = appVersion.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-                val minAppVersionParts = matchingAttribute.min.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-                val maxAppVersionParts = matchingAttribute.max.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-
-                if (appVersionParts.isEmpty()) return false.toResult()
-                if (appVersionParts.compareTo(minAppVersionParts) <= -1) return false.toResult()
-                if (appVersionParts.compareTo(maxAppVersionParts) >= 1) return false.toResult()
-
-                return true.toResult()
+                return matchingAttribute.matches(appProperties.appVersion())
             }
             is MatchingAttribute.Atb -> {
-                return (matchingAttribute.value == appProperties.atb()).toResult()
+                return matchingAttribute.matches(appProperties.atb())
             }
             is MatchingAttribute.AppAtb -> {
-                return (matchingAttribute.value == appProperties.appAtb()).toResult()
+                return matchingAttribute.matches(appProperties.appAtb())
             }
             is MatchingAttribute.SearchAtb -> {
-                return (matchingAttribute.value == appProperties.searchAtb()).toResult()
+                return matchingAttribute.matches(appProperties.searchAtb())
             }
             is MatchingAttribute.ExpVariant -> {
-                return (matchingAttribute.value == appProperties.expVariant()).toResult()
+                return matchingAttribute.matches(appProperties.expVariant())
             }
             is MatchingAttribute.InstalledGPlay -> {
-                return (matchingAttribute.value == appProperties.installedGPlay()).toResult()
+                return matchingAttribute.matches(appProperties.installedGPlay())
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
+}
 
-    private fun List<Int>.compareTo(other: List<Int>): Int {
-        val otherSize = other.size
+fun StringArrayMatchingAttribute.matches(value: String): Result {
+    this.value.find { it.equals(value, true) } ?: return false.toResult()
+    return true.toResult()
+}
 
-        for (index in this.indices) {
-            if (index > otherSize-1 ) return 0
-            val value = this[index]
-            if (value < other[index]) return -1
-            if (value > other[index]) return 1
-        }
+fun BooleanMatchingAttribute.matches(value: Boolean): Result {
+    return (this.value == value).toResult()
+}
 
-        return 0
+fun RangeIntMatchingAttribute.matches(value: Int): Result {
+    if ((this.min.defaultValue() || value >= this.min) &&
+        (this.max.defaultValue() || value <= this.max)
+    ) {
+        return true.toResult()
     }
+
+    return false.toResult()
 }
