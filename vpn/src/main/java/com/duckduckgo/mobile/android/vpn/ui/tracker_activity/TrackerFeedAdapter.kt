@@ -32,6 +32,8 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
@@ -50,7 +52,7 @@ class TrackerFeedAdapter @Inject constructor(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
+            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick, position == trackerFeedItems.size, )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
@@ -148,6 +150,7 @@ class TrackerFeedAdapter @Inject constructor(
         val context: Context = view.context
         var activityMessage: TextView = view.findViewById(R.id.activity_message)
         var timeSinceTrackerBlocked: TextView = view.findViewById(R.id.activity_time_since)
+        var splitter: View = view.findViewById(R.id.entry_splitter)
         var trackingAppIcon: ImageView = view.findViewById(R.id.tracking_app_icon)
         var trackerBadgesView: RecyclerView = view.findViewById<RecyclerView>(R.id.tracker_badges).apply {
             adapter = TrackerBadgeAdapter()
@@ -155,7 +158,7 @@ class TrackerFeedAdapter @Inject constructor(
 
         var packageManager: PackageManager = view.context.packageManager
 
-        fun bind(tracker: TrackerFeedItem.TrackerFeedData?, onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit) {
+        fun bind(tracker: TrackerFeedItem.TrackerFeedData?, onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit, isLastPosition: Boolean) {
             tracker?.let { item ->
                 with(activityMessage) {
                     val companies = resources.getQuantityString(R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackingCompanyBadges.size, tracker.trackingCompanyBadges.size)
@@ -187,6 +190,11 @@ class TrackerFeedAdapter @Inject constructor(
                 }
                 itemView.setOnClickListener {
                     onAppClick(item)
+                }
+                if (isLastPosition){
+                    splitter.hide()
+                }else {
+                    splitter.show()
                 }
             }
         }

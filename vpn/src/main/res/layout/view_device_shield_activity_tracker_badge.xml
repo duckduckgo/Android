@@ -16,10 +16,25 @@
   ~ limitations under the License.
   -->
 
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tracker_company_icon"
-    android:layout_width="20dp"
-    android:layout_height="20dp"
-    android:layout_margin="2dp"
-           android:scaleType="fitXY"
-    />
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/keyline_5"
+    android:layout_height="@dimen/keyline_5"
+    android:layout_margin="2dp">
+
+    <ImageView
+        android:id="@+id/tracker_company_badge_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <TextView
+        android:id="@+id/tracker_company_badge_text"
+        android:paddingTop="1.5dp"
+        android:background="@drawable/background_circular_text"
+        android:textColor="?accentTextColor"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</FrameLayout>
+

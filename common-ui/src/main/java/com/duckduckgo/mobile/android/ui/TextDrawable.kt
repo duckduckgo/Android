@@ -37,6 +37,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     private val fontSize: Int
     private val radius: Float
     private val borderThickness: Int
+
     private fun getDarkerShade(color: Int): Int {
         return Color.rgb(
             (SHADE_FACTOR * Color.red(color)).toInt(),

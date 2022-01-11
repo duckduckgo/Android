@@ -22,10 +22,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import java.util.*
@@ -53,7 +56,11 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         diffResult.dispatchUpdatesTo(this)
     }
 
-    class TrackerBadgeViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    class TrackerBadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+        var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
+        var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
+
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -71,9 +78,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {
-            val badge = badgeIcon(view.context, trackerInfo.companyName)
+            val badge = badgeIcon(iconBadge.context, trackerInfo.companyName)
             if (badge == null) {
-                (view as ImageView).setImageDrawable(
+                iconBadge.setImageDrawable(
                     TextDrawable.builder()
                         .beginConfig()
                         .fontSize(50)
@@ -81,8 +88,10 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                         .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
                 )
             } else {
-                (view as ImageView).setImageResource(badge)
+                iconBadge.setImageResource(badge)
             }
+            iconBadge.show()
+            textBadge.hide()
         }
 
         private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
@@ -96,13 +105,9 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
-            (view as ImageView).setImageDrawable(
-                TextDrawable.builder()
-                    .beginConfig()
-                    .fontSize(35)
-                    .textColor(ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.accentTextColor))
-                    .endConfig()
-                    .buildRound("+${trackerInfo.amount}", ContextCompat.getColor(view.context, com.duckduckgo.mobile.android.R.color.accentIconColor)))
+            textBadge.text = "+${trackerInfo.amount}"
+            iconBadge.hide()
+            textBadge.show()
         }
     }
 

@@ -29,7 +29,6 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import dagger.android.AndroidInjection
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -55,9 +54,9 @@ class DeviceShieldActivityFeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
-            layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+            val stickyHeadersLayoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+            layoutManager = stickyHeadersLayoutManager
             adapter = trackerFeedAdapter
-            addItemDecoration(TrackerActivityFeedItemDecorator(ContextCompat.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.default_list_divider)!!))
         }
 
         lifecycleScope.launch {

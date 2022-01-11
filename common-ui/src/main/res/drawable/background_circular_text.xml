@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,16 +15,13 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/timestamp_header"
-          style="@style/SettingsSectionTitle"
-          android:background="?attr/colorPrimaryDark"
-          android:layout_height="wrap_content"
-          android:layout_width="match_parent"
-          android:paddingStart="16dp"
-          android:paddingEnd="0dp"
-          android:paddingTop="15dp"
-          android:paddingBottom="16dp"
-          tools:text="Yesterday"
-/>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="oval">
+
+    <solid android:color="?accentIconColor" />
+
+    <size
+        android:height="@dimen/keyline_5"
+        android:width="@dimen/keyline_5" />
+
+</shape>

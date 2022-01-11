@@ -52,7 +52,7 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
-        <item name="secondaryTextColor">@color/warmerGray</item>
+        <item name="secondaryTextColor">@color/gray50</item>
         <item name="accentTextColor">@color/gray30</item>
         <item name="primaryIconColor">@color/gray20</item>
         <item name="secondaryIconColor">@color/gray70</item>
