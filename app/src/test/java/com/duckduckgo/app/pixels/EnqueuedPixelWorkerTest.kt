@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.WorkManager
+import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.mockito.kotlin.*
@@ -31,12 +32,18 @@ class EnqueuedPixelWorkerTest {
     private val pixel: Pixel = mock()
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
+    private val webViewVersionProvider: WebViewVersionProvider = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
     @Before
     fun setup() {
-        enqueuedPixelWorker = EnqueuedPixelWorker(workManager, { pixel }, unsentForgetAllPixelStore)
+        enqueuedPixelWorker = EnqueuedPixelWorker(
+            workManager,
+            { pixel },
+            unsentForgetAllPixelStore,
+            webViewVersionProvider
+        )
     }
 
     @Test
@@ -73,22 +80,30 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndAppLaunchThenSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.get()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
-        verify(pixel).fire(AppPixelName.APP_LAUNCH)
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+        )
     }
 
     @Test
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(webViewVersionProvider.get()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
-        verify(pixel).fire(AppPixelName.APP_LAUNCH)
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+        )
     }
 }
