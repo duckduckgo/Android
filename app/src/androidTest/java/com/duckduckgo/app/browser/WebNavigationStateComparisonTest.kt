@@ -16,6 +16,12 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
+import com.duckduckgo.app.browser.WebNavigationStateChange.Other
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.PageNavigationCleared
+import com.duckduckgo.app.browser.WebNavigationStateChange.Unchanged
+import com.duckduckgo.app.browser.WebNavigationStateChange.UrlUpdated
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

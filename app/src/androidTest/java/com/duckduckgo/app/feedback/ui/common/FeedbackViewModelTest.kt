@@ -22,6 +22,11 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
+import com.duckduckgo.app.feedback.ui.common.FragmentState.InitialAppEnjoymentClarifier
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackMainReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackSubReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeOpenEndedFeedback
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeWebSitesBrokenFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MissingBrowserFeaturesSubReasons.TAB_MANAGEMENT
 import com.duckduckgo.app.playstore.PlayStoreUtils

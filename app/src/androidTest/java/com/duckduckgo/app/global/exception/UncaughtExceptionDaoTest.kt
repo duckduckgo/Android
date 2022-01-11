@@ -21,6 +21,9 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.GLOBAL
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.ON_PAGE_STARTED
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource.ON_PROGRESS_CHANGED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
 import org.junit.Assert.assertEquals

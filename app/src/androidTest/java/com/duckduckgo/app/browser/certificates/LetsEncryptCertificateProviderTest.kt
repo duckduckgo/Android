@@ -17,6 +17,10 @@
 package com.duckduckgo.app.browser.certificates
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
+import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
+import com.duckduckgo.app.browser.certificates.rootstore.LetsEncryptE1
+import com.duckduckgo.app.browser.certificates.rootstore.LetsEncryptR3
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
