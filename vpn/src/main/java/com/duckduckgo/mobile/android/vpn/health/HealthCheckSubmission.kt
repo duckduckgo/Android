@@ -16,48 +16,20 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-data class HealthCheckSubmission(
-    val userReport: UserHealthSubmission,
-    val systemReport: SystemHealthSubmission
-)
+data class HealthCheckSubmission(val userReport: UserHealthSubmission, val systemReport: SystemHealthData)
 
-data class SystemHealthSubmission(
-    val isBadHealth: Boolean,
-    val rawMetrics: List<RawMetricsSubmission>
-)
-
-data class RawMetricsSubmission(
-    val name: String,
-    val metrics: Map<String, Metric> = emptyMap()
-) {
-
-    fun isInBadHealth(): Boolean {
-        return metrics.count { it.value.isBadState == true } > 0
-    }
-
-    fun badHealthReasons(): List<String> {
-        val badHealthReasons = mutableListOf<String>()
-        metrics
-            .filter { it.value.isBadState == true }
-            .forEach {
-                badHealthReasons.add(it.key)
-            }
-        return badHealthReasons
-    }
+internal fun RawMetricsSubmission.isInBadHealth(): Boolean {
+    return metrics.count { it.value.isBadState == true } > 0
 }
 
-data class Metric(
-    val value: String,
-    val isBadState: Boolean? = null
-) {
-
-    override fun toString(): String {
-        if (isBadState == null) return value
-        return String.format("%s, isBadState=%s", value, isBadState)
-    }
+internal fun RawMetricsSubmission.badHealthReasons(): List<String> {
+    val badHealthReasons = mutableListOf<String>()
+    metrics
+        .filter { it.value.isBadState == true }
+        .forEach {
+            badHealthReasons.add(it.key)
+        }
+    return badHealthReasons
 }
 
-data class UserHealthSubmission(
-    val state: String,
-    val notes: String? = null
-)
+data class UserHealthSubmission(val state: String, val notes: String? = null)
