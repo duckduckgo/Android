@@ -30,6 +30,8 @@
     <TextView
         android:id="@+id/tracker_company_badge_text"
         android:paddingTop="1.5dp"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
         android:background="@drawable/background_circular_text"
         android:textColor="?accentTextColor"
         android:textAlignment="center"
