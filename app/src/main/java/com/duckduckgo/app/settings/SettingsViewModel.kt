@@ -293,7 +293,10 @@ class SettingsViewModel(
         pixel.fire(pixelName)
     }
 
-    private fun getAppLinksSettingsState(appLinksEnabled: Boolean, showAppLinksPrompt: Boolean): AppLinkSettingType {
+    private fun getAppLinksSettingsState(
+        appLinksEnabled: Boolean,
+        showAppLinksPrompt: Boolean
+    ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
                 AppLinkSettingType.ASK_EVERYTIME

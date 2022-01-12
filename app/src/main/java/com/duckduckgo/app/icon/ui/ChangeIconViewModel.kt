@@ -36,9 +36,15 @@ class ChangeIconViewModel @Inject constructor(
     private val pixel: Pixel
 ) : ViewModel() {
 
-    data class IconViewData(val appIcon: AppIcon, val selected: Boolean) {
+    data class IconViewData(
+        val appIcon: AppIcon,
+        val selected: Boolean
+    ) {
         companion object {
-            fun from(appIcon: AppIcon, selectedAppIcon: AppIcon): IconViewData {
+            fun from(
+                appIcon: AppIcon,
+                selectedAppIcon: AppIcon
+            ): IconViewData {
                 return if (appIcon.componentName == selectedAppIcon.componentName) {
                     IconViewData(appIcon, true)
                 } else {
@@ -88,7 +94,13 @@ class ChangeIconViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (
+                    ChangeIconViewModel(
+                        settingsDataStore.get(),
+                        appIconModifier.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

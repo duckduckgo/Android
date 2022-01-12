@@ -17,11 +17,9 @@
 package com.duckduckgo.app.brokensite.api
 
 import android.net.Uri
-import android.os.Build
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.absoluteString
-import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel

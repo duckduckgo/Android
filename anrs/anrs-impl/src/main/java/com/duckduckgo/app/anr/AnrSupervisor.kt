@@ -59,6 +59,7 @@ class AnrSupervisorRunnable @Inject constructor(
 
     private val anrDao = anrsDatabase.arnDao()
     private val handler = Handler(Looper.getMainLooper())
+
     // stop flag
     private var stopped = AtomicBoolean(true)
 

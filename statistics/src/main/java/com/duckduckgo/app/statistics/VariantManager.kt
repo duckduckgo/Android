@@ -150,7 +150,10 @@ class ExperimentationVariantManager(
         store.referrerVariant = variant
     }
 
-    private fun lookupVariant(key: String?, activeVariants: List<Variant>): Variant? {
+    private fun lookupVariant(
+        key: String?,
+        activeVariants: List<Variant>
+    ): Variant? {
         val variant = activeVariants.firstOrNull { it.key == key }
 
         if (variant != null) return variant

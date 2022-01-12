@@ -44,7 +44,10 @@ class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
     }
 }
 
-class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+class AppConfigurationWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : RxWorker(context, workerParams) {
 
     @Inject
     lateinit var appConfigurationDownloader: ConfigurationDownloader

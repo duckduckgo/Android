@@ -168,7 +168,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderHeading(viewState: ViewState, isPrivacyOn: Boolean) {
+    private fun renderHeading(
+        viewState: ViewState,
+        isPrivacyOn: Boolean
+    ) {
         with(privacyDashboardHeader) {
             if (viewState.isSiteInTempAllowedList) {
                 heading.gone()
@@ -176,7 +179,8 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
             } else {
                 protectionsTemporarilyDisabled.gone()
                 heading.show()
-                heading.text = upgradeRenderer.heading(this@PrivacyDashboardActivity, viewState.beforeGrade, viewState.afterGrade, isPrivacyOn).html(this@PrivacyDashboardActivity)
+                heading.text = upgradeRenderer.heading(this@PrivacyDashboardActivity, viewState.beforeGrade, viewState.afterGrade, isPrivacyOn)
+                    .html(this@PrivacyDashboardActivity)
             }
         }
     }
@@ -210,7 +214,10 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         trackerNetworkLeaderboardNotReady.show()
     }
 
-    private fun renderToggle(enabled: Boolean, isSiteIntTempAllowedList: Boolean) {
+    private fun renderToggle(
+        enabled: Boolean,
+        isSiteIntTempAllowedList: Boolean
+    ) {
         val backgroundColor = if (enabled && !isSiteIntTempAllowedList) R.color.midGreen else R.color.warmerGray
         contentPrivacyDashboard.privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         contentPrivacyDashboard.privacyToggle.quietlySetIsChecked(enabled && !isSiteIntTempAllowedList, privacyToggleListener)
@@ -249,11 +256,13 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
 
         const val RELOAD_RESULT_CODE = 100
 
-        fun intent(context: Context, tabId: String): Intent {
+        fun intent(
+            context: Context,
+            tabId: String
+        ): Intent {
             val intent = Intent(context, PrivacyDashboardActivity::class.java)
             intent.tabId = tabId
             return intent
         }
-
     }
 }

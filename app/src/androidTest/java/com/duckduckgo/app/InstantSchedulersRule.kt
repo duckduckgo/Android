@@ -25,7 +25,10 @@ import org.junit.runners.model.Statement
 
 class InstantSchedulersRule : TestRule {
 
-    override fun apply(base: Statement, description: Description): Statement {
+    override fun apply(
+        base: Statement,
+        description: Description
+    ): Statement {
 
         return object : Statement() {
 
@@ -45,10 +48,7 @@ class InstantSchedulersRule : TestRule {
 
                 RxJavaPlugins.reset()
                 RxAndroidPlugins.reset()
-
             }
-
         }
     }
-
 }

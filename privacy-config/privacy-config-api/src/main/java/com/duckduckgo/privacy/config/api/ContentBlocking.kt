@@ -28,4 +28,7 @@ interface ContentBlocking {
 }
 
 /** Public data class for Content Blocking Exceptions */
-data class ContentBlockingException(val domain: String, val reason: String)
+data class ContentBlockingException(
+    val domain: String,
+    val reason: String
+)

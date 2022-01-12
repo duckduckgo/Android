@@ -22,9 +22,6 @@ import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 import javax.inject.Inject
 

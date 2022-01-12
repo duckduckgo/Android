@@ -53,17 +53,17 @@ class AppBadHealthStateHandlerTest {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
 
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppHealthDatabase::class.java)
-          .allowMainThreadQueries()
-          .build()
+            .allowMainThreadQueries()
+            .build()
 
         appBadHealthStateHandler = AppBadHealthStateHandler(db, deviceShieldPixels, coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenOnAppHealthUpdateThenAlwaysReturnFalse() = runTest {
-      assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
+        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
 
-      verifyNoInteractions(deviceShieldPixels)
+        verifyNoInteractions(deviceShieldPixels)
     }
 
     @Test
@@ -74,8 +74,10 @@ class AppBadHealthStateHandlerTest {
 
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
-            "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\":[{\"metrics\":{\"metric\":{\"isBadState\":true,\"value\":\"value\"}},\"name\":\"rawMetric\",\"redacted\":false}]}}",
-            state?.healthDataJsonString)
+            "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\"" +
+                ":[{\"metrics\":{\"metric\":{\"isBadState\":true,\"value\":\"value\"}},\"name\":\"rawMetric\",\"redacted\":false}]}}",
+            state?.healthDataJsonString
+        )
 
         verify(deviceShieldPixels).sendHealthMonitorReport(any())
     }
@@ -89,7 +91,8 @@ class AppBadHealthStateHandlerTest {
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
             "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\":[]}}",
-            state?.healthDataJsonString)
+            state?.healthDataJsonString
+        )
 
         verify(deviceShieldPixels).sendHealthMonitorReport(any())
     }
@@ -112,25 +115,33 @@ class AppBadHealthStateHandlerTest {
         private val EMPTY_HEALTH_DATA = AppHealthData(listOf(), SystemHealthData(false, listOf()))
 
         private val BAD_HEALTH_DATA =
-        AppHealthData(
-            listOf("alert"),
-            SystemHealthData(
-                true,
-                listOf(
-                    RawMetricsSubmission(
-                        "rawMetric",
-                        metrics = mapOf("metric" to Metric("value", isBadState = true)),
-                        redacted = false))))
+            AppHealthData(
+                listOf("alert"),
+                SystemHealthData(
+                    true,
+                    listOf(
+                        RawMetricsSubmission(
+                            "rawMetric",
+                            metrics = mapOf("metric" to Metric("value", isBadState = true)),
+                            redacted = false
+                        )
+                    )
+                )
+            )
 
         private val REDACTED_BAD_HEALTH_DATA =
-        AppHealthData(
-            listOf("alert"),
-            SystemHealthData(
-                true,
-                listOf(
-                    RawMetricsSubmission(
-                        "rawMetric",
-                        metrics = mapOf("metric" to Metric("value", isBadState = true)),
-                        redacted = true))))
+            AppHealthData(
+                listOf("alert"),
+                SystemHealthData(
+                    true,
+                    listOf(
+                        RawMetricsSubmission(
+                            "rawMetric",
+                            metrics = mapOf("metric" to Metric("value", isBadState = true)),
+                            redacted = true
+                        )
+                    )
+                )
+            )
     }
 }

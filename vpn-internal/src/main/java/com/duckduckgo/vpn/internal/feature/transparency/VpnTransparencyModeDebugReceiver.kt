@@ -61,6 +61,7 @@ class TransparencyModeDebugReceiver(
         fun isTurnOnIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "on"
         }
+
         fun isTurnOffIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "off"
         }
@@ -98,7 +99,10 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
         trackerDetectorInterceptor.setEnable(false)
         stateRefresherJob.cancel()

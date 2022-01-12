@@ -109,7 +109,10 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         pixel.fire(AppPixelName.FAVORITE_WIDGET_CONFIGURATION_SHOWN)
     }
 
-    private fun storeAndSubmitConfiguration(widgetId: Int, selectedTheme: WidgetTheme) {
+    private fun storeAndSubmitConfiguration(
+        widgetId: Int,
+        selectedTheme: WidgetTheme
+    ) {
         widgetPrefs.saveWidgetSelectedTheme(widgetId, selectedTheme.toString())
         pixelSelectedTheme(selectedTheme)
         val widgetUpdateIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)

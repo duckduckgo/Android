@@ -31,7 +31,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface HealthNotificationManager {
-    fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthData)
+    fun showBadHealthNotification(
+        reasonsForAlert: List<String>,
+        systemHealth: SystemHealthData
+    )
 
     fun hideBadHealthNotification()
 }
@@ -39,7 +42,10 @@ interface HealthNotificationManager {
 @ContributesBinding(AppScope::class)
 class RealHealthNotificationManager @Inject constructor(private val context: Context) : HealthNotificationManager {
 
-    override fun showBadHealthNotification(reasonsForAlert: List<String>, systemHealth: SystemHealthData) {
+    override fun showBadHealthNotification(
+        reasonsForAlert: List<String>,
+        systemHealth: SystemHealthData
+    ) {
 
         val target = Intent().also {
             it.setClassName(context.packageName, "dummy.ui.VpnDiagnosticsActivity")

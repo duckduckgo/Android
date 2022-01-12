@@ -19,8 +19,6 @@ package com.duckduckgo.mobile.android.vpn.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 
 @Entity(tableName = "app_health_state")
 data class AppHealthState(

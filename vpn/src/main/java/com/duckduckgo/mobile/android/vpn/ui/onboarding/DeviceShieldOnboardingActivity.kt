@@ -144,7 +144,11 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         viewModel.onStart()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             when (resultCode) {
                 RESULT_OK -> {

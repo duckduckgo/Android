@@ -258,7 +258,9 @@ class EmailProtectionSignInViewModelTest {
     class TestEmailService : EmailService {
         override suspend fun newAlias(authorization: String): EmailAlias = EmailAlias("test")
 
-        override suspend fun joinWaitlist(): WaitlistResponse { throw Exception() }
+        override suspend fun joinWaitlist(): WaitlistResponse {
+            throw Exception()
+        }
 
         override suspend fun waitlistStatus(): WaitlistStatusResponse = WaitlistStatusResponse(1234)
 

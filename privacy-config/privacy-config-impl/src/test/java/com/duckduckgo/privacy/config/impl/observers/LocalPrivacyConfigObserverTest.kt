@@ -51,7 +51,8 @@ class LocalPrivacyConfigObserverTest {
                 mockContext,
                 mockPrivacyConfigPersister,
                 TestScope(),
-                coroutineRule.testDispatcherProvider)
+                coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test

@@ -90,7 +90,11 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         const val KEY_BOOKMARK_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
         const val KEY_CURRENT_FOLDER = "KEY_CURRENT_FOLDER"
 
-        fun intent(context: Context, parentFolderId: Long, currentFolder: BookmarkFolder? = null): Intent {
+        fun intent(
+            context: Context,
+            parentFolderId: Long,
+            currentFolder: BookmarkFolder? = null
+        ): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()
             bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)

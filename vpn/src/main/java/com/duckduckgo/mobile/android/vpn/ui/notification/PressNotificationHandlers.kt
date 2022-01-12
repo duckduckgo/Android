@@ -29,7 +29,10 @@ private const val INVALID_NOTIFICATION_VARIANT = -1
 class ReminderNotificationPressedHandler @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
-    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+    override fun onReceiveResult(
+        resultCode: Int,
+        resultData: Bundle?
+    ) {
         Timber.v("Reminder notification pressed")
         deviceShieldPixels.didPressReminderNotification()
     }
@@ -38,7 +41,10 @@ class ReminderNotificationPressedHandler @Inject constructor(
 class OngoingNotificationPressedHandler @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
 ) : ResultReceiver(Handler(Looper.getMainLooper())) {
-    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+    override fun onReceiveResult(
+        resultCode: Int,
+        resultData: Bundle?
+    ) {
         Timber.v("Ongoing notification pressed")
         deviceShieldPixels.didPressOngoingNotification()
     }
@@ -50,7 +56,10 @@ class WeeklyNotificationPressedHandler @Inject constructor(
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
 
-    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+    override fun onReceiveResult(
+        resultCode: Int,
+        resultData: Bundle?
+    ) {
         Timber.v("Weekly notification pressed")
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
             Timber.e("Weekly notification pressed reported with uninitialized notification variant")
@@ -66,7 +75,10 @@ class DailyNotificationPressedHandler @Inject constructor(
 
     var notificationVariant: Int = INVALID_NOTIFICATION_VARIANT
 
-    override fun onReceiveResult(resultCode: Int, resultData: Bundle?) {
+    override fun onReceiveResult(
+        resultCode: Int,
+        resultData: Bundle?
+    ) {
         Timber.v("Daily notification pressed")
         if (notificationVariant == INVALID_NOTIFICATION_VARIANT) {
             Timber.e("Daily notification pressed reported with uninitialized notification variant")

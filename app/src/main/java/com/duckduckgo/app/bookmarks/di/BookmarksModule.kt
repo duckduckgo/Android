@@ -89,13 +89,20 @@ class BookmarksModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun favoriteRepository(favoritesDao: FavoritesDao, faviconManager: Lazy<FaviconManager>): FavoritesRepository {
+    fun favoriteRepository(
+        favoritesDao: FavoritesDao,
+        faviconManager: Lazy<FaviconManager>
+    ): FavoritesRepository {
         return FavoritesDataRepository(favoritesDao, faviconManager)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun bookmarkFoldersRepository(bookmarkFoldersDao: BookmarkFoldersDao, bookmarksDao: BookmarksDao, appDatabase: AppDatabase): BookmarksRepository {
+    fun bookmarkFoldersRepository(
+        bookmarkFoldersDao: BookmarkFoldersDao,
+        bookmarksDao: BookmarksDao,
+        appDatabase: AppDatabase
+    ): BookmarksRepository {
         return BookmarksDataRepository(bookmarkFoldersDao, bookmarksDao, appDatabase)
     }
 }

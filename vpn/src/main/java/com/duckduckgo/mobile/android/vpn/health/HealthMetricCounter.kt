@@ -31,7 +31,6 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -102,7 +101,10 @@ class HealthMetricCounter @Inject constructor(
         }
     }
 
-    fun getStat(type: SimpleEvent, recentTimeThresholdMillis: Long): Long {
+    fun getStat(
+        type: SimpleEvent,
+        recentTimeThresholdMillis: Long
+    ): Long {
         return healthStatsDao.eventCount(type.type, recentTimeThresholdMillis)
     }
 

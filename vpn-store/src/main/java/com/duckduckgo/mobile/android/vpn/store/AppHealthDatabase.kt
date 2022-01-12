@@ -53,7 +53,6 @@ object AppHealthDatabaseConverters {
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
 
-
     @TypeConverter
     @JvmStatic
     fun toStringList(value: String): List<String> {

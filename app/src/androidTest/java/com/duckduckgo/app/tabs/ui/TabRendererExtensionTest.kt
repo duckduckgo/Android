@@ -64,6 +64,5 @@ class TabRendererExtensionTest {
         private const val TITLE = "Title"
         private const val URL = "https://example.com"
         private const val INVALID_URL = "notaurl"
-
     }
 }

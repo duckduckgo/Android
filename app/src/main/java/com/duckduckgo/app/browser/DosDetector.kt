@@ -44,7 +44,10 @@ class DosDetector @Inject constructor() {
         return dosCount > MAX_REQUESTS_COUNT
     }
 
-    private fun reset(url: Uri?, currentLoadTime: Long) {
+    private fun reset(
+        url: Uri?,
+        currentLoadTime: Long
+    ) {
         dosCount = 0
         lastUrl = url
         lastUrlLoadTime = currentLoadTime

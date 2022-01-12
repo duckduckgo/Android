@@ -29,5 +29,4 @@ abstract class ApplicationModule {
     @SingleInstanceIn(AppScope::class)
     @Binds
     abstract fun bindContext(application: Application): Context
-
 }

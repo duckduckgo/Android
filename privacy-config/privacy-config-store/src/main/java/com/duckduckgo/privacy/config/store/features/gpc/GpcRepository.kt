@@ -29,7 +29,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface GpcRepository {
-    fun updateAll(exceptions: List<GpcExceptionEntity>, headerEnabledSites: List<GpcHeaderEnabledSiteEntity>)
+    fun updateAll(
+        exceptions: List<GpcExceptionEntity>,
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+    )
+
     fun enableGpc()
     fun disableGpc()
     fun isGpcEnabled(): Boolean
@@ -53,7 +57,10 @@ class RealGpcRepository(
         coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
-    override fun updateAll(exceptions: List<GpcExceptionEntity>, headerEnabledSites: List<GpcHeaderEnabledSiteEntity>) {
+    override fun updateAll(
+        exceptions: List<GpcExceptionEntity>,
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+    ) {
         gpcExceptionsDao.updateAll(exceptions)
         gpcHeadersDao.updateAll(headerEnabledSites)
         loadToMemory()

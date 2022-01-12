@@ -201,12 +201,14 @@ class AppTPWaitlistViewModelTest {
 
     class FailWaitlistService : AppTrackingProtectionWaitlistService {
 
-        override suspend fun joinWaitlist(): WaitlistResponse { throw java.lang.Exception() }
+        override suspend fun joinWaitlist(): WaitlistResponse {
+            throw java.lang.Exception()
+        }
+
         override suspend fun waitlistStatus(): WaitlistStatusResponse = WaitlistStatusResponse(1234)
         override suspend fun getCode(token: String): AppTPInviteCodeResponse = AppTPInviteCodeResponse("token")
         override suspend fun redeemCode(code: String): AppTPRedeemCodeResponse {
             TODO("Not yet implemented")
         }
     }
-
 }

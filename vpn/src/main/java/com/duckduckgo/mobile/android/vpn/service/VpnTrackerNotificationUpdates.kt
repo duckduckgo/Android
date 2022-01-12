@@ -59,7 +59,10 @@ class VpnTrackerNotificationUpdates @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         notificationTickerJob.cancel()
         newTrackerObserverJob.cancel()
     }

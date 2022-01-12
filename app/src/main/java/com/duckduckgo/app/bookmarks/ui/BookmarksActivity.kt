@@ -95,7 +95,11 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private fun getParentFolderId() = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID)
         ?: ROOT_FOLDER_ID
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
@@ -290,7 +294,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
         }.show()
     }
 
-    private fun confirmDeleteBookmarkFolder(bookmarkFolder: BookmarkFolder, folderBranch: BookmarkFolderBranch) {
+    private fun confirmDeleteBookmarkFolder(
+        bookmarkFolder: BookmarkFolder,
+        folderBranch: BookmarkFolderBranch
+    ) {
         val message = getString(R.string.bookmarkDeleteConfirmationMessage, bookmarkFolder.name).html(this)
         Snackbar.make(
             binding.root,
@@ -325,7 +332,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context, bookmarkFolder: BookmarkFolder? = null): Intent {
+        fun intent(
+            context: Context,
+            bookmarkFolder: BookmarkFolder? = null
+        ): Intent {
             val intent = Intent(context, BookmarksActivity::class.java)
             bookmarkFolder?.let {
                 val bundle = Bundle()

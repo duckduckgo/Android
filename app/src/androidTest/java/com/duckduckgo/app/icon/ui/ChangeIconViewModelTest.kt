@@ -96,5 +96,4 @@ class ChangeIconViewModelTest {
         verify(mockSettingsDataStore).appIcon = selectedIcon
         verify(mockCommandObserver).onChanged(Mockito.any(ChangeIconViewModel.Command.IconChanged::class.java))
     }
-
 }

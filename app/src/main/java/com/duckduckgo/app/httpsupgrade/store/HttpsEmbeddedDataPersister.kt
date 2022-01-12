@@ -23,7 +23,6 @@ interface HttpsEmbeddedDataPersister {
     fun shouldPersistEmbeddedData(): Boolean
 
     fun persistEmbeddedData()
-
 }
 
 class EmptyHttpsEmbeddedDataPersister : HttpsEmbeddedDataPersister {

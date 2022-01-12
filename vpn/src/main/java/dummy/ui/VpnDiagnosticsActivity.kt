@@ -301,7 +301,10 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         return sb.toString()
     }
 
-    private fun calculatePercentage(numerator: Long, denominator: Long): String {
+    private fun calculatePercentage(
+        numerator: Long,
+        denominator: Long
+    ): String {
         if (denominator == 0L) return "0%"
         return String.format(
             "%s%%",
@@ -461,8 +464,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 .getNetworkCapabilities(this)
                 ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
                 connectivityManager
-                    .getNetworkCapabilities(this)
-                    ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
+                .getNetworkCapabilities(this)
+                ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
         } else {
             isConnectedLegacy(this)
         }
@@ -645,7 +648,10 @@ data class NetworkInfo(
     val connectedToInternet: Boolean
 )
 
-data class Network(val address: String, val type: NetworkType)
+data class Network(
+    val address: String,
+    val type: NetworkType
+)
 
 val networkTypeV4 = NetworkType("IPv4")
 val networkTypeV6 = NetworkType("IPv6")

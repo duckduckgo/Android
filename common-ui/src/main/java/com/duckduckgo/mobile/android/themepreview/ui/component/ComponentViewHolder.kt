@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component.*
 import com.google.android.material.snackbar.Snackbar
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -69,20 +68,28 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     }
 
     companion object {
-        fun create(parent: ViewGroup, viewType: Int): ComponentViewHolder {
+        fun create(
+            parent: ViewGroup,
+            viewType: Int
+        ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
-                BUTTON -> ButtonComponentViewHolder(parent)
-                TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
-                SWITCH -> SwitchComponentViewHolder(parent)
-                RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
-                CHECKBOX -> CheckboxComponentViewHolder(parent)
-                SNACKBAR -> SnackbarComponentViewHolder(parent)
-                INFO_PANEL -> InfoPanelComponentViewHolder(parent)
-                else -> TODO()
+                Component.BUTTON -> ButtonComponentViewHolder(parent)
+                Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
+                Component.SWITCH -> SwitchComponentViewHolder(parent)
+                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
+                Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
+                Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
+                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                else -> {
+                    TODO()
+                }
             }
         }
 
-        private fun inflate(parent: ViewGroup, layout: Int): View {
+        private fun inflate(
+            parent: ViewGroup,
+            layout: Int
+        ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }
     }

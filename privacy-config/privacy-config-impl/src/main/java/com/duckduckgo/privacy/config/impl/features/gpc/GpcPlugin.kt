@@ -35,7 +35,10 @@ class GpcPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: String): Boolean {
+    override fun store(
+        name: String,
+        jsonString: String
+    ): Boolean {
         if (name == featureName.value) {
             val gpcExceptions = mutableListOf<GpcExceptionEntity>()
             val gpcHeaders = mutableListOf<GpcHeaderEnabledSiteEntity>()

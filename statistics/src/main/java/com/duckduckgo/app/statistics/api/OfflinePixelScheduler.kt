@@ -37,7 +37,10 @@ class OfflinePixelScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleEventObserver {
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event
+    ) {
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleOfflinePixels()
         }
@@ -60,8 +63,10 @@ class OfflinePixelScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(WORK_REQUEST_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
-
-    open class OfflinePixelWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    open class OfflinePixelWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
 
         lateinit var offlinePixelSender: OfflinePixelSender
         override suspend fun doWork(): Result {

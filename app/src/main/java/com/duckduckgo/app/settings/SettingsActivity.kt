@@ -148,10 +148,15 @@ class SettingsActivity :
             provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
             about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
             privacyPolicy.setOnClickListener {
-                startActivity(WebViewActivity.intent(this@SettingsActivity, PRIVACY_POLICY_WEB_LINK, getString(R.string.settingsPrivacyPolicyDuckduckgo)))
+                startActivity(
+                    WebViewActivity.intent(
+                        this@SettingsActivity,
+                        PRIVACY_POLICY_WEB_LINK,
+                        getString(R.string.settingsPrivacyPolicyDuckduckgo)
+                    )
+                )
             }
         }
-
     }
 
     private fun configureInternalFeatures() {
@@ -291,7 +296,10 @@ class SettingsActivity :
         }
     }
 
-    private fun updateDeviceShieldSettings(appTPEnabled: Boolean, waitlistState: WaitlistState) {
+    private fun updateDeviceShieldSettings(
+        appTPEnabled: Boolean,
+        waitlistState: WaitlistState
+    ) {
         with(viewsPrivacy) {
             if (waitlistState != WaitlistState.InBeta) {
                 deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
@@ -408,7 +416,11 @@ class SettingsActivity :
     }
 
     @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)

@@ -72,7 +72,6 @@ class UdpPacketProcessor @AssistedInject constructor(
         if (pollJobNetworkToDevice == null) {
             pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
         }
-
     }
 
     fun stop() {
@@ -155,7 +154,10 @@ class UdpPacketProcessor @AssistedInject constructor(
         try {
             val payloadBuffer = packet.backingBuffer ?: return
 
-            Timber.d("App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
+            Timber.d(
+                "App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} " +
+                    "bytes to ${connectionInfo.destinationAddress}"
+            )
 
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
@@ -234,10 +236,12 @@ class UdpPacketProcessor @AssistedInject constructor(
         return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
 
-    data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
+    data class ChannelDetails(
+        val datagramChannel: DatagramChannel,
+        val originatingApp: OriginatingApp
+    )
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE
     }
-
 }

@@ -59,7 +59,12 @@ class GpcJavascriptReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText(GpcJavascriptReferenceTest::class.java.classLoader!!, "reference_tests/gpc/tests.json"))
+            val referenceTest = adapter.fromJson(
+                FileUtilities.loadText(
+                    GpcJavascriptReferenceTest::class.java.classLoader!!,
+                    "reference_tests/gpc/tests.json"
+                )
+            )
             return referenceTest?.gpcJavaScriptAPI?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
     }
@@ -83,7 +88,12 @@ class GpcJavascriptReferenceTest(private val testCase: TestCase) {
     private fun mockGpcPrivacyConfig() {
         val gpcExceptions = mutableListOf<GpcException>()
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
-        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/gpc/config_reference.json"))
+        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(
+            FileUtilities.loadText(
+                javaClass.classLoader!!,
+                "reference_tests/gpc/config_reference.json"
+            )
+        )
         val gpcAdapter: JsonAdapter<GpcFeature> = moshi.adapter(GpcFeature::class.java)
         val gpcFeature: GpcFeature? = gpcAdapter.fromJson(config?.features?.get("gpc").toString())
 

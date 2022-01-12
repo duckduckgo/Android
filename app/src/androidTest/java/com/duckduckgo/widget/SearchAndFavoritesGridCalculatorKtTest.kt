@@ -42,7 +42,10 @@ class SearchAndFavoritesGridCalculatorKtTest {
         }
 
         companion object {
-            data class TestCase(val expectedColumns: Int, val width: Int)
+            data class TestCase(
+                val expectedColumns: Int,
+                val width: Int
+            )
 
             @JvmStatic
             @Parameterized.Parameters(name = "Test case: {index} - {0}")
@@ -77,7 +80,10 @@ class SearchAndFavoritesGridCalculatorKtTest {
         }
 
         companion object {
-            data class TestCase(val expectedRows: Int, val width: Int)
+            data class TestCase(
+                val expectedRows: Int,
+                val width: Int
+            )
 
             @JvmStatic
             @Parameterized.Parameters(name = "Test case: {index} - {0}")

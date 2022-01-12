@@ -98,7 +98,8 @@ constructor(
             packetPersister = packetPersister,
             tcbCloser = tcbCloser,
             vpnCoroutineScope = vpnCoroutineScope,
-            healthMetricCounter = healthMetricCounter)
+            healthMetricCounter = healthMetricCounter
+        )
     private val tcpDeviceToNetwork =
         TcpDeviceToNetwork(
             queues = queues,
@@ -116,7 +117,8 @@ constructor(
             recentAppTrackerCache = recentAppTrackerCache,
             vpnCoroutineScope = vpnCoroutineScope,
             tracerRegister = tracerPacketRegister,
-            healthMetricCounter = healthMetricCounter)
+            healthMetricCounter = healthMetricCounter
+        )
 
     override fun run() {
         Timber.i("Starting %s", this::class.simpleName)
@@ -208,15 +210,16 @@ constructor(
             acknowledgementNumber: Long?
         ): String {
             with(packet.tcpHeader) {
-                return "\tflags:[ ${isSYN.printFlag("SYN")}${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
-                isRST.printFlag(
-                    "RST"
-                )
-                }${
-                isURG.printFlag(
-                    "URG"
-                )
-                }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
+                return "\tflags:[ ${isSYN.printFlag("SYN")}" +
+                    "${isACK.printFlag("ACK")}${isFIN.printFlag("FIN")}${isPSH.printFlag("PSH")}${
+                    isRST.printFlag(
+                        "RST"
+                    )
+                    }${
+                    isURG.printFlag(
+                        "URG"
+                    )
+                    }]. [sequenceNumber=$sequenceNumber, ackNumber=$acknowledgementNumber]"
             }
         }
 
@@ -253,7 +256,8 @@ constructor(
                 }
 
                 this.referencePacket.updateTcpBuffer(
-                    buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0)
+                    buffer, (FIN or ACK).toByte(), responseSeq, responseAck, 0
+                )
 
                 if (triggeredByServerEndOfStream) {
                     finSequenceNumberToClient = sequenceNumberToClient
@@ -269,7 +273,8 @@ constructor(
                     responseAck,
                     sequenceNumberToClient,
                     acknowledgementNumberToClient,
-                    payloadSize)
+                    payloadSize
+                )
             }
 
             queues.networkToDevice.offerFirst(buffer)
@@ -282,7 +287,10 @@ constructor(
             }
         }
 
-        fun TCB.sendAck(queues: VpnQueues, packet: Packet) {
+        fun TCB.sendAck(
+            queues: VpnQueues,
+            packet: Packet
+        ) {
             synchronized(this) {
                 val payloadSize = packet.tcpPayloadSize(true)
 
@@ -296,7 +304,8 @@ constructor(
                     Timber.v(
                         "%s - Sending ACK from network to device. Flags contain RST, SYN or FIN so incremented acknowledge number to %d",
                         ipAndPort,
-                        acknowledgementNumberToClient)
+                        acknowledgementNumberToClient
+                    )
                 }
 
                 Timber.i(
@@ -304,7 +313,8 @@ constructor(
                     ipAndPort,
                     payloadSize,
                     acknowledgementNumberToClient,
-                    sequenceNumberToClient)
+                    sequenceNumberToClient
+                )
 
                 val buffer = ByteBufferPool.acquire()
                 packet.updateTcpBuffer(
@@ -312,7 +322,8 @@ constructor(
                     (ACK).toByte(),
                     sequenceNumberToClient,
                     acknowledgementNumberToClient,
-                    0)
+                    0
+                )
                 // sequenceNumberToClient = increaseOrWraparound(sequenceNumberToClient, 1)
                 queues.networkToDevice.offer(buffer)
             }
@@ -335,7 +346,10 @@ constructor(
             updateState(tcbState.copy(clientState = newState.state))
         }
 
-        fun increaseOrWraparound(current: Long, increment: Long): Long {
+        fun increaseOrWraparound(
+            current: Long,
+            increment: Long
+        ): Long {
             return (current + increment) % MAX_SEQUENCE_NUMBER
         }
 

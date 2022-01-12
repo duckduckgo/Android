@@ -135,7 +135,10 @@ class QueryUrlConverterTest {
         assertFalse(result.contains("iar=$vertical"))
     }
 
-    private fun assertDuckDuckGoSearchQuery(query: String, url: String) {
+    private fun assertDuckDuckGoSearchQuery(
+        query: String,
+        url: String
+    ) {
         val uri = Uri.parse(url)
         assertEquals("duckduckgo.com", uri.host)
         assertEquals("https", uri.scheme)

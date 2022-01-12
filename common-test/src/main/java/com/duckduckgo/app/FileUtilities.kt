@@ -22,21 +22,36 @@ import java.io.InputStream
 
 object FileUtilities {
 
-    fun loadText(classLoader: ClassLoader, resourceName: String): String = readResource(classLoader, resourceName).use { it.readText() }
+    fun loadText(
+        classLoader: ClassLoader,
+        resourceName: String
+    ): String = readResource(classLoader, resourceName).use { it.readText() }
 
-    fun readBytes(classLoader: ClassLoader, resourceName: String): ByteArray {
-        return loadResource(classLoader, resourceName).use { it.readBytes() }
-    }
-
-    private fun readResource(classLoader: ClassLoader, resourceName: String): BufferedReader {
+    private fun readResource(
+        classLoader: ClassLoader,
+        resourceName: String
+    ): BufferedReader {
         return classLoader.getResource(resourceName).openStream().bufferedReader()
     }
 
-    fun loadResource(classLoader: ClassLoader, resourceName: String): InputStream {
+    fun readBytes(
+        classLoader: ClassLoader,
+        resourceName: String
+    ): ByteArray {
+        return loadResource(classLoader, resourceName).use { it.readBytes() }
+    }
+
+    fun loadResource(
+        classLoader: ClassLoader,
+        resourceName: String
+    ): InputStream {
         return classLoader.getResource(resourceName).openStream()
     }
 
-    fun getJsonObjectFromFile(classLoader: ClassLoader, filename: String): JSONObject {
+    fun getJsonObjectFromFile(
+        classLoader: ClassLoader,
+        filename: String
+    ): JSONObject {
         val json = loadText(classLoader, filename)
         return JSONObject(json)
     }

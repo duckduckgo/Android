@@ -32,8 +32,17 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 interface PixelSender : LifecycleObserver {
-    fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
-    fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable
+    fun sendPixel(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>
+    ): Completable
+
+    fun enqueuePixel(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>
+    ): Completable
 }
 
 class RxPixelSender constructor(
@@ -86,11 +95,26 @@ class RxPixelSender constructor(
             }.onErrorComplete()
     }
 
-    override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
-        return api.fire(pixelName, getDeviceFactor(), getAtbInfo(), addDeviceParametersTo(parameters), encodedParameters, devMode = shouldFirePixelsAsDev)
+    override fun sendPixel(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>
+    ): Completable {
+        return api.fire(
+            pixelName,
+            getDeviceFactor(),
+            getAtbInfo(),
+            addDeviceParametersTo(parameters),
+            encodedParameters,
+            devMode = shouldFirePixelsAsDev
+        )
     }
 
-    override fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+    override fun enqueuePixel(
+        pixelName: String,
+        parameters: Map<String, String>,
+        encodedParameters: Map<String, String>
+    ): Completable {
         return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,

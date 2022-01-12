@@ -235,6 +235,7 @@ class AppEmailManagerTest {
         assertEquals(1234, mockEmailDataStore.waitlistTimestamp)
         assertEquals("abcde", mockEmailDataStore.waitlistToken)
     }
+
     @Test
     fun whenJoinWaitlistIfTimestampAndTokenDidExistThenStoreTimestampAndTokenAreNotStored() {
         mockEmailDataStore.waitlistTimestamp = 1234
@@ -405,6 +406,7 @@ class AppEmailManagerTest {
         override suspend fun waitlistStatus(): WaitlistStatusResponse {
             throw Exception()
         }
+
         override suspend fun getCode(token: String): EmailInviteCodeResponse {
             throw Exception()
         }
@@ -424,5 +426,4 @@ class FakeEmailDataStore : EmailDataStore {
 
     var canUseEncryption: Boolean = false
     override fun canUseEncryption(): Boolean = canUseEncryption
-
 }

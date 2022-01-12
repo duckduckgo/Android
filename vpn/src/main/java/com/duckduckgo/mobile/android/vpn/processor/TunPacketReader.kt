@@ -61,7 +61,6 @@ class TunPacketReader @AssistedInject constructor(
                     Timber.w(e, "Failed while reading from the TUN")
                 }
             }
-
         } catch (e: InterruptedException) {
             Timber.w(e, "Thread interrupted")
             running = false

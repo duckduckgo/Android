@@ -65,5 +65,4 @@ class LocalPrivacyConfigObserver @Inject constructor(
         val adapter = moshi.adapter(JsonPrivacyConfig::class.java)
         return adapter.fromJson(json)
     }
-
 }
