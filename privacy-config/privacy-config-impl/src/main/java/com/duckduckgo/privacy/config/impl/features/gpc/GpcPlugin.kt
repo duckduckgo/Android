@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
+import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
@@ -40,6 +41,7 @@ class GpcPlugin @Inject constructor(
     ): Boolean {
         if (name == featureName.value) {
             val gpcExceptions = mutableListOf<GpcExceptionEntity>()
+            val gpcHeaders = mutableListOf<GpcHeaderEnabledSiteEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<GpcFeature> =
                 moshi.adapter(GpcFeature::class.java)
@@ -48,7 +50,10 @@ class GpcPlugin @Inject constructor(
             gpcFeature?.exceptions?.map {
                 gpcExceptions.add(GpcExceptionEntity(it.domain))
             }
-            gpcRepository.updateAll(gpcExceptions)
+            gpcFeature?.settings?.gpcHeaderEnabledSites?.map {
+                gpcHeaders.add(GpcHeaderEnabledSiteEntity(it))
+            }
+            gpcRepository.updateAll(gpcExceptions, gpcHeaders)
             val isEnabled = gpcFeature?.state == "enabled"
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true

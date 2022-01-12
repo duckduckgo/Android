@@ -18,6 +18,7 @@ package com.duckduckgo.privacy.config.store.features.gpc
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
+import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toGpcException
 import org.mockito.kotlin.mock
@@ -40,12 +41,14 @@ class RealGpcRepositoryTest {
     lateinit var testee: RealGpcRepository
 
     private val mockDatabase: PrivacyConfigDatabase = mock()
-    private val mockGpcDao: GpcDao = mock()
+    private val mockGpcExceptionsDao: GpcExceptionsDao = mock()
+    private val mockGpcHeadersDao: GpcHeadersDao = mock()
     private val mockGpcDataStore: GpcDataStore = mock()
 
     @Before
     fun before() {
-        whenever(mockDatabase.gpcDao()).thenReturn(mockGpcDao)
+        whenever(mockDatabase.gpcHeadersDao()).thenReturn(mockGpcHeadersDao)
+        whenever(mockDatabase.gpcExceptionsDao()).thenReturn(mockGpcExceptionsDao)
         testee =
             RealGpcRepository(
                 mockGpcDataStore,
@@ -81,9 +84,10 @@ class RealGpcRepositoryTest {
                     coroutineRule.testDispatcherProvider
                 )
 
-            testee.updateAll(listOf())
+            testee.updateAll(listOf(), listOf())
 
-            verify(mockGpcDao).updateAll(anyList())
+            verify(mockGpcExceptionsDao).updateAll(anyList())
+            verify(mockGpcHeadersDao).updateAll(anyList())
         }
 
     @Test
@@ -98,11 +102,30 @@ class RealGpcRepositoryTest {
                     coroutineRule.testDispatcherProvider
                 )
             assertEquals(1, testee.exceptions.size)
-            reset(mockGpcDao)
+            reset(mockGpcExceptionsDao)
 
-            testee.updateAll(listOf())
+            testee.updateAll(listOf(), listOf())
 
             assertEquals(0, testee.exceptions.size)
+        }
+
+    @Test
+    fun whenUpdateAllThenPreviousHeadersAreCleared() =
+        runTest {
+            givenGpcDaoContainsHeaders()
+            testee =
+                RealGpcRepository(
+                    mockGpcDataStore,
+                    mockDatabase,
+                    TestScope(),
+                    coroutineRule.testDispatcherProvider
+                )
+            assertEquals(1, testee.headerEnabledSites.size)
+            reset(mockGpcHeadersDao)
+
+            testee.updateAll(listOf(), listOf())
+
+            assertEquals(0, testee.headerEnabledSites.size)
         }
 
     @Test
@@ -129,10 +152,15 @@ class RealGpcRepositoryTest {
     }
 
     private fun givenGpcDaoContainsExceptions() {
-        whenever(mockGpcDao.getAll()).thenReturn(listOf(gpcException))
+        whenever(mockGpcExceptionsDao.getAll()).thenReturn(listOf(gpcException))
+    }
+
+    private fun givenGpcDaoContainsHeaders() {
+        whenever(mockGpcHeadersDao.getAll()).thenReturn(listOf(gpcHeader))
     }
 
     companion object {
         val gpcException = GpcExceptionEntity("example.com")
+        val gpcHeader = GpcHeaderEnabledSiteEntity("example.com")
     }
 }

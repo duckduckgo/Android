@@ -61,7 +61,7 @@ class RealGpc @Inject constructor(
         existingHeaders: Map<String, String>
     ): Boolean {
         return if (canGpcBeUsedByUrl(url) && !containsGpcHeader(existingHeaders)) {
-            headerConsumers.any { sameOrSubdomain(url, it) }
+            gpcRepository.headerEnabledSites.any { sameOrSubdomain(url, it.domain) }
         } else {
             false
         }
@@ -98,12 +98,5 @@ class RealGpc @Inject constructor(
     companion object {
         const val GPC_HEADER = "sec-gpc"
         const val GPC_HEADER_VALUE = "1"
-
-        private val headerConsumers = listOf(
-            "nytimes.com",
-            "washingtonpost.com",
-            "globalprivacycontrol.org",
-            "global-privacy-control.glitch.me"
-        )
     }
 }
