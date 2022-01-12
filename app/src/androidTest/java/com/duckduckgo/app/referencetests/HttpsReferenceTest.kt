@@ -102,10 +102,11 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var httpsTests: HttpsTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(HttpsReferenceTest::class.java.classLoader!!, "reference_tests/https/tests.json")
+            val jsonObject: JSONObject =
+                FileUtilities.getJsonObjectFromFile(HttpsReferenceTest::class.java.classLoader!!, "reference_tests/https/tests.json")
 
             jsonObject.keys().forEach {
-                if (it == "navigations" ) {
+                if (it == "navigations") {
                     httpsTests = adapter.fromJson(jsonObject.get(it).toString())
                 }
             }
@@ -134,7 +135,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         initialiseBloomFilter()
         initialiseRemoteConfig()
 
-        testee = HttpsUpgraderImpl(bloomFilterFactory , bloomFalsePositiveDao, userAllowlistDao, toggle = mockFeatureToggle, https = https)
+        testee = HttpsUpgraderImpl(bloomFilterFactory, bloomFalsePositiveDao, userAllowlistDao, toggle = mockFeatureToggle, https = https)
         testee.reloadData()
     }
 
@@ -154,7 +155,8 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     private fun initialiseRemoteConfig() {
         val httpsExceptions = mutableListOf<HttpsException>()
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(JsonPrivacyConfig::class.java)
-        val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/config_reference.json"))
+        val config: JsonPrivacyConfig? =
+            jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/config_reference.json"))
         val httpsAdapter: JsonAdapter<HttpsFeature> = moshi.adapter(HttpsFeature::class.java)
         val httpsFeature: HttpsFeature? = httpsAdapter.fromJson(config?.features?.get("https").toString())
 
@@ -214,18 +216,21 @@ class HttpsReferenceTest(private val testCase: TestCase) {
 
         override fun persistEmbeddedData() {
             Timber.d("Updating https data from embedded files")
-            val specJson = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/https_bloomfilter_spec_reference.json")
+            val specJson = FileUtilities.loadText(
+                javaClass.classLoader!!,
+                "reference_tests/https/https_bloomfilter_spec_reference.json"
+            )
             val specAdapter = moshi.adapter(HttpsBloomFilterSpec::class.java)
 
-            val falsePositivesJson = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/https/https_allowlist_reference.json")
+            val falsePositivesJson = FileUtilities.loadText(
+                javaClass.classLoader!!,
+                "reference_tests/https/https_allowlist_reference.json"
+            )
             val falsePositivesType = Types.newParameterizedType(List::class.java, HttpsFalsePositiveDomain::class.java)
             val falsePositivesAdapter: JsonAdapter<List<HttpsFalsePositiveDomain>> = moshi.adapter(falsePositivesType)
 
             val bytes = FileUtilities.readBytes(javaClass.classLoader!!, "reference_tests/https/https_bloomfilter_reference.bin")
             httpsDataPersister.persistBloomFilter(specAdapter.fromJson(specJson)!!, bytes, falsePositivesAdapter.fromJson(falsePositivesJson)!!)
         }
-
     }
-
 }
-
