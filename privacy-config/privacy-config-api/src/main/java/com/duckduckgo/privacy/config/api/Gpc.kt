@@ -63,3 +63,6 @@ interface Gpc {
 
 /** Public data class for GPC Exceptions */
 data class GpcException(val domain: String)
+
+/** Public data class for GPC Header Enable Sites */
+data class GpcHeaderEnabledSite(val domain: String)

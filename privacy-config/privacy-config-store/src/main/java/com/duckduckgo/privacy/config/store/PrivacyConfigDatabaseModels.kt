@@ -22,6 +22,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -66,6 +67,12 @@ data class HttpsExceptionEntity(@PrimaryKey val domain: String, val reason: Stri
 
 fun HttpsExceptionEntity.toHttpsException(): HttpsException {
     return HttpsException(domain = this.domain, reason = this.reason)
+}
+
+@Entity(tableName = "gpc_header_enabled_sites") data class GpcHeaderEnabledSiteEntity(@PrimaryKey val domain: String)
+
+fun GpcHeaderEnabledSiteEntity.toGpcHeaderEnabledSite(): GpcHeaderEnabledSite {
+    return GpcHeaderEnabledSite(domain = this.domain)
 }
 
 @Entity(tableName = "gpc_exceptions") data class GpcExceptionEntity(@PrimaryKey val domain: String)
