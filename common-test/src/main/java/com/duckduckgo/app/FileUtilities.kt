@@ -24,6 +24,10 @@ object FileUtilities {
 
     fun loadText(classLoader: ClassLoader, resourceName: String): String = readResource(classLoader, resourceName).use { it.readText() }
 
+    fun readBytes(classLoader: ClassLoader, resourceName: String): ByteArray {
+        return loadResource(classLoader, resourceName).use { it.readBytes() }
+    }
+
     private fun readResource(classLoader: ClassLoader, resourceName: String): BufferedReader {
         return classLoader.getResource(resourceName).openStream().bufferedReader()
     }
