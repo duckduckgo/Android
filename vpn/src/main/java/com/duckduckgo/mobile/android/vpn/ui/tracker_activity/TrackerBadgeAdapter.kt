@@ -60,6 +60,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
         var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
         var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
+        var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
 
         companion object {
             fun create(parent: ViewGroup): TrackerBadgeViewHolder {
@@ -92,6 +93,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
             iconBadge.show()
             textBadge.hide()
+            largeTextBadge.hide()
         }
 
         private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
@@ -105,9 +107,16 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
-            textBadge.text = "+${trackerInfo.amount}"
             iconBadge.hide()
-            textBadge.show()
+            if (trackerInfo.amount > 9){
+                largeTextBadge.text = "+${trackerInfo.amount}"
+                largeTextBadge.show()
+                textBadge.hide()
+            } else {
+                textBadge.text = "+${trackerInfo.amount}"
+                textBadge.show()
+                largeTextBadge.hide()
+            }
         }
     }
 

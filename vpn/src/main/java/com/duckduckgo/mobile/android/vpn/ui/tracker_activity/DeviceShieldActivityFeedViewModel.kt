@@ -43,7 +43,8 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter
 ) : ViewModel() {
 
-    private val MAX_BADGES_TO_DISPLAY = 2
+    private val MAX_BADGES_TO_DISPLAY = 5
+    private val MAX_ELEMENTS_TO_DISPLAY = 6
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private var tickerJob: Job? = null
@@ -139,7 +140,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private fun mapTrackingCompanies(trackingCompanyInfo: MutableList<TrackingCompanyInfo>): List<TrackerCompanyBadge> {
         val trackingBadges = mutableListOf<TrackerCompanyBadge>()
         val trackingCompanies = trackingCompanyInfo.sortedByDescending { it.companyPrevalence }
-        if (trackingCompanies.size > MAX_BADGES_TO_DISPLAY){
+        if (trackingCompanies.size > MAX_ELEMENTS_TO_DISPLAY){
             val visibleBadges = trackingCompanies.take(MAX_BADGES_TO_DISPLAY)
             visibleBadges.forEach {
                 trackingBadges.add(TrackerCompanyBadge.Company(it.companyName, it.companyDisplayName))

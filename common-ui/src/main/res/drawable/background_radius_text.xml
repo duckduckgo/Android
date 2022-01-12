@@ -16,12 +16,12 @@
   -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-       android:shape="oval">
+       android:shape="rectangle">
 
     <solid android:color="?accentIconColor" />
-    <corners android:radius="8dp" />
+    <corners android:radius="12dp" />
     <padding android:top="1.5dp"
-             android:right="4dp"
+             android:right="6dp"
              android:left="4dp"/>
 
 </shape>

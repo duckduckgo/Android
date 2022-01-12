@@ -19,9 +19,8 @@
        android:shape="oval">
 
     <solid android:color="?accentIconColor" />
-
-    <size
-        android:height="@dimen/keyline_5"
-        android:width="@dimen/keyline_5" />
+    <padding android:top="1.5dp"
+             android:right="4dp"
+             android:left="4dp"/>
 
 </shape>
