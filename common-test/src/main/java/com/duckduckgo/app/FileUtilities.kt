@@ -34,7 +34,10 @@ object FileUtilities {
         return classLoader.getResource(resourceName).openStream().bufferedReader()
     }
 
-    fun readBytes(classLoader: ClassLoader, resourceName: String): ByteArray {
+    fun readBytes(
+        classLoader: ClassLoader,
+        resourceName: String
+    ): ByteArray {
         return loadResource(classLoader, resourceName).use { it.readBytes() }
     }
 
