@@ -34,7 +34,7 @@
         "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
         "expectReportURLParams": [
           {"name": "category", "value": "paywall"},
-          {"name": "siteUrl", "value": "https%3A%2F%2Fsub.example.test%2F"},
+          {"name": "siteUrl", "value": "https%3A%2F%2Fsub.example.test%2Fpath%2Fto%2Fthing.html"},
           {"name": "upgradedHttps", "value": "false"},
           {"name": "tds", "value": "abc123"},
           {"name": "blockedTrackers", "value": ""},
@@ -58,7 +58,7 @@
         "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
         "expectReportURLParams": [
           {"name": "category", "value": "images"},
-          {"name": "siteUrl", "value": "http%3A%2F%2Funsafe.example.test%2F"},
+          {"name": "siteUrl", "value": "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html"},
           {"name": "upgradedHttps", "value": "false"},
           {"name": "tds", "value": "abc123"},
           {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
