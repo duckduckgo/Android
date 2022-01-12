@@ -38,7 +38,6 @@
         android:layout_width="@dimen/keyline_5"
         android:layout_height="@dimen/keyline_5"/>
 
-
     <TextView
         android:id="@+id/tracker_company_large_badge_text"
         android:textSize="13sp"
