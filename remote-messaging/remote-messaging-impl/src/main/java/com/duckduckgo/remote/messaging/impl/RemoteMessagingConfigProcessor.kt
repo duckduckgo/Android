@@ -38,14 +38,14 @@ class RealRemoteMessagingConfigProcessor(
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
-        if (true) {// if (currentVersion != newVersion) {
-            //parse
+        if (true) { // if (currentVersion != newVersion) {
+            // parse
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
-            //TODO: evaluate
+            // TODO: evaluate
             val message = remoteMessagingConfigMatcher.evaluate(config)
-            //update version
+            // update version
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
-            //TODO: add/store/replace message
+            // TODO: add/store/replace message
         } else {
             Timber.i("RMF: skip, same version")
         }

@@ -19,8 +19,6 @@ package com.duckduckgo.remote.messaging.impl.matchers
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import timber.log.Timber
 
 class DeviceAttributeMatcher(
@@ -63,7 +61,7 @@ private fun List<Int>.compareTo(other: List<Int>): Int {
     val otherSize = other.size
 
     for (index in this.indices) {
-        if (index > otherSize-1 ) return 0
+        if (index > otherSize - 1) return 0
         val value = this[index]
         if (value < other[index]) return -1
         if (value > other[index]) return 1

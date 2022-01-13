@@ -50,7 +50,7 @@ class RemoteMessagingConfigMatcherTest {
         }
     }
 
-    //TODO: move this to a rule
+    // TODO: move this to a rule
     @Before
     fun before() {
         Timber.plant(printlnTree)
@@ -174,9 +174,9 @@ class RemoteMessagingConfigMatcherTest {
             RemoteConfig(
                 messages = listOf(
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(4)),
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,3)),
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,3,4)),
-                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,4)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 3)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 3, 4)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2, 4)),
                     aMediumMessage(matchingRules = rules(1), exclusionRules = rules(5))
                 ),
                 rules = rules

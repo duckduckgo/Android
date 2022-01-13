@@ -42,7 +42,7 @@ class RemoteMessagingConfigJsonMapperTest {
     @Test
     fun whenJsonParseThenRemoteConfigReturned() = coroutineRule.runBlocking {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config.json")
-        //val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        // val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
         val result = jsonAdapter.fromJson(jsonString)!!
@@ -116,7 +116,6 @@ class RemoteMessagingConfigJsonMapperTest {
         )
         assertEquals(bigTwoActions, config.messages[4])
 
-
         assertEquals(3, config.rules.size)
 
         assertEquals(21, config.rules[5]?.size)
@@ -169,7 +168,6 @@ class RemoteMessagingConfigJsonMapperTest {
         )
 
         val config = testee.map(result)
-
 
         assertEquals(1, config.messages.size)
         val smallMessage = RemoteMessage(

@@ -21,7 +21,6 @@ import com.duckduckgo.remote.messaging.impl.models.BooleanMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
-import timber.log.Timber
 import java.util.*
 
 class AndroidAppAttributeMatcher(

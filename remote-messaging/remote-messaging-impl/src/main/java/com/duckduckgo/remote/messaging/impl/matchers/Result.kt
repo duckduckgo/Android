@@ -25,7 +25,6 @@ sealed class Result {
 fun String.defaultValue() = this.isEmpty()
 fun Int.defaultValue() = this == -1
 
-
 fun Boolean?.toResult(): Result {
     return when (this) {
         true -> Result.Match

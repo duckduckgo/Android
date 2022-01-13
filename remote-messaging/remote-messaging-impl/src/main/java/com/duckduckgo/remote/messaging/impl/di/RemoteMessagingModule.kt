@@ -66,7 +66,7 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
-        //val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        // val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val moshi = Moshi.Builder().build()
         val retrofit = Retrofit.Builder()
             .baseUrl(AppUrl.Url.API)

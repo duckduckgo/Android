@@ -16,18 +16,14 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
-import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
@@ -125,7 +121,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //Favorites
+    // Favorites
     @Test
     fun whenFavoritesEqualOrLowerThanMaxThenReturnMatch() = runBlocking {
         givenBrowserProperties(favorites = 10L)
@@ -192,7 +188,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //DaysSinceInstalled
+    // DaysSinceInstalled
     @Test
     fun whenDaysSinceInstalledEqualOrLowerThanMaxThenReturnMatch() = runBlocking {
         givenBrowserProperties(daysSinceInstalled = 10L)
@@ -259,7 +255,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //DaysUsedSince
+    // DaysUsedSince
     @Test
     fun whenDaysUsedSinceMatchesThenReturnMatch() = runBlocking {
         givenBrowserProperties(daysUsedSince = 10L)
@@ -282,7 +278,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //DefaultBrowser
+    // DefaultBrowser
     @Test
     fun whenDefaultBrowserMatchesThenReturnMatch() = runBlocking {
         givenBrowserProperties(defaultBrowser = true)
@@ -305,7 +301,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //EmailEnabled
+    // EmailEnabled
     @Test
     fun whenEmailEnabledMatchesThenReturnMatch() = runBlocking {
         givenBrowserProperties(emailEnabled = true)
@@ -328,7 +324,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //SearchCount
+    // SearchCount
     @Test
     fun whenSearchCountEqualOrLowerThanMaxThenReturnMatch() = runBlocking {
         givenBrowserProperties(searchCount = 10L)
@@ -395,7 +391,7 @@ class UserAttributeMatcherTest {
         assertEquals(Result.Fail, result)
     }
 
-    //WidgetAdded
+    // WidgetAdded
     @Test
     fun whenWidgetAddedMatchesThenReturnMatch() = runBlocking {
         givenBrowserProperties(widgetAdded = true)

@@ -258,7 +258,7 @@ class DeviceAttributeMatcherTest {
 
     private fun givenDeviceProperties(
         locale: Locale = Locale.getDefault(),
-        apiLevel: Int =  Build.VERSION.SDK_INT,
+        apiLevel: Int = Build.VERSION.SDK_INT,
         webView: String = ""
     ) {
         whenever(deviceProperties.deviceLocale()).thenReturn(locale)
