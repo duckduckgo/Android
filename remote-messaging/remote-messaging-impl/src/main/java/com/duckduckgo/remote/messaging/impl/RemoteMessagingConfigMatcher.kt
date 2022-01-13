@@ -31,11 +31,12 @@ class RemoteMessagingConfigMatcher(
         val rules = remoteConfig.rules
 
         remoteConfig.messages.forEach { message ->
-            val matchingRules = if (message.matchingRules.isEmpty()) return message else message.matchingRules
+            val matchingRules = if (message.matchingRules.isEmpty() && message.exclusionRules.isEmpty()) return message else message.matchingRules
 
-            val result = matchingRules.evaluateMatchingRules(rules)
+            val matchingResult = matchingRules.evaluateMatchingRules(rules)
+            val excludeResult = message.exclusionRules.evaluateExclusionRules(rules)
 
-            if (result == Result.Match) return message
+            if (matchingResult == Result.Match && excludeResult == Result.Fail) return message
         }
 
         return null
@@ -56,7 +57,28 @@ class RemoteMessagingConfigMatcher(
                 }
             }
 
-            if (result == Result.NextMessage) return result
+            if (result == Result.NextMessage || result == Result.Match) return result
+        }
+
+        return result
+    }
+
+    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute>>): Result {
+        var result: Result = Result.Fail
+
+        for (rule in this) {
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.Fail
+            result = Result.Fail
+
+            for (attr in attributes) {
+                result = evaluateAttribute(attr)
+                if (result == Result.Fail || result == Result.NextMessage) {
+                    Timber.i("RMF: first failed attribute $attr")
+                    break
+                }
+            }
+
+            if (result == Result.NextMessage || result == Result.Match) return result
         }
 
         return result

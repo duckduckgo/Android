@@ -23,7 +23,9 @@ import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.Result
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.*
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.runBlocking
@@ -61,72 +63,55 @@ class RemoteMessagingConfigMatcherTest {
 
     @Test
     fun whenEmptyConfigThenReturnNull() = runBlocking {
-        val message = testee.evaluate(RemoteConfig(emptyList(), emptyMap()))
+        val emptyRemoteConfig = RemoteConfig(messages = emptyList(), rules = emptyMap())
+
+        val message = testee.evaluate(emptyRemoteConfig)
 
         assertNull(message)
     }
 
     @Test
     fun whenNoMatchingRulesThenReturnFirstMessage() = runBlocking {
-        val remoteMessage = aSmallMessage()
+        val noRulesRemoteConfig = RemoteConfig(messages = listOf(aSmallMessage()), rules = emptyMap())
 
-        val message = testee.evaluate(RemoteConfig(listOf(remoteMessage), emptyMap()))
+        val message = testee.evaluate(noRulesRemoteConfig)
 
-        assertEquals(remoteMessage, message)
+        assertEquals(aSmallMessage(), message)
     }
 
     @Test
     fun whenNotExistingRuleThenReturnMessage() = runBlocking {
-        val remoteMessage = aSmallMessage(matchingRules = listOf(1))
+        val noRulesRemoteConfig = RemoteConfig(
+            messages = listOf(aSmallMessage(matchingRules = rules(1))),
+            rules = emptyMap()
+        )
 
-        val message = testee.evaluate(RemoteConfig(listOf(remoteMessage), emptyMap()))
+        val message = testee.evaluate(noRulesRemoteConfig)
 
-        assertEquals(remoteMessage, message)
+        assertEquals(aSmallMessage(matchingRules = rules(1)), message)
     }
 
     @Test
-    fun whenDeviceMatchesMessageRulesThenReturnFirstMatch() = runBlocking {
-        val matchingAttributes = listOf(MatchingAttribute.Api(max = 19))
-        given(matchingAttributes = matchingAttributes)
-        val rules = mapOf(Pair(1, matchingAttributes))
-        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
+    fun whenNoMessagesThenReturnNull() = runBlocking {
+        val rules = mapOf(rule(1, Api(max = 19)))
+        val noMessagesRemoteConfig = RemoteConfig(messages = emptyList(), rules = rules)
 
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(expectedMessage),
-                rules = rules
-            )
-        )
+        val message = testee.evaluate(noMessagesRemoteConfig)
 
-        assertEquals(expectedMessage, message)
-    }
-
-    @Test
-    fun whenDeviceMatchesMessageRulesForMultipleMessagesThenReturnFirstMatch() = runBlocking {
-        val matchingAttributes = listOf(MatchingAttribute.Api(max = 19))
-        given(matchingAttributes = matchingAttributes)
-        val rules = mapOf(Pair(1, matchingAttributes))
-        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
-
-        val message = testee.evaluate(
-            RemoteConfig(
-                messages = listOf(expectedMessage, aSmallMessage(matchingRules = rules.keys.toList())),
-                rules = rules
-            )
-        )
-
-        assertEquals(expectedMessage, message)
+        assertNull(message)
     }
 
     @Test
     fun whenDeviceDoesNotMatchMessageRulesThenReturnNull() = runBlocking {
-        val failingAttributes = listOf(MatchingAttribute.Api(max = 19))
-        given(failingAttributes = failingAttributes)
-        val rules = mapOf(Pair(1, failingAttributes))
+        givenDeviceMatches()
+        val rules = mapOf(rule(1, Api(max = 19)))
 
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(aSmallMessage(matchingRules = rules.keys.toList()), aMediumMessage(matchingRules = rules.keys.toList())),
+                messages = listOf(
+                    aSmallMessage(matchingRules = rules(1)),
+                    aMediumMessage(matchingRules = rules(1))
+                ),
                 rules = rules
             )
         )
@@ -135,33 +120,217 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() = runBlocking {
-        val matchingAttributes = listOf(MatchingAttribute.Locale(value = listOf("en_US")))
-        val failingAttributes = listOf(MatchingAttribute.Api(max = 19))
-        given(matchingAttributes = matchingAttributes, failingAttributes = failingAttributes)
+    fun whenNoMatchingRulesThenReturnFirstNonExcludedMessage() = runBlocking {
+        givenDeviceMatches(Api(max = 19), Locale(value = listOf("en_US")), EmailEnabled(value = true))
         val rules = mapOf(
-            Pair(1, failingAttributes),
-            Pair(2, matchingAttributes)
+            rule(1, Api(max = 19)),
+            rule(2, Locale(value = listOf("en_US"))),
+            rule(3, EmailEnabled(value = false))
         )
-        val expectedMessage = aMediumMessage(matchingRules = rules.keys.toList())
 
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(expectedMessage),
+                messages = listOf(
+                    aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(2)),
+                    aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3))
+                ),
                 rules = rules
             )
         )
 
-        assertEquals(expectedMessage, message)
+        assertEquals(aMediumMessage(matchingRules = emptyList(), exclusionRules = rules(3)), message)
+    }
+
+    @Test
+    fun whenMatchingMessageShouldBeExcludedThenReturnNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19), Locale(value = listOf("en_US")))
+        val rules = mapOf(
+            rule(1, Api(max = 19)),
+            rule(2, Locale(value = listOf("en_US")))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2))),
+                rules = rules
+            )
+        )
+
+        assertNull(message)
+    }
+
+    @Test
+    fun whenMatchingMessageShouldBeExcludedByOneOfMultipleRulesThenReturnNull() = runBlocking {
+        givenDeviceMatches(Api(max = 19), EmailEnabled(value = true), Bookmarks(max = 10))
+        val rules = mapOf(
+            rule(1, Api(max = 19)),
+            rule(2, EmailEnabled(value = true), Bookmarks(max = 10)),
+            rule(3, EmailEnabled(value = true), Bookmarks(max = 10)),
+            rule(4, Api(max = 19)),
+            rule(5, EmailEnabled(value = true))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(4)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,3)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,3,4)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2,4)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(5))
+                ),
+                rules = rules
+            )
+        )
+
+        assertNull(message)
+    }
+
+    @Test
+    fun whenMultipleMatchingMessagesAndSomeExcludedThenReturnFirstNonExcludedMatch() = runBlocking {
+        givenDeviceMatches(Api(max = 19), Locale(value = listOf("en_US")))
+        val rules = mapOf(
+            rule(1, Api(max = 19)),
+            rule(2, Locale(value = listOf("en_US")))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList()),
+                ),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1), exclusionRules = emptyList()), message)
+    }
+
+    @Test
+    fun whenMessageMatchesAndExclusionRuleFailsThenReturnMessage() = runBlocking {
+        givenDeviceMatches(Api(max = 19), EmailEnabled(value = true))
+        val rules = mapOf(
+            rule(1, Api(max = 19)),
+            rule(2, EmailEnabled(value = false))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)),
+                ),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1), exclusionRules = rules(2)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesThenReturnFirstMatch() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val rules = mapOf(rule(1, Api(max = 19)))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(matchingRules = rules(1))),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesForMultipleMessagesThenReturnFirstMatch() = runBlocking {
+        givenDeviceMatches(Api(max = 19))
+        val rules = mapOf(rule(1, Api(max = 19)))
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aMediumMessage(matchingRules = rules(1)),
+                    aSmallMessage(matchingRules = rules(1))
+                ),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesMessageRulesForOneOfMultipleMessagesThenReturnMatch() = runBlocking {
+        givenDeviceMatches(Api(max = 19), EmailEnabled(value = true))
+        val rules = mapOf(
+            rule(1, Api(max = 19)),
+            rule(2, EmailEnabled(value = false))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aSmallMessage(matchingRules = rules(2)),
+                    aMediumMessage(matchingRules = rules(1, 2))
+                ),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1, 2)), message)
+    }
+
+    @Test
+    fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() = runBlocking {
+        givenDeviceMatches(Api(max = 19), Locale(value = listOf("en_US")))
+        val rules = mapOf(
+            rule(1, Locale(value = listOf("en_US"))),
+            rule(2, Api(max = 15))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(aMediumMessage(matchingRules = rules(1, 2))),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(matchingRules = rules(1, 2)), message)
+    }
+
+    @Test
+    fun whenDeviceDoesMatchAnyRuleThenReturnNull() = runBlocking {
+        givenDeviceMatches(Locale(value = listOf("en_US")), Api(max = 19))
+        val rules = mapOf(
+            rule(1, Api(max = 15)),
+            rule(2, Api(max = 15))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aMediumMessage(matchingRules = rules(1, 2)),
+                    aSmallMessage(matchingRules = rules(1, 2))
+                ),
+                rules = rules
+            )
+        )
+
+        assertNull(message)
     }
 
     @Test
     fun whenUnknownRuleFailsThenReturnNull() = runBlocking {
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(aSmallMessage(matchingRules = listOf(1)), aMediumMessage(matchingRules = listOf(1))),
+                messages = listOf(
+                    aSmallMessage(matchingRules = rules(1)),
+                    aMediumMessage(matchingRules = rules(1))
+                ),
                 rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Unknown(fallback = false)))
+                    rule(1, Unknown(fallback = false))
                 )
             )
         )
@@ -171,39 +340,36 @@ class RemoteMessagingConfigMatcherTest {
 
     @Test
     fun whenUnknownRuleMatchesThenReturnFirstMatch() = runBlocking {
-        val expectedMessage = aSmallMessage(matchingRules = listOf(1))
-
         val message = testee.evaluate(
             RemoteConfig(
-                messages = listOf(expectedMessage, aMediumMessage(matchingRules = listOf(1))),
+                messages = listOf(
+                    aSmallMessage(matchingRules = rules(1)),
+                    aMediumMessage(matchingRules = rules(1))
+                ),
                 rules = mapOf(
-                    Pair(1, listOf(MatchingAttribute.Unknown(fallback = true)))
+                    rule(1, Unknown(fallback = true))
                 )
             )
         )
 
-        assertEquals(expectedMessage, message)
+        assertEquals(aSmallMessage(matchingRules = rules(1)), message)
     }
 
-    @Test
-    fun whenThen() = runBlocking {
-        val message = testee.evaluate(RemoteConfig(emptyList(), emptyMap()))
-    }
-
-    private suspend fun given(
-        matchingAttributes: List<MatchingAttribute> = emptyList(),
-        failingAttributes: List<MatchingAttribute> = emptyList()
+    private suspend fun givenDeviceMatches(
+        vararg matchingAttributes: MatchingAttribute
     ) {
+        whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
+        whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
+        whenever(userAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
+
         matchingAttributes.forEach {
             whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
             whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
             whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
         }
-
-        failingAttributes.forEach {
-            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
-            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
-            whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Fail)
-        }
     }
+
+    private fun rule(id: Int, vararg matchingAttributes: MatchingAttribute) = Pair(id, matchingAttributes.asList())
+
+    private fun rules(vararg ids: Int) = ids.asList()
 }
