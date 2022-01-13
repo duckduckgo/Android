@@ -273,6 +273,11 @@ interface DeviceShieldPixels {
      * Will fire when user submits a health monitor report
      */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
+
+    /**
+     * Will send a first-in-day pixel for the given alertName
+     */
+    fun sendHealthMonitorAlert(alertName: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -546,6 +551,12 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
+    }
+
+    override fun sendHealthMonitorAlert(alertName: String) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName)
+        )
     }
 
     private fun suddenKill() {

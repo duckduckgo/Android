@@ -19,6 +19,10 @@ package com.duckduckgo.mobile.android.vpn.health
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -26,8 +30,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,6 +38,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class AppBadHealthStateHandlerTest {
@@ -43,6 +46,9 @@ class AppBadHealthStateHandlerTest {
     @get:Rule @Suppress("unused") val coroutineRule = CoroutineTestRule()
 
     @Mock private lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Mock private lateinit var appBuildConfig: AppBuildConfig
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+
     private lateinit var db: AppHealthDatabase
     private lateinit var appBadHealthStateHandler: AppBadHealthStateHandler
 
@@ -50,13 +56,17 @@ class AppBadHealthStateHandlerTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
 
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
+        AndroidThreeTen.init(context)
 
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppHealthDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
-        appBadHealthStateHandler = AppBadHealthStateHandler(db, deviceShieldPixels, coroutineRule.testDispatcherProvider)
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+
+        appBadHealthStateHandler = AppBadHealthStateHandler(
+            context, appBuildConfig, db, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
+        )
     }
 
     @Test
@@ -70,7 +80,7 @@ class AppBadHealthStateHandlerTest {
     fun whenOnAppHealthUpdateWithBadHealthDataThenStoreInDbAndSendPixel() = runTest {
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
 
-        val state = db.appHealthDao().latestHealthState()
+        val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
 
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
@@ -86,7 +96,7 @@ class AppBadHealthStateHandlerTest {
     fun whenOnAppHealthUpdateWithRedactedBadHealthDataThenSkipRedactedMetricsFromDbAndSendPixel() = runTest {
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(REDACTED_BAD_HEALTH_DATA))
 
-        val state = db.appHealthDao().latestHealthState()
+        val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
 
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
@@ -98,17 +108,13 @@ class AppBadHealthStateHandlerTest {
     }
 
     @Test
-    fun whenGoodHealthUpdateThenClearDatabase() = runTest {
-        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
-
-        assertNotNull(db.appHealthDao().latestHealthState())
-
+    fun whenOnAppHealthUpdateWithGoodHealthDataThenStoreInDb() = runTest {
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
 
-        assertNull(db.appHealthDao().latestHealthState())
+        val state = db.appHealthDao().latestHealthState(GOOD_HEALTH)
 
-        // pixel just sent once
-        verify(deviceShieldPixels).sendHealthMonitorReport(any())
+        assertEquals(GOOD_HEALTH, state?.type)
+        assertEquals(listOf<String>(), state?.alerts)
     }
 
     companion object {

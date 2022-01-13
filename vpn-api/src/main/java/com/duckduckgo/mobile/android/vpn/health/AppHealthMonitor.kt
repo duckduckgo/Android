@@ -19,4 +19,5 @@ package com.duckduckgo.mobile.android.vpn.health
 interface AppHealthMonitor {
     fun startMonitoring()
     fun stopMonitoring()
+    fun isMonitoringStarted(): Boolean
 }

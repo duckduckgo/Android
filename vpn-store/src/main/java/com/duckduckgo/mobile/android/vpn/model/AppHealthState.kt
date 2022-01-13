@@ -18,13 +18,32 @@ package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 
 @Entity(tableName = "app_health_state")
 data class AppHealthState(
     // unique ID so that we only have one entry in the DB
-    @PrimaryKey val id: Long = 1L,
+    @PrimaryKey val type: HealthEventType,
     val localtime: String = DatabaseDateFormatter.timestamp(),
     val alerts: List<String>,
     val healthDataJsonString: String,
-)
+) {
+    object HealthEventTypeConverter {
+        @TypeConverter
+        @JvmStatic
+        fun toType(stage: String): HealthEventType {
+            return HealthEventType.valueOf(stage)
+        }
+
+        @TypeConverter
+        @JvmStatic
+        fun fromType(stage: HealthEventType): String {
+            return stage.name
+        }
+    }
+}
+
+enum class HealthEventType {
+    BAD_HEALTH, GOOD_HEALTH
+}

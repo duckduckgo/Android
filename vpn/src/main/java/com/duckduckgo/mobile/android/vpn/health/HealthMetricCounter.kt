@@ -21,7 +21,11 @@ import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_CONNECT_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
@@ -65,15 +69,21 @@ class HealthMetricCounter @Inject constructor(
         }
     }
 
-    fun onWrittenToDeviceToNetworkQueue() {
+    fun onWrittenToDeviceToNetworkQueue(isUdp: Boolean = false) {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(ADD_TO_DEVICE_TO_NETWORK_QUEUE())
+            healthStatsDao.insertEvent(
+                if (isUdp) ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE() else ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE()
+            )
         }
     }
 
-    fun onReadFromDeviceToNetworkQueue() {
+    fun onReadFromDeviceToNetworkQueue(isUdp: Boolean = false) {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE())
+            healthStatsDao.insertEvent(
+                if (isUdp) REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE() else REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE()
+            )
         }
     }
 

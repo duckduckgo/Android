@@ -28,18 +28,20 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
     fun determineHealthTunInputQueueReadRatio(
         tunInputs: Long,
-        queueReads: Long
+        queueReads: QueueReads
     ): HealthState {
         if (tunInputs < 100) return Initializing
 
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tunInputs-queueReads", rawMetrics)
 
-        val percentage = percentage(queueReads, tunInputs)
+        val percentage = percentage(queueReads.queueReads, tunInputs)
 
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
         rawMetrics["tunInputs"] = Metric(tunInputs.toString())
-        rawMetrics["queueReads"] = Metric(queueReads.toString())
+        rawMetrics["queueReads"] = Metric(queueReads.queueReads.toString())
+        rawMetrics["queueTCPReads"] = Metric(queueReads.queueTCPReads.toString())
+        rawMetrics["queueUDPReads"] = Metric(queueReads.queueUDPReads.toString())
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
@@ -170,3 +172,9 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         }
     }
 }
+
+data class QueueReads(
+    val queueReads: Long,
+    val queueTCPReads: Long,
+    val queueUDPReads: Long,
+)
