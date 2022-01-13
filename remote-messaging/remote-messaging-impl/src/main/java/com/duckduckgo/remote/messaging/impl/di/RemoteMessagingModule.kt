@@ -63,7 +63,7 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient): RemoteMessagingService {
-        //val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
+        // val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val moshi = Moshi.Builder().build()
         val retrofit = Retrofit.Builder()
             .baseUrl(AppUrl.Url.API)
@@ -114,7 +114,7 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository {
+    fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
         return LocalRemoteMessagingConfigRepository(database)
     }
 

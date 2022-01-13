@@ -29,7 +29,7 @@ interface RemoteMessagingConfigProcessor {
 
 class RealRemoteMessagingConfigProcessor(
     private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
-    private val remoteMessagingConfigRepository: com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+    private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository
 ) : RemoteMessagingConfigProcessor {
 
     override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
@@ -37,13 +37,13 @@ class RealRemoteMessagingConfigProcessor(
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
-        if (true) {// if (currentVersion != newVersion) {
-            //parse
+        if (true) { // if (currentVersion != newVersion) {
+            // parse
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
-            //TODO: evaluate
-            //update version
-            remoteMessagingConfigRepository.insert(com.duckduckgo.remote.messaging.store.RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
-            //TODO: add/store/replace message
+            // TODO: evaluate
+            // update version
+            remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
+            // TODO: add/store/replace message
         } else {
             Timber.i("RMF: skip, same version")
         }
