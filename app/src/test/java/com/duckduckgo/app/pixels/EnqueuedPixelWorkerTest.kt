@@ -80,7 +80,7 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndAppLaunchThenSendAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(webViewVersionProvider.get()).thenReturn("91")
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
@@ -95,7 +95,7 @@ class EnqueuedPixelWorkerTest {
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
-        whenever(webViewVersionProvider.get()).thenReturn("91")
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)

@@ -63,7 +63,7 @@ class EnqueuedPixelWorker @Inject constructor(
             Timber.i("Sending app launch pixel")
             pixel.get().fire(
                 pixel = AppPixelName.APP_LAUNCH,
-                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.get())
+                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
             )
         }
     }

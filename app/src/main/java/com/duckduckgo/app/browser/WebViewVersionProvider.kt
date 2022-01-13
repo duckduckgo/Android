@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.browser
 
-import android.content.Context
-import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.WebViewVersionProvider.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -28,35 +26,27 @@ interface WebViewVersionProvider {
         const val WEBVIEW_UNKNOWN_VERSION = "unknown"
     }
 
-    fun get(): String
-}
-
-interface RawWebViewVersionProvider {
-    fun get(): String?
+    fun getFullVersion(): String
+    fun getMajorVersion(): String
 }
 
 @ContributesBinding(AppScope::class)
-class WebViewCompatRawWebViewVersionProvider @Inject constructor(
-    private val context: Context
-) : RawWebViewVersionProvider {
-
-    override fun get(): String? = WebViewCompat.getCurrentWebViewPackage(context)?.versionName
-
-}
-
-@ContributesBinding(AppScope::class)
-class MajorWebViewVersionProvider @Inject constructor(
-    private val rawWebViewVersionProvider: RawWebViewVersionProvider
+class DefaultWebViewVersionProvider @Inject constructor(
+    private val webViewVersionSource: WebViewVersionSource
 ) : WebViewVersionProvider {
     companion object {
         const val WEBVIEW_VERSION_DELIMITER = "."
     }
 
-    override fun get(): String = rawWebViewVersionProvider.get().run {
-        if (this.isNullOrEmpty()) {
-            WEBVIEW_UNKNOWN_VERSION
-        } else this.captureMajorVersion()
-    }
+    override fun getFullVersion(): String = webViewVersionSource.get().mapEmptyToUnknown()
+
+    override fun getMajorVersion(): String =
+        webViewVersionSource.get().captureMajorVersion().mapNonIntegerToUnknown()
 
     private fun String.captureMajorVersion() = this.split(WEBVIEW_VERSION_DELIMITER)[0]
+
+    private fun String.mapNonIntegerToUnknown() =
+        if (isNotBlank() && all(Char::isDigit)) this else WEBVIEW_UNKNOWN_VERSION
+
+    private fun String.mapEmptyToUnknown() = if (isBlank()) WEBVIEW_UNKNOWN_VERSION else this
 }
