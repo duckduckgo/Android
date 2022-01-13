@@ -64,5 +64,4 @@ class HttpsBloomFilterSpecDaoTest {
         assertEquals(60, specification.totalEntries)
         assertEquals("xyz", specification.sha256)
     }
-
 }

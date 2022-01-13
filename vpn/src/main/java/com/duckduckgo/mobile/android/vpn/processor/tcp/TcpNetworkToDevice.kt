@@ -136,7 +136,12 @@ class TcpNetworkToDevice(
         }
     }
 
-    private fun sendToNetworkToDeviceQueue(packet: Packet, receiveBuffer: ByteBuffer, tcb: TCB, readBytes: Int) {
+    private fun sendToNetworkToDeviceQueue(
+        packet: Packet,
+        receiveBuffer: ByteBuffer,
+        tcb: TCB,
+        readBytes: Int
+    ) {
         Timber.v(
             "Network-to-device packet %s. %d bytes. %s",
             tcb.ipAndPort,
@@ -157,7 +162,11 @@ class TcpNetworkToDevice(
         offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
     }
 
-    private fun handleEndOfStream(tcb: TCB, packet: Packet, key: SelectionKey) {
+    private fun handleEndOfStream(
+        tcb: TCB,
+        packet: Packet,
+        key: SelectionKey
+    ) {
         Timber.d(
             "Network-to-device end of stream %s. %s %dms after creation %s",
             tcb.ipAndPort,
@@ -185,7 +194,10 @@ class TcpNetworkToDevice(
         }
     }
 
-    private fun sendReset(packet: Packet, tcb: TCB) {
+    private fun sendReset(
+        packet: Packet,
+        tcb: TCB
+    ) {
         val buffer = ByteBufferPool.acquire()
         packet.updateTcpBuffer(
             buffer,
@@ -241,12 +253,19 @@ class TcpNetworkToDevice(
         }
     }
 
-    private fun offerToNetworkToDeviceQueue(buffer: ByteBuffer, tcb: TCB, packet: Packet) {
+    private fun offerToNetworkToDeviceQueue(
+        buffer: ByteBuffer,
+        tcb: TCB,
+        packet: Packet
+    ) {
         logPacket(tcb, packet)
         queues.networkToDevice.offer(buffer)
     }
 
-    private fun logPacket(tcb: TCB, packet: Packet) {
+    private fun logPacket(
+        tcb: TCB,
+        packet: Packet
+    ) {
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d. Data length: %d",
             tcb.ipAndPort,
@@ -255,7 +274,6 @@ class TcpNetworkToDevice(
             packet.ip4Header.totalLength,
             packet.tcpPayloadSize(false)
         )
-
     }
 
     private fun endOfStream(readBytes: Int) = readBytes == -1

@@ -33,14 +33,14 @@ class TermsOfServiceListAdapterTest {
 
     @Test
     fun whenFormatIsValidThenDataIsCreated() {
-        val json = loadText("json/tosdr.json")
+        val json = loadText(TermsOfServiceListAdapterTest::class.java.classLoader!!, "json/tosdr.json")
         val terms = jsonAdapter.fromJson(json)
         assertNotNull(terms)
     }
 
     @Test
     fun whenFormatIsValidThenDataIsConvertedCorrectly() {
-        val json = loadText("json/tosdr.json")
+        val json = loadText(TermsOfServiceListAdapterTest::class.java.classLoader!!, "json/tosdr.json")
         val terms = jsonAdapter.fromJson(json)!!
 
         val firstTerm = terms.first { it.name == "example.com" }
@@ -58,7 +58,7 @@ class TermsOfServiceListAdapterTest {
 
     @Test(expected = JsonDataException::class)
     fun whenFormatIsMismatchedThenExceptionIsThrown() {
-        val json = loadText("json/tosdr_mismatched.json")
+        val json = loadText(TermsOfServiceListAdapterTest::class.java.classLoader!!, "json/tosdr_mismatched.json")
         jsonAdapter.fromJson(json)
     }
 }

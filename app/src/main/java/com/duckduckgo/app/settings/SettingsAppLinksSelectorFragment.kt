@@ -62,7 +62,10 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
         return alertBuilder.create()
     }
 
-    private fun updateCurrentSelection(currentOption: AppLinkSettingType, radioGroup: RadioGroup) {
+    private fun updateCurrentSelection(
+        currentOption: AppLinkSettingType,
+        radioGroup: RadioGroup
+    ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }

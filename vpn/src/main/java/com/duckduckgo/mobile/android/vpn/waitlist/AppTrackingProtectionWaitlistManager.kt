@@ -33,7 +33,11 @@ interface TrackingProtectionWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
     fun didJoinBeta(): Boolean
     fun notifyOnJoinedWaitlist()
-    fun joinWaitlist(timestamp: Int, token: String)
+    fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    )
+
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
@@ -83,7 +87,10 @@ class AppTrackingProtectionWaitlistManager @Inject constructor(
         dataStore.sendNotification = true
     }
 
-    override fun joinWaitlist(timestamp: Int, token: String) {
+    override fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
         if (dataStore.waitlistTimestamp == -1) {
             dataStore.waitlistTimestamp = timestamp
         }

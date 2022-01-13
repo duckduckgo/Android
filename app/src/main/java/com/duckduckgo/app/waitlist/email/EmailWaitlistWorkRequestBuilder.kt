@@ -51,7 +51,10 @@ class EmailWaitlistWorkRequestBuilder @Inject constructor() {
     }
 }
 
-class EmailWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class EmailWaitlistWorker(
+    private val context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams) {
 
     @Inject
     lateinit var emailManager: EmailManager

@@ -35,7 +35,10 @@ class NetworkFileDownloader @Inject constructor(
     private val fileService: DownloadFileService
 ) {
 
-    fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+    fun download(
+        pendingDownload: PendingFileDownload,
+        callback: FileDownloader.FileDownloadListener
+    ) {
 
         if (!downloadManagerAvailable()) {
             callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
@@ -43,7 +46,10 @@ class NetworkFileDownloader @Inject constructor(
         }
 
         fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            override fun onResponse(
+                call: Call<Void>,
+                response: Response<Void>
+            ) {
                 if (response.isSuccessful) {
                     var updatedPendingDownload = pendingDownload.copy()
 
@@ -59,7 +65,11 @@ class NetworkFileDownloader @Inject constructor(
                     }
 
                     when (val extractionResult = filenameExtractor.extract(updatedPendingDownload)) {
-                        is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(updatedPendingDownload, extractionResult.filename, callback)
+                        is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(
+                            updatedPendingDownload,
+                            extractionResult.filename,
+                            callback
+                        )
                         is FilenameExtractor.FilenameExtractionResult.Guess -> {
                             downloadFile(updatedPendingDownload, extractionResult.bestGuess, callback)
                         }
@@ -71,13 +81,15 @@ class NetworkFileDownloader @Inject constructor(
                 }
             }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
+            override fun onFailure(
+                call: Call<Void>,
+                t: Throwable
+            ) {
                 // TODO [Improve downloads] This is a connection failed, the reason provided is misleading.
                 callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
                 return
             }
         })
-
     }
 
     private fun downloadManagerAvailable(): Boolean {
@@ -89,7 +101,11 @@ class NetworkFileDownloader @Inject constructor(
         }
     }
 
-    private fun downloadFile(pendingDownload: PendingFileDownload, guessedFileName: String, callback: FileDownloader.FileDownloadListener) {
+    private fun downloadFile(
+        pendingDownload: PendingFileDownload,
+        guessedFileName: String,
+        callback: FileDownloader.FileDownloadListener
+    ) {
         val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
             allowScanningByMediaScanner()
             addRequestHeader("User-Agent", pendingDownload.userAgent)

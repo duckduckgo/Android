@@ -31,9 +31,15 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealDrm @Inject constructor(private val featureToggle: FeatureToggle, private val drmRepository: DrmRepository) : Drm {
+class RealDrm @Inject constructor(
+    private val featureToggle: FeatureToggle,
+    private val drmRepository: DrmRepository
+) : Drm {
 
-    override fun getDrmPermissionsForRequest(url: String, resources: Array<String>): Array<String> {
+    override fun getDrmPermissionsForRequest(
+        url: String,
+        resources: Array<String>
+    ): Array<String> {
         val perms = mutableSetOf<String>()
         if (shouldEnableDrmForUri(url.toUri())) {
             resources.find { (it == PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID) }?.let {

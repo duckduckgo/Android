@@ -26,6 +26,10 @@ include ':privacy-config-store'
 include ':traces-api'
 include ':traces-impl'
 
+include ':anrs-api'
+include ':anrs-impl'
+include ':anrs-store'
+
 include ':remote-messaging-api'
 include ':remote-messaging-impl'
 include ':remote-messaging-store'
@@ -43,6 +47,10 @@ project(':remote-messaging-store').projectDir = new File('remote-messaging/remot
 
 project(':traces-api').projectDir = new File('traces/traces-api')
 project(':traces-impl').projectDir = new File('traces/traces-impl')
+
+project(':anrs-api').projectDir = new File('anrs/anrs-api')
+project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
+project(':anrs-store').projectDir = new File('anrs/anrs-store')
 
 rootProject.children.each { subproject ->
 

@@ -30,6 +30,7 @@ class TimberExtensions {
             Timber.v("Logging Stopped")
             Timber.uprootAll()
         }
+
         @JvmStatic
         fun enableLogging() {
             Timber.uprootAll()

@@ -24,29 +24,49 @@ class BloomFilter {
         System.loadLibrary("https-bloom-lib")
     }
 
-    constructor(maxItems: Int, targetProbability: Double) {
+    constructor(
+        maxItems: Int,
+        targetProbability: Double
+    ) {
         nativePointer = createBloomFilter(maxItems, targetProbability)
     }
 
-    constructor(path: String, bits: Int, maxItems: Int) {
+    constructor(
+        path: String,
+        bits: Int,
+        maxItems: Int
+    ) {
         nativePointer = createBloomFilterFromFile(path, bits, maxItems)
     }
 
-    private external fun createBloomFilter(maxItems: Int, targetProbability: Double): Long
+    private external fun createBloomFilter(
+        maxItems: Int,
+        targetProbability: Double
+    ): Long
 
-    private external fun createBloomFilterFromFile(path: String, bits: Int, maxItems: Int): Long
+    private external fun createBloomFilterFromFile(
+        path: String,
+        bits: Int,
+        maxItems: Int
+    ): Long
 
     fun add(element: String) {
         add(nativePointer, element)
     }
 
-    private external fun add(nativePointer: Long, element: String)
+    private external fun add(
+        nativePointer: Long,
+        element: String
+    )
 
     fun contains(element: String): Boolean {
         return contains(nativePointer, element)
     }
 
-    private external fun contains(nativePointer: Long, element: String): Boolean
+    private external fun contains(
+        nativePointer: Long,
+        element: String
+    ): Boolean
 
     @Suppress("unused", "protectedInFinal")
     protected fun finalize() {

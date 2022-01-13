@@ -115,9 +115,6 @@ class TrackingProtectionExclusionListActivity :
                 REPORT_ISSUES_ANNOTATION,
                 getText(R.string.atp_ActivityDisabledLabel)
             ) { launchFeedback() }
-            setOnClickListener {
-                launchFeedback()
-            }
         }
         setupRecycler()
     }
@@ -196,7 +193,10 @@ class TrackingProtectionExclusionListActivity :
         )
     }
 
-    private fun showEnableProtectionDialog(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
+    private fun showEnableProtectionDialog(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int
+    ) {
         val dialog = ManuallyEnableAppProtectionDialog.instance(excludedAppInfo, position)
         dialog.show(
             supportFragmentManager,
@@ -218,7 +218,10 @@ class TrackingProtectionExclusionListActivity :
         return true
     }
 
-    override fun onAppProtectionEnabled(packageName: String, excludingReason: Int) {
+    override fun onAppProtectionEnabled(
+        packageName: String,
+        excludingReason: Int
+    ) {
         viewModel.onAppProtectionEnabled(packageName, excludingReason, needsPixel = true)
     }
 
@@ -226,7 +229,12 @@ class TrackingProtectionExclusionListActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String, skippedReport: Boolean) {
+    override fun onAppProtectionDisabled(
+        answer: Int,
+        appName: String,
+        packageName: String,
+        skippedReport: Boolean
+    ) {
         viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName, skippedReport = skippedReport)
     }
 
@@ -237,7 +245,10 @@ class TrackingProtectionExclusionListActivity :
     companion object {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
-        fun intent(context: Context, isRunning: Boolean): Intent {
+        fun intent(
+            context: Context,
+            isRunning: Boolean
+        ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)
             return intent
@@ -250,5 +261,4 @@ class TrackingProtectionExclusionListActivity :
         Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG)
             .show()
     }
-
 }

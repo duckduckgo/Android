@@ -44,7 +44,11 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     interface ViewData
-    data class Header(val networkName: String, val networkDisplayName: String) : ViewData
+    data class Header(
+        val networkName: String,
+        val networkDisplayName: String
+    ) : ViewData
+
     data class Row(val tracker: TrackingEvent) : ViewData
 
     class HeaderViewHolder(
@@ -58,7 +62,10 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var viewData: List<ViewData> = ArrayList()
     private var networkRenderer: TrackersRenderer = TrackersRenderer()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             HEADER -> {
@@ -72,7 +79,10 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int
+    ) {
         val viewElement = viewData[position]
         if (holder is HeaderViewHolder && viewElement is Header) {
             onBindHeader(holder, viewElement)
@@ -81,14 +91,20 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    private fun onBindRow(holder: RowViewHolder, viewElement: Row) {
+    private fun onBindRow(
+        holder: RowViewHolder,
+        viewElement: Row
+    ) {
         holder.binding.host.text = Uri.parse(viewElement.tracker.trackerUrl).baseHost
         viewElement.tracker.categories?.let { categories ->
             holder.binding.category.text = DISPLAY_CATEGORIES.firstOrNull { categories.contains(it) }
         }
     }
 
-    private fun onBindHeader(holder: HeaderViewHolder, viewElement: Header) {
+    private fun onBindHeader(
+        holder: HeaderViewHolder,
+        viewElement: Header
+    ) {
         holder.apply {
             val context = binding.root.context
             val iconResource = networkRenderer.networkLogoIcon(context, viewElement.networkName)
@@ -143,9 +159,15 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         return viewData
     }
 
-    class DiffCallback(private val old: List<ViewData>, private val new: List<ViewData>) : DiffUtil.Callback() {
+    class DiffCallback(
+        private val old: List<ViewData>,
+        private val new: List<ViewData>
+    ) : DiffUtil.Callback() {
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
 
@@ -157,7 +179,10 @@ class TrackerNetworksAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             return new.size
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
     }

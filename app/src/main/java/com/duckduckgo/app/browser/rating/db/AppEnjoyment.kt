@@ -47,9 +47,12 @@ interface AppEnjoymentDao {
     @Query("SELECT * from app_enjoyment WHERE eventType = $TYPE_DECLINED_TO_PARTICIPATE AND promptCount = :promptCount")
     fun hasUserDeclinedToSayWhetherEnjoying(promptCount: Int): Boolean
 
-    @Query("SELECT timestamp FROM app_enjoyment WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK OR eventType=$TYPE_DECLINED_TO_PARTICIPATE ORDER BY timestamp DESC LIMIT 1")
+    @Query(
+        "SELECT timestamp FROM app_enjoyment " +
+            "WHERE eventType=$TYPE_DECLINED_RATING OR eventType=$TYPE_DECLINED_FEEDBACK OR eventType=$TYPE_DECLINED_TO_PARTICIPATE " +
+            "ORDER BY timestamp DESC LIMIT 1"
+    )
     fun latestDateUserDeclinedRatingOrFeedback(): Long?
-
 }
 
 @Entity(tableName = "app_enjoyment")
@@ -72,7 +75,6 @@ enum class AppEnjoymentEventType(val value: Int) {
         private val map = AppEnjoymentEventType.values().associateBy(AppEnjoymentEventType::value)
         fun fromValue(value: Int) = map[value]
     }
-
 }
 
 class AppEnjoymentTypeConverter {
@@ -82,7 +84,6 @@ class AppEnjoymentTypeConverter {
 
     @TypeConverter
     fun convertFromDb(value: Int): AppEnjoymentEventType? = AppEnjoymentEventType.fromValue(value)
-
 }
 
 class PromptCountConverter {
@@ -92,7 +93,6 @@ class PromptCountConverter {
 
     @TypeConverter
     fun convertFromDb(promptCount: Int): PromptCount = PromptCount(promptCount)
-
 }
 
 class LocationPermissionTypeConverter {
@@ -102,5 +102,4 @@ class LocationPermissionTypeConverter {
 
     @TypeConverter
     fun convertFromDb(value: Int): LocationPermissionType? = LocationPermissionType.fromValue(value)
-
 }

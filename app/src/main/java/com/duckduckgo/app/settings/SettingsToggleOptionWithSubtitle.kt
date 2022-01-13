@@ -31,8 +31,16 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
     private val binding: SettingsToggleOptionWithSubtitleBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.style.SettingsItem)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, R.style.SettingsItem)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsToggleOptionWithSubtitle)
         title = attributes.getString(R.styleable.SettingsToggleOptionWithSubtitle_toggleTitle) ?: ""
@@ -49,16 +57,28 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
     }
 
     var title: String
-        get() { return binding.title.text.toString() }
-        set(value) { binding.title.text = value }
+        get() {
+            return binding.title.text.toString()
+        }
+        set(value) {
+            binding.title.text = value
+        }
 
     var subtitle: String
-        get() { return binding.subtitle.text.toString() }
-        set(value) { binding.subtitle.text = value }
+        get() {
+            return binding.subtitle.text.toString()
+        }
+        set(value) {
+            binding.subtitle.text = value
+        }
 
     var isChecked: Boolean
-        get() { return binding.toggle.isChecked }
-        set(value) { binding.toggle.isChecked = value }
+        get() {
+            return binding.toggle.isChecked
+        }
+        set(value) {
+            binding.toggle.isChecked = value
+        }
 
     override fun setEnabled(enabled: Boolean) {
         binding.root.childrenRecursiveSequence().forEach { it.isEnabled = enabled }
@@ -69,7 +89,10 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
         binding.toggle.setOnCheckedChangeListener(listener)
     }
 
-    fun quietlySetIsChecked(newCheckedState: Boolean, changeListener: CompoundButton.OnCheckedChangeListener?) {
+    fun quietlySetIsChecked(
+        newCheckedState: Boolean,
+        changeListener: CompoundButton.OnCheckedChangeListener?
+    ) {
         binding.toggle.quietlySetIsChecked(newCheckedState, changeListener)
     }
 }

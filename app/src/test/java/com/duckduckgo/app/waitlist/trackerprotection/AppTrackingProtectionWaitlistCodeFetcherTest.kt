@@ -75,5 +75,4 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
         verify(workManager).cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
         verify(mockNotificationSender).sendNotification(any())
     }
-
 }

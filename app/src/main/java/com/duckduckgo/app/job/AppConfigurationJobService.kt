@@ -23,7 +23,10 @@ import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
 
-@Deprecated("This is the old sync service which uses JobScheduler. A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards.")
+@Deprecated(
+    "This is the old sync service which uses JobScheduler. " +
+        "A new version, `AppConfigurationWorker` uses WorkManager and should be used going forwards."
+)
 class AppConfigurationJobService : JobService() {
 
     @Inject

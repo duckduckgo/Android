@@ -30,7 +30,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyEnableAppsProtectionDialogListener {
-        fun onAppProtectionEnabled(packageName: String, excludingReason: Int)
+        fun onAppProtectionEnabled(
+            packageName: String,
+            excludingReason: Int
+        )
+
         fun onDialogSkipped(position: Int)
     }
 
@@ -144,7 +148,10 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         private const val KEY_EXCLUDING_REASON = "KEY_EXCLUDING_REASON"
         private const val KEY_POSITION = "KEY_POSITION"
 
-        fun instance(appInfo: TrackingProtectionAppInfo, position: Int): ManuallyEnableAppProtectionDialog {
+        fun instance(
+            appInfo: TrackingProtectionAppInfo,
+            position: Int
+        ): ManuallyEnableAppProtectionDialog {
             return ManuallyEnableAppProtectionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_APP_PACKAGE_NAME, appInfo.packageName)

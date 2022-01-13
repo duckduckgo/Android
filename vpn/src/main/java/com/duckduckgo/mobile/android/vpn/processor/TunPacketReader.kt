@@ -61,7 +61,6 @@ class TunPacketReader @AssistedInject constructor(
                     Timber.w(e, "Failed while reading from the TUN")
                 }
             }
-
         } catch (e: InterruptedException) {
             Timber.w(e, "Thread interrupted")
             running = false
@@ -94,7 +93,7 @@ class TunPacketReader @AssistedInject constructor(
         val packet = Packet(bufferToNetwork)
         if (packet.isUDP) {
             queues.udpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+            healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
         } else if (packet.isTCP) {
             queues.tcpDeviceToNetwork.offer(packet)
             healthMetricCounter.onWrittenToDeviceToNetworkQueue()

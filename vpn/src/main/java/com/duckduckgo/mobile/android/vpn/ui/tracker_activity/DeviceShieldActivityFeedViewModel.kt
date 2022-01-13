@@ -73,7 +73,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             }
     }
 
-    private suspend fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>, showHeadings: Boolean): List<TrackerFeedItem> {
+    private suspend fun aggregateDataPerApp(
+        trackerData: List<BucketizedVpnTracker>,
+        showHeadings: Boolean
+    ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
 
@@ -132,7 +135,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         return sourceData
     }
 
-    data class TimeWindow(val value: Long, val unit: TimeUnit) {
+    data class TimeWindow(
+        val value: Long,
+        val unit: TimeUnit
+    ) {
         fun asString(): String {
             return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
         }

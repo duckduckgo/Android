@@ -134,7 +134,11 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         if (notify) {
             setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithNotification, listOf(readBlogSpan))
         } else {
-            setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithoutNotification, listOf(getNotificationSpan, readBlogSpan))
+            setClickableSpan(
+                binding.emailPrivacyDescription,
+                R.string.emailProtectionDescriptionJoinedWithoutNotification,
+                listOf(getNotificationSpan, readBlogSpan)
+            )
         }
     }
 
@@ -153,7 +157,11 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         setClickableSpan(binding.footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan))
     }
 
-    private fun setClickableSpan(view: MaterialTextView, stringId: Int, span: List<NonUnderlinedClickableSpan>) {
+    private fun setClickableSpan(
+        view: MaterialTextView,
+        stringId: Int,
+        span: List<NonUnderlinedClickableSpan>
+    ) {
         context?.let {
             val htmlString = getString(stringId).html(it)
             val spannableString = SpannableStringBuilder(htmlString)

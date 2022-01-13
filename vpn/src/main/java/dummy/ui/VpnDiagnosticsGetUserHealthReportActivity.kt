@@ -77,5 +77,3 @@ class VpnDiagnosticsGetUserHealthReportActivity : DuckDuckGoActivity() {
         const val UNDETERMINED_STATUS = "undetermined"
     }
 }
-
-

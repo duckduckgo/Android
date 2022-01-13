@@ -31,12 +31,18 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
 
     private var terms: List<Pair<Int, String>> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PracticeViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): PracticeViewHolder {
         val binding = ItemPrivacyPracticeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PracticeViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: PracticeViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: PracticeViewHolder,
+        position: Int
+    ) {
         val term = terms[position]
         val descriptionResource = if (term.first == GOOD) R.string.practicesIconContentGood else R.string.practicesIconContentBad
         holder.binding.icon.contentDescription = holder.binding.icon.context.getText(descriptionResource)
@@ -48,7 +54,10 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
         return terms.size
     }
 
-    fun updateData(goodTerms: List<String>, badTerms: List<String>) {
+    fun updateData(
+        goodTerms: List<String>,
+        badTerms: List<String>
+    ) {
         terms = goodTerms.map { GOOD to it } + badTerms.map { BAD to it }
         notifyDataSetChanged()
     }
@@ -56,5 +65,4 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
     class PracticeViewHolder(
         val binding: ItemPrivacyPracticeBinding
     ) : RecyclerView.ViewHolder(binding.root)
-
 }

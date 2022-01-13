@@ -64,28 +64,27 @@ class WelcomePage : OnboardingPageFragment() {
 
     override fun layoutResource(): Int = R.layout.content_onboarding_welcome
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
         buildScreenContent()
         scheduleWelcomeAnimation()
         setSkipAnimationListener()
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         lifecycleScope.launch {
             events.asFlow()
                 .flatMapLatest { welcomePageViewModel.reduce(it) }
                 .collect(::render)
         }
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     private fun buildScreenContent() {
@@ -148,7 +147,11 @@ class WelcomePage : OnboardingPageFragment() {
         typingAnimation?.cancel()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
             if (resultCode == RESULT_OK) {
                 event(WelcomePageView.Event.OnDefaultBrowserSet)

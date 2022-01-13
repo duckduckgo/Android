@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -50,7 +50,7 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/content_blocking.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -59,7 +59,7 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameMatchesContentBlockingAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/content_blocking_disabled.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -68,7 +68,7 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameMatchesContentBlockingThenUpdateAllExistingExceptions() {
-        val jsonString = FileUtilities.loadText("json/content_blocking.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/content_blocking.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

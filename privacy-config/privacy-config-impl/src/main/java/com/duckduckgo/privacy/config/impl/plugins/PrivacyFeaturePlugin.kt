@@ -21,7 +21,11 @@ import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 
 interface PrivacyFeaturePlugin {
-    fun store(name: String, jsonString: String): Boolean
+    fun store(
+        name: String,
+        jsonString: String
+    ): Boolean
+
     val featureName: PrivacyFeatureName
 }
 

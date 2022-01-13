@@ -49,12 +49,18 @@ class PrivacyModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityLookup: EntityLookup): PrivacyPractices =
+    fun privacyPractices(
+        termsOfServiceStore: TermsOfServiceStore,
+        entityLookup: EntityLookup
+    ): PrivacyPractices =
         PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun entityLookup(entityDao: TdsEntityDao, domainEntityDao: TdsDomainEntityDao): EntityLookup =
+    fun entityLookup(
+        entityDao: TdsEntityDao,
+        domainEntityDao: TdsDomainEntityDao
+    ): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
     @Provides
@@ -96,7 +102,10 @@ class PrivacyModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
+    fun appCacheCleaner(
+        context: Context,
+        fileDeleter: FileDeleter
+    ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
 

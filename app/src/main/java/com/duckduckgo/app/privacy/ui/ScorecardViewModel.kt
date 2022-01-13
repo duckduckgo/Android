@@ -69,7 +69,12 @@ class ScorecardViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
-    private fun updatedState(site: Site, domain: String, isWhitelisted: Boolean, isSiteAContentBlockingException: Boolean): ViewState {
+    private fun updatedState(
+        site: Site,
+        domain: String,
+        isWhitelisted: Boolean,
+        isSiteAContentBlockingException: Boolean
+    ): ViewState {
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade

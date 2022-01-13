@@ -36,7 +36,7 @@ import javax.inject.Inject
     boundType = VpnServiceCallbacks::class
 )
 @SingleInstanceIn(VpnScope::class)
-class VpnServiceHeartbeatImpl @Inject constructor(
+class VpnServiceHeartbeat @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider
@@ -63,7 +63,10 @@ class VpnServiceHeartbeatImpl @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
             VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")

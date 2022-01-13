@@ -134,12 +134,18 @@ class BrowserModule {
     }
 
     @Provides
-    fun webViewLongPressHandler(context: Context, pixel: Pixel): LongPressHandler {
+    fun webViewLongPressHandler(
+        context: Context,
+        pixel: Pixel
+    ): LongPressHandler {
         return WebViewLongPressHandler(context, pixel)
     }
 
     @Provides
-    fun defaultWebBrowserCapability(context: Context, appBuildConfig: AppBuildConfig): DefaultBrowserDetector {
+    fun defaultWebBrowserCapability(
+        context: Context,
+        appBuildConfig: AppBuildConfig
+    ): DefaultBrowserDetector {
         return AndroidDefaultBrowserDetector(context, appBuildConfig)
     }
 
@@ -184,7 +190,10 @@ class BrowserModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun userAgentProvider(@Named("defaultUserAgent") defaultUserAgent: Provider<String>, deviceInfo: DeviceInfo): UserAgentProvider {
+    fun userAgentProvider(
+        @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
+        deviceInfo: DeviceInfo
+    ): UserAgentProvider {
         return UserAgentProvider(defaultUserAgent, deviceInfo)
     }
 
@@ -196,7 +205,8 @@ class BrowserModule {
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         gpc: Gpc,
         userAgentProvider: UserAgentProvider
-    ): RequestInterceptor = WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
+    ): RequestInterceptor =
+        WebViewRequestInterceptor(resourceSurrogates, trackerDetector, httpsUpgrader, privacyProtectionCountDao, gpc, userAgentProvider)
 
     @Provides
     fun cookieManager(
@@ -261,13 +271,20 @@ class BrowserModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun webViewPreviewPersister(context: Context, fileDeleter: FileDeleter): WebViewPreviewPersister {
+    fun webViewPreviewPersister(
+        context: Context,
+        fileDeleter: FileDeleter
+    ): WebViewPreviewPersister {
         return FileBasedWebViewPreviewPersister(context, fileDeleter)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun faviconPersister(context: Context, fileDeleter: FileDeleter, dispatcherProvider: DispatcherProvider): FaviconPersister {
+    fun faviconPersister(
+        context: Context,
+        fileDeleter: FileDeleter,
+        dispatcherProvider: DispatcherProvider
+    ): FaviconPersister {
         return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
     }
 
@@ -298,7 +315,10 @@ class BrowserModule {
     fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
 
     @Provides
-    fun fileDownloader(dataUriDownloader: DataUriDownloader, networkFileDownloader: NetworkFileDownloader): FileDownloader {
+    fun fileDownloader(
+        dataUriDownloader: DataUriDownloader,
+        networkFileDownloader: NetworkFileDownloader
+    ): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
     }
 
@@ -311,17 +331,28 @@ class BrowserModule {
         variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
-        return BrowserTabFireproofDialogsEventHandler(userEventsStore, pixel, fireproofWebsiteRepository, appSettingsPreferencesStore, variantManager, dispatchers)
+        return BrowserTabFireproofDialogsEventHandler(
+            userEventsStore,
+            pixel,
+            fireproofWebsiteRepository,
+            appSettingsPreferencesStore,
+            variantManager,
+            dispatchers
+        )
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun thirdPartyCookieManager(cookieManager: CookieManager, authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository): ThirdPartyCookieManager {
+    fun thirdPartyCookieManager(
+        cookieManager: CookieManager,
+        authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
+    ): ThirdPartyCookieManager {
         return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     @IntoSet
-    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver = serviceWorkerLifecycleObserver
+    fun serviceWorkerLifecycleObserver(serviceWorkerLifecycleObserver: ServiceWorkerLifecycleObserver): LifecycleObserver =
+        serviceWorkerLifecycleObserver
 }

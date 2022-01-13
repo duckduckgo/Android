@@ -34,7 +34,10 @@ import dagger.SingleInstanceIn
  * we'll store the content in a db rather than a raw file.
  */
 @SingleInstanceIn(AppScope::class)
-class TermsOfServiceRawStore @Inject constructor(private val moshi: Moshi, private val context: Context) : TermsOfServiceStore {
+class TermsOfServiceRawStore @Inject constructor(
+    private val moshi: Moshi,
+    private val context: Context
+) : TermsOfServiceStore {
 
     private var data: List<TermsOfService> = ArrayList()
     private var initialized: Boolean = false

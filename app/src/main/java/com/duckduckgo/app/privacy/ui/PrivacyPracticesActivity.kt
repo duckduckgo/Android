@@ -85,7 +85,10 @@ class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, tabId: String): Intent {
+        fun intent(
+            context: Context,
+            tabId: String
+        ): Intent {
             val intent = Intent(context, PrivacyPracticesActivity::class.java)
             intent.tabId = tabId
             return intent

@@ -76,7 +76,16 @@ class SystemSearchViewModelTest {
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf())
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mockFavoritesRepository,
+            mockFaviconManager,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider
+        )
         testee.command.observeForever(commandObserver)
     }
 
@@ -360,7 +369,16 @@ class SystemSearchViewModelTest {
     fun whenUserHasFavoritesThenInitialStateShowsFavorites() {
         val savedSite = Favorite(1, "title", "http://example.com", 0)
         whenever(mockFavoritesRepository.favorites()).thenReturn(flowOf(listOf(savedSite)))
-        testee = SystemSearchViewModel(mockUserStageStore, mockAutoComplete, mockDeviceAppLookup, mockPixel, mockFavoritesRepository, mockFaviconManager, mockSettingsStore, coroutineRule.testDispatcherProvider)
+        testee = SystemSearchViewModel(
+            mockUserStageStore,
+            mockAutoComplete,
+            mockDeviceAppLookup,
+            mockPixel,
+            mockFavoritesRepository,
+            mockFaviconManager,
+            mockSettingsStore,
+            coroutineRule.testDispatcherProvider
+        )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
         assertEquals(1, viewState.favorites.size)

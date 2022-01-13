@@ -141,15 +141,24 @@ class VpnRoutesTest {
         assertTrue("Expected no routes but found ${routes.size}", routes.isEmpty())
     }
 
-    private fun assertIpLesserOrEqualTo(ipAddress: String, compareTo: String) {
+    private fun assertIpLesserOrEqualTo(
+        ipAddress: String,
+        compareTo: String
+    ) {
         assertTrue("$ipAddress needs to be <= $compareTo", ipAddress.normalizeIpAddress() <= compareTo.normalizeIpAddress())
     }
 
-    private fun assertIpGreaterOrEqualTo(ipAddress: String, compareTo: String) {
+    private fun assertIpGreaterOrEqualTo(
+        ipAddress: String,
+        compareTo: String
+    ) {
         assertTrue("$ipAddress needs to be >= $compareTo", ipAddress.normalizeIpAddress() >= compareTo.normalizeIpAddress())
     }
 
-    private fun findRoutes(lowest: String, highest: String): List<Route> {
+    private fun findRoutes(
+        lowest: String,
+        highest: String
+    ): List<Route> {
         return VpnRoutes.includedRoutes
             .filter { it.lowAddress.normalizeIpAddress() <= highest.normalizeIpAddress() }
             .filter { it.highAddress.normalizeIpAddress() >= lowest.normalizeIpAddress() }
@@ -197,5 +206,4 @@ class VpnRoutesTest {
         val uByte = this.toInt() and 0xFF
         return uByte < 255
     }
-
 }

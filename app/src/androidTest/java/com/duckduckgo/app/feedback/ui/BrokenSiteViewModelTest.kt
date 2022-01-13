@@ -146,7 +146,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -156,7 +156,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -168,7 +168,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
@@ -198,7 +198,5 @@ class BrokenSiteViewModelTest {
 
     companion object Constants {
         private const val url = "http://example.com"
-        private const val message = "Feedback message"
     }
-
 }

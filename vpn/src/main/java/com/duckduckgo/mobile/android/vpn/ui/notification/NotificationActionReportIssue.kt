@@ -42,5 +42,4 @@ class NotificationActionReportIssue {
             return if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
         }
     }
-
 }

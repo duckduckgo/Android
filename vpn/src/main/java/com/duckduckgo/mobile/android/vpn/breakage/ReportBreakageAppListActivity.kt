@@ -97,11 +97,18 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
         return true
     }
 
-    override fun onInstalledAppSelected(installedApp: InstalledApp, position: Int) {
+    override fun onInstalledAppSelected(
+        installedApp: InstalledApp,
+        position: Int
+    ) {
         viewModel.onAppSelected(installedApp)
     }
 
-    private fun addClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit): SpannableString {
+    private fun addClickableLink(
+        annotation: String,
+        text: CharSequence,
+        onClick: () -> Unit
+    ): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -173,7 +180,12 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     private fun processCommand(command: ReportBreakageAppListView.Command) {
         when (command) {
             is ReportBreakageAppListView.Command.LaunchBreakageForm -> {
-                reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm(appName = command.selectedApp.name, appPackageId = command.selectedApp.packageName))
+                reportBreakage.launch(
+                    ReportBreakageScreen.IssueDescriptionForm(
+                        appName = command.selectedApp.name,
+                        appPackageId = command.selectedApp.packageName
+                    )
+                )
             }
             is ReportBreakageAppListView.Command.SendBreakageInfo -> {
                 val intent = Intent().apply {

@@ -65,5 +65,4 @@ class RealPrivacyConfigPersister @Inject constructor(
             }
         }
     }
-
 }

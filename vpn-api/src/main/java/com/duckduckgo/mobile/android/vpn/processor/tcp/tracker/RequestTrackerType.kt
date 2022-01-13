@@ -33,5 +33,4 @@ sealed class RequestTrackerType {
     object Undetermined : RequestTrackerType() {
         override fun toString(): String = "Undetermined"
     }
-
 }

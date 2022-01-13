@@ -101,7 +101,10 @@ class QueryParamReferrerParserTest {
         verifyCampaignReferrerFound("AB", result)
     }
 
-    private fun verifyCampaignReferrerFound(expectedReferrer: String, result: ParsedReferrerResult) {
+    private fun verifyCampaignReferrerFound(
+        expectedReferrer: String,
+        result: ParsedReferrerResult
+    ) {
         assertTrue(result is CampaignReferrerFound)
         val value = (result as CampaignReferrerFound).campaignSuffix
         assertEquals(expectedReferrer, value)
@@ -115,5 +118,4 @@ class QueryParamReferrerParserTest {
         private const val INSTALLATION_SOURCE_KEY = "utm_source"
         private const val INSTALLATION_SOURCE_EU_AUCTION_VALUE = "eea-search-choice"
     }
-
 }

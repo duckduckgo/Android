@@ -70,5 +70,4 @@ data class TermsOfService(
 
             return derived
         }
-
 }

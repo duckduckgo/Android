@@ -56,7 +56,11 @@ class EmailModule {
     }
 
     @Provides
-    fun providesEmailInjector(emailManager: EmailManager, duckDuckGoUrlDetector: DuckDuckGoUrlDetector, dispatcherProvider: DispatcherProvider): EmailInjector {
+    fun providesEmailInjector(
+        emailManager: EmailManager,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        dispatcherProvider: DispatcherProvider
+    ): EmailInjector {
         return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider)
     }
 

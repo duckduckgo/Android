@@ -140,6 +140,8 @@ dependencies {
     implementation project(path: ':feature-toggles-impl')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':privacy-config-impl')
+    implementation project(path: ':anrs-api')
+    implementation project(path: ':anrs-impl')
 
     implementation project(path: ':remote-messaging-impl')
 

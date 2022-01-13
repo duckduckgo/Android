@@ -47,7 +47,8 @@ class RealUnprotectedTemporaryRepositoryTest {
         whenever(mockDatabase.unprotectedTemporaryDao()).thenReturn(mockUnprotectedTemporaryDao)
         testee =
             RealUnprotectedTemporaryRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -56,7 +57,8 @@ class RealUnprotectedTemporaryRepositoryTest {
 
         testee =
             RealUnprotectedTemporaryRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(unprotectedTemporaryException, testee.exceptions.first())
     }
@@ -66,7 +68,8 @@ class RealUnprotectedTemporaryRepositoryTest {
         runTest {
             testee =
                 RealUnprotectedTemporaryRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
 
             testee.updateAll(listOf())
 
@@ -79,7 +82,8 @@ class RealUnprotectedTemporaryRepositoryTest {
             givenUnprotectedTemporaryDaoContainsExceptions()
             testee =
                 RealUnprotectedTemporaryRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
             assertEquals(1, testee.exceptions.size)
             reset(mockUnprotectedTemporaryDao)
 

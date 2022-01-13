@@ -68,9 +68,10 @@ class TermsOfServicePracticesTest(private val testCase: TermsOfServicePracticesT
 
             )
         }
-
     }
-
 }
 
-data class TermsOfServicePracticesTestCase(val expectedPractices: PrivacyPractices.Summary, val terms: TermsOfService)
+data class TermsOfServicePracticesTestCase(
+    val expectedPractices: PrivacyPractices.Summary,
+    val terms: TermsOfService
+)

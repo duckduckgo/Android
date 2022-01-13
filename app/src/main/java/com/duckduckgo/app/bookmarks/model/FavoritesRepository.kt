@@ -31,7 +31,11 @@ interface FavoritesRepository {
     fun favoritesCount(): Long
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
     fun favoritesSync(): List<SavedSite.Favorite>
-    fun insert(title: String, url: String): SavedSite.Favorite
+    fun insert(
+        title: String,
+        url: String
+    ): SavedSite.Favorite
+
     fun insert(favorite: SavedSite.Favorite)
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
@@ -78,7 +82,10 @@ class FavoritesDataRepository(
 
     override fun favoritesSync() = favoritesDao.favoritesSync().mapToSavedSites()
 
-    override fun insert(title: String, url: String): SavedSite.Favorite {
+    override fun insert(
+        title: String,
+        url: String
+    ): SavedSite.Favorite {
         val titleOrFallback = title.takeIf { it.isNotEmpty() } ?: url
         val lastPosition = favoritesDao.getLastPosition() ?: 0
         val favoriteEntity = FavoriteEntity(title = titleOrFallback, url = url, position = lastPosition + 1)
@@ -122,5 +129,6 @@ class FavoritesDataRepository(
 
     private fun FavoriteEntity.mapToSavedSite(): SavedSite.Favorite = SavedSite.Favorite(this.id, this.title, this.url, this.position)
 
-    private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> = this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
+    private fun List<FavoriteEntity>.mapToSavedSites(): List<SavedSite.Favorite> =
+        this.map { SavedSite.Favorite(it.id, it.title, it.url, it.position) }
 }

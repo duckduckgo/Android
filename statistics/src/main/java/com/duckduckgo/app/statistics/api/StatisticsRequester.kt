@@ -51,7 +51,8 @@ class StatisticsRequester(
             val storedAtb = store.atb
             if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
                 Timber.d(
-                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
+                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour"
+                )
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = VariantManager.DEFAULT_VARIANT.key
             }
@@ -75,7 +76,8 @@ class StatisticsRequester(
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")
-                })
+                }
+            )
     }
 
     private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean =
@@ -104,7 +106,8 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
                 },
-                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") })
+                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -129,7 +132,8 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
                 },
-                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") })
+                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") }
+            )
     }
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {
