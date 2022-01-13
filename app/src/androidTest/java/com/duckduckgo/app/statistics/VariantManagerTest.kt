@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
-class VariantManagerTest {
+class `VariantManagerTest` {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
         VariantManager.REFERRER_VARIANTS +
@@ -32,14 +32,14 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
