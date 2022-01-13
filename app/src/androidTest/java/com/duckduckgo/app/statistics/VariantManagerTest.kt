@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
-class `VariantManagerTest` {
+class VariantManagerTest {
 
     private val variants = VariantManager.ACTIVE_VARIANTS +
         VariantManager.REFERRER_VARIANTS +
