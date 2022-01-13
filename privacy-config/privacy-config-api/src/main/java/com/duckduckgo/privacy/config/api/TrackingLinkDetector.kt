@@ -35,6 +35,9 @@ interface TrackingLinkDetector {
 
     /** The last tracking link and its destination URL. */
     var lastTrackingLinkInfo: TrackingLinkInfo?
+
+    /** Indicates whether a tracking link is currently being processed. */
+    var isProcessingTrackingLink: Boolean
 }
 
 /** Public data class for Tracking Link Info. */

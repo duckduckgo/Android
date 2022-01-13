@@ -399,7 +399,6 @@ class BrowserTabViewModel(
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
-    private var isProcessingAmpLink = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1002,7 +1001,7 @@ class BrowserTabViewModel(
                 lastTrackingInfo.destinationUrl = url
             }
         }
-        finishProcessingAmpLink()
+        finishProcessingTrackingLink()
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1141,6 +1140,7 @@ class BrowserTabViewModel(
 
         val isLoading = newProgress < 100
         val progress = currentLoadingViewState()
+        val isProcessingAmpLink = trackingLinkDetector.isProcessingTrackingLink
         if (progress.progress == newProgress) return
         val visualProgress = if (newProgress < FIXED_PROGRESS || isProcessingAmpLink) {
             FIXED_PROGRESS
@@ -2261,16 +2261,16 @@ class BrowserTabViewModel(
     }
 
     override fun handleCloakedTrackingLink(initialUrl: String) {
-        isProcessingAmpLink = true
+        startProcessingTrackingLink()
         command.value = ExtractUrlFromTrackingLink(initialUrl)
     }
 
-    override fun startProcessingAmpLink() {
-        isProcessingAmpLink = true
+    override fun startProcessingTrackingLink() {
+        trackingLinkDetector.isProcessingTrackingLink = true
     }
 
-    private fun finishProcessingAmpLink() {
-        isProcessingAmpLink = false
+    private fun finishProcessingTrackingLink() {
+        trackingLinkDetector.isProcessingTrackingLink = false
     }
 
     fun updateLastTrackingLink(url: String) {

@@ -146,7 +146,7 @@ open class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.ExtractedTrackingLink -> {
                     if (isForMainFrame) {
-                        webViewClientListener?.startProcessingAmpLink()
+                        webViewClientListener?.startProcessingTrackingLink()
                         Timber.d("Tracking link detection: Loading extracted URL: ${urlType.extractedUrl}")
                         webView.loadUrl(urlType.extractedUrl)
                         return true

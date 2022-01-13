@@ -50,7 +50,7 @@ interface WebViewClientListener {
     fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isForMainFrame: Boolean): Boolean
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun handleCloakedTrackingLink(initialUrl: String)
-    fun startProcessingAmpLink()
+    fun startProcessingTrackingLink()
     fun openMessageInNewTab(message: Message)
     fun recoverFromRenderProcessGone()
     fun requiresAuthentication(request: BasicAuthenticationRequest)
