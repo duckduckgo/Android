@@ -24,7 +24,10 @@ import androidx.annotation.RequiresApi
 import java.util.*
 
 @RequiresApi(R)
-fun Context.historicalExitReasonsByProcessName(name: String, n: Int = 10): List<String> {
+fun Context.historicalExitReasonsByProcessName(
+    name: String,
+    n: Int = 10
+): List<String> {
     val activityManager = applicationContext.getSystemService(ACTIVITY_SERVICE) as ActivityManager
 
     return activityManager.getHistoricalProcessExitReasons(null, 0, 0)

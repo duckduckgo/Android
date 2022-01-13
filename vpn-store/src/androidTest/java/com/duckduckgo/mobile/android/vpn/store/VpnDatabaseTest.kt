@@ -30,7 +30,8 @@ class VpnDatabaseTest {
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
-    val testHelper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
+    val testHelper =
+        MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), VpnDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     @Test
     fun whenTestingAllMigrationsThenSucceeds() {

@@ -26,7 +26,10 @@ class SmoothProgressAnimator(private val pageLoadingIndicator: ProgressBar) {
 
     private var progressBarAnimation: ObjectAnimator = ObjectAnimator.ofInt(pageLoadingIndicator, "progress", 0)
 
-    fun onNewProgress(newProgress: Int, onAnimationEnd: (Animator?) -> Unit) {
+    fun onNewProgress(
+        newProgress: Int,
+        onAnimationEnd: (Animator?) -> Unit
+    ) {
         progressBarAnimation.pause()
         pageLoadingIndicator.apply {
             if (progress > newProgress) {

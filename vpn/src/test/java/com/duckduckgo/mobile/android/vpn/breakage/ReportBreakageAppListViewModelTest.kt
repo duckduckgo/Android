@@ -28,7 +28,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -89,7 +88,10 @@ class ReportBreakageAppListViewModelTest {
         viewModel.getInstalledApps().test {
             protectedAppsChannel.send(listOf(appWithoutIssues))
             assertEquals(
-                ReportBreakageAppListView.State(listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)), false),
+                ReportBreakageAppListView.State(
+                    listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)),
+                    false
+                ),
                 awaitItem()
             )
         }

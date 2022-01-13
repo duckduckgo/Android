@@ -24,7 +24,10 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 
 class ItemOffsetDecoration(private val mItemOffset: Int) : ItemDecoration() {
 
-    constructor(context: Context, @DimenRes itemOffsetId: Int) : this(context.resources.getDimensionPixelSize(itemOffsetId))
+    constructor(
+        context: Context,
+        @DimenRes itemOffsetId: Int
+    ) : this(context.resources.getDimensionPixelSize(itemOffsetId))
 
     override fun getItemOffsets(
         outRect: Rect,

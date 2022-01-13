@@ -30,10 +30,12 @@ class WebTrackersBlockedAppRepository @Inject constructor(appDatabase: AppDataba
 
     private val dao = appDatabase.webTrackersBlockedDao()
 
-    override fun get(startTime: () -> String, endTime: String): Flow<List<WebTrackerBlocked>> {
+    override fun get(
+        startTime: () -> String,
+        endTime: String
+    ): Flow<List<WebTrackerBlocked>> {
         return dao.getTrackersBetween(startTime(), endTime)
             .distinctUntilChanged()
             .map { it.filter { tracker -> tracker.timestamp >= startTime() } }
     }
-
 }

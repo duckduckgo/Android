@@ -49,7 +49,8 @@ class DeviceShieldWeeklyNotificationFactoryTest {
         vpnTrackerDao = db.vpnTrackerDao()
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
 
-        factory = DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
+        factory =
+            DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
     }
 
     @After
@@ -170,7 +171,6 @@ class DeviceShieldWeeklyNotificationFactoryTest {
     private fun trackingApp1() = TrackingApp("package1", "app1")
     private fun trackingApp2() = TrackingApp("package2", "app2")
     private fun trackingApp3() = TrackingApp("package3", "app3")
-
 }
 
 private fun DeviceShieldNotificationFactory.DeviceShieldNotification.assertTitleEquals(expected: String) {

@@ -32,7 +32,10 @@ class LocationPermissionsRepository @Inject constructor(
     fun getLocationPermissionsSync(): List<LocationPermissionEntity> = locationPermissionsDao.allPermissions()
     fun getLocationPermissionsAsync(): LiveData<List<LocationPermissionEntity>> = locationPermissionsDao.allPermissionsEntities()
 
-    suspend fun savePermission(domain: String, permission: LocationPermissionType): LocationPermissionEntity? {
+    suspend fun savePermission(
+        domain: String,
+        permission: LocationPermissionType
+    ): LocationPermissionEntity? {
         val locationPermissionEntity = LocationPermissionEntity(domain = domain, permission = permission)
         val id = withContext(dispatchers.io()) {
             locationPermissionsDao.insert(locationPermissionEntity)
@@ -65,5 +68,4 @@ class LocationPermissionsRepository @Inject constructor(
             locationPermissionsDao.permissionEntitiesCountByDomain(domain)
         }
     }
-
 }

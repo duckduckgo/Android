@@ -33,7 +33,10 @@ import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
 
-fun ImageView.loadFavicon(file: File, domain: String) {
+fun ImageView.loadFavicon(
+    file: File,
+    domain: String
+) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
     Glide.with(context)
         .load(file)
@@ -45,7 +48,10 @@ fun ImageView.loadFavicon(file: File, domain: String) {
         .into(this)
 }
 
-fun ImageView.loadFavicon(bitmap: Bitmap?, domain: String) {
+fun ImageView.loadFavicon(
+    bitmap: Bitmap?,
+    domain: String
+) {
     val defaultDrawable = generateDefaultDrawable(this.context, domain)
     Glide.with(context)
         .load(bitmap)
@@ -61,7 +67,10 @@ fun ImageView.loadDefaultFavicon(domain: String) {
     this.setImageDrawable(generateDefaultDrawable(this.context, domain))
 }
 
-fun generateDefaultDrawable(context: Context, domain: String): Drawable {
+fun generateDefaultDrawable(
+    context: Context,
+    domain: String
+): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
 

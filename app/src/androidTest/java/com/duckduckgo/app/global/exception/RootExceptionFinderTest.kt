@@ -73,7 +73,10 @@ class RootExceptionFinderTest {
         assertNotNull("Root was null; not found correctly", calculatedRoot)
     }
 
-    private fun buildNestedException(root: Throwable, depthRequired: Int): Throwable {
+    private fun buildNestedException(
+        root: Throwable,
+        depthRequired: Int
+    ): Throwable {
         var nested = root
         for (i in 0 until depthRequired) {
             nested = IllegalArgumentException((i + 1).toString(), nested)

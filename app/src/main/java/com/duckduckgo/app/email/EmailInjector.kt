@@ -26,27 +26,54 @@ import com.duckduckgo.app.global.DispatcherProvider
 import java.io.BufferedReader
 
 interface EmailInjector {
-    fun injectEmailAutofillJs(webView: WebView, url: String?)
-    fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit)
-    fun injectAddressInEmailField(webView: WebView, alias: String?)
+    fun injectEmailAutofillJs(
+        webView: WebView,
+        url: String?
+    )
+
+    fun addJsInterface(
+        webView: WebView,
+        onTooltipShown: () -> Unit
+    )
+
+    fun injectAddressInEmailField(
+        webView: WebView,
+        alias: String?
+    )
 }
 
-class EmailInjectorJs(private val emailManager: EmailManager, private val urlDetector: DuckDuckGoUrlDetector, private val dispatcherProvider: DispatcherProvider) : EmailInjector {
+class EmailInjectorJs(
+    private val emailManager: EmailManager,
+    private val urlDetector: DuckDuckGoUrlDetector,
+    private val dispatcherProvider: DispatcherProvider
+) : EmailInjector {
     private val javaScriptInjector = JavaScriptInjector()
 
-    override fun addJsInterface(webView: WebView, onTooltipShown: () -> Unit) {
-        webView.addJavascriptInterface(EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown), JAVASCRIPT_INTERFACE_NAME)
+    override fun addJsInterface(
+        webView: WebView,
+        onTooltipShown: () -> Unit
+    ) {
+        webView.addJavascriptInterface(
+            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown),
+            JAVASCRIPT_INTERFACE_NAME
+        )
     }
 
     @UiThread
-    override fun injectEmailAutofillJs(webView: WebView, url: String?) {
+    override fun injectEmailAutofillJs(
+        webView: WebView,
+        url: String?
+    ) {
         if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
             webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
         }
     }
 
     @UiThread
-    override fun injectAddressInEmailField(webView: WebView, alias: String?) {
+    override fun injectAddressInEmailField(
+        webView: WebView,
+        alias: String?
+    ) {
         webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
     }
 
@@ -63,7 +90,10 @@ class EmailInjectorJs(private val emailManager: EmailManager, private val urlDet
             return functions
         }
 
-        fun getAliasFunctions(context: Context, alias: String?): String {
+        fun getAliasFunctions(
+            context: Context,
+            alias: String?
+        ): String {
             if (!this::aliasFunctions.isInitialized) {
                 aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
             }

@@ -168,7 +168,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
     //
     // A proper fix should be to create a VpnServiceComponent that just provide the dependencies needed by the VPN, which would
     // also help with memory
-    override fun getDir(name: String?, mode: Int): File {
+    override fun getDir(
+        name: String?,
+        mode: Int
+    ): File {
         val dir = super.getDir(name, mode)
         if (name == "webview" && processDetector.detectProcess(this) is VpnProcess) {
             return File("${dir.absolutePath}/vpn").apply {

@@ -30,7 +30,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -136,7 +135,10 @@ class TrackerNetworksViewModelTest {
         }
     }
 
-    private fun site(url: String = "", trackingEvents: List<TrackingEvent> = emptyList()): Site {
+    private fun site(
+        url: String = "",
+        trackingEvents: List<TrackingEvent> = emptyList()
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
@@ -157,5 +159,4 @@ class TrackerNetworksViewModelTest {
 
         fun tracker(number: Int): String = String.format(TRACKER, number)
     }
-
 }

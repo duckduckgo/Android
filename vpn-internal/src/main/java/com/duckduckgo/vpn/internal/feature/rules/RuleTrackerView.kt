@@ -58,6 +58,9 @@ class RuleTrackerView @JvmOverloads constructor(
         }
 
     interface RuleTrackerListener {
-        fun onTrackerClicked(view: View, enabled: Boolean)
+        fun onTrackerClicked(
+            view: View,
+            enabled: Boolean
+        )
     }
 }

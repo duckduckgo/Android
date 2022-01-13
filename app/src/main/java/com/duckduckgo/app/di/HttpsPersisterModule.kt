@@ -31,5 +31,4 @@ class HttpsPersisterModule {
     fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {
         return EmptyHttpsEmbeddedDataPersister()
     }
-
 }

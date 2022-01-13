@@ -36,8 +36,16 @@ import com.duckduckgo.mobile.android.ui.view.showKeyboard
  */
 class KeyboardAwareEditText : AppCompatEditText {
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, 0)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyleAttr: Int
+    ) : super(context, attrs, defStyleAttr)
 
     private var didSelectQueryFirstTime = false
 
@@ -45,7 +53,11 @@ class KeyboardAwareEditText : AppCompatEditText {
         return Patterns.WEB_URL.matcher(this.toString()).matches()
     }
 
-    override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+    override fun onFocusChanged(
+        focused: Boolean,
+        direction: Int,
+        previouslyFocusedRect: Rect?
+    ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
             if (text != null && text?.isWebUrl() == false) {
@@ -70,7 +82,10 @@ class KeyboardAwareEditText : AppCompatEditText {
 
     var onBackKeyListener: OnBackKeyListener? = null
 
-    override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
+    override fun onKeyPreIme(
+        keyCode: Int,
+        event: KeyEvent
+    ): Boolean {
 
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
             return onBackKeyListener?.onBackKey() ?: false
@@ -79,7 +94,13 @@ class KeyboardAwareEditText : AppCompatEditText {
         return super.onKeyPreIme(keyCode, event)
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int
+    ) {
         super.onLayout(changed, left, top, right, bottom)
         if (isFocused) {
             showKeyboard()

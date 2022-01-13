@@ -100,7 +100,10 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
     companion object {
         const val URL_EXTRA = "URL_EXTRA"
 
-        fun intent(context: Context, urlExtra: String): Intent {
+        fun intent(
+            context: Context,
+            urlExtra: String
+        ): Intent {
             val intent = Intent(context, EmailWebViewActivity::class.java)
             intent.putExtra(URL_EXTRA, urlExtra)
             return intent

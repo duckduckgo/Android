@@ -27,14 +27,23 @@ import javax.inject.Inject
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ExceptionPixel
 @Inject
-constructor(private val pixel: Pixel, private val rootExceptionFinder: RootExceptionFinder) {
+constructor(
+    private val pixel: Pixel,
+    private val rootExceptionFinder: RootExceptionFinder
+) {
 
-    fun sendExceptionPixel(pixelName: Pixel.PixelName, throwable: Throwable) {
+    fun sendExceptionPixel(
+        pixelName: Pixel.PixelName,
+        throwable: Throwable
+    ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)
     }
 
-    fun sendExceptionPixel(pixelName: String, throwable: Throwable) {
+    fun sendExceptionPixel(
+        pixelName: String,
+        throwable: Throwable
+    ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)
     }

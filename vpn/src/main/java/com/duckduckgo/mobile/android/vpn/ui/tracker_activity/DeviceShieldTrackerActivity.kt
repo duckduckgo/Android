@@ -25,14 +25,12 @@ import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.SpannedString
-import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -40,11 +38,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -83,8 +81,8 @@ class DeviceShieldTrackerActivity :
 
     private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
     private lateinit var ctaTrackerFaq: View
-    private lateinit var deviceShieldEnabledLabel: TextView
-    private lateinit var deviceShieldDisabledLabel: TextView
+    private lateinit var deviceShieldEnabledLabel: InfoPanel
+    private lateinit var deviceShieldDisabledLabel: InfoPanel
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
@@ -148,7 +146,11 @@ class DeviceShieldTrackerActivity :
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             when (resultCode) {
                 RESULT_OK -> {
@@ -315,26 +317,28 @@ class DeviceShieldTrackerActivity :
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityEnabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityDisabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
 
-    private fun addClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit): SpannableString {
+    private fun addClickableLink(
+        annotation: String,
+        text: CharSequence,
+        onClick: () -> Unit
+    ): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -463,11 +467,13 @@ class DeviceShieldTrackerActivity :
         private const val REQUEST_ASK_VPN_PERMISSION = 101
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
-        fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
+        fun intent(
+            context: Context,
+            onLaunchCallback: ResultReceiver? = null
+        ): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
         }
     }
-
 }

@@ -45,7 +45,8 @@ class UncaughtExceptionRepositoryDbTest {
     private var rootExceptionFinder = RootExceptionFinder()
     private var deviceInfo: DeviceInfo = mock()
 
-    private val entity = UncaughtExceptionEntity(exceptionSource = UncaughtExceptionSource.GLOBAL, message = "message", version = "version", timestamp = 1000)
+    private val entity =
+        UncaughtExceptionEntity(exceptionSource = UncaughtExceptionSource.GLOBAL, message = "message", version = "version", timestamp = 1000)
 
     @Before
     fun before() {
@@ -78,9 +79,34 @@ class UncaughtExceptionRepositoryDbTest {
         assertTrue(testee.isNotDuplicate(entity.copy(exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
 
         assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
-        assertTrue(testee.isNotDuplicate(entity.copy(version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    message = "different message",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500
+                )
+            )
+        )
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    version = "different version",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500
+                )
+            )
+        )
 
-        assertTrue(testee.isNotDuplicate(entity.copy(message = "different message", version = "different version", exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW, timestamp = 1500)))
+        assertTrue(
+            testee.isNotDuplicate(
+                entity.copy(
+                    message = "different message",
+                    version = "different version",
+                    exceptionSource = UncaughtExceptionSource.HIDE_CUSTOM_VIEW,
+                    timestamp = 1500
+                )
+            )
+        )
     }
 }

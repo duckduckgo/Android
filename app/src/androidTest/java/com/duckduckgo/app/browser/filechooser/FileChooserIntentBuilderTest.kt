@@ -138,7 +138,10 @@ class FileChooserIntentBuilderTest {
      * This is a bit messy but the Intent APIs are messy themselves; at least this contains the mess to this one helper function
      */
 
-    private fun buildIntent(data: String? = null, clipData: List<String>? = null): Intent {
+    private fun buildIntent(
+        data: String? = null,
+        clipData: List<String>? = null
+    ): Intent {
         return Intent().also {
             if (data != null) {
                 it.data = data.toUri()

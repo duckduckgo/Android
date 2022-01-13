@@ -67,7 +67,11 @@ class AppTPCompanyTrackersViewModel constructor(
         return ViewState(trackerData.size, sourceData)
     }
 
-    data class ViewState(val totalTrackingAttempts: Int, val trackingCompanies: List<CompanyTrackingDetails>)
+    data class ViewState(
+        val totalTrackingAttempts: Int,
+        val trackingCompanies: List<CompanyTrackingDetails>
+    )
+
     data class CompanyTrackingDetails(
         val companyName: String,
         val companyDisplayName: String,

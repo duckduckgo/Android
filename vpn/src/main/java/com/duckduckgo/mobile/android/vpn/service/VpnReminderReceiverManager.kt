@@ -67,5 +67,4 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     private fun prefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
     }
-
 }

@@ -38,17 +38,33 @@ import javax.inject.Inject
 import javax.inject.Named
 import dagger.SingleInstanceIn
 
-data class WebViewHttpAuthCredentials(val username: String, val password: String)
+data class WebViewHttpAuthCredentials(
+    val username: String,
+    val password: String
+)
 
 // Methods are marked to run in the UiThread because it is the thread of webview
 // if necessary the method impls will change thread to access the http auth dao
 interface WebViewHttpAuthStore {
     @UiThread
-    fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String)
+    fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    )
+
     @UiThread
-    fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials?
+    fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials?
+
     @UiThread
     fun clearHttpAuthUsernamePassword(webView: WebView)
+
     @WorkerThread
     suspend fun cleanHttpAuthDatabase()
 }
@@ -77,7 +93,13 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
+    override fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    ) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
@@ -85,7 +107,11 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials? {
+    override fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials? {
         val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             webViewDatabase.getHttpAuthUsernamePassword(host, realm)
         } else {

@@ -50,14 +50,20 @@ class ExceptionRulesDebugReceiver(
         context.registerReceiver(this, IntentFilter(intentAction))
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 
     companion object {
         private const val ACTION = "rule"
 
-        fun ruleIntent(packageId: String, domain: String): Intent {
+        fun ruleIntent(
+            packageId: String,
+            domain: String
+        ): Intent {
             return Intent(ACTION).apply {
                 putExtra("app", packageId)
                 putExtra("domain", domain)
@@ -93,7 +99,10 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 
         coroutineScope.launch(Dispatchers.IO) {

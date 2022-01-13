@@ -27,7 +27,11 @@ import com.duckduckgo.mobile.android.R
 /** Simple view that draws a filled circle with a stroke. */
 class ColorDotView
 @JvmOverloads
-constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
     View(context, attrs, defStyleAttr) {
 
     var fillColor: Int = Color.LTGRAY
@@ -66,7 +70,12 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         a.recycle()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         cx = w / 2F
         cy = h / 2F

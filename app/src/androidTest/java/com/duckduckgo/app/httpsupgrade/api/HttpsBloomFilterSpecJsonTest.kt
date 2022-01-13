@@ -40,5 +40,4 @@ class HttpsBloomFilterSpecJsonTest {
           "sha256" : "932ae1481fc33d94320a3b072638c0df8005482506933897e35feb1294693c84"
         }
         """
-
 }

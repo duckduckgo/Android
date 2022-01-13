@@ -160,7 +160,14 @@ class AppTrackerBlockingStatsRepositoryTest {
         timestamp: String = bucketByHour()
     ) {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val tracker = VpnTracker(trackerCompanyId = trackerCompanyId, domain = domain, timestamp = timestamp, company = "", companyDisplayName = "", trackingApp = defaultTrackingApp)
+        val tracker = VpnTracker(
+            trackerCompanyId = trackerCompanyId,
+            domain = domain,
+            timestamp = timestamp,
+            company = "",
+            companyDisplayName = "",
+            trackingApp = defaultTrackingApp
+        )
         vpnTrackerDao.insert(tracker)
     }
 
@@ -175,12 +182,18 @@ class AppTrackerBlockingStatsRepositoryTest {
         return bucketByHour(yesterday)
     }
 
-    private fun assertTrackerFound(vpnTrackers: List<VpnTracker>?, trackerDomain: String) {
+    private fun assertTrackerFound(
+        vpnTrackers: List<VpnTracker>?,
+        trackerDomain: String
+    ) {
         assertFalse(vpnTrackers.isNullOrEmpty())
         assertTrue(isTrackerInList(vpnTrackers, trackerDomain))
     }
 
-    private fun isTrackerInList(vpnTrackers: List<VpnTracker>?, trackerDomain: String): Boolean {
+    private fun isTrackerInList(
+        vpnTrackers: List<VpnTracker>?,
+        trackerDomain: String
+    ): Boolean {
         vpnTrackers!!.forEach {
             if (it.domain == trackerDomain) {
                 return true

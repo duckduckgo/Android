@@ -53,5 +53,4 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
         return null
     }
-
 }

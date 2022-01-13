@@ -67,7 +67,6 @@ class PixelReQueryInterceptorTest {
             EXPECTED_OTHER_PIXEL_TABLET_URL.toHttpUrl(),
             pixelReQueryInterceptor.intercept(FakeChain(OTHER_PIXEL_TABLET_URL)).request.url
         )
-
     }
 
     private companion object {
@@ -80,7 +79,9 @@ class PixelReQueryInterceptorTest {
 
         private const val EXPECTED_RQ_0_URL = "https://improving.duckduckgo.com/t/rq_0?atb=v255-7zu&appVersion=5.74.0&test=1"
         private const val EXPECTED_RQ_1_URL = "https://improving.duckduckgo.com/t/rq_1?atb=v255-7zu&appVersion=5.74.0&test=1"
-        private const val EXPECTED_OTHER_PIXEL_PHONE_URL = "https://improving.duckduckgo.com/t/my_pixel_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
-        private const val EXPECTED_OTHER_PIXEL_TABLET_URL = "https://improving.duckduckgo.com/t/my_pixel_android_tablet?atb=v255-7zu&appVersion=5.74.0&test=1"
+        private const val EXPECTED_OTHER_PIXEL_PHONE_URL =
+            "https://improving.duckduckgo.com/t/my_pixel_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
+        private const val EXPECTED_OTHER_PIXEL_TABLET_URL =
+            "https://improving.duckduckgo.com/t/my_pixel_android_tablet?atb=v255-7zu&appVersion=5.74.0&test=1"
     }
 }

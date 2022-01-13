@@ -88,7 +88,12 @@ class SurveyDownloader @Inject constructor(
             val newSurvey = when {
                 surveyOption != null ->
                     when {
-                        canSurveyBeScheduled(surveyOption) -> Survey(surveyGroup.id, calculateUrlWithParameters(surveyOption), surveyOption.installationDay, SCHEDULED)
+                        canSurveyBeScheduled(surveyOption) -> Survey(
+                            surveyGroup.id,
+                            calculateUrlWithParameters(surveyOption),
+                            surveyOption.installationDay,
+                            SCHEDULED
+                        )
                         else -> null
                     }
                 else -> Survey(surveyGroup.id, null, null, NOT_ALLOCATED)

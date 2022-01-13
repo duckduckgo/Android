@@ -148,7 +148,7 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         val eTag = response.headers().extractETag()
         val systemAppOverrides = response.body()?.rules.orEmpty()
-                .map { AppTrackerSystemAppOverridePackage(it) }
+            .map { AppTrackerSystemAppOverridePackage(it) }
 
         Timber.d("Received the app system app overrides list, size: ${systemAppOverrides.size}")
 

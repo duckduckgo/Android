@@ -21,7 +21,8 @@ import com.duckduckgo.app.global.UrlScheme.Companion.http
 
 val IP_REGEX =
     Regex(
-        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$")
+        "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]+)?$"
+    )
 
 fun Uri.withScheme(): Uri {
     // Uri.parse function falsely parses IP:PORT string.
@@ -114,4 +115,8 @@ fun Uri.getValidUrl(): ValidUrl? {
     return ValidUrl(validBaseHost, validHost, path)
 }
 
-data class ValidUrl(val baseHost: String, val host: String, val path: String?)
+data class ValidUrl(
+    val baseHost: String,
+    val host: String,
+    val path: String?
+)

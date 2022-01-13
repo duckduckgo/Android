@@ -24,10 +24,12 @@ import com.duckduckgo.app.global.file.FileDeleter
 interface AppCacheClearer {
 
     suspend fun clearCache()
-
 }
 
-class AndroidAppCacheClearer(private val context: Context, private val fileDeleter: FileDeleter) : AppCacheClearer {
+class AndroidAppCacheClearer(
+    private val context: Context,
+    private val fileDeleter: FileDeleter
+) : AppCacheClearer {
 
     override suspend fun clearCache() {
         fileDeleter.deleteContents(context.cacheDir, FILENAMES_EXCLUDED_FROM_DELETION)
@@ -57,5 +59,4 @@ class AndroidAppCacheClearer(private val context: Context, private val fileDelet
             FAVICON_PERSISTED_DIR
         )
     }
-
 }

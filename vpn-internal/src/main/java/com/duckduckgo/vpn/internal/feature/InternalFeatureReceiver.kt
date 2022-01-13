@@ -33,7 +33,10 @@ abstract class InternalFeatureReceiver(
     private val receiver: (Intent) -> Unit
 ) : BroadcastReceiver() {
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 

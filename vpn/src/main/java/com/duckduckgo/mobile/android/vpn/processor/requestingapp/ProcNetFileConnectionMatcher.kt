@@ -29,9 +29,16 @@ import java.util.regex.Pattern
 import kotlin.coroutines.coroutineContext
 
 interface NetworkFileConnectionMatcher {
-    suspend fun searchNetworkFile(file: File, pattern: Pattern, connectionInfo: ConnectionInfo): NetworkFileSearchResult
+    suspend fun searchNetworkFile(
+        file: File,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo
+    ): NetworkFileSearchResult
 
-    fun matchesConnection(connectionInfo: ConnectionInfo, localPort: Int): Boolean {
+    fun matchesConnection(
+        connectionInfo: ConnectionInfo,
+        localPort: Int
+    ): Boolean {
         return connectionInfo.sourcePort == localPort
     }
 }
@@ -39,13 +46,22 @@ interface NetworkFileConnectionMatcher {
 class ProcNetFileConnectionMatcher : NetworkFileConnectionMatcher {
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override suspend fun searchNetworkFile(file: File, pattern: Pattern, connectionInfo: ConnectionInfo): NetworkFileSearchResult {
+    override suspend fun searchNetworkFile(
+        file: File,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo
+    ): NetworkFileSearchResult {
         BufferedReader(FileReader(file)).use { reader ->
             return searchLineByLine(reader, pattern, connectionInfo, file)
         }
     }
 
-    private suspend fun searchLineByLine(reader: BufferedReader, pattern: Pattern, connectionInfo: ConnectionInfo, file: File): NetworkFileSearchResult {
+    private suspend fun searchLineByLine(
+        reader: BufferedReader,
+        pattern: Pattern,
+        connectionInfo: ConnectionInfo,
+        file: File
+    ): NetworkFileSearchResult {
         var matcher: Matcher
 
         reader.lineSequence().forEach { line ->

@@ -29,7 +29,13 @@ import javax.inject.Inject
 
 interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
-    suspend fun getFaviconFromDisk(file: File, cornerRadius: Int, width: Int, height: Int): Bitmap?
+    suspend fun getFaviconFromDisk(
+        file: File,
+        cornerRadius: Int,
+        width: Int,
+        height: Int
+    ): Bitmap?
+
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
 }
 
@@ -52,7 +58,12 @@ class GlideFaviconDownloader @Inject constructor(
         }
     }
 
-    override suspend fun getFaviconFromDisk(file: File, cornerRadius: Int, width: Int, height: Int): Bitmap? {
+    override suspend fun getFaviconFromDisk(
+        file: File,
+        cornerRadius: Int,
+        width: Int,
+        height: Int
+    ): Bitmap? {
         return withContext(dispatcherProvider.io()) {
             return@withContext runCatching {
                 Glide.with(context)

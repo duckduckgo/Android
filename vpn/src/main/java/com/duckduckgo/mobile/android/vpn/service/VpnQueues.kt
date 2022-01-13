@@ -91,7 +91,11 @@ private class LoggingLinkedBlockingDeque<T> : LinkedBlockingDeque<T>() {
         return super.offer(e)
     }
 
-    override fun offer(e: T, timeout: Long, unit: TimeUnit?): Boolean {
+    override fun offer(
+        e: T,
+        timeout: Long,
+        unit: TimeUnit?
+    ): Boolean {
         updateLastOffer()
         return super.offer(e, timeout, unit)
     }

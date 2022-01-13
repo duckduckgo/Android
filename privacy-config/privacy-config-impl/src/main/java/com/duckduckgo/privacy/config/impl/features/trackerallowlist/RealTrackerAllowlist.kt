@@ -32,9 +32,15 @@ import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
+class RealTrackerAllowlist @Inject constructor(
+    private val trackerAllowlistRepository: TrackerAllowlistRepository,
+    private val featureToggle: FeatureToggle
+) : TrackerAllowlist {
 
-    override fun isAnException(documentURL: String, url: String): Boolean {
+    override fun isAnException(
+        documentURL: String,
+        url: String
+    ): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
@@ -45,7 +51,11 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
         }
     }
 
-    private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
+    private fun matches(
+        url: String,
+        documentUrl: String,
+        trackerAllowlist: TrackerAllowlistEntity
+    ): Boolean {
         val cleanedUrl = removePortFromUrl(url.toUri())
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()

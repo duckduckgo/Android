@@ -120,7 +120,11 @@ class VpnPermissionRequesterActivity : AppCompatActivity() {
     }
 
     @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         when (requestCode) {
             RC_REQUEST_VPN_PERMISSION -> handleVpnPermissionResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)

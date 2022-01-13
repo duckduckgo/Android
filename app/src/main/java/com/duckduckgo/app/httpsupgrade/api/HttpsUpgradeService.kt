@@ -33,5 +33,4 @@ interface HttpsUpgradeService {
 
     @GET("https://staticcdn.duckduckgo.com/https/https-mobile-v2-false-positives.json")
     fun falsePositives(): Call<List<HttpsFalsePositiveDomain>>
-
 }

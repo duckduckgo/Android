@@ -37,7 +37,11 @@ class SiteFactory @Inject constructor(
      * @see [loadFullSiteDetails] to ensure full privacy details are loaded
      */
     @AnyThread
-    fun buildSite(url: String, title: String? = null, httpUpgraded: Boolean = false): Site {
+    fun buildSite(
+        url: String,
+        title: String? = null,
+        httpUpgraded: Boolean = false
+    ): Site {
         return SiteMonitor(url, title, httpUpgraded)
     }
 

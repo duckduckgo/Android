@@ -45,7 +45,10 @@ class TaskTimeRecorder(private val ext: BuildTimePluginExtension) : TaskExecutio
         taskStartTime[task.path] = Instant.now()
     }
 
-    override fun afterExecute(task: Task, state: TaskState) {
+    override fun afterExecute(
+        task: Task,
+        state: TaskState
+    ) {
         check(taskStartTime.contains(task.path)) { "No start time for ${task.path}" }
         val duration = Duration.between(taskStartTime[task.path], Instant.now()).seconds
         taskDurations.add(task.path to duration)

@@ -61,7 +61,11 @@ interface AndroidInjector<T> {
          *  2. Use the factory to create the dagger component that relates to an Android type, eg. Activity
          *  3. Inject any dependency requested by the Android type
          */
-        inline fun <reified T> inject(injector: Any, instance: T, mapKey: Class<*>? = null) {
+        inline fun <reified T> inject(
+            injector: Any,
+            instance: T,
+            mapKey: Class<*>? = null
+        ) {
             if ((injector is HasDaggerInjector)) {
                 (injector.daggerFactoryFor(mapKey ?: instance!!::class.java) as Factory<T>)
                     .create(instance)
@@ -82,19 +86,32 @@ interface AndroidInjector<T> {
  */
 class AndroidInjection {
     companion object {
-        inline fun <reified T : Activity> inject(instance: T, bindingKey: Class<*>? = null) {
+        inline fun <reified T : Activity> inject(
+            instance: T,
+            bindingKey: Class<*>? = null
+        ) {
             AndroidInjector.inject(instance.applicationContext as Application, instance, bindingKey)
         }
 
-        inline fun <reified T : Fragment> inject(instance: T, bindingKey: Class<*>? = null) {
+        inline fun <reified T : Fragment> inject(
+            instance: T,
+            bindingKey: Class<*>? = null
+        ) {
             AndroidInjector.inject(findHasDaggerInjectorForFragment(instance), instance, bindingKey)
         }
 
-        inline fun <reified T : Service> inject(instance: T, bindingKey: Class<*>? = null) {
+        inline fun <reified T : Service> inject(
+            instance: T,
+            bindingKey: Class<*>? = null
+        ) {
             AndroidInjector.inject(instance.application, instance, bindingKey)
         }
 
-        inline fun <reified T : BroadcastReceiver> inject(instance: T, context: Context, bindingKey: Class<*>? = null) {
+        inline fun <reified T : BroadcastReceiver> inject(
+            instance: T,
+            context: Context,
+            bindingKey: Class<*>? = null
+        ) {
             AndroidInjector.inject(context.applicationContext as Application, instance, bindingKey)
         }
 

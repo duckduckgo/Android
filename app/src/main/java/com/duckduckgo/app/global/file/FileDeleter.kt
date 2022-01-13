@@ -28,7 +28,10 @@ interface FileDeleter {
      * Optionally: specify an exclusion list. Files with names exactly matching will not be deleted.
      * Note, the exclusion list only applies to the top-level directory. All files in subdirectories will be deleted, regardless of exclusion list.
      */
-    suspend fun deleteContents(parentDirectory: File, excludedFiles: List<String> = emptyList())
+    suspend fun deleteContents(
+        parentDirectory: File,
+        excludedFiles: List<String> = emptyList()
+    )
 
     /**
      * Delete the contents of the given directory, and deletes the directory itself.
@@ -38,11 +41,17 @@ interface FileDeleter {
     /**
      * Delete a file(s) of the given directory, but don't delete the directory itself
      */
-    suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>)
+    suspend fun deleteFilesFromDirectory(
+        parentDirectory: File,
+        files: List<String>
+    )
 }
 
 class AndroidFileDeleter : FileDeleter {
-    override suspend fun deleteContents(parentDirectory: File, excludedFiles: List<String>) {
+    override suspend fun deleteContents(
+        parentDirectory: File,
+        excludedFiles: List<String>
+    ) {
         withContext(Dispatchers.IO) {
             val files = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
@@ -56,7 +65,10 @@ class AndroidFileDeleter : FileDeleter {
         }
     }
 
-    override suspend fun deleteFilesFromDirectory(parentDirectory: File, files: List<String>) {
+    override suspend fun deleteFilesFromDirectory(
+        parentDirectory: File,
+        files: List<String>
+    ) {
         withContext(Dispatchers.IO) {
             val allFiles = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = allFiles.filter { files.contains(it.name) }

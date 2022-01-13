@@ -79,7 +79,10 @@ class SQLCookieRemover(
         }
     }
 
-    private fun removeCookies(databasePath: String, excludedSites: List<String>): Boolean {
+    private fun removeCookies(
+        databasePath: String,
+        excludedSites: List<String>
+    ): Boolean {
         var deleteExecuted = false
         openReadableDatabase(databasePath)?.apply {
             try {

@@ -77,7 +77,15 @@ class RatingModule {
         onboardingStore: OnboardingStore,
         appBuildConfig: AppBuildConfig
     ): PromptTypeDecider {
-        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore, appBuildConfig)
+        return InitialPromptTypeDecider(
+            playStoreUtils,
+            searchCountDao,
+            initialPromptDecider,
+            secondaryPromptDecider,
+            context,
+            onboardingStore,
+            appBuildConfig
+        )
     }
 
     @Provides
@@ -99,13 +107,19 @@ class RatingModule {
 
     @Named(INITIAL_PROMPT_DECIDER_NAME)
     @Provides
-    fun initialPromptDecider(appDaysUsedRepository: AppDaysUsedRepository, appEnjoymentRepository: AppEnjoymentRepository): ShowPromptDecider {
+    fun initialPromptDecider(
+        appDaysUsedRepository: AppDaysUsedRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
+    ): ShowPromptDecider {
         return InitialPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
 
     @Named(SECONDARY_PROMPT_DECIDER_NAME)
     @Provides
-    fun secondaryPromptDecider(appDaysUsedRepository: AppDaysUsedRepository, appEnjoymentRepository: AppEnjoymentRepository): ShowPromptDecider {
+    fun secondaryPromptDecider(
+        appDaysUsedRepository: AppDaysUsedRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
+    ): ShowPromptDecider {
         return SecondaryPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
 
@@ -113,5 +127,4 @@ class RatingModule {
         private const val INITIAL_PROMPT_DECIDER_NAME = "initial-prompt-decider"
         private const val SECONDARY_PROMPT_DECIDER_NAME = "secondary-prompt-decider"
     }
-
 }

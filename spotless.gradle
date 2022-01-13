@@ -9,7 +9,9 @@ spotless {
         indentWithSpaces()
     }
     kotlin {
-        ktfmt().dropboxStyle()
+        target '**/*.kt'
+        ktlint().userData(['disabled_rules' : 'no-wildcard-imports, import-ordering, no-blank-line-before-rbrace',
+                           'max_line_length': '150'])
         trimTrailingWhitespace()
         indentWithSpaces()
     }

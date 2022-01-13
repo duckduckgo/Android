@@ -63,7 +63,10 @@ class FavoritesAdapter(
         return listOf(Header) + (if (value.isEmpty()) listOf(EmptyHint) else value)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FavoritesScreenViewHolders {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FavoritesScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             FAVORITE_TYPE -> {
@@ -86,7 +89,10 @@ class FavoritesAdapter(
         return favoriteItems.size
     }
 
-    override fun onBindViewHolder(holder: FavoritesScreenViewHolders, position: Int) {
+    override fun onBindViewHolder(
+        holder: FavoritesScreenViewHolders,
+        position: Int
+    ) {
         when (holder) {
             is FavoritesScreenViewHolders.FavoriteViewHolder -> {
                 holder.update((favoriteItems[position] as FavoriteItem).favorite)
@@ -175,7 +181,10 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(anchor: View, favorite: Favorite) {
+        private fun showOverFlowMenu(
+            anchor: View,
+            favorite: Favorite
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
