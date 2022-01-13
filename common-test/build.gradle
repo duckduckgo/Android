@@ -17,5 +17,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     implementation Testing.junit4
+    implementation JakeWharton.timber
 
 }
