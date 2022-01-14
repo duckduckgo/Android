@@ -37,7 +37,10 @@ class RealRemoteMessagingConfigProcessor(
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
-        if (true) { // if (currentVersion != newVersion) {
+        val isNewVersion = currentVersion != newVersion
+        val shouldProcess = remoteMessagingConfigRepository.get().invalidate
+
+        if (isNewVersion || shouldProcess) {
             // parse
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
             // TODO: evaluate

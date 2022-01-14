@@ -23,5 +23,6 @@ import androidx.room.PrimaryKey
 data class RemoteMessagingConfig(
     @PrimaryKey
     val id: Int = 1,
-    val version: Long
+    val version: Long,
+    val invalidate: Boolean = false
 )
