@@ -29,6 +29,7 @@ include ':traces-impl'
 include ':anrs-api'
 include ':anrs-impl'
 include ':anrs-store'
+include ':anrs-test'
 
 include ':common-test'
 
@@ -44,6 +45,7 @@ project(':traces-impl').projectDir = new File('traces/traces-impl')
 project(':anrs-api').projectDir = new File('anrs/anrs-api')
 project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
 project(':anrs-store').projectDir = new File('anrs/anrs-store')
+project(':anrs-test').projectDir = new File('anrs/anrs-test')
 
 rootProject.children.each { subproject ->
 

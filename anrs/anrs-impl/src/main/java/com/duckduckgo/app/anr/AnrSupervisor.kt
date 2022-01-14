@@ -21,14 +21,16 @@ import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.Module
+import dagger.Provides
+import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class AnrSupervisor @Inject constructor(
+class AnrSupervisor constructor(
     private val anrSupervisorRunnable: AnrSupervisorRunnable
 ) : BrowserLifecycleObserver {
 
@@ -140,5 +142,15 @@ class Callback : Runnable {
     override fun run() {
         isCalled = true
         this.notifyAll()
+    }
+}
+
+@Module
+@ContributesTo(AppScope::class)
+class AnrSupervisorModule {
+    @Provides
+    @IntoSet
+    fun bindAnrSupervisor(anrSupervisorRunnable: AnrSupervisorRunnable): BrowserLifecycleObserver {
+        return AnrSupervisor(anrSupervisorRunnable)
     }
 }
