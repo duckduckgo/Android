@@ -54,7 +54,7 @@ class ExcludedAppsViewModel(
 
         viewModelScope.launch {
             excludedApps.manuallyExcludedApp(packageName)
-            if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING) {
+            if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING && !skippedReport) {
                 command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             }
         }

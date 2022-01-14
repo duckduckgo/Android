@@ -93,7 +93,7 @@ class TunPacketReader @AssistedInject constructor(
         val packet = Packet(bufferToNetwork)
         if (packet.isUDP) {
             queues.udpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+            healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
         } else if (packet.isTCP) {
             queues.tcpDeviceToNetwork.offer(packet)
             healthMetricCounter.onWrittenToDeviceToNetworkQueue()

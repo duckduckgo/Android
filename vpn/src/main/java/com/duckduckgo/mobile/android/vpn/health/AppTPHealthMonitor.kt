@@ -23,6 +23,8 @@ import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.BadHealth
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.GoodHealth
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_CONNECT_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
@@ -79,6 +81,7 @@ class AppTPHealthMonitor @Inject constructor(
         private const val OLD_METRIC_CLEANUP_FREQUENCY_MS: Long = 60_000
 
         private val MEMORY_ALERT_SAMPLES: Int = (15.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
+        private val TUN_READ_ALERT_SAMPLES: Int = (4.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
     }
 
     private val now: Long
@@ -95,7 +98,8 @@ class AppTPHealthMonitor @Inject constructor(
 
     private val healthRules = mutableListOf<HealthRule>()
 
-    private val tunReadAlerts = object : HealthRule("tunReadAlerts") {}.also { healthRules.add(it) }
+    private val tunReadAlerts =
+        object : HealthRule("tunReadAlerts", samplesToWaitBeforeAlerting = TUN_READ_ALERT_SAMPLES) {}.also { healthRules.add(it) }
     private val socketReadExceptionAlerts = object : HealthRule("socketReadExceptionAlerts") {}.also { healthRules.add(it) }
     private val socketWriteExceptionAlerts = object : HealthRule("socketWriteExceptionAlerts") {}.also { healthRules.add(it) }
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
@@ -113,7 +117,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleSocketConnectExceptions(timeWindow, socketConnectExceptionAlerts)
         healthStates += sampleTunWriteExceptions(timeWindow, tunWriteExceptionAlerts)
         healthStates += sampleTracerPackets(timeWindow, tracerPacketsAlerts)
-        healthStates += sampleMemoryUsage(memoryAlerts)
+        // healthStates += sampleMemoryUsage(memoryAlerts)
 
         /*
          * useful for testing notifications; can trigger good or bad health from diagnostics screen
@@ -168,8 +172,13 @@ class AppTPHealthMonitor @Inject constructor(
     ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
         val readFromNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val readFromTCPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val readFromUDPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
 
-        val state = healthClassifier.determineHealthTunInputQueueReadRatio(tunReads, readFromNetworkQueue)
+        val state = healthClassifier.determineHealthTunInputQueueReadRatio(
+            tunReads,
+            QueueReads(queueReads = readFromNetworkQueue, queueTCPReads = readFromTCPNetworkQueue, queueUDPReads = readFromUDPNetworkQueue)
+        )
         healthAlerts.updateAlert(state)
         return state
     }
@@ -287,10 +296,14 @@ class AppTPHealthMonitor @Inject constructor(
         oldMetricCleanupJob.cancel()
     }
 
+    override fun isMonitoringStarted(): Boolean {
+        return monitoringJob.isActive
+    }
+
     private fun injectTracerPacket() {
         val packet = tracerPacketBuilder.build()
         healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.CREATED))
-        healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.ADDED_TO_NETWORK_TO_DEVICE_QUEUE))
+        healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.ADDED_TO_DEVICE_TO_NETWORK_QUEUE))
         vpnQueues.tcpDeviceToNetwork.offer(packet)
     }
 
