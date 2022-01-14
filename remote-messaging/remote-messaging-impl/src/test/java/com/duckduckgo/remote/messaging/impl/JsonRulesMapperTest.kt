@@ -24,6 +24,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import java.text.SimpleDateFormat
+import java.util.*
 
 @RunWith(Parameterized::class)
 class JsonRulesMapperTest(private val testCase: TestCase) {
@@ -522,7 +524,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "2020-08-09", value = 2))
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "2020-08-09", value = 2)
+                    MatchingAttribute.DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2)
                 )
             ),
             TestCase(
@@ -530,7 +532,15 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "2020-08-09", value = 2, fallback = true))
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "2020-08-09", value = 2, fallback = true)
+                    MatchingAttribute.DaysUsedSince(since = SimpleDateFormat("yyyy-mm-dd").parse("2020-08-09")!!, value = 2, fallback = true)
+                )
+            ),
+            TestCase(
+                givenJsonRule(
+                    Pair("daysUsedSince", JsonMatchingAttribute(since = "20200809", value = 2, fallback = true))
+                ),
+                matchingRule(
+                    MatchingAttribute.Unknown(fallback = true)
                 )
             ),
             TestCase(
@@ -538,7 +548,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "wrong", value = "wrong"))
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "wrong", value = -1, fallback = null)
+                    MatchingAttribute.Unknown(fallback = null)
                 )
             ),
             TestCase(
@@ -546,7 +556,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(since = "wrong", value = "wrong", fallback = true))
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "wrong", value = -1, fallback = true)
+                    MatchingAttribute.Unknown(fallback = true)
                 )
             ),
             TestCase(
@@ -554,7 +564,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute())
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "", value = -1, fallback = null)
+                    MatchingAttribute.Unknown(fallback = null)
                 )
             ),
             TestCase(
@@ -562,7 +572,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     Pair("daysUsedSince", JsonMatchingAttribute(fallback = true))
                 ),
                 matchingRule(
-                    MatchingAttribute.DaysUsedSince(since = "", value = -1, fallback = true)
+                    MatchingAttribute.Unknown(fallback = true)
                 )
             ),
             TestCase(

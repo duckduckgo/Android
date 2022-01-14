@@ -20,8 +20,11 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import timber.log.Timber
+import java.text.SimpleDateFormat
 
 class JsonRulesMapper {
+
+    private val dateFormatter = SimpleDateFormat("yyyy-mm-dd")
 
     @Suppress("UNCHECKED_CAST")
     private val localeMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
@@ -167,7 +170,7 @@ class JsonRulesMapper {
 
     private val daysUsedSinceMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.DaysUsedSince(
-            since = (jsonMatchingAttribute.since as? String) ?: "",
+            since = dateFormatter.parse(jsonMatchingAttribute.since as String)!!,
             value = (jsonMatchingAttribute.value as? Int) ?: -1,
             fallback = jsonMatchingAttribute.fallback
         )
