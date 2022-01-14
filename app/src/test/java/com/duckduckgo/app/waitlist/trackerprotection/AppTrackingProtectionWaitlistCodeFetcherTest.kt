@@ -23,7 +23,7 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -43,7 +43,7 @@ class AppTrackingProtectionWaitlistCodeFetcherTest {
     private val mockNotification: SchedulableNotification = mock()
     private val mockNotificationSender: NotificationSender = mock()
     private val workManager: WorkManager = mock()
-    private val waitlistManager: TrackingProtectionWaitlistManager = mock()
+    private val waitlistManager: AppTPWaitlistManager = mock()
 
     private lateinit var testee: AppTrackingProtectionWaitlistCodeFetcher
 

@@ -25,7 +25,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPInviteCodeResponse
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeResponse
@@ -51,7 +51,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCoroutinesApi
 class AppTPWaitlistViewModelTest {
 
-    private val manager: TrackingProtectionWaitlistManager = mock()
+    private val manager: AppTPWaitlistManager = mock()
     private var service: AppTrackingProtectionWaitlistService = mock()
     private var workManager: WorkManager = mock()
     private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = mock()
@@ -160,7 +160,7 @@ class AppTPWaitlistViewModelTest {
 
     @Test
     fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
-        val waitlistState = WaitlistState.JoinedQueue(false)
+        val waitlistState = WaitlistState.JoinedWaitlist(false)
         whenever(manager.waitlistState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())

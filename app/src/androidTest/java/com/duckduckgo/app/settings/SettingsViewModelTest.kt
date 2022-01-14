@@ -38,7 +38,7 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -84,7 +84,7 @@ class SettingsViewModelTest {
     lateinit var mockContext: Context
 
     @Mock
-    private lateinit var appTPWaitlistManager: TrackingProtectionWaitlistManager
+    private lateinit var appTPWaitlistManager: AppTPWaitlistManager
 
     @Mock
     private lateinit var mockGpc: Gpc
@@ -627,7 +627,7 @@ class SettingsViewModelTest {
     fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
-            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.JoinedQueue(false))
+            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.JoinedWaitlist(false))
 
             testee.onAppTPSettingClicked()
 

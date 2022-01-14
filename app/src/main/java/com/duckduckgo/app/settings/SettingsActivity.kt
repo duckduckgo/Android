@@ -62,7 +62,7 @@ import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
