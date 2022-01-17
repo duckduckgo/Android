@@ -171,7 +171,7 @@ class AppBadHealthStateHandler @Inject constructor(
                 mapOf(
                     "manufacturer" to appBuildConfig.manufacturer,
                     // model only in internal builds to avoid privacy issues in production for now
-                    "model" to if (appBuildConfig.flavor.isInternal()) appBuildConfig.flavor.toString() else "redacted",
+                    "model" to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     "restarted" to restarted.toString(),
                     "badHealthData" to encodedData,
                 )
