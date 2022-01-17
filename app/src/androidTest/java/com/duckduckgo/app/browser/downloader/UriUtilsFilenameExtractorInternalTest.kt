@@ -29,7 +29,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.whenever
 
-class UriUtilsFilenameExtractorTest {
+class UriUtilsFilenameExtractorInternalTest {
 
     private val mockedPixel: Pixel = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
@@ -37,7 +37,7 @@ class UriUtilsFilenameExtractorTest {
 
     @Before
     fun setup() {
-        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
     }
 
     @Test
@@ -313,11 +313,7 @@ class UriUtilsFilenameExtractorTest {
         assertEquals("bat.py", extractionResult.filename)
     }
 
-    private fun buildPendingDownload(
-        url: String,
-        contentDisposition: String?,
-        mimeType: String?
-    ): FileDownloader.PendingFileDownload {
+    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -326,4 +322,5 @@ class UriUtilsFilenameExtractorTest {
             userAgent = "aUserAgent"
         )
     }
+
 }
