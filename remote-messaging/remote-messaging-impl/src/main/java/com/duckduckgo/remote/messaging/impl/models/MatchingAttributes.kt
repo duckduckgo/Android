@@ -27,14 +27,16 @@ sealed class MatchingAttribute {
     data class Api(
         override val min: Int = -1,
         override val max: Int = -1,
+        override val value: Int = -1,
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeIntMatchingAttribute
+    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class WebView(
         override val min: String = "",
         override val max: String = "",
+        override val value: String = "",
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeStringMatchingAttribute
+    ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
 
     data class Flavor(
         override val value: List<String> = emptyList(),
@@ -49,8 +51,9 @@ sealed class MatchingAttribute {
     data class AppVersion(
         override val min: String = "",
         override val max: String = "",
+        override val value: String = "",
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeStringMatchingAttribute
+    ) : MatchingAttribute(), RangeStringMatchingAttribute, StringMatchingAttribute
 
     data class Atb(
         override val value: String = "",
@@ -95,20 +98,23 @@ sealed class MatchingAttribute {
     data class SearchCount(
         override val min: Int = -1,
         override val max: Int = -1,
+        override val value: Int = -1,
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeIntMatchingAttribute
+    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class Bookmarks(
         override val min: Int = -1,
         override val max: Int = -1,
+        override val value: Int = -1,
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeIntMatchingAttribute
+    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class Favorites(
         override val min: Int = -1,
         override val max: Int = -1,
+        override val value: Int = -1,
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeIntMatchingAttribute
+    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class AppTheme(
         override val value: String = "",
@@ -118,8 +124,9 @@ sealed class MatchingAttribute {
     data class DaysSinceInstalled(
         override val min: Int = -1,
         override val max: Int = -1,
+        override val value: Int = -1,
         val fallback: Boolean? = null
-    ) : MatchingAttribute(), RangeIntMatchingAttribute
+    ) : MatchingAttribute(), RangeIntMatchingAttribute, IntMatchingAttribute
 
     data class DaysUsedSince(
         override val since: Date,
@@ -148,6 +155,10 @@ interface StringMatchingAttribute {
     val value: String
 }
 
+interface IntMatchingAttribute {
+    val value: Int
+}
+
 interface StringArrayMatchingAttribute {
     val value: List<String>
 }
@@ -156,3 +167,13 @@ interface DateMatchingAttribute {
     val since: Date
     val value: Int
 }
+
+@Suppress("UNCHECKED_CAST")
+fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
+
+fun Any?.toIntOrDefault(default: Int): Int = this?.let { it as Int } ?: default
+
+fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
+
+const val MATCHING_ATTR_INT_DEFAULT_VALUE = -1
+const val MATCHING_ATTR_STRING_DEFAULT_VALUE = ""

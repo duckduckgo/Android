@@ -19,6 +19,11 @@ package com.duckduckgo.remote.messaging.impl.mappers
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
+import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
+import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
+import com.duckduckgo.remote.messaging.impl.models.toIntOrDefault
+import com.duckduckgo.remote.messaging.impl.models.toStringList
+import com.duckduckgo.remote.messaging.impl.models.toStringOrDefault
 import timber.log.Timber
 import java.text.SimpleDateFormat
 
@@ -29,23 +34,25 @@ class JsonRulesMapper {
     @Suppress("UNCHECKED_CAST")
     private val localeMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Locale(
-            value = (jsonMatchingAttribute.value as? List<String>) ?: emptyList(),
+            value = jsonMatchingAttribute.value.toStringList(),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val osApiMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Api(
-            min = (jsonMatchingAttribute.min as? Int) ?: MIN_DEFAULT_VALUE,
-            max = (jsonMatchingAttribute.max as? Int) ?: MAX_DEFAULT_VALUE,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val webViewMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.WebView(
-            min = (jsonMatchingAttribute.min as? String) ?: "",
-            max = (jsonMatchingAttribute.max as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
@@ -53,50 +60,51 @@ class JsonRulesMapper {
     @Suppress("UNCHECKED_CAST")
     private val flavorMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Flavor(
-            value = (jsonMatchingAttribute.value as? List<String>) ?: emptyList(),
+            value = jsonMatchingAttribute.value.toStringList(),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val appIdMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.AppId(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val appVersionMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.AppVersion(
-            min = (jsonMatchingAttribute.min as? String) ?: "",
-            max = (jsonMatchingAttribute.max as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val atbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Atb(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val appAtbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.AppAtb(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val searchAtbMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.SearchAtb(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val expVariantMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.ExpVariant(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
@@ -131,39 +139,43 @@ class JsonRulesMapper {
 
     private val searchCountMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.SearchCount(
-            min = (jsonMatchingAttribute.min as? Int) ?: MIN_DEFAULT_VALUE,
-            max = (jsonMatchingAttribute.max as? Int) ?: MAX_DEFAULT_VALUE,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val bookmarksMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Bookmarks(
-            min = (jsonMatchingAttribute.min as? Int) ?: MIN_DEFAULT_VALUE,
-            max = (jsonMatchingAttribute.max as? Int) ?: MAX_DEFAULT_VALUE,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val favoritesMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.Favorites(
-            min = (jsonMatchingAttribute.min as? Int) ?: MIN_DEFAULT_VALUE,
-            max = (jsonMatchingAttribute.max as? Int) ?: MAX_DEFAULT_VALUE,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val appThemeMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.AppTheme(
-            value = (jsonMatchingAttribute.value as? String) ?: "",
+            value = jsonMatchingAttribute.value.toStringOrDefault(MATCHING_ATTR_STRING_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
 
     private val daysSinceInstalledMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.DaysSinceInstalled(
-            min = (jsonMatchingAttribute.min as? Int) ?: MIN_DEFAULT_VALUE,
-            max = (jsonMatchingAttribute.max as? Int) ?: MAX_DEFAULT_VALUE,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            min = jsonMatchingAttribute.min.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
+            max = jsonMatchingAttribute.max.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
@@ -171,7 +183,7 @@ class JsonRulesMapper {
     private val daysUsedSinceMapper: (JsonMatchingAttribute) -> MatchingAttribute = { jsonMatchingAttribute ->
         MatchingAttribute.DaysUsedSince(
             since = dateFormatter.parse(jsonMatchingAttribute.since as String)!!,
-            value = (jsonMatchingAttribute.value as? Int) ?: -1,
+            value = jsonMatchingAttribute.value.toIntOrDefault(MATCHING_ATTR_INT_DEFAULT_VALUE),
             fallback = jsonMatchingAttribute.fallback
         )
     }
@@ -208,10 +220,5 @@ class JsonRulesMapper {
         }.onFailure {
             Timber.i("RMF: error $it")
         }.getOrDefault(MatchingAttribute.Unknown(this.value.fallback))
-    }
-
-    companion object {
-        private const val MIN_DEFAULT_VALUE = -1
-        private const val MAX_DEFAULT_VALUE = -1
     }
 }
