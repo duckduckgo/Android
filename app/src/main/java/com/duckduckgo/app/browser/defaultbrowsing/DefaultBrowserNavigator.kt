@@ -28,7 +28,10 @@ import javax.inject.Inject
 
 class DefaultBrowserNavigator @Inject constructor() {
 
-    fun navigateToSettings(fragment: Fragment, requestCode: Int = 0) {
+    fun navigateToSettings(
+        fragment: Fragment,
+        requestCode: Int = 0
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val intent = DefaultBrowserSystemSettings.intent()
             try {
@@ -39,10 +42,13 @@ class DefaultBrowserNavigator @Inject constructor() {
         }
     }
 
-    fun openDefaultBrowserDialog(fragment: Fragment, url: String, requestCode: Int = 0) {
+    fun openDefaultBrowserDialog(
+        fragment: Fragment,
+        url: String,
+        requestCode: Int = 0
+    ) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         intent.putExtra(BrowserActivity.LAUNCH_FROM_DEFAULT_BROWSER_DIALOG, true)
         fragment.startActivityForResult(intent, requestCode)
     }
-
 }

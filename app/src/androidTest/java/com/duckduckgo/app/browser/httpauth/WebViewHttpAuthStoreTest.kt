@@ -46,7 +46,8 @@ class WebViewHttpAuthStoreTest {
     private val webView: WebView = mock()
     private val databaseLocator = AuthDatabaseLocator(context)
 
-    private val webViewHttpAuthStore = RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestScope())
+    private val webViewHttpAuthStore =
+        RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestScope())
 
     @Test
     @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)

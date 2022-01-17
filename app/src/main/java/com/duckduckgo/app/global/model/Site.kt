@@ -60,8 +60,10 @@ interface Site {
 
     fun calculateGrades(): SiteGrades
 
-    data class SiteGrades(val grade: PrivacyGrade, val improvedGrade: PrivacyGrade)
-
+    data class SiteGrades(
+        val grade: PrivacyGrade,
+        val improvedGrade: PrivacyGrade
+    )
 }
 
 fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents

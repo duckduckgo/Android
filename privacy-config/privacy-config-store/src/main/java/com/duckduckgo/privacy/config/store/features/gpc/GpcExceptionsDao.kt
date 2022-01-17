@@ -24,7 +24,7 @@ import androidx.room.Transaction
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 
 @Dao
-abstract class GpcDao {
+abstract class GpcExceptionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAll(domains: List<GpcExceptionEntity>)

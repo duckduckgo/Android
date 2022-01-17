@@ -29,7 +29,11 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 
-fun TextView.addClickableLink(annotation: String, textSequence: CharSequence, onClick: () -> Unit) {
+fun TextView.addClickableLink(
+    annotation: String,
+    textSequence: CharSequence,
+    onClick: () -> Unit
+) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
     val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -68,7 +72,10 @@ fun TextView.addClickableLink(annotation: String, textSequence: CharSequence, on
     movementMethod = LinkMovementMethod.getInstance()
 }
 
-fun TextView.addClickableSpan(textSequence: CharSequence, spans: List<Pair<String, ClickableSpan>>) {
+fun TextView.addClickableSpan(
+    textSequence: CharSequence,
+    spans: List<Pair<String, ClickableSpan>>
+) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
     val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)

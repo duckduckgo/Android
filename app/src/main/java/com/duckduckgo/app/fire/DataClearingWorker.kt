@@ -34,7 +34,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
-class DataClearingWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
+class DataClearingWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var settingsDataStore: SettingsDataStore
     lateinit var clearDataAction: ClearDataAction

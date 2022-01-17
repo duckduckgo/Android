@@ -33,7 +33,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class AppTrackerListUpdateWorker(
+    context: Context,
+    workerParameters: WorkerParameters
+) : CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
 
@@ -67,7 +70,8 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 }
 
                 Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
+                vpnDatabase.vpnAppTrackerBlockingDao()
+                    .updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
 
                 return Result.success()
             }

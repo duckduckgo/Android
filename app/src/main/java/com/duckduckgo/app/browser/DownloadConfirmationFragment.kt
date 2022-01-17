@@ -53,7 +53,11 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         super.onAttach(context)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.download_confirmation, container, false)
         setupDownload()
         setupViews(view)
@@ -106,7 +110,11 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     interface DownloadConfirmationDialogListener {
         fun openExistingFile(file: File?)
-        fun replaceExistingFile(file: File?, pendingFileDownload: PendingFileDownload)
+        fun replaceExistingFile(
+            file: File?,
+            pendingFileDownload: PendingFileDownload
+        )
+
         fun continueDownload(pendingFileDownload: PendingFileDownload)
         fun cancelDownload()
     }

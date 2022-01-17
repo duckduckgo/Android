@@ -34,7 +34,6 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import org.mockito.kotlin.mock
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -158,7 +157,10 @@ class GeoLocationPermissionsTest {
         }
     }
 
-    private fun givenLocationPermissionsDomain(domain: String, permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS) {
+    private fun givenLocationPermissionsDomain(
+        domain: String,
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+    ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }
 }

@@ -48,7 +48,11 @@ class PrivacyProtectionNotification(
     }
 }
 
-class PrivacyProtectionNotificationSpecification(context: Context, trackers: Int, upgrades: Int) : NotificationSpec {
+class PrivacyProtectionNotificationSpecification(
+    context: Context,
+    trackers: Int,
+    upgrades: Int
+) : NotificationSpec {
 
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.PrivacyProtection

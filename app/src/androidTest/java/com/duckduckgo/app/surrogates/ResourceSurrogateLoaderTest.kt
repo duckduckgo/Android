@@ -126,5 +126,4 @@ class ResourceSurrogateLoaderTest {
     private fun readFile(filename: String): ByteArray {
         return javaClass.classLoader!!.getResource("binary/surrogates/$filename").readBytes()
     }
-
 }

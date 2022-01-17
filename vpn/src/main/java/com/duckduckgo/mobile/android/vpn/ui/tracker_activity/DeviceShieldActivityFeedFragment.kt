@@ -47,11 +47,18 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     private var feedListener: DeviceShieldActivityFeedListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         AndroidInjection.inject(this)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
             layoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
@@ -70,7 +77,14 @@ class DeviceShieldActivityFeedFragment : Fragment() {
                 .collect { it ->
                     feedListener?.onTrackerListShowed(it.size)
                     trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        startActivity(AppTPCompanyTrackersActivity.intent(requireContext(), trackerFeedData.trackingApp.packageId, trackerFeedData.trackingApp.appDisplayName, trackerFeedData.bucket))
+                        startActivity(
+                            AppTPCompanyTrackersActivity.intent(
+                                requireContext(),
+                                trackerFeedData.trackingApp.packageId,
+                                trackerFeedData.trackingApp.appDisplayName,
+                                trackerFeedData.bucket
+                            )
+                        )
                     }
                 }
         }
@@ -118,5 +132,4 @@ class DeviceShieldActivityFeedFragment : Fragment() {
     interface DeviceShieldActivityFeedListener {
         fun onTrackerListShowed(totalTrackers: Int)
     }
-
 }

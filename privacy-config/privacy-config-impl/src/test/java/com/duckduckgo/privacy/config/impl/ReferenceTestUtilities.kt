@@ -50,7 +50,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 
 @ExperimentalCoroutinesApi
-class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: DispatcherProvider) {
+class ReferenceTestUtilities(
+    db: PrivacyConfigDatabase,
+    val dispatcherProvider: DispatcherProvider
+) {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
@@ -75,7 +78,8 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
 
     fun getJsonPrivacyConfig(jsonFileName: String): JsonPrivacyConfig {
         val jsonAdapter: JsonAdapter<JsonPrivacyConfig> = moshi.adapter(
-            JsonPrivacyConfig::class.java)
+            JsonPrivacyConfig::class.java
+        )
         val config: JsonPrivacyConfig? = jsonAdapter.fromJson(FileUtilities.loadText(javaClass.classLoader!!, jsonFileName))
         return config!!
     }
@@ -84,11 +88,10 @@ class ReferenceTestUtilities(db: PrivacyConfigDatabase, val dispatcherProvider: 
         return FakePrivacyFeaturePluginPoint(getPrivacyFeaturePlugins())
     }
 
-    internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>):
+    internal class FakePrivacyFeaturePluginPoint(private val plugins: Collection<PrivacyFeaturePlugin>) :
         PluginPoint<PrivacyFeaturePlugin> {
         override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
             return plugins
         }
     }
-
 }

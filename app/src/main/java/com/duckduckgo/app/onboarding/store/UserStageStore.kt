@@ -58,7 +58,6 @@ class AppUserStageStore @Inject constructor(
     override suspend fun moveToStage(appStage: AppStage) {
         userStageDao.updateUserStage(appStage)
     }
-
 }
 
 suspend fun UserStageStore.isNewUser(): Boolean {

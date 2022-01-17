@@ -39,5 +39,4 @@ class IntentTabExtensionTest {
     companion object {
         const val TAB_ID = "abcd"
     }
-
 }

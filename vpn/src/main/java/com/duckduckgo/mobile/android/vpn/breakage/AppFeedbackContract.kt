@@ -22,14 +22,20 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 
 class AppFeedbackContract : ActivityResultContract<Void?, Boolean>() {
-    override fun createIntent(context: Context, input: Void?): Intent {
+    override fun createIntent(
+        context: Context,
+        input: Void?
+    ): Intent {
         // TODO Class.forName is not great but required to unblock ATP for now
         // We need to make bigger refactors to extract features into its own gradle modules
         // so that they are accessible from other places.
         return Intent(context, Class.forName("com.duckduckgo.app.feedback.ui.common.FeedbackActivity"))
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?
+    ): Boolean {
         return resultCode == RESULT_OK
     }
 }

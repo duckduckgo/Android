@@ -26,17 +26,22 @@ import javax.inject.Inject
 
 class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
-    fun determineHealthTunInputQueueReadRatio(tunInputs: Long, queueReads: Long): HealthState {
+    fun determineHealthTunInputQueueReadRatio(
+        tunInputs: Long,
+        queueReads: QueueReads
+    ): HealthState {
         if (tunInputs < 100) return Initializing
 
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tunInputs-queueReads", rawMetrics)
 
-        val percentage = percentage(queueReads, tunInputs)
+        val percentage = percentage(queueReads.queueReads, tunInputs)
 
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
         rawMetrics["tunInputs"] = Metric(tunInputs.toString())
-        rawMetrics["queueReads"] = Metric(queueReads.toString())
+        rawMetrics["queueReads"] = Metric(queueReads.queueReads.toString())
+        rawMetrics["queueTCPReads"] = Metric(queueReads.queueTCPReads.toString())
+        rawMetrics["queueUDPReads"] = Metric(queueReads.queueUDPReads.toString())
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
@@ -92,7 +97,8 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
         val successRate = percentage(successfulTraces.size.toLong(), allTraces.size.toLong())
         val numberFailed = allTraces.size - successfulTraces.size
-        val meanCompletedNs = if (successfulTraces.isEmpty()) 0.0 else successfulTraces.sumOf { it.timeToCompleteNanos }.toDouble() / successfulTraces.size
+        val meanCompletedNs =
+            if (successfulTraces.isEmpty()) 0.0 else successfulTraces.sumOf { it.timeToCompleteNanos }.toDouble() / successfulTraces.size
         val meanCompletedMs = meanCompletedNs / 1_000_000
 
         rawMetrics["successRate"] = Metric(successRate.toString(), badHealthIf { successRate < 85 })
@@ -153,7 +159,10 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
     companion object {
 
-        fun percentage(numerator: Long, denominator: Long): Double {
+        fun percentage(
+            numerator: Long,
+            denominator: Long
+        ): Double {
             if (denominator == 0L) return 0.0
             return numerator.toDouble() / denominator * 100
         }
@@ -163,3 +172,9 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         }
     }
 }
+
+data class QueueReads(
+    val queueReads: Long,
+    val queueTCPReads: Long,
+    val queueUDPReads: Long,
+)

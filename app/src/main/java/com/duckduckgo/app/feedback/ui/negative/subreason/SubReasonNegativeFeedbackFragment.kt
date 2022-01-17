@@ -36,10 +36,25 @@ class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feed
     private lateinit var recyclerAdapter: SubReasonAdapter
 
     interface DisambiguationNegativeFeedbackListener {
-        fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons)
-        fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons)
-        fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: CustomizationSubReasons)
-        fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons)
+        fun userSelectedSubReasonMissingBrowserFeatures(
+            mainReason: MainReason,
+            subReason: MissingBrowserFeaturesSubReasons
+        )
+
+        fun userSelectedSubReasonSearchNotGoodEnough(
+            mainReason: MainReason,
+            subReason: SearchNotGoodEnoughSubReasons
+        )
+
+        fun userSelectedSubReasonNeedMoreCustomization(
+            mainReason: MainReason,
+            subReason: CustomizationSubReasons
+        )
+
+        fun userSelectedSubReasonAppIsSlowOrBuggy(
+            mainReason: MainReason,
+            subReason: PerformanceSubReasons
+        )
     }
 
     private val binding: ContentFeedbackNegativeDisambiguationSubReasonBinding by viewBinding()

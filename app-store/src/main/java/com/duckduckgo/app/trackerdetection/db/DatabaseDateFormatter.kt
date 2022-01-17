@@ -28,5 +28,4 @@ internal class DatabaseDateFormatter {
             return FORMATTER_SECONDS.format(date)
         }
     }
-
 }

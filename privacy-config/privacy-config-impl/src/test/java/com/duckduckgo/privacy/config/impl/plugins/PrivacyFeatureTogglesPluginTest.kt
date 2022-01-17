@@ -47,7 +47,7 @@ class PrivacyFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledAndFeatureIsNotAPrivacyFeatureThenReturnNull() = runTest {
-        assertNull(testee.isEnabled(NonPrivacyFeature(), true)) 
+        assertNull(testee.isEnabled(NonPrivacyFeature(), true))
     }
 
     @Test
@@ -84,22 +84,28 @@ class PrivacyFeatureTogglesPluginTest {
 
     private fun givenPrivacyFeatureIsEnabled() {
         whenever(
-                mockFeatureTogglesRepository.get(
-                    PrivacyFeatureName.ContentBlockingFeatureName().value, true))
+            mockFeatureTogglesRepository.get(
+                PrivacyFeatureName.ContentBlockingFeatureName().value, true
+            )
+        )
             .thenReturn(true)
     }
 
     private fun givenPrivacyFeatureIsDisabled() {
         whenever(
-                mockFeatureTogglesRepository.get(
-                    PrivacyFeatureName.ContentBlockingFeatureName().value, true))
+            mockFeatureTogglesRepository.get(
+                PrivacyFeatureName.ContentBlockingFeatureName().value, true
+            )
+        )
             .thenReturn(false)
     }
 
     private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
-                mockFeatureTogglesRepository.get(
-                    PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue))
+            mockFeatureTogglesRepository.get(
+                PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue
+            )
+        )
             .thenReturn(defaultValue)
     }
 

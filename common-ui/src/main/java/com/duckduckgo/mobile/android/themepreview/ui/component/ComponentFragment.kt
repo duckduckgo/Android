@@ -35,7 +35,10 @@ abstract class ComponentFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_component_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceBundle: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceBundle: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceBundle)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)

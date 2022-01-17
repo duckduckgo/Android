@@ -96,7 +96,10 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Default
     }
 }
 
-class TrackersDbCleanerWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
+class TrackersDbCleanerWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
     lateinit var appTrackersDao: VpnTrackerDao

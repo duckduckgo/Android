@@ -48,7 +48,8 @@ class RealHttpsRepositoryTest {
         whenever(mockDatabase.httpsDao()).thenReturn(mockHttpsDao)
         testee =
             RealHttpsRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -57,7 +58,8 @@ class RealHttpsRepositoryTest {
 
         testee =
             RealHttpsRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(httpException.toHttpsException(), testee.exceptions.first())
     }
@@ -67,7 +69,8 @@ class RealHttpsRepositoryTest {
         runTest {
             testee =
                 RealHttpsRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
 
             testee.updateAll(listOf())
 
@@ -80,7 +83,8 @@ class RealHttpsRepositoryTest {
             givenHttpsDaoContainsExceptions()
             testee =
                 RealHttpsRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
             assertEquals(1, testee.exceptions.size)
             reset(mockHttpsDao)
 

@@ -24,5 +24,4 @@ interface DownloadFileService {
 
     @HEAD
     fun getFileDetails(@Url urlString: String): Call<Void>?
-
 }

@@ -144,7 +144,10 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     companion object {
 
-        fun intent(context: Context, survey: Survey): Intent {
+        fun intent(
+            context: Context,
+            survey: Survey
+        ): Intent {
             val intent = Intent(context, SurveyActivity::class.java)
             intent.putExtra(SURVEY_EXTRA, survey)
             return intent
@@ -155,12 +158,18 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     inner class SurveyWebViewClient : WebViewClient() {
 
-        override fun onPageFinished(view: WebView?, url: String?) {
+        override fun onPageFinished(
+            view: WebView?,
+            url: String?
+        ) {
             super.onPageFinished(view, url)
             viewModel.onSurveyLoaded()
         }
 
-        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+        override fun shouldInterceptRequest(
+            view: WebView,
+            request: WebResourceRequest
+        ): WebResourceResponse? {
             if (request.url.host == "duckduckgo.com") {
                 runOnUiThread {
                     viewModel.onSurveyCompleted()
@@ -170,17 +179,29 @@ class SurveyActivity : DuckDuckGoActivity() {
         }
 
         @Suppress("OverridingDeprecatedMember")
-        override fun onReceivedError(view: WebView, errorCode: Int, description: String, failingUrl: String) {
+        override fun onReceivedError(
+            view: WebView,
+            errorCode: Int,
+            description: String,
+            failingUrl: String
+        ) {
             viewModel.onSurveyFailedToLoad()
         }
 
-        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+        override fun onReceivedError(
+            view: WebView,
+            request: WebResourceRequest,
+            error: WebResourceError
+        ) {
             if (request.isForMainFrame) {
                 viewModel.onSurveyFailedToLoad()
             }
         }
 
-        override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+        override fun onRenderProcessGone(
+            view: WebView?,
+            detail: RenderProcessGoneDetail?
+        ): Boolean {
             viewModel.onSurveyFailedToLoad()
             return true
         }

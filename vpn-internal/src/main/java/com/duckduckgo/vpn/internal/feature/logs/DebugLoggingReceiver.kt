@@ -42,6 +42,7 @@ class DebugLoggingReceiver(
                 putExtra("turn", "on")
             }
         }
+
         fun turnOffIntent(): Intent {
             return Intent(ACTION).apply {
                 putExtra("turn", "off")
@@ -81,7 +82,10 @@ class DebugLoggingReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         receiver?.unregister()
     }
 }

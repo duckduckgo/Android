@@ -49,5 +49,4 @@ enum class LocationPermissionType(val value: Int) {
         private val map = values().associateBy(LocationPermissionType::value)
         fun fromValue(value: Int) = map[value]
     }
-
 }

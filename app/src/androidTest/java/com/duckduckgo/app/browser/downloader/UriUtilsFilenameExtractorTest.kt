@@ -287,7 +287,11 @@ class UriUtilsFilenameExtractorTest {
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
-    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+    private fun buildPendingDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -296,5 +300,4 @@ class UriUtilsFilenameExtractorTest {
             userAgent = "aUserAgent"
         )
     }
-
 }

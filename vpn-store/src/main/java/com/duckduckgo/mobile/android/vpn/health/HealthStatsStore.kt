@@ -50,7 +50,11 @@ data class SimpleEvent(
 
         fun TUN_READ() = build("TUN_READ")
         fun ADD_TO_DEVICE_TO_NETWORK_QUEUE() = build("ADD_TO_DEVICE_TO_NETWORK_QUEUE")
+        fun ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE() = build("ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE")
+        fun ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE() = build("ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE")
         fun REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE() = build("REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE")
+        fun REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE() = build("REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE")
+        fun REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE() = build("REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE")
         fun SOCKET_CHANNEL_READ_EXCEPTION() = build("SOCKET_CHANNEL_READ_EXCEPTION")
         fun SOCKET_CHANNEL_WRITE_EXCEPTION() = build("SOCKET_CHANNEL_WRITE_EXCEPTION")
         fun SOCKET_CHANNEL_CONNECT_EXCEPTION() = build("SOCKET_CHANNEL_CONNECT_EXCEPTION")
@@ -69,10 +73,13 @@ interface HealthStatDao {
     fun insertEvent(event: SimpleEvent)
 
     @Query("SELECT count(*) FROM SimpleEvent WHERE timestamp >= :timestamp AND type=:type")
-    fun eventCount(type: String, timestamp: Long): Long
+    fun eventCount(
+        type: String,
+        timestamp: Long
+    ): Long
 
     @Query(
         "DELETE FROM SimpleEvent WHERE id IN (SELECT id FROM SimpleEvent ORDER BY timestamp DESC LIMIT -1 OFFSET :maxNumberToKeep)",
     )
-    fun purgeOldMetrics(maxNumberToKeep:Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
+    fun purgeOldMetrics(maxNumberToKeep: Int = MAX_NUMBER_HEALTH_METRICS_TO_RETAIN)
 }

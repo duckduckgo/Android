@@ -56,5 +56,8 @@ class ListExtensionKtTest(private val testCase: TestListTestCase) {
         )
     }
 
-    data class TestListTestCase(val inputList: List<String>, val expected: List<String>)
+    data class TestListTestCase(
+        val inputList: List<String>,
+        val expected: List<String>
+    )
 }

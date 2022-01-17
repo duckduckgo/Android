@@ -37,7 +37,10 @@ class DatabaseDateFormatter {
             return FORMATTER_SECONDS.format(date)
         }
 
-        fun duration(start: String, end: String = FORMATTER_SECONDS.format(LocalDateTime.now())): Duration {
+        fun duration(
+            start: String,
+            end: String = FORMATTER_SECONDS.format(LocalDateTime.now())
+        ): Duration {
             val startTime = LocalDateTime.parse(start, FORMATTER_SECONDS)
             val endTime = LocalDateTime.parse(end, FORMATTER_SECONDS)
             return Duration.between(startTime, endTime)

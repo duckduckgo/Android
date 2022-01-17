@@ -37,7 +37,11 @@ class TypeAnimationTextView @JvmOverloads constructor(
     var typingDelayInMs: Long = 20
     var textInDialog: Spanned? = null
 
-    fun startTypingAnimation(textDialog: String, isCancellable: Boolean = true, afterAnimation: () -> Unit = {}) {
+    fun startTypingAnimation(
+        textDialog: String,
+        isCancellable: Boolean = true,
+        afterAnimation: () -> Unit = {}
+    ) {
         textInDialog = textDialog.html(context)
         if (isCancellable) {
             setOnClickListener {

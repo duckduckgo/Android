@@ -38,7 +38,11 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
     var listener: HttpAuthenticationListener? = null
 
     interface HttpAuthenticationListener {
-        fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials)
+        fun handleAuthentication(
+            request: BasicAuthenticationRequest,
+            credentials: BasicAuthenticationCredentials
+        )
+
         fun cancelAuthentication(request: BasicAuthenticationRequest)
     }
 
@@ -89,7 +93,10 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
         }
     }
 
-    private fun showKeyboard(editText: EditText, alert: AlertDialog) {
+    private fun showKeyboard(
+        editText: EditText,
+        alert: AlertDialog
+    ) {
         editText.showKeyboard()
         alert.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }

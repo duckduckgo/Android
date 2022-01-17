@@ -36,7 +36,11 @@ class QuickAccessDragTouchItemListener(
         return false
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         val items = favoritesQuickAccessAdapter.currentList.toMutableList()
         val quickAccessFavorite = items[viewHolder.bindingAdapterPosition]
         items.removeAt(viewHolder.bindingAdapterPosition)
@@ -45,17 +49,26 @@ class QuickAccessDragTouchItemListener(
         return true
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(
+        viewHolder: RecyclerView.ViewHolder,
+        direction: Int
+    ) {
         // noop
     }
 
-    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+    override fun clearView(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ) {
         super.clearView(recyclerView, viewHolder)
         dragDropListener.onListChanged(favoritesQuickAccessAdapter.currentList)
         (viewHolder as? DragDropViewHolderListener)?.onItemReleased()
     }
 
-    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+    override fun onSelectedChanged(
+        viewHolder: RecyclerView.ViewHolder?,
+        actionState: Int
+    ) {
         super.onSelectedChanged(viewHolder, actionState)
         val listener = viewHolder as? DragDropViewHolderListener ?: return
         when (actionState) {

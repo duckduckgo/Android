@@ -24,13 +24,26 @@ interface AppHealthCallback {
     suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean
 }
 
-data class AppHealthData(val alerts: List<String>, val systemHealth: SystemHealthData)
+data class AppHealthData(
+    val alerts: List<String>,
+    val systemHealth: SystemHealthData
+)
 
-data class SystemHealthData(val isBadHealth: Boolean, val rawMetrics: List<RawMetricsSubmission>)
+data class SystemHealthData(
+    val isBadHealth: Boolean,
+    val rawMetrics: List<RawMetricsSubmission>
+)
 
-data class RawMetricsSubmission(val name: String, val metrics: Map<String, Metric> = emptyMap(), val redacted: Boolean = false)
+data class RawMetricsSubmission(
+    val name: String,
+    val metrics: Map<String, Metric> = emptyMap(),
+    val redacted: Boolean = false
+)
 
-data class Metric(val value: String, val isBadState: Boolean? = null) {
+data class Metric(
+    val value: String,
+    val isBadState: Boolean? = null
+) {
 
     override fun toString(): String {
         if (isBadState == null) return value

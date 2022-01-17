@@ -31,7 +31,12 @@ import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealGpc @Inject constructor(context: Context, private val featureToggle: FeatureToggle, val gpcRepository: GpcRepository, private val unprotectedTemporary: UnprotectedTemporary) : Gpc {
+class RealGpc @Inject constructor(
+    context: Context,
+    private val featureToggle: FeatureToggle,
+    val gpcRepository: GpcRepository,
+    private val unprotectedTemporary: UnprotectedTemporary
+) : Gpc {
 
     private val gpcJsFunctions: String = context.resources.openRawResource(R.raw.gpc).bufferedReader().use { it.readText() }
 
@@ -51,9 +56,12 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
         }
     }
 
-    override fun canUrlAddHeaders(url: String, existingHeaders: Map<String, String>): Boolean {
+    override fun canUrlAddHeaders(
+        url: String,
+        existingHeaders: Map<String, String>
+    ): Boolean {
         return if (canGpcBeUsedByUrl(url) && !containsGpcHeader(existingHeaders)) {
-            headerConsumers.any { sameOrSubdomain(url, it) }
+            gpcRepository.headerEnabledSites.any { sameOrSubdomain(url, it.domain) }
         } else {
             false
         }
@@ -90,13 +98,5 @@ class RealGpc @Inject constructor(context: Context, private val featureToggle: F
     companion object {
         const val GPC_HEADER = "sec-gpc"
         const val GPC_HEADER_VALUE = "1"
-
-        private val headerConsumers = listOf(
-            "nytimes.com",
-            "washingtonpost.com",
-            "globalprivacycontrol.org",
-            "global-privacy-control.glitch.me"
-        )
     }
-
 }

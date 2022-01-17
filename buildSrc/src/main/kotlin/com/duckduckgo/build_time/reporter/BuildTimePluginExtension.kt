@@ -23,7 +23,9 @@ import org.gradle.api.reporting.ReportingExtension
 import java.time.Duration
 
 enum class Output {
-    CONSOLE, PIXEL, CSV
+    CONSOLE,
+    PIXEL,
+    CSV
 }
 
 open class BuildTimePluginExtension(private val project: Project) {

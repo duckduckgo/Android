@@ -16,6 +16,9 @@ git add `git diff --name-only`
 exit 0
 ```
 
+If you want to reformat code whilst writing it, please make sure you have installed and enabled 
+the [IntelliJ Ktfmt plugin](https://plugins.jetbrains.com/plugin/14912-ktfmt), with Dropbox Style selected.
+
 ##  Code conventions
 
 ### Logging

@@ -37,7 +37,11 @@ class DeviceShieldEnabledNotificationBuilder {
         private fun registerOngoingNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel =
-                    NotificationChannel(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID, "Tracker Protection Running", NotificationManager.IMPORTANCE_MIN)
+                    NotificationChannel(
+                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
+                        "Tracker Protection Running",
+                        NotificationManager.IMPORTANCE_MIN
+                    )
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -100,6 +104,5 @@ class DeviceShieldEnabledNotificationBuilder {
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
                 .build()
         }
-
     }
 }

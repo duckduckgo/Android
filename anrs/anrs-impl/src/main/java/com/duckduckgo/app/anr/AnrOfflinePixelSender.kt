@@ -26,7 +26,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Completable
 import io.reactivex.Completable.complete
 import io.reactivex.Completable.defer
-import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)

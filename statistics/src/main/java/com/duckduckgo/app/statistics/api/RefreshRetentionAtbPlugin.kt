@@ -28,6 +28,7 @@ interface RefreshRetentionAtbPlugin {
      * Will be called right after we have refreshed the ATB retention on search
      */
     fun onSearchRetentionAtbRefreshed()
+
     /**
      * Will be called right after we have refreshed the ATB retention on search
      */

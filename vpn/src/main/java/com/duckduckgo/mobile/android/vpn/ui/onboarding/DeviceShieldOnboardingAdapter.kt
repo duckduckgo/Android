@@ -29,11 +29,17 @@ import com.duckduckgo.mobile.android.vpn.R
 
 class DeviceShieldOnboardingAdapter(val pages: List<DeviceShieldOnboardingViewModel.OnboardingPage>) : RecyclerView.Adapter<PageViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PageViewHolder(parent)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ) = PageViewHolder(parent)
 
     override fun getItemCount() = pages.size
 
-    override fun onBindViewHolder(holder: PageViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: PageViewHolder,
+        position: Int
+    ) {
         holder.bind(pages[position], position)
     }
 }
@@ -51,7 +57,10 @@ class PageViewHolder(parent: ViewGroup) :
     private val indicatorThree: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_three)
     private val indicators: List<ImageView> = listOf(indicatorOne, indicatorTwo, indicatorThree)
 
-    fun bind(page: DeviceShieldOnboardingViewModel.OnboardingPage, position: Int) {
+    fun bind(
+        page: DeviceShieldOnboardingViewModel.OnboardingPage,
+        position: Int
+    ) {
         pageTitle.setText(page.title)
         pageText.setText(page.text)
 

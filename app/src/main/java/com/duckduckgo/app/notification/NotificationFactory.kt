@@ -25,7 +25,10 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.app.notification.model.NotificationSpec
 import javax.inject.Inject
 
-class NotificationFactory @Inject constructor(val context: Context, val manager: NotificationManagerCompat) {
+class NotificationFactory @Inject constructor(
+    val context: Context,
+    val manager: NotificationManagerCompat
+) {
 
     fun createNotification(
         specification: NotificationSpec,
@@ -53,5 +56,4 @@ class NotificationFactory @Inject constructor(val context: Context, val manager:
 
         return builder.build()
     }
-
 }

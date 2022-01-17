@@ -83,7 +83,10 @@ class TrustedCertificateStoreImpl(
     }
 
     @Throws(CertificateExpiredException::class, CertificateNotYetValidException::class)
-    private fun validate(cert: Certificate, issuerCertificate: Certificate) {
+    private fun validate(
+        cert: Certificate,
+        issuerCertificate: Certificate
+    ) {
         if (issuerCertificate.type == CertificateTypes.X509) {
             (issuerCertificate as X509Certificate).checkValidity()
         }

@@ -22,19 +22,20 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
-import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
-import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import javax.inject.Inject
 
 class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrokenSiteBinding by viewBinding()
     private val viewModel: BrokenSiteViewModel by bindViewModel()
+    @Inject lateinit var webViewVersionProvider: WebViewVersionProvider
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -82,7 +83,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         }
 
         brokenSites.submitButton.setOnClickListener {
-            val webViewVersion = WebViewCompat.getCurrentWebViewPackage(applicationContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
+            val webViewVersion = webViewVersionProvider.getFullVersion()
             viewModel.onSubmitPressed(webViewVersion)
         }
     }
@@ -128,7 +129,10 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
         private const val SURROGATES_EXTRA = "SURROGATES_EXTRA"
 
-        fun intent(context: Context, data: BrokenSiteData): Intent {
+        fun intent(
+            context: Context,
+            data: BrokenSiteData
+        ): Intent {
             val intent = Intent(context, BrokenSiteActivity::class.java)
             intent.putExtra(URL_EXTRA, data.url)
             intent.putExtra(BLOCKED_TRACKERS_EXTRA, data.blockedTrackers)

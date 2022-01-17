@@ -48,7 +48,10 @@ class FilenameExtractor @Inject constructor(
         return bestGuess(guesses)
     }
 
-    private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
+    private fun evaluateGuessQuality(
+        guesses: Guesses,
+        pathSegments: List<String>
+    ): GuessQuality {
         val latestGuess = guesses.latestGuess
         val bestGuess = guesses.bestGuess
 
@@ -62,7 +65,11 @@ class FilenameExtractor @Inject constructor(
         return NotGoodEnough
     }
 
-    private fun guessFilename(url: String, contentDisposition: String?, mimeType: String?): String {
+    private fun guessFilename(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): String {
         val tidiedUrl = url.removeSuffix("/")
         var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
 
@@ -106,6 +113,8 @@ class FilenameExtractor @Inject constructor(
         data class Guess(val bestGuess: String) : FilenameExtractionResult()
     }
 
-    data class Guesses(var latestGuess: String, var bestGuess: String? = null)
-
+    data class Guesses(
+        var latestGuess: String,
+        var bestGuess: String? = null
+    )
 }

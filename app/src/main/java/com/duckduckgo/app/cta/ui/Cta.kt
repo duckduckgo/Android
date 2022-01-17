@@ -98,7 +98,10 @@ sealed class DaxDialogCta(
 
     open fun getDaxText(context: Context): String = context.getString(description)
 
-    class DaxSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
+    class DaxSerpCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.daxSerpCtaText,
         R.string.daxDialogPhew,
@@ -192,7 +195,10 @@ sealed class DaxDialogCta(
         private fun isFromSameNetworkDomain(): Boolean = mainTrackerDomains.any { siteHost.contains(it) }
     }
 
-    class DaxNoSerpCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxDialogCta(
+    class DaxNoSerpCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
         R.string.daxDialogGotIt,
@@ -241,7 +247,10 @@ sealed class DaxBubbleCta(
 
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    class DaxIntroCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+    class DaxIntroCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxBubbleCta(
         CtaId.DAX_INTRO,
         R.string.daxIntroCtaText,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -252,7 +261,10 @@ sealed class DaxBubbleCta(
         appInstallStore
     )
 
-    class DaxFireproofCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+    class DaxFireproofCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxBubbleCta(
         CtaId.DAX_FIREPROOF,
         R.string.daxFireproofCtaText,
         AppPixelName.ONBOARDING_FIREPROOF_CTA_SHOWN,
@@ -263,7 +275,10 @@ sealed class DaxBubbleCta(
         appInstallStore
     )
 
-    class DaxEndCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxBubbleCta(
+    class DaxEndCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxBubbleCta(
         CtaId.DAX_END,
         R.string.daxEndCtaText,
         AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
@@ -309,7 +324,10 @@ sealed class BubbleCta(
             super.showCta(view)
             val accessibilityDelegate: View.AccessibilityDelegate =
                 object : View.AccessibilityDelegate() {
-                    override fun onInitializeAccessibilityNodeInfo(v: View?, info: AccessibilityNodeInfo) {
+                    override fun onInitializeAccessibilityNodeInfo(
+                        v: View?,
+                        info: AccessibilityNodeInfo
+                    ) {
                         super.onInitializeAccessibilityNodeInfo(v, info)
                         info.text = v?.context?.getString(R.string.daxFavoritesOnboardingCtaContentDescription)
                     }
@@ -346,7 +364,10 @@ sealed class DaxFireDialogCta(
 
     override fun pixelShownParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to addCtaToHistory(ctaPixelParam))
 
-    class TryClearDataCta(override val onboardingStore: OnboardingStore, override val appInstallStore: AppInstallStore) : DaxFireDialogCta(
+    class TryClearDataCta(
+        override val onboardingStore: OnboardingStore,
+        override val appInstallStore: AppInstallStore
+    ) : DaxFireDialogCta(
         ctaId = CtaId.DAX_FIRE_BUTTON,
         description = R.string.daxClearDataCtaText,
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,

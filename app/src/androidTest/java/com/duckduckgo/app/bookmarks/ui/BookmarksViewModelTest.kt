@@ -73,7 +73,14 @@ class BookmarksViewModelTest {
     private val bookmarkEntity = BookmarkEntity(id = bookmark.id, title = bookmark.title, url = bookmark.url, parentId = 0)
 
     private val testee: BookmarksViewModel by lazy {
-        val model = BookmarksViewModel(favoritesRepository, bookmarksRepository, faviconManager, savedSitesManager, pixel, coroutineRule.testDispatcherProvider)
+        val model = BookmarksViewModel(
+            favoritesRepository,
+            bookmarksRepository,
+            faviconManager,
+            savedSitesManager,
+            pixel,
+            coroutineRule.testDispatcherProvider
+        )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model
@@ -83,7 +90,14 @@ class BookmarksViewModelTest {
     fun before() = runTest {
         whenever(favoritesRepository.favorites()).thenReturn(flowOf())
 
-        whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(flowOf(Pair(listOf(bookmark), listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder))))
+        whenever(bookmarksRepository.fetchBookmarksAndFolders(anyLong())).thenReturn(
+            flowOf(
+                Pair(
+                    listOf(bookmark),
+                    listOf(bookmarkFolder, bookmarkFolder, bookmarkFolder)
+                )
+            )
+        )
     }
 
     @After

@@ -22,9 +22,11 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 sealed class PrivacyFeatureName(override val value: String) : FeatureName {
     data class ContentBlockingFeatureName(override val value: String = "contentBlocking") :
         PrivacyFeatureName(value)
+
     data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
     data class HttpsFeatureName(override val value: String = "https") : PrivacyFeatureName(value)
     data class TrackerAllowlistFeatureName(override val value: String = "trackerAllowlist") :
         PrivacyFeatureName(value)
+
     data class DrmFeatureName(override val value: String = "eme") : PrivacyFeatureName(value)
 }

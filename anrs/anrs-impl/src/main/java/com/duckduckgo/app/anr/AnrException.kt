@@ -41,6 +41,7 @@ internal class AnrException(thread: Thread) : Exception("ANR detected") {
         }
         return list
     }
+
     private fun generateProcessMap(): String {
         val bos = ByteArrayOutputStream()
         val ps = PrintStream(bos)
@@ -60,7 +61,12 @@ internal class AnrException(thread: Thread) : Exception("ANR detected") {
         }
     }
 
-    private fun printThread(ps: PrintStream, locale: Locale, thread: Thread, stack: Array<StackTraceElement>) {
+    private fun printThread(
+        ps: PrintStream,
+        locale: Locale,
+        thread: Thread,
+        stack: Array<StackTraceElement>
+    ) {
         ps.println(String.format(locale, "\t%s (%s)", thread.name, thread.state))
         for (element in stack) {
             element.apply {

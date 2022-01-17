@@ -80,13 +80,22 @@ class SendTrackerDebugReceiver @Inject constructor(
 
             val insertionList = mutableListOf<VpnTracker>()
             for (i in 0 until times) {
-                insertionList.add(dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(timestamp = DatabaseDateFormatter.timestamp(LocalDateTime.now().minusHours(hoursAgo))))
+                insertionList.add(
+                    dummyTrackers[(dummyTrackers.indices).shuffled().first()].copy(
+                        timestamp = DatabaseDateFormatter.timestamp(
+                            LocalDateTime.now().minusHours(hoursAgo)
+                        )
+                    )
+                )
             }
             vpnDatabase.vpnTrackerDao().insert(insertionList)
         }
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         handleIntent(intent)
     }
 
@@ -95,7 +104,10 @@ class SendTrackerDebugReceiver @Inject constructor(
         register()
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.v("Send tracker receiver stopped")
         unregister()
     }

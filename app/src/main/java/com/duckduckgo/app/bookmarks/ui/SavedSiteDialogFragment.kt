@@ -79,7 +79,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->

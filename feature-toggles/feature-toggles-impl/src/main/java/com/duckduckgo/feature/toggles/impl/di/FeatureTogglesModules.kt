@@ -33,7 +33,6 @@ abstract class FeatureTogglesBindingModule {
 
     @Multibinds
     abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
-
 }
 
 @Module

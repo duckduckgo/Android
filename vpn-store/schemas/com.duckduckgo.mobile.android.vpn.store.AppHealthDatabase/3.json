@@ -1,0 +1,52 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "baebcb7495bb653baa202ce10ebd2bb0",
+    "entities": [
+      {
+        "tableName": "app_health_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`type` TEXT NOT NULL, `localtime` TEXT NOT NULL, `alerts` TEXT NOT NULL, `healthDataJsonString` TEXT NOT NULL, PRIMARY KEY(`type`))",
+        "fields": [
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localtime",
+            "columnName": "localtime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alerts",
+            "columnName": "alerts",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "healthDataJsonString",
+            "columnName": "healthDataJsonString",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "type"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'baebcb7495bb653baa202ce10ebd2bb0')"
+    ]
+  }
+}

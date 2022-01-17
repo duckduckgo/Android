@@ -27,12 +27,19 @@ class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    fun userSubmittingFeedback(feedback: String, brokenSite: String?) {
+    fun userSubmittingFeedback(
+        feedback: String,
+        brokenSite: String?
+    ) {
         command.value = Command.ExitAndSubmitFeedback(feedback, brokenSite)
     }
 
     sealed class Command {
-        data class ExitAndSubmitFeedback(val feedback: String, val brokenSite: String?) : Command()
+        data class ExitAndSubmitFeedback(
+            val feedback: String,
+            val brokenSite: String?
+        ) : Command()
+
         object Exit : Command()
     }
 }

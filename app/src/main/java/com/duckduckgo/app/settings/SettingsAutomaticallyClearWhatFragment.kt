@@ -60,7 +60,10 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
         return alertBuilder.create()
     }
 
-    private fun updateCurrentSelect(currentOption: ClearWhatOption, radioGroup: RadioGroup) {
+    private fun updateCurrentSelect(
+        currentOption: ClearWhatOption,
+        radioGroup: RadioGroup
+    ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }
@@ -88,5 +91,4 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
             return fragment
         }
     }
-
 }

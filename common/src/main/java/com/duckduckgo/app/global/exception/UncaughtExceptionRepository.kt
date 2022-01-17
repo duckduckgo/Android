@@ -23,7 +23,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface UncaughtExceptionRepository {
-    suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource)
+    suspend fun recordUncaughtException(
+        e: Throwable?,
+        exceptionSource: UncaughtExceptionSource
+    )
+
     suspend fun getExceptions(): List<UncaughtExceptionEntity>
     suspend fun deleteException(id: Long)
 }
@@ -36,7 +40,10 @@ class UncaughtExceptionRepositoryDb(
 
     private var lastSeenException: Throwable? = null
 
-    override suspend fun recordUncaughtException(e: Throwable?, exceptionSource: UncaughtExceptionSource) {
+    override suspend fun recordUncaughtException(
+        e: Throwable?,
+        exceptionSource: UncaughtExceptionSource
+    ) {
         return withContext(Dispatchers.IO) {
             if (e == lastSeenException) {
                 return@withContext

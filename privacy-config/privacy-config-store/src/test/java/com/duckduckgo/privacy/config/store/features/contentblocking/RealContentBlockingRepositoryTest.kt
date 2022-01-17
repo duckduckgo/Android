@@ -54,10 +54,12 @@ class RealContentBlockingRepositoryTest {
 
         testee =
             RealContentBlockingRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(
-            contentBlockingException.toContentBlockingException(), testee.exceptions.first())
+            contentBlockingException.toContentBlockingException(), testee.exceptions.first()
+        )
     }
 
     @Test
@@ -65,7 +67,8 @@ class RealContentBlockingRepositoryTest {
         runTest {
             testee =
                 RealContentBlockingRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
 
             testee.updateAll(listOf())
 
@@ -78,7 +81,8 @@ class RealContentBlockingRepositoryTest {
             givenContentBlockingDaoContainsExceptions()
             testee =
                 RealContentBlockingRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
             assertEquals(1, testee.exceptions.size)
             reset(mockContentBlockingDao)
 

@@ -29,12 +29,15 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Database(
-    exportSchema = true, version = 2,
+    exportSchema = true, version = 3,
     entities = [
         AppHealthState::class
     ]
 )
-@TypeConverters(AppHealthDatabaseConverters::class)
+@TypeConverters(
+    AppHealthDatabaseConverters::class,
+    AppHealthState.HealthEventTypeConverter::class,
+)
 abstract class AppHealthDatabase : RoomDatabase() {
 
     abstract fun appHealthDao(): AppHealthDao
@@ -52,7 +55,6 @@ abstract class AppHealthDatabase : RoomDatabase() {
 object AppHealthDatabaseConverters {
     private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
     private val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
-
 
     @TypeConverter
     @JvmStatic
