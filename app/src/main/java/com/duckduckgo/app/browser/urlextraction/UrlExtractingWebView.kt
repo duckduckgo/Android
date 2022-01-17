@@ -50,8 +50,10 @@ class UrlExtractingWebView(
 
         urlExtractor.addUrlExtraction(this) { extractedUrl ->
             extractedUrlListener?.invoke(extractedUrl)
-            stopLoading()
-            destroy()
+            post {
+                stopLoading()
+                destroy()
+            }
         }
     }
 
