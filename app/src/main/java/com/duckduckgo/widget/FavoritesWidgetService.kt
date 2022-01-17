@@ -46,7 +46,10 @@ class FavoritesWidgetService : RemoteViewsService() {
         return FavoritesWidgetItemFactory(this.applicationContext, intent)
     }
 
-    class FavoritesWidgetItemFactory(val context: Context, intent: Intent) : RemoteViewsFactory {
+    class FavoritesWidgetItemFactory(
+        val context: Context,
+        intent: Intent
+    ) : RemoteViewsFactory {
 
         private val theme = WidgetTheme.getThemeFrom(intent.extras?.getString(THEME_EXTRAS))
 
@@ -72,7 +75,12 @@ class FavoritesWidgetService : RemoteViewsService() {
                 return widgetPrefs.widgetSize(appWidgetId).let { it.first * it.second }
             }
 
-        data class WidgetFavorite(val title: String, val url: String, val bitmap: Bitmap?)
+        data class WidgetFavorite(
+            val title: String,
+            val url: String,
+            val bitmap: Bitmap?
+        )
+
         private val domains = mutableListOf<WidgetFavorite>()
 
         override fun onCreate() {
@@ -82,7 +90,12 @@ class FavoritesWidgetService : RemoteViewsService() {
         override fun onDataSetChanged() {
             val newList = favoritesDataRepository.favoritesSync().take(maxItems).map {
                 val bitmap = runBlocking {
-                    faviconManager.loadFromDiskWithParams(url = it.url, cornerRadius = faviconItemCornerRadius, width = faviconItemSize, height = faviconItemSize)
+                    faviconManager.loadFromDiskWithParams(
+                        url = it.url,
+                        cornerRadius = faviconItemCornerRadius,
+                        width = faviconItemSize,
+                        height = faviconItemSize
+                    )
                         ?: generateDefaultDrawable(context, it.url.extractDomain().orEmpty()).toBitmap(faviconItemSize, faviconItemSize)
                 }
                 WidgetFavorite(it.title, it.url, bitmap)
@@ -139,7 +152,10 @@ class FavoritesWidgetService : RemoteViewsService() {
             }
         }
 
-        private fun configureClickListener(remoteViews: RemoteViews, item: String) {
+        private fun configureClickListener(
+            remoteViews: RemoteViews,
+            item: String
+        ) {
             val bundle = Bundle()
             bundle.putString(Intent.EXTRA_TEXT, item)
             bundle.putBoolean(BrowserActivity.NEW_SEARCH_EXTRA, false)

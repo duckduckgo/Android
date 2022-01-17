@@ -48,7 +48,11 @@ interface VpnAppTrackerBlockingDao {
     fun insertAppPackages(appPackages: List<AppTrackerPackage>)
 
     @Transaction
-    fun updateTrackerBlocklist(blocklist: List<AppTracker>, appPackages: List<AppTrackerPackage>, metadata: AppTrackerMetadata) {
+    fun updateTrackerBlocklist(
+        blocklist: List<AppTracker>,
+        appPackages: List<AppTrackerPackage>,
+        metadata: AppTrackerMetadata
+    ) {
         setTrackerBlocklistMetadata(metadata)
 
         deleteTrackerBlockList()
@@ -80,7 +84,10 @@ interface VpnAppTrackerBlockingDao {
     fun deleteExclusionList()
 
     @Transaction
-    fun updateExclusionList(exclusionList: List<AppTrackerExcludedPackage>, metadata: AppTrackerExclusionListMetadata) {
+    fun updateExclusionList(
+        exclusionList: List<AppTrackerExcludedPackage>,
+        metadata: AppTrackerExclusionListMetadata
+    ) {
         setExclusionListMetadata(metadata)
         deleteExclusionList()
         insertExclusionList(exclusionList)
@@ -108,7 +115,10 @@ interface VpnAppTrackerBlockingDao {
     fun deleteTrackerExceptionRules()
 
     @Transaction
-    fun updateTrackerExceptionRules(exceptionRules: List<AppTrackerExceptionRule>, metadata: AppTrackerExceptionRuleMetadata) {
+    fun updateTrackerExceptionRules(
+        exceptionRules: List<AppTrackerExceptionRule>,
+        metadata: AppTrackerExceptionRuleMetadata
+    ) {
         setTrackerExceptionRulesMetadata(metadata)
         deleteTrackerExceptionRules()
         insertTrackerExceptionRules(exceptionRules)
@@ -125,5 +135,4 @@ interface VpnAppTrackerBlockingDao {
 
     @Query("DELETE from vpn_app_tracker_manual_exclusion_list")
     fun deleteManualAppExclusionList()
-
 }

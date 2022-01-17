@@ -141,7 +141,10 @@ class DeviceShieldNotificationScheduler(
         workManager.enqueueUniquePeriodicWork(WORKER_VPN_WEEKLY_NOTIFICATION_NAME, ExistingPeriodicWorkPolicy.KEEP, weeklyNotificationRequest)
     }
 
-    class DeviceShieldDailyNotificationWorker(val context: Context, val params: WorkerParameters) : CoroutineWorker(context, params) {
+    class DeviceShieldDailyNotificationWorker(
+        val context: Context,
+        val params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var notificationPressedHandler: DailyNotificationPressedHandler
         lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var repository: AppTrackerBlockingStatsRepository
@@ -188,7 +191,10 @@ class DeviceShieldNotificationScheduler(
         }
     }
 
-    class DeviceShieldWeeklyNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class DeviceShieldWeeklyNotificationWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var notificationPressedHandler: WeeklyNotificationPressedHandler
         lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var notificationManager: NotificationManagerCompat

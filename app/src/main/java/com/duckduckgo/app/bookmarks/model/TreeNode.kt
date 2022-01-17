@@ -22,7 +22,10 @@ class TreeNode<T>(val value: T) {
     fun add(child: TreeNode<T>) = children.add(child)
     fun isEmpty() = children.isEmpty()
 
-    fun forEachVisit(visitBefore: Visitor<T>, visitAfter: Visitor<T>) {
+    fun forEachVisit(
+        visitBefore: Visitor<T>,
+        visitAfter: Visitor<T>
+    ) {
         visitBefore(this)
         children.forEach {
             it.forEachVisit(visitBefore, visitAfter)

@@ -22,8 +22,10 @@ import java.nio.charset.StandardCharsets
 
 interface HostnameExtractor {
 
-    fun extract(tcb: TCB, payloadBytes: ByteArray): String?
-
+    fun extract(
+        tcb: TCB,
+        payloadBytes: ByteArray
+    ): String?
 }
 
 class AndroidHostnameExtractor(
@@ -31,14 +33,20 @@ class AndroidHostnameExtractor(
     private val encryptedRequestHostExtractor: EncryptedRequestHostExtractor
 ) : HostnameExtractor {
 
-    override fun extract(tcb: TCB, payloadBytes: ByteArray): String? {
+    override fun extract(
+        tcb: TCB,
+        payloadBytes: ByteArray
+    ): String? {
         if (tcb.hostName != null) return tcb.hostName
         determineHost(tcb, payloadBytes)
         Timber.v("Host is %s for %s", tcb.hostName, tcb.ipAndPort)
         return tcb.hostName
     }
 
-    private fun determineHost(tcb: TCB, payloadBytes: ByteArray) {
+    private fun determineHost(
+        tcb: TCB,
+        payloadBytes: ByteArray
+    ) {
         var host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
         if (host != null) {
             Timber.v("Found domain from plaintext headers: %s", host)
@@ -53,5 +61,4 @@ class AndroidHostnameExtractor(
             return
         }
     }
-
 }

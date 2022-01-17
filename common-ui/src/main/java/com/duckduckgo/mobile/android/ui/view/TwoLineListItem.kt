@@ -46,10 +46,13 @@ class TwoLineListItem : LinearLayout {
         setTitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemTitle) ?: "")
         setSubtitle(attributes.getString(R.styleable.TwoLineListItem_twoLineItemSubtitle) ?: "")
         setImageVisibility(
-            attributes.getBoolean(R.styleable.TwoLineListItem_twoLineItemImageVisible, true))
+            attributes.getBoolean(R.styleable.TwoLineListItem_twoLineItemImageVisible, true)
+        )
         setImageResource(
             attributes.getResourceId(
-                R.styleable.TwoLineListItem_twoLineItemDrawable, R.drawable.ic_overflow))
+                R.styleable.TwoLineListItem_twoLineItemDrawable, R.drawable.ic_overflow
+            )
+        )
         attributes.recycle()
     }
 

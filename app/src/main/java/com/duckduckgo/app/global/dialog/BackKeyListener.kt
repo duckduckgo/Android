@@ -21,7 +21,11 @@ import android.view.KeyEvent
 
 class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.OnKeyListener {
 
-    override fun onKey(dialog: DialogInterface?, keyCode: Int, event: KeyEvent?): Boolean {
+    override fun onKey(
+        dialog: DialogInterface?,
+        keyCode: Int,
+        event: KeyEvent?
+    ): Boolean {
         if (isBackKey(keyCode, event)) {
             onBackPressed.invoke()
             dialog?.dismiss()
@@ -30,7 +34,10 @@ class BackKeyListener(private val onBackPressed: () -> Unit) : DialogInterface.O
         return false
     }
 
-    private fun isBackKey(keyCode: Int, event: KeyEvent?): Boolean {
+    private fun isBackKey(
+        keyCode: Int,
+        event: KeyEvent?
+    ): Boolean {
         return (keyCode == KeyEvent.KEYCODE_BACK && event?.action == KeyEvent.ACTION_UP)
     }
 }

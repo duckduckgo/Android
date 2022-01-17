@@ -22,7 +22,11 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 
 class PredefinedGradeDataJsonConverter {
 
-    class GradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: Input, val url: String) {
+    class GradeTestCase(
+        val expected: Grade.Scores.ScoresAvailable,
+        val input: Input,
+        val url: String
+    ) {
 
         class Input(
             val https: Boolean,
@@ -32,10 +36,17 @@ class PredefinedGradeDataJsonConverter {
             val trackers: Array<Tracker>
         )
 
-        class Tracker(val blocked: Boolean, val parentEntity: Entity)
+        class Tracker(
+            val blocked: Boolean,
+            val parentEntity: Entity
+        )
     }
 
-    class JsonGradeTestCase(val expected: Grade.Scores.ScoresAvailable, val input: JsonInput, val url: String) {
+    class JsonGradeTestCase(
+        val expected: Grade.Scores.ScoresAvailable,
+        val input: JsonInput,
+        val url: String
+    ) {
 
         class JsonInput(
             val https: Boolean,
@@ -46,7 +57,11 @@ class PredefinedGradeDataJsonConverter {
             val parentTrackerPrevalence: Double?
         )
 
-        class JsonTracker(val blocked: Boolean, val parentEntity: String, val prevalence: Double?)
+        class JsonTracker(
+            val blocked: Boolean,
+            val parentEntity: String,
+            val prevalence: Double?
+        )
     }
 }
 
@@ -67,7 +82,10 @@ fun PredefinedGradeDataJsonConverter.JsonGradeTestCase.toGradeTestCase(): Predef
     return PredefinedGradeDataJsonConverter.GradeTestCase(expected, input.toInput(), url)
 }
 
-private fun entity(name: String?, prevalence: Double?): Entity {
+private fun entity(
+    name: String?,
+    prevalence: Double?
+): Entity {
     if (name == null) return TestEntity("", "", 0.0)
     return TestEntity(name, name, prevalence ?: 0.0)
 }

@@ -56,7 +56,11 @@ class SystemComponentsModule {
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider): DeviceAppLookup = InstalledDeviceAppLookup(deviceAppListProvider)
 
     @Provides
-    fun appIconModifier(context: Context, appShortcutCreator: AppShortcutCreator, appBuildConfig: AppBuildConfig): IconModifier =
+    fun appIconModifier(
+        context: Context,
+        appShortcutCreator: AppShortcutCreator,
+        appBuildConfig: AppBuildConfig
+    ): IconModifier =
         AppIconModifier(context, appShortcutCreator, appBuildConfig)
 
     @Provides

@@ -53,7 +53,7 @@ class RealCohortCalculator @Inject constructor() : CohortCalculator {
     }
 
     private fun weeklyCohortName(localDate: LocalDate): String {
-        return "${localDate.year}-week-${weekOfYear(localDate)}"
+        return "${weekBasedYear(localDate)}-week-${weekOfYear(localDate)}"
     }
 
     private fun monthlyCohortName(localDate: LocalDate): String {
@@ -75,6 +75,10 @@ class RealCohortCalculator @Inject constructor() : CohortCalculator {
 
     private fun weekOfYear(localDate: LocalDate): Int {
         return localDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+    }
+
+    private fun weekBasedYear(localDate: LocalDate): Int {
+        return localDate.get(IsoFields.WEEK_BASED_YEAR)
     }
 
     companion object {

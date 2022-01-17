@@ -33,11 +33,17 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     private var trackers = mutableListOf<TrackerInfo>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerBadgeViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): TrackerBadgeViewHolder {
         return TrackerBadgeViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: TrackerBadgeViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: TrackerBadgeViewHolder,
+        position: Int
+    ) {
         holder.bind(trackers[position])
     }
 
@@ -76,7 +82,11 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")
                 .replace(".", "")
@@ -87,16 +97,25 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
     }
 
-    private class DiffCallback(private val oldList: List<TrackerInfo>, private val newList: List<TrackerInfo>) : DiffUtil.Callback() {
+    private class DiffCallback(
+        private val oldList: List<TrackerInfo>,
+        private val newList: List<TrackerInfo>
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition].companyName == newList[newItemPosition].companyName
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }

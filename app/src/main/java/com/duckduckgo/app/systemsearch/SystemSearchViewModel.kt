@@ -54,7 +54,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 
-data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
+data class SystemSearchResult(
+    val autocomplete: AutoCompleteResult,
+    val deviceApps: List<DeviceApp>
+)
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,
@@ -159,7 +162,8 @@ class SystemSearchViewModel(
         return Observable.zip(
             autoComplete.autoComplete(query),
             Observable.just(deviceAppLookup.query(query)),
-            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult>
+            { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
                 SystemSearchResult(autocompleteResult, appsResult)
             }
         )

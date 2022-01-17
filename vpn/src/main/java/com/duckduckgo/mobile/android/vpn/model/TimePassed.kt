@@ -39,7 +39,11 @@ fun dateOfLastWeek(): String {
     return DatabaseDateFormatter.timestamp(midnight)
 }
 
-data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
+data class TimePassed(
+    val hours: Long,
+    val minutes: Long,
+    val seconds: Long
+) {
 
     fun shortFormat(): String {
         val sb = StringBuilder()
@@ -60,7 +64,11 @@ data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
         return sb.toString()
     }
 
-    fun format(alwaysShowHours: Boolean = true, alwaysShowMinutes: Boolean = true, alwaysShowSeconds: Boolean = true): String {
+    fun format(
+        alwaysShowHours: Boolean = true,
+        alwaysShowMinutes: Boolean = true,
+        alwaysShowSeconds: Boolean = true
+    ): String {
         val sb = StringBuilder()
 
         if (hours > 0 || alwaysShowHours) {
@@ -85,7 +93,10 @@ data class TimePassed(val hours: Long, val minutes: Long, val seconds: Long) {
 
     companion object {
 
-        fun between(currentMillis: Long, oldMillis: Long): TimePassed {
+        fun between(
+            currentMillis: Long,
+            oldMillis: Long
+        ): TimePassed {
             return fromMilliseconds(currentMillis - oldMillis)
         }
 

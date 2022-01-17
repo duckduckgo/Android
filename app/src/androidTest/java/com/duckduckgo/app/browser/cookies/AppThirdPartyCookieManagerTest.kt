@@ -57,7 +57,8 @@ class AppThirdPartyCookieManagerTest {
             .allowMainThreadQueries()
             .build()
         authCookiesAllowedDomainsDao = db.authCookiesAllowedDomainsDao()
-        authCookiesAllowedDomainsRepository = AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
+        authCookiesAllowedDomainsRepository =
+            AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
         testee = AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
@@ -180,7 +181,9 @@ class AppThirdPartyCookieManagerTest {
     companion object {
         val EXCLUDED_DOMAIN_URI = "http://home.nest.com".toUri()
         val EXAMPLE_URI = "http://example.com".toUri()
-        val THIRD_PARTY_AUTH_URI = "https://accounts.google.com/o/oauth2/auth/identifier?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fexample.com".toUri()
-        val NON_THIRD_PARTY_AUTH_URI = "https://accounts.google.com/o/oauth2/auth/identifier?response_type=code&ss_domain=https%3A%2F%2Fexample.com".toUri()
+        val THIRD_PARTY_AUTH_URI =
+            "https://accounts.google.com/o/oauth2/auth/identifier?response_type=permission%20id_token&ss_domain=https%3A%2F%2Fexample.com".toUri()
+        val NON_THIRD_PARTY_AUTH_URI =
+            "https://accounts.google.com/o/oauth2/auth/identifier?response_type=code&ss_domain=https%3A%2F%2Fexample.com".toUri()
     }
 }

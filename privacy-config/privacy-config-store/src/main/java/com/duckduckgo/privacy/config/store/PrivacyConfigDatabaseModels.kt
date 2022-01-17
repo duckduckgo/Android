@@ -22,6 +22,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -33,7 +34,11 @@ data class TrackerAllowlistEntity(
     val rules: List<AllowlistRuleEntity>
 )
 
-class AllowlistRuleEntity(val rule: String, val domains: List<String>, val reason: String)
+class AllowlistRuleEntity(
+    val rule: String,
+    val domains: List<String>,
+    val reason: String
+)
 
 class RuleTypeConverter {
 
@@ -59,30 +64,51 @@ fun DrmExceptionEntity.toDrmException(): DrmException {
 }
 
 @Entity(tableName = "unprotected_temporary")
-data class UnprotectedTemporaryEntity(@PrimaryKey val domain: String, val reason: String)
+data class UnprotectedTemporaryEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
 
 @Entity(tableName = "https_exceptions")
-data class HttpsExceptionEntity(@PrimaryKey val domain: String, val reason: String)
+data class HttpsExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
 
 fun HttpsExceptionEntity.toHttpsException(): HttpsException {
     return HttpsException(domain = this.domain, reason = this.reason)
 }
 
-@Entity(tableName = "gpc_exceptions") data class GpcExceptionEntity(@PrimaryKey val domain: String)
+@Entity(tableName = "gpc_header_enabled_sites")
+data class GpcHeaderEnabledSiteEntity(@PrimaryKey val domain: String)
+
+fun GpcHeaderEnabledSiteEntity.toGpcHeaderEnabledSite(): GpcHeaderEnabledSite {
+    return GpcHeaderEnabledSite(domain = this.domain)
+}
+
+@Entity(tableName = "gpc_exceptions")
+data class GpcExceptionEntity(@PrimaryKey val domain: String)
 
 fun GpcExceptionEntity.toGpcException(): GpcException {
     return GpcException(domain = this.domain)
 }
 
 @Entity(tableName = "content_blocking_exceptions")
-data class ContentBlockingExceptionEntity(@PrimaryKey val domain: String, val reason: String)
+data class ContentBlockingExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
 
 fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
     return ContentBlockingException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "privacy_config")
-data class PrivacyConfig(@PrimaryKey val id: Int = 1, val version: Long, val readme: String)
+data class PrivacyConfig(
+    @PrimaryKey val id: Int = 1,
+    val version: Long,
+    val readme: String
+)
 
 class Adapters {
     companion object {

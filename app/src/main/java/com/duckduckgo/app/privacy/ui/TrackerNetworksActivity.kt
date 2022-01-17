@@ -76,7 +76,10 @@ class TrackerNetworksActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        fun intent(context: Context, tabId: String): Intent {
+        fun intent(
+            context: Context,
+            tabId: String
+        ): Intent {
             val intent = Intent(context, TrackerNetworksActivity::class.java)
             intent.tabId = tabId
             return intent

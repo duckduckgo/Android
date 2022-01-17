@@ -44,18 +44,27 @@ class ExcludedAppsViewModel(
 
     internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
 
-    fun onAppProtectionDisabled(answer: Int = 0, appName: String, packageName: String, skippedReport: Boolean) {
+    fun onAppProtectionDisabled(
+        answer: Int = 0,
+        appName: String,
+        packageName: String,
+        skippedReport: Boolean
+    ) {
         recordManualChange(packageName)
 
         viewModelScope.launch {
             excludedApps.manuallyExcludedApp(packageName)
-            if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING) {
+            if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING && !skippedReport) {
                 command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             }
         }
     }
 
-    fun onAppProtectionEnabled(packageName: String, excludingReason: Int, needsPixel: Boolean = false) {
+    fun onAppProtectionEnabled(
+        packageName: String,
+        excludingReason: Int,
+        needsPixel: Boolean = false
+    ) {
         recordManualChange(packageName)
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
@@ -90,7 +99,11 @@ class ExcludedAppsViewModel(
         }
     }
 
-    fun onAppProtectionChanged(excludedAppInfo: TrackingProtectionAppInfo, position: Int, enabled: Boolean) {
+    fun onAppProtectionChanged(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int,
+        enabled: Boolean
+    ) {
         viewModelScope.launch {
             if (enabled) {
                 checkForAppProtectionEnabled(excludedAppInfo, position)
@@ -100,7 +113,10 @@ class ExcludedAppsViewModel(
         }
     }
 
-    private suspend fun checkForAppProtectionEnabled(excludedAppInfo: TrackingProtectionAppInfo, position: Int) {
+    private suspend fun checkForAppProtectionEnabled(
+        excludedAppInfo: TrackingProtectionAppInfo,
+        position: Int
+    ) {
         if (!excludedAppInfo.isProblematic()) {
             onAppProtectionEnabled(excludedAppInfo.packageName, excludedAppInfo.knownProblem)
         } else {
@@ -138,7 +154,11 @@ internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
 internal sealed class Command {
     object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
-    data class ShowEnableProtectionDialog(val excludingReason: TrackingProtectionAppInfo, val position: Int) : Command()
+    data class ShowEnableProtectionDialog(
+        val excludingReason: TrackingProtectionAppInfo,
+        val position: Int
+    ) : Command()
+
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
 }
 

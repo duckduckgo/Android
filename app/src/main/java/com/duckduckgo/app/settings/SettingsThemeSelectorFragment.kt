@@ -69,7 +69,10 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         return alertBuilder.create()
     }
 
-    private fun updateCurrentSelect(currentOption: DuckDuckGoTheme, radioGroup: RadioGroup) {
+    private fun updateCurrentSelect(
+        currentOption: DuckDuckGoTheme,
+        radioGroup: RadioGroup
+    ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }
@@ -96,5 +99,4 @@ class SettingsThemeSelectorFragment : DialogFragment() {
             return fragment
         }
     }
-
 }

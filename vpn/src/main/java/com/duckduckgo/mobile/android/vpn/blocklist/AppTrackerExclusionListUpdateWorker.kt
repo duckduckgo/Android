@@ -34,7 +34,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class AppTrackerExclusionListUpdateWorker(
+    context: Context,
+    workerParameters: WorkerParameters
+) : CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
 
@@ -70,7 +73,8 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
 
                 Timber.d("Updating the app tracker system app overrides, eTag: ${sysAppsOverrides.etag.value}")
                 vpnDatabase.vpnSystemAppsOverridesDao().upsertSystemAppOverrides(
-                        sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag))
+                    sysAppsOverrides.overridePackages, AppTrackerSystemAppOverrideListMetadata(eTag = updatedEtag)
+                )
 
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
 
@@ -98,7 +102,8 @@ class AppTrackerExclusionListUpdateWorker(context: Context, workerParameters: Wo
                 }
 
                 Timber.d("Updating the app tracker exclusion list, eTag: ${exclusionList.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
+                vpnDatabase.vpnAppTrackerBlockingDao()
+                    .updateExclusionList(exclusionList.excludedPackages, AppTrackerExclusionListMetadata(eTag = exclusionList.etag.value))
 
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
 

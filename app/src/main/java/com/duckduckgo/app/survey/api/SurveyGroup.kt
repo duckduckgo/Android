@@ -16,7 +16,10 @@
 
 package com.duckduckgo.app.survey.api
 
-data class SurveyGroup(val id: String, val surveyOptions: List<SurveyOption>) {
+data class SurveyGroup(
+    val id: String,
+    val surveyOptions: List<SurveyOption>
+) {
 
     data class SurveyOption(
         val url: String,

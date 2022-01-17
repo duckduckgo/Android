@@ -37,10 +37,14 @@ class DetectOriginatingAppPackageModern(
         return getPackageIdForUid(connectionOwnerUid)
     }
 
-    private fun getConnectionOwnerUid(connectionInfo: ConnectionInfo, source: InetSocketAddress, destination: InetSocketAddress): Int {
+    private fun getConnectionOwnerUid(
+        connectionInfo: ConnectionInfo,
+        source: InetSocketAddress,
+        destination: InetSocketAddress
+    ): Int {
         return try {
             connectivityManager.getConnectionOwnerUid(connectionInfo.protocolNumber, source, destination)
-        } catch (t:Throwable) {
+        } catch (t: Throwable) {
             Timber.e(t, "Error getting connection owner UID")
             Process.INVALID_UID
         }

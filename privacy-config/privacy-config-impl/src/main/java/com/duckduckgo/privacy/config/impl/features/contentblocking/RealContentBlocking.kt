@@ -29,7 +29,11 @@ import dagger.SingleInstanceIn
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealContentBlocking @Inject constructor(private val contentBlockingRepository: ContentBlockingRepository, private val featureToggle: FeatureToggle, private val unprotectedTemporary: UnprotectedTemporary) : ContentBlocking {
+class RealContentBlocking @Inject constructor(
+    private val contentBlockingRepository: ContentBlockingRepository,
+    private val featureToggle: FeatureToggle,
+    private val unprotectedTemporary: UnprotectedTemporary
+) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
@@ -42,5 +46,4 @@ class RealContentBlocking @Inject constructor(private val contentBlockingReposit
     private fun matches(url: String): Boolean {
         return contentBlockingRepository.exceptions.any { sameOrSubdomain(url, it.domain) }
     }
-
 }

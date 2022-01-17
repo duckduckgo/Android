@@ -39,13 +39,19 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportBreakageAppListViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ReportBreakageAppListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
         return ReportBreakageAppListViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ReportBreakageAppListViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ReportBreakageAppListViewHolder,
+        position: Int
+    ) {
         holder.bind(installedApps[position], position, listener)
     }
 
@@ -69,23 +75,35 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
             return newList.size
         }
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition].packageName == newList[newItemPosition].packageName
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
-
     }
 
     interface Listener {
-        fun onInstalledAppSelected(installedApp: InstalledApp, position: Int)
+        fun onInstalledAppSelected(
+            installedApp: InstalledApp,
+            position: Int
+        )
     }
 }
 
 class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    fun bind(installedApp: InstalledApp, position: Int, listener: ReportBreakageAppListAdapter.Listener) {
+    fun bind(
+        installedApp: InstalledApp,
+        position: Int,
+        listener: ReportBreakageAppListAdapter.Listener
+    ) {
         itemView.deviceShieldInstalledAppEntryName.text =
             String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)
                 .applyBoldSpanTo(listOf(installedApp.name))

@@ -109,12 +109,19 @@ class FeedbackActivity :
         updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeFeedbackSubReasonView(forwardDirection: Boolean, mainReason: MainReason) {
+    private fun showNegativeFeedbackSubReasonView(
+        forwardDirection: Boolean,
+        mainReason: MainReason
+    ) {
         val fragment = SubReasonNegativeFeedbackFragment.instance(mainReason)
         updateFragment(fragment, forwardDirection)
     }
 
-    private fun showNegativeOpenEndedFeedbackView(forwardDirection: Boolean, mainReason: MainReason, subReason: SubReason? = null) {
+    private fun showNegativeOpenEndedFeedbackView(
+        forwardDirection: Boolean,
+        mainReason: MainReason,
+        subReason: SubReason? = null
+    ) {
         val fragment = ShareOpenEndedFeedbackFragment.instanceNegativeFeedback(mainReason, subReason)
         updateFragment(fragment, forwardDirection)
     }
@@ -134,7 +141,10 @@ class FeedbackActivity :
         updateFragment(fragment, forwardDirection)
     }
 
-    private fun updateFragment(fragment: FeedbackFragment, forwardDirection: Boolean) {
+    private fun updateFragment(
+        fragment: FeedbackFragment,
+        forwardDirection: Boolean
+    ) {
         val tag = fragment.javaClass.name
         if (supportFragmentManager.findFragmentByTag(tag) != null) return
 
@@ -185,7 +195,11 @@ class FeedbackActivity :
     /**
      * Negative feedback listeners
      */
-    override fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+    override fun userProvidedNegativeOpenEndedFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        feedback: String
+    ) {
         viewModel.userProvidedNegativeOpenEndedFeedback(mainReason, subReason, feedback)
     }
 
@@ -200,26 +214,41 @@ class FeedbackActivity :
      * Negative feedback subReason selection
      */
 
-    override fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: MissingBrowserFeaturesSubReasons) {
+    override fun userSelectedSubReasonMissingBrowserFeatures(
+        mainReason: MainReason,
+        subReason: MissingBrowserFeaturesSubReasons
+    ) {
         viewModel.userSelectedSubReasonMissingBrowserFeatures(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: SearchNotGoodEnoughSubReasons) {
+    override fun userSelectedSubReasonSearchNotGoodEnough(
+        mainReason: MainReason,
+        subReason: SearchNotGoodEnoughSubReasons
+    ) {
         viewModel.userSelectedSubReasonSearchNotGoodEnough(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: CustomizationSubReasons) {
+    override fun userSelectedSubReasonNeedMoreCustomization(
+        mainReason: MainReason,
+        subReason: CustomizationSubReasons
+    ) {
         viewModel.userSelectedSubReasonNeedMoreCustomization(mainReason, subReason)
     }
 
-    override fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: PerformanceSubReasons) {
+    override fun userSelectedSubReasonAppIsSlowOrBuggy(
+        mainReason: MainReason,
+        subReason: PerformanceSubReasons
+    ) {
         viewModel.userSelectedSubReasonAppIsSlowOrBuggy(mainReason, subReason)
     }
 
     /**
      * Negative feedback, broken site
      */
-    override fun onProvidedBrokenSiteFeedback(feedback: String, url: String?) {
+    override fun onProvidedBrokenSiteFeedback(
+        feedback: String,
+        url: String?
+    ) {
         viewModel.onProvidedBrokenSiteFeedback(feedback, url)
     }
 

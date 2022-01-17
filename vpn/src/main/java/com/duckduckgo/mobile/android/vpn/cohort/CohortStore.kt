@@ -78,7 +78,10 @@ class RealCohortStore @Inject constructor(
         setCohortLocalDate(LocalDate.now())
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         // noop
     }
 

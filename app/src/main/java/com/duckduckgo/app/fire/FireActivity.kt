@@ -54,11 +54,17 @@ class FireActivity : AppCompatActivity() {
     companion object {
         private const val KEY_RESTART_INTENTS = "KEY_RESTART_INTENTS"
 
-        fun triggerRestart(context: Context, notifyDataCleared: Boolean) {
+        fun triggerRestart(
+            context: Context,
+            notifyDataCleared: Boolean
+        ) {
             triggerRestart(context, getRestartIntent(context, notifyDataCleared))
         }
 
-        private fun triggerRestart(context: Context, nextIntent: Intent) {
+        private fun triggerRestart(
+            context: Context,
+            nextIntent: Intent
+        ) {
             val intent = Intent(context, FireActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.putExtra(KEY_RESTART_INTENTS, nextIntent)
@@ -71,7 +77,10 @@ class FireActivity : AppCompatActivity() {
             killProcess()
         }
 
-        private fun getRestartIntent(context: Context, notifyDataCleared: Boolean = false): Intent {
+        private fun getRestartIntent(
+            context: Context,
+            notifyDataCleared: Boolean = false
+        ): Intent {
             val intent = BrowserActivity.intent(context, notifyDataCleared = notifyDataCleared)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent

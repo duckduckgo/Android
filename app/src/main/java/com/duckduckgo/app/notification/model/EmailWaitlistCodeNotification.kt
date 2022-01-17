@@ -51,7 +51,10 @@ class EmailWaitlistCodeNotification(
     }
 }
 
-class EmailWaitlistCodeSpecification(context: Context, code: String?) : NotificationSpec {
+class EmailWaitlistCodeSpecification(
+    context: Context,
+    code: String?
+) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.EMAIL_WAITLIST
     override val systemId = NotificationRegistrar.NotificationId.EmailWaitlist
     override val name = context.getString(R.string.waitlistNotificationTitle)

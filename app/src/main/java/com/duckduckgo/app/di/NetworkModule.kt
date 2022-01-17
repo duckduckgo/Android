@@ -27,6 +27,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
@@ -109,7 +110,10 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("api")
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun apiRetrofit(
+        @Named("api") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -122,7 +126,10 @@ class NetworkModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
-    fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun nonCachingRetrofit(
+        @Named("nonCaching") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -183,9 +190,13 @@ class NetworkModule {
         gpc: Gpc,
         featureToggle: FeatureToggle,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
-        appBuildConfig: AppBuildConfig
+        appBuildConfig: AppBuildConfig,
+        dispatcherProvider: DispatcherProvider
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope, appBuildConfig)
+        BrokenSiteSubmitter(
+            statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle,
+            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider
+        )
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =

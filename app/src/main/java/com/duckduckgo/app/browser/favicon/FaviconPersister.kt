@@ -29,12 +29,33 @@ import java.io.File
 import java.io.FileOutputStream
 
 interface FaviconPersister {
-    fun faviconFile(directory: String, subFolder: String, domain: String): File?
-    suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File?
-    suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String)
+    fun faviconFile(
+        directory: String,
+        subFolder: String,
+        domain: String
+    ): File?
+
+    suspend fun store(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String
+    ): File?
+
+    suspend fun copyToDirectory(
+        file: File,
+        directory: String,
+        newSubfolder: String,
+        newFilename: String
+    )
+
     suspend fun deleteAll(directory: String)
     suspend fun deletePersistedFavicon(domain: String)
-    suspend fun deleteFaviconsForSubfolder(directory: String, subFolder: String, domain: String?)
+    suspend fun deleteFaviconsForSubfolder(
+        directory: String,
+        subFolder: String,
+        domain: String?
+    )
 }
 
 class FileBasedFaviconPersister(
@@ -47,7 +68,11 @@ class FileBasedFaviconPersister(
         fileDeleter.deleteDirectory(faviconDirectory(directory))
     }
 
-    override fun faviconFile(directory: String, subFolder: String, domain: String): File? {
+    override fun faviconFile(
+        directory: String,
+        subFolder: String,
+        domain: String
+    ): File? {
         val file = fileForFavicon(directory, subFolder, domain)
         return if (file.exists()) {
             file
@@ -56,14 +81,24 @@ class FileBasedFaviconPersister(
         }
     }
 
-    override suspend fun copyToDirectory(file: File, directory: String, newSubfolder: String, newFilename: String) {
+    override suspend fun copyToDirectory(
+        file: File,
+        directory: String,
+        newSubfolder: String,
+        newFilename: String
+    ) {
         withContext(dispatcherProvider.io()) {
             val persistedFile = fileForFavicon(directory, newSubfolder, newFilename)
             file.copyTo(persistedFile, overwrite = true)
         }
     }
 
-    override suspend fun store(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+    override suspend fun store(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String
+    ): File? {
         return withContext(dispatcherProvider.io() + NonCancellable) {
             writeToDisk(directory, subFolder, bitmap, domain)
         }
@@ -74,7 +109,11 @@ class FileBasedFaviconPersister(
         fileDeleter.deleteFilesFromDirectory(directoryToDelete, listOf(filename(domain)))
     }
 
-    override suspend fun deleteFaviconsForSubfolder(directory: String, subFolder: String, domain: String?) {
+    override suspend fun deleteFaviconsForSubfolder(
+        directory: String,
+        subFolder: String,
+        domain: String?
+    ) {
         val directoryToDelete = directoryForFavicon(directory, subFolder)
 
         if (domain == null) {
@@ -85,16 +124,27 @@ class FileBasedFaviconPersister(
         }
     }
 
-    private fun fileForFavicon(directory: String, subFolder: String, domain: String): File {
+    private fun fileForFavicon(
+        directory: String,
+        subFolder: String,
+        domain: String
+    ): File {
         val tabFaviconDirectory = directoryForFavicon(directory, subFolder)
         return File(tabFaviconDirectory, filename(domain))
     }
 
-    private fun directoryForFavicon(directory: String, subFolder: String): File {
+    private fun directoryForFavicon(
+        directory: String,
+        subFolder: String
+    ): File {
         return File(faviconDirectory(directory), subFolder)
     }
 
-    private fun prepareDestinationFile(directory: String, tabId: String, url: String): File {
+    private fun prepareDestinationFile(
+        directory: String,
+        tabId: String,
+        url: String
+    ): File {
         val fileDestination = directoryForFavicon(directory, tabId)
         fileDestination.mkdirs()
 
@@ -102,7 +152,12 @@ class FileBasedFaviconPersister(
     }
 
     @Synchronized
-    private fun writeToDisk(directory: String, subFolder: String, bitmap: Bitmap, domain: String): File? {
+    private fun writeToDisk(
+        directory: String,
+        subFolder: String,
+        bitmap: Bitmap,
+        domain: String
+    ): File? {
         val existingFile = fileForFavicon(directory, subFolder, domain)
 
         if (existingFile.exists()) {
@@ -127,7 +182,10 @@ class FileBasedFaviconPersister(
     }
 
     @Synchronized
-    private fun writeBytesToFile(file: File, bitmap: Bitmap) {
+    private fun writeBytesToFile(
+        file: File,
+        bitmap: Bitmap
+    ) {
         runCatching {
             FileOutputStream(file).use { outputStream ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
@@ -147,5 +205,4 @@ class FileBasedFaviconPersister(
         const val FAVICON_PERSISTED_DIR = "favicons"
         const val NO_SUBFOLDER = ""
     }
-
 }

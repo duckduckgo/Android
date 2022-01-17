@@ -127,6 +127,26 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
+    fun whenOnAppProtectionDisabledSkipDialogThenDoNotLaunchFeedback() = runTest {
+        val packageName = "com.package.name"
+        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = true)
+
+        viewModel.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenOnAppProtectionDisabledSkipFalseDialogThenLaunchFeedback() = runTest {
+        val packageName = "com.package.name"
+        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = false)
+
+        viewModel.commands().test {
+            assertEquals(LaunchFeedback(IssueDescriptionForm(packageName, packageName)), awaitItem())
+        }
+    }
+
+    @Test
     fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
         viewModel.commands().test {
             viewModel.onLeavingScreen()
