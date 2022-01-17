@@ -45,6 +45,5 @@ class DefaultBrowserObserver(
                 else -> pixel.fire(AppPixelName.DEFAULT_BROWSER_UNSET)
             }
         }
-
     }
 }

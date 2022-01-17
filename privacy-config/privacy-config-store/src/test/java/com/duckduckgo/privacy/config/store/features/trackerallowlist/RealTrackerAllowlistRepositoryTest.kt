@@ -48,7 +48,8 @@ class RealTrackerAllowlistRepositoryTest {
         whenever(mockDatabase.trackerAllowlistDao()).thenReturn(mockTrackerAllowlistDao)
         testee =
             RealTrackerAllowlistRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -57,7 +58,8 @@ class RealTrackerAllowlistRepositoryTest {
 
         testee =
             RealTrackerAllowlistRepository(
-                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(trackerAllowlistEntity, testee.exceptions.first())
     }
@@ -67,7 +69,8 @@ class RealTrackerAllowlistRepositoryTest {
         runTest {
             testee =
                 RealTrackerAllowlistRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
 
             testee.updateAll(listOf())
 
@@ -80,7 +83,8 @@ class RealTrackerAllowlistRepositoryTest {
             givenHttpsDaoContainsExceptions()
             testee =
                 RealTrackerAllowlistRepository(
-                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider)
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
             assertEquals(1, testee.exceptions.size)
             reset(mockTrackerAllowlistDao)
 
@@ -98,8 +102,11 @@ class RealTrackerAllowlistRepositoryTest {
             TrackerAllowlistEntity(
                 domain = "domain",
                 rules =
-                    listOf(
-                        AllowlistRuleEntity(
-                            rule = "rule", domains = listOf("domain"), reason = "reason")))
+                listOf(
+                    AllowlistRuleEntity(
+                        rule = "rule", domains = listOf("domain"), reason = "reason"
+                    )
+                )
+            )
     }
 }

@@ -33,12 +33,21 @@ class ShareOpenEndedNegativeFeedbackViewModel : ViewModel() {
         command.value = Command.ExitAndSubmitPositiveFeedback(feedback)
     }
 
-    fun userSubmittingNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEndedComment: String) {
+    fun userSubmittingNegativeFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        openEndedComment: String
+    ) {
         command.value = Command.ExitAndSubmitNegativeFeedback(mainReason, subReason, openEndedComment)
     }
 
     sealed class Command {
-        data class ExitAndSubmitNegativeFeedback(val mainReason: MainReason, val subReason: SubReason?, val feedback: String) : Command()
+        data class ExitAndSubmitNegativeFeedback(
+            val mainReason: MainReason,
+            val subReason: SubReason?,
+            val feedback: String
+        ) : Command()
+
         data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
         object Exit : Command()
     }

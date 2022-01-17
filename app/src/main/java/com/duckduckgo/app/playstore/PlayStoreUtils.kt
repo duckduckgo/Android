@@ -58,7 +58,6 @@ class PlayStoreAndroidUtils(val context: Context) : PlayStoreUtils {
             val isAppEnabled = isPlayStoreAppEnabled()
             Timber.i("The Play Store app is installed " + if (isAppEnabled) "and enabled" else "but disabled")
             return isAppEnabled
-
         } catch (e: PackageManager.NameNotFoundException) {
             Timber.i("Could not find package details for $PLAY_STORE_PACKAGE; Play Store is not installed")
             false

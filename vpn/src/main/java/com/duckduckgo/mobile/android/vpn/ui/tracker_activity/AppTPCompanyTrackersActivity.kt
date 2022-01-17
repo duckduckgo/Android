@@ -74,7 +74,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
         observeViewModel()
         binding.activityRecyclerView.adapter = itemsAdapter
-
     }
 
     private fun observeViewModel() {
@@ -85,7 +84,10 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
-                    binding.trackingAttempts.text = resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttemptsTitle, it.totalTrackingAttempts, it.totalTrackingAttempts)
+                    binding.trackingAttempts.text = resources.getQuantityString(
+                        R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
+                        it.totalTrackingAttempts, it.totalTrackingAttempts
+                    )
                     binding.includeToolbar.appTrackdAgo.text = it.lastTrackerBlockedAgo
                     itemsAdapter.updateData(it.trackingCompanies)
                 }
@@ -136,7 +138,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         private const val EXTRA_APP_NAME = "EXTRA_APP_NAME"
         private const val EXTRA_DATE = "EXTRA_DATE"
 
-        fun intent(context: Context, packageName: String, appDisplayName: String, bucket: String): Intent {
+        fun intent(
+            context: Context,
+            packageName: String,
+            appDisplayName: String,
+            bucket: String
+        ): Intent {
             val intent = Intent(context, AppTPCompanyTrackersActivity::class.java)
             intent.putExtra(EXTRA_PACKAGE_NAME, packageName)
             intent.putExtra(EXTRA_APP_NAME, appDisplayName)
@@ -144,5 +151,4 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             return intent
         }
     }
-
 }

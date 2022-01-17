@@ -53,7 +53,10 @@ class DeviceShieldNotificationsDebugReceiver(
         context.registerReceiver(this, IntentFilter(intentAction))
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 }

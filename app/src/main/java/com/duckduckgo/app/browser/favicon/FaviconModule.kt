@@ -54,7 +54,10 @@ class FaviconModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun faviconDownloader(context: Context, dispatcherProvider: DispatcherProvider): FaviconDownloader {
+    fun faviconDownloader(
+        context: Context,
+        dispatcherProvider: DispatcherProvider
+    ): FaviconDownloader {
         return GlideFaviconDownloader(context, dispatcherProvider)
     }
 }

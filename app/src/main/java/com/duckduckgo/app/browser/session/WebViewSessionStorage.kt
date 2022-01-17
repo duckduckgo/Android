@@ -23,8 +23,16 @@ import android.webkit.WebView
 import timber.log.Timber
 
 interface WebViewSessionStorage {
-    fun saveSession(webView: WebView?, tabId: String)
-    fun restoreSession(webView: WebView?, tabId: String): Boolean
+    fun saveSession(
+        webView: WebView?,
+        tabId: String
+    )
+
+    fun restoreSession(
+        webView: WebView?,
+        tabId: String
+    ): Boolean
+
     fun deleteSession(tabId: String)
     fun deleteAllSessions()
 }
@@ -37,16 +45,27 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
          * Size (in bytes) of a single entry in the cache for the given key.
          * We specify the max cache size in bytes, so we need to calculate an approximate size of the cache entry in bytes.
          */
-        override fun sizeOf(key: String, bundle: Bundle) = bundle.sizeInBytes()
+        override fun sizeOf(
+            key: String,
+            bundle: Bundle
+        ) = bundle.sizeInBytes()
 
-        override fun entryRemoved(evicted: Boolean, key: String?, oldValue: Bundle?, newValue: Bundle?) {
+        override fun entryRemoved(
+            evicted: Boolean,
+            key: String?,
+            oldValue: Bundle?,
+            newValue: Bundle?
+        ) {
             if (evicted) {
                 Timber.v("Evicted $key from WebView session storage")
             }
         }
     }
 
-    override fun saveSession(webView: WebView?, tabId: String) {
+    override fun saveSession(
+        webView: WebView?,
+        tabId: String
+    ) {
         if (webView == null) {
             Timber.w("WebView is null; cannot save session")
             return
@@ -71,7 +90,10 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         }
     }
 
-    override fun restoreSession(webView: WebView?, tabId: String): Boolean {
+    override fun restoreSession(
+        webView: WebView?,
+        tabId: String
+    ): Boolean {
         if (webView == null) {
             Timber.w("WebView is null; cannot restore session")
             return false
@@ -127,7 +149,5 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
         private const val CACHE_KEY_WEBVIEW = "webview"
         private const val CACHE_KEY_SCROLL_POSITION = "scroll-position"
-
     }
-
 }

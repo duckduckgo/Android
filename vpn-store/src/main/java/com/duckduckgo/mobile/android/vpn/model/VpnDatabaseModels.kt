@@ -63,7 +63,9 @@ data class VpnRunningStats(
 )
 
 enum class VpnServiceState {
-    ENABLED, DISABLED, INVALID
+    ENABLED,
+    DISABLED,
+    INVALID
 }
 
 @Entity(tableName = "vpn_service_state_stats")
@@ -84,7 +86,10 @@ data class VpnPreferences(
     val value: Boolean
 )
 
-data class TrackingApp(val packageId: String, val appDisplayName: String) {
+data class TrackingApp(
+    val packageId: String,
+    val appDisplayName: String
+) {
     override fun toString(): String = "package=$packageId ($appDisplayName)"
 }
 

@@ -89,7 +89,13 @@ class GlobalPrivacyControlViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), featureToggle.get(), gpc.get()) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (
+                    GlobalPrivacyControlViewModel(
+                        pixel.get(),
+                        featureToggle.get(),
+                        gpc.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

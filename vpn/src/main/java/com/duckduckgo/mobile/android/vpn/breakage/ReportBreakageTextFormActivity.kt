@@ -52,7 +52,10 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
                     appName = brokenApp.appName,
                     appPackageId = brokenApp.appPackageId,
                     description = binding.appBreakageFormFeedbackInput.text.toString(),
-                    customMetadata = Base64.encodeToString(metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
+                    customMetadata = Base64.encodeToString(
+                        metadataReporter.getVpnStateMetadata(issueReport.appPackageId).toByteArray(),
+                        Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE
+                    )
                 )
                 deviceShieldPixels.sendAppBreakageReport(issue.toMap())
 
@@ -79,7 +82,8 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     }
 
     fun setupViews() {
-        binding.appBreakageFormDisclaimer.text = HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        binding.appBreakageFormDisclaimer.text =
+            HtmlCompat.fromHtml(getString(R.string.atp_ReportBreakageFormDisclaimerText), HtmlCompat.FROM_HTML_MODE_LEGACY)
         binding.ctaNextFormText.setOnClickListener {
             reportBreakageLoginInfo.launch(ReportBreakageScreen.LoginInformation(brokenApp.appName, brokenApp.appPackageId))
         }
@@ -88,7 +92,10 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     companion object {
         private const val APP_PACKAGE_ID_EXTRA = "APP_PACKAGE_ID_EXTRA"
 
-        fun intent(context: Context, brokenApp: BrokenApp): Intent {
+        fun intent(
+            context: Context,
+            brokenApp: BrokenApp
+        ): Intent {
             return Intent(context, ReportBreakageTextFormActivity::class.java).apply {
                 putExtra(APP_PACKAGE_ID_EXTRA, brokenApp)
             }

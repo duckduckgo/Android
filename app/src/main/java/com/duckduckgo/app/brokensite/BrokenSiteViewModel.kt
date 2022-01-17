@@ -25,7 +25,6 @@ import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
@@ -35,7 +34,10 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 
-class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender: BrokenSiteSender) : ViewModel() {
+class BrokenSiteViewModel(
+    private val pixel: Pixel,
+    private val brokenSiteSender: BrokenSiteSender
+) : ViewModel() {
 
     data class ViewState(
         val indexSelected: Int = -1,
@@ -71,7 +73,12 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(
+        url: String,
+        blockedTrackers: String,
+        surrogates: String,
+        upgradedHttps: Boolean
+    ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
@@ -96,7 +103,7 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
 
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
-            val brokenSite = getBrokenSite(url, webViewVersion)
+            val brokenSite = getBrokenSite(webViewVersion)
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite)
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,
@@ -107,12 +114,11 @@ class BrokenSiteViewModel(private val pixel: Pixel, private val brokenSiteSender
     }
 
     @VisibleForTesting
-    fun getBrokenSite(url: String, webViewVersion: String): BrokenSite {
+    fun getBrokenSite(webViewVersion: String): BrokenSite {
         val category = categories[viewValue.indexSelected]
-        val absoluteUrl = Uri.parse(url).absoluteString
         return BrokenSite(
             category = category.key,
-            siteUrl = absoluteUrl,
+            siteUrl = url,
             upgradeHttps = upgradedHttps,
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,

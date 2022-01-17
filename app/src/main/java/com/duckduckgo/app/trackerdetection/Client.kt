@@ -42,5 +42,8 @@ interface Client {
 
     val name: ClientName
 
-    fun matches(url: String, documentUrl: String): Result
+    fun matches(
+        url: String,
+        documentUrl: String
+    ): Result
 }

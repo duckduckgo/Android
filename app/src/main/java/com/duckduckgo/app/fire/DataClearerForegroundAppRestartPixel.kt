@@ -87,14 +87,20 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
         resetCount()
     }
 
-    private fun incrementCount(counter: Int, sharedPrefKey: String) {
+    private fun incrementCount(
+        counter: Int,
+        sharedPrefKey: String
+    ) {
         val updated = counter + 1
         preferences.edit(commit = true) {
             putInt(sharedPrefKey, updated)
         }
     }
 
-    private fun firePendingPixels(counter: Int, pixelName: Pixel.PixelName) {
+    private fun firePendingPixels(
+        counter: Int,
+        pixelName: Pixel.PixelName
+    ) {
         if (counter > 0) {
             for (i in 1..counter) {
                 Timber.i("Fired pixel: ${pixelName.pixelName}/$counter")

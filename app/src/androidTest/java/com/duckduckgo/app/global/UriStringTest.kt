@@ -290,5 +290,4 @@ class UriStringTest {
     fun whenGivenNumberThenIsWebUrlIsFalse() {
         assertFalse(isWebUrl("33"))
     }
-
 }

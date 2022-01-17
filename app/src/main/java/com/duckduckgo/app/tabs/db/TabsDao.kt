@@ -128,7 +128,10 @@ abstract class TabsDao {
     }
 
     @Transaction
-    open fun deleteTabAndUpdateSelection(tab: TabEntity, newSelectedTab: TabEntity? = null) {
+    open fun deleteTabAndUpdateSelection(
+        tab: TabEntity,
+        newSelectedTab: TabEntity? = null
+    ) {
         deleteTab(tab)
 
         if (newSelectedTab != null) {
@@ -159,6 +162,10 @@ abstract class TabsDao {
     }
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
-    abstract fun updateUrlAndTitle(tabId: String, url: String?, title: String?, viewed: Boolean)
-
+    abstract fun updateUrlAndTitle(
+        tabId: String,
+        url: String?,
+        title: String?,
+        viewed: Boolean
+    )
 }

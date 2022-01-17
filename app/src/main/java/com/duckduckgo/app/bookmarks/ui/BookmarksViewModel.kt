@@ -67,7 +67,11 @@ class BookmarksViewModel(
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder, val folderBranch: BookmarkFolderBranch) : Command()
+        class ConfirmDeleteBookmarkFolder(
+            val bookmarkFolder: BookmarkFolder,
+            val folderBranch: BookmarkFolderBranch
+        ) : Command()
+
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
     }
@@ -227,7 +231,10 @@ class BookmarksViewModel(
         }
     }
 
-    private fun onBookmarkItemsChanged(bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
+    private fun onBookmarkItemsChanged(
+        bookmarks: List<Bookmark>,
+        bookmarkFolders: List<BookmarkFolder>
+    ) {
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             bookmarkFolders = bookmarkFolders,

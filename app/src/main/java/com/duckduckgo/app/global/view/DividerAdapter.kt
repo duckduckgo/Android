@@ -25,13 +25,19 @@ class DividerAdapter : RecyclerView.Adapter<DividerAdapter.DividerViewHolder>() 
 
     class DividerViewHolder(binding: ViewItemDividerBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DividerViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): DividerViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ViewItemDividerBinding.inflate(inflater, parent, false)
         return DividerViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: DividerViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: DividerViewHolder,
+        position: Int
+    ) {
         // noop
     }
 

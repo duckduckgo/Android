@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.privacy.config.impl.FileUtilities.loadResource
+import com.duckduckgo.app.FileUtilities.loadResource
 import com.duckduckgo.privacy.config.impl.PrivacyConfigPersister
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -51,7 +51,8 @@ class LocalPrivacyConfigObserverTest {
                 mockContext,
                 mockPrivacyConfigPersister,
                 TestScope(),
-                coroutineRule.testDispatcherProvider)
+                coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -68,6 +69,6 @@ class LocalPrivacyConfigObserverTest {
         val resources: Resources = mock()
         whenever(mockContext.resources).thenReturn(resources)
         whenever(resources.openRawResource(any()))
-            .thenReturn(loadResource("json/privacy_config.json"))
+            .thenReturn(loadResource(javaClass.classLoader!!, "json/privacy_config.json"))
     }
 }

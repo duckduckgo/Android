@@ -32,7 +32,10 @@ fun String.html(context: Context): Spanned {
     return fromHtml(this, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
 }
 
-private fun htmlDrawable(context: Context, resource: Int): Drawable? {
+private fun htmlDrawable(
+    context: Context,
+    resource: Int
+): Drawable? {
     return ContextCompat.getDrawable(context, resource)?.also {
         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
     }
@@ -48,7 +51,6 @@ fun String.websiteFromGeoLocationsApiOrigin(): String {
 
     return host.takeIf { it.startsWith(WWW_PREFIX, ignoreCase = true) }
         ?.drop(WWW_PREFIX.length) ?: host
-
 }
 
 fun String.asLocationPermissionOrigin(): String {

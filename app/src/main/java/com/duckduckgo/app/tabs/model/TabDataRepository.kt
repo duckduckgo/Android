@@ -69,13 +69,20 @@ class TabDataRepository @Inject constructor(
 
     private val siteData: LinkedHashMap<String, MutableLiveData<Site>> = LinkedHashMap()
 
-    override suspend fun add(url: String?, skipHome: Boolean): String {
+    override suspend fun add(
+        url: String?,
+        skipHome: Boolean
+    ): String {
         val tabId = generateTabId()
         add(tabId, buildSiteData(url), skipHome = skipHome, isDefaultTab = false)
         return tabId
     }
 
-    override suspend fun addFromSourceTab(url: String?, skipHome: Boolean, sourceTabId: String): String {
+    override suspend fun addFromSourceTab(
+        url: String?,
+        skipHome: Boolean,
+        sourceTabId: String
+    ): String {
         val tabId = generateTabId()
 
         add(
@@ -113,7 +120,13 @@ class TabDataRepository @Inject constructor(
         return data
     }
 
-    private fun add(tabId: String, data: MutableLiveData<Site>, skipHome: Boolean, isDefaultTab: Boolean, sourceTabId: String? = null) {
+    private fun add(
+        tabId: String,
+        data: MutableLiveData<Site>,
+        skipHome: Boolean,
+        isDefaultTab: Boolean,
+        sourceTabId: String? = null
+    ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
 
@@ -156,7 +169,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun addNewTabAfterExistingTab(url: String?, tabId: String) {
+    override suspend fun addNewTabAfterExistingTab(
+        url: String?,
+        tabId: String
+    ) {
         databaseExecutor().scheduleDirect {
             val position = tabsDao.tab(tabId)?.position ?: -1
             val uri = Uri.parse(url)
@@ -174,7 +190,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override suspend fun update(tabId: String, site: Site?) {
+    override suspend fun update(
+        tabId: String,
+        site: Site?
+    ) {
         databaseExecutor().scheduleDirect {
             tabsDao.updateUrlAndTitle(tabId, site?.url, site?.title, viewed = true)
         }
@@ -254,7 +273,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override fun updateTabFavicon(tabId: String, fileName: String?) {
+    override fun updateTabFavicon(
+        tabId: String,
+        fileName: String?
+    ) {
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
             if (tab == null) {
@@ -266,7 +288,10 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    override fun updateTabPreviewImage(tabId: String, fileName: String?) {
+    override fun updateTabPreviewImage(
+        tabId: String,
+        fileName: String?
+    ) {
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
             if (tab == null) {
@@ -281,12 +306,18 @@ class TabDataRepository @Inject constructor(
         }
     }
 
-    private fun deleteOldFavicon(tabId: String, currentFavicon: String? = null) {
+    private fun deleteOldFavicon(
+        tabId: String,
+        currentFavicon: String? = null
+    ) {
         Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
         appCoroutineScope.launch { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
-    private fun deleteOldPreviewImages(tabId: String, currentPreviewImage: String? = null) {
+    private fun deleteOldPreviewImages(
+        tabId: String,
+        currentPreviewImage: String? = null
+    ) {
         Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
         appCoroutineScope.launch { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }

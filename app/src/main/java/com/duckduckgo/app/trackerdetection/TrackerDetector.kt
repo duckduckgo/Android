@@ -34,7 +34,10 @@ import dagger.SingleInstanceIn
 
 interface TrackerDetector {
     fun addClient(client: Client)
-    fun evaluate(url: String, documentUrl: String): TrackingEvent?
+    fun evaluate(
+        url: String,
+        documentUrl: String
+    ): TrackingEvent?
 }
 
 @ContributesBinding(AppScope::class)
@@ -57,7 +60,10 @@ class TrackerDetectorImpl @Inject constructor(
         clients.add(client)
     }
 
-    override fun evaluate(url: String, documentUrl: String): TrackingEvent? {
+    override fun evaluate(
+        url: String,
+        documentUrl: String
+    ): TrackingEvent? {
 
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
@@ -91,17 +97,24 @@ class TrackerDetectorImpl @Inject constructor(
         return contentBlocking.isAnException(documentUrl)
     }
 
-    private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
+    private fun firstParty(
+        firstUrl: String,
+        secondUrl: String
+    ): Boolean =
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
 
-    private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean {
+    private fun sameNetworkName(
+        firstUrl: String,
+        secondUrl: String
+    ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(firstUrl) ?: return false
         val secondNetwork = entityLookup.entityForUrl(secondUrl) ?: return false
         return firstNetwork.name == secondNetwork.name
     }
 
     @VisibleForTesting
-    val clientCount get() = clients.count()
+    val clientCount
+        get() = clients.count()
 }
 
 private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {

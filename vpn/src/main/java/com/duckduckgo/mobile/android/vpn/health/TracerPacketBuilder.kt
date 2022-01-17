@@ -26,5 +26,4 @@ class TracerPacketBuilder @Inject constructor() {
         val tracerId = UUID.randomUUID().toString()
         return Packet.TracerPacker(tracerId)
     }
-
 }

@@ -42,7 +42,10 @@ class BookmarksEntityQueryListener(
         return false
     }
 
-    private fun filterBookmarks(query: String, bookmarks: List<SavedSite.Bookmark>): List<BookmarksAdapter.BookmarkItem> {
+    private fun filterBookmarks(
+        query: String,
+        bookmarks: List<SavedSite.Bookmark>
+    ): List<BookmarksAdapter.BookmarkItem> {
         val lowercaseQuery = query.toLowerCase()
         return bookmarks.filter {
             val lowercaseTitle = it.title.toLowerCase()
@@ -50,7 +53,10 @@ class BookmarksEntityQueryListener(
         }.map { BookmarksAdapter.BookmarkItem(it) }
     }
 
-    private fun filterBookmarkFolders(query: String, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
+    private fun filterBookmarkFolders(
+        query: String,
+        bookmarkFolders: List<BookmarkFolder>
+    ): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
         val lowercaseQuery = query.toLowerCase()
         return bookmarkFolders.filter {
             val lowercaseTitle = it.name.toLowerCase()

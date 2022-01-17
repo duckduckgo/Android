@@ -35,7 +35,10 @@ class AlertingUncaughtExceptionHandler(
     private val appBuildConfig: AppBuildConfig
 ) : Thread.UncaughtExceptionHandler {
 
-    override fun uncaughtException(thread: Thread?, originalException: Throwable?) {
+    override fun uncaughtException(
+        thread: Thread?,
+        originalException: Throwable?
+    ) {
 
         if (shouldRecordExceptionAndCrashApp(originalException)) {
             recordExceptionAndAllowCrash(thread, originalException)
@@ -45,7 +48,6 @@ class AlertingUncaughtExceptionHandler(
         if (shouldCrashApp()) {
             originalHandler.uncaughtException(thread, originalException)
         }
-
     }
 
     /**
@@ -66,7 +68,10 @@ class AlertingUncaughtExceptionHandler(
      */
     private fun shouldCrashApp(): Boolean = appBuildConfig.isDebug
 
-    private fun recordExceptionAndAllowCrash(thread: Thread?, originalException: Throwable?) {
+    private fun recordExceptionAndAllowCrash(
+        thread: Thread?,
+        originalException: Throwable?
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
             try {
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)

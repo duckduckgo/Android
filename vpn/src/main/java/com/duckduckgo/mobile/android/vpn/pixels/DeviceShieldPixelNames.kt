@@ -118,6 +118,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
     ATP_APP_HEALTH_MONITOR_REPORT("m_atp_health_monitor_report"),
+    ATP_APP_HEALTH_ALERT_DAILY("m_atp_health_alert_%s_d"),
 
     ATP_ENCRYPTED_IO_EXCEPTION("m_atp_ev_encrypted_io_error_c"),
     ATP_ENCRYPTED_GENERAL_EXCEPTION("m_atp_ev_encrypted_error_c"),

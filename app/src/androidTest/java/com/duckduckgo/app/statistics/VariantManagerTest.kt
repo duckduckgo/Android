@@ -32,14 +32,14 @@ class VariantManagerTest {
     @Test
     fun serpControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "sc" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun serpExperimentalVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "se" }
-        assertEqualsDouble(0.0, variant.weight)
+        assertEqualsDouble(1.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
@@ -54,7 +54,10 @@ class VariantManagerTest {
     }
 
     @Suppress("SameParameterValue")
-    private fun assertEqualsDouble(expected: Double, actual: Double) {
+    private fun assertEqualsDouble(
+        expected: Double,
+        actual: Double
+    ) {
         val comparison = expected.compareTo(actual)
         if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")

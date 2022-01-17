@@ -33,7 +33,10 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerD
 
     fun setEnable(enable: Boolean) = this.enable.set(enable)
 
-    override fun interceptTrackerRequest(hostname: String, packageId: String): RequestTrackerType? {
+    override fun interceptTrackerRequest(
+        hostname: String,
+        packageId: String
+    ): RequestTrackerType? {
         return if (enable.get()) {
             Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
             RequestTrackerType.NotTracker(hostname)

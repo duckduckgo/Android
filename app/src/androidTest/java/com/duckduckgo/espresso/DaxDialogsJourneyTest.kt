@@ -56,5 +56,4 @@ class DaxDialogsJourneyTest {
 
         onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
     }
-
 }

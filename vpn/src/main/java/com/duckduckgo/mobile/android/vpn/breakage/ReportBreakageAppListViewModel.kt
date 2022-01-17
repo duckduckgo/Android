@@ -60,6 +60,7 @@ class ReportBreakageAppListViewModel constructor(
             selectedAppFlow.value?.let { command.send(ReportBreakageAppListView.Command.LaunchBreakageForm(it)) }
         }
     }
+
     internal fun onBreakageSubmitted(issueReport: IssueReport) {
         viewModelScope.launch {
             selectedAppFlow.value?.let {

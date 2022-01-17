@@ -38,5 +38,4 @@ class PlayHttpsEmbeddedDataPersister(
         val bytes = context.resources.openRawResource(R.raw.https_mobile_v2_bloom).use { it.readBytes() }
         httpsDataPersister.persistBloomFilter(specAdapter.fromJson(specJson)!!, bytes, falsePositivesAdapter.fromJson(falsePositivesJson)!!)
     }
-
 }

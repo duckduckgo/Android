@@ -87,5 +87,4 @@ class DuckDuckGoRequestRewriterTest {
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
     }
-
 }

@@ -40,7 +40,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
     private var phrase = ""
     private var suggestions: List<AutoCompleteSuggestion> = emptyList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AutoCompleteViewHolder =
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): AutoCompleteViewHolder =
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
     override fun getItemViewType(position: Int): Int {
@@ -51,7 +54,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        position: Int
+    ) {
         if (holder is EmptySuggestionViewHolder) {
             // nothing required
         } else {
@@ -72,7 +78,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     @UiThread
-    fun updateData(newPhrase: String, newSuggestions: List<AutoCompleteSuggestion>) {
+    fun updateData(
+        newPhrase: String,
+        newSuggestions: List<AutoCompleteSuggestion>
+    ) {
         if (phrase == newPhrase && suggestions == newSuggestions) return
         phrase = newPhrase
         suggestions = newSuggestions

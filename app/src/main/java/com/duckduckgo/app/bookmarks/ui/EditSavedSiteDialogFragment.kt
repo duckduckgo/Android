@@ -48,10 +48,16 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
 
-    private fun validateInput(newValue: String, existingValue: String) =
+    private fun validateInput(
+        newValue: String,
+        existingValue: String
+    ) =
         if (newValue.isNotBlank()) newValue else existingValue
 
-    private fun populateFields(titleInput: EditText, urlInput: EditText) {
+    private fun populateFields(
+        titleInput: EditText,
+        urlInput: EditText
+    ) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
     }
@@ -108,7 +114,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     companion object {
         const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(savedSite: SavedSite, parentFolderId: Long = 0, parentFolderName: String? = null): EditSavedSiteDialogFragment {
+        fun instance(
+            savedSite: SavedSite,
+            parentFolderId: Long = 0,
+            parentFolderName: String? = null
+        ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)

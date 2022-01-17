@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.drm
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -50,7 +50,7 @@ class DrmPluginTest {
 
     @Test
     fun whenFeatureNameMatchesEmeAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/drm.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -59,7 +59,7 @@ class DrmPluginTest {
 
     @Test
     fun whenFeatureNameMatchesEmeAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/drm_disabled.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -68,7 +68,7 @@ class DrmPluginTest {
 
     @Test
     fun whenFeatureNameMatchesEmeThenUpdateAllExistingExceptions() {
-        val jsonString = FileUtilities.loadText("json/drm.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

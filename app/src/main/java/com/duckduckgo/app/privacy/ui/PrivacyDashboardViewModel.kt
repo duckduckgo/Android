@@ -117,7 +117,10 @@ class PrivacyDashboardViewModel(
         )
     }
 
-    private fun showTrackerNetworkLeaderboard(siteVisitedCount: Int, networkCount: Int): Boolean {
+    private fun showTrackerNetworkLeaderboard(
+        siteVisitedCount: Int,
+        networkCount: Int
+    ): Boolean {
         return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
@@ -224,7 +227,13 @@ class PrivacyDashboardViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
+                    userWhitelistDao.get(),
+                    contentBlocking.get(),
+                    networkLeaderboardDao.get(),
+                    pixel.get(),
+                    appCoroutineScope.get()
+                ) as T
                 else -> null
             }
         }

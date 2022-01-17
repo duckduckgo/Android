@@ -45,7 +45,11 @@ import com.duckduckgo.mobile.android.vpn.health.CurrentMemorySnapshot
 import com.duckduckgo.mobile.android.vpn.health.HealthCheckSubmission
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_CONNECT_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
@@ -130,7 +134,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
             val encodedData =
                 Base64.encodeToString(
-                    json.toByteArray(), Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
+                    json.toByteArray(),
+                    Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE,
                 )
             deviceShieldPixels.sendHealthMonitorReport(mapOf("data" to encodedData))
         }
@@ -257,24 +262,33 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
         healthMetricsStrings.add(
             String.format(
-                "device-to-network queue writes: %d\ntun reads: %d\nrate: %s",
+                """
+                    device-to-network queue writes: %d
+                      tun reads: %d (rate %s)
+                      queue reads: %s (rate %s)
+                        queue TCP reads: %s (rate %s)
+                        queue UDP reads: %s (rate %s)
+                """.trimIndent(),
                 healthMetricsInfo.writtenToDeviceToNetworkQueue,
                 healthMetricsInfo.tunPacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.writtenToDeviceToNetworkQueue,
                     healthMetricsInfo.tunPacketReceived,
                 ),
-            ),
-        )
-
-        healthMetricsStrings.add(
-            String.format(
-                "\n\ndevice-to-network queue writes: %d\nqueue reads: %d\nrate: %s",
-                healthMetricsInfo.writtenToDeviceToNetworkQueue,
                 healthMetricsInfo.removeFromDeviceToNetworkQueue,
                 calculatePercentage(
                     healthMetricsInfo.writtenToDeviceToNetworkQueue,
                     healthMetricsInfo.removeFromDeviceToNetworkQueue,
+                ),
+                healthMetricsInfo.removeFromTCPDeviceToNetworkQueue,
+                calculatePercentage(
+                    healthMetricsInfo.writtenToTCPDeviceToNetworkQueue,
+                    healthMetricsInfo.removeFromTCPDeviceToNetworkQueue,
+                ),
+                healthMetricsInfo.removeFromUDPDeviceToNetworkQueue,
+                calculatePercentage(
+                    healthMetricsInfo.writtenToUDPDeviceToNetworkQueue,
+                    healthMetricsInfo.removeFromUDPDeviceToNetworkQueue,
                 ),
             ),
         )
@@ -301,7 +315,10 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         return sb.toString()
     }
 
-    private fun calculatePercentage(numerator: Long, denominator: Long): String {
+    private fun calculatePercentage(
+        numerator: Long,
+        denominator: Long
+    ): String {
         if (denominator == 0L) return "0%"
         return String.format(
             "%s%%",
@@ -315,8 +332,16 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         val tunPacketReceived = healthMetricCounter.getStat(TUN_READ(), timeWindow)
         val removeFromDeviceToNetworkQueue =
             healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val removeFromTCPDeviceToNetworkQueue =
+            healthMetricCounter.getStat(REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val removeFromUDPDeviceToNetworkQueue =
+            healthMetricCounter.getStat(REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val writtenToDeviceToNetworkQueue =
             healthMetricCounter.getStat(ADD_TO_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val writtenToTCPDeviceToNetworkQueue =
+            healthMetricCounter.getStat(ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
+        val writtenToUDPDeviceToNetworkQueue =
+            healthMetricCounter.getStat(ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val socketReadExceptions =
             healthMetricCounter.getStat(SOCKET_CHANNEL_READ_EXCEPTION(), timeWindow)
         val socketWriteExceptions =
@@ -328,7 +353,11 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         return HealthMetricsInfo(
             tunPacketReceived = tunPacketReceived,
             writtenToDeviceToNetworkQueue = writtenToDeviceToNetworkQueue,
+            writtenToTCPDeviceToNetworkQueue = writtenToTCPDeviceToNetworkQueue,
+            writtenToUDPDeviceToNetworkQueue = writtenToUDPDeviceToNetworkQueue,
             removeFromDeviceToNetworkQueue = removeFromDeviceToNetworkQueue,
+            removeFromTCPDeviceToNetworkQueue = removeFromTCPDeviceToNetworkQueue,
+            removeFromUDPDeviceToNetworkQueue = removeFromUDPDeviceToNetworkQueue,
             socketReadExceptions = socketReadExceptions,
             socketWriteExceptions = socketWriteExceptions,
             socketConnectException = socketConnectExceptions,
@@ -461,8 +490,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 .getNetworkCapabilities(this)
                 ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
                 connectivityManager
-                    .getNetworkCapabilities(this)
-                    ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
+                .getNetworkCapabilities(this)
+                ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
         } else {
             isConnectedLegacy(this)
         }
@@ -631,7 +660,11 @@ data class TracerInfo(
 data class HealthMetricsInfo(
     val tunPacketReceived: Long,
     val writtenToDeviceToNetworkQueue: Long,
+    val writtenToTCPDeviceToNetworkQueue: Long,
+    val writtenToUDPDeviceToNetworkQueue: Long,
     val removeFromDeviceToNetworkQueue: Long,
+    val removeFromTCPDeviceToNetworkQueue: Long,
+    val removeFromUDPDeviceToNetworkQueue: Long,
     val socketReadExceptions: Long,
     val socketWriteExceptions: Long,
     val socketConnectException: Long,
@@ -645,7 +678,10 @@ data class NetworkInfo(
     val connectedToInternet: Boolean
 )
 
-data class Network(val address: String, val type: NetworkType)
+data class Network(
+    val address: String,
+    val type: NetworkType
+)
 
 val networkTypeV4 = NetworkType("IPv4")
 val networkTypeV6 = NetworkType("IPv6")

@@ -28,7 +28,11 @@ import javax.inject.Inject
 
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
-    override fun convertQueryToUrl(searchQuery: String, vertical: String?, queryOrigin: QueryOrigin): String {
+    override fun convertQueryToUrl(
+        searchQuery: String,
+        vertical: String?,
+        queryOrigin: QueryOrigin
+    ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
             is QueryOrigin.FromUser -> UriString.isWebUrl(searchQuery)
@@ -68,5 +72,4 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     companion object {
         val majorVerticals = listOf("images", "videos", "news", "shopping")
     }
-
 }

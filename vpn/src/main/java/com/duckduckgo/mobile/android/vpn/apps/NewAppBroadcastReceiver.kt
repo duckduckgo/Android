@@ -50,7 +50,10 @@ class NewAppBroadcastReceiver @Inject constructor(
 ) : BroadcastReceiver(), VpnServiceCallbacks {
 
     @MainThread
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         when (intent.action) {
             Intent.ACTION_PACKAGE_ADDED -> intent.data?.schemeSpecificPart?.let { restartVpn(it) }
         }
@@ -99,7 +102,10 @@ class NewAppBroadcastReceiver @Inject constructor(
         register()
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.v("New app receiver stopped")
         unregister()
     }

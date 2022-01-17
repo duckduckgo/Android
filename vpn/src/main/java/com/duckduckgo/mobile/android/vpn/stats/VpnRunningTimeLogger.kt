@@ -51,7 +51,10 @@ class VpnRunningTimeLogger @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         job.cancel()
         // vpn stopped, ensure we log the stopped timestamp
         coroutineScope.launch(dispatcherProvider.io()) {

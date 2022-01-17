@@ -22,8 +22,12 @@ data class Choice(
     @StringRes val questionStringRes: Int,
     val isSelected: Boolean = false
 )
+
 object ReportBreakageSingleChoiceFormView {
-    data class State(val choices: List<Choice>, val canSubmit: Boolean)
+    data class State(
+        val choices: List<Choice>,
+        val canSubmit: Boolean
+    )
 
     sealed class Command {
         data class SubmitChoice(val selectedChoice: Choice) : Command()

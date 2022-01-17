@@ -22,7 +22,10 @@ import com.duckduckgo.mobile.android.ui.view.toDp
 import timber.log.Timber
 
 class SearchAndFavoritesGridCalculator {
-    fun calculateColumns(context: Context, width: Int): Int {
+    fun calculateColumns(
+        context: Context,
+        width: Int
+    ): Int {
         val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesSideMargin).toDp()
         val item = context.resources.getDimension(R.dimen.searchWidgetFavoriteItemContainerWidth).toDp()
         val divider = context.resources.getDimension(R.dimen.searchWidgetFavoritesHorizontalSpacing).toDp()
@@ -39,7 +42,10 @@ class SearchAndFavoritesGridCalculator {
         return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1)
     }
 
-    fun calculateRows(context: Context, height: Int): Int {
+    fun calculateRows(
+        context: Context,
+        height: Int
+    ): Int {
         val searchBar = context.resources.getDimension(R.dimen.searchWidgetSearchBarHeight).toDp()
         val margins = context.resources.getDimension(R.dimen.searchWidgetFavoritesTopMargin).toDp() +
             (context.resources.getDimension(R.dimen.searchWidgetPadding).toDp() * 2)

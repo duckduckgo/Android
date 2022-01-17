@@ -20,12 +20,18 @@ import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
 
 interface PayloadBytesExtractor {
-    fun extract(packet: Packet, payloadBuffer: ByteBuffer): ByteArray
+    fun extract(
+        packet: Packet,
+        payloadBuffer: ByteBuffer
+    ): ByteArray
 }
 
 class ConcretePayloadBytesExtractor : PayloadBytesExtractor {
 
-    override fun extract(packet: Packet, payloadBuffer: ByteBuffer): ByteArray {
+    override fun extract(
+        packet: Packet,
+        payloadBuffer: ByteBuffer
+    ): ByteArray {
         val headerLength = packet.ip4Header.headerLength + packet.tcpHeader.headerLength
         val payloadSize = packet.ip4Header.totalLength - headerLength
         val newArray = ByteArray(payloadSize)
@@ -37,5 +43,4 @@ class ConcretePayloadBytesExtractor : PayloadBytesExtractor {
         }
         return newArray
     }
-
 }

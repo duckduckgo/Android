@@ -46,7 +46,10 @@ class VpnModule {
     @SingleInstanceIn(VpnScope::class)
     @TargetApi(29)
     @Named("DetectOriginatingAppPackageModern")
-    fun providesOriginatingAppResolverModern(connectivityManager: ConnectivityManager, packageManager: PackageManager): OriginatingAppPackageIdentifier {
+    fun providesOriginatingAppResolverModern(
+        connectivityManager: ConnectivityManager,
+        packageManager: PackageManager
+    ): OriginatingAppPackageIdentifier {
         return DetectOriginatingAppPackageModern(connectivityManager, packageManager)
     }
 
@@ -80,7 +83,8 @@ class VpnModule {
     fun provideNameHeaderExtractor(): HostnameHeaderExtractor = PlaintextHostHeaderExtractor()
 
     @Provides
-    fun provideEncryptedRequestHostExtractor(tlsMessageDetector: TlsMessageDetector): EncryptedRequestHostExtractor = ServerNameIndicationHeaderHostExtractor(tlsMessageDetector)
+    fun provideEncryptedRequestHostExtractor(tlsMessageDetector: TlsMessageDetector): EncryptedRequestHostExtractor =
+        ServerNameIndicationHeaderHostExtractor(tlsMessageDetector)
 
     @Provides
     fun providePayloadBytesExtractor(): PayloadBytesExtractor = ConcretePayloadBytesExtractor()
@@ -95,7 +99,10 @@ class VpnModule {
 
     @SingleInstanceIn(VpnScope::class)
     @Provides
-    fun providesPacketPersister(vpnDatabase: VpnDatabase, appBuildConfig: AppBuildConfig): PacketPersister {
+    fun providesPacketPersister(
+        vpnDatabase: VpnDatabase,
+        appBuildConfig: AppBuildConfig
+    ): PacketPersister {
         return if (appBuildConfig.isDebug) {
             RoomPacketPersister(vpnDatabase)
         } else {
@@ -114,7 +121,15 @@ class VpnModule {
         tlsContentTypeExtractor: ContentTypeExtractor,
         requestInterceptors: PluginPoint<VpnTrackerDetectorInterceptor>,
     ): VpnTrackerDetector {
-        return DomainBasedTrackerDetector(hostnameExtractor, appTrackerRepository, appTrackerRecorder, payloadBytesExtractor, tlsContentTypeExtractor, vpnDatabase, requestInterceptors)
+        return DomainBasedTrackerDetector(
+            hostnameExtractor,
+            appTrackerRepository,
+            appTrackerRecorder,
+            payloadBytesExtractor,
+            tlsContentTypeExtractor,
+            vpnDatabase,
+            requestInterceptors
+        )
     }
 
     @SingleInstanceIn(VpnScope::class)

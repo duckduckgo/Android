@@ -35,5 +35,4 @@ class Chip @JvmOverloads constructor(
     fun setChipIcon(@DrawableRes iconResource: Int) {
         leftDrawable(iconResource)
     }
-
 }
