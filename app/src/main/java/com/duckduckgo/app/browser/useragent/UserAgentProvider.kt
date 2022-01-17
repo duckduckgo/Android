@@ -37,7 +37,10 @@ import javax.inject.Provider
  * Example Default Desktop User Agent (From Chrome):
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
-class UserAgentProvider constructor(@Named("defaultUserAgent") private val defaultUserAgent: Provider<String>, private val device: DeviceInfo) {
+class UserAgentProvider constructor(
+    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
+    private val device: DeviceInfo
+) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
     private val baseDesktopAgent: String by lazy { concatWithSpaces(desktopPrefix, getWebKitVersionOnwards(true)) }
@@ -54,7 +57,10 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
      *
      * We include everything from the original UA string from AppleWebKit onwards (omitting if missing)
      */
-    fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
+    fun userAgent(
+        url: String? = null,
+        isDesktop: Boolean = false
+    ): String {
         val host = url?.toUri()?.host
         val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
         val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
@@ -73,7 +79,10 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
         return concatWithSpaces(prefix, application, safariComponent)
     }
 
-    private fun containsExcludedPath(url: String?, site: DesktopAgentSiteOnly): Boolean {
+    private fun containsExcludedPath(
+        url: String?,
+        site: DesktopAgentSiteOnly
+    ): Boolean {
         return if (url != null) {
             val segments = url.toUri().pathSegments
             site.excludedPaths.any { segments.contains(it) }
@@ -83,7 +92,8 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
     }
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
-        val matches = AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
+        val matches =
+            AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
         var result = matches.groupValues.last()
         if (forDesktop) {
             result = result.replace(" Mobile", "")
@@ -136,7 +146,10 @@ class UserAgentProvider constructor(@Named("defaultUserAgent") private val defau
         )
     }
 
-    data class DesktopAgentSiteOnly(val host: String, val excludedPaths: List<String> = emptyList())
+    data class DesktopAgentSiteOnly(
+        val host: String,
+        val excludedPaths: List<String> = emptyList()
+    )
 }
 
 @ContributesTo(AppScope::class)

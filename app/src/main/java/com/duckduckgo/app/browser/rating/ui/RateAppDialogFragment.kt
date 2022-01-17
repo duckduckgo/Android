@@ -58,7 +58,10 @@ class RateAppDialogFragment : EnjoymentDialog() {
     }
 
     companion object {
-        fun create(promptCount: PromptCount, listener: Listener): RateAppDialogFragment {
+        fun create(
+            promptCount: PromptCount,
+            listener: Listener
+        ): RateAppDialogFragment {
             return RateAppDialogFragment().also { fragment ->
                 val bundle = Bundle()
                 bundle.putInt(PROMPT_COUNT_BUNDLE_KEY, promptCount.value)

@@ -69,7 +69,10 @@ class VpnServiceHeartbeatMonitor(
         Companion.startHearbeatMonitor(workManager)
     }
 
-    class VpnServiceHeartbeatMonitorWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class VpnServiceHeartbeatMonitorWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var vpnPhoenixDao: VpnPhoenixDao
         lateinit var vpnHeartBeatDao: VpnHeartBeatDao
         lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -137,7 +140,10 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
     @Inject
     lateinit var workManager: WorkManager
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         AndroidInjection.inject(this, context)
 
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {

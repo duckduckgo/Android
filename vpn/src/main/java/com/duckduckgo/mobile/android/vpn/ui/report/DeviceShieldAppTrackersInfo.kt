@@ -48,7 +48,5 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, DeviceShieldAppTrackersInfo::class.java)
         }
-
     }
-
 }

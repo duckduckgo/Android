@@ -27,5 +27,8 @@ sealed class VpnStopReason {
 interface VpnServiceCallbacks {
     fun onVpnStarted(coroutineScope: CoroutineScope)
 
-    fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason)
+    fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    )
 }

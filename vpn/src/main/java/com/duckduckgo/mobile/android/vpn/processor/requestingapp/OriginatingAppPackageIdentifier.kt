@@ -40,7 +40,10 @@ class OriginatingAppPackageIdentifierStrategy @Inject constructor(
 ) {
 
     @SuppressLint("NewApi")
-    fun resolvePackageId(connectionInfo: ConnectionInfo, sdkVersion: Int = Build.VERSION.SDK_INT): String {
+    fun resolvePackageId(
+        connectionInfo: ConnectionInfo,
+        sdkVersion: Int = Build.VERSION.SDK_INT
+    ): String {
 
         return if (sdkVersion >= Build.VERSION_CODES.Q) {
             modern.resolvePackageId(connectionInfo)

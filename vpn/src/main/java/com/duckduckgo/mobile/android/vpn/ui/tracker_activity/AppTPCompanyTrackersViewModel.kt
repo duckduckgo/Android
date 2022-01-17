@@ -43,7 +43,10 @@ constructor(
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
 
-    suspend fun getTrackersForAppFromDate(date: String, packageName: String): Flow<ViewState> =
+    suspend fun getTrackersForAppFromDate(
+        date: String,
+        packageName: String
+    ): Flow<ViewState> =
         withContext(dispatchers.io()) {
             return@withContext statsRepository
                 .getTrackersForAppFromDate(date, packageName)
@@ -97,6 +100,7 @@ constructor(
         val lastTrackerBlockedAgo: String,
         val trackingCompanies: List<CompanyTrackingDetails>
     )
+
     data class CompanyTrackingDetails(
         val companyName: String,
         val companyDisplayName: String,

@@ -150,7 +150,10 @@ class AutomaticDataClearer @Inject constructor(
                 .addTag(DataClearingWorker.WORK_REQUEST_TAG)
                 .build()
             it.enqueue(workRequest)
-            Timber.i("Work request scheduled, ${durationMillis}ms from now, to clear data if the user hasn't returned to the app. job id: ${workRequest.id}")
+            Timber.i(
+                "Work request scheduled, ${durationMillis}ms from now, " +
+                    "to clear data if the user hasn't returned to the app. job id: ${workRequest.id}"
+            )
         }
     }
 
@@ -195,7 +198,11 @@ class AutomaticDataClearer @Inject constructor(
         }
     }
 
-    private fun shouldClearData(cleanWhenOption: ClearWhenOption, appUsedSinceLastClear: Boolean, appIconChanged: Boolean): Boolean {
+    private fun shouldClearData(
+        cleanWhenOption: ClearWhenOption,
+        appUsedSinceLastClear: Boolean,
+        appIconChanged: Boolean
+    ): Boolean {
         Timber.d("Determining if data should be cleared for option $cleanWhenOption")
 
         if (!appUsedSinceLastClear) {
@@ -232,5 +239,4 @@ class AutomaticDataClearer @Inject constructor(
 
         return enoughTimePassed
     }
-
 }

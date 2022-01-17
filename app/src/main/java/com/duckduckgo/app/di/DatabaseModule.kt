@@ -38,7 +38,10 @@ class DatabaseModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAppDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
+    fun provideAppDatabase(
+        context: Context,
+        migrationsProvider: MigrationsProvider
+    ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)

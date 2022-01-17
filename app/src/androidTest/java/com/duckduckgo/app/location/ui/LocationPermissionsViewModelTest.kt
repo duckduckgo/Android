@@ -39,7 +39,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -273,7 +272,10 @@ class LocationPermissionsViewModelTest {
         assertEquals(locationPermissionsDao.getPermission(domain)!!.permission, LocationPermissionType.DENY_ALWAYS)
     }
 
-    private fun givenLocationPermission(permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE, vararg domain: String) {
+    private fun givenLocationPermission(
+        permission: LocationPermissionType = LocationPermissionType.ALLOW_ONCE,
+        vararg domain: String
+    ) {
         domain.forEach {
             locationPermissionsDao.insert(LocationPermissionEntity(domain = it, permission = permission))
         }

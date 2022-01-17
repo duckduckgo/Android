@@ -23,13 +23,15 @@ import kotlinx.coroutines.test.runTest
 import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-private data class Cookie(val url: String, val value: String)
+private data class Cookie(
+    val url: String,
+    val value: String
+)
 
 @ExperimentalCoroutinesApi
 class WebViewCookieManagerTest {

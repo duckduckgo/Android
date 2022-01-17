@@ -35,7 +35,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class PrivacyConfigDownloadWorker(
+    context: Context,
+    workerParameters: WorkerParameters
+) : CoroutineWorker(context, workerParameters) {
     lateinit var privacyConfigDownloader: PrivacyConfigDownloader
     lateinit var dispatcherProvider: DispatcherProvider
 
@@ -49,7 +52,6 @@ class PrivacyConfigDownloadWorker(context: Context, workerParameters: WorkerPara
             }
         }
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)

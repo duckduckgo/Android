@@ -54,7 +54,8 @@ class RealPrivacyConfigDownloaderTest {
         runTest {
             testee =
                 RealPrivacyConfigDownloader(
-                    TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
+                    TestFailingPrivacyConfigService(), mockPrivacyConfigPersister
+                )
             assertFalse(testee.download())
         }
 
@@ -82,7 +83,8 @@ class RealPrivacyConfigDownloaderTest {
                 version = 1,
                 readme = "readme",
                 features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-                unprotectedTemporaryList)
+                unprotectedTemporaryList
+            )
         }
     }
 

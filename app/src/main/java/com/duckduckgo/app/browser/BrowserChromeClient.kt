@@ -44,7 +44,10 @@ class BrowserChromeClient @Inject constructor(
 
     private var customView: View? = null
 
-    override fun onShowCustomView(view: View, callback: CustomViewCallback?) {
+    override fun onShowCustomView(
+        view: View,
+        callback: CustomViewCallback?
+    ) {
         try {
             Timber.d("on show custom view")
             if (customView != null) {
@@ -54,7 +57,6 @@ class BrowserChromeClient @Inject constructor(
 
             customView = view
             webViewClientListener?.goFullScreen(view)
-
         } catch (e: Throwable) {
             appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOW_CUSTOM_VIEW)
@@ -76,7 +78,10 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onProgressChanged(webView: WebView, newProgress: Int) {
+    override fun onProgressChanged(
+        webView: WebView,
+        newProgress: Int
+    ) {
         try {
             Timber.d("onProgressChanged ${webView.url}, $newProgress")
             val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -90,14 +95,21 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onReceivedIcon(webView: WebView, icon: Bitmap) {
+    override fun onReceivedIcon(
+        webView: WebView,
+        icon: Bitmap
+    ) {
         webView.url?.let {
             Timber.i("Favicon bitmap received: ${webView.url}")
             webViewClientListener?.iconReceived(it, icon)
         }
     }
 
-    override fun onReceivedTouchIconUrl(view: WebView?, url: String?, precomposed: Boolean) {
+    override fun onReceivedTouchIconUrl(
+        view: WebView?,
+        url: String?,
+        precomposed: Boolean
+    ) {
         Timber.i("Favicon touch received: ${view?.url}, $url")
         val visitedUrl = view?.url ?: return
         val iconUrl = url ?: return
@@ -105,7 +117,10 @@ class BrowserChromeClient @Inject constructor(
         super.onReceivedTouchIconUrl(view, url, precomposed)
     }
 
-    override fun onReceivedTitle(view: WebView, title: String) {
+    override fun onReceivedTitle(
+        view: WebView,
+        title: String
+    ) {
         try {
             webViewClientListener?.titleReceived(title)
         } catch (e: Throwable) {
@@ -116,7 +131,11 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onShowFileChooser(webView: WebView, filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: FileChooserParams): Boolean {
+    override fun onShowFileChooser(
+        webView: WebView,
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: FileChooserParams
+    ): Boolean {
         return try {
             webViewClientListener?.showFileChooser(filePathCallback, fileChooserParams)
             true
@@ -133,7 +152,12 @@ class BrowserChromeClient @Inject constructor(
         }
     }
 
-    override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: Message?): Boolean {
+    override fun onCreateWindow(
+        view: WebView?,
+        isDialog: Boolean,
+        isUserGesture: Boolean,
+        resultMsg: Message?
+    ): Boolean {
         if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
             webViewClientListener?.openMessageInNewTab(resultMsg)
             return true
@@ -152,8 +176,10 @@ class BrowserChromeClient @Inject constructor(
         webViewClientListener?.closeCurrentTab()
     }
 
-    override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+    override fun onGeolocationPermissionsShowPrompt(
+        origin: String,
+        callback: GeolocationPermissions.Callback
+    ) {
         webViewClientListener?.onSiteLocationPermissionRequested(origin, callback)
     }
-
 }

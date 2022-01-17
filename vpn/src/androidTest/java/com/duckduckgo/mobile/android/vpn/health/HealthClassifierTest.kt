@@ -140,7 +140,7 @@ class HealthClassifierTest {
     @Test
     fun whenTooFewTunInputsThenReportsInitializing() {
         val tunInputs: Long = 0
-        val queueReads: Long = 0
+        val queueReads = QueueReads(0, 0, 0)
         testee.determineHealthTunInputQueueReadRatio(tunInputs, queueReads).assertInitializing()
     }
 
@@ -149,7 +149,7 @@ class HealthClassifierTest {
 
         // success rate: 0%
         val tunInputs: Long = 100
-        val queueReads: Long = 0
+        val queueReads = QueueReads(0, 0, 0)
 
         testee.determineHealthTunInputQueueReadRatio(tunInputs, queueReads).assertBadHealth()
     }
@@ -159,7 +159,7 @@ class HealthClassifierTest {
 
         // success rate: 10%
         val tunInputs: Long = 900
-        val queueReads: Long = 100
+        val queueReads = QueueReads(100, 100, 0)
 
         testee.determineHealthTunInputQueueReadRatio(tunInputs, queueReads).assertBadHealth()
     }
@@ -169,7 +169,7 @@ class HealthClassifierTest {
 
         // success rate: 100%
         val tunInputs: Long = 900
-        val queueReads: Long = 900
+        val queueReads = QueueReads(900, 900, 0)
 
         testee.determineHealthTunInputQueueReadRatio(tunInputs, queueReads).assertGoodHealth()
     }
@@ -179,7 +179,7 @@ class HealthClassifierTest {
 
         // success rate: 900%
         val tunInputs: Long = 100
-        val queueReads: Long = 900
+        val queueReads = QueueReads(900, 900, 0)
 
         testee.determineHealthTunInputQueueReadRatio(tunInputs, queueReads).assertGoodHealth()
     }
@@ -196,7 +196,11 @@ class HealthClassifierTest {
         assertTrue(String.format("Expected Initializing but was %s", this.javaClass.simpleName), (this) is Initializing)
     }
 
-    private fun configureTracers(numberInvalid: Int, numberSlowTracers: Int, totalTracers: Int) {
+    private fun configureTracers(
+        numberInvalid: Int,
+        numberSlowTracers: Int,
+        totalTracers: Int
+    ) {
         for (i in 0 until numberInvalid) {
             tracers.add(anInvalidTracer())
         }

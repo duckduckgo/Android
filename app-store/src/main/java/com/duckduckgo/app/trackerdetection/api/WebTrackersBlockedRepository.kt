@@ -23,10 +23,12 @@ import org.threeten.bp.LocalDateTime
 
 interface WebTrackersBlockedRepository {
 
-    fun get(startTime: () -> String, endTime: String = noEndDate()): Flow<List<WebTrackerBlocked>>
+    fun get(
+        startTime: () -> String,
+        endTime: String = noEndDate()
+    ): Flow<List<WebTrackerBlocked>>
 
     private fun noEndDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
-
 }

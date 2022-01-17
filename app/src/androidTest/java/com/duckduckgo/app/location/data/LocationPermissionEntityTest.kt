@@ -49,5 +49,4 @@ class LocationPermissionEntityTest {
         val host = domain.asLocationPermissionOrigin()
         Assert.assertEquals("https://www.example.com/", host)
     }
-
 }

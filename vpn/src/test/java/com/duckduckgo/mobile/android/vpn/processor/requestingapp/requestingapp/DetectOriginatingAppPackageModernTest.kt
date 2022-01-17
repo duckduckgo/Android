@@ -25,7 +25,6 @@ import org.junit.Test
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
-
 class DetectOriginatingAppPackageModernTest {
 
     private val connectivityManager: ConnectivityManager = mock()

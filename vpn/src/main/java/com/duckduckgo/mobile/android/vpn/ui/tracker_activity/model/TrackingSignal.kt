@@ -20,7 +20,11 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.mobile.android.vpn.R
 
-enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayName: Int, @DrawableRes val signalIcon: Int) {
+enum class TrackingSignal(
+    val signaltag: String,
+    @StringRes val signalDisplayName: Int,
+    @DrawableRes val signalIcon: Int
+) {
     AAID("AAID", R.string.atp_TrackingSignalAAID, R.drawable.ic_signal_advertising_id),
     DEVICE_ID("device_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     FB_PERSISTENT_ID("fb_persistent_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
@@ -84,6 +88,5 @@ enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayNam
         fun fromTag(signalTag: String): TrackingSignal {
             return valueOf(signalTag.uppercase())
         }
-
     }
 }

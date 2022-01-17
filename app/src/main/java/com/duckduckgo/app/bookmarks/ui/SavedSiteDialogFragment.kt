@@ -79,7 +79,11 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         setStyle(STYLE_NO_TITLE, R.style.SavedSiteFullScreenDialog)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
@@ -173,7 +177,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
         binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
             (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
-            (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
+                (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
 
     private val titleTextWatcher = object : TextChangedWatcher() {

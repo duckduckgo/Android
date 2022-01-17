@@ -57,7 +57,8 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
     fun createNotificationNewTrackerFound(trackersBlocked: List<VpnTracker>): DeviceShieldNotification {
         val numberOfApps = trackersBlocked.distinctBy { it.trackingApp.packageId }
-        if (trackersBlocked.isEmpty() || numberOfApps.isEmpty()) return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.atp_OnNoTrackersNotificationHeader)))
+        if (trackersBlocked.isEmpty() || numberOfApps.isEmpty())
+            return DeviceShieldNotification(SpannableStringBuilder(resources.getString(R.string.atp_OnNoTrackersNotificationHeader)))
 
         val prefix = resources.getString(R.string.atp_OnNotificationPrefix)
         val numberOfAppsString = resources.getQuantityString(R.plurals.atp_NotificationNumberOfApps, numberOfApps.size, numberOfApps.size)
@@ -74,7 +75,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
         )
     }
 
-    private fun getNumberOfAppsContainingTopOffender(trackers: List<VpnTracker>, topOffender: VpnTracker): Map<TrackingApp, List<VpnTracker>> {
+    private fun getNumberOfAppsContainingTopOffender(
+        trackers: List<VpnTracker>,
+        topOffender: VpnTracker
+    ): Map<TrackingApp, List<VpnTracker>> {
         return trackers.filter { it.trackerCompanyId == topOffender.trackerCompanyId }.groupBy { it.trackingApp }
     }
 
@@ -84,7 +88,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val trackers = appTrackerBlockingStatsRepository.getVpnTrackersSync({ dateOfLastDay() })
             val trackerCount = appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastDay() }).firstOrNull() ?: trackers.size
-            Timber.v("createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is ${trackers.size}. Notification type: $dailyNotificationType")
+            Timber.v(
+                "createDailyDeviceShieldNotification. $trackerCount total trackers in the last day, number of trackers returned is " +
+                    "${trackers.size}. Notification type: $dailyNotificationType"
+            )
 
             if (trackers.isEmpty()) {
                 return DeviceShieldNotification(hidden = true)
@@ -101,7 +108,11 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }.copy(notificationVariant = dailyNotificationType)
         }
 
-        private fun createDailyTotalTrackersNotification(totalTrackersCount: Int, apps: Int, firstAppName: String): DeviceShieldNotification {
+        private fun createDailyTotalTrackersNotification(
+            totalTrackersCount: Int,
+            apps: Int,
+            firstAppName: String
+        ): DeviceShieldNotification {
             val totalTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, totalTrackersCount, totalTrackersCount)
             val textPrefix = resources.getString(R.string.atp_DailyTrackersNotificationPrefix)
             val numberTrackers = resources.getQuantityString(R.plurals.atp_TrackingAttempts, totalTrackersCount, totalTrackersCount)
@@ -147,7 +158,13 @@ class DeviceShieldNotificationFactory @Inject constructor(
             val wordsToBold = mutableListOf(firstAppName)
             if (second != null) wordsToBold.add(second.appDisplayName)
 
-            Timber.v("createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${wordsToBold.joinToString(separator = ", ")}}")
+            Timber.v(
+                "createDailyNotificationTopAppsContainingTrackers. Text to style: [$textToStyle] Words to bold: ${
+                    wordsToBold.joinToString(
+                        separator = ", "
+                    )
+                }}"
+            )
             return DeviceShieldNotification(textToStyle.applyBoldSpanTo(wordsToBold))
         }
 
@@ -172,7 +189,16 @@ class DeviceShieldNotificationFactory @Inject constructor(
 
             val textToStyle = "$prefix $numberOfTimesString $latestAppString$otherAppsCount $pastDaySuffix"
             Timber.v("createDailyLastCompanyAttemptNotification. [$textToStyle]")
-            return DeviceShieldNotification(textToStyle.applyBoldSpanTo(listOf(lastCompany.companyDisplayName, latestAppString, numberOfTimesString, otherAppsCount)))
+            return DeviceShieldNotification(
+                textToStyle.applyBoldSpanTo(
+                    listOf(
+                        lastCompany.companyDisplayName,
+                        latestAppString,
+                        numberOfTimesString,
+                        otherAppsCount
+                    )
+                )
+            )
         }
 
         private fun getTopOffender(trackers: List<VpnTracker>): VpnTracker {
@@ -203,7 +229,10 @@ class DeviceShieldNotificationFactory @Inject constructor(
             }
         }
 
-        private fun createWeeklyReportNotification(trackerCount: Int, trackers: List<VpnTracker>): DeviceShieldNotification {
+        private fun createWeeklyReportNotification(
+            trackerCount: Int,
+            trackers: List<VpnTracker>
+        ): DeviceShieldNotification {
             val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.size }
             val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
             val latestApp = perApp.first().first.appDisplayName
@@ -266,7 +295,6 @@ class DeviceShieldNotificationFactory @Inject constructor(
                 )
             )
         }
-
     }
 
     data class DeviceShieldNotification(

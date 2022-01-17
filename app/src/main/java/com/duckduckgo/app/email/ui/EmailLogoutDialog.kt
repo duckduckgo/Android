@@ -46,5 +46,4 @@ class EmailLogoutDialog : DialogFragment() {
     companion object {
         fun create(): EmailLogoutDialog = EmailLogoutDialog()
     }
-
 }

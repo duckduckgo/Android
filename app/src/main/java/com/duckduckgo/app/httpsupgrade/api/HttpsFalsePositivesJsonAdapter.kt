@@ -25,5 +25,4 @@ class HttpsFalsePositivesJsonAdapter {
     fun adapt(data: Map<String, List<String>>): List<HttpsFalsePositiveDomain> {
         return data.getValue("data").map { HttpsFalsePositiveDomain(it) }
     }
-
 }

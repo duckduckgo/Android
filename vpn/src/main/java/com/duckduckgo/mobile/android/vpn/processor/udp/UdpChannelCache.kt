@@ -29,7 +29,12 @@ import javax.inject.Inject
 
 @SingleInstanceIn(VpnScope::class)
 class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
-    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: UdpPacketProcessor.ChannelDetails?, newValue: UdpPacketProcessor.ChannelDetails?) {
+    override fun entryRemoved(
+        evicted: Boolean,
+        key: String?,
+        oldValue: UdpPacketProcessor.ChannelDetails?,
+        newValue: UdpPacketProcessor.ChannelDetails?
+    ) {
         Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
         if (evicted) {
             oldValue?.datagramChannel?.close()

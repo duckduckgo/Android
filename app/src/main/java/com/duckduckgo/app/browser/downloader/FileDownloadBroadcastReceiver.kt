@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = LifecycleObserver::class,
@@ -49,7 +48,10 @@ class FileDownloadBroadcastReceiver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(
+        context: Context?,
+        intent: Intent?
+    ) {
 
         appCoroutineScope.launch(dispatcher.io()) {
             Timber.d("Download completed.")

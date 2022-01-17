@@ -16,8 +16,17 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-data class Tracer(val tracerId: String, val creationTimestampMillis: Long, val events: List<TracerEvent>)
-data class TracerEvent(val tracerId: String, val event: TracedState, val timestampNanos: Long = System.nanoTime())
+data class Tracer(
+    val tracerId: String,
+    val creationTimestampMillis: Long,
+    val events: List<TracerEvent>
+)
+
+data class TracerEvent(
+    val tracerId: String,
+    val event: TracedState,
+    val timestampNanos: Long = System.nanoTime()
+)
 
 enum class TracedState {
     CREATED,

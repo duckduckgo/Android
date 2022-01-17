@@ -29,7 +29,10 @@ interface PrivacyConfigDownloader {
 
 @WorkerThread
 @ContributesBinding(AppScope::class)
-class RealPrivacyConfigDownloader @Inject constructor(private val privacyConfigService: PrivacyConfigService, private val privacyConfigPersister: PrivacyConfigPersister) : PrivacyConfigDownloader {
+class RealPrivacyConfigDownloader @Inject constructor(
+    private val privacyConfigService: PrivacyConfigService,
+    private val privacyConfigPersister: PrivacyConfigPersister
+) : PrivacyConfigDownloader {
 
     override suspend fun download(): Boolean {
         Timber.d("Downloading privacy config")

@@ -59,7 +59,10 @@ class ShortcutReceiver @Inject constructor(
         context.registerReceiver(this, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(
+        context: Context?,
+        intent: Intent?
+    ) {
         val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
 
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {

@@ -21,12 +21,20 @@ import com.duckduckgo.app.settings.clear.ClearWhenOption
 import timber.log.Timber
 
 interface BackgroundTimeKeeper {
-    fun hasEnoughTimeElapsed(timeNow: Long = SystemClock.elapsedRealtime(), backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean
+    fun hasEnoughTimeElapsed(
+        timeNow: Long = SystemClock.elapsedRealtime(),
+        backgroundedTimestamp: Long,
+        clearWhenOption: ClearWhenOption
+    ): Boolean
 }
 
 class DataClearerTimeKeeper : BackgroundTimeKeeper {
 
-    override fun hasEnoughTimeElapsed(timeNow: Long, backgroundedTimestamp: Long, clearWhenOption: ClearWhenOption): Boolean {
+    override fun hasEnoughTimeElapsed(
+        timeNow: Long,
+        backgroundedTimestamp: Long,
+        clearWhenOption: ClearWhenOption
+    ): Boolean {
         if (clearWhenOption == ClearWhenOption.APP_EXIT_ONLY) return false
 
         val elapsedTime = timeSinceAppBackgrounded(timeNow, backgroundedTimestamp)
@@ -35,7 +43,10 @@ class DataClearerTimeKeeper : BackgroundTimeKeeper {
         return elapsedTime >= clearWhenOption.durationMilliseconds()
     }
 
-    private fun timeSinceAppBackgrounded(timeNow: Long, backgroundedTimestamp: Long): Long {
+    private fun timeSinceAppBackgrounded(
+        timeNow: Long,
+        backgroundedTimestamp: Long
+    ): Long {
         return timeNow - backgroundedTimestamp
     }
 }

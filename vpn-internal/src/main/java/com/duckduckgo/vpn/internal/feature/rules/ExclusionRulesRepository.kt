@@ -29,7 +29,10 @@ class ExclusionRulesRepository @Inject constructor(
 ) {
     private val blockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
 
-    suspend fun upsertRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
+    suspend fun upsertRule(
+        appPackageName: String,
+        domain: String
+    ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         if (rule != null) {
             val updatedRule = rule.copy(
@@ -44,7 +47,10 @@ class ExclusionRulesRepository @Inject constructor(
         }
     }
 
-    suspend fun removeRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
+    suspend fun removeRule(
+        appPackageName: String,
+        domain: String
+    ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         rule?.let {
             val updatedRule = it.copy(

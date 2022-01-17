@@ -18,8 +18,8 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.impl.FileUtilities
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.features.contentblocking.RealContentBlocking
@@ -65,7 +65,12 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText("reference_tests/privacyconfig/tests.json"))
+            val referenceTest = adapter.fromJson(
+                FileUtilities.loadText(
+                    PrivacyConfigGlobalExceptionsReferenceTest::class.java.classLoader!!,
+                    "reference_tests/privacyconfig/tests.json"
+                )
+            )
             referenceJsonFile = referenceTest?.globalExceptions?.referenceConfig!!
             return referenceTest.globalExceptions.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
         }
@@ -85,8 +90,10 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         givenFeatureToggleIsEnabled()
-        when(testCase.featureName) {
-            "contentBlocking" -> { testFeatureEnabledForContentBlocking() }
+        when (testCase.featureName) {
+            "contentBlocking" -> {
+                testFeatureEnabledForContentBlocking()
+            }
         }
     }
 
@@ -114,7 +121,11 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
             referenceTestUtilities.privacyRepository,
             db
         )
-        privacyConfigPersister.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+        privacyConfigPersister.persistPrivacyConfig(
+            referenceTestUtilities.getJsonPrivacyConfig(
+                "reference_tests/privacyconfig/$referenceJsonFile"
+            )
+        )
     }
 
     private fun givenFeatureToggleIsEnabled() {

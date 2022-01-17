@@ -71,7 +71,10 @@ class DataUriParser @Inject constructor() {
         ) : ParseResult()
     }
 
-    data class GeneratedFilename(val name: String, val fileType: String = "") {
+    data class GeneratedFilename(
+        val name: String,
+        val fileType: String = ""
+    ) {
 
         override fun toString(): String {
             if (fileType.isBlank()) {
@@ -79,6 +82,5 @@ class DataUriParser @Inject constructor() {
             }
             return "$name.$fileType"
         }
-
     }
 }

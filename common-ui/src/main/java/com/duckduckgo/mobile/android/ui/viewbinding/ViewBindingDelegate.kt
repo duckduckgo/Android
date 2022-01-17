@@ -25,7 +25,10 @@ import kotlin.reflect.KProperty
 inline fun <reified T : ViewBinding> ViewGroup.viewBinding() =
     ViewBindingDelegate(T::class.java, this)
 
-class ViewBindingDelegate<T : ViewBinding>(bindingClass: Class<T>, view: ViewGroup) :
+class ViewBindingDelegate<T : ViewBinding>(
+    bindingClass: Class<T>,
+    view: ViewGroup
+) :
     ReadOnlyProperty<ViewGroup, T> {
     private val binding: T =
         try {
@@ -34,7 +37,8 @@ class ViewBindingDelegate<T : ViewBinding>(bindingClass: Class<T>, view: ViewGro
                     "inflate",
                     LayoutInflater::class.java,
                     ViewGroup::class.java,
-                    Boolean::class.javaPrimitiveType)
+                    Boolean::class.javaPrimitiveType
+                )
             inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast<T>()
         } catch (e: NoSuchMethodException) {
             val inflateMethod =
@@ -42,7 +46,10 @@ class ViewBindingDelegate<T : ViewBinding>(bindingClass: Class<T>, view: ViewGro
             inflateMethod.invoke(null, LayoutInflater.from(view.context), view).cast<T>()
         }
 
-    override fun getValue(thisRef: ViewGroup, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: ViewGroup,
+        property: KProperty<*>
+    ): T {
         return binding
     }
 }

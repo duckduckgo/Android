@@ -35,4 +35,7 @@ import androidx.room.PrimaryKey
         Index("tabId")
     ]
 )
-data class TabSelectionEntity(@PrimaryKey var id: Int = 1, var tabId: String?)
+data class TabSelectionEntity(
+    @PrimaryKey var id: Int = 1,
+    var tabId: String?
+)

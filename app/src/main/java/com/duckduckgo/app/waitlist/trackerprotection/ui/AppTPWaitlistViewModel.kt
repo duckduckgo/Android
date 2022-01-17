@@ -92,7 +92,10 @@ class AppTPWaitlistViewModel(
         }
     }
 
-    private fun joinedWaitlist(timestamp: Int, token: String) {
+    private fun joinedWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
         deviceShieldPixels.didShowWaitlistDialog()
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)

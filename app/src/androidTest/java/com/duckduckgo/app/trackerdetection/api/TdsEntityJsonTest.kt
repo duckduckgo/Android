@@ -31,14 +31,14 @@ class TdsEntityJsonTest {
 
     @Test
     fun whenFormatIsValidThenEntitiesAreCreated() {
-        val json = loadText("json/tds_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         assertEquals(4, entities.count())
     }
 
     @Test
     fun whenFormatIsValidThenBasicElementsAreConvertedCorrectly() {
-        val json = loadText("json/tds_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities.first()
         assertEquals(TdsEntity("21 Productions Inc", "21 Productions", 0.348), entity)
@@ -46,7 +46,7 @@ class TdsEntityJsonTest {
 
     @Test
     fun whenEntityIsMissingPrevalenceThenPrevalenceIsSetToZero() {
-        val json = loadText("json/tds_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities[1]
         assertEquals(0.0, entity.prevalence, 0.0001)
@@ -54,7 +54,7 @@ class TdsEntityJsonTest {
 
     @Test
     fun whenEntityIsMissingDisplayNameThenDisplayNameIsSameAsName() {
-        val json = loadText("json/tds_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities[2]
         assertEquals("4Cite Marketing", entity.displayName)
@@ -62,7 +62,7 @@ class TdsEntityJsonTest {
 
     @Test
     fun whenEntityHasBlankDisplayNameThenDisplayNameIsSameAsName() {
-        val json = loadText("json/tds_entities.json")
+        val json = loadText(javaClass.classLoader!!, "json/tds_entities.json")
         val entities = jsonAdapter.fromJson(json)!!.jsonToEntities()
         val entity = entities.last()
         assertEquals("AT Internet", entity.displayName)

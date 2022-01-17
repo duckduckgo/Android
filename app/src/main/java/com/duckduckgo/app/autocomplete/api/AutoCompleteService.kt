@@ -32,4 +32,7 @@ interface AutoCompleteService {
     ): Observable<List<AutoCompleteServiceRawResult>>
 }
 
-data class AutoCompleteServiceRawResult(val phrase: String, val isNav: Boolean?)
+data class AutoCompleteServiceRawResult(
+    val phrase: String,
+    val isNav: Boolean?
+)

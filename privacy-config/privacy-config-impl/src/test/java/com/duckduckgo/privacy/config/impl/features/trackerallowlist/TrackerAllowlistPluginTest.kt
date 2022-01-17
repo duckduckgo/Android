@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
@@ -51,7 +51,7 @@ class TrackerAllowlistPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackerAllowlistAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/tracker_allowlist.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -60,7 +60,7 @@ class TrackerAllowlistPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackerAllowlistAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/tracker_allowlist_disabled.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -69,7 +69,7 @@ class TrackerAllowlistPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackerAllowlistThenUpdateAllExistingExceptions() {
-        val jsonString = FileUtilities.loadText("json/tracker_allowlist.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

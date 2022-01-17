@@ -30,8 +30,16 @@ import timber.log.Timber
 import javax.inject.Inject
 
 interface LongPressHandler {
-    fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu)
-    fun userSelectedMenuItem(longPressTarget: LongPressTarget, item: MenuItem): RequiredAction
+    fun handleLongPress(
+        longPressTargetType: Int,
+        longPressTargetUrl: String?,
+        menu: ContextMenu
+    )
+
+    fun userSelectedMenuItem(
+        longPressTarget: LongPressTarget,
+        item: MenuItem
+    ): RequiredAction
 
     sealed class RequiredAction {
         object None : RequiredAction()
@@ -43,9 +51,16 @@ interface LongPressHandler {
     }
 }
 
-class WebViewLongPressHandler @Inject constructor(private val context: Context, private val pixel: Pixel) : LongPressHandler {
+class WebViewLongPressHandler @Inject constructor(
+    private val context: Context,
+    private val pixel: Pixel
+) : LongPressHandler {
 
-    override fun handleLongPress(longPressTargetType: Int, longPressTargetUrl: String?, menu: ContextMenu) {
+    override fun handleLongPress(
+        longPressTargetType: Int,
+        longPressTargetUrl: String?,
+        menu: ContextMenu
+    ) {
         menu.setHeaderTitle(longPressTargetUrl?.take(MAX_TITLE_LENGTH) ?: context.getString(R.string.options))
 
         var menuShown = true
@@ -75,7 +90,6 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
         if (menuShown) {
             pixel.fire(LONG_PRESS)
         }
-
     }
 
     private fun addImageMenuOptions(menu: ContextMenu) {
@@ -92,7 +106,10 @@ class WebViewLongPressHandler @Inject constructor(private val context: Context, 
 
     private fun isLinkSupported(longPressTargetUrl: String?) = URLUtil.isNetworkUrl(longPressTargetUrl) || URLUtil.isDataUrl(longPressTargetUrl)
 
-    override fun userSelectedMenuItem(longPressTarget: LongPressTarget, item: MenuItem): RequiredAction {
+    override fun userSelectedMenuItem(
+        longPressTarget: LongPressTarget,
+        item: MenuItem
+    ): RequiredAction {
         return when (item.itemId) {
             CONTEXT_MENU_ID_OPEN_IN_NEW_TAB -> {
                 pixel.fire(LONG_PRESS_NEW_TAB)

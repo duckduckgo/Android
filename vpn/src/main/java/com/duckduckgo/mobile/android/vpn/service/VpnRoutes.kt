@@ -110,4 +110,9 @@ class VpnRoutes {
     }
 }
 
-data class Route(val address: String, val maskWidth: Int, val lowAddress: String, val highAddress: String)
+data class Route(
+    val address: String,
+    val maskWidth: Int,
+    val lowAddress: String,
+    val highAddress: String
+)

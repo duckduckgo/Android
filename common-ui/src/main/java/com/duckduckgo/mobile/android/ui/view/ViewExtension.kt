@@ -73,7 +73,8 @@ fun View.hideKeyboard(): Boolean {
         val inputMethodManager =
             context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         return inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
-    } catch (ignored: RuntimeException) {}
+    } catch (ignored: RuntimeException) {
+    }
     return false
 }
 
@@ -121,19 +122,28 @@ fun CompoundButton.quietlySetIsChecked(
     setOnCheckedChangeListener(changeListener)
 }
 
-fun View.makeSnackbarWithNoBottomInset(text: CharSequence, @Duration duration: Int): Snackbar {
+fun View.makeSnackbarWithNoBottomInset(
+    text: CharSequence,
+    @Duration duration: Int
+): Snackbar {
     val snackbar = Snackbar.make(this, text, duration)
     snackbar.isGestureInsetBottomIgnored = true
     return snackbar
 }
 
-fun View.makeSnackbarWithNoBottomInset(@StringRes resId: Int, @Duration duration: Int): Snackbar {
+fun View.makeSnackbarWithNoBottomInset(
+    @StringRes resId: Int,
+    @Duration duration: Int
+): Snackbar {
     val snackbar = Snackbar.make(this, resId, duration)
     snackbar.isGestureInsetBottomIgnored = true
     return snackbar
 }
 
-fun Slider.quietlySetValue(newValue: Float, listener: Slider.OnChangeListener) {
+fun Slider.quietlySetValue(
+    newValue: Float,
+    listener: Slider.OnChangeListener
+) {
     removeOnChangeListener(listener)
     value = newValue
     addOnChangeListener(listener)

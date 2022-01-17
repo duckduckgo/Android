@@ -140,7 +140,11 @@ class BrowserViewModel(
         }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, sourceTabId: String? = null, skipHome: Boolean = false): String {
+    suspend fun onOpenInNewTabRequested(
+        query: String,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false
+    ): String {
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
@@ -255,7 +259,16 @@ class BrowserViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), userEventsStore.get()) as T
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(
+                    tabRepository.get(),
+                    queryUrlConverter.get(),
+                    dataClearer.get(),
+                    appEnjoymentPromptEmitter.get(),
+                    appEnjoymentUserEventRecorder.get(),
+                    dispatchers,
+                    pixel.get(),
+                    userEventsStore.get()
+                ) as T
                 else -> null
             }
         }

@@ -40,11 +40,17 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
     private val items = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompanyDetailsViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): CompanyDetailsViewHolder {
         return CompanyDetailsViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: CompanyDetailsViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CompanyDetailsViewHolder,
+        position: Int
+    ) {
         val companyTrackingDetails = items[position]
         holder.bind(companyTrackingDetails)
     }
@@ -72,11 +78,17 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
         override fun getNewListSize() = new.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition].companyName == new[newItemPosition].companyName
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
     }
@@ -140,7 +152,15 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             }
 
             companyName.text = trackerInfo.companyDisplayName
-            trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, trackerInfo.trackingAttempts, trackerInfo.trackingAttempts)
+            trackingAttempts.text = view.context.resources.getQuantityString(
+                R.plurals.atp_CompanyDetailsTrackingAttempts,
+                trackerInfo.trackingAttempts,
+                trackerInfo.trackingAttempts
+            )
+            trackingAttempts.text = view.context.resources.getQuantityString(
+                R.plurals.atp_CompanyDetailsTrackingAttempts,
+                trackerInfo.trackingAttempts, trackerInfo.trackingAttempts
+            )
             showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
             showMore.setOnClickListener {
                 if (!bottomSignalsLayout.isVisible) {
@@ -156,7 +176,11 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             }
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")
                 .replace(".", "")
@@ -166,5 +190,4 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             return if (resource != 0) resource else null
         }
     }
-
 }

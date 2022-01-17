@@ -117,9 +117,15 @@ class DeviceShieldTrackerActivityViewModel(
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
     internal fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
 
-    internal data class TrackerActivityViewState(val trackerCountInfo: TrackerCountInfo, val runningState: RunningState)
+    internal data class TrackerActivityViewState(
+        val trackerCountInfo: TrackerCountInfo,
+        val runningState: RunningState
+    )
 
-    internal data class TrackerCountInfo(val trackers: TrackerCount, val apps: TrackingAppCount) {
+    internal data class TrackerCountInfo(
+        val trackers: TrackerCount,
+        val apps: TrackingAppCount
+    ) {
         fun stringTrackerCount(): String {
             return String.format(Locale.US, "%,d", trackers.value)
         }

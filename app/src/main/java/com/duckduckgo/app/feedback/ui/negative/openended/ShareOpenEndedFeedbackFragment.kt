@@ -33,7 +33,12 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
 
     interface OpenEndedFeedbackListener {
-        fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String)
+        fun userProvidedNegativeOpenEndedFeedback(
+            mainReason: MainReason,
+            subReason: SubReason?,
+            feedback: String
+        )
+
         fun userProvidedPositiveOpenEndedFeedback(feedback: String)
         fun userCancelled()
     }
@@ -143,7 +148,10 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
         private const val SUB_REASON_EXTRA = "SUB_REASON_EXTRA"
         private const val IS_POSITIVE_FEEDBACK_EXTRA = "IS_POSITIVE_FEEDBACK_EXTRA"
 
-        fun instanceNegativeFeedback(mainReason: MainReason, subReason: SubReason?): ShareOpenEndedFeedbackFragment {
+        fun instanceNegativeFeedback(
+            mainReason: MainReason,
+            subReason: SubReason?
+        ): ShareOpenEndedFeedbackFragment {
             val fragment = ShareOpenEndedFeedbackFragment()
             fragment.arguments = Bundle().also {
                 it.putBoolean(IS_POSITIVE_FEEDBACK_EXTRA, false)

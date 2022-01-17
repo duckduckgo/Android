@@ -91,6 +91,5 @@ class HttpsUpgradeDataDownloader @Inject constructor(
                 throw IOException("Status: ${response.code()} - ${response.errorBody()?.string()}")
             }
         }
-
     }
 }

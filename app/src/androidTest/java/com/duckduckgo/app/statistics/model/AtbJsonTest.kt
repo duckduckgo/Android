@@ -31,7 +31,7 @@ class AtbJsonTest {
 
     @Test
     fun whenFormatIsValidThenDataIsConverted() {
-        val json = loadText("json/atb_response_valid.json")
+        val json = loadText(javaClass.classLoader!!, "json/atb_response_valid.json")
         val atb = jsonAdapter.fromJson(json)!!
         assertEquals("v105-3", atb.version)
     }

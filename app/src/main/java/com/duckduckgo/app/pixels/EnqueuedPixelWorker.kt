@@ -22,9 +22,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
+import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -42,11 +44,15 @@ class EnqueuedPixelWorker @Inject constructor(
     private val workManager: WorkManager,
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
+    private val webViewVersionProvider: WebViewVersionProvider
 ) : LifecycleEventObserver {
 
     private var launchedByFireAction: Boolean = false
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event
+    ) {
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleWorker(workManager)
             launchedByFireAction = isLaunchByFireAction()
@@ -58,7 +64,10 @@ class EnqueuedPixelWorker @Inject constructor(
                 return
             }
             Timber.i("Sending app launch pixel")
-            pixel.get().fire(AppPixelName.APP_LAUNCH)
+            pixel.get().fire(
+                pixel = AppPixelName.APP_LAUNCH,
+                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
+            )
         }
     }
 
@@ -82,7 +91,10 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 
-    class RealEnqueuedPixelWorker(val context: Context, parameters: WorkerParameters) : CoroutineWorker(context, parameters) {
+    class RealEnqueuedPixelWorker(
+        val context: Context,
+        parameters: WorkerParameters
+    ) : CoroutineWorker(context, parameters) {
         lateinit var pixel: Pixel
         lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -111,7 +123,6 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 }
-
 
 @ContributesMultibinding(AppScope::class)
 class EnqueuedPixelWorkerInjectorPlugin @Inject constructor(

@@ -28,8 +28,16 @@ import kotlinx.android.synthetic.main.view_device_shield_past_week_activity_cont
 class PastWeekTrackerActivityContentView : FrameLayout {
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : this(context, attrs, 0)
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyle: Int
+    ) : super(context, attrs, defStyle) {
 
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)
         text = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_android_text) ?: ""
@@ -48,14 +56,26 @@ class PastWeekTrackerActivityContentView : FrameLayout {
     }
 
     var count: String
-        get() { return root.content_text.text.toString() }
-        set(value) { root.content_text.text = value }
+        get() {
+            return root.content_text.text.toString()
+        }
+        set(value) {
+            root.content_text.text = value
+        }
 
     var text: String
-        get() { return root.content_title.text.toString() }
-        set(value) { root.content_title.text = value }
+        get() {
+            return root.content_title.text.toString()
+        }
+        set(value) {
+            root.content_title.text = value
+        }
 
     var footer: String
-        get() { return root.content_footer.text.toString() }
-        set(value) { root.content_footer.text = value }
+        get() {
+            return root.content_footer.text.toString()
+        }
+        set(value) {
+            root.content_footer.text = value
+        }
 }
