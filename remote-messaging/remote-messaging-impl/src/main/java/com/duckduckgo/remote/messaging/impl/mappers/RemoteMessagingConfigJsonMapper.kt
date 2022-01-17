@@ -27,10 +27,10 @@ class RemoteMessagingConfigJsonMapper(
     fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
         val messages = jsonRemoteMessageMapper.map(jsonRemoteMessagingConfig.messages)
         Timber.i("RMF: messages parsed $messages")
-        val matchingRules = jsonRulesMapper.map(jsonRemoteMessagingConfig.matchingRules)
+        val rules = jsonRulesMapper.map(jsonRemoteMessagingConfig.rules)
         return RemoteConfig(
             messages = messages,
-            rules = matchingRules
+            rules = rules
         )
     }
 }

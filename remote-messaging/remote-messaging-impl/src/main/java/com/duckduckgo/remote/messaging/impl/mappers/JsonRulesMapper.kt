@@ -199,7 +199,7 @@ class JsonRulesMapper {
         Pair("daysUsedSince", daysUsedSinceMapper)
     )
 
-    fun map(jsonMatchingRules: List<JsonMatchingRule>): Map<Int, List<MatchingAttribute>> = jsonMatchingRules
+    fun map(jsonRules: List<JsonMatchingRule>): Map<Int, List<MatchingAttribute>> = jsonRules
         .map { Pair(it.id, it.attributes.map { attrs -> attrs.map() }) }.toMap()
 
     private fun Map.Entry<String, JsonMatchingAttribute>.map(): MatchingAttribute {

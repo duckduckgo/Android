@@ -99,7 +99,7 @@ class JsonRemoteMessageMapper {
                 exclusionRules = this.exclusionRules.orEmpty()
             )
         }.onFailure {
-            Timber.i("RMF: error $it")
+            Timber.e("RMF: error $it")
         }.getOrNull()
     }
 
