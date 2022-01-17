@@ -45,7 +45,7 @@ object DownloaderUtil {
         var filename: String? = null
 
         if (contentDisposition != null) {
-            filename = extractFileNameFromContentDisposition(contentDisposition)
+            filename = fileNameFromContentDisposition(contentDisposition)
         }
 
         if (filename.isNullOrEmpty()) {
@@ -62,7 +62,7 @@ object DownloaderUtil {
 
     private fun filenameWithExtension(initialFilename: String, mimeType: String?): String {
         var filename = initialFilename
-        var extension: String? = null
+        val extension: String?
 
         val dotIndex = filename.lastIndexOf('.')
         if (dotIndex < 0) {
@@ -140,7 +140,7 @@ object DownloaderUtil {
         return filename
     }
 
-    private fun extractFileNameFromContentDisposition(contentDisposition: String): String? {
+    private fun fileNameFromContentDisposition(contentDisposition: String): String? {
         val filename = parseContentDisposition(contentDisposition) ?: return null
 
         return if (!filename.endsWith("/")) {
