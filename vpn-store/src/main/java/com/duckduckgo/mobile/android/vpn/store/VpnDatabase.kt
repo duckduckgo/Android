@@ -120,7 +120,10 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         @VisibleForTesting
-        internal fun prepopulateAppTrackerBlockingList(context: Context, vpnDatabase: VpnDatabase) {
+        internal fun prepopulateAppTrackerBlockingList(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.full_app_trackers_blocklist_v2).bufferedReader()
                 .use { it.readText() }
                 .also {
@@ -193,7 +196,8 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
-                        " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, `score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
+                        " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
+                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
                 )
             }
         }
