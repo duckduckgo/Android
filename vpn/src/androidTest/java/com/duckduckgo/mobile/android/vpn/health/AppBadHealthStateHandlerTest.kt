@@ -30,6 +30,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -78,7 +79,7 @@ class AppBadHealthStateHandlerTest {
 
     @Test
     fun whenOnAppHealthUpdateWithBadHealthDataThenStoreInDbAndSendPixel() = runTest {
-        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
+        assertTrue(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
 
         val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
 
@@ -94,7 +95,7 @@ class AppBadHealthStateHandlerTest {
 
     @Test
     fun whenOnAppHealthUpdateWithRedactedBadHealthDataThenSkipRedactedMetricsFromDbAndSendPixel() = runTest {
-        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(REDACTED_BAD_HEALTH_DATA))
+        assertTrue(appBadHealthStateHandler.onAppHealthUpdate(REDACTED_BAD_HEALTH_DATA))
 
         val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
 

@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.vpn.internal.feature.health
+package com.duckduckgo.mobile.android.vpn.health
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding

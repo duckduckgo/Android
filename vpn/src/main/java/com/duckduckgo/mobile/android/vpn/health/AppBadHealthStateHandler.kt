@@ -71,7 +71,7 @@ class AppBadHealthStateHandler @Inject constructor(
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     private var backoffIncrement: Long
-        get() = preferences.getLong("backoff", INITIAL_BACKOFF_INCREMENT)
+        get() = preferences.getLong("backoff", INITIAL_BACKOFF)
         set(value) {
             preferences.edit { putLong("backoff", value) }
         }
@@ -127,8 +127,9 @@ class AppBadHealthStateHandler @Inject constructor(
     }
 
     private fun resetBackoff() {
-        backoffIncrement = INITIAL_BACKOFF_INCREMENT
+        backoffIncrement = INITIAL_BACKOFF
         restartBoundary = null
+        Timber.d("Reset backoff, restartBoundary = $restartBoundary")
     }
 
     private fun sendFirstInDayAlertPixels(alerts: List<String>) {
@@ -142,11 +143,11 @@ class AppBadHealthStateHandler @Inject constructor(
     private suspend fun pixelAndMaybeRestartVpn(json: String): Boolean {
         val boundary = restartBoundary
         return if (shouldRestartVpn(boundary)) {
-            Timber.v("Internal flavor detected, restarting the VPN...")
+            Timber.v("Restarting the VPN...")
 
             // update the restart boundary
             DATE_FORMATTER.format(LocalDateTime.now().plusSeconds(backoffIncrement)).run {
-                backoffIncrement *= 2
+                backoffIncrement = if (backoffIncrement == 0L) INITIAL_BACKOFF_INCREMENT else backoffIncrement * 2
                 restartBoundary = this
             }
 
@@ -167,10 +168,8 @@ class AppBadHealthStateHandler @Inject constructor(
     }
 
     private fun shouldRestartVpn(boundary: String?): Boolean {
-        // only restart in internal builds for now
-        if (appBuildConfig.flavor != BuildFlavor.INTERNAL) return false
-
         val now = DATE_FORMATTER.format(LocalDateTime.now())
+        Timber.d("Checking if should restart VPN, boundary = $boundary")
         return (boundary == null || now >= boundary)
     }
 
@@ -208,6 +207,7 @@ class AppBadHealthStateHandler @Inject constructor(
     companion object {
         private const val FILENAME = "com.duckduckgo.mobile.android.vpn.app.health.state"
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        private const val INITIAL_BACKOFF: Long = 0
         private val INITIAL_BACKOFF_INCREMENT: Long = 1.minutes.inWholeSeconds
     }
 }
