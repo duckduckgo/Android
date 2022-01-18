@@ -43,15 +43,28 @@ interface TabRepository {
     /**
      * @return tabId of new record
      */
-    suspend fun add(url: String? = null, skipHome: Boolean = false): String
+    suspend fun add(
+        url: String? = null,
+        skipHome: Boolean = false
+    ): String
 
     suspend fun addDefaultTab(): String
 
-    suspend fun addFromSourceTab(url: String? = null, skipHome: Boolean = false, sourceTabId: String): String
+    suspend fun addFromSourceTab(
+        url: String? = null,
+        skipHome: Boolean = false,
+        sourceTabId: String
+    ): String
 
-    suspend fun addNewTabAfterExistingTab(url: String? = null, tabId: String)
+    suspend fun addNewTabAfterExistingTab(
+        url: String? = null,
+        tabId: String
+    )
 
-    suspend fun update(tabId: String, site: Site?)
+    suspend fun update(
+        tabId: String,
+        site: Site?
+    )
 
     /**
      * @return record if it exists, otherwise a new one
@@ -75,9 +88,15 @@ interface TabRepository {
 
     suspend fun select(tabId: String)
 
-    fun updateTabPreviewImage(tabId: String, fileName: String?)
+    fun updateTabPreviewImage(
+        tabId: String,
+        fileName: String?
+    )
 
-    fun updateTabFavicon(tabId: String, fileName: String?)
+    fun updateTabFavicon(
+        tabId: String,
+        fileName: String?
+    )
 
     suspend fun selectByUrlOrNewTab(url: String)
 }

@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
@@ -37,11 +36,17 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
     private var trackers = mutableListOf<TrackerCompanyBadge>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackerBadgeViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): TrackerBadgeViewHolder {
         return TrackerBadgeViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: TrackerBadgeViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: TrackerBadgeViewHolder,
+        position: Int
+    ) {
         holder.bind(trackers[position])
     }
 
@@ -71,7 +76,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         fun bind(trackerInfo: TrackerCompanyBadge) {
-            when (trackerInfo){
+            when (trackerInfo) {
                 is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
                 is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
             }
@@ -96,7 +101,11 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             largeTextBadge.hide()
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")
                 .replace(".", "")
@@ -108,7 +117,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
 
         private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
             iconBadge.hide()
-            if (trackerInfo.amount > 9){
+            if (trackerInfo.amount > 9) {
                 largeTextBadge.text = "+${trackerInfo.amount}"
                 largeTextBadge.show()
                 textBadge.hide()
@@ -128,7 +137,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company){
+            if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company) {
                 return oldItem.companyName == newItem.companyName
             } else {
                 return false

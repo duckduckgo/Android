@@ -54,8 +54,10 @@ class BookmarkFoldersViewModelTest {
     private val viewStateObserver: Observer<BookmarkFoldersViewModel.ViewState> = mock()
     private val commandObserver: Observer<BookmarkFoldersViewModel.Command> = mock()
 
-    private val viewStateCaptor: ArgumentCaptor<BookmarkFoldersViewModel.ViewState> = ArgumentCaptor.forClass(BookmarkFoldersViewModel.ViewState::class.java)
-    private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> = ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
+    private val viewStateCaptor: ArgumentCaptor<BookmarkFoldersViewModel.ViewState> =
+        ArgumentCaptor.forClass(BookmarkFoldersViewModel.ViewState::class.java)
+    private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> =
+        ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
 
     private val folderStructure = listOf(
         BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),

@@ -92,5 +92,4 @@ class AppTPWaitlistRedeemCodeViewModelTest {
             assertEquals(awaitItem(), AppTPWaitlistRedeemCodeViewModel.ViewState.ErrorRedeeming)
         }
     }
-
 }

@@ -23,7 +23,10 @@ interface FeatureToggle {
      * @return `true` if the feature is enabled, `false` if is not and `null` if the feature does
      * not exist.
      */
-    fun isFeatureEnabled(featureName: FeatureName, defaultValue: Boolean = true): Boolean?
+    fun isFeatureEnabled(
+        featureName: FeatureName,
+        defaultValue: Boolean = true
+    ): Boolean?
 }
 
 /**

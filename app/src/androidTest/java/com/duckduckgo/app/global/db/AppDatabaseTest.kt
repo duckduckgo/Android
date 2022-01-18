@@ -452,11 +452,17 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(40, 41, migrationsProvider.MIGRATION_40_TO_41)
     }
 
-    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
+    private fun givenUserStageIs(
+        database: SupportSQLiteDatabase,
+        appStage: AppStage
+    ) {
         database.execSQL("INSERT INTO `userStage` values (1, '${appStage.name}') ")
     }
 
-    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: String) {
+    private fun givenUserStageIs(
+        database: SupportSQLiteDatabase,
+        appStage: String
+    ) {
         database.execSQL("INSERT INTO `userStage` values (1, '$appStage') ")
     }
 
@@ -474,11 +480,18 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }
 
-    private fun runMigrations(newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun runMigrations(
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         return testHelper.runMigrationsAndValidate(TEST_DB_NAME, newVersion, true, *migrations)
     }
 
-    private fun createDatabaseAndMigrate(originalVersion: Int, newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun createDatabaseAndMigrate(
+        originalVersion: Int,
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         createDatabase(originalVersion)
         return runMigrations(newVersion, *migrations)
     }

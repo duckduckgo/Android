@@ -274,6 +274,10 @@ interface DeviceShieldPixels {
      */
     fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
 
+    /**
+     * Will send a first-in-day pixel for the given alertName
+     */
+    fun sendHealthMonitorAlert(alertName: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -549,19 +553,34 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
     }
 
+    override fun sendHealthMonitorAlert(alertName: String) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName)
+        )
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
 
-    private fun firePixel(p: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun firePixel(
+        p: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         pixel.fire(p, payload)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixel: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         tryToFireDailyPixel(pixel.pixelName, payload)
     }
 
-    private fun tryToFireDailyPixel(pixelName: String, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap()
+    ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
@@ -572,7 +591,10 @@ class RealDeviceShieldPixels @Inject constructor(
         }
     }
 
-    private fun tryToFireUniquePixel(pixel: DeviceShieldPixelNames, tag: String? = null) {
+    private fun tryToFireUniquePixel(
+        pixel: DeviceShieldPixelNames,
+        tag: String? = null
+    ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return

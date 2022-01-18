@@ -142,5 +142,4 @@ class AccessibilitySettingsViewModelTest {
     }
 
     private fun defaultViewState() = AccessibilitySettingsViewModel.ViewState()
-
 }

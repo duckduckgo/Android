@@ -44,7 +44,10 @@ class SiteLocationPermissionDialog : DialogFragment() {
     private var faviconJob: Job? = null
 
     interface SiteLocationPermissionDialogListener {
-        fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType)
+        fun onSiteLocationPermissionSelected(
+            domain: String,
+            permission: LocationPermissionType
+        )
     }
 
     val listener: SiteLocationPermissionDialogListener
@@ -155,7 +158,6 @@ class SiteLocationPermissionDialog : DialogFragment() {
             dismiss()
             listener.onSiteLocationPermissionSelected(originUrl, LocationPermissionType.DENY_ALWAYS)
         }
-
     }
 
     private fun hideExtraViews(
@@ -205,7 +207,11 @@ class SiteLocationPermissionDialog : DialogFragment() {
 
         private const val DDG_DOMAIN = "duckduckgo.com"
 
-        fun instance(origin: String, isEditingPermission: Boolean, tabId: String): SiteLocationPermissionDialog {
+        fun instance(
+            origin: String,
+            isEditingPermission: Boolean,
+            tabId: String
+        ): SiteLocationPermissionDialog {
             return SiteLocationPermissionDialog().also { fragment ->
                 val bundle = Bundle()
                 bundle.putString(KEY_REQUEST_ORIGIN, origin)

@@ -40,7 +40,10 @@ class JSONObjectAdapter {
     }
 
     @ToJson
-    fun toJson(writer: JsonWriter, value: JSONObject?) {
+    fun toJson(
+        writer: JsonWriter,
+        value: JSONObject?
+    ) {
         value?.let { writer.run { value(Buffer().writeUtf8(value.toString())) } }
     }
 }

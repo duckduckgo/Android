@@ -44,15 +44,24 @@ class FakeChain(private val url: String) : Interceptor.Chain {
         return Request.Builder().url(url).build()
     }
 
-    override fun withConnectTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+    override fun withConnectTimeout(
+        timeout: Int,
+        unit: TimeUnit
+    ): Interceptor.Chain {
         TODO("Not yet implemented")
     }
 
-    override fun withReadTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+    override fun withReadTimeout(
+        timeout: Int,
+        unit: TimeUnit
+    ): Interceptor.Chain {
         TODO("Not yet implemented")
     }
 
-    override fun withWriteTimeout(timeout: Int, unit: TimeUnit): Interceptor.Chain {
+    override fun withWriteTimeout(
+        timeout: Int,
+        unit: TimeUnit
+    ): Interceptor.Chain {
         TODO("Not yet implemented")
     }
 

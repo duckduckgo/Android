@@ -84,7 +84,12 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText(BrokenSitesReferenceTest::class.java.classLoader!!, "reference_tests/brokensites/tests.json"))
+            val referenceTest = adapter.fromJson(
+                FileUtilities.loadText(
+                    BrokenSitesReferenceTest::class.java.classLoader!!,
+                    "reference_tests/brokensites/tests.json"
+                )
+            )
             return referenceTest?.reportURL?.tests?.filterNot { it.exceptPlatforms.contains("android-browser") } ?: emptyList()
         }
     }
@@ -92,7 +97,10 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = BrokenSiteSubmitter(mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel, TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider)
+        testee = BrokenSiteSubmitter(
+            mockStatisticsDataStore, mockVariantManager, mockTdsMetadataDao, mockGpc, mockFeatureToggle, mockPixel,
+            TestScope(), mockAppBuildConfig, coroutineRule.testDispatcherProvider
+        )
     }
 
     @After
@@ -133,8 +141,7 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             if (encodedParams.contains(param.name)) {
                 assertTrue(encodedParams.containsKey(param.name))
                 assertEquals(param.value, encodedParams[param.name])
-            }
-            else {
+            } else {
                 val result = if (encodedParamsList.contains(param.name)) {
                     URLEncoder.encode(params[param.name], "UTF-8")
                 } else {
@@ -164,7 +171,10 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val exceptPlatforms: List<String>
     )
 
-    data class UrlParam(val name: String, val value: String)
+    data class UrlParam(
+        val name: String,
+        val value: String
+    )
 
     data class BrokenSiteTest(
         val name: String,

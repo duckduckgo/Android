@@ -38,7 +38,6 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
             Timber.w(t, "Failed to extract ClientHello domain")
             return null
         }
-
     }
 
     private fun extractHostFromClientHelloSniHeader(packet: ByteArray): String? {
@@ -79,7 +78,11 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
         return String(serverNameBytes, US_ASCII)
     }
 
-    private fun findServerNameIndicationHeaderStart(packet: ByteArray, extensionStartIndex: Int, extensionsLength: Int): Int {
+    private fun findServerNameIndicationHeaderStart(
+        packet: ByteArray,
+        extensionStartIndex: Int,
+        extensionsLength: Int
+    ): Int {
         var extensionBytesSearched = 0
         var index = extensionStartIndex
 
@@ -151,7 +154,10 @@ class ServerNameIndicationHeaderHostExtractor(private val tlsMessageDetector: Tl
     }
 
     // first byte must be multiplied by 256 (or shl 8), then added to second
-    private fun addHigherLowerOrderBytes(higherOrderByte: HigherOrderByte, lowerOrderByte: LowerOrderByte): Int {
+    private fun addHigherLowerOrderBytes(
+        higherOrderByte: HigherOrderByte,
+        lowerOrderByte: LowerOrderByte
+    ): Int {
         val higherInt = higherOrderByte.byte.toInt() shl 8 and 0xFF00
         val lowerInt = lowerOrderByte.byte.toInt() and 0x00FF
         return higherInt + lowerInt
@@ -170,7 +176,6 @@ inline class HigherOrderByte(val byte: Byte) {
     operator fun plus(lowerOrderByte: LowerOrderByte): Int {
         return (this.byte.toInt() shl 8 and 0xFF00) + (lowerOrderByte.byte.toInt() and 0x00FF)
     }
-
 }
 
 inline class LowerOrderByte(val byte: Byte)

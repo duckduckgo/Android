@@ -35,7 +35,8 @@ class OnboardingSharedPreferences @Inject constructor(private val context: Conte
         get() = preferences.getInt(KEY_COUNT_NEW_TAB_FOR_RETURNING_USER, 0)
         set(value) = preferences.edit { putInt(KEY_COUNT_NEW_TAB_FOR_RETURNING_USER, value) }
 
-    override fun hasReachedThresholdToShowWidgetForReturningUser(): Boolean = preferences.getInt(KEY_COUNT_NEW_TAB_FOR_RETURNING_USER, 0) >= THRESHOLD_COUNT_NEW_TAB_FOR_RETURNING_USER
+    override fun hasReachedThresholdToShowWidgetForReturningUser(): Boolean =
+        preferences.getInt(KEY_COUNT_NEW_TAB_FOR_RETURNING_USER, 0) >= THRESHOLD_COUNT_NEW_TAB_FOR_RETURNING_USER
 
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)

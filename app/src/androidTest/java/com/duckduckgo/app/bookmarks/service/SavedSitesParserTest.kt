@@ -98,7 +98,7 @@ class SavedSitesParserTest {
 
     @Test
     fun doesNotImportAnythingWhenFileIsNotProperlyFormatted() = runTest {
-        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!,"bookmarks/bookmarks_invalid.html")
+        val inputStream = FileUtilities.loadResource(javaClass.classLoader!!, "bookmarks/bookmarks_invalid.html")
         val document = Jsoup.parse(inputStream, Charsets.UTF_8.name(), "duckduckgo.com")
 
         val bookmarks = parser.parseHtml(document, mockBookmarksRepository)

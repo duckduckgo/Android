@@ -116,7 +116,10 @@ class FavoritesQuickAccessAdapter(
             }
         }
 
-        fun bindFromPayload(item: QuickAccessFavorite, payloads: MutableList<Any>) {
+        fun bindFromPayload(
+            item: QuickAccessFavorite,
+            payloads: MutableList<Any>
+        ) {
             for (payload in payloads) {
                 val bundle = payload as Bundle
 
@@ -146,7 +149,11 @@ class FavoritesQuickAccessAdapter(
             binding.root.setOnClickListener { onItemSelected(item) }
         }
 
-        private fun showOverFlowMenu(layoutInflater: LayoutInflater, anchor: View, item: QuickAccessFavorite) {
+        private fun showOverFlowMenu(
+            layoutInflater: LayoutInflater,
+            anchor: View,
+            item: QuickAccessFavorite
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -162,7 +169,10 @@ class FavoritesQuickAccessAdapter(
             itemState = ItemState.Drag
         }
 
-        override fun onItemMoved(dX: Float, dY: Float) {
+        override fun onItemMoved(
+            dX: Float,
+            dY: Float
+        ) {
             if (itemState != ItemState.Drag) return
 
             if (dX.absoluteValue > 10 || dY.absoluteValue > 10) {
@@ -195,17 +205,36 @@ class FavoritesQuickAccessAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickAccessViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): QuickAccessViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ViewQuickAccessItemBinding.inflate(inflater, parent, false)
-        return QuickAccessViewHolder(inflater, binding, lifecycleOwner, faviconManager, onMoveListener, onItemSelected, onEditClicked, onDeleteClicked)
+        return QuickAccessViewHolder(
+            inflater,
+            binding,
+            lifecycleOwner,
+            faviconManager,
+            onMoveListener,
+            onItemSelected,
+            onEditClicked,
+            onDeleteClicked
+        )
     }
 
-    override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: QuickAccessViewHolder,
+        position: Int
+    ) {
         holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: QuickAccessViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: QuickAccessViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
             return
@@ -215,17 +244,26 @@ class FavoritesQuickAccessAdapter(
 }
 
 class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite>() {
-    override fun areItemsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
+    override fun areItemsTheSame(
+        oldItem: QuickAccessFavorite,
+        newItem: QuickAccessFavorite
+    ): Boolean {
         return oldItem.favorite.id == newItem.favorite.id
     }
 
-    override fun areContentsTheSame(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Boolean {
+    override fun areContentsTheSame(
+        oldItem: QuickAccessFavorite,
+        newItem: QuickAccessFavorite
+    ): Boolean {
         return oldItem.favorite.title == newItem.favorite.title &&
             oldItem.favorite.url == newItem.favorite.url &&
             oldItem.favorite.position == newItem.favorite.position
     }
 
-    override fun getChangePayload(oldItem: QuickAccessFavorite, newItem: QuickAccessFavorite): Any {
+    override fun getChangePayload(
+        oldItem: QuickAccessFavorite,
+        newItem: QuickAccessFavorite
+    ): Any {
         val diffBundle = Bundle()
 
         if (oldItem.favorite.title != newItem.favorite.title) {
@@ -252,6 +290,10 @@ class QuickAccessAdapterDiffCallback : DiffUtil.ItemCallback<QuickAccessFavorite
 
 interface DragDropViewHolderListener {
     fun onDragStarted()
-    fun onItemMoved(dX: Float, dY: Float)
+    fun onItemMoved(
+        dX: Float,
+        dY: Float
+    )
+
     fun onItemReleased()
 }

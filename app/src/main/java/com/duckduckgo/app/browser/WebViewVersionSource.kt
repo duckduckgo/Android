@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.model
+package com.duckduckgo.app.browser
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
+import android.content.Context
+import androidx.webkit.WebViewCompat
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-@Entity(tableName = "app_health_state")
-data class AppHealthState(
-    // unique ID so that we only have one entry in the DB
-    @PrimaryKey val id: Long = 1L,
-    val localtime: String = DatabaseDateFormatter.timestamp(),
-    val alerts: List<String>,
-    val healthDataJsonString: String,
-)
+interface WebViewVersionSource {
+    fun get(): String
+}
+
+@ContributesBinding(AppScope::class)
+class WebViewCompatWebViewVersionSource @Inject constructor(
+    private val context: Context
+) : WebViewVersionSource {
+    override fun get(): String =
+        WebViewCompat.getCurrentWebViewPackage(context)?.versionName ?: ""
+}

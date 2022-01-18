@@ -35,7 +35,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 19,
+    exportSchema = true, version = 20,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -134,7 +134,10 @@ abstract class VpnDatabase : RoomDatabase() {
         }
 
         @VisibleForTesting
-        internal fun prepopulateAppTrackerExclusionList(context: Context, vpnDatabase: VpnDatabase) {
+        internal fun prepopulateAppTrackerExclusionList(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.app_tracker_app_exclusion_list).bufferedReader()
                 .use { it.readText() }
                 .also {
@@ -143,7 +146,10 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun prepopulateAppTrackerExceptionRules(context: Context, vpnDatabase: VpnDatabase) {
+        private fun prepopulateAppTrackerExceptionRules(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
             context.resources.openRawResource(R.raw.app_tracker_exception_rules).bufferedReader()
                 .use { it.readText() }
                 .also { json ->
@@ -172,14 +178,30 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list` (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))")
-                database.execSQL("CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)")
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list`" +
+                        " (`packageId` TEXT NOT NULL, PRIMARY KEY (`packageId`))"
+                )
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_system_app_override_list_metadata`" +
+                        " (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `eTag` TEXT)"
+                )
+            }
+        }
+
+        private val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
+                        " (`trackerCompanyId` TEXT  PRIMARY KEY NOT NULL, `entityName` TEXT, `score` INTEGER, `signals` TEXT)"
+                )
             }
         }
 
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
+                MIGRATION_19_TO_20
             )
     }
 }

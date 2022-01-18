@@ -44,17 +44,17 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Fireproof experiment
             Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
             // Returning users
-            Variant(key = "zk", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zv", weight = 1.0, features = listOf(VariantFeature.ReturningUsersNoOnboarding), filterBy = { isEnglishLocale() }),
-            Variant(key = "zz", weight = 1.0, features = listOf(VariantFeature.ReturningUsersWidgetPromotion), filterBy = { isEnglishLocale() }),
+            Variant(key = "zk", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zv", weight = 0.0, features = listOf(VariantFeature.ReturningUsersNoOnboarding), filterBy = { isEnglishLocale() }),
+            Variant(key = "zz", weight = 0.0, features = listOf(VariantFeature.ReturningUsersWidgetPromotion), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -150,7 +150,10 @@ class ExperimentationVariantManager(
         store.referrerVariant = variant
     }
 
-    private fun lookupVariant(key: String?, activeVariants: List<Variant>): Variant? {
+    private fun lookupVariant(
+        key: String?,
+        activeVariants: List<Variant>
+    ): Variant? {
         val variant = activeVariants.firstOrNull { it.key == key }
 
         if (variant != null) return variant

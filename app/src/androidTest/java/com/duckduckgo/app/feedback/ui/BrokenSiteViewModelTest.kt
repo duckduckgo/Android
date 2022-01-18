@@ -199,5 +199,4 @@ class BrokenSiteViewModelTest {
     companion object Constants {
         private const val url = "http://example.com"
     }
-
 }

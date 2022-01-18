@@ -27,7 +27,11 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface ThirdPartyCookieManager {
-    suspend fun processUriForThirdPartyCookies(webView: WebView, uri: Uri)
+    suspend fun processUriForThirdPartyCookies(
+        webView: WebView,
+        uri: Uri
+    )
+
     suspend fun clearAllData()
 }
 
@@ -36,7 +40,10 @@ class AppThirdPartyCookieManager(
     private val authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
 ) : ThirdPartyCookieManager {
 
-    override suspend fun processUriForThirdPartyCookies(webView: WebView, uri: Uri) {
+    override suspend fun processUriForThirdPartyCookies(
+        webView: WebView,
+        uri: Uri
+    ) {
         if (uri.host == GOOGLE_ACCOUNTS_HOST) {
             addHostToList(uri)
         } else {
@@ -48,7 +55,10 @@ class AppThirdPartyCookieManager(
         authCookiesAllowedDomainsRepository.deleteAll(hostsThatAlwaysRequireThirdPartyCookies)
     }
 
-    private suspend fun processThirdPartyCookiesSetting(webView: WebView, uri: Uri) {
+    private suspend fun processThirdPartyCookiesSetting(
+        webView: WebView,
+        uri: Uri
+    ) {
         val host = uri.host ?: return
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(Dispatchers.Main) {

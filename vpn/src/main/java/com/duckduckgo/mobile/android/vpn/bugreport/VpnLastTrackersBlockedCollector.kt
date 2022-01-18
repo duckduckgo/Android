@@ -51,7 +51,14 @@ class VpnLastTrackersBlockedCollector @Inject constructor(
                     result[it.key] = it.value.toSet().toList()
                 }
 
-            val adapter = moshi.adapter<Map<String, List<String>>>(Types.newParameterizedType(Map::class.java, String::class.java, List::class.java, String::class.java))
+            val adapter = moshi.adapter<Map<String, List<String>>>(
+                Types.newParameterizedType(
+                    Map::class.java,
+                    String::class.java,
+                    List::class.java,
+                    String::class.java
+                )
+            )
             return@withContext JSONObject(adapter.toJson(result))
         }
     }

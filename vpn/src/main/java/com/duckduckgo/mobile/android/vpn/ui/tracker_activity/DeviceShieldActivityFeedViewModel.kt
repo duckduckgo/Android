@@ -76,7 +76,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             }
     }
 
-    private suspend fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>, showHeadings: Boolean): List<TrackerFeedItem> {
+    private suspend fun aggregateDataPerApp(
+        trackerData: List<BucketizedVpnTracker>,
+        showHeadings: Boolean
+    ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
 
@@ -96,7 +99,9 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                     val trackerCompanyName = trackerBucket.value.first().trackerCompanySignal.tracker.company
                     val trackerCompanyDisplayName = trackerBucket.value.first().trackerCompanySignal.tracker.companyDisplayName
                     val timestamp =
-                        trackerBucket.value.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first().trackerCompanySignal.tracker.timestamp
+                        trackerBucket.value
+                            .sortedByDescending { it.trackerCompanySignal.tracker.timestamp }
+                            .first().trackerCompanySignal.tracker.timestamp
                     val trackeCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
                     trackingCompanyInfo.add(
                         TrackingCompanyInfo(
@@ -140,7 +145,7 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
     private fun mapTrackingCompanies(trackingCompanyInfo: MutableList<TrackingCompanyInfo>): List<TrackerCompanyBadge> {
         val trackingBadges = mutableListOf<TrackerCompanyBadge>()
         val trackingCompanies = trackingCompanyInfo.sortedByDescending { it.companyPrevalence }
-        if (trackingCompanies.size > MAX_ELEMENTS_TO_DISPLAY){
+        if (trackingCompanies.size > MAX_ELEMENTS_TO_DISPLAY) {
             val visibleBadges = trackingCompanies.take(MAX_BADGES_TO_DISPLAY)
             visibleBadges.forEach {
                 trackingBadges.add(TrackerCompanyBadge.Company(it.companyName, it.companyDisplayName))
@@ -154,9 +159,17 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         return trackingBadges
     }
 
-    data class TrackingCompanyInfo(val companyName: String, val companyDisplayName: String, val timestamp: String, val companyPrevalence: Int)
+    data class TrackingCompanyInfo(
+        val companyName: String,
+        val companyDisplayName: String,
+        val timestamp: String,
+        val companyPrevalence: Int
+    )
 
-    data class TimeWindow(val value: Long, val unit: TimeUnit) {
+    data class TimeWindow(
+        val value: Long,
+        val unit: TimeUnit
+    ) {
         fun asString(): String {
             return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
         }

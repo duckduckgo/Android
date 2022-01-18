@@ -41,7 +41,8 @@ class TrackerDetectorClientTypeTest {
     private var mockContentBlocking: ContentBlocking = mock()
     private var mockTrackerAllowlist: TrackerAllowlist = mock()
 
-    private var testee = TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+    private var testee =
+        TrackerDetectorImpl(mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
 
     @Before
     fun before() {

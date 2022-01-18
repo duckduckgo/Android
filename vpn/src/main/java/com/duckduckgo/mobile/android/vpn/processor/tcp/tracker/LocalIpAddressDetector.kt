@@ -24,5 +24,4 @@ class LocalIpAddressDetector @Inject constructor() {
     fun isLocalAddress(destinationAddress: InetAddress): Boolean {
         return destinationAddress.isSiteLocalAddress
     }
-
 }

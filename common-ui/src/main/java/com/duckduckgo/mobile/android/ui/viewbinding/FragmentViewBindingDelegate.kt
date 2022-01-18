@@ -37,7 +37,7 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 
     // LazyThreadSafetyMode.NONE because it will never be initialised from ore than one thread
     private val nullifyBindingHandler by
-        lazy(LazyThreadSafetyMode.NONE) { Handler(Looper.getMainLooper()) }
+    lazy(LazyThreadSafetyMode.NONE) { Handler(Looper.getMainLooper()) }
     private var binding: T? = null
 
     private val bindMethod = bindingClass.getMethod("bind", View::class.java)
@@ -54,7 +54,10 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         }
     }
 
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: Fragment,
+        property: KProperty<*>
+    ): T {
 
         // onCreateView maybe be called between the onDestroyView and the next Main thread run-loop.
         // Because nullifyBindingHandler has to post to null the binding, it may happen that

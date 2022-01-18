@@ -29,13 +29,13 @@ interface UnprotectedTemporary {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealUnprotectedTemporary @Inject constructor(private val unprotectedTemporaryRepository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
+class RealUnprotectedTemporary @Inject constructor(private val repository: UnprotectedTemporaryRepository) : UnprotectedTemporary {
 
     override fun isAnException(url: String): Boolean {
         return matches(url)
     }
 
     private fun matches(url: String): Boolean {
-        return unprotectedTemporaryRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+        return repository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 }

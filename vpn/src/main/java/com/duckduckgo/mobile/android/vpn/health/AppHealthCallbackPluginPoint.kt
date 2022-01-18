@@ -43,7 +43,7 @@ abstract class AppHealthCallbackModule {
     companion object {
         @Provides
         @SingleInstanceIn(AppScope::class)
-        fun provideAppHealthCallbackPluginPoint(callbacks: DaggerSet<AppHealthCallback>) : PluginPoint<AppHealthCallback> {
+        fun provideAppHealthCallbackPluginPoint(callbacks: DaggerSet<AppHealthCallback>): PluginPoint<AppHealthCallback> {
             return AppHealthCallbackPluginPoint(callbacks)
         }
     }

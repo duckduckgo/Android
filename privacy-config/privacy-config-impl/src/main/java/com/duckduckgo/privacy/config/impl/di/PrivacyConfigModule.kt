@@ -68,7 +68,6 @@ abstract class PrivacyFeaturesBindingModule {
 
     @Multibinds
     abstract fun providePrivacyFeatureStorePlugins(): DaggerSet<PrivacyFeaturePlugin>
-
 }
 
 @Module
@@ -117,13 +116,21 @@ class DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providePTrackerAllowlistRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackerAllowlistRepository {
+    fun providePTrackerAllowlistRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): TrackerAllowlistRepository {
         return RealTrackerAllowlistRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideContentBlockingRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): ContentBlockingRepository {
+    fun provideContentBlockingRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): ContentBlockingRepository {
         return RealContentBlockingRepository(database, coroutineScope, dispatcherProvider)
     }
 
@@ -141,19 +148,32 @@ class DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideGpcRepository(gpcDataStore: GpcDataStore, database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): GpcRepository {
+    fun provideGpcRepository(
+        gpcDataStore: GpcDataStore,
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): GpcRepository {
         return RealGpcRepository(gpcDataStore, database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideHttpsRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): HttpsRepository {
+    fun provideHttpsRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): HttpsRepository {
         return RealHttpsRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideUnprotectedTemporaryRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): UnprotectedTemporaryRepository {
+    fun provideUnprotectedTemporaryRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): UnprotectedTemporaryRepository {
         return RealUnprotectedTemporaryRepository(database, coroutineScope, dispatcherProvider)
     }
 
@@ -165,7 +185,11 @@ class DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideDrmRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): DrmRepository {
+    fun provideDrmRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): DrmRepository {
         return RealDrmRepository(database, coroutineScope, dispatcherProvider)
     }
 }

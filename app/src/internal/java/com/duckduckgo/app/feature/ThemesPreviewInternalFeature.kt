@@ -36,5 +36,4 @@ class ThemesPreviewInternalFeature @Inject constructor() : InternalFeaturePlugin
     override fun onInternalFeatureClicked(activityContext: Context) {
         activityContext.startActivity(AppComponentsActivity.intent(activityContext))
     }
-
 }

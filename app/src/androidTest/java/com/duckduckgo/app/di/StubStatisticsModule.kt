@@ -61,7 +61,6 @@ class StubStatisticsModule {
 
             override fun refreshSearchRetentionAtb() {
             }
-
         }
     }
 
@@ -69,19 +68,32 @@ class StubStatisticsModule {
     fun stubPixel(): Pixel {
         return object : Pixel {
 
-            override fun fire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
+            override fun fire(
+                pixel: Pixel.PixelName,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ) {
             }
 
-            override fun fire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-
+            override fun fire(
+                pixelName: String,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ) {
             }
 
-            override fun enqueueFire(pixel: Pixel.PixelName, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-
+            override fun enqueueFire(
+                pixel: Pixel.PixelName,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ) {
             }
 
-            override fun enqueueFire(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>) {
-
+            override fun enqueueFire(
+                pixelName: String,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ) {
             }
         }
     }
@@ -104,14 +116,21 @@ class StubStatisticsModule {
     @Provides
     fun pixelSender(): PixelSender {
         return object : PixelSender {
-            override fun sendPixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+            override fun sendPixel(
+                pixelName: String,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ): Completable {
                 return Completable.fromAction {}
             }
 
-            override fun enqueuePixel(pixelName: String, parameters: Map<String, String>, encodedParameters: Map<String, String>): Completable {
+            override fun enqueuePixel(
+                pixelName: String,
+                parameters: Map<String, String>,
+                encodedParameters: Map<String, String>
+            ): Completable {
                 return Completable.fromAction {}
             }
-
         }
     }
 }

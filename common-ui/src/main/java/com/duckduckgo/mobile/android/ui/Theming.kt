@@ -39,10 +39,15 @@ enum class DuckDuckGoTheme {
 
 object Theming {
 
-    fun getThemedDrawable(context: Context, drawableId: Int, theme: DuckDuckGoTheme): Drawable {
+    fun getThemedDrawable(
+        context: Context,
+        drawableId: Int,
+        theme: DuckDuckGoTheme
+    ): Drawable {
         val themeId: Int = THEME_MAP[Pair(R.style.AppTheme, theme)] ?: R.style.AppTheme_Light
         return context.resources.getDrawable(
-            drawableId, ContextThemeWrapper(context, themeId).theme)
+            drawableId, ContextThemeWrapper(context, themeId).theme
+        )
     }
 
     object Constants {
@@ -52,7 +57,8 @@ object Theming {
         val THEME_MAP =
             mapOf(
                 Pair(R.style.AppTheme, DuckDuckGoTheme.LIGHT) to R.style.AppTheme_Light,
-                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark)
+                Pair(R.style.AppTheme, DuckDuckGoTheme.DARK) to R.style.AppTheme_Dark
+            )
     }
 }
 
@@ -86,7 +92,10 @@ private fun AppCompatActivity.registerForThemeChangeBroadcast(): BroadcastReceiv
     val manager = LocalBroadcastManager.getInstance(applicationContext)
     val receiver =
         object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
+            override fun onReceive(
+                context: Context,
+                intent: Intent
+            ) {
                 recreate()
             }
         }

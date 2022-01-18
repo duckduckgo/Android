@@ -17,14 +17,14 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.model.AppHealthState
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,19 +35,61 @@ class AppHealthStateCollector @Inject constructor(
     override val collectorName: String = "latestAppBadHealth"
 
     override suspend fun collectVpnRelatedState(appPackageId: String?): JSONObject {
-        val healthState = appHealthDatabase.appHealthDao().latestHealthState()
-        Timber.v("Stored app health state: $healthState")
+        val latestBadHealth = appHealthDatabase.appHealthDao().remove(BAD_HEALTH)
+        val latestGoodHealth = appHealthDatabase.appHealthDao().remove(GOOD_HEALTH)
+
+        val isGoodHealthNow = latestGoodHealth?.let {
+            return@let latestBadHealth == null || it.localtime > latestBadHealth.localtime
+        } ?: (latestBadHealth == null)
+
+        Timber.v("Latest app BAD health state: $latestBadHealth")
+        Timber.v("Is currently in GOOD health: $isGoodHealthNow")
+
+        // ensure DB table is cleared
+        appHealthDatabase.appHealthDao().clearAll()
 
         return JSONObject().apply {
-            healthState?.let {
-                put(SECONDS_AGO, DatabaseDateFormatter.duration(it.localtime).seconds)
-                put(HEALTH_STATE, JSONObject(it.healthDataJsonString))
+            latestBadHealth?.let { state ->
+                put(IS_CURRENTLY_IN_GOOD_HEALTH, isGoodHealthNow.toString())
+                put(
+                    BAD_HEALTH_DATA,
+                    JSONObject().apply {
+                        put(
+                            SUSTAINED_BAD_HEALTH_SEC,
+                            calculatedSustainedBadHealthInSeconds(badHealth = latestBadHealth, goodHealth = latestGoodHealth)
+                        )
+                        put(SECONDS_AGO, DatabaseDateFormatter.duration(state.localtime).seconds)
+                        put(BAD_HEALTH_DATA, JSONObject(state.healthDataJsonString))
+                    }
+                )
             }
+        }
+    }
+
+    private fun calculatedSustainedBadHealthInSeconds(
+        badHealth: AppHealthState?,
+        goodHealth: AppHealthState?
+    ): Long? {
+        if (badHealth == null || goodHealth == null) {
+            Timber.v("aitor no health")
+            return null
+        }
+
+        val secondsSustained = DatabaseDateFormatter.duration(goodHealth.localtime, badHealth.localtime).seconds
+
+        return if (secondsSustained > 0) {
+            Timber.v("aitor sustained")
+            secondsSustained
+        } else {
+            Timber.v("aitor not sustained bad=${badHealth.localtime}, good=${goodHealth.localtime}")
+            null
         }
     }
 
     companion object {
         private const val SECONDS_AGO = "secondsAgo"
-        private const val HEALTH_STATE = "healthState"
+        private const val BAD_HEALTH_DATA = "badHealthData"
+        private const val SUSTAINED_BAD_HEALTH_SEC = "secondsSustained"
+        private const val IS_CURRENTLY_IN_GOOD_HEALTH = "isCurrentlyGooHealth"
     }
 }

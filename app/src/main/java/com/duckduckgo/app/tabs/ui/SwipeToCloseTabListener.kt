@@ -34,7 +34,10 @@ class SwipeToCloseTabListener(
         fun onSwiped(tab: TabEntity)
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(
+        viewHolder: RecyclerView.ViewHolder,
+        direction: Int
+    ) {
         val tab = tabSwitcherAdapter.getTab(viewHolder.adapterPosition)
         tabSwipedListener.onSwiped(tab)
     }
@@ -55,8 +58,11 @@ class SwipeToCloseTabListener(
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
-    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
         return false
     }
-
 }

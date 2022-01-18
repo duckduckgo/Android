@@ -40,15 +40,21 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
     private val items = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompanyDetailsViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): CompanyDetailsViewHolder {
         return CompanyDetailsViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: CompanyDetailsViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CompanyDetailsViewHolder,
+        position: Int
+    ) {
         val companyTrackingDetails = items[position]
-        holder.bind(companyTrackingDetails){ expanded ->
+        holder.bind(companyTrackingDetails) { expanded ->
             items.forEachIndexed { index, companyDetails ->
-                companyDetails.takeIf { it.companyName == companyTrackingDetails.companyName}?.let {
+                companyDetails.takeIf { it.companyName == companyTrackingDetails.companyName }?.let {
                     items[index] = it.copy(expanded = expanded)
                 }
             }
@@ -61,7 +67,7 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
         val newData = mutableListOf<AppTPCompanyTrackersViewModel.CompanyTrackingDetails>()
         data.forEach { updateDataItem ->
             val existingItem = items.find { it.companyName == updateDataItem.companyName }
-            val itemToAdd = if (existingItem != null){
+            val itemToAdd = if (existingItem != null) {
                 existingItem.copy(trackingAttempts = updateDataItem.trackingAttempts)
             } else {
                 updateDataItem
@@ -88,11 +94,17 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
 
         override fun getNewListSize() = new.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition].companyName == new[newItemPosition].companyName
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return old[oldItemPosition] == new[newItemPosition]
         }
     }
@@ -115,7 +127,10 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
         var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
         var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
 
-        fun bind(companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails, onExpanded: (Boolean)-> Unit) {
+        fun bind(
+            companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails,
+            onExpanded: (Boolean) -> Unit
+        ) {
             val badge = badgeIcon(view.context, companyDetails.companyName)
             if (badge == null) {
                 badgeImage.setImageDrawable(
@@ -130,7 +145,10 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             }
 
             companyName.text = companyDetails.companyDisplayName
-            trackingAttempts.text = view.context.resources.getQuantityString(R.plurals.atp_CompanyDetailsTrackingAttempts, companyDetails.trackingAttempts, companyDetails.trackingAttempts)
+            trackingAttempts.text = view.context.resources.getQuantityString(
+                R.plurals.atp_CompanyDetailsTrackingAttempts,
+                companyDetails.trackingAttempts, companyDetails.trackingAttempts
+            )
 
             val inflater = LayoutInflater.from(view.context)
             topSignalsLayout.removeAllViews()
@@ -176,19 +194,23 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             }
         }
 
-        private fun showMore(){
+        private fun showMore() {
             bottomSignalsLayout.show()
             showMore.gone()
             showLess.show()
         }
 
-        private fun showLess(){
+        private fun showLess() {
             bottomSignalsLayout.gone()
             showMore.show()
             showLess.gone()
         }
 
-        private fun badgeIcon(context: Context, networkName: String, prefix: String = "tracking_network_logo_"): Int? {
+        private fun badgeIcon(
+            context: Context,
+            networkName: String,
+            prefix: String = "tracking_network_logo_"
+        ): Int? {
             val drawable = "$prefix$networkName"
                 .replace(" ", "_")
                 .replace(".", "")
@@ -198,5 +220,4 @@ class AppTPCompanyDetailsAdapter() : RecyclerView.Adapter<AppTPCompanyDetailsAda
             return if (resource != 0) resource else null
         }
     }
-
 }

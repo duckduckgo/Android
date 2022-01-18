@@ -38,7 +38,6 @@ class TlsContentTypeExtractor @Inject constructor(private val tlsMessageDetector
             Timber.w(t, "Failed to extract TLS content type")
             return TlsContentType.Undetermined
         }
-
     }
 
     private fun extractContentType(packet: ByteArray): TlsContentType {

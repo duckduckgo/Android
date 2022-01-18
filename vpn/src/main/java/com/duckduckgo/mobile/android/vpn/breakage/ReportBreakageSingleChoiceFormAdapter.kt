@@ -38,13 +38,19 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
         diffResult.dispatchUpdatesTo(this)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReportBreakageSingleChoiceFormViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ReportBreakageSingleChoiceFormViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.view_report_breakage_text_single_choice_entry, parent, false)
         return ReportBreakageSingleChoiceFormViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ReportBreakageSingleChoiceFormViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ReportBreakageSingleChoiceFormViewHolder,
+        position: Int
+    ) {
         holder.bind(choices[position], position, listener)
     }
 
@@ -68,23 +74,35 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
             return newList.size
         }
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition].questionStringRes == newList[newItemPosition].questionStringRes
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
-
     }
 
     interface Listener {
-        fun onChoiceSelected(choice: Choice, position: Int)
+        fun onChoiceSelected(
+            choice: Choice,
+            position: Int
+        )
     }
 }
 
 class ReportBreakageSingleChoiceFormViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    fun bind(choice: Choice, position: Int, listener: ReportBreakageSingleChoiceFormAdapter.Listener) {
+    fun bind(
+        choice: Choice,
+        position: Int,
+        listener: ReportBreakageSingleChoiceFormAdapter.Listener
+    ) {
         with(itemView.findViewById<TextView>(R.id.single_choice_text)) {
             text = itemView.context.getString(choice.questionStringRes)
             setOnClickListener {

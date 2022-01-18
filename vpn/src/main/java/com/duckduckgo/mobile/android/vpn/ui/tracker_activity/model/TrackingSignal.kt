@@ -21,7 +21,11 @@ import androidx.annotation.StringRes
 import com.duckduckgo.mobile.android.vpn.R
 import timber.log.Timber
 
-enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayName: Int, @DrawableRes val signalIcon: Int) {
+enum class TrackingSignal(
+    val signaltag: String,
+    @StringRes val signalDisplayName: Int,
+    @DrawableRes val signalIcon: Int
+) {
     AAID("AAID", R.string.atp_TrackingSignalAAID, R.drawable.ic_signal_advertising_id),
     UNIQUE_IDENTIFIER("unique_identifier", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
     FB_PERSISTENT_ID("fb_persistent_id", R.string.atp_TrackingSignalUniqueIdentifier, R.drawable.ic_signal_advertising_id),
@@ -94,6 +98,5 @@ enum class TrackingSignal(val signaltag: String, @StringRes val signalDisplayNam
                 UNIQUE_IDENTIFIER
             }
         }
-
     }
 }

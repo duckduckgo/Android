@@ -68,7 +68,8 @@ class RealPrivacyConfigPersisterTest {
                 mockTogglesRepository,
                 unprotectedTemporaryRepository,
                 privacyRepository,
-                db)
+                db
+            )
     }
 
     @After
@@ -84,7 +85,8 @@ class RealPrivacyConfigPersisterTest {
         privacyRepository = RealPrivacyConfigRepository(db)
         unprotectedTemporaryRepository =
             RealUnprotectedTemporaryRepository(
-                db, TestScope(), coroutineRule.testDispatcherProvider)
+                db, TestScope(), coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
@@ -151,7 +153,8 @@ class RealPrivacyConfigPersisterTest {
             version = 2,
             readme = "readme",
             features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
-            unprotectedTemporaryList)
+            unprotectedTemporaryList
+        )
     }
 
     class FakePrivacyFeaturePluginPoint : PluginPoint<PrivacyFeaturePlugin> {
@@ -164,10 +167,14 @@ class RealPrivacyConfigPersisterTest {
     class FakePrivacyFeaturePlugin : PrivacyFeaturePlugin {
         var count = 0
 
-        override fun store(name: String, jsonString: String): Boolean {
+        override fun store(
+            name: String,
+            jsonString: String
+        ): Boolean {
             count++
             return true
         }
+
         override val featureName: PrivacyFeatureName =
             PrivacyFeatureName.ContentBlockingFeatureName()
     }

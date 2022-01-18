@@ -38,7 +38,7 @@ We have also labeled tasks you can help with as [help wanted](https://github.co
 
 ### Style Guide
 
-We care about clean code. Refer to our [style guide](styleguide/STYLEGUIDE.md).
+Refer to our [style guide](STYLEGUIDE.md).
 
 ### Commit Messages
 
@@ -48,7 +48,7 @@ See Chris Beams' guide to writing good commit messages https://chris.beams.io/po
 
 Bitrise as a our CI environment, [all builds can be seen here](https://app.bitrise.io/app/dc22e377b9a9ccbf#/builds).
 We use [Spotless](https://github.com/diffplug/spotless) as a code formatter, and every build in Bitrise will trigger a check for several rules.
-If your PR is failing because of that, please make sure that you have our [style guide](styleguide/STYLEGUIDE.md) imported and the code formatted.
+If your PR is failing because of that, please make sure that you follow our [style guide](STYLEGUIDE.md) and the code is formatted.
 You can also trigger an automatic code formatting of the code by executing:
 
 ```

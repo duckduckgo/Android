@@ -44,5 +44,4 @@ class PixelEmailRemovalInterceptorTest {
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
     }
-
 }

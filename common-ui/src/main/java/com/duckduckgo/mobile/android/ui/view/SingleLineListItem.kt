@@ -45,10 +45,13 @@ class SingleLineListItem : LinearLayout {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.SingleLineListItem)
         setTitle(attributes.getString(R.styleable.SingleLineListItem_singleLineItemTitle) ?: "")
         setImageVisibility(
-            attributes.getBoolean(R.styleable.SingleLineListItem_singleLineItemImageVisible, true))
+            attributes.getBoolean(R.styleable.SingleLineListItem_singleLineItemImageVisible, true)
+        )
         setImageResource(
             attributes.getResourceId(
-                R.styleable.SingleLineListItem_singleLineItemDrawable, R.drawable.ic_overflow))
+                R.styleable.SingleLineListItem_singleLineItemDrawable, R.drawable.ic_overflow
+            )
+        )
         attributes.recycle()
     }
 

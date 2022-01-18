@@ -239,7 +239,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 // noop, handled in onDismissed callback
             }
             .addCallback(object : Snackbar.Callback() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                override fun onDismissed(
+                    transientBottomBar: Snackbar?,
+                    event: Int
+                ) {
                     when (event) {
                         // handle the UNDO action here as we only have one
                         BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> launch { viewModel.undoDeletableTab(tab) }
@@ -288,7 +291,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     companion object {
-        fun intent(context: Context, selectedTabId: String? = null): Intent {
+        fun intent(
+            context: Context,
+            selectedTabId: String? = null
+        ): Intent {
             val intent = Intent(context, TabSwitcherActivity::class.java)
             intent.putExtra(EXTRA_KEY_SELECTED_TAB, selectedTabId)
             return intent

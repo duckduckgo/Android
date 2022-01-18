@@ -108,7 +108,10 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onWebsiteNotification(intent: Intent, pixelSuffix: String) {
+    private fun onWebsiteNotification(
+        intent: Intent,
+        pixelSuffix: String
+    ) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
         taskStackBuilderFactory.createTaskBuilder()
@@ -170,7 +173,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
         const val NOTIFICATION_AUTO_CANCEL = "NOTIFICATION_AUTO_CANCEL"
 
-        fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+        fun pendingNotificationHandlerIntent(
+            context: Context,
+            eventType: String,
+            specification: NotificationSpec
+        ): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
             intent.putExtras(specification.bundle)

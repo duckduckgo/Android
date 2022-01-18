@@ -66,7 +66,8 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
         val smallestSize = Math.min(metrics.widthPixels, metrics.heightPixels)
         val tabletSize =
             TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 600f, context.resources.displayMetrics)
+                TypedValue.COMPLEX_UNIT_DIP, 600f, context.resources.displayMetrics
+            )
                 .toInt()
         return if (smallestSize >= tabletSize) DeviceInfo.FormFactor.TABLET
         else DeviceInfo.FormFactor.PHONE

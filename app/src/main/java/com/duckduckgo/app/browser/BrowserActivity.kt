@@ -175,7 +175,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
+    private fun openNewTab(
+        tabId: String,
+        url: String? = null,
+        skipHome: Boolean
+    ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         addOrReplaceNewTab(fragment, tabId)
@@ -191,7 +195,10 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         return fragment
     }
 
-    private fun addOrReplaceNewTab(fragment: BrowserTabFragment, tabId: String) {
+    private fun addOrReplaceNewTab(
+        fragment: BrowserTabFragment,
+        tabId: String
+    ) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -388,13 +395,19 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         launch { viewModel.onNewTabRequested() }
     }
 
-    fun openInNewTab(query: String, sourceTabId: String?) {
+    fun openInNewTab(
+        query: String,
+        sourceTabId: String?
+    ) {
         launch {
             viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
         }
     }
 
-    fun openMessageInNewTab(message: Message, sourceTabId: String?) {
+    fun openMessageInNewTab(
+        message: Message,
+        sourceTabId: String?
+    ) {
         openMessageInNewTabJob = launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
@@ -414,7 +427,11 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         startActivity(BookmarksActivity.intent(this))
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
         } else {
@@ -530,6 +547,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         playStoreUtils.launchPlayStore()
     }
 
-    private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
-
+    private data class CombinedInstanceState(
+        val originalInstanceState: Bundle?,
+        val newInstanceState: Bundle?
+    )
 }

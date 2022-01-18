@@ -185,22 +185,35 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
             return this
         }
 
-        override fun buildRect(text: String, color: Int): TextDrawable {
+        override fun buildRect(
+            text: String,
+            color: Int
+        ): TextDrawable {
             rect()
             return build(text, color)
         }
 
-        override fun buildRoundRect(text: String, color: Int, radius: Int): TextDrawable {
+        override fun buildRoundRect(
+            text: String,
+            color: Int,
+            radius: Int
+        ): TextDrawable {
             roundRect(radius)
             return build(text, color)
         }
 
-        override fun buildRound(text: String, color: Int): TextDrawable {
+        override fun buildRound(
+            text: String,
+            color: Int
+        ): TextDrawable {
             round()
             return build(text, color)
         }
 
-        override fun build(text: String, color: Int): TextDrawable {
+        override fun build(
+            text: String,
+            color: Int
+        ): TextDrawable {
             this.color = color
             this.text = text
             return TextDrawable(this)
@@ -233,7 +246,10 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     }
 
     interface IBuilder {
-        fun build(text: String, color: Int): TextDrawable
+        fun build(
+            text: String,
+            color: Int
+        ): TextDrawable
     }
 
     interface IShapeBuilder {
@@ -241,9 +257,21 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         fun rect(): IBuilder?
         fun round(): IBuilder?
         fun roundRect(radius: Int): IBuilder?
-        fun buildRect(text: String, color: Int): TextDrawable
-        fun buildRoundRect(text: String, color: Int, radius: Int): TextDrawable
-        fun buildRound(text: String, color: Int): TextDrawable
+        fun buildRect(
+            text: String,
+            color: Int
+        ): TextDrawable
+
+        fun buildRoundRect(
+            text: String,
+            color: Int,
+            radius: Int
+        ): TextDrawable
+
+        fun buildRound(
+            text: String,
+            color: Int
+        ): TextDrawable
     }
 
     companion object {
@@ -251,6 +279,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         fun builder(): IShapeBuilder {
             return Builder()
         }
+
         fun asIconDrawable(text: String): TextDrawable {
             return TextDrawable.builder().buildRound(text.take(1), Color.DKGRAY)
         }

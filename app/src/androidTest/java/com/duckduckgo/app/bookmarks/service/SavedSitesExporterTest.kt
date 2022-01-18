@@ -155,7 +155,11 @@ class SavedSitesExporterTest {
         )
     }
 
-    private fun testNode(node: TreeNode<FolderTreeItem>, itemList: List<Any>, count: Int) {
+    private fun testNode(
+        node: TreeNode<FolderTreeItem>,
+        itemList: List<Any>,
+        count: Int
+    ) {
         if (node.value.url != null) {
             val entity = itemList[count] as BookmarkEntity
 

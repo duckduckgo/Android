@@ -98,7 +98,10 @@ class LocationPermissionsAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LocationPermissionsViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): LocationPermissionsViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             DESCRIPTION_TYPE -> {
@@ -147,7 +150,10 @@ class LocationPermissionsAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: LocationPermissionsViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: LocationPermissionsViewHolder,
+        position: Int
+    ) {
         when (holder) {
             is LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder -> {
                 holder.bind(locationPermissionEnabled)
@@ -270,7 +276,10 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
             }
         }
 
-        private fun showOverFlowMenu(anchor: View, entity: LocationPermissionEntity) {
+        private fun showOverFlowMenu(
+            anchor: View,
+            entity: LocationPermissionEntity
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {

@@ -42,7 +42,10 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
     // content provide shall have empty constructor
     private val startupTraces: StartupTraces by lazy { RealStartupTraces(context!!.applicationContext) }
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Lifecycle.Event
+    ) {
         if (event == Lifecycle.Event.ON_START) {
             Debug.stopMethodTracing()
         }
@@ -71,15 +74,27 @@ class AppStartUpTracer @Inject constructor() : ContentProvider(), LifecycleEvent
         return false
     }
 
-    override fun update(p0: Uri, p1: ContentValues?, p2: String?, p3: Array<out String>?): Int {
+    override fun update(
+        p0: Uri,
+        p1: ContentValues?,
+        p2: String?,
+        p3: Array<out String>?
+    ): Int {
         TODO("Not yet implemented")
     }
 
-    override fun insert(p0: Uri, p1: ContentValues?): Uri? {
+    override fun insert(
+        p0: Uri,
+        p1: ContentValues?
+    ): Uri? {
         TODO("Not yet implemented")
     }
 
-    override fun delete(p0: Uri, p1: String?, p2: Array<out String>?): Int {
+    override fun delete(
+        p0: Uri,
+        p1: String?,
+        p2: Array<out String>?
+    ): Int {
         TODO("Not yet implemented")
     }
 

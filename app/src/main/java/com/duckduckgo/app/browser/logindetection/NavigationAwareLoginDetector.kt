@@ -31,7 +31,10 @@ interface NavigationAwareLoginDetector {
     fun onEvent(navigationEvent: NavigationEvent)
 }
 
-data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String)
+data class LoginDetected(
+    val authLoginDomain: String,
+    val forwardedToDomain: String
+)
 
 sealed class NavigationEvent {
     sealed class UserAction : NavigationEvent() {
@@ -205,7 +208,11 @@ class NextPageLoginDetection constructor(
     private sealed class LoginResult {
         data class AuthFlow(val authLoginDomain: String) : LoginResult()
         data class TwoFactorAuthFlow(val loginDomain: String) : LoginResult()
-        data class LoginDetected(val authLoginDomain: String, val forwardedToDomain: String) : LoginResult()
+        data class LoginDetected(
+            val authLoginDomain: String,
+            val forwardedToDomain: String
+        ) : LoginResult()
+
         object Unknown : LoginResult()
     }
 

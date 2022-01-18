@@ -45,6 +45,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
     }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
@@ -80,7 +81,10 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         return alertBuilder.create()
     }
 
-    private fun updateCurrentSelect(currentOption: ClearWhenOption, radioGroup: RadioGroup) {
+    private fun updateCurrentSelect(
+        currentOption: ClearWhenOption,
+        radioGroup: RadioGroup
+    ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }
@@ -116,5 +120,4 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
             return fragment
         }
     }
-
 }

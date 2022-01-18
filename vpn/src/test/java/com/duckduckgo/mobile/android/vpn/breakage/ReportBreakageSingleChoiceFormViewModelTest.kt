@@ -21,7 +21,6 @@ import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageSingleChoiceFormViewModel.Companion.CHOICES
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule

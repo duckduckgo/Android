@@ -36,13 +36,12 @@ sealed class TrackerFeedItem(open val id: Int) {
     data class TrackerFeedItemHeader(val timestamp: String) : TrackerFeedItem(timestamp.hashCode())
 }
 
-sealed class TrackerCompanyBadge(){
+sealed class TrackerCompanyBadge() {
     data class Company(
         val companyName: String,
         val companyDisplayName: String,
-    ): TrackerCompanyBadge()
+    ) : TrackerCompanyBadge()
     data class Extra(
         val amount: Int
-    ): TrackerCompanyBadge()
+    ) : TrackerCompanyBadge()
 }
-

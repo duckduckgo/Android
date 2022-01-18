@@ -49,7 +49,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
 
     constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : super(context, attrs) {
         isNestedScrollingEnabled = true
     }
 
@@ -139,19 +142,42 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild {
 
     override fun hasNestedScrollingParent(): Boolean = nestedScrollHelper.hasNestedScrollingParent()
 
-    override fun dispatchNestedScroll(dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, offsetInWindow: IntArray?): Boolean =
+    override fun dispatchNestedScroll(
+        dxConsumed: Int,
+        dyConsumed: Int,
+        dxUnconsumed: Int,
+        dyUnconsumed: Int,
+        offsetInWindow: IntArray?
+    ): Boolean =
         nestedScrollHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow)
 
-    override fun dispatchNestedPreScroll(dx: Int, dy: Int, consumed: IntArray?, offsetInWindow: IntArray?): Boolean =
+    override fun dispatchNestedPreScroll(
+        dx: Int,
+        dy: Int,
+        consumed: IntArray?,
+        offsetInWindow: IntArray?
+    ): Boolean =
         nestedScrollHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow)
 
-    override fun dispatchNestedFling(velocityX: Float, velocityY: Float, consumed: Boolean): Boolean =
+    override fun dispatchNestedFling(
+        velocityX: Float,
+        velocityY: Float,
+        consumed: Boolean
+    ): Boolean =
         nestedScrollHelper.dispatchNestedFling(velocityX, velocityY, consumed)
 
-    override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean =
+    override fun dispatchNestedPreFling(
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean =
         nestedScrollHelper.dispatchNestedPreFling(velocityX, velocityY)
 
-    override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
+    override fun onOverScrolled(
+        scrollX: Int,
+        scrollY: Int,
+        clampedX: Boolean,
+        clampedY: Boolean
+    ) {
         // taking into account lastDeltaY since we are only interested whether we clamped at the top
         lastClampedTopY = clampedY && lastDeltaY <= 0
 

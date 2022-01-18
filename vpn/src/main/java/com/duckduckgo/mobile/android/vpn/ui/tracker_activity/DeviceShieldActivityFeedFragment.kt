@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
@@ -47,14 +46,22 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     private var feedListener: DeviceShieldActivityFeedListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         AndroidInjection.inject(this)
         with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
-            val stickyHeadersLayoutManager = StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
+            val stickyHeadersLayoutManager =
+                StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             layoutManager = stickyHeadersLayoutManager
             adapter = trackerFeedAdapter
         }
@@ -71,7 +78,14 @@ class DeviceShieldActivityFeedFragment : Fragment() {
                 .collect { it ->
                     feedListener?.onTrackerListShowed(it.size)
                     trackerFeedAdapter.updateData(if (config.unboundedRows()) it else it.take(config.maxRows)) { trackerFeedData ->
-                        startActivity(AppTPCompanyTrackersActivity.intent(requireContext(), trackerFeedData.trackingApp.packageId, trackerFeedData.trackingApp.appDisplayName, trackerFeedData.bucket))
+                        startActivity(
+                            AppTPCompanyTrackersActivity.intent(
+                                requireContext(),
+                                trackerFeedData.trackingApp.packageId,
+                                trackerFeedData.trackingApp.appDisplayName,
+                                trackerFeedData.bucket
+                            )
+                        )
                     }
                 }
         }
@@ -119,5 +133,4 @@ class DeviceShieldActivityFeedFragment : Fragment() {
     interface DeviceShieldActivityFeedListener {
         fun onTrackerListShowed(totalTrackers: Int)
     }
-
 }

@@ -1,5 +1,0 @@
-com.android.tool.sizereduction.plugin
-com.developerphil.adbidea
-org.exbin.deltahex.intellij
-org.intellij.plugins.markdown
-org.jetbrains.kotlin

@@ -51,7 +51,14 @@ class UncaughtExceptionModule {
         appBuildConfig: AppBuildConfig
     ): AlertingUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        return AlertingUncaughtExceptionHandler(originalHandler, offlinePixelCountDataStore, uncaughtExceptionRepository, dispatcherProvider, appCoroutineScope, appBuildConfig)
+        return AlertingUncaughtExceptionHandler(
+            originalHandler,
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository,
+            dispatcherProvider,
+            appCoroutineScope,
+            appBuildConfig
+        )
     }
 
     @Provides

@@ -27,5 +27,8 @@ interface FeatureTogglesPlugin {
      * @return `true` if the feature is enable. `false` when disabled. `null` if the plugin does not
      * know the featureName. [defaultValue] if the plugin knows featureName but is not set
      */
-    fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean?
+    fun isEnabled(
+        featureName: FeatureName,
+        defaultValue: Boolean
+    ): Boolean?
 }

@@ -31,7 +31,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -99,12 +98,14 @@ class PrivacyPracticesViewModelTest {
         }
     }
 
-    private fun site(url: String = "", privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN): Site {
+    private fun site(
+        url: String = "",
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         return site
     }
-
 }

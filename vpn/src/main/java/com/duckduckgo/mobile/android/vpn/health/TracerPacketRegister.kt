@@ -42,7 +42,10 @@ class TracerPacketRegister @Inject constructor() {
     }
 
     @Synchronized
-    private fun addEvent(id: String, event: TracerEvent) {
+    private fun addEvent(
+        id: String,
+        event: TracerEvent
+    ) {
         val tracer = getTracer(id)
         val events = mutableListOf<TracerEvent>().also {
             it.addAll(tracer.events)
@@ -74,7 +77,10 @@ class TracerPacketRegister @Inject constructor() {
         return categorize(tracer, tracerId)
     }
 
-    private fun categorize(tracer: Tracer, tracerId: String): TracerSummary {
+    private fun categorize(
+        tracer: Tracer,
+        tracerId: String
+    ): TracerSummary {
         val startTime = tracer.creationTimestampMillis
         val firstEvent = tracer.events.firstOrNull() ?: return Invalid(
             tracerId,
@@ -109,7 +115,10 @@ class TracerPacketRegister @Inject constructor() {
         tracers.evictAll()
     }
 
-    sealed class TracerSummary(open val tracerId: String, open val creationTimestampMillis: Long) {
+    sealed class TracerSummary(
+        open val tracerId: String,
+        open val creationTimestampMillis: Long
+    ) {
         data class Completed(
             override val tracerId: String,
             override val creationTimestampMillis: Long,
@@ -151,13 +160,16 @@ class TracerPacketRegister @Inject constructor() {
             }
         }
 
-        data class Invalid(override val tracerId: String, override val creationTimestampMillis: Long, val reason: String) :
+        data class Invalid(
+            override val tracerId: String,
+            override val creationTimestampMillis: Long,
+            val reason: String
+        ) :
             TracerSummary(tracerId, creationTimestampMillis) {
 
             override fun toString(): String {
                 return String.format("TracerSummary for %s. Invalid: %s", tracerId, reason)
             }
-
         }
     }
 

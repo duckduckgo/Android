@@ -60,7 +60,8 @@ constructor(
         val lastTrackerBlockedAgo =
             if (trackerData.isNotEmpty()) {
                 timeDiffFormatter.formatTimePassed(
-                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp))
+                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                )
             } else {
                 ""
             }
@@ -77,7 +78,7 @@ constructor(
             val signals = data.value[0].trackerEntity.signals
             val timestamp = data.value[0].tracker.timestamp
 
-            val trackingSignals = if (trackerCompanies.containsKey(trackerCompanyName)){
+            val trackingSignals = if (trackerCompanies.containsKey(trackerCompanyName)) {
                 trackerCompanies.get(trackerCompanyName)!!
             } else {
                 val randomTrackingSignals = mapTrackingSignals(signals)
@@ -91,7 +92,9 @@ constructor(
                     companyDisplayName = trackerCompanyDisplayName,
                     trackingAttempts = data.value.size,
                     timestamp = timestamp,
-                    trackingSignals = trackingSignals))
+                    trackingSignals = trackingSignals
+                )
+            )
         }
 
         return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)

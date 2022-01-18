@@ -21,7 +21,11 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 interface PrivacyFeatureTogglesDataStore {
-    fun get(featureName: String, defaultValue: Boolean): Boolean?
+    fun get(
+        featureName: String,
+        defaultValue: Boolean
+    ): Boolean?
+
     fun insert(toggle: PrivacyFeatureToggles)
     fun deleteAll()
 }
@@ -32,7 +36,10 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-    override fun get(featureName: String, defaultValue: Boolean): Boolean? {
+    override fun get(
+        featureName: String,
+        defaultValue: Boolean
+    ): Boolean? {
         return if (preferences.contains(featureName)) {
             preferences.getBoolean(featureName, defaultValue)
         } else {
@@ -53,4 +60,7 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
     }
 }
 
-data class PrivacyFeatureToggles(val featureName: String, val enabled: Boolean)
+data class PrivacyFeatureToggles(
+    val featureName: String,
+    val enabled: Boolean
+)

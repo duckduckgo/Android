@@ -51,7 +51,10 @@ class AuditSettingsViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    fun goToUrl(url: String, protectionsEnabled: Boolean = true) {
+    fun goToUrl(
+        url: String,
+        protectionsEnabled: Boolean = true
+    ) {
         viewModelScope.launch {
             if (protectionsEnabled) {
                 reAddProtections()

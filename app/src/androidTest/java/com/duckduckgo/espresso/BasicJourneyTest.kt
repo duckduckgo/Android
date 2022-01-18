@@ -50,5 +50,4 @@ class BasicJourneyTest {
         // check that the forward arrow is visible
         onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
     }
-
 }

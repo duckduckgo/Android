@@ -86,9 +86,23 @@ class PrivacyReportViewModel(
     }
 
     object PrivacyReportView {
-        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked, val onboardingComplete: Boolean)
-        data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
-        data class TrackersBlocked(val latestApp: String, val otherAppsSize: Int, val trackers: Int)
+        data class ViewState(
+            val isRunning: Boolean,
+            val hasValueChanged: Boolean,
+            val trackersBlocked: TrackersBlocked,
+            val onboardingComplete: Boolean
+        )
+
+        data class RunningState(
+            val isRunning: Boolean,
+            val hasValueChanged: Boolean
+        )
+
+        data class TrackersBlocked(
+            val latestApp: String,
+            val otherAppsSize: Int,
+            val trackers: Int
+        )
     }
 }
 

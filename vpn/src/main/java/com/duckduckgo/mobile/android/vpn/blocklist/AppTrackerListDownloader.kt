@@ -99,7 +99,10 @@ class RealAppTrackerListDownloader @Inject constructor(
         val packages = extractAppPackages(responseBody)
         val trackerEntities = extractTrackerEntities(responseBody)
 
-        Timber.d("Received the app tracker remote lists. blocklist size: ${blocklist.size}, app-packages size: ${packages.size}, entities size: ${trackerEntities.size}")
+        Timber.d(
+            "Received the app tracker remote lists. blocklist size: ${blocklist.size}, " +
+                "app-packages size: ${packages.size}, entities size: ${trackerEntities.size}"
+        )
 
         return AppTrackerBlocklist(etag = ETag.ValidETag(eTag), blocklist = blocklist, appPackages = packages, entities = trackerEntities)
     }
@@ -155,7 +158,7 @@ class RealAppTrackerListDownloader @Inject constructor(
 
         val eTag = response.headers().extractETag()
         val systemAppOverrides = response.body()?.rules.orEmpty()
-                .map { AppTrackerSystemAppOverridePackage(it) }
+            .map { AppTrackerSystemAppOverridePackage(it) }
 
         Timber.d("Received the app system app overrides list, size: ${systemAppOverrides.size}")
 
