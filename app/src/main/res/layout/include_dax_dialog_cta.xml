@@ -153,7 +153,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/returningUserCta"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_marginBottom="20dp"
         android:letterSpacing="0.0"
