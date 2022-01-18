@@ -180,6 +180,8 @@ class TrackerFeedAdapter @Inject constructor(
                         resources.getQuantityString(
                             R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackers.size, tracker.trackers.size
                         )
+                    val trackingAttempts =
+                        resources.getQuantityString(R.plurals.atp_ActivityTrackersCompanyBlocked, tracker.trackers.size, tracker.trackers.size)
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
