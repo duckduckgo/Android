@@ -111,14 +111,16 @@ class AppTPWaitlistViewModel(
     }
 
     fun onNotifyMeClicked() {
-        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
         viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogNotifyMe()
             waitlistManager.notifyOnJoinedWaitlist()
         }
     }
 
     fun onNoThanksClicked() {
-        deviceShieldPixels.didPressWaitlistDialogDismiss()
+        viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogDismiss()
+        }
     }
 
     fun onDialogDismissed() {
