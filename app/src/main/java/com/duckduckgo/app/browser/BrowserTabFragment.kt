@@ -777,12 +777,22 @@ class BrowserTabFragment :
 
                 requireActivity().runOnUiThread {
                     webView?.loadUrl(destinationUrl)
+                    destroyUrlExtractingWebView()
                 }
-                urlExtractingWebView = null
             }
             Timber.d("Tracking link detection: Loading tracking URL for extraction")
             urlExtractingWebView?.loadUrl(initialUrl)
         }
+    }
+
+    private fun destroyUrlExtractingWebView() {
+        urlExtractingWebView?.stopLoading()
+        urlExtractingWebView?.clearHistory()
+        urlExtractingWebView?.loadUrl("about:blank")
+        urlExtractingWebView?.onPause()
+        urlExtractingWebView?.removeAllViews()
+        urlExtractingWebView?.destroy()
+        urlExtractingWebView = null
     }
 
     private fun injectEmailAddress(alias: String) {

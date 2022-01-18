@@ -41,6 +41,7 @@ class UrlExtractingWebView(
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
             disableWebSql(this)
             loadsImagesAutomatically = false
+            cacheMode = WebSettings.LOAD_NO_CACHE
         }
         setWebViewClient(webViewClient)
 
@@ -50,10 +51,6 @@ class UrlExtractingWebView(
 
         urlExtractor.addUrlExtraction(this) { extractedUrl ->
             extractedUrlListener?.invoke(extractedUrl)
-            post {
-                stopLoading()
-                destroy()
-            }
         }
     }
 
