@@ -193,7 +193,7 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
-                        " (`trackerCompanyId` TEXT  PRIMARY KEY NOT NULL, `entityName` TEXT, `score` INTEGER, `signals` TEXT)"
+                        " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, `score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
                 )
             }
         }
