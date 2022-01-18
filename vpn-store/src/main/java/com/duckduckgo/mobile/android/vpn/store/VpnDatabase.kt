@@ -198,7 +198,6 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
-
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
