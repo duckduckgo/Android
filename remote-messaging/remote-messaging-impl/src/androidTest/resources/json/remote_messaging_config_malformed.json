@@ -3,17 +3,24 @@
   "messages": [
     {
       "id": "26780792-49fe-4e25-ae27-aa6a2e6f013b",
-      "messageType": "small",
       "content": {
+        "messageType": "small",
         "titleText": "Here goes a title"
       },
-      "matchingRules": [5, 6],
-      "exclusionRules": [7, 8, 9]
+      "matchingRules": [
+        5,
+        6
+      ],
+      "exclusionRules": [
+        7,
+        8,
+        9
+      ]
     },
     {
       "id": "26780792-49fe-4e25-ae27-aa6a2e6f013b",
-      "messageType": "small",
       "content": {
+        "messageType": "small",
         "titleText": "Here goes a title",
         "descriptionText": "description",
         "placeholder": "WARNING",
@@ -23,13 +30,20 @@
           "value": "com.duckduckgo.mobile.android"
         }
       },
-      "matchingRules": [5, 6],
-      "exclusionRules": [7, 8, 9]
+      "matchingRules": [
+        5,
+        6
+      ],
+      "exclusionRules": [
+        7,
+        8,
+        9
+      ]
     },
     {
       "id": "c2d0a1f1-6157-434f-8145-38416037d339",
-      "messageType": "big_two_action",
       "content": {
+        "messageType": "big_two_action",
         "titleText": "Here goes a title",
         "descriptionText": "description",
         "placeholder": "WARNING",
@@ -37,7 +51,7 @@
       }
     }
   ],
-  "matchingRules": [
+  "rules": [
     {
       "id": 6,
       "attributes": {
@@ -46,7 +60,10 @@
           "max": 29
         },
         "osApi": {
-          "value": ["en_US", "en_GB"],
+          "value": [
+            "en_US",
+            "en_GB"
+          ],
           "fallback": true
         },
         "webview": {

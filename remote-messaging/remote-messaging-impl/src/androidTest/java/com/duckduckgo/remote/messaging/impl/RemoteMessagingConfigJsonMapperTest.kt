@@ -57,7 +57,6 @@ class RemoteMessagingConfigJsonMapperTest {
         assertEquals(5, config.messages.size)
         val bigSingleActionMessage = RemoteMessage(
             id = "8274589c-8aeb-4322-a737-3852911569e3",
-            messageType = "big_single_action",
             content = Content.BigSingleAction(
                 titleText = "title",
                 descriptionText = "description",
@@ -74,7 +73,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
         val smallMessage = RemoteMessage(
             id = "26780792-49fe-4e25-ae27-aa6a2e6f013b",
-            messageType = "small",
             content = Content.Small(
                 titleText = "Here goes a title",
                 descriptionText = "description"
@@ -86,7 +84,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
         val mediumMessage = RemoteMessage(
             id = "c3549d64-b388-41d8-9649-33e6e2674e8e",
-            messageType = "medium",
             content = Content.Medium(
                 titleText = "Here goes a title",
                 descriptionText = "description",
@@ -99,7 +96,6 @@ class RemoteMessagingConfigJsonMapperTest {
 
         val bigTwoActions = RemoteMessage(
             id = "c2d0a1f1-6157-434f-8145-38416037d339",
-            messageType = "big_two_action",
             content = Content.BigTwoActions(
                 titleText = "Here goes a title",
                 descriptionText = "description",
@@ -172,7 +168,6 @@ class RemoteMessagingConfigJsonMapperTest {
         assertEquals(1, config.messages.size)
         val smallMessage = RemoteMessage(
             id = "26780792-49fe-4e25-ae27-aa6a2e6f013b",
-            messageType = "small",
             content = Content.Small(
                 titleText = "Here goes a title",
                 descriptionText = "description"
@@ -185,7 +180,7 @@ class RemoteMessagingConfigJsonMapperTest {
         assertEquals(2, config.rules.size)
         assertEquals(3, config.rules[6]?.size)
 
-        val matchingAttr = listOf(Locale(), Api(fallback = true), WebView(fallback = false))
+        val matchingAttr = listOf(Locale(), Unknown(fallback = true), WebView(fallback = false))
         assertEquals(matchingAttr, config.rules[6])
     }
 
