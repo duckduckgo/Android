@@ -85,14 +85,16 @@ class AppTPCompanyTrackersViewModelTest {
 
         return listOf(
             VpnTrackerCompanySignal(
-            VpnTracker(
-                trackerCompanyId = trackerCompanyId,
-                domain = domain,
-                timestamp = timestamp,
-                company = "",
-                companyDisplayName = "",
-                trackingApp = defaultTrackingApp
-            ), AppTrackerEntity(trackerCompanyId, "Google", 100, listOf("unique_identifier"))
-        ))
+                VpnTracker(
+                    trackerCompanyId = trackerCompanyId,
+                    domain = domain,
+                    timestamp = timestamp,
+                    company = "",
+                    companyDisplayName = "",
+                    trackingApp = defaultTrackingApp
+                ),
+                AppTrackerEntity(trackerCompanyId, "Google", 100, listOf("unique_identifier"))
+            )
+        )
     }
 }
