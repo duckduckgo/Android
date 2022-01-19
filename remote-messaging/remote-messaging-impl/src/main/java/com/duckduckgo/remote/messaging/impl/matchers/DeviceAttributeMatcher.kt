@@ -20,7 +20,6 @@ import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import timber.log.Timber
 
@@ -41,7 +40,7 @@ class DeviceAttributeMatcher(
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
                     return (matchingAttribute as StringMatchingAttribute).matches(deviceProperties.webView())
                 }
-                return (matchingAttribute as StringArrayMatchingAttribute).matches(deviceProperties.webView())
+                return (matchingAttribute as RangeStringMatchingAttribute).matches(deviceProperties.webView())
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }

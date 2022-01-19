@@ -21,6 +21,7 @@ import com.duckduckgo.remote.messaging.impl.models.BooleanMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import java.util.*
@@ -41,7 +42,7 @@ class AndroidAppAttributeMatcher(
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
                     return (matchingAttribute as StringMatchingAttribute).matches(appProperties.appVersion())
                 }
-                return (matchingAttribute as StringArrayMatchingAttribute).matches(appProperties.appVersion())
+                return (matchingAttribute as RangeStringMatchingAttribute).matches(appProperties.appVersion())
             }
             is MatchingAttribute.Atb -> {
                 return matchingAttribute.matches(appProperties.atb())
