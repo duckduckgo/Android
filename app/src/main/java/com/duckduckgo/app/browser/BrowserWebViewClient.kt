@@ -62,8 +62,7 @@ open class BrowserWebViewClient(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val emailInjector: EmailInjector,
-    private val accessibilityManager: AccessibilityManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val accessibilityManager: AccessibilityManager
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -156,7 +155,7 @@ open class BrowserWebViewClient(
                     false
                 }
                 is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                    if (isForMainFrame && lastPageStarted != trackingLinkDetector.lastTrackingLinkInfo?.destinationUrl) {
+                    if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.handleCloakedTrackingLink(urlType.trackingUrl)
                             return true

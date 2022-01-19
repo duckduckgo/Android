@@ -115,8 +115,7 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
-        accessibilityManager: AccessibilityManager,
-        trackingLinkDetector: TrackingLinkDetector
+        accessibilityManager: AccessibilityManager
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -134,8 +133,7 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             emailInjector,
-            accessibilityManager,
-            trackingLinkDetector
+            accessibilityManager
         )
     }
 

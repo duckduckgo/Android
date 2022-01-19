@@ -37,6 +37,8 @@ class RealTrackingLinkDetector @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary
 ) : TrackingLinkDetector {
 
+    var lastUrl: String? = null
+
     private var lastExtractedUrl: String? = null
 
     override var lastTrackingLinkInfo: TrackingLinkInfo? = null
@@ -53,7 +55,9 @@ class RealTrackingLinkDetector @Inject constructor(
 
     override fun extractCanonicalFromTrackingLink(url: String): TrackingLinkType? {
         if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return null
-        if (url == lastExtractedUrl || isProcessingTrackingLink) return null
+        if (url == lastExtractedUrl || isProcessingTrackingLink || url == lastUrl) return null
+
+        lastUrl = url
 
         val extractedUrl = extractCanonical(url)
 
