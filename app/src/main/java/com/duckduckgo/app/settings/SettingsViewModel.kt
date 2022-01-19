@@ -108,6 +108,7 @@ class SettingsViewModel(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
+        object LaunchAddHomeScreenWidget : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
@@ -194,6 +195,10 @@ class SettingsViewModel(
 
     fun userRequestedToChangeIcon() {
         viewModelScope.launch { command.send(Command.LaunchAppIcon) }
+    }
+
+    fun userRequestedToAddHomeScreenWidget() {
+        viewModelScope.launch { command.send(Command.LaunchAddHomeScreenWidget) }
     }
 
     fun userRequestedToChangeFireAnimation() {
