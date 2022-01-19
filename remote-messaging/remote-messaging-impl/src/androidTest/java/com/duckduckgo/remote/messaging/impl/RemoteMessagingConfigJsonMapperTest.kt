@@ -20,13 +20,13 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.*
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
-import com.duckduckgo.remote.messaging.impl.models.Action
-import com.duckduckgo.remote.messaging.impl.models.Content
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
-import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Rule
@@ -40,7 +40,7 @@ class RemoteMessagingConfigJsonMapperTest {
     var coroutineRule = CoroutineTestRule()
 
     @Test
-    fun whenJsonParseThenRemoteConfigReturned() = coroutineRule.runBlocking {
+    fun whenJsonParseThenRemoteConfigReturned() = runTest {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config.json")
         // val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val moshi = Moshi.Builder().build()
@@ -132,7 +132,7 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonHasUnknownItemsThenMessageNotParsed() = coroutineRule.runBlocking {
+    fun whenJsonHasUnknownItemsThenMessageNotParsed() = runTest {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_unsupported_items.json")
         val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
@@ -156,7 +156,7 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonMalformedThenMessageNotParsed() = coroutineRule.runBlocking {
+    fun whenJsonMalformedThenMessageNotParsed() = runTest {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
         val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
@@ -190,7 +190,7 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenMatchingAttributeUnknownNoFallbackThenFallbackToFail() = coroutineRule.runBlocking {
+    fun whenMatchingAttributeUnknownNoFallbackThenFallbackToFail() = runTest {
         val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
         val moshi = Moshi.Builder().build()
         val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
@@ -203,7 +203,7 @@ class RemoteMessagingConfigJsonMapperTest {
 
         val config = testee.map(result)
 
-        assertEquals(Unknown(), config.rules[7]?.first())
+        assertEquals(Unknown(null), config.rules[7]?.first())
     }
 }
 

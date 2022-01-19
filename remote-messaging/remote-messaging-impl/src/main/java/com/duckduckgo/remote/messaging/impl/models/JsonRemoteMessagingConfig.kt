@@ -19,7 +19,7 @@ package com.duckduckgo.remote.messaging.impl.models
 data class JsonRemoteMessagingConfig(
     val version: Long,
     val messages: List<JsonRemoteMessage>,
-    val matchingRules: List<JsonMatchingRule>
+    val rules: List<JsonMatchingRule>
 )
 
 data class JsonRemoteMessage(

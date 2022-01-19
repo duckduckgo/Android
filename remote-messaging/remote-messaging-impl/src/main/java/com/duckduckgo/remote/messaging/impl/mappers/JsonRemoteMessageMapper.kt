@@ -16,9 +16,9 @@
 
 package com.duckduckgo.remote.messaging.impl.mappers
 
-import com.duckduckgo.remote.messaging.impl.models.Action
-import com.duckduckgo.remote.messaging.impl.models.Content
-import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
@@ -99,7 +99,7 @@ class JsonRemoteMessageMapper {
                 exclusionRules = this.exclusionRules.orEmpty()
             )
         }.onFailure {
-            Timber.i("RMF: error $it")
+            Timber.e("RMF: error $it")
         }.getOrNull()
     }
 
