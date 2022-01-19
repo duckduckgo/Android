@@ -16,7 +16,12 @@
 
 package com.duckduckgo.app.bookmarks.db
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import kotlinx.coroutines.flow.Flow
 
@@ -56,7 +61,13 @@ interface BookmarkFoldersDao {
     )
     fun getBookmarkFoldersByParentIdSync(parentId: Long): List<BookmarkFolder>
 
-    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.id = :parentId")
+    @Query(
+        "select *, (select count(*) from bookmarks " +
+            "where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) " +
+            "from bookmark_folders as inner_bookmark_folders " +
+            "where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders " +
+            "from bookmark_folders where bookmark_folders.id = :parentId"
+    )
     fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
