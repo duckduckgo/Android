@@ -184,15 +184,17 @@ class TrackerFeedAdapter @Inject constructor(
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
-                    val companies = resources.getQuantityString(
-                        R.plurals.atp_ActivityTrackersBlockedCompanyCount,
-                        tracker.trackingCompanyBadges.size, tracker.trackingCompanyBadges.size
-                    )
+                    val companies =
+                        resources.getQuantityString(
+                            R.plurals.atp_ActivityTrackersBlockedCompanyCount, tracker.trackers.size, tracker.trackers.size
+                        )
+                    val trackingAttempts =
+                        resources.getQuantityString(R.plurals.atp_ActivityTrackersCompanyBlocked, tracker.trackers.size, tracker.trackers.size)
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
                                 R.string.atp_ActivityTrackersBlocked,
-                                item.trackersTotalCount,
+                                trackingAttempts,
                                 companies,
                                 item.trackingApp.appDisplayName
                             ),

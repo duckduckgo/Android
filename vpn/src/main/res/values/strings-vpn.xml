@@ -197,7 +197,11 @@
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
     <string name="atp_ActivityManageProtection">Manage Protection for Your Apps</string>
-    <string name="atp_ActivityTrackersBlocked">%1d tracking attempts blocked from <![CDATA[%2s]]> in <![CDATA[<b>%3s</b>]]> app</string>
+    <plurals name="atp_ActivityTrackersCompanyBlocked">
+        <item quantity="one">"%d tracking attempt"</item>
+        <item quantity="other">%d tracking attempts"</item>
+    </plurals>
+    <string name="atp_ActivityTrackersBlocked">%1d blocked from <![CDATA[%2s]]> in <![CDATA[<b>%3s</b>]]> app</string>
     <string name="atp_ActivityTrackersCountOne">from %1$s</string>
     <string name="atp_ActivityTrackersCountTwo">from %1$s and 1 other</string>
     <string name="atp_ActivityTrackersCountMany">from %1$s and %2$d others</string>
