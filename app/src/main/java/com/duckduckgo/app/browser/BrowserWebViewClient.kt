@@ -41,7 +41,6 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI

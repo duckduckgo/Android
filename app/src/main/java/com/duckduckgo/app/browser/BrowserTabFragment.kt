@@ -783,7 +783,7 @@ class BrowserTabFragment :
 
             val client = urlExtractingWebViewClient.get()
 
-            val listener = object: UrlExtractionListener {
+            val listener = object : UrlExtractionListener {
                 override fun onUrlExtractionError() {
                     Timber.d("Tracking link detection: Extraction error! Loading initial URL: $initialUrl")
                     webView?.loadUrl(initialUrl)

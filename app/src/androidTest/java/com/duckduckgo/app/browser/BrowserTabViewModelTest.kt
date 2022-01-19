@@ -3770,7 +3770,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSubmittedQueryIsCloakedTrackingLinkThenHandleCloakedTrackingLink() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromTrackingLink }
@@ -3780,7 +3781,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSubmittedQueryIsExtractedTrackingLinkThenNavigateToExtractedTrackingLink() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is Navigate }

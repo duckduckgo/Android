@@ -61,7 +61,12 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val test = adapter.fromJson(FileUtilities.loadText(AmpFormatReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_matching_tests.json"))
+            val test = adapter.fromJson(
+                FileUtilities.loadText(
+                    AmpFormatReferenceTest::class.java.classLoader!!,
+                    "reference_tests/tracking_link_detection_matching_tests.json"
+                )
+            )
             return test?.ampFormats?.tests ?: emptyList()
         }
     }
@@ -81,7 +86,10 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> = moshi.adapter(TrackingLinkDetectionFeature::class.java)
         val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
         val ampLinkFormats = CopyOnWriteArrayList<Regex>()
-        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(AmpFormatReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_reference.json")
+        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
+            AmpFormatReferenceTest::class.java.classLoader!!,
+            "reference_tests/tracking_link_detection_reference.json"
+        )
 
         jsonObject.keys().forEach { key ->
             val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonObject.get(key).toString())

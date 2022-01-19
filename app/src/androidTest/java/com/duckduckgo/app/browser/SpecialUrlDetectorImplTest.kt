@@ -290,7 +290,8 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsTrackingLinkThenExtractedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn(TrackingLinkType.ExtractedTrackingLink(extractedUrl = "https://www.example.com"))
+        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
+            .thenReturn(TrackingLinkType.ExtractedTrackingLink(extractedUrl = "https://www.example.com"))
         val expected = ExtractedTrackingLink::class
         val actual = testee.determineType("https://www.google.com/amp/s/www.example.com")
         assertEquals(expected, actual::class)
@@ -299,7 +300,8 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsCloakedTrackingLinkThenCloakedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString())).thenReturn(TrackingLinkType.CloakedTrackingLink(trackingUrl = "https://www.example.com/amp"))
+        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
+            .thenReturn(TrackingLinkType.CloakedTrackingLink(trackingUrl = "https://www.example.com/amp"))
         val expected = CloakedTrackingLink::class
         val actual = testee.determineType("https://www.example.com/amp")
         assertEquals(expected, actual::class)

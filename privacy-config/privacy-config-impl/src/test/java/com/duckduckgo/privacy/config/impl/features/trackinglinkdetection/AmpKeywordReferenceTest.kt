@@ -60,7 +60,12 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val test = adapter.fromJson(FileUtilities.loadText(AmpKeywordReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_matching_tests.json"))
+            val test = adapter.fromJson(
+                FileUtilities.loadText(
+                    AmpKeywordReferenceTest::class.java.classLoader!!,
+                    "reference_tests/tracking_link_detection_matching_tests.json"
+                )
+            )
             return test?.ampKeywords?.tests ?: emptyList()
         }
     }
@@ -79,7 +84,10 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> = moshi.adapter(TrackingLinkDetectionFeature::class.java)
         val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
         val ampLinkKeywords = CopyOnWriteArrayList<String>()
-        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(AmpKeywordReferenceTest::class.java.classLoader!!, "reference_tests/tracking_link_detection_reference.json")
+        val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
+            AmpKeywordReferenceTest::class.java.classLoader!!,
+            "reference_tests/tracking_link_detection_reference.json"
+        )
 
         jsonObject.keys().forEach {
             val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonObject.get(it).toString())

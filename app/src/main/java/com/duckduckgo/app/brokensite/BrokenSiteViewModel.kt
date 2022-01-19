@@ -153,7 +153,13 @@ class BrokenSiteViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (BrokenSiteViewModel(pixel.get(), brokenSiteSender.get(), trackingLinkDetector.get()) as T)
+                isAssignableFrom(BrokenSiteViewModel::class.java) -> (
+                    BrokenSiteViewModel(
+                        pixel.get(),
+                        brokenSiteSender.get(),
+                        trackingLinkDetector.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

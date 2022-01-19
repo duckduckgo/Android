@@ -30,8 +30,11 @@ interface TrackingLinkDetectionRepository {
     val ampKeywords: CopyOnWriteArrayList<String>
 }
 
-class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    TrackingLinkDetectionRepository {
+class RealTrackingLinkDetectionRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : TrackingLinkDetectionRepository {
 
     private val trackingLinkDetectionDao: TrackingLinkDetectionDao = database.trackingLinkDetectionDao()
 
@@ -45,7 +48,11 @@ class RealTrackingLinkDetectionRepository(val database: PrivacyConfigDatabase, c
         }
     }
 
-    override fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>) {
+    override fun updateAll(
+        exceptions: List<TrackingLinkExceptionEntity>,
+        ampLinkFormats: List<AmpLinkFormatEntity>,
+        ampKeywords: List<AmpKeywordEntity>
+    ) {
         trackingLinkDetectionDao.updateAll(exceptions, ampLinkFormats, ampKeywords)
         loadToMemory()
     }

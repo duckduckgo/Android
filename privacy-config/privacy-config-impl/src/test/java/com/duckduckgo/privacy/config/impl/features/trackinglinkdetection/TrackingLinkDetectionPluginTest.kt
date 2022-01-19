@@ -59,7 +59,10 @@ class TrackingLinkDetectionPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingLinkDetectionAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText(TrackingLinkDetectionPluginTest::class.java.classLoader!!, "json/tracking_link_detection_disabled.json")
+        val jsonString = FileUtilities.loadText(
+            TrackingLinkDetectionPluginTest::class.java.classLoader!!,
+            "json/tracking_link_detection_disabled.json"
+        )
 
         testee.store(FEATURE_NAME, jsonString)
 

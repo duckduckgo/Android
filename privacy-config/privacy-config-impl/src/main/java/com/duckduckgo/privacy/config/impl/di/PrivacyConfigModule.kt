@@ -197,7 +197,11 @@ class DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideTrackingLinkDetectionRepository(database: PrivacyConfigDatabase, @AppCoroutineScope coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider): TrackingLinkDetectionRepository {
+    fun provideTrackingLinkDetectionRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): TrackingLinkDetectionRepository {
         return RealTrackingLinkDetectionRepository(database, coroutineScope, dispatcherProvider)
     }
 }

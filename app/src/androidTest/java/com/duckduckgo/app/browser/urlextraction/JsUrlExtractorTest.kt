@@ -55,7 +55,10 @@ class JsUrlExtractorTest {
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val onUrlExtracted = mock<(extractedUrl: String?) -> Unit>()
         testee.addUrlExtraction(webView, onUrlExtracted)
-        verify(webView).addJavascriptInterface(any<UrlExtractionJavascriptInterface>(), eq(UrlExtractionJavascriptInterface.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME))
+        verify(webView).addJavascriptInterface(
+            any<UrlExtractionJavascriptInterface>(),
+            eq(UrlExtractionJavascriptInterface.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME)
+        )
     }
 
     @UiThreadTest
