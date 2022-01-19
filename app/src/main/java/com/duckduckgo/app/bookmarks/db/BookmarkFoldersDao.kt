@@ -29,16 +29,31 @@ interface BookmarkFoldersDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(bookmarkFolders: List<BookmarkFolderEntity>)
 
-    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders")
+    @Query(
+        "select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) " +
+            "from bookmark_folders as inner_bookmark_folders " +
+            "where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders"
+    )
     fun getBookmarkFolders(): Flow<List<BookmarkFolder>>
 
     @Query("select * from bookmark_folders")
     fun getBookmarkFoldersSync(): List<BookmarkFolderEntity>
 
-    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
+    @Query(
+        "select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, " +
+            "(select count(*) from bookmark_folders as inner_bookmark_folders " +
+            "where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders " +
+            "from bookmark_folders where bookmark_folders.parentId = :parentId"
+    )
     fun getBookmarkFoldersByParentId(parentId: Long): Flow<List<BookmarkFolder>>
 
-    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
+    @Query(
+        "select *, (select count(*) from bookmarks " +
+            "where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) " +
+            "from bookmark_folders as inner_bookmark_folders " +
+            "where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders " +
+            "from bookmark_folders where bookmark_folders.parentId = :parentId"
+    )
     fun getBookmarkFoldersByParentIdSync(parentId: Long): List<BookmarkFolder>
 
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.id = :parentId")

@@ -23,7 +23,10 @@ class AppTrackerJsonParser {
 
     companion object {
 
-        fun parseAppTrackerJson(moshi: Moshi, json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+        fun parseAppTrackerJson(
+            moshi: Moshi,
+            json: String
+        ): Pair<List<AppTracker>, List<AppTrackerPackage>> {
             val adapter: JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
             val parsed = adapter.fromJson(json)
             val appTrackers = parseAppTrackers(parsed)
@@ -49,7 +52,5 @@ class AppTrackerJsonParser {
                     AppTrackerPackage(packageName = it.key, entityName = it.value)
                 }.map { it.value }
         }
-
     }
-
 }

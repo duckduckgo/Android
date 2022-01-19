@@ -19,25 +19,27 @@ package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface UnprotectedTemporaryRepository {
     fun updateAll(exceptions: List<UnprotectedTemporaryEntity>)
     val exceptions: CopyOnWriteArrayList<UnprotectedTemporaryEntity>
 }
 
-class RealUnprotectedTemporaryRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    UnprotectedTemporaryRepository {
+class RealUnprotectedTemporaryRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : UnprotectedTemporaryRepository {
 
-    private val unprotectedTemporaryDao: UnprotectedTemporaryDao = database.unprotectedTemporaryDao()
+    private val unprotectedTemporaryDao: UnprotectedTemporaryDao =
+        database.unprotectedTemporaryDao()
     override val exceptions = CopyOnWriteArrayList<UnprotectedTemporaryEntity>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
     override fun updateAll(exceptions: List<UnprotectedTemporaryEntity>) {
@@ -47,8 +49,6 @@ class RealUnprotectedTemporaryRepository(val database: PrivacyConfigDatabase, co
 
     private fun loadToMemory() {
         exceptions.clear()
-        unprotectedTemporaryDao.getAll().map {
-            exceptions.add(it)
-        }
+        unprotectedTemporaryDao.getAll().map { exceptions.add(it) }
     }
 }

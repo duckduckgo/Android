@@ -21,10 +21,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels.Companion.DS_PIXELS_PREF_FILE
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -296,6 +296,27 @@ class RealDeviceShieldPixelsTest {
 
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
         verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenDidShowWaitlistDialogThenFirePixels() {
+        deviceShieldPixels.didShowWaitlistDialog()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
+    }
+
+    @Test
+    fun whenWaitlistDialogDismissThenFirePixels() {
+        deviceShieldPixels.didPressWaitlistDialogDismiss()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
+    }
+
+    @Test
+    fun whenWaitlistDialogNotifyMeThenFirePixels() {
+        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
+
+        verify(pixel).fire(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
     }
 
     private fun DeviceShieldPixelNames.notificationVariant(variant: Int): String {

@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.global
 
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
@@ -31,10 +31,14 @@ class AlertingUncaughtExceptionHandler(
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
+    private val appBuildConfig: AppBuildConfig
 ) : Thread.UncaughtExceptionHandler {
 
-    override fun uncaughtException(thread: Thread?, originalException: Throwable?) {
+    override fun uncaughtException(
+        thread: Thread?,
+        originalException: Throwable?
+    ) {
 
         if (shouldRecordExceptionAndCrashApp(originalException)) {
             recordExceptionAndAllowCrash(thread, originalException)
@@ -44,7 +48,6 @@ class AlertingUncaughtExceptionHandler(
         if (shouldCrashApp()) {
             originalHandler.uncaughtException(thread, originalException)
         }
-
     }
 
     /**
@@ -63,9 +66,12 @@ class AlertingUncaughtExceptionHandler(
     /**
      * If the exception is one we don't report on, we still want to see a crash when we're in DEBUG builds for safety we aren't ignoring important issues
      */
-    private fun shouldCrashApp(): Boolean = BuildConfig.DEBUG
+    private fun shouldCrashApp(): Boolean = appBuildConfig.isDebug
 
-    private fun recordExceptionAndAllowCrash(thread: Thread?, originalException: Throwable?) {
+    private fun recordExceptionAndAllowCrash(
+        thread: Thread?,
+        originalException: Throwable?
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
             try {
                 uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)

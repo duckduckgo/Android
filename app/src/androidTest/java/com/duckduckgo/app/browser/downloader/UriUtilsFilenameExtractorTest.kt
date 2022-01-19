@@ -19,16 +19,26 @@ package com.duckduckgo.app.browser.downloader
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.whenever
 
 class UriUtilsFilenameExtractorTest {
 
     private val mockedPixel: Pixel = mock()
-    private val testee: FilenameExtractor = FilenameExtractor(mockedPixel)
+    private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val testee: FilenameExtractor = FilenameExtractor(mockAppBuildConfig, mockedPixel)
+
+    @Before
+    fun setup() {
+        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+    }
 
     @Test
     fun whenUrlEndsWithFilenameAsJpgNoMimeOrContentDispositionThenFilenameShouldBeExtracted() {
@@ -287,7 +297,27 @@ class UriUtilsFilenameExtractorTest {
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
-    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+    @Test
+    fun whenUrlContainsFilenameAndMimeTypeIsTextXPython3AndContentDispositionIsEmptyThenFilenameIsReturned() {
+        val url = """
+            https://ddg-name-test-ubsgiobgibsdgsbklsdjgm.netlify.app/uploads/qwertyuiopasdfghjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnm/bat.py
+        """.trimIndent()
+        val mimeType = "text/x-python3; charset=UTF-8"
+        val contentDisposition = ""
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("bat.py", extractionResult.filename)
+    }
+
+    private fun buildPendingDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -296,5 +326,4 @@ class UriUtilsFilenameExtractorTest {
             userAgent = "aUserAgent"
         )
     }
-
 }

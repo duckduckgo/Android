@@ -58,7 +58,10 @@ class RealSavedSitesExporter(
         return storeHtml(uri, html)
     }
 
-    private fun storeHtml(uri: Uri, content: String): ExportSavedSitesResult {
+    private fun storeHtml(
+        uri: Uri,
+        content: String
+    ): ExportSavedSitesResult {
         return try {
             if (content.isEmpty()) {
                 return ExportSavedSitesResult.NoSavedSitesExported
@@ -87,7 +90,11 @@ class RealSavedSitesExporter(
         return node
     }
 
-    private fun populateNode(parentNode: TreeNode<FolderTreeItem>, parentId: Long, currentDepth: Int) {
+    private fun populateNode(
+        parentNode: TreeNode<FolderTreeItem>,
+        parentId: Long,
+        currentDepth: Int
+    ) {
 
         val bookmarkFolders = bookmarksRepository.getBookmarkFoldersByParentId(parentId)
 

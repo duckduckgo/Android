@@ -17,7 +17,6 @@
 package com.duckduckgo.app.feedback.api
 
 import android.os.Build
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
@@ -26,6 +25,7 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -33,9 +33,18 @@ import java.util.*
 
 interface FeedbackSubmitter {
 
-    suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String)
+    suspend fun sendNegativeFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        openEnded: String
+    )
+
     suspend fun sendPositiveFeedback(openEnded: String?)
-    suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?)
+    suspend fun sendBrokenSiteFeedback(
+        openEnded: String,
+        brokenSite: String?
+    )
+
     suspend fun sendUserRated()
 }
 
@@ -45,9 +54,14 @@ class FireAndForgetFeedbackSubmitter(
     private val apiKeyMapper: SubReasonApiMapper,
     private val statisticsDataStore: StatisticsDataStore,
     private val pixel: Pixel,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
+    private val appBuildConfig: AppBuildConfig
 ) : FeedbackSubmitter {
-    override suspend fun sendNegativeFeedback(mainReason: MainReason, subReason: SubReason?, openEnded: String) {
+    override suspend fun sendNegativeFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        openEnded: String
+    ) {
         Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
 
         val category = categoryFromMainReason(mainReason)
@@ -83,7 +97,10 @@ class FireAndForgetFeedbackSubmitter(
         }
     }
 
-    override suspend fun sendBrokenSiteFeedback(openEnded: String, brokenSite: String?) {
+    override suspend fun sendBrokenSiteFeedback(
+        openEnded: String,
+        brokenSite: String?
+    ) {
         Timber.i("User provided broken site report through feedback, url:{$brokenSite}, comment:{$openEnded}")
 
         val category = categoryFromMainReason(WEBSITES_NOT_LOADING)
@@ -148,7 +165,10 @@ class FireAndForgetFeedbackSubmitter(
         }
     }
 
-    private fun pixelForNegativeFeedback(category: String, subcategory: String): String {
+    private fun pixelForNegativeFeedback(
+        category: String,
+        subcategory: String
+    ): String {
         return String.format(Locale.US, FEEDBACK_NEGATIVE_SUBMISSION.pixelName, NEGATIVE_FEEDBACK, category, subcategory)
     }
 
@@ -157,7 +177,7 @@ class FireAndForgetFeedbackSubmitter(
     }
 
     private fun version(): String {
-        return BuildConfig.VERSION_NAME
+        return appBuildConfig.versionName
     }
 
     private fun atbWithVariant(): String {

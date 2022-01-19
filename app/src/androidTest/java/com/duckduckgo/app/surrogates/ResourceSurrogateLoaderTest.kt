@@ -19,7 +19,7 @@ package com.duckduckgo.app.surrogates
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -36,7 +36,7 @@ class ResourceSurrogateLoaderTest {
     fun setup() {
         resourceSurrogates = ResourceSurrogatesImpl()
         dataStore = ResourceSurrogateDataStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        testee = ResourceSurrogateLoader(TestCoroutineScope(), resourceSurrogates, dataStore)
+        testee = ResourceSurrogateLoader(TestScope(), resourceSurrogates, dataStore)
     }
 
     @Test
@@ -126,5 +126,4 @@ class ResourceSurrogateLoaderTest {
     private fun readFile(filename: String): ByteArray {
         return javaClass.classLoader!!.getResource("binary/surrogates/$filename").readBytes()
     }
-
 }

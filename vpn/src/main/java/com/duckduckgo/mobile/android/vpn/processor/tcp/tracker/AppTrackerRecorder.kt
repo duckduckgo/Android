@@ -18,8 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
@@ -28,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.Executors
@@ -38,8 +38,11 @@ interface AppTrackerRecorder {
     fun insertTracker(vpnTracker: VpnTracker)
 }
 
-@ContributesMultibinding(boundType = VpnServiceCallbacks::class, scope = VpnObjectGraph::class)
-@VpnScope
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnServiceCallbacks::class,
+)
+@SingleInstanceIn(VpnScope::class)
 class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
 
     private val batchedTrackers = mutableListOf<VpnTracker>()
@@ -58,7 +61,10 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()
         coroutineScope.launch(insertionDispatcher) {
@@ -93,10 +99,10 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class AppTrackerRecorderModule {
 
     @Binds
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     abstract fun providesAppTrackerRecorder(batchedAppTrackerRecorder: BatchedAppTrackerRecorder): AppTrackerRecorder
 }

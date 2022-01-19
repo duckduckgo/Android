@@ -25,25 +25,25 @@ import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.SpannedString
-import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
+import android.widget.CompoundButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.BuildConfig
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -73,14 +73,17 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
     private lateinit var trackerBlockedCountView: PastWeekTrackerActivityContentView
 
     private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
     private lateinit var ctaTrackerFaq: View
-    private lateinit var deviceShieldEnabledLabel: TextView
-    private lateinit var deviceShieldDisabledLabel: TextView
+    private lateinit var deviceShieldEnabledLabel: InfoPanel
+    private lateinit var deviceShieldDisabledLabel: InfoPanel
     private lateinit var deviceShieldSwitch: SwitchCompat
     private lateinit var ctaShowAll: View
 
@@ -100,6 +103,10 @@ class DeviceShieldTrackerActivity :
         if (!it.isEmpty()) {
             Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
         }
+    }
+
+    private val enableAppTPSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAppTPToggleSwitched(isChecked)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +151,11 @@ class DeviceShieldTrackerActivity :
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
             when (resultCode) {
                 RESULT_OK -> {
@@ -152,7 +163,7 @@ class DeviceShieldTrackerActivity :
                     return
                 }
                 else -> {
-                    deviceShieldSwitch.quietlySetIsChecked(false, null)
+                    deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
                     Timber.d("Permission not granted")
                 }
             }
@@ -236,6 +247,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchDisableConfirmationDialog() {
+        deviceShieldSwitch.quietlySetIsChecked(true, enableAppTPSwitchListener)
         deviceShieldPixels.didShowDisableTrackingProtectionDialog()
         val dialog = AppTPDisableConfirmationDialog.instance()
         dialog.show(
@@ -250,13 +262,12 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onTurnAppTrackingProtectionOff() {
-        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
+        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
         viewModel.onAppTpManuallyDisabled()
     }
 
     override fun onDisableDialogCancelled() {
         deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
-        deviceShieldSwitch.quietlySetIsChecked(true, null)
     }
 
     private fun launchBetaInstructions() {
@@ -276,17 +287,19 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun startVPN() {
+        deviceShieldSwitch.quietlySetIsChecked(true, enableAppTPSwitchListener)
         TrackerBlockingVpnService.startService(this)
     }
 
     private fun stopDeviceShield() {
+        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
         TrackerBlockingVpnService.stopService(this)
     }
 
     private fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
         // is there a better way to do this?
         if (::deviceShieldSwitch.isInitialized) {
-            deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, null)
+            deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, enableAppTPSwitchListener)
         } else {
             Timber.v("switch view reference not yet initialized; cache value until menu populated")
             deviceShieldCachedState = state.runningState.isRunning
@@ -311,26 +324,28 @@ class DeviceShieldTrackerActivity :
             deviceShieldDisabledLabel.gone()
             deviceShieldEnabledLabel.show()
             deviceShieldEnabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityEnabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         } else {
             deviceShieldEnabledLabel.gone()
             deviceShieldDisabledLabel.show()
             deviceShieldDisabledLabel.apply {
-                text = addClickableLink(
+                setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(R.string.atp_ActivityDisabledLabel)
                 ) { launchFeedback() }
-                movementMethod = LinkMovementMethod.getInstance()
             }
         }
     }
 
-    private fun addClickableLink(annotation: String, text: CharSequence, onClick: () -> Unit): SpannableString {
+    private fun addClickableLink(
+        annotation: String,
+        text: CharSequence,
+        onClick: () -> Unit
+    ): SpannableString {
         val fullText = text as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -372,15 +387,7 @@ class DeviceShieldTrackerActivity :
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
         deviceShieldSwitch = switchMenuItem?.actionView as SwitchCompat
-        deviceShieldSwitch.setOnClickListener {
-            viewModel.onAppTPToggleSwitched(deviceShieldSwitch.isChecked)
-            if (!deviceShieldSwitch.isChecked) {
-                // because we now show a dialog before shutting the vpn down, we want to reset to a positive value
-                // until the user decides to stop it.
-                deviceShieldSwitch.quietlySetIsChecked(true, null)
-            }
-        }
-
+        deviceShieldSwitch.setOnCheckedChangeListener(enableAppTPSwitchListener)
         return true
     }
 
@@ -389,12 +396,12 @@ class DeviceShieldTrackerActivity :
             it.isChecked = viewModel.isCustomDnsServerSet()
             it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
         }
-        menu.findItem(R.id.diagnosticsScreen).isVisible = BuildConfig.DEBUG
-        menu.findItem(R.id.dataScreen).isVisible = BuildConfig.DEBUG
-        menu.findItem(R.id.customDnsServer).isVisible = BuildConfig.DEBUG
+        menu.findItem(R.id.diagnosticsScreen).isVisible = appBuildConfig.isDebug
+        menu.findItem(R.id.dataScreen).isVisible = appBuildConfig.isDebug
+        menu.findItem(R.id.customDnsServer).isVisible = appBuildConfig.isDebug
 
         deviceShieldCachedState?.let { checked ->
-            deviceShieldSwitch.quietlySetIsChecked(checked, null)
+            deviceShieldSwitch.quietlySetIsChecked(checked, enableAppTPSwitchListener)
             deviceShieldCachedState = null
         }
 
@@ -459,11 +466,13 @@ class DeviceShieldTrackerActivity :
         private const val REQUEST_ASK_VPN_PERMISSION = 101
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
-        fun intent(context: Context, onLaunchCallback: ResultReceiver? = null): Intent {
+        fun intent(
+            context: Context,
+            onLaunchCallback: ResultReceiver? = null
+        ): Intent {
             return Intent(context, DeviceShieldTrackerActivity::class.java).apply {
                 putExtra(RESULT_RECEIVER_EXTRA, onLaunchCallback)
             }
         }
     }
-
 }

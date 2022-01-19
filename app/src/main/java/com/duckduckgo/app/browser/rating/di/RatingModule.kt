@@ -29,17 +29,19 @@ import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 class RatingModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     @IntoSet
     fun appEnjoymentManagerObserver(
@@ -51,12 +53,12 @@ class RatingModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun appEnjoymentPromptEmitter(): AppEnjoymentPromptEmitter {
         return AppEnjoymentLiveDataEmitter()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentUserEventRecorder(
         appEnjoymentRepository: AppEnjoymentRepository,
@@ -72,9 +74,18 @@ class RatingModule {
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
         context: Context,
-        onboardingStore: OnboardingStore
+        onboardingStore: OnboardingStore,
+        appBuildConfig: AppBuildConfig
     ): PromptTypeDecider {
-        return InitialPromptTypeDecider(playStoreUtils, searchCountDao, initialPromptDecider, secondaryPromptDecider, context, onboardingStore)
+        return InitialPromptTypeDecider(
+            playStoreUtils,
+            searchCountDao,
+            initialPromptDecider,
+            secondaryPromptDecider,
+            context,
+            onboardingStore,
+            appBuildConfig
+        )
     }
 
     @Provides
@@ -82,13 +93,13 @@ class RatingModule {
         return PlayStoreAndroidUtils(context)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentDao(database: AppDatabase): AppEnjoymentDao {
         return database.appEnjoymentDao()
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun appEnjoymentRepository(appEnjoymentDao: AppEnjoymentDao): AppEnjoymentRepository {
         return AppEnjoymentDatabaseRepository(appEnjoymentDao)
@@ -96,13 +107,19 @@ class RatingModule {
 
     @Named(INITIAL_PROMPT_DECIDER_NAME)
     @Provides
-    fun initialPromptDecider(appDaysUsedRepository: AppDaysUsedRepository, appEnjoymentRepository: AppEnjoymentRepository): ShowPromptDecider {
+    fun initialPromptDecider(
+        appDaysUsedRepository: AppDaysUsedRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
+    ): ShowPromptDecider {
         return InitialPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
 
     @Named(SECONDARY_PROMPT_DECIDER_NAME)
     @Provides
-    fun secondaryPromptDecider(appDaysUsedRepository: AppDaysUsedRepository, appEnjoymentRepository: AppEnjoymentRepository): ShowPromptDecider {
+    fun secondaryPromptDecider(
+        appDaysUsedRepository: AppDaysUsedRepository,
+        appEnjoymentRepository: AppEnjoymentRepository
+    ): ShowPromptDecider {
         return SecondaryPromptDecider(appDaysUsedRepository, appEnjoymentRepository)
     }
 
@@ -110,5 +127,4 @@ class RatingModule {
         private const val INITIAL_PROMPT_DECIDER_NAME = "initial-prompt-decider"
         private const val SECONDARY_PROMPT_DECIDER_NAME = "secondary-prompt-decider"
     }
-
 }

@@ -37,7 +37,7 @@ import com.duckduckgo.app.onboarding.store.isNewUser
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Observable
@@ -54,7 +54,10 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Provider
 
-data class SystemSearchResult(val autocomplete: AutoCompleteResult, val deviceApps: List<DeviceApp>)
+data class SystemSearchResult(
+    val autocomplete: AutoCompleteResult,
+    val deviceApps: List<DeviceApp>
+)
 
 class SystemSearchViewModel(
     private var userStageStore: UserStageStore,
@@ -159,7 +162,8 @@ class SystemSearchViewModel(
         return Observable.zip(
             autoComplete.autoComplete(query),
             Observable.just(deviceAppLookup.query(query)),
-            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult> { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult>
+            { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
                 SystemSearchResult(autocompleteResult, appsResult)
             }
         )
@@ -345,7 +349,7 @@ class SystemSearchViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SystemSearchViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
     private val autoComplete: Provider<AutoCompleteApi>,

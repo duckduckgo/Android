@@ -49,7 +49,8 @@ class DeviceShieldDailyNotificationFactoryTest {
         vpnTrackerDao = db.vpnTrackerDao()
         appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
 
-        factory = DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
+        factory =
+            DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)
     }
 
     @After
@@ -172,8 +173,20 @@ class DeviceShieldDailyNotificationFactoryTest {
         val trackerDomain = "example.com"
         trackerFound(trackerDomain, appContainingTracker = trackingApp1())
         trackerFound(trackerDomain, trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp1())
-        trackerFound(trackerDomain, trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp2(), timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3)))
-        trackerFound(trackerDomain, trackerCompanyId = 1, company = "Google", appContainingTracker = trackingApp3(), timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4)))
+        trackerFound(
+            trackerDomain,
+            trackerCompanyId = 1,
+            company = "Google",
+            appContainingTracker = trackingApp2(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(3))
+        )
+        trackerFound(
+            trackerDomain,
+            trackerCompanyId = 1,
+            company = "Google",
+            appContainingTracker = trackingApp3(),
+            timestamp = DatabaseDateFormatter.bucketByHour(LocalDateTime.now().plusHours(4))
+        )
 
         val notification = factory.dailyNotificationFactory.createDailyDeviceShieldNotification(3)
 
@@ -226,7 +239,6 @@ class DeviceShieldDailyNotificationFactoryTest {
     private fun trackingApp1() = TrackingApp("package1", "app1")
     private fun trackingApp2() = TrackingApp("package2", "app2")
     private fun trackingApp3() = TrackingApp("package3", "app3")
-
 }
 
 private fun DeviceShieldNotificationFactory.DeviceShieldNotification.assertTitleEquals(expected: String) {

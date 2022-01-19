@@ -18,12 +18,12 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.apps.AppCategory
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -53,7 +53,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenOnSubmitBreakageAndNoSelectedItemThenEmitNoCommand() = coroutineRule.runBlocking {
+    fun whenOnSubmitBreakageAndNoSelectedItemThenEmitNoCommand() = runTest {
         viewModel.commands().test {
             viewModel.onSubmitBreakage()
 
@@ -63,7 +63,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenOnSubmitBreakageAndAppSelectedThenEmitLaunchBreakageFormCommand() = coroutineRule.runBlocking {
+    fun whenOnSubmitBreakageAndAppSelectedThenEmitLaunchBreakageFormCommand() = runTest {
         viewModel.commands().test {
             val expectedItem = InstalledApp(packageName = "com.android.ddg", name = "ddg", isSelected = true)
             viewModel.onAppSelected(expectedItem)
@@ -75,7 +75,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() = coroutineRule.runBlocking {
+    fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() = runTest {
         whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             expectNoEvents()
@@ -83,19 +83,22 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenGetInstalledAppsThenEmitState() = coroutineRule.runBlocking {
+    fun whenGetInstalledAppsThenEmitState() = runTest {
         whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             protectedAppsChannel.send(listOf(appWithoutIssues))
             assertEquals(
-                ReportBreakageAppListView.State(listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)), false),
+                ReportBreakageAppListView.State(
+                    listOf(InstalledApp(packageName = appWithoutIssues.packageName, name = appWithoutIssues.name)),
+                    false
+                ),
                 awaitItem()
             )
         }
     }
 
     @Test
-    fun whenGetInstalledAppsAndSelectedAppThenEmitState() = coroutineRule.runBlocking {
+    fun whenGetInstalledAppsAndSelectedAppThenEmitState() = runTest {
         whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name))
@@ -112,7 +115,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() = coroutineRule.runBlocking {
+    fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() = runTest {
         whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = "unknown.package.name", name = appWithIssues.name))
@@ -129,7 +132,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenOnBreakageSubmittedNoExtraInfoThenEmitSendBreakageInfoCommand() = coroutineRule.runBlocking {
+    fun whenOnBreakageSubmittedNoExtraInfoThenEmitSendBreakageInfoCommand() = runTest {
         viewModel.commands().test {
             val selectedApp = InstalledApp("com.package.com", name = "AppName")
             viewModel.onAppSelected(selectedApp)
@@ -145,7 +148,7 @@ class ReportBreakageAppListViewModelTest {
     }
 
     @Test
-    fun whenOnBreakageSubmittedWithExtraInfoThenEmitSendBreakageInfoCommand() = coroutineRule.runBlocking {
+    fun whenOnBreakageSubmittedWithExtraInfoThenEmitSendBreakageInfoCommand() = runTest {
         viewModel.commands().test {
             val selectedApp = InstalledApp("com.package.com", name = "AppName")
             viewModel.onAppSelected(selectedApp)

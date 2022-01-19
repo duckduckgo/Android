@@ -24,10 +24,10 @@ import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 
-/**
- * Composite view to show an item containing a text label and a [ColorDotView].
- */
-class ColorAttributeView @JvmOverloads constructor(
+/** Composite view to show an item containing a text label and a [ColorDotView]. */
+class ColorAttributeView
+@JvmOverloads
+constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -60,20 +60,13 @@ class ColorAttributeView @JvmOverloads constructor(
         colorAttributeTextView = view.findViewById(R.id.color_attribute)
         colorDotView = view.findViewById(R.id.color_dot)
 
-        val a = context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.ColorAttributeView,
-            defStyleAttr,
-            defStyleRes
-        )
-        attributeText = a.getString(
-            R.styleable.ColorAttributeView_android_text
-        ) ?: attributeText
+        val a =
+            context.theme.obtainStyledAttributes(
+                attrs, R.styleable.ColorAttributeView, defStyleAttr, defStyleRes
+            )
+        attributeText = a.getString(R.styleable.ColorAttributeView_android_text) ?: attributeText
         dotFillColor = a.getColor(R.styleable.ColorAttributeView_colorFillColor, dotFillColor)
-        dotStrokeColor = a.getColor(
-            R.styleable.ColorAttributeView_colorStrokeColor,
-            dotStrokeColor
-        )
+        dotStrokeColor = a.getColor(R.styleable.ColorAttributeView_colorStrokeColor, dotStrokeColor)
         a.recycle()
     }
 }

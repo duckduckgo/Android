@@ -1,0 +1,78 @@
+{
+  "reportURL": {
+    "name": "Broken site report testing",
+    "tests": [
+      {
+        "name": "Simple test with a common set of fields",
+        "siteURL": "https://example.test/",
+        "wasUpgraded": true,
+        "category": "content",
+        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+        "surrogates": ["surrogate.domain.test"],
+        "atb": "v123-456g",
+        "blocklistVersion": "abc123",
+        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+        "expectReportURLParams": [
+          {"name": "category", "value": "content"},
+          {"name": "siteUrl", "value": "https%3A%2F%2Fexample.test%2F"},
+          {"name": "upgradedHttps", "value": "true"},
+          {"name": "tds", "value": "abc123"},
+          {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+          {"name": "surrogates", "value": "surrogate.domain.test"}
+        ],
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Making sure that siteURL gets trimmed - path, query and fragment should be dropped",
+        "siteURL": "https://sub.example.test/path/to/thing.html?query=value#item123",
+        "wasUpgraded": false,
+        "category": "paywall",
+        "blockedTrackers": [],
+        "surrogates": [],
+        "atb": "v123-456g",
+        "blocklistVersion": "abc123",
+        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+        "expectReportURLParams": [
+          {"name": "category", "value": "paywall"},
+          {"name": "siteUrl", "value": "https%3A%2F%2Fsub.example.test%2Fpath%2Fto%2Fthing.html"},
+          {"name": "upgradedHttps", "value": "false"},
+          {"name": "tds", "value": "abc123"},
+          {"name": "blockedTrackers", "value": ""},
+          {"name": "surrogates", "value": ""}
+        ],
+        "exceptPlatforms": []
+      },
+      {
+        "name": "Native app specific fields",
+        "siteURL": "http://unsafe.example.test/path/to/thing.html?query=value#item123",
+        "wasUpgraded": false,
+        "category": "images",
+        "blockedTrackers": ["bad.tracker.test", "tracking.test"],
+        "surrogates": ["surrogate.domain.test"],
+        "atb": "v123-456g",
+        "blocklistVersion": "abc123",
+        "manufacturer": "IBM",
+        "model": "305 RAMAC",
+        "os": "12",
+        "gpcEnabled": true,
+        "expectReportURLPrefix": "https://improving.duckduckgo.com/t/epbf",
+        "expectReportURLParams": [
+          {"name": "category", "value": "images"},
+          {"name": "siteUrl", "value": "http%3A%2F%2Funsafe.example.test%2Fpath%2Fto%2Fthing.html"},
+          {"name": "upgradedHttps", "value": "false"},
+          {"name": "tds", "value": "abc123"},
+          {"name": "blockedTrackers", "value": "bad.tracker.test,tracking.test"},
+          {"name": "surrogates", "value": "surrogate.domain.test"},
+          {"name": "manufacturer", "value": "IBM"},
+          {"name": "model", "value": "305 RAMAC"},
+          {"name": "os", "value": "12"},
+          {"name": "gpc", "value": "true"}
+        ],
+        "exceptPlatforms": [
+          "web-extension",
+          "safari-extension"
+        ]
+      }
+    ]
+  }
+}

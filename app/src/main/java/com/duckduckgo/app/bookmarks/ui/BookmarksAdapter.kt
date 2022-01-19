@@ -50,19 +50,28 @@ class BookmarksAdapter(
     object EmptyHint : BookmarksItemTypes
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
 
-    fun setItems(bookmarkItems: List<BookmarkItem>, showEmptyHint: Boolean) {
+    fun setItems(
+        bookmarkItems: List<BookmarkItem>,
+        showEmptyHint: Boolean
+    ) {
         val generatedList = generateNewList(bookmarkItems, showEmptyHint)
         submitList(generatedList)
     }
 
-    private fun generateNewList(value: List<BookmarksItemTypes>, showEmptyHint: Boolean): List<BookmarksItemTypes> {
+    private fun generateNewList(
+        value: List<BookmarksItemTypes>,
+        showEmptyHint: Boolean
+    ): List<BookmarksItemTypes> {
         if (!showEmptyHint) {
             return value
         }
         return if (value.isEmpty()) listOf(EmptyHint) else value
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkScreenViewHolders {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BookmarkScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_TYPE -> {
@@ -77,7 +86,10 @@ class BookmarksAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: BookmarkScreenViewHolders, position: Int) {
+    override fun onBindViewHolder(
+        holder: BookmarkScreenViewHolders,
+        position: Int
+    ) {
         when (holder) {
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
                 holder.update((getItem(position) as BookmarkItem).bookmark)
@@ -147,7 +159,10 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             return uri.baseHost ?: return urlString
         }
 
-        private fun showOverFlowMenu(anchor: View, bookmark: SavedSite.Bookmark) {
+        private fun showOverFlowMenu(
+            anchor: View,
+            bookmark: SavedSite.Bookmark
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {

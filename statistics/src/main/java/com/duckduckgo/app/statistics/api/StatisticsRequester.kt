@@ -38,7 +38,8 @@ class StatisticsRequester(
 ) : StatisticsUpdater {
 
     /**
-     * This should only be called after AppInstallationReferrerStateListener has had a chance to consume referer data
+     * This should only be called after AppInstallationReferrerStateListener has had a chance to
+     * consume referer data
      */
     @SuppressLint("CheckResult")
     override fun initializeAtb() {
@@ -49,14 +50,17 @@ class StatisticsRequester(
 
             val storedAtb = store.atb
             if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
-                Timber.d("Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour")
+                Timber.d(
+                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour"
+                )
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = VariantManager.DEFAULT_VARIANT.key
             }
             return
         }
 
-        service.atb()
+        service
+            .atb()
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
@@ -68,9 +72,7 @@ class StatisticsRequester(
                 service.exti(atbWithVariant)
             }
             .subscribe(
-                {
-                    Timber.d("Atb initialization succeeded")
-                },
+                { Timber.d("Atb initialization succeeded") },
                 {
                     store.clearAtb()
                     Timber.w("Atb initialization failed ${it.localizedMessage}")
@@ -78,7 +80,8 @@ class StatisticsRequester(
             )
     }
 
-    private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean = storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
+    private fun storedAtbFormatNeedsCorrecting(storedAtb: Atb): Boolean =
+        storedAtb.version.endsWith(LEGACY_ATB_FORMAT_SUFFIX)
 
     @SuppressLint("CheckResult")
     override fun refreshSearchRetentionAtb() {
@@ -93,7 +96,8 @@ class StatisticsRequester(
         val fullAtb = atb.formatWithVariant(variantManager.getVariant())
         val retentionAtb = store.searchRetentionAtb ?: atb.version
 
-        service.updateSearchAtb(fullAtb, retentionAtb)
+        service
+            .updateSearchAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -102,9 +106,7 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed() }
                 },
-                {
-                    Timber.v("Search atb refresh failed with error ${it.localizedMessage}")
-                }
+                { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") }
             )
     }
 
@@ -120,7 +122,8 @@ class StatisticsRequester(
         val fullAtb = atb.formatWithVariant(variantManager.getVariant())
         val retentionAtb = store.appRetentionAtb ?: atb.version
 
-        service.updateAppAtb(fullAtb, retentionAtb)
+        service
+            .updateAppAtb(fullAtb, retentionAtb)
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
@@ -129,11 +132,8 @@ class StatisticsRequester(
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed() }
                 },
-                {
-                    Timber.v("App atb refresh failed with error ${it.localizedMessage}")
-                }
+                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") }
             )
-
     }
 
     private fun storeUpdateVersionIfPresent(retrievedAtb: Atb) {

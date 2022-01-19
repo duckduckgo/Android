@@ -19,7 +19,7 @@ package com.duckduckgo.vpn.internal.feature.transparency
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
@@ -61,13 +61,14 @@ class TransparencyModeDebugReceiver(
         fun isTurnOnIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "on"
         }
+
         fun isTurnOffIntent(intent: Intent): Boolean {
             return intent.getStringExtra("turn")?.lowercase() == "off"
         }
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val trackerDetectorInterceptor: TransparencyTrackerDetectorInterceptor
@@ -98,7 +99,10 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Debug receiver TransparencyModeDebugReceiver turning OFF transparency mode")
         trackerDetectorInterceptor.setEnable(false)
         stateRefresherJob.cancel()

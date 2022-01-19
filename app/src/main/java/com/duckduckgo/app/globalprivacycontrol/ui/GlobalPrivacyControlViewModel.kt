@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -80,7 +80,7 @@ class GlobalPrivacyControlViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class GlobalPrivacyControlViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val featureToggle: Provider<FeatureToggle>,
@@ -89,7 +89,13 @@ class GlobalPrivacyControlViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (GlobalPrivacyControlViewModel(pixel.get(), featureToggle.get(), gpc.get()) as T)
+                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (
+                    GlobalPrivacyControlViewModel(
+                        pixel.get(),
+                        featureToggle.get(),
+                        gpc.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

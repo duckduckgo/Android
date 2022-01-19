@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.network
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.blocklist.AppTrackerListService
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -25,7 +25,7 @@ import retrofit2.Retrofit
 import javax.inject.Named
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class VpnNetworkModule {
     @Provides
     fun provideAppTrackerListService(@Named("api") retrofit: Retrofit): AppTrackerListService {

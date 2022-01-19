@@ -31,19 +31,19 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = LifecycleObserver::class
 )
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class ShortcutReceiver @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
@@ -59,7 +59,10 @@ class ShortcutReceiver @Inject constructor(
         context.registerReceiver(this, IntentFilter(ShortcutBuilder.SHORTCUT_ADDED_ACTION))
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(
+        context: Context?,
+        intent: Intent?
+    ) {
         val title = intent?.getStringExtra(SHORTCUT_TITLE_ARG)
 
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {

@@ -20,17 +20,19 @@ package com.duckduckgo.app.browser.tabpreview
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import kotlinx.coroutines.runBlocking
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.io.File
 
+@ExperimentalCoroutinesApi
 class FileBasedWebViewPreviewPersisterTest {
 
     private lateinit var testee: FileBasedWebViewPreviewPersister
@@ -68,7 +70,7 @@ class FileBasedWebViewPreviewPersisterTest {
     }
 
     @Test
-    fun whenDeleteAllCalledThenEntireTabPreviewDirectoryDeleted() = runBlocking<Unit> {
+    fun whenDeleteAllCalledThenEntireTabPreviewDirectoryDeleted() = runTest {
         testee.deleteAll()
         val captor = argumentCaptor<File>()
         verify(mockFileDeleter).deleteDirectory(captor.capture())
@@ -76,14 +78,14 @@ class FileBasedWebViewPreviewPersisterTest {
     }
 
     @Test
-    fun whenDeletingOnlyPreviewForATabThenTabDirectoryRemoved() = runBlocking<Unit> {
+    fun whenDeletingOnlyPreviewForATabThenTabDirectoryRemoved() = runTest {
         val tabId = "ABC-123"
         testee.deletePreviewsForTab(tabId, currentPreviewImage = null)
         verify(mockFileDeleter).deleteDirectory(any())
     }
 
     @Test
-    fun whenDeletingOldPreviewForATabButANewOneExistsThenOnlySinglePreviewImageDeleted() = runBlocking<Unit> {
+    fun whenDeletingOldPreviewForATabButANewOneExistsThenOnlySinglePreviewImageDeleted() = runTest {
         val tabId = "ABC-123"
         val newTabPreviewFilename = "new.jpg"
         val captor = argumentCaptor<List<String>>()
@@ -92,12 +94,18 @@ class FileBasedWebViewPreviewPersisterTest {
         verifyExistingPreviewExcludedFromDeletion(captor.firstValue, newTabPreviewFilename)
     }
 
-    private fun verifyExistingPreviewExcludedFromDeletion(exclusionList: List<String>, newTabPreviewFilename: String) {
+    private fun verifyExistingPreviewExcludedFromDeletion(
+        exclusionList: List<String>,
+        newTabPreviewFilename: String
+    ) {
         assertEquals(1, exclusionList.size)
         assertTrue(exclusionList.contains(newTabPreviewFilename))
     }
 
-    private fun verifyTabIdUsedAsDirectory(tabId: String, path: File) {
+    private fun verifyTabIdUsedAsDirectory(
+        tabId: String,
+        path: File
+    ) {
         assertTrue(path.parent.endsWith(tabId))
     }
 

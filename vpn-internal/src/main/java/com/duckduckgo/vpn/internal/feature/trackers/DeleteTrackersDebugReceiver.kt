@@ -19,7 +19,7 @@ package com.duckduckgo.vpn.internal.feature.trackers
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -50,7 +50,7 @@ class DeleteTrackersDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeleteTrackersDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
@@ -73,8 +73,10 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         receiver?.unregister()
     }
-
 }

@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastHour
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -86,13 +86,27 @@ class PrivacyReportViewModel(
     }
 
     object PrivacyReportView {
-        data class ViewState(val isRunning: Boolean, val hasValueChanged: Boolean, val trackersBlocked: TrackersBlocked, val onboardingComplete: Boolean)
-        data class RunningState(val isRunning: Boolean, val hasValueChanged: Boolean)
-        data class TrackersBlocked(val latestApp: String, val otherAppsSize: Int, val trackers: Int)
+        data class ViewState(
+            val isRunning: Boolean,
+            val hasValueChanged: Boolean,
+            val trackersBlocked: TrackersBlocked,
+            val onboardingComplete: Boolean
+        )
+
+        data class RunningState(
+            val isRunning: Boolean,
+            val hasValueChanged: Boolean
+        )
+
+        data class TrackersBlocked(
+            val latestApp: String,
+            val otherAppsSize: Int,
+            val trackers: Int
+        )
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyReportViewModelFactory @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val deviceShieldPixels: DeviceShieldPixels,

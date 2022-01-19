@@ -28,31 +28,45 @@ class MainReasonAdapter(private val itemClickListener: (FeedbackTypeMainReasonDi
     ListAdapter<FeedbackTypeMainReasonDisplay, MainReasonAdapter.ViewHolder>(DiffCallback()) {
 
     class DiffCallback : DiffUtil.ItemCallback<FeedbackTypeMainReasonDisplay>() {
-        override fun areItemsTheSame(oldItem: FeedbackTypeMainReasonDisplay, newItem: FeedbackTypeMainReasonDisplay): Boolean {
+        override fun areItemsTheSame(
+            oldItem: FeedbackTypeMainReasonDisplay,
+            newItem: FeedbackTypeMainReasonDisplay
+        ): Boolean {
             return oldItem == newItem
         }
 
-        override fun areContentsTheSame(oldItem: FeedbackTypeMainReasonDisplay, newItem: FeedbackTypeMainReasonDisplay): Boolean {
+        override fun areContentsTheSame(
+            oldItem: FeedbackTypeMainReasonDisplay,
+            newItem: FeedbackTypeMainReasonDisplay
+        ): Boolean {
             return oldItem == newItem
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemFeedbackReasonBinding.inflate(inflater, parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int
+    ) {
         holder.bind(getItem(position), itemClickListener)
     }
 
     data class ViewHolder(val binding: ItemFeedbackReasonBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(reason: FeedbackTypeMainReasonDisplay, clickListener: (FeedbackTypeMainReasonDisplay) -> Unit) {
+        fun bind(
+            reason: FeedbackTypeMainReasonDisplay,
+            clickListener: (FeedbackTypeMainReasonDisplay) -> Unit
+        ) {
             binding.reason.text = binding.root.context.getString(reason.listDisplayResId)
             binding.root.setOnClickListener { clickListener(reason) }
         }
     }
-
 }

@@ -26,13 +26,15 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AutomaticDataClearerTest {
 
     private lateinit var testee: AutomaticDataClearer
@@ -42,7 +44,8 @@ class AutomaticDataClearerTest {
     private val mockTimeKeeper: BackgroundTimeKeeper = mock()
     private val mockWorkManager: WorkManager = mock()
     private val pixel: Pixel = mock()
-    private val dataClearerForegroundAppRestartPixel = DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
+    private val dataClearerForegroundAppRestartPixel =
+        DataClearerForegroundAppRestartPixel(InstrumentationRegistry.getInstrumentation().targetContext, pixel)
 
     @UiThreadTest
     @Before
@@ -59,7 +62,7 @@ class AutomaticDataClearerTest {
     /* Clear None tests */
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -72,7 +75,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -85,7 +88,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -98,7 +101,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -111,7 +114,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -124,7 +127,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -137,7 +140,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -150,7 +153,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runBlocking {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenDataNotCleared() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_NONE, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -165,7 +168,7 @@ class AutomaticDataClearerTest {
     /* Clear tabs tests */
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runBlocking<Unit> {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -178,7 +181,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -191,7 +194,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runBlocking<Unit> {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -204,7 +207,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -217,7 +220,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -230,7 +233,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -243,7 +246,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -256,7 +259,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearThenShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -269,7 +272,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -282,7 +285,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotAppExitOnlyAndNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
+    fun whenNotAppExitOnlyAndNotFreshAppLaunchAndEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureEnoughTimePassed()
@@ -295,7 +298,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runBlocking<Unit> {
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppUsedSinceLastClearShouldClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -308,7 +311,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearShouldNotClearTabs() = runBlocking<Unit> {
+    fun whenNotAppExitOnlyAndFreshAppLaunchAndNotEnoughTimePassedAndAppNotUsedSinceLastClearShouldNotClearTabs() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_ONLY, ClearWhenOption.APP_EXIT_OR_15_MINS)
         configureNotEnoughTimePassed()
@@ -323,7 +326,7 @@ class AutomaticDataClearerTest {
     /* Clear Tabs and Data tests */
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -336,7 +339,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -349,7 +352,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -362,7 +365,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = true
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -375,7 +378,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -388,7 +391,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureEnoughTimePassed()
@@ -401,7 +404,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -414,7 +417,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOnlyNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_ONLY)
         configureNotEnoughTimePassed()
@@ -427,7 +430,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOrTimerFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOrTimerFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureNotEnoughTimePassed()
@@ -440,7 +443,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runBlocking<Unit> {
+    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppUsedSinceLastClearThenShouldClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureEnoughTimePassed()
@@ -453,7 +456,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOrTimerNotFreshAppLaunchAndEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureEnoughTimePassed()
@@ -466,7 +469,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureNotEnoughTimePassed()
@@ -479,7 +482,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runBlocking<Unit> {
+    fun whenAppExitOrTimerNotFreshAppLaunchAndNotEnoughTimePassedAppNotUsedSinceLastClearThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
         configureNotEnoughTimePassed()
@@ -492,7 +495,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconJustChangedButAppNotUsedThenShouldNotClear() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndIconJustChangedButAppNotUsedThenShouldNotClear() = runTest {
         val isFreshAppLaunch = false
 
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
@@ -507,7 +510,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenFreshAppLaunchAndIconJustChangedButAppUsedThenShouldClear() = runBlocking<Unit> {
+    fun whenFreshAppLaunchAndIconJustChangedButAppUsedThenShouldClear() = runTest {
         val isFreshAppLaunch = true
 
         configureUserOptions(ClearWhatOption.CLEAR_TABS_AND_DATA, ClearWhenOption.APP_EXIT_OR_5_MINS)
@@ -522,7 +525,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndIconNotChangedThenShouldClear() = runTest {
         val isFreshAppLaunch = false
 
         configureAppIconNotChanged()
@@ -538,7 +541,7 @@ class AutomaticDataClearerTest {
     }
 
     @Test
-    fun whenNotFreshAppLaunchAndIconNotChangedAppUsedThenShouldClear() = runBlocking<Unit> {
+    fun whenNotFreshAppLaunchAndIconNotChangedAppUsedThenShouldClear() = runTest {
         val isFreshAppLaunch = false
 
         configureAppIconNotChanged()
@@ -553,7 +556,10 @@ class AutomaticDataClearerTest {
         }
     }
 
-    private fun configureUserOptions(whatOption: ClearWhatOption, whenOption: ClearWhenOption) {
+    private fun configureUserOptions(
+        whatOption: ClearWhatOption,
+        whenOption: ClearWhenOption
+    ) {
         whenever(mockSettingsDataStore.automaticallyClearWhenOption).thenReturn(whenOption)
         whenever(mockSettingsDataStore.automaticallyClearWhatOption).thenReturn(whatOption)
     }

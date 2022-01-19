@@ -24,7 +24,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -122,7 +122,10 @@ class DefaultBrowserPageViewModel(
         }
     }
 
-    private fun reduceToNewState(origin: Origin, navigateToBrowser: Boolean = false) {
+    private fun reduceToNewState(
+        origin: Origin,
+        navigateToBrowser: Boolean = false
+    ) {
         val newViewState = nextViewState(origin)
 
         if (newViewState == null || navigateToBrowser) {
@@ -200,7 +203,7 @@ class DefaultBrowserPageViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DefaultBrowserPageViewModelFactory @Inject constructor(
     private val defaultBrowserDetector: Provider<DefaultBrowserDetector>,
     private val pixel: Provider<Pixel>,
@@ -209,7 +212,13 @@ class DefaultBrowserPageViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector.get(), pixel.get(), installStore.get()) as T)
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (
+                    DefaultBrowserPageViewModel(
+                        defaultBrowserDetector.get(),
+                        pixel.get(),
+                        installStore.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

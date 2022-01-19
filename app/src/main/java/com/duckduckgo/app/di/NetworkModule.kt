@@ -27,6 +27,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.AppUrl.Url
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.api.*
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.global.plugins.pixel.PixelInterceptorPlugin
@@ -38,12 +39,15 @@ import com.duckduckgo.app.surrogates.api.ResourceSurrogateListService
 import com.duckduckgo.app.survey.api.SurveyService
 import com.duckduckgo.app.trackerdetection.api.TrackerListService
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.privacy.config.api.Gpc
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -55,13 +59,12 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import timber.log.Timber
 import java.io.File
 import javax.inject.Named
-import javax.inject.Singleton
 
 @Module
 class NetworkModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("api")
     fun apiOkHttpClient(
         context: Context,
@@ -81,7 +84,7 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
     fun pixelOkHttpClient(
         apiRequestInterceptor: ApiRequestInterceptor,
@@ -105,9 +108,12 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("api")
-    fun apiRetrofit(@Named("api") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun apiRetrofit(
+        @Named("api") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -118,9 +124,12 @@ class NetworkModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Named("nonCaching")
-    fun nonCachingRetrofit(@Named("nonCaching") okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
+    fun nonCachingRetrofit(
+        @Named("nonCaching") okHttpClient: OkHttpClient,
+        moshi: Moshi
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(Url.API)
             .client(okHttpClient)
@@ -132,9 +141,10 @@ class NetworkModule {
     @Provides
     fun apiRequestInterceptor(
         context: Context,
-        userAgentProvider: UserAgentProvider
+        userAgentProvider: UserAgentProvider,
+        appBuildConfig: AppBuildConfig
     ): ApiRequestInterceptor {
-        return ApiRequestInterceptor(context, userAgentProvider)
+        return ApiRequestInterceptor(context, userAgentProvider, appBuildConfig)
     }
 
     @Provides
@@ -179,9 +189,14 @@ class NetworkModule {
         pixel: Pixel,
         gpc: Gpc,
         featureToggle: FeatureToggle,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appBuildConfig: AppBuildConfig,
+        dispatcherProvider: DispatcherProvider
     ): BrokenSiteSender =
-        BrokenSiteSubmitter(statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle, pixel, appCoroutineScope)
+        BrokenSiteSubmitter(
+            statisticsStore, variantManager, tdsMetadataDao, gpc, featureToggle,
+            pixel, appCoroutineScope, appBuildConfig, dispatcherProvider
+        )
 
     @Provides
     fun surveyService(@Named("api") retrofit: Retrofit): SurveyService =
@@ -194,9 +209,10 @@ class NetworkModule {
         apiKeyMapper: SubReasonApiMapper,
         statisticsStore: StatisticsDataStore,
         pixel: Pixel,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        appBuildConfig: AppBuildConfig
     ): FeedbackSubmitter =
-        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope)
+        FireAndForgetFeedbackSubmitter(feedbackService, variantManager, apiKeyMapper, statisticsStore, pixel, appCoroutineScope, appBuildConfig)
 
     @Provides
     fun feedbackService(@Named("api") retrofit: Retrofit): FeedbackService =

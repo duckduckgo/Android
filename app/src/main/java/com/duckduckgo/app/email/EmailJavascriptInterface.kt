@@ -47,7 +47,11 @@ class EmailJavascriptInterface(
     }
 
     @JavascriptInterface
-    fun storeCredentials(token: String, username: String, cohort: String) {
+    fun storeCredentials(
+        token: String,
+        username: String,
+        cohort: String
+    ) {
         if (isUrlFromDuckDuckGoEmail()) {
             emailManager.storeCredentials(token, username, cohort)
         }

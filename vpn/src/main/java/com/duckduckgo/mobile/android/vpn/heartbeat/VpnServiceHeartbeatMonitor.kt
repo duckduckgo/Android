@@ -24,7 +24,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class VpnServiceHeartbeatMonitorModule {
     @Provides
     @IntoSet
@@ -69,7 +69,10 @@ class VpnServiceHeartbeatMonitor(
         Companion.startHearbeatMonitor(workManager)
     }
 
-    class VpnServiceHeartbeatMonitorWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class VpnServiceHeartbeatMonitorWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var vpnPhoenixDao: VpnPhoenixDao
         lateinit var vpnHeartBeatDao: VpnHeartBeatDao
         lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -137,7 +140,10 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
     @Inject
     lateinit var workManager: WorkManager
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         AndroidInjection.inject(this, context)
 
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {

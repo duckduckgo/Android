@@ -1,0 +1,176 @@
+{
+  "readme": "This configuration has all features disabled.",
+  "features": {
+    "https": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "contentBlocking": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        },
+        {
+          "domain": "dont.block.co.uk",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "trackerAllowlist": {
+      "state": "disabled",
+      "settings": {
+        "allowlistedTrackers": {}
+      },
+      "exceptions": []
+    },
+    "trackingCookies3p": {
+      "state": "disabled",
+      "settings": {
+        "excludedCookieDomains": [
+          {
+            "domain": "hangouts.google.com",
+            "reason": "Site breakage"
+          }
+        ]
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "trackingCookies1p": {
+      "state": "disabled",
+      "settings": {
+        "firstPartyTrackerCookiePolicy": {
+          "threshold": 86400,
+          "maxAge": 86400
+        }
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "clickToPlay": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingCanvas": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingAudio": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingTemporaryStorage": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "referrer": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingBattery": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingScreenSize": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "fingerprintingHardware": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "floc": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "gpc": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "autofill": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    },
+    "eme": {
+      "state": "disabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Exception should not alter feature's 'disabled' state"
+        }
+      ]
+    }
+  },
+  "version": 1635943904459,
+  "unprotectedTemporary": []
+}

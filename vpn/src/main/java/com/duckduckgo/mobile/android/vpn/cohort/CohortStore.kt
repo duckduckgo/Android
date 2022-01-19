@@ -20,15 +20,15 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
@@ -48,7 +48,7 @@ interface CohortStore {
 }
 
 @ContributesBinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = CohortStore::class
 )
 class RealCohortStore @Inject constructor(
@@ -78,7 +78,10 @@ class RealCohortStore @Inject constructor(
         setCohortLocalDate(LocalDate.now())
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         // noop
     }
 
@@ -89,10 +92,10 @@ class RealCohortStore @Inject constructor(
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class CohortStoreModule {
     @Binds
     @IntoSet
-    @VpnScope
+    @SingleInstanceIn(VpnScope::class)
     abstract fun bindCohortStore(realCohortStore: RealCohortStore): VpnServiceCallbacks
 }

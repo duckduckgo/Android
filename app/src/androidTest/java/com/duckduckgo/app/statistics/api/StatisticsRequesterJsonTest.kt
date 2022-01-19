@@ -28,8 +28,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.statistics.store.StatisticsSharedPreferences
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -314,16 +314,22 @@ class StatisticsRequesterJsonTest {
         assertEquals("1", testParam)
     }
 
-    private fun queueResponseFromFile(filename: String, responseCode: Int = 200) {
+    private fun queueResponseFromFile(
+        filename: String,
+        responseCode: Int = 200
+    ) {
         val response = MockResponse()
-            .setBody(loadText("$JSON_DIR/$filename"))
+            .setBody(loadText(StatisticsRequesterJsonTest::class.java.classLoader!!, "$JSON_DIR/$filename"))
             .setResponseCode(responseCode)
 
         queueResponse(response)
     }
 
     @Suppress("SameParameterValue")
-    private fun queueResponseFromString(responseBody: String, responseCode: Int = 200) {
+    private fun queueResponseFromString(
+        responseBody: String,
+        responseCode: Int = 200
+    ) {
         val response = MockResponse()
             .setBody(responseBody)
             .setResponseCode(responseCode)

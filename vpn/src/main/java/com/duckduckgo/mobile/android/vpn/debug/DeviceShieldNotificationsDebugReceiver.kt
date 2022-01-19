@@ -24,8 +24,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.mobile.android.vpn.BuildConfig
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.ui.notification.*
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -53,14 +53,18 @@ class DeviceShieldNotificationsDebugReceiver(
         context.registerReceiver(this, IntentFilter(intentAction))
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val context: Context,
+    private val appBuildConfig: AppBuildConfig,
     private val deviceShieldNotificationFactory: DeviceShieldNotificationFactory,
     private val notificationManagerCompat: NotificationManagerCompat,
     private val weeklyNotificationPressedHandler: WeeklyNotificationPressedHandler,
@@ -71,7 +75,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun register() {
-        if (!BuildConfig.DEBUG) {
+        if (!appBuildConfig.isDebug) {
             Timber.i("Will not register DeviceShieldNotificationsDebugReceiver, not in DEBUG mode")
             return
         }

@@ -158,6 +158,19 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import android.content.pm.ResolveInfo
+import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
+import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
@@ -359,7 +372,11 @@ class BrowserTabFragment :
         decorator = BrowserTabFragmentDecorator()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_browser_tab, container, false)
     }
 
@@ -471,7 +488,10 @@ class BrowserTabFragment :
         fragment?.dismiss()
     }
 
-    private fun addHomeShortcut(homeShortcut: Command.AddHomeShortcut, context: Context) {
+    private fun addHomeShortcut(
+        homeShortcut: Command.AddHomeShortcut,
+        context: Context
+    ) {
         shortcutBuilder.requestPinShortcut(context, homeShortcut)
     }
 
@@ -590,7 +610,10 @@ class BrowserTabFragment :
         viewModel.onUserSubmittedQuery(query)
     }
 
-    private fun navigate(url: String, headers: Map<String, String>) {
+    private fun navigate(
+        url: String,
+        headers: Map<String, String>
+    ) {
         hideKeyboard()
         renderer.hideFindInPage()
         viewModel.registerDaxBubbleCtaDismissed()
@@ -644,7 +667,7 @@ class BrowserTabFragment :
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
-                openExternalDialog(intent, null, false)
+                openExternalDialog(intent = intent, fallbackUrl = null, fallbackIntent = null, useFirstActivityFound = false)
             }
             is Command.SendEmail -> {
                 val intent = Intent(Intent.ACTION_SENDTO)
@@ -693,7 +716,13 @@ class BrowserTabFragment :
                 openAppLink(it.appLink)
             }
             is Command.HandleNonHttpAppLink -> {
-                openExternalDialog(it.nonHttpAppLink.intent, it.nonHttpAppLink.fallbackUrl, false, it.headers)
+                openExternalDialog(
+                    intent = it.nonHttpAppLink.intent,
+                    fallbackUrl = it.nonHttpAppLink.fallbackUrl,
+                    fallbackIntent = it.nonHttpAppLink.fallbackIntent,
+                    useFirstActivityFound = false,
+                    headers = it.headers
+                )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> launchAddWidget()
@@ -781,11 +810,17 @@ class BrowserTabFragment :
     }
 
     private fun locationPermissionsHaveNotBeenGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+        return ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
     }
 
-    private fun checkSystemLocationPermission(domain: String, deniedForever: Boolean) {
+    private fun checkSystemLocationPermission(
+        domain: String,
+        deniedForever: Boolean
+    ) {
         if (locationPermissionsHaveNotBeenGranted()) {
             if (deniedForever) {
                 viewModel.onSystemLocationPermissionDeniedOneTime()
@@ -830,7 +865,10 @@ class BrowserTabFragment :
 
     private fun showDomainHasLocationPermission(domain: String) {
         val snackbar =
-            rootView.makeSnackbarWithNoBottomInset(getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()), Snackbar.LENGTH_SHORT)
+            rootView.makeSnackbarWithNoBottomInset(
+                getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
+                Snackbar.LENGTH_SHORT
+            )
         snackbar.view.setOnClickListener {
             browserActivity?.launchLocationSettings()
         }
@@ -890,7 +928,10 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.APP_LINKS_SNACKBAR_SHOWN)
                 }
 
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                override fun onDismissed(
+                    transientBottomBar: Snackbar?,
+                    event: Int
+                ) {
                     super.onDismissed(transientBottomBar, event)
                 }
             })
@@ -930,7 +971,11 @@ class BrowserTabFragment :
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
-    private fun getChooserIntent(url: String?, title: String, excludedComponents: List<ComponentName>): Intent {
+    private fun getChooserIntent(
+        url: String?,
+        title: String,
+        excludedComponents: List<ComponentName>
+    ): Intent {
         val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
         val chooserIntent = Intent.createChooser(urlIntent, title)
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
@@ -940,6 +985,7 @@ class BrowserTabFragment :
     private fun openExternalDialog(
         intent: Intent,
         fallbackUrl: String? = null,
+        fallbackIntent: Intent? = null,
         useFirstActivityFound: Boolean = true,
         headers: Map<String, String> = emptyMap()
     ) {
@@ -948,27 +994,47 @@ class BrowserTabFragment :
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
-                if (fallbackUrl != null) {
-                    webView?.loadUrl(fallbackUrl, headers)
-                } else {
-                    showToast(R.string.unableToOpenLink)
+                when {
+                    fallbackIntent != null -> {
+                        val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
+                        launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound)
+                    }
+                    fallbackUrl != null -> {
+                        webView?.loadUrl(fallbackUrl, headers)
+                    }
+                    else -> {
+                        showToast(R.string.unableToOpenLink)
+                    }
                 }
             } else {
-                if (activities.size == 1 || useFirstActivityFound) {
-                    val activity = activities.first()
-                    val appTitle = activity.loadLabel(pm)
-                    Timber.i("Exactly one app available for intent: $appTitle")
-                    launchExternalAppDialog(it) { it.startActivity(intent) }
-                } else {
-                    val title = getString(R.string.openExternalApp)
-                    val intentChooser = Intent.createChooser(intent, title)
-                    launchExternalAppDialog(it) { it.startActivity(intentChooser) }
-                }
+                launchDialogForIntent(it, pm, intent, activities, useFirstActivityFound)
             }
         }
     }
 
-    private fun askToFireproofWebsite(context: Context, fireproofWebsite: FireproofWebsiteEntity) {
+    private fun launchDialogForIntent(
+        context: Context,
+        pm: PackageManager?,
+        intent: Intent,
+        activities: List<ResolveInfo>,
+        useFirstActivityFound: Boolean
+    ) {
+        if (activities.size == 1 || useFirstActivityFound) {
+            val activity = activities.first()
+            val appTitle = activity.loadLabel(pm)
+            Timber.i("Exactly one app available for intent: $appTitle")
+            launchExternalAppDialog(context) { context.startActivity(intent) }
+        } else {
+            val title = getString(R.string.openExternalApp)
+            val intentChooser = Intent.createChooser(intent, title)
+            launchExternalAppDialog(context) { context.startActivity(intentChooser) }
+        }
+    }
+
+    private fun askToFireproofWebsite(
+        context: Context,
+        fireproofWebsite: FireproofWebsiteEntity
+    ) {
         val isShowing = loginDetectionDialog?.isShowing
 
         if (isShowing != true) {
@@ -1005,7 +1071,10 @@ class BrowserTabFragment :
         viewModel.onDisableLoginDetectionDialogShown()
     }
 
-    private fun launchExternalAppDialog(context: Context, onClick: () -> Unit) {
+    private fun launchExternalAppDialog(
+        context: Context,
+        onClick: () -> Unit
+    ) {
         val isShowing = alertDialog?.isShowing
 
         if (isShowing != true) {
@@ -1029,13 +1098,20 @@ class BrowserTabFragment :
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == REQUEST_CODE_CHOOSE_FILE) {
             handleFileUploadResult(resultCode, data)
         }
     }
 
-    private fun handleFileUploadResult(resultCode: Int, intent: Intent?) {
+    private fun handleFileUploadResult(
+        resultCode: Int,
+        intent: Intent?
+    ) {
         if (resultCode != RESULT_OK || intent == null) {
             Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
             pendingUploadTask?.onReceiveValue(null)
@@ -1059,7 +1135,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun saveBasicAuthCredentials(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
+    private fun saveBasicAuthCredentials(
+        request: BasicAuthenticationRequest,
+        credentials: BasicAuthenticationCredentials
+    ) {
         webView?.let {
             webViewHttpAuthStore.setHttpAuthUsernamePassword(
                 it,
@@ -1107,7 +1186,10 @@ class BrowserTabFragment :
         quickAccessRecyclerView.disableAnimation()
     }
 
-    private fun createQuickAccessItemHolder(recyclerView: RecyclerView, apapter: FavoritesQuickAccessAdapter): ItemTouchHelper {
+    private fun createQuickAccessItemHolder(
+        recyclerView: RecyclerView,
+        apapter: FavoritesQuickAccessAdapter
+    ): ItemTouchHelper {
         return ItemTouchHelper(
             QuickAccessDragTouchItemListener(
                 apapter,
@@ -1123,7 +1205,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createQuickAccessAdapter(originPixel: AppPixelName, onMoveListener: (RecyclerView.ViewHolder) -> Unit): FavoritesQuickAccessAdapter {
+    private fun createQuickAccessAdapter(
+        originPixel: AppPixelName,
+        onMoveListener: (RecyclerView.ViewHolder) -> Unit
+    ): FavoritesQuickAccessAdapter {
         return FavoritesQuickAccessAdapter(
             this, faviconManager, onMoveListener,
             {
@@ -1290,7 +1375,7 @@ class BrowserTabFragment :
         val metrics = resources.displayMetrics
         val distanceToTrigger = (DEFAULT_CIRCLE_TARGET_TIMES_1_5 * metrics.density).toInt()
         swipeRefreshContainer.setDistanceToTriggerSync(distanceToTrigger)
-        swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), R.color.cornflowerBlue))
+        swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.cornflowerBlue))
 
         swipeRefreshContainer.setOnRefreshListener {
             onRefreshRequested()
@@ -1316,7 +1401,11 @@ class BrowserTabFragment :
         omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, view: View, menuInfo: ContextMenu.ContextMenuInfo?) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        view: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
         webView?.hitTestResult?.let {
             val target = getLongPressTarget(it) ?: return
             viewModel.userLongPressedInWebView(target, menu)
@@ -1417,7 +1506,10 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.FIREPROOF_SNACKBAR_SHOWN)
                 }
 
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                override fun onDismissed(
+                    transientBottomBar: Snackbar?,
+                    event: Int
+                ) {
                     super.onDismissed(transientBottomBar, event)
                 }
             })
@@ -1437,7 +1529,11 @@ class BrowserTabFragment :
         }
     }
 
-    override fun onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Boolean) {
+    override fun onFindResultReceived(
+        activeMatchOrdinal: Int,
+        numberOfMatches: Int,
+        isDoneCounting: Boolean
+    ) {
         viewModel.onFindResultsReceived(activeMatchOrdinal, numberOfMatches)
     }
 
@@ -1476,7 +1572,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun refreshUserAgent(url: String?, isDesktop: Boolean) {
+    private fun refreshUserAgent(
+        url: String?,
+        isDesktop: Boolean
+    ) {
         val currentAgent = webView?.settings?.userAgentString
         val newAgent = userAgentProvider.userAgent(url, isDesktop)
         if (newAgent != currentAgent) {
@@ -1559,7 +1658,12 @@ class BrowserTabFragment :
         }
     }
 
-    private fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+    private fun requestFileDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
+        requestUserConfirmation: Boolean
+    ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -1575,7 +1679,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun requestImageDownload(url: String, requestUserConfirmation: Boolean) {
+    private fun requestImageDownload(
+        url: String,
+        requestUserConfirmation: Boolean
+    ) {
         pendingFileDownload = PendingFileDownload(
             url = url,
             userAgent = userAgentProvider.userAgent(),
@@ -1628,7 +1735,11 @@ class BrowserTabFragment :
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         when (requestCode) {
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1698,7 +1809,10 @@ class BrowserTabFragment :
         viewModel.onUserClickCtaSecondaryButton()
     }
 
-    private fun launchHideTipsDialog(context: Context, cta: Cta) {
+    private fun launchHideTipsDialog(
+        context: Context,
+        cta: Cta
+    ) {
         AlertDialog.Builder(context)
             .setTitle(R.string.hideTipsTitle)
             .setMessage(getString(R.string.hideTipsText))
@@ -1760,7 +1874,11 @@ class BrowserTabFragment :
 
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
-        fun newInstance(tabId: String, query: String? = null, skipHome: Boolean): BrowserTabFragment {
+        fun newInstance(
+            tabId: String,
+            query: String? = null,
+            skipHome: Boolean
+        ): BrowserTabFragment {
             val fragment = BrowserTabFragment()
             val args = Bundle()
             args.putString(TAB_ID_ARG, tabId)
@@ -2133,7 +2251,10 @@ class BrowserTabFragment :
 
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
-                Timber.v("Accessibility: UpdateAccessibilitySetting fontSizeChanged from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}")
+                Timber.v(
+                    "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
+                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}"
+                )
 
                 webView.settings.textZoom = viewState.fontSize.toInt()
             }
@@ -2145,7 +2266,10 @@ class BrowserTabFragment :
             }
         }
 
-        private fun renderPopupMenus(browserShowing: Boolean, viewState: BrowserViewState) {
+        private fun renderPopupMenus(
+            browserShowing: Boolean,
+            viewState: BrowserViewState
+        ) {
             popupMenu.contentView.apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
                 forwardPopupMenuItem.isEnabled = viewState.canGoForward
@@ -2235,7 +2359,10 @@ class BrowserTabFragment :
             }
         }
 
-        private fun showCta(configuration: Cta, favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showCta(
+            configuration: Cta,
+            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+        ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
@@ -2408,7 +2535,10 @@ class BrowserTabFragment :
             focusDummy.requestFocus()
         }
 
-        private fun shouldUpdateOmnibarTextInput(viewState: OmnibarViewState, omnibarInput: String?) =
+        private fun shouldUpdateOmnibarTextInput(
+            viewState: OmnibarViewState,
+            omnibarInput: String?
+        ) =
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
 
@@ -2429,7 +2559,10 @@ class BrowserTabFragment :
         }
     }
 
-    override fun replaceExistingFile(file: File?, pendingFileDownload: PendingFileDownload) {
+    override fun replaceExistingFile(
+        file: File?,
+        pendingFileDownload: PendingFileDownload
+    ) {
         Timber.i("Deleting existing file: $file")
         runCatching { file?.delete() }
         continueDownload(pendingFileDownload)
@@ -2446,7 +2579,10 @@ class BrowserTabFragment :
         }
     }
 
-    private fun createIntentToOpenFile(context: Context, file: File): Intent? {
+    private fun createIntentToOpenFile(
+        context: Context,
+        file: File
+    ): Intent? {
         val uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
         val mime = activity?.contentResolver?.getType(uri) ?: return null
         val intent = Intent(Intent.ACTION_VIEW)
@@ -2471,7 +2607,10 @@ class BrowserTabFragment :
         }
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         viewModel.onSiteLocationPermissionSelected(domain, permission)
     }
 

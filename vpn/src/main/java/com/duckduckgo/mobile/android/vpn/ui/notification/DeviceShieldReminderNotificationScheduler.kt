@@ -25,21 +25,21 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@VpnScope
-@ContributesMultibinding(VpnObjectGraph::class)
+@SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(VpnScope::class)
 class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
@@ -54,7 +54,10 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         enableReminderReceiver()
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         when (vpnStopReason) {
             is VpnStopReason.SelfStop -> onVPNManuallyStopped()
             else -> onVPNUndesiredStop()

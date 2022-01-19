@@ -20,19 +20,22 @@ import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class VariantModule {
 
     @Provides
-    @Singleton
-    fun variantManager(statisticsDataStore: StatisticsDataStore, weightedRandomizer: WeightedRandomizer): VariantManager =
+    @SingleInstanceIn(AppScope::class)
+    fun variantManager(
+        statisticsDataStore: StatisticsDataStore,
+        weightedRandomizer: WeightedRandomizer
+    ): VariantManager =
         ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
 
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
-
 }

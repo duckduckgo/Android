@@ -25,9 +25,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.TdsJson
-import com.duckduckgo.app.trackerdetection.db.*
+import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +39,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @WorkerThread
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TrackerDataLoader @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val trackerDetector: TrackerDetector,
@@ -74,7 +77,10 @@ class TrackerDataLoader @Inject constructor(
         persistTds(DEFAULT_ETAG, adapter.fromJson(json)!!)
     }
 
-    fun persistTds(eTag: String, tdsJson: TdsJson) {
+    fun persistTds(
+        eTag: String,
+        tdsJson: TdsJson
+    ) {
         appDatabase.runInTransaction {
             tdsMetadataDao.tdsDownloadSuccessful(TdsMetadata(eTag = eTag))
             tdsEntityDao.updateAll(tdsJson.jsonToEntities())

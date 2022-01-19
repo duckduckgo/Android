@@ -31,7 +31,12 @@ import kotlinx.coroutines.flow.map
 interface BookmarksRepository {
     suspend fun insert(bookmarkFolder: BookmarkFolder): Long
     suspend fun insert(bookmark: Bookmark)
-    suspend fun insert(title: String, url: String, parentId: Long = 0): Bookmark
+    suspend fun insert(
+        title: String,
+        url: String,
+        parentId: Long = 0
+    ): Bookmark
+
     suspend fun update(bookmarkFolder: BookmarkFolder)
     suspend fun update(bookmark: Bookmark)
     suspend fun delete(bookmark: Bookmark)
@@ -40,7 +45,12 @@ interface BookmarksRepository {
     suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder?
     suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
-    suspend fun getFlatFolderStructure(selectedFolderId: Long, currentFolder: BookmarkFolder?, rootFolderName: String): List<BookmarkFolderItem>
+    suspend fun getFlatFolderStructure(
+        selectedFolderId: Long,
+        currentFolder: BookmarkFolder?,
+        rootFolderName: String
+    ): List<BookmarkFolderItem>
+
     suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>>
     fun bookmarks(): Flow<List<Bookmark>>
     fun getBookmark(url: String): Bookmark?
@@ -61,7 +71,11 @@ class BookmarksDataRepository(
         bookmarksDao.insert(BookmarkEntity(title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId))
     }
 
-    override suspend fun insert(title: String, url: String, parentId: Long): Bookmark {
+    override suspend fun insert(
+        title: String,
+        url: String,
+        parentId: Long
+    ): Bookmark {
         val id = bookmarksDao.insert(BookmarkEntity(title = title, url = url, parentId = 0))
         return Bookmark(id = id, title = title, url = url, parentId = parentId)
     }
@@ -122,7 +136,10 @@ class BookmarksDataRepository(
         return getSubFolders(bookmarkFolder, parentGroupings)
     }
 
-    private fun getSubFolders(bookmarkFolder: BookmarkFolder, parentGroupings: Map<Long, List<BookmarkFolder>>): List<BookmarkFolder> {
+    private fun getSubFolders(
+        bookmarkFolder: BookmarkFolder,
+        parentGroupings: Map<Long, List<BookmarkFolder>>
+    ): List<BookmarkFolder> {
         return listOf(bookmarkFolder) + (parentGroupings[bookmarkFolder.id] ?: emptyList()).flatMap {
             getSubFolders(it, parentGroupings)
         }
@@ -171,9 +188,13 @@ class BookmarksDataRepository(
         return addBookmarksAsRoot(folderStructure, rootFolderName, selectedFolderId)
     }
 
-    private fun removeCurrentFolderBranch(currentFolder: BookmarkFolder?, bookmarkFolders: List<BookmarkFolder>): List<BookmarkFolder> {
+    private fun removeCurrentFolderBranch(
+        currentFolder: BookmarkFolder?,
+        bookmarkFolders: List<BookmarkFolder>
+    ): List<BookmarkFolder> {
         currentFolder?.let {
-            val bookmarkFolderBranch = getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
+            val bookmarkFolderBranch =
+                getBranchFolders(BookmarkFolder(id = currentFolder.id, name = currentFolder.name, parentId = currentFolder.parentId))
             return bookmarkFolders.minus(bookmarkFolderBranch)
         }
         return bookmarkFolders
@@ -193,7 +214,11 @@ class BookmarksDataRepository(
             (bookmarkFolders).flatMap { getSubFoldersWithDepth(it, parentGroupings, depth + 1, selectedFolderId) }
     }
 
-    private fun addBookmarksAsRoot(folderStructure: List<BookmarkFolderItem>, rootFolder: String, selectedFolderId: Long) =
+    private fun addBookmarksAsRoot(
+        folderStructure: List<BookmarkFolderItem>,
+        rootFolder: String,
+        selectedFolderId: Long
+    ) =
         listOf(BookmarkFolderItem(0, BookmarkFolder(0, rootFolder, -1), isSelected = selectedFolderId == 0L)) + folderStructure
 
     override suspend fun fetchBookmarksAndFolders(parentId: Long?): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
@@ -209,8 +234,7 @@ class BookmarksDataRepository(
         bookmarkFoldersFlow: Flow<List<BookmarkFolder>>
     ): Flow<Pair<List<Bookmark>, List<BookmarkFolder>>> {
 
-        return bookmarksFlow.combine(bookmarkFoldersFlow) {
-            bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
+        return bookmarksFlow.combine(bookmarkFoldersFlow) { bookmarks: List<BookmarkEntity>, folders: List<BookmarkFolder> ->
 
             val mappedBookmarks = bookmarks.map {
                 Bookmark(it.id, it.title ?: "", it.url, it.parentId)

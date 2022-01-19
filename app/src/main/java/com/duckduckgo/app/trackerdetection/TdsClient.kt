@@ -22,15 +22,30 @@ import com.duckduckgo.app.trackerdetection.model.Action.IGNORE
 import com.duckduckgo.app.trackerdetection.model.RuleExceptions
 import com.duckduckgo.app.trackerdetection.model.TdsTracker
 
-class TdsClient(override val name: Client.ClientName, private val trackers: List<TdsTracker>) : Client {
+class TdsClient(
+    override val name: Client.ClientName,
+    private val trackers: List<TdsTracker>
+) : Client {
 
-    override fun matches(url: String, documentUrl: String): Client.Result {
+    override fun matches(
+        url: String,
+        documentUrl: String
+    ): Client.Result {
         val tracker = trackers.firstOrNull { sameOrSubdomain(url, it.domain) } ?: return Client.Result(false)
         val matches = matchesTrackerEntry(tracker, url, documentUrl)
-        return Client.Result(matches = matches.shouldBlock, entityName = tracker.ownerName, categories = tracker.categories, surrogate = matches.surrogate)
+        return Client.Result(
+            matches = matches.shouldBlock,
+            entityName = tracker.ownerName,
+            categories = tracker.categories,
+            surrogate = matches.surrogate
+        )
     }
 
-    private fun matchesTrackerEntry(tracker: TdsTracker, url: String, documentUrl: String): MatchedResult {
+    private fun matchesTrackerEntry(
+        tracker: TdsTracker,
+        url: String,
+        documentUrl: String
+    ): MatchedResult {
         tracker.rules.forEach { rule ->
             val regex = ".*${rule.rule}.*".toRegex()
             if (url.matches(regex)) {
@@ -50,7 +65,10 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
         return MatchedResult(shouldBlock = (tracker.defaultAction == BLOCK))
     }
 
-    private fun matchedException(exceptions: RuleExceptions?, documentUrl: String): Boolean {
+    private fun matchedException(
+        exceptions: RuleExceptions?,
+        documentUrl: String
+    ): Boolean {
 
         if (exceptions == null) return false
 
@@ -71,5 +89,8 @@ class TdsClient(override val name: Client.ClientName, private val trackers: List
         return false
     }
 
-    private data class MatchedResult(val shouldBlock: Boolean, val surrogate: String? = null)
+    private data class MatchedResult(
+        val shouldBlock: Boolean,
+        val surrogate: String? = null
+    )
 }

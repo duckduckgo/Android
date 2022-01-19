@@ -25,5 +25,8 @@ data class TermsOfServiceJson(
     val match: Match
 ) {
 
-    data class Match(val good: List<String>, val bad: List<String>)
+    data class Match(
+        val good: List<String>,
+        val bad: List<String>
+    )
 }

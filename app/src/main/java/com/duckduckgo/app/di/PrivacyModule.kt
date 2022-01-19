@@ -38,22 +38,29 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class PrivacyModule {
 
     @Provides
-    @Singleton
-    fun privacyPractices(termsOfServiceStore: TermsOfServiceStore, entityLookup: EntityLookup): PrivacyPractices =
+    @SingleInstanceIn(AppScope::class)
+    fun privacyPractices(
+        termsOfServiceStore: TermsOfServiceStore,
+        entityLookup: EntityLookup
+    ): PrivacyPractices =
         PrivacyPracticesImpl(termsOfServiceStore, entityLookup)
 
     @Provides
-    @Singleton
-    fun entityLookup(entityDao: TdsEntityDao, domainEntityDao: TdsDomainEntityDao): EntityLookup =
+    @SingleInstanceIn(AppScope::class)
+    fun entityLookup(
+        entityDao: TdsEntityDao,
+        domainEntityDao: TdsDomainEntityDao
+    ): EntityLookup =
         TdsEntityLookup(entityDao, domainEntityDao)
 
     @Provides
@@ -87,20 +94,23 @@ class PrivacyModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun dataClearerForegroundAppRestartPixelObserver(
         dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
     ): LifecycleObserver = dataClearerForegroundAppRestartPixel
 
     @Provides
-    @Singleton
-    fun appCacheCleaner(context: Context, fileDeleter: FileDeleter): AppCacheClearer {
+    @SingleInstanceIn(AppScope::class)
+    fun appCacheCleaner(
+        context: Context,
+        fileDeleter: FileDeleter
+    ): AppCacheClearer {
         return AndroidAppCacheClearer(context, fileDeleter)
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun geoLocationPermissions(
         context: Context,
         locationPermissionsRepository: LocationPermissionsRepository,

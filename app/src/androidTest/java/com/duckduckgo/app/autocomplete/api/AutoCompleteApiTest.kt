@@ -21,7 +21,7 @@ import com.duckduckgo.app.bookmarks.db.BookmarkEntity
 import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.junit.Assert.*
@@ -183,7 +183,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "title example", "https://example.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com/path/to/foo", "title foo", "https://foo.com/path/to/foo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com/path/to/foo",
+                    "title foo",
+                    "https://foo.com/path/to/foo"
+                ),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "foo.com", true),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "baz.com", true)
@@ -238,7 +242,11 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com?key=value", "title foo", "https://foo.com?key=value"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "foo.com?key=value",
+                    "title foo",
+                    "https://foo.com?key=value"
+                ),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "foo.com", "title foo", "https://foo.com"),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "example.com", false),
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion(phrase = "bar.com", true),
@@ -269,7 +277,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "bar.com", "title bar", "https://bar.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "example.com", "the title example", "https://example.com"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "example.com",
+                    "the title example",
+                    "https://example.com"
+                ),
             ),
             value.suggestions
         )
@@ -321,7 +333,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com", "CNN international", "https://cnn.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "cnn.com/world", "CNN international - world", "https://cnn.com/world"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "cnn.com/world",
+                    "CNN international - world",
+                    "https://cnn.com/world"
+                ),
             ),
             value.suggestions
         )
@@ -346,7 +362,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"
+                ),
             ),
             value.suggestions
         )
@@ -371,7 +391,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com", "Reddit", "https://reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"
+                ),
             ),
             value.suggestions
         )
@@ -395,7 +419,11 @@ class AutoCompleteApiTest {
 
         assertEquals(
             listOf(
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "reddit.com/r/duckduckgo", "Reddit - duckduckgo", "https://reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "reddit.com/r/duckduckgo",
+                    "Reddit - duckduckgo",
+                    "https://reddit.com/r/duckduckgo"
+                ),
             ),
             value.suggestions
         )
@@ -420,7 +448,11 @@ class AutoCompleteApiTest {
         assertEquals(
             listOf(
                 AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com", "Reddit", "https://www.reddit.com"),
-                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(phrase = "www.reddit.com/r/duckduckgo", "duckduckgo", "https://www.reddit.com/r/duckduckgo"),
+                AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion(
+                    phrase = "www.reddit.com/r/duckduckgo",
+                    "duckduckgo",
+                    "https://www.reddit.com/r/duckduckgo"
+                ),
             ),
             value.suggestions
         )

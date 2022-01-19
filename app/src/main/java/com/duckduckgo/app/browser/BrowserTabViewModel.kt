@@ -52,7 +52,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Inva
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
@@ -111,7 +110,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.jakewharton.rxrelay2.PublishRelay
@@ -197,6 +196,7 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
+        val bookmarkFolder: BookmarkFolder? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
         val canFireproofSite: Boolean = false,
@@ -214,7 +214,11 @@ class BrowserTabViewModel(
     )
 
     sealed class HighlightableButton {
-        data class Visible(val enabled: Boolean = true, val highlighted: Boolean = false) : HighlightableButton()
+        data class Visible(
+            val enabled: Boolean = true,
+            val highlighted: Boolean = false
+        ) : HighlightableButton()
+
         object Gone : HighlightableButton()
 
         fun isHighlighted(): Boolean {
@@ -274,15 +278,30 @@ class BrowserTabViewModel(
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
-    data class LocationPermission(val origin: String, val callback: GeolocationPermissions.Callback)
+    data class LocationPermission(
+        val origin: String,
+        val callback: GeolocationPermissions.Callback
+    )
 
     sealed class Command {
         object Refresh : Command()
-        class Navigate(val url: String, val headers: Map<String, String>) : Command()
+        class Navigate(
+            val url: String,
+            val headers: Map<String, String>
+        ) : Command()
+
         class NavigateBack(val steps: Int) : Command()
         object NavigateForward : Command()
-        class OpenInNewTab(val query: String, val sourceTabId: String? = null) : Command()
-        class OpenMessageInNewTab(val message: Message, val sourceTabId: String? = null) : Command()
+        class OpenInNewTab(
+            val query: String,
+            val sourceTabId: String? = null
+        ) : Command()
+
+        class OpenMessageInNewTab(
+            val message: Message,
+            val sourceTabId: String? = null
+        ) : Command()
+
         class OpenInNewBackgroundTab(val query: String) : Command()
         object LaunchNewTab : Command()
         object ResetHistory : Command()
@@ -292,7 +311,11 @@ class BrowserTabViewModel(
         object ShowKeyboard : Command()
         object HideKeyboard : Command()
         class ShowFullScreen(val view: View) : Command()
-        class DownloadImage(val url: String, val requestUserConfirmation: Boolean) : Command()
+        class DownloadImage(
+            val url: String,
+            val requestUserConfirmation: Boolean
+        ) : Command()
+
         class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
@@ -304,28 +327,67 @@ class BrowserTabViewModel(
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
         object DismissFindInPage : Command()
-        class ShowFileChooser(val filePathCallback: ValueCallback<Array<Uri>>, val fileChooserParams: WebChromeClient.FileChooserParams) : Command()
-        class HandleNonHttpAppLink(val nonHttpAppLink: NonHttpAppLink, val headers: Map<String, String>) : Command()
+        class ShowFileChooser(
+            val filePathCallback: ValueCallback<Array<Uri>>,
+            val fileChooserParams: WebChromeClient.FileChooserParams
+        ) : Command()
+
+        class HandleNonHttpAppLink(
+            val nonHttpAppLink: NonHttpAppLink,
+            val headers: Map<String, String>
+        ) : Command()
+
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
-        class AddHomeShortcut(val title: String, val url: String, val icon: Bitmap? = null) : Command()
+        class AddHomeShortcut(
+            val title: String,
+            val url: String,
+            val icon: Bitmap? = null
+        ) : Command()
+
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
-        class SaveCredentials(val request: BasicAuthenticationRequest, val credentials: BasicAuthenticationCredentials) : Command()
+        class SaveCredentials(
+            val request: BasicAuthenticationRequest,
+            val credentials: BasicAuthenticationCredentials
+        ) : Command()
+
         object GenerateWebViewPreviewImage : Command()
         object LaunchTabSwitcher : Command()
         object HideWebContent : Command()
         object ShowWebContent : Command()
-        class CheckSystemLocationPermission(val domain: String, val deniedForever: Boolean) : Command()
+        class CheckSystemLocationPermission(
+            val domain: String,
+            val deniedForever: Boolean
+        ) : Command()
+
         class AskDomainPermission(val domain: String) : Command()
         object RequestSystemLocationPermission : Command()
-        class RefreshUserAgent(val url: String?, val isDesktop: Boolean) : Command()
-        class ShowErrorWithAction(val textResId: Int, val action: () -> Unit) : Command()
+        class RefreshUserAgent(
+            val url: String?,
+            val isDesktop: Boolean
+        ) : Command()
+
+        class ShowErrorWithAction(
+            val textResId: Int,
+            val action: () -> Unit
+        ) : Command()
+
         class ShowDomainHasPermissionMessage(val domain: String) : Command()
-        class ConvertBlobToDataUri(val url: String, val mimeType: String) : Command()
-        class RequestFileDownload(val url: String, val contentDisposition: String?, val mimeType: String, val requestUserConfirmation: Boolean) : Command()
+        class ConvertBlobToDataUri(
+            val url: String,
+            val mimeType: String
+        ) : Command()
+
+        class RequestFileDownload(
+            val url: String,
+            val contentDisposition: String?,
+            val mimeType: String,
+            val requestUserConfirmation: Boolean
+        ) : Command()
+
         object ChildTabClosed : Command()
 
         class CopyAliasToClipboard(val alias: String) : Command()
@@ -338,10 +400,19 @@ class BrowserTabViewModel(
 
         sealed class DownloadCommand : Command() {
             class ScanMediaFiles(val file: File) : DownloadCommand()
-            class ShowDownloadFailedNotification(val message: String, val reason: DownloadFailReason) : DownloadCommand()
-            class ShowDownloadFinishedNotification(val file: File, val mimeType: String?) : DownloadCommand()
+            class ShowDownloadFailedNotification(
+                val message: String,
+                val reason: DownloadFailReason
+            ) : DownloadCommand()
+
+            class ShowDownloadFinishedNotification(
+                val file: File,
+                val mimeType: String?
+            ) : DownloadCommand()
+
             object ShowDownloadInProgressNotification : DownloadCommand()
         }
+
         class EditWithSelectedQuery(val query: String) : Command()
     }
 
@@ -497,7 +568,12 @@ class BrowserTabViewModel(
         }.launchIn(viewModelScope)
     }
 
-    fun loadData(tabId: String, initialUrl: String?, skipHome: Boolean, favoritesOnboarding: Boolean) {
+    fun loadData(
+        tabId: String,
+        initialUrl: String?,
+        skipHome: Boolean,
+        favoritesOnboarding: Boolean
+    ) {
         Timber.i("favoritesOnboarding loadData $initialUrl, $skipHome, $favoritesOnboarding")
         this.tabId = tabId
         this.skipHome = skipHome
@@ -524,9 +600,14 @@ class BrowserTabViewModel(
             .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
             .onEach { (settings, viewVisible) ->
                 Timber.v("Accessibility: newSettings $settings, $viewVisible")
-                val shouldRefreshWebview = (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
+                val shouldRefreshWebview =
+                    (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
                 accessibilityViewState.value =
-                    currentAccessibilityViewState().copy(fontSize = settings.fontSize, forceZoom = settings.forceZoom, refreshWebView = shouldRefreshWebview)
+                    currentAccessibilityViewState().copy(
+                        fontSize = settings.fontSize,
+                        forceZoom = settings.forceZoom,
+                        refreshWebView = shouldRefreshWebview
+                    )
             }.launchIn(viewModelScope)
     }
 
@@ -534,7 +615,10 @@ class BrowserTabViewModel(
         showBrowser()
     }
 
-    private fun buildSiteFactory(url: String, title: String? = null) {
+    private fun buildSiteFactory(
+        url: String,
+        title: String? = null
+    ) {
 
         if (buildingSiteFactoryJob?.isCompleted == false) {
             Timber.i("Cancelling existing work to build SiteMonitor for $url")
@@ -586,7 +670,10 @@ class BrowserTabViewModel(
         super.onCleared()
     }
 
-    fun registerWebViewListener(browserWebViewClient: BrowserWebViewClient, browserChromeClient: BrowserChromeClient) {
+    fun registerWebViewListener(
+        browserWebViewClient: BrowserWebViewClient,
+        browserChromeClient: BrowserChromeClient
+    ) {
         browserWebViewClient.webViewClientListener = this
         browserChromeClient.webViewClientListener = this
     }
@@ -637,7 +724,10 @@ class BrowserTabViewModel(
         pixel.fire(pixelName, params)
     }
 
-    fun onUserSubmittedQuery(query: String, queryOrigin: QueryOrigin = QueryOrigin.FromUser) {
+    fun onUserSubmittedQuery(
+        query: String,
+        queryOrigin: QueryOrigin = QueryOrigin.FromUser
+    ) {
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NewQuerySubmitted)
 
         if (query.isBlank()) {
@@ -682,7 +772,8 @@ class BrowserTabViewModel(
         findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
-        autoCompleteViewState.value = currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
+        autoCompleteViewState.value =
+            currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun getUrlHeaders(url: String?): Map<String, String> {
@@ -745,7 +836,10 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun iconReceived(url: String, icon: Bitmap) {
+    override fun iconReceived(
+        url: String,
+        icon: Bitmap
+    ) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl != url) {
@@ -760,7 +854,10 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun iconReceived(visitedUrl: String, iconUrl: String) {
+    override fun iconReceived(
+        visitedUrl: String,
+        iconUrl: String
+    ) {
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl.toUri().host != visitedUrl.toUri().host) {
@@ -900,10 +997,10 @@ class BrowserTabViewModel(
 
         Timber.v("navigationStateChanged: $stateChange")
         when (stateChange) {
-            is NewPage -> pageChanged(stateChange.url, stateChange.title)
-            is PageCleared -> pageCleared()
-            is UrlUpdated -> urlUpdated(stateChange.url)
-            is PageNavigationCleared -> disableUserNavigation()
+            is WebNavigationStateChange.NewPage -> pageChanged(stateChange.url, stateChange.title)
+            is WebNavigationStateChange.PageCleared -> pageCleared()
+            is WebNavigationStateChange.UrlUpdated -> urlUpdated(stateChange.url)
+            is WebNavigationStateChange.PageNavigationCleared -> disableUserNavigation()
         }
 
         if (newWebNavigationState.progress ?: 0 >= SHOW_CONTENT_MIN_PROGRESS) {
@@ -930,7 +1027,10 @@ class BrowserTabViewModel(
         command.value = ShowWebContent
     }
 
-    private fun pageChanged(url: String, title: String?) {
+    private fun pageChanged(
+        url: String,
+        title: String?
+    ) {
         Timber.v("Page changed: $url")
         buildSiteFactory(url, title)
 
@@ -996,7 +1096,10 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun shouldShowDaxIcon(currentUrl: String?, showPrivacyGrade: Boolean): Boolean {
+    private fun shouldShowDaxIcon(
+        currentUrl: String?,
+        showPrivacyGrade: Boolean
+    ): Boolean {
         val url = currentUrl ?: return false
         return showPrivacyGrade && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
     }
@@ -1040,9 +1143,10 @@ class BrowserTabViewModel(
 
     private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
-        return withContext(dispatchers.io()) {
-            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
-        }
+        return null
+//        return withContext(dispatchers.io()) {
+//            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
+//        }
     }
 
     private suspend fun getFavorite(url: String): SavedSite.Favorite? {
@@ -1151,7 +1255,10 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback) {
+    override fun onSiteLocationPermissionRequested(
+        origin: String,
+        callback: GeolocationPermissions.Callback
+    ) {
         locationPermission = LocationPermission(origin, callback)
 
         if (!geoLocationPermissions.isDeviceLocationEnabled()) {
@@ -1191,7 +1298,10 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         locationPermission?.let { locationPermission ->
             when (permission) {
                 LocationPermissionType.ALLOW_ALWAYS -> {
@@ -1271,7 +1381,6 @@ class BrowserTabViewModel(
                 locationPermission.callback.invoke(locationPermission.origin, false, false)
             }
         }
-
     }
 
     override fun onSystemLocationPermissionAllowed() {
@@ -1405,7 +1514,10 @@ class BrowserTabViewModel(
         }
     }
 
-    override fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams) {
+    override fun showFileChooser(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: WebChromeClient.FileChooserParams
+    ) {
         command.value = ShowFileChooser(filePathCallback, fileChooserParams)
     }
 
@@ -1419,7 +1531,11 @@ class BrowserTabViewModel(
     private fun currentCtaViewState(): CtaViewState = ctaViewState.value!!
     private fun currentPrivacyGradeState(): PrivacyGradeViewState = privacyGradeViewState.value!!
 
-    fun onOmnibarInputStateChanged(query: String, hasFocus: Boolean, hasQueryChanged: Boolean) {
+    fun onOmnibarInputStateChanged(
+        query: String,
+        hasFocus: Boolean,
+        hasQueryChanged: Boolean
+    ) {
 
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
@@ -1472,7 +1588,11 @@ class BrowserTabViewModel(
         Timber.d("showPrivacyGrade=$showPrivacyGrade, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
 
         autoCompleteViewState.value = currentAutoCompleteViewState()
-            .copy(showSuggestions = showAutoCompleteSuggestions, showFavorites = showFavoritesAsSuggestions, searchResults = autoCompleteSearchResults)
+            .copy(
+                showSuggestions = showAutoCompleteSuggestions,
+                showFavorites = showFavoritesAsSuggestions,
+                searchResults = autoCompleteSearchResults
+            )
 
         if (hasQueryChanged && hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())
@@ -1493,7 +1613,10 @@ class BrowserTabViewModel(
         }
     }
 
-    private suspend fun saveSiteBookmark(url: String, title: String) {
+    private suspend fun saveSiteBookmark(
+        url: String,
+        title: String
+    ) {
         val savedBookmark = withContext(dispatchers.io()) {
             if (url.isNotBlank()) {
                 faviconManager.persistCachedFavicon(tabId, url)
@@ -1533,7 +1656,10 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun saveFavoriteSite(url: String, title: String) {
+    private fun saveFavoriteSite(
+        url: String,
+        title: String
+    ) {
         viewModelScope.launch {
             val favorite = withContext(dispatchers.io()) {
                 if (url.isNotBlank()) {
@@ -1696,12 +1822,18 @@ class BrowserTabViewModel(
         command.value = EditWithSelectedQuery(query)
     }
 
-    fun userLongPressedInWebView(target: LongPressTarget, menu: ContextMenu) {
+    fun userLongPressedInWebView(
+        target: LongPressTarget,
+        menu: ContextMenu
+    ) {
         Timber.i("Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})")
         longPressHandler.handleLongPress(target.type, target.url, menu)
     }
 
-    fun userSelectedItemFromLongPressMenu(longPressTarget: LongPressTarget, item: MenuItem): Boolean {
+    fun userSelectedItemFromLongPressMenu(
+        longPressTarget: LongPressTarget,
+        item: MenuItem
+    ): Boolean {
 
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
         Timber.d("Required action from long press is $requiredAction")
@@ -1759,7 +1891,10 @@ class BrowserTabViewModel(
         command.value = DismissFindInPage
     }
 
-    fun onFindResultsReceived(activeMatchOrdinal: Int, numberOfMatches: Int) {
+    fun onFindResultsReceived(
+        activeMatchOrdinal: Int,
+        numberOfMatches: Int
+    ) {
         val activeIndex = if (numberOfMatches == 0) 0 else activeMatchOrdinal + 1
         val currentViewState = currentFindInPageViewState()
         findInPageViewState.value = currentViewState.copy(
@@ -1845,11 +1980,17 @@ class BrowserTabViewModel(
         return builder.build().toString()
     }
 
-    fun saveWebViewState(webView: WebView?, tabId: String) {
+    fun saveWebViewState(
+        webView: WebView?,
+        tabId: String
+    ) {
         webViewSessionStorage.saveSession(webView, tabId)
     }
 
-    fun restoreWebViewState(webView: WebView?, lastUrl: String) {
+    fun restoreWebViewState(
+        webView: WebView?,
+        lastUrl: String
+    ) {
         val sessionRestored = webViewSessionStorage.restoreSession(webView, tabId)
         if (sessionRestored) {
             Timber.v("Successfully restored session")
@@ -1882,7 +2023,10 @@ class BrowserTabViewModel(
         val menuHighlighted = currentBrowserViewState().showMenuButton.isHighlighted()
         if (menuHighlighted) {
             this.showFavoritesOnboarding = false
-            browserViewState.value = currentBrowserViewState().copy(showMenuButton = HighlightableButton.Visible(highlighted = false), addFavorite = HighlightableButton.Visible(highlighted = true))
+            browserViewState.value = currentBrowserViewState().copy(
+                showMenuButton = HighlightableButton.Visible(highlighted = false),
+                addFavorite = HighlightableButton.Visible(highlighted = true)
+            )
         }
     }
 
@@ -1902,7 +2046,10 @@ class BrowserTabViewModel(
         command.value = LaunchNewTab
     }
 
-    fun onSurveyChanged(survey: Survey?, locale: Locale = Locale.getDefault()) {
+    fun onSurveyChanged(
+        survey: Survey?,
+        locale: Locale = Locale.getDefault()
+    ) {
         val surveyCleared = ctaViewModel.onSurveyChanged(survey)
         if (surveyCleared) {
             ctaViewState.value = currentCtaViewState().copy(cta = null)
@@ -1924,7 +2071,13 @@ class BrowserTabViewModel(
         Timber.i("favoritesOnboarding: - refreshCta $showFavoritesOnboarding")
         if (currentGlobalLayoutState() is Browser) {
             val cta = withContext(dispatchers.io()) {
-                ctaViewModel.refreshCta(dispatchers.io(), currentBrowserViewState().browserShowing, siteLiveData.value, showFavoritesOnboarding, locale)
+                ctaViewModel.refreshCta(
+                    dispatchers.io(),
+                    currentBrowserViewState().browserShowing,
+                    siteLiveData.value,
+                    showFavoritesOnboarding,
+                    locale
+                )
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
             return cta
@@ -1996,7 +2149,10 @@ class BrowserTabViewModel(
         }
     }
 
-    fun updateTabPreview(tabId: String, fileName: String) {
+    fun updateTabPreview(
+        tabId: String,
+        fileName: String
+    ) {
         tabRepository.updateTabPreviewImage(tabId, fileName)
     }
 
@@ -2004,7 +2160,10 @@ class BrowserTabViewModel(
         tabRepository.updateTabPreviewImage(tabId, null)
     }
 
-    override fun handleAppLink(appLink: AppLink, isForMainFrame: Boolean): Boolean {
+    override fun handleAppLink(
+        appLink: AppLink,
+        isForMainFrame: Boolean
+    ): Boolean {
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink.uriString,
@@ -2073,7 +2232,10 @@ class BrowserTabViewModel(
         command.value = RequiresAuthentication(request)
     }
 
-    override fun handleAuthentication(request: BasicAuthenticationRequest, credentials: BasicAuthenticationCredentials) {
+    override fun handleAuthentication(
+        request: BasicAuthenticationRequest,
+        credentials: BasicAuthenticationCredentials
+    ) {
         request.handler.proceed(credentials.username, credentials.password)
         command.value = ShowWebContent
         command.value = SaveCredentials(request, credentials)
@@ -2128,7 +2290,12 @@ class BrowserTabViewModel(
         navigationAwareLoginDetector.onEvent(NavigationEvent.LoginAttempt(currentUrl))
     }
 
-    fun requestFileDownload(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+    fun requestFileDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
+        requestUserConfirmation: Boolean
+    ) {
         if (url.startsWith("blob:")) {
             command.value = ConvertBlobToDataUri(url, mimeType)
         } else {
@@ -2136,7 +2303,12 @@ class BrowserTabViewModel(
         }
     }
 
-    private fun sendRequestFileDownloadCommand(url: String, contentDisposition: String?, mimeType: String, requestUserConfirmation: Boolean) {
+    private fun sendRequestFileDownloadCommand(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String,
+        requestUserConfirmation: Boolean
+    ) {
         command.postValue(RequestFileDownload(url, contentDisposition, mimeType, requestUserConfirmation))
     }
 
@@ -2194,6 +2366,7 @@ class BrowserTabViewModel(
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
+            pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
             fileDownloader.download(
                 pendingFileDownload,
                 object : FileDownloader.FileDownloadListener {
@@ -2203,7 +2376,11 @@ class BrowserTabViewModel(
                         closeAndReturnToSourceIfBlankTab()
                     }
 
-                    override fun downloadFinishedNetworkFile(file: File, mimeType: String?) {
+                    override fun downloadFinishedNetworkFile(
+                        file: File,
+                        mimeType: String?
+                    ) {
+                        // TODO [Improve downloads] This is unused.
                         Timber.i("downloadFinished network file")
                     }
 
@@ -2213,14 +2390,23 @@ class BrowserTabViewModel(
                         closeAndReturnToSourceIfBlankTab()
                     }
 
-                    override fun downloadFinishedDataUri(file: File, mimeType: String?) {
+                    override fun downloadFinishedDataUri(
+                        file: File,
+                        mimeType: String?
+                    ) {
                         Timber.i("downloadFinished data uri")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
                         command.postValue(DownloadCommand.ScanMediaFiles(file))
                         command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
                     }
 
-                    override fun downloadFailed(message: String, downloadFailReason: DownloadFailReason) {
+                    override fun downloadFailed(
+                        message: String,
+                        downloadFailReason: DownloadFailReason
+                    ) {
+                        // TODO [Improve downloads] This used only when DownloadManager is not involved.
                         Timber.w("Failed to download file [$message]")
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
                         command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
                     }
 
@@ -2272,7 +2458,7 @@ class BrowserTabViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BrowserTabViewModelFactory @Inject constructor(
     private val statisticsUpdater: Provider<StatisticsUpdater>,
     private val queryUrlConverter: Provider<QueryUrlConverter>,
@@ -2312,7 +2498,42 @@ class BrowserTabViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(statisticsUpdater.get(), queryUrlConverter.get(), duckDuckGoUrlDetector.get(), siteFactory.get(), tabRepository.get(), userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), bookmarksRepository.get(), favoritesRepository.get(), fireproofWebsiteRepository.get(), locationPermissionsRepository.get(), geoLocationPermissions.get(), navigationAwareLoginDetector.get(), autoComplete.get(), appSettingsPreferencesStore.get(), longPressHandler.get(), webViewSessionStorage.get(), specialUrlDetector.get(), faviconManager.get(), addToHomeCapabilityDetector.get(), ctaViewModel.get(), searchCountDao.get(), pixel.get(), dispatchers, userEventsStore.get(), fileDownloader.get(), gpc.get(), fireproofDialogsEventHandler.get(), emailManager.get(), accessibilitySettingsDataStore.get(), appCoroutineScope.get(), appLinksHandler.get(), variantManager.get()) as T
+                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(
+                    statisticsUpdater.get(),
+                    queryUrlConverter.get(),
+                    duckDuckGoUrlDetector.get(),
+                    siteFactory.get(),
+                    tabRepository.get(),
+                    userWhitelistDao.get(),
+                    contentBlocking.get(),
+                    networkLeaderboardDao.get(),
+                    bookmarksRepository.get(),
+                    favoritesRepository.get(),
+                    fireproofWebsiteRepository.get(),
+                    locationPermissionsRepository.get(),
+                    geoLocationPermissions.get(),
+                    navigationAwareLoginDetector.get(),
+                    autoComplete.get(),
+                    appSettingsPreferencesStore.get(),
+                    longPressHandler.get(),
+                    webViewSessionStorage.get(),
+                    specialUrlDetector.get(),
+                    faviconManager.get(),
+                    addToHomeCapabilityDetector.get(),
+                    ctaViewModel.get(),
+                    searchCountDao.get(),
+                    pixel.get(),
+                    dispatchers,
+                    userEventsStore.get(),
+                    fileDownloader.get(),
+                    gpc.get(),
+                    fireproofDialogsEventHandler.get(),
+                    emailManager.get(),
+                    accessibilitySettingsDataStore.get(),
+                    appCoroutineScope.get(),
+                    appLinksHandler.get(),
+                    variantManager.get()
+                ) as T
                 else -> null
             }
         }

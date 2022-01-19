@@ -81,7 +81,10 @@ class DataClearerTimeKeeperTest(private val testCase: TestCase) {
         assertEquals(testCase.expected, testee.hasEnoughTimeElapsed(backgroundedTimestamp = timestamp, clearWhenOption = testCase.clearWhenOption))
     }
 
-    private fun getPastTimestamp(millisPreviously: Long, timeNow: Long): Long {
+    private fun getPastTimestamp(
+        millisPreviously: Long,
+        timeNow: Long
+    ): Long {
         return Calendar.getInstance().also {
             it.timeInMillis = timeNow
             it.add(Calendar.MILLISECOND, (-millisPreviously).toInt())

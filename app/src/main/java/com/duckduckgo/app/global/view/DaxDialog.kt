@@ -111,7 +111,10 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceState)
         setDialogAndStartAnimation()
     }

@@ -17,28 +17,32 @@
 package com.duckduckgo.mobile.android.vpn.waitlist
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface TrackingProtectionWaitlistManager {
     fun waitlistState(): WaitlistState
     suspend fun fetchInviteCode(): FetchCodeResult
     fun didJoinBeta(): Boolean
     fun notifyOnJoinedWaitlist()
-    fun joinWaitlist(timestamp: Int, token: String)
+    fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    )
+
     suspend fun redeemCode(inviteCode: String): RedeemCodeResult
 }
 
-@Singleton
-@ContributesBinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class AppTrackingProtectionWaitlistManager @Inject constructor(
     private val service: AppTrackingProtectionWaitlistService,
     private val dataStore: AppTrackingProtectionWaitlistDataStore,
@@ -83,7 +87,10 @@ class AppTrackingProtectionWaitlistManager @Inject constructor(
         dataStore.sendNotification = true
     }
 
-    override fun joinWaitlist(timestamp: Int, token: String) {
+    override fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
         if (dataStore.waitlistTimestamp == -1) {
             dataStore.waitlistTimestamp = timestamp
         }
@@ -111,7 +118,7 @@ class AppTrackingProtectionWaitlistManager @Inject constructor(
 
     private fun parseRedeemCodeError(e: HttpException): RedeemCodeResult {
         return try {
-            val error = Moshi.Builder().build().adapter(AppTPRedeemCodeError::class.java).fromJson(e.response()?.errorBody()?.string())
+            val error = Moshi.Builder().build().adapter(AppTPRedeemCodeError::class.java).fromJson(e.response()?.errorBody()?.string().orEmpty())
             when (error?.error) {
                 AppTPRedeemCodeError.INVALID -> RedeemCodeResult.InvalidCode
                 AppTPRedeemCodeError.ALREADY_REDEEMED -> RedeemCodeResult.AlreadyRedeemed

@@ -16,19 +16,19 @@
 
 package com.duckduckgo.privacy.config.api
 
-/**
- * Public interface for the Content Blocking feature
- */
+/** Public interface for the Content Blocking feature */
 interface ContentBlocking {
     /**
-     * This method takes a [url] and returns `true` or `false` depending if the [url]
-     * is in the content blocking exceptions list
-     * @return a `true` if the given [url] if the url is in the content blocking exceptions list and `false` otherwise.
+     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
+     * content blocking exceptions list
+     * @return a `true` if the given [url] if the url is in the content blocking exceptions list and
+     * `false` otherwise.
      */
     fun isAnException(url: String): Boolean
 }
 
-/**
- * Public data class for Content Blocking Exceptions
- */
-data class ContentBlockingException(val domain: String, val reason: String)
+/** Public data class for Content Blocking Exceptions */
+data class ContentBlockingException(
+    val domain: String,
+    val reason: String
+)

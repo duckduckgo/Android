@@ -43,12 +43,18 @@ class BookmarkFolderStructureAdapter(
     private val maxWidth = viewWidth * WIDTH_FACTOR
     private val maxPadding = (maxWidth - (maxWidth % paddingIncrementPx)).toInt()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FolderViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): FolderViewHolder {
         val binding = ItemBookmarkFolderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return FolderViewHolder(binding, viewModel, paddingIncrementPx, maxPadding, verticalPaddingPx)
     }
 
-    override fun onBindViewHolder(holder: FolderViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: FolderViewHolder,
+        position: Int
+    ) {
         holder.bind(getItem(position))
     }
 }
@@ -88,11 +94,17 @@ class FolderViewHolder(
 }
 
 class BookmarkFolderStructureDiffCallback : DiffUtil.ItemCallback<BookmarkFolderItem>() {
-    override fun areItemsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
+    override fun areItemsTheSame(
+        oldItem: BookmarkFolderItem,
+        newItem: BookmarkFolderItem
+    ): Boolean {
         return oldItem.bookmarkFolder.id == newItem.bookmarkFolder.id
     }
 
-    override fun areContentsTheSame(oldItem: BookmarkFolderItem, newItem: BookmarkFolderItem): Boolean {
+    override fun areContentsTheSame(
+        oldItem: BookmarkFolderItem,
+        newItem: BookmarkFolderItem
+    ): Boolean {
         return oldItem == newItem
     }
 }

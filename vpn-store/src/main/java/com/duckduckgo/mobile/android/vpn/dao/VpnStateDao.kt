@@ -31,5 +31,4 @@ interface VpnStateDao {
 
     @Query("select * from vpn_state")
     fun get(): Flow<VpnState>
-
 }

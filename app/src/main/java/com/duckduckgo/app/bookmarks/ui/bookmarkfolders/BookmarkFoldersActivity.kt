@@ -123,7 +123,12 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
         private const val ROOT_FOLDER_ID = 0L
         private const val ADD_BOOKMARK_FOLDER_FRAGMENT_TAG = "ADD_BOOKMARK_FOLDER"
 
-        fun intent(context: Context, parentFolderId: Long, currentFolder: BookmarkFolder? = null, showAddFolderMenu: Boolean = false): Intent {
+        fun intent(
+            context: Context,
+            parentFolderId: Long,
+            currentFolder: BookmarkFolder? = null,
+            showAddFolderMenu: Boolean = false
+        ): Intent {
             val intent = Intent(context, BookmarkFoldersActivity::class.java)
             val bundle = Bundle()
             bundle.putLong(KEY_BOOKMARK_FOLDER_ID, parentFolderId)

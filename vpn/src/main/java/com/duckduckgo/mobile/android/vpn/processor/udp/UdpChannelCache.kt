@@ -17,19 +17,24 @@
 package com.duckduckgo.mobile.android.vpn.processor.udp
 
 import android.util.LruCache
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
 
-@VpnScope
+@SingleInstanceIn(VpnScope::class)
 class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
-    override fun entryRemoved(evicted: Boolean, key: String?, oldValue: UdpPacketProcessor.ChannelDetails?, newValue: UdpPacketProcessor.ChannelDetails?) {
+    override fun entryRemoved(
+        evicted: Boolean,
+        key: String?,
+        oldValue: UdpPacketProcessor.ChannelDetails?,
+        newValue: UdpPacketProcessor.ChannelDetails?
+    ) {
         Timber.i("UDP channel cache entry removed: $key. Evicted? $evicted")
         if (evicted) {
             oldValue?.datagramChannel?.close()
@@ -44,7 +49,7 @@ class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcesso
 }
 
 @Module
-@ContributesTo(VpnObjectGraph::class)
+@ContributesTo(VpnScope::class)
 abstract class UdpChannelCacheModule {
     @Binds
     @IntoSet

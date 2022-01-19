@@ -25,20 +25,23 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface TrackerDetector {
     fun addClient(client: Client)
-    fun evaluate(url: String, documentUrl: String): TrackingEvent?
+    fun evaluate(
+        url: String,
+        documentUrl: String
+    ): TrackingEvent?
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class TrackerDetectorImpl @Inject constructor(
     private val entityLookup: EntityLookup,
     private val userWhitelistDao: UserWhitelistDao,
@@ -57,7 +60,10 @@ class TrackerDetectorImpl @Inject constructor(
         clients.add(client)
     }
 
-    override fun evaluate(url: String, documentUrl: String): TrackingEvent? {
+    override fun evaluate(
+        url: String,
+        documentUrl: String
+    ): TrackingEvent? {
 
         if (firstParty(url, documentUrl)) {
             Timber.v("$url is a first party url")
@@ -91,17 +97,24 @@ class TrackerDetectorImpl @Inject constructor(
         return contentBlocking.isAnException(documentUrl)
     }
 
-    private fun firstParty(firstUrl: String, secondUrl: String): Boolean =
+    private fun firstParty(
+        firstUrl: String,
+        secondUrl: String
+    ): Boolean =
         sameOrSubdomain(firstUrl, secondUrl) || sameOrSubdomain(secondUrl, firstUrl) || sameNetworkName(firstUrl, secondUrl)
 
-    private fun sameNetworkName(firstUrl: String, secondUrl: String): Boolean {
+    private fun sameNetworkName(
+        firstUrl: String,
+        secondUrl: String
+    ): Boolean {
         val firstNetwork = entityLookup.entityForUrl(firstUrl) ?: return false
         val secondNetwork = entityLookup.entityForUrl(secondUrl) ?: return false
         return firstNetwork.name == secondNetwork.name
     }
 
     @VisibleForTesting
-    val clientCount get() = clients.count()
+    val clientCount
+        get() = clients.count()
 }
 
 private fun UserWhitelistDao.isDocumentWhitelisted(document: String?): Boolean {

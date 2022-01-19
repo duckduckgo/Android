@@ -27,7 +27,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.view.toPx
 
-class TabGridItemDecorator(context: Context, var selectedTabId: String?) : RecyclerView.ItemDecoration() {
+class TabGridItemDecorator(
+    context: Context,
+    var selectedTabId: String?
+) : RecyclerView.ItemDecoration() {
 
     private val borderStroke: Paint = Paint().apply {
         isAntiAlias = true
@@ -39,7 +42,11 @@ class TabGridItemDecorator(context: Context, var selectedTabId: String?) : Recyc
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 
-    override fun onDrawOver(canvas: Canvas, recyclerView: RecyclerView, state: RecyclerView.State) {
+    override fun onDrawOver(
+        canvas: Canvas,
+        recyclerView: RecyclerView,
+        state: RecyclerView.State
+    ) {
         val adapter = recyclerView.adapter as TabSwitcherAdapter? ?: return
 
         for (i in 0 until recyclerView.childCount) {
@@ -60,7 +67,10 @@ class TabGridItemDecorator(context: Context, var selectedTabId: String?) : Recyc
         super.onDrawOver(canvas, recyclerView, state)
     }
 
-    private fun drawSelectedTabDecoration(child: View, c: Canvas) {
+    private fun drawSelectedTabDecoration(
+        child: View,
+        c: Canvas
+    ) {
         borderStroke.alpha = (child.alpha * 255).toInt()
         c.drawRoundRect(child.getBounds(), BORDER_RADIUS, BORDER_RADIUS, borderStroke)
     }

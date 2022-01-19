@@ -26,10 +26,10 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -452,11 +452,17 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(40, 41, migrationsProvider.MIGRATION_40_TO_41)
     }
 
-    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: AppStage) {
+    private fun givenUserStageIs(
+        database: SupportSQLiteDatabase,
+        appStage: AppStage
+    ) {
         database.execSQL("INSERT INTO `userStage` values (1, '${appStage.name}') ")
     }
 
-    private fun givenUserStageIs(database: SupportSQLiteDatabase, appStage: String) {
+    private fun givenUserStageIs(
+        database: SupportSQLiteDatabase,
+        appStage: String
+    ) {
         database.execSQL("INSERT INTO `userStage` values (1, '$appStage') ")
     }
 
@@ -474,11 +480,18 @@ class AppDatabaseTest {
         testHelper.createDatabase(TEST_DB_NAME, version).close()
     }
 
-    private fun runMigrations(newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun runMigrations(
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         return testHelper.runMigrationsAndValidate(TEST_DB_NAME, newVersion, true, *migrations)
     }
 
-    private fun createDatabaseAndMigrate(originalVersion: Int, newVersion: Int, vararg migrations: Migration): SupportSQLiteDatabase {
+    private fun createDatabaseAndMigrate(
+        originalVersion: Int,
+        newVersion: Int,
+        vararg migrations: Migration
+    ): SupportSQLiteDatabase {
         createDatabase(originalVersion)
         return runMigrations(newVersion, *migrations)
     }

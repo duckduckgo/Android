@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
-import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteModule
 import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
@@ -29,7 +28,7 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.onboarding.di.WelcomePageModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.usage.di.AppUsageModule
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.EmptyFavoritesWidgetService
 import com.duckduckgo.widget.FavoritesWidgetService
 import com.duckduckgo.widget.SearchAndFavoritesWidget
@@ -41,11 +40,11 @@ import dagger.android.AndroidInjector
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Retrofit
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@Singleton
+@SingleInstanceIn(AppScope::class)
 @MergeComponent(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     modules = [
         ApplicationModule::class,
         WorkerModule::class,
@@ -57,7 +56,6 @@ import javax.inject.Singleton
         JsonModule::class,
         SystemComponentsModule::class,
         BrowserModule::class,
-        BrowserAutoCompleteModule::class,
         ResourceSurrogateModule::class,
         NotificationModule::class,
         OnboardingModule::class,

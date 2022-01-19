@@ -2,21 +2,19 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.5.10'
+        kotlin_version = '1.6.10'
+        spotless = "6.1.2"
+        anvil_version = "2.3.10-1-6-0"
+        gradle_plugin = "7.0.3"
+        min_sdk = 21
+        target_sdk = 30
+        compile_sdk = 31
     }
-    ext.spotless = "5.14.0"
-    ext.anvil_version = "2.3.3"
-
-    ext.gradle_plugin = "7.0.3"
-
-    ext.min_sdk = 21
-    ext.target_sdk = 30
-    ext.compile_sdk = 31
-    ext.tools_build_version = "30.0.3"
 
     repositories {
         google()
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_plugin"
@@ -42,3 +40,5 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+apply plugin: 'android-reporting'

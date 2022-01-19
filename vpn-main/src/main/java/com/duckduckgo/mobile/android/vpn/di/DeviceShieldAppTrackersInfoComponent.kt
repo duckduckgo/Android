@@ -16,37 +16,38 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppObjectGraph
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@VpnScope
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface DeviceShieldAppTrackersInfoComponent : AndroidInjector<DeviceShieldAppTrackersInfo> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<DeviceShieldAppTrackersInfo>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface DeviceShieldAppTrackersInfoComponentProvider {
     fun provideDeviceShieldAppTrackersInfoComponentFactory(): DeviceShieldAppTrackersInfoComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class DeviceShieldAppTrackersInfoBindingModule {
     @Binds
     @IntoMap
     @ClassKey(DeviceShieldAppTrackersInfo::class)
-    abstract fun bindDeviceShieldAppTrackersInfoComponentFactory(factory: DeviceShieldAppTrackersInfoComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun DeviceShieldAppTrackersInfoComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

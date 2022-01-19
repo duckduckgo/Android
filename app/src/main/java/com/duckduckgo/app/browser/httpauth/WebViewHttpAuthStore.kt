@@ -27,7 +27,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
@@ -36,28 +36,44 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-data class WebViewHttpAuthCredentials(val username: String, val password: String)
+data class WebViewHttpAuthCredentials(
+    val username: String,
+    val password: String
+)
 
 // Methods are marked to run in the UiThread because it is the thread of webview
 // if necessary the method impls will change thread to access the http auth dao
 interface WebViewHttpAuthStore {
     @UiThread
-    fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String)
+    fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    )
+
     @UiThread
-    fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials?
+    fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials?
+
     @UiThread
     fun clearHttpAuthUsernamePassword(webView: WebView)
+
     @WorkerThread
     suspend fun cleanHttpAuthDatabase()
 }
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = LifecycleObserver::class
 )
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class RealWebViewHttpAuthStore @Inject constructor(
     private val webViewDatabase: WebViewDatabase,
     private val databaseCleaner: DatabaseCleaner,
@@ -77,7 +93,13 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun setHttpAuthUsernamePassword(webView: WebView, host: String, realm: String, username: String, password: String) {
+    override fun setHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String,
+        username: String,
+        password: String
+    ) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
@@ -85,7 +107,11 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
-    override fun getHttpAuthUsernamePassword(webView: WebView, host: String, realm: String): WebViewHttpAuthCredentials? {
+    override fun getHttpAuthUsernamePassword(
+        webView: WebView,
+        host: String,
+        realm: String
+    ): WebViewHttpAuthCredentials? {
         val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             webViewDatabase.getHttpAuthUsernamePassword(host, realm)
         } else {
@@ -106,10 +132,10 @@ class RealWebViewHttpAuthStore @Inject constructor(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class WebViewHttpAuthStoreModule {
     @Binds
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     abstract fun bindWebViewHttpAuthStore(
         realWebViewHttpAuthStore: RealWebViewHttpAuthStore
     ): WebViewHttpAuthStore

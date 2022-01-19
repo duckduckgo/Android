@@ -49,10 +49,17 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
 
-    private fun validateInput(newValue: String, existingValue: String) =
+    private fun validateInput(
+        newValue: String,
+        existingValue: String
+    ) =
         if (newValue.isNotBlank()) newValue else existingValue
 
-    private fun populateFields(titleInput: EditText, urlInput: EditText, savedLocation: EditText) {
+    private fun populateFields(
+        titleInput: EditText,
+        urlInput: EditText,
+        savedLocation: EditText
+    ) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
         getExistingBookmarkFolderName()?.let {
@@ -100,7 +107,8 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
-    private fun getExistingBookmarkFolderName(): String? = requireArguments().getSerializable(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME) as String?
+    private fun getExistingBookmarkFolderName(): String? =
+        requireArguments().getSerializable(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME) as String?
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")
@@ -113,7 +121,11 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     companion object {
         const val KEY_SAVED_SITE = "KEY_SAVED_SITE"
 
-        fun instance(savedSite: SavedSite, parentFolderId: Long = 0, parentFolderName: String? = null): EditSavedSiteDialogFragment {
+        fun instance(
+            savedSite: SavedSite,
+            parentFolderId: Long = 0,
+            parentFolderName: String? = null
+        ): EditSavedSiteDialogFragment {
             val dialog = EditSavedSiteDialogFragment()
             val bundle = Bundle()
             bundle.putSerializable(KEY_SAVED_SITE, savedSite)

@@ -49,7 +49,11 @@ class FileDownloadNotificationManager @Inject constructor(
         }
     }
 
-    fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?) {
+    fun showDownloadFinishedNotification(
+        filename: String,
+        uri: Uri,
+        mimeType: String?
+    ) {
         mainThreadHandler().post {
             Toast.makeText(applicationContext, R.string.downloadComplete, Toast.LENGTH_LONG).show()
 

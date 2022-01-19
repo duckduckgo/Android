@@ -604,7 +604,7 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>

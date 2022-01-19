@@ -21,11 +21,11 @@ import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,7 +48,7 @@ class BrowserServiceWorkerClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestAndOriginHeaderExistThenSendItToInterceptor() = coroutinesTestRule.runBlocking {
+    fun whenShouldInterceptRequestAndOriginHeaderExistThenSendItToInterceptor() = runTest {
         val webResourceRequest: WebResourceRequest = mock()
         whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Origin" to "example.com"))
 
@@ -58,7 +58,7 @@ class BrowserServiceWorkerClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestAndOriginHeaderDoesNotExistButRefererExistThenSendItToInterceptor() = coroutinesTestRule.runBlocking {
+    fun whenShouldInterceptRequestAndOriginHeaderDoesNotExistButRefererExistThenSendItToInterceptor() = runTest {
         val webResourceRequest: WebResourceRequest = mock()
         whenever(webResourceRequest.requestHeaders).thenReturn(mapOf("Referer" to "example.com"))
 
@@ -68,7 +68,7 @@ class BrowserServiceWorkerClientTest {
     }
 
     @Test
-    fun whenShouldInterceptRequestAndNoOriginOrRefererHeadersExistThenSendNullToInterceptor() = coroutinesTestRule.runBlocking {
+    fun whenShouldInterceptRequestAndNoOriginOrRefererHeadersExistThenSendNullToInterceptor() = runTest {
         val webResourceRequest: WebResourceRequest = mock()
         whenever(webResourceRequest.requestHeaders).thenReturn(mapOf())
 
@@ -76,5 +76,4 @@ class BrowserServiceWorkerClientTest {
 
         verify(requestInterceptor).shouldInterceptFromServiceWorker(webResourceRequest, null)
     }
-
 }

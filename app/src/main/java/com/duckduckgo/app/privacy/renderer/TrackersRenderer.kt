@@ -24,12 +24,20 @@ import java.util.*
 
 class TrackersRenderer {
 
-    fun trackersText(context: Context, trackerCount: Int, allTrackersBlocked: Boolean): String {
+    fun trackersText(
+        context: Context,
+        trackerCount: Int,
+        allTrackersBlocked: Boolean
+    ): String {
         val resource = if (allTrackersBlocked) R.plurals.trackerBlocked else R.plurals.trackersFound
         return context.resources.getQuantityString(resource, trackerCount, trackerCount)
     }
 
-    fun majorNetworksText(context: Context, networkCount: Int, allTrackersBlocked: Boolean): String {
+    fun majorNetworksText(
+        context: Context,
+        networkCount: Int,
+        allTrackersBlocked: Boolean
+    ): String {
         val resource = if (allTrackersBlocked) R.plurals.majorNetworksBlocked else R.plurals.majorNetworksFound
         return context.resources.getQuantityString(resource, networkCount, networkCount)
     }
@@ -45,16 +53,26 @@ class TrackersRenderer {
     }
 
     @DrawableRes
-    fun networkPillIcon(context: Context, networkName: String): Int? {
+    fun networkPillIcon(
+        context: Context,
+        networkName: String
+    ): Int? {
         return networkIcon(context, networkName, "network_pill_")
     }
 
     @DrawableRes
-    fun networkLogoIcon(context: Context, networkName: String): Int? {
+    fun networkLogoIcon(
+        context: Context,
+        networkName: String
+    ): Int? {
         return networkIcon(context, networkName, "network_logo_")
     }
 
-    private fun networkIcon(context: Context, networkName: String, prefix: String): Int? {
+    private fun networkIcon(
+        context: Context,
+        networkName: String,
+        prefix: String
+    ): Int? {
         val drawable = "$prefix$networkName"
             .replace(" ", "_")
             .replace(".", "")
@@ -64,7 +82,10 @@ class TrackersRenderer {
         return if (resource != 0) resource else null
     }
 
-    fun networkPercentage(network: NetworkLeaderboardEntry, totalDomainsVisited: Int): String? {
+    fun networkPercentage(
+        network: NetworkLeaderboardEntry,
+        totalDomainsVisited: Int
+    ): String? {
         if (totalDomainsVisited == 0 || network.count == 0) return ""
         val to100 = ((network.count / totalDomainsVisited.toFloat()) * 100).toInt()
         return "$to100%"
@@ -75,5 +96,4 @@ class TrackersRenderer {
         0 -> R.drawable.icon_success
         else -> R.drawable.icon_fail
     }
-
 }

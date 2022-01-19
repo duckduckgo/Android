@@ -21,18 +21,29 @@ import com.duckduckgo.app.global.exception.extractExceptionCause
 import javax.inject.Inject
 
 /**
- * This is a temporary class: At some point we will introduce a new class to log handled exception or illegal states
- * to be stored and send as offline pixels
+ * This is a temporary class: At some point we will introduce a new class to log handled exception
+ * or illegal states to be stored and send as offline pixels
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ExceptionPixel @Inject constructor(private val pixel: Pixel, private val rootExceptionFinder: RootExceptionFinder) {
+class ExceptionPixel
+@Inject
+constructor(
+    private val pixel: Pixel,
+    private val rootExceptionFinder: RootExceptionFinder
+) {
 
-    fun sendExceptionPixel(pixelName: Pixel.PixelName, throwable: Throwable) {
+    fun sendExceptionPixel(
+        pixelName: Pixel.PixelName,
+        throwable: Throwable
+    ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)
     }
 
-    fun sendExceptionPixel(pixelName: String, throwable: Throwable) {
+    fun sendExceptionPixel(
+        pixelName: String,
+        throwable: Throwable
+    ) {
         val params = getParams(throwable)
         pixel.fire(pixelName, params)
     }
@@ -40,8 +51,6 @@ class ExceptionPixel @Inject constructor(private val pixel: Pixel, private val r
     private fun getParams(throwable: Throwable): Map<String, String> {
         val rootCause = rootExceptionFinder.findRootException(throwable)
         val exceptionCause = rootCause.extractExceptionCause()
-        return mapOf(
-            Pixel.PixelParameter.EXCEPTION_MESSAGE to exceptionCause
-        )
+        return mapOf(Pixel.PixelParameter.EXCEPTION_MESSAGE to exceptionCause)
     }
 }

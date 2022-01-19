@@ -9,8 +9,8 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -42,7 +42,7 @@ class BrokenSiteViewModelTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
         testee.command.observeForever(mockCommandObserver)
     }
@@ -146,7 +146,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -156,7 +156,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -168,7 +168,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite(url, "")
+        val brokenSiteExpected = testee.getBrokenSite("")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
@@ -198,7 +198,5 @@ class BrokenSiteViewModelTest {
 
     companion object Constants {
         private const val url = "http://example.com"
-        private const val message = "Feedback message"
     }
-
 }

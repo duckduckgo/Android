@@ -30,7 +30,7 @@ import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_DASHBOARD_OPENED
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import io.reactivex.Completable
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -270,7 +270,10 @@ class RxPixelSenderTest {
         )
     }
 
-    private fun assertPixelEntity(expectedEntity: PixelEntity, pixelEntity: PixelEntity) {
+    private fun assertPixelEntity(
+        expectedEntity: PixelEntity,
+        pixelEntity: PixelEntity
+    ) {
         assertEquals(expectedEntity.pixelName, pixelEntity.pixelName)
         assertEquals(expectedEntity.atb, pixelEntity.atb)
         assertEquals(expectedEntity.additionalQueryParams, pixelEntity.additionalQueryParams)
@@ -306,7 +309,10 @@ class RxPixelSenderTest {
         whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
     }
 
-    private fun PendingPixelDao.insert(pixel: PixelEntity, times: Int) {
+    private fun PendingPixelDao.insert(
+        pixel: PixelEntity,
+        times: Int
+    ) {
         for (x in 1..times) {
             this.insert(pixel)
         }

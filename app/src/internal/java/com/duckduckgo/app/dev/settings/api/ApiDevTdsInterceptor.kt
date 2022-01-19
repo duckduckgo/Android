@@ -18,14 +18,14 @@ package com.duckduckgo.app.dev.settings.api
 
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.global.api.ApiInterceptorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     boundType = ApiInterceptorPlugin::class
 )
 class ApiDevTdsInterceptor @Inject constructor(
@@ -57,5 +57,4 @@ class ApiDevTdsInterceptor @Inject constructor(
         private const val NEXT_TDS = "tds-next.json"
         private const val TDS = "tds.json"
     }
-
 }

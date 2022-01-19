@@ -21,15 +21,16 @@ import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.global.ActivityLifecycleCallbacks
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@ContributesMultibinding(AppObjectGraph::class)
-@Singleton
+@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class BrowserApplicationStateInfo @Inject constructor(
-    private val observers: Set<@JvmSuppressWildcards BrowserLifecycleObserver>
+    private val observers: DaggerSet<BrowserLifecycleObserver>
 ) : ActivityLifecycleCallbacks {
     private var created = 0
     private var started = 0
@@ -38,7 +39,10 @@ class BrowserApplicationStateInfo @Inject constructor(
     private var isFreshLaunch: Boolean = false
     private var overrideIsFreshLaunch: Boolean = false
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(
+        activity: Activity,
+        savedInstanceState: Bundle?
+    ) {
         if (created++ == 0 && !overrideIsFreshLaunch) isFreshLaunch = true
     }
 

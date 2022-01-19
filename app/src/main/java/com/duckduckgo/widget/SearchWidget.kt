@@ -47,7 +47,10 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     @Inject
     lateinit var widgetCapabilities: AppWidgetCapabilities
 
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent?
+    ) {
         inject(context)
         super.onReceive(context, intent)
     }
@@ -64,19 +67,33 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         }
     }
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray
+    ) {
         // There may be multiple widgets active, so update all of them
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId, null)
         }
     }
 
-    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
         updateAppWidget(context, appWidgetManager, appWidgetId, newOptions)
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
     }
 
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle?) {
+    private fun updateAppWidget(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle?
+    ) {
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
 
@@ -101,7 +118,10 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
 
-    override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
+    override fun onDeleted(
+        context: Context,
+        appWidgetIds: IntArray?
+    ) {
         if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
             appInstallStore.widgetInstalled = false
             pixel.fire(WIDGETS_DELETED)

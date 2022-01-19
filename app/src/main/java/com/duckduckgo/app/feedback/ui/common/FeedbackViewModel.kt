@@ -17,11 +17,16 @@
 package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.Command.Exit
-import com.duckduckgo.app.feedback.ui.common.FragmentState.*
+import com.duckduckgo.app.feedback.ui.common.FragmentState.InitialAppEnjoymentClarifier
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackMainReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeFeedbackSubReason
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeOpenEndedFeedback
+import com.duckduckgo.app.feedback.ui.common.FragmentState.NegativeWebSitesBrokenFeedback
+import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveFeedbackFirstStep
+import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveShareFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
@@ -30,7 +35,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -43,14 +49,15 @@ class FeedbackViewModel(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val appBuildConfig: AppBuildConfig,
+    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     val updateViewCommand: SingleLiveEvent<UpdateViewCommand> = SingleLiveEvent()
 
     init {
-        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
+        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = FragmentState.InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
     }
 
     private val currentViewState: UpdateViewCommand
@@ -58,12 +65,12 @@ class FeedbackViewModel(
 
     fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
         val newState = when (mainReason) {
-            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.WEBSITES_NOT_LOADING -> NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
-            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.MISSING_BROWSING_FEATURES -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.WEBSITES_NOT_LOADING -> FragmentState.NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.SEARCH_NOT_GOOD_ENOUGH -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.APP_IS_SLOW_OR_BUGGY -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.OTHER -> FragmentState.NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
         }
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
@@ -148,7 +155,7 @@ class FeedbackViewModel(
             return true
         }
 
-        if (BuildConfig.DEBUG) {
+        if (appBuildConfig.isDebug) {
             Timber.i("Not installed from the Play Store but it is DEBUG; will treat as if installed from Play Store")
             return true
         }
@@ -173,7 +180,11 @@ class FeedbackViewModel(
         )
     }
 
-    fun userProvidedNegativeOpenEndedFeedback(mainReason: MainReason, subReason: SubReason?, feedback: String) {
+    fun userProvidedNegativeOpenEndedFeedback(
+        mainReason: MainReason,
+        subReason: SubReason?,
+        feedback: String
+    ) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Exit(feedbackSubmitted = true)
             withContext(dispatchers.io()) {
@@ -182,7 +193,10 @@ class FeedbackViewModel(
         }
     }
 
-    fun onProvidedBrokenSiteFeedback(feedback: String, brokenSite: String?) {
+    fun onProvidedBrokenSiteFeedback(
+        feedback: String,
+        brokenSite: String?
+    ) {
         appCoroutineScope.launch(dispatchers.main()) {
             command.value = Exit(feedbackSubmitted = true)
             withContext(dispatchers.io()) {
@@ -218,7 +232,10 @@ class FeedbackViewModel(
         }
     }
 
-    fun userSelectedSubReasonMissingBrowserFeatures(mainReason: MainReason, subReason: FeedbackType.MissingBrowserFeaturesSubReasons) {
+    fun userSelectedSubReasonMissingBrowserFeatures(
+        mainReason: MainReason,
+        subReason: FeedbackType.MissingBrowserFeaturesSubReasons
+    ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
@@ -228,7 +245,10 @@ class FeedbackViewModel(
         )
     }
 
-    fun userSelectedSubReasonSearchNotGoodEnough(mainReason: MainReason, subReason: FeedbackType.SearchNotGoodEnoughSubReasons) {
+    fun userSelectedSubReasonSearchNotGoodEnough(
+        mainReason: MainReason,
+        subReason: FeedbackType.SearchNotGoodEnoughSubReasons
+    ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
@@ -238,7 +258,10 @@ class FeedbackViewModel(
         )
     }
 
-    fun userSelectedSubReasonNeedMoreCustomization(mainReason: MainReason, subReason: FeedbackType.CustomizationSubReasons) {
+    fun userSelectedSubReasonNeedMoreCustomization(
+        mainReason: MainReason,
+        subReason: FeedbackType.CustomizationSubReasons
+    ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
@@ -248,7 +271,10 @@ class FeedbackViewModel(
         )
     }
 
-    fun userSelectedSubReasonAppIsSlowOrBuggy(mainReason: MainReason, subReason: FeedbackType.PerformanceSubReasons) {
+    fun userSelectedSubReasonAppIsSlowOrBuggy(
+        mainReason: MainReason,
+        subReason: FeedbackType.PerformanceSubReasons
+    ) {
         val newState = NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason, subReason)
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,
@@ -282,8 +308,16 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
     // negative flow
     data class NegativeFeedbackMainReason(override val forwardDirection: Boolean) : FragmentState(forwardDirection)
 
-    data class NegativeFeedbackSubReason(override val forwardDirection: Boolean, val mainReason: MainReason) : FragmentState(forwardDirection)
-    data class NegativeOpenEndedFeedback(override val forwardDirection: Boolean, val mainReason: MainReason, val subReason: SubReason? = null) :
+    data class NegativeFeedbackSubReason(
+        override val forwardDirection: Boolean,
+        val mainReason: MainReason
+    ) : FragmentState(forwardDirection)
+
+    data class NegativeOpenEndedFeedback(
+        override val forwardDirection: Boolean,
+        val mainReason: MainReason,
+        val subReason: SubReason? = null
+    ) :
         FragmentState(forwardDirection)
 
     data class NegativeWebSitesBrokenFeedback(
@@ -305,16 +339,24 @@ data class UpdateViewCommand(
     val subReason: SubReason? = null
 )
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class FeedbackViewModelFactory @Inject constructor(
     private val playStoreUtils: Provider<PlayStoreUtils>,
     private val feedbackSubmitter: Provider<FeedbackSubmitter>,
-    private val appCoroutineScope: Provider<CoroutineScope>
+    private val appCoroutineScope: Provider<CoroutineScope>,
+    private val appBuildConfig: Provider<AppBuildConfig>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (FeedbackViewModel(playStoreUtils.get(), feedbackSubmitter.get(), appCoroutineScope.get()) as T)
+                isAssignableFrom(FeedbackViewModel::class.java) -> (
+                    FeedbackViewModel(
+                        playStoreUtils.get(),
+                        feedbackSubmitter.get(),
+                        appCoroutineScope.get(),
+                        appBuildConfig.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

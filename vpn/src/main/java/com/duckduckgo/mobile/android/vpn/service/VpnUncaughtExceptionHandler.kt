@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -26,7 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Thread.UncaughtExceptionHandler
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 class VpnUncaughtExceptionHandler(
     private val context: Context,
@@ -34,12 +34,14 @@ class VpnUncaughtExceptionHandler(
     private val coroutineScope: CoroutineScope,
 ) : UncaughtExceptionHandler {
 
-    override fun uncaughtException(thread: Thread, throwable: Throwable) {
+    override fun uncaughtException(
+        thread: Thread,
+        throwable: Throwable
+    ) {
         if (throwable is OutOfMemoryError) {
             Timber.e("Out of memory; triggering a VPN restart")
 
             restartVpn()
-
         } else {
             Timber.e(throwable, "VPN uncaughtException")
             originalHandler?.uncaughtException(thread, throwable)
@@ -54,14 +56,16 @@ class VpnUncaughtExceptionHandler(
 }
 
 @Module
-@ContributesTo(scope = AppObjectGraph::class)
+@ContributesTo(scope = AppScope::class)
 class VpnExceptionModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providesVpnUncaughtExceptionHandler(context: Context, @AppCoroutineScope vpnCoroutineScope: CoroutineScope): VpnUncaughtExceptionHandler {
+    fun providesVpnUncaughtExceptionHandler(
+        context: Context,
+        @AppCoroutineScope vpnCoroutineScope: CoroutineScope
+    ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return VpnUncaughtExceptionHandler(context, originalHandler, vpnCoroutineScope)
     }
-
 }

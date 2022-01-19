@@ -21,7 +21,7 @@ import com.duckduckgo.app.global.store.BinaryDataStore
 import com.duckduckgo.app.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -30,7 +30,7 @@ import dagger.Provides
 
 @Module
 @ContributesTo(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     replaces = [HttpsPersisterModule::class]
 )
 class PlayHttpsPersisterModule {
@@ -45,5 +45,4 @@ class PlayHttpsPersisterModule {
     ): HttpsEmbeddedDataPersister {
         return PlayHttpsEmbeddedDataPersister(httpsDataPersister, binaryDataStore, httpsBloomSpecDao, context, moshi)
     }
-
 }

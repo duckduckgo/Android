@@ -17,9 +17,7 @@
 package com.duckduckgo.app.global
 
 import android.app.Application
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
@@ -27,15 +25,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.FireActivity
-import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.AppPixelName.APP_LAUNCH
 import com.duckduckgo.app.process.ProcessDetector
 import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess
 import com.duckduckgo.app.process.ProcessDetector.DuckDuckGoProcess.VpnProcess
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.DaggerMap
 import com.duckduckgo.mobile.android.vpn.service.VpnUncaughtExceptionHandler
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.android.AndroidInjector
@@ -48,13 +43,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleObserver {
-
-    @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var unsentForgetAllPixelStore: UnsentForgetAllPixelStore
+open class DuckDuckGoApplication : HasDaggerInjector, Application() {
 
     @Inject
     lateinit var alertingUncaughtExceptionHandler: AlertingUncaughtExceptionHandler
@@ -76,11 +65,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     lateinit var appCoroutineScope: CoroutineScope
 
     @Inject
-    lateinit var injectorFactoryMap: Map<@JvmSuppressWildcards Class<*>, @JvmSuppressWildcards AndroidInjector.Factory<*>>
+    lateinit var injectorFactoryMap: DaggerMap<Class<*>, AndroidInjector.Factory<*>>
 
     private val processDetector = ProcessDetector()
-
-    private var launchedByFireAction: Boolean = false
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
@@ -107,15 +94,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
             return
         }
 
+        // Deprecated, we need to move all these into AppLifecycleEventObserver
         ProcessLifecycleOwner.get().lifecycle.apply {
-            addObserver(this@DuckDuckGoApplication)
             lifecycleObserverPluginPoint.getPlugins().forEach {
                 Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
                 addObserver(it)
             }
         }
-
-        submitUnsentFirePixels()
 
         appCoroutineScope.launch {
             referralStateListener.initialiseReferralRetrieval()
@@ -183,7 +168,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
     //
     // A proper fix should be to create a VpnServiceComponent that just provide the dependencies needed by the VPN, which would
     // also help with memory
-    override fun getDir(name: String?, mode: Int): File {
+    override fun getDir(
+        name: String?,
+        mode: Int
+    ): File {
         val dir = super.getDir(name, mode)
         if (name == "webview" && processDetector.detectProcess(this) is VpnProcess) {
             return File("${dir.absolutePath}/vpn").apply {
@@ -209,42 +197,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
         return dir
     }
 
-    private fun submitUnsentFirePixels() {
-        val count = unsentForgetAllPixelStore.pendingPixelCountClearData
-        Timber.i("Found $count unsent clear data pixels")
-        if (count > 0) {
-            val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
-            if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
-                Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
-                launchedByFireAction = true
-            }
-            for (i in 1..count) {
-                pixel.fire(AppPixelName.FORGET_ALL_EXECUTED)
-            }
-            unsentForgetAllPixelStore.resetCount()
-        }
-    }
-
     private fun initializeDateLibrary() {
         AndroidThreeTen.init(this)
         // Query the ZoneRulesProvider so that it is loaded on a background coroutine
         GlobalScope.launch(Dispatchers.IO) {
             ZoneRulesProvider.getAvailableZoneIds()
         }
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
-        if (launchedByFireAction) {
-            launchedByFireAction = false
-            Timber.i("Suppressing app launch pixel")
-            return
-        }
-        pixel.fire(APP_LAUNCH)
-    }
-
-    companion object {
-        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
     }
 
     /**
@@ -255,12 +213,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application(), LifecycleOb
      *
      * This method will return the [AndroidInjector.Factory] for the given key passed in as parameter.
      */
-    override fun daggerFactoryFor(key: Any): AndroidInjector.Factory<*> {
+    override fun daggerFactoryFor(key: Class<*>): AndroidInjector.Factory<*> {
         return injectorFactoryMap[key]
             ?: throw RuntimeException(
                 """
-                Could not find the dagger component for ${key::class.simpleName}.
-                You probably forgot to create the ${key::class.simpleName}Component
+                Could not find the dagger component for ${key.simpleName}.
+                You probably forgot to create the ${key.simpleName}Component
                 """.trimIndent()
             )
     }

@@ -77,5 +77,4 @@ class TabSwitcherButton @JvmOverloads constructor(
             .alpha(1.0f)
             .start()
     }
-
 }

@@ -22,6 +22,7 @@ import androidx.room.TypeConverter
 import com.duckduckgo.privacy.config.api.ContentBlockingException
 import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -78,10 +79,15 @@ fun HttpsExceptionEntity.toHttpsException(): HttpsException {
     return HttpsException(domain = this.domain, reason = this.reason)
 }
 
+@Entity(tableName = "gpc_header_enabled_sites")
+data class GpcHeaderEnabledSiteEntity(@PrimaryKey val domain: String)
+
+fun GpcHeaderEnabledSiteEntity.toGpcHeaderEnabledSite(): GpcHeaderEnabledSite {
+    return GpcHeaderEnabledSite(domain = this.domain)
+}
+
 @Entity(tableName = "gpc_exceptions")
-data class GpcExceptionEntity(
-    @PrimaryKey val domain: String
-)
+data class GpcExceptionEntity(@PrimaryKey val domain: String)
 
 fun GpcExceptionEntity.toGpcException(): GpcException {
     return GpcException(domain = this.domain)
@@ -107,7 +113,8 @@ data class PrivacyConfig(
 class Adapters {
     companion object {
         private val moshi = Moshi.Builder().build()
-        private val ruleListType = Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
+        private val ruleListType =
+            Types.newParameterizedType(List::class.java, AllowlistRuleEntity::class.java)
         val ruleListAdapter: JsonAdapter<List<AllowlistRuleEntity>> = moshi.adapter(ruleListType)
     }
 }

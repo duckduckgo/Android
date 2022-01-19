@@ -33,11 +33,18 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
         initLayout()
     }
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs, 0) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?
+    ) : super(context, attrs, 0) {
         initLayout()
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyleAttr: Int
+    ) : super(context, attrs, defStyleAttr) {
         initLayout()
     }
 
@@ -45,12 +52,14 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
         View.inflate(context, R.layout.view_network_tracker_pill, this)
     }
 
-    fun render(networkEntity: NetworkLeaderboardEntry?, totalSitesVisited: Int) {
+    fun render(
+        networkEntity: NetworkLeaderboardEntry?,
+        totalSitesVisited: Int
+    ) {
         networkEntity ?: return
         icon.setImageResource(renderer.networkPillIcon(context, networkEntity.networkName) ?: R.drawable.network_pill_generic)
         val percentText = renderer.networkPercentage(networkEntity, totalSitesVisited)
         icon.contentDescription = "${networkEntity.networkName} $percentText"
         percentage.text = percentText
     }
-
 }

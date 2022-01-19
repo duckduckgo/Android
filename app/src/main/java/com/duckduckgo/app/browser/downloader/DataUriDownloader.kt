@@ -30,7 +30,10 @@ class DataUriDownloader @Inject constructor(
 ) {
 
     @WorkerThread
-    fun download(pending: FileDownloader.PendingFileDownload, callback: FileDownloader.FileDownloadListener?) {
+    fun download(
+        pending: FileDownloader.PendingFileDownload,
+        callback: FileDownloader.FileDownloadListener?
+    ) {
 
         try {
             callback?.downloadStartedDataUri()
@@ -63,12 +66,18 @@ class DataUriDownloader @Inject constructor(
         }
     }
 
-    private fun writeBytesToFiles(data: String?, file: File) {
+    private fun writeBytesToFiles(
+        data: String?,
+        file: File
+    ) {
         val imageByteArray = Base64.decode(data, Base64.DEFAULT)
         file.writeBytes(imageByteArray)
     }
 
-    private fun initialiseFilesOnDisk(pending: FileDownloader.PendingFileDownload, generatedFilename: GeneratedFilename): File {
+    private fun initialiseFilesOnDisk(
+        pending: FileDownloader.PendingFileDownload,
+        generatedFilename: GeneratedFilename
+    ): File {
         val downloadDirectory = pending.directory
         val file = File(downloadDirectory, generatedFilename.toString())
 

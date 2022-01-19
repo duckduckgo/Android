@@ -24,13 +24,14 @@ import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class BookmarkFoldersDaoTest {
 
     @get:Rule
@@ -72,7 +73,7 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenBookmarkFolderAddedThenItIsInTheList() = runBlocking {
+    fun whenBookmarkFolderAddedThenItIsInTheList() = runTest {
         val bookmarkFolderEntity = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         bookmarkFoldersDao.insert(bookmarkFolderEntity)
         val list = bookmarkFoldersDao.getBookmarkFolders().first()
@@ -80,14 +81,14 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenBookmarkFoldersAddedThenTheyAreInTheList() = runBlocking {
+    fun whenBookmarkFoldersAddedThenTheyAreInTheList() = runTest {
         bookmarkFoldersDao.insertList(bookmarkFolderList)
         val list = bookmarkFoldersDao.getBookmarkFoldersSync()
         assertEquals(bookmarkFolderList, list)
     }
 
     @Test
-    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulated() = runBlocking {
+    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulated() = runTest {
         bookmarkFoldersDao.insertList(bookmarkFolderList)
         bookmarksDao.insertList(bookmarksList)
 
@@ -105,7 +106,7 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulatedByParentId() = runBlocking {
+    fun whenBookmarksAndBookmarkFoldersAddedThenNumBookmarksAndNumFoldersPopulatedByParentId() = runTest {
         bookmarkFoldersDao.insertList(bookmarkFolderList)
         bookmarksDao.insertList(bookmarksList)
 
@@ -128,14 +129,14 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenInInitialStateThenTheBookmarkFoldersAreEmpty() = runBlocking {
+    fun whenInInitialStateThenTheBookmarkFoldersAreEmpty() = runTest {
         val list = bookmarkFoldersDao.getBookmarkFoldersByParentId(0).first()
         assertNotNull(list)
         assertTrue(list.isEmpty())
     }
 
     @Test
-    fun whenBookmarkFolderDeletedThenItIsNoLongerInTheList() = runBlocking {
+    fun whenBookmarkFolderDeletedThenItIsNoLongerInTheList() = runTest {
         val bookmarkFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         bookmarkFoldersDao.insert(bookmarkFolder)
         bookmarkFoldersDao.delete(listOf(bookmarkFolder))
@@ -144,7 +145,7 @@ class BookmarkFoldersDaoTest {
     }
 
     @Test
-    fun whenBookmarkFolderUpdatedThenUpdateBookmarkFolder() = runBlocking {
+    fun whenBookmarkFolderUpdatedThenUpdateBookmarkFolder() = runTest {
         bookmarkFoldersDao.insert(BookmarkFolderEntity(id = 1, name = "name", parentId = 0))
 
         val bookmarkFolderEntity = BookmarkFolderEntity(id = 1, name = "updated name", parentId = 0)

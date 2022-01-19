@@ -21,8 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
 
 abstract class ComponentFragment : Fragment() {
@@ -35,7 +35,10 @@ abstract class ComponentFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_component_list, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceBundle: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceBundle: Bundle?
+    ) {
         super.onViewCreated(view, savedInstanceBundle)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
@@ -46,5 +49,4 @@ abstract class ComponentFragment : Fragment() {
     }
 
     abstract fun getComponents(): List<Component>
-
 }

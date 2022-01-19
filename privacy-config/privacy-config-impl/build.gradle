@@ -57,7 +57,7 @@ dependencies {
     testImplementation project(path: ':common-test')
     testImplementation AndroidX.work.testing
     testImplementation AndroidX.room.testing
-    testImplementation Testing.mockito.kotlin
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
@@ -65,6 +65,9 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+
+    androidTestImplementation project(path: ':common-test')
+    testImplementation project(path: ':common-test')
 }
 
 android {

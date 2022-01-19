@@ -25,21 +25,21 @@ import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.job.TestWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -64,11 +64,18 @@ class AppEmailWaitlistCodeFetcherTest {
     @Before
     fun before() {
         initializeWorkManager()
-        testee = AppEmailWaitlistCodeFetcher(workManager, mockEmailManager, mockNotification, mockNotificationSender, coroutineRule.testDispatcherProvider, TestCoroutineScope())
+        testee = AppEmailWaitlistCodeFetcher(
+            workManager,
+            mockEmailManager,
+            mockNotification,
+            mockNotificationSender,
+            coroutineRule.testDispatcherProvider,
+            TestScope()
+        )
     }
 
     @Test
-    fun whenFetchInviteCodeIfUserInQueueCodeAlreadyExistsAndWorkerIsRunningThenCancelWorker() = coroutineRule.runBlocking {
+    fun whenFetchInviteCodeIfUserInQueueCodeAlreadyExistsAndWorkerIsRunningThenCancelWorker() = runTest {
         givenUserIsInTheQueueAndCodeAlreadyExists()
         enqueueWaitlistWorker()
 
@@ -78,7 +85,7 @@ class AppEmailWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenFetchInviteCodeIfUserInQueueAndCodeReturnedThenCancelWorker() = coroutineRule.runBlocking {
+    fun whenFetchInviteCodeIfUserInQueueAndCodeReturnedThenCancelWorker() = runTest {
         givenUserIsInTheQueueAndCodeReturned()
         enqueueWaitlistWorker()
 
@@ -88,7 +95,7 @@ class AppEmailWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenFetchInviteCodeIfUserInQueueAndCodeReturnedThenNotificationSent() = coroutineRule.runBlocking {
+    fun whenFetchInviteCodeIfUserInQueueAndCodeReturnedThenNotificationSent() = runTest {
         givenUserIsInTheQueueAndCodeReturned()
         enqueueWaitlistWorker()
 
@@ -98,7 +105,7 @@ class AppEmailWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenFetchInviteCodeIfUserInQueueAndNoCodeReturnedThenDoNothing() = coroutineRule.runBlocking {
+    fun whenFetchInviteCodeIfUserInQueueAndNoCodeReturnedThenDoNothing() = runTest {
         givenUserIsInTheQueueAndNoCodeReturned()
         enqueueWaitlistWorker()
 
@@ -109,7 +116,7 @@ class AppEmailWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = coroutineRule.runBlocking {
+    fun whenExecuteWaitlistCodeFetcherIfUserInNotInQueueThenDoNothing() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.NotJoinedQueue)
 
         (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
@@ -118,7 +125,7 @@ class AppEmailWaitlistCodeFetcherTest {
     }
 
     @Test
-    fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = coroutineRule.runBlocking {
+    fun whenExecuteWaitlistCodeFetcherIfUserIsInBetaThenDoNothing() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.InBeta)
 
         (testee as AppEmailWaitlistCodeFetcher).executeWaitlistCodeFetcher()
@@ -126,17 +133,17 @@ class AppEmailWaitlistCodeFetcherTest {
         verify(mockEmailManager, never()).fetchInviteCode()
     }
 
-    private fun givenUserIsInTheQueueAndCodeAlreadyExists() = coroutineRule.runBlocking {
+    private fun givenUserIsInTheQueueAndCodeAlreadyExists() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.CodeExisted)
     }
 
-    private fun givenUserIsInTheQueueAndCodeReturned() = coroutineRule.runBlocking {
+    private fun givenUserIsInTheQueueAndCodeReturned() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.Code)
     }
 
-    private fun givenUserIsInTheQueueAndNoCodeReturned() = coroutineRule.runBlocking {
+    private fun givenUserIsInTheQueueAndNoCodeReturned() = runTest {
         whenever(mockEmailManager.waitlistState()).thenReturn(AppEmailManager.WaitlistState.JoinedQueue())
         whenever(mockEmailManager.fetchInviteCode()).thenReturn(AppEmailManager.FetchCodeResult.NoCode)
     }

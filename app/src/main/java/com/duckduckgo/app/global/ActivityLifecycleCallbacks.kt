@@ -20,14 +20,19 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
+    override fun onActivityCreated(
+        activity: Activity,
+        savedInstanceState: Bundle?
+    ) {
+    }
 
     override fun onActivityStarted(activity: Activity) {}
 
@@ -37,13 +42,17 @@ interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
 
     override fun onActivityStopped(activity: Activity) {}
 
-    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+    override fun onActivitySaveInstanceState(
+        activity: Activity,
+        outState: Bundle
+    ) {
+    }
 
     override fun onActivityDestroyed(activity: Activity) {}
 }
 
 private class ActivityLifecycleCallbacksPluginPoint(
-    private val plugins: Set<@JvmSuppressWildcards ActivityLifecycleCallbacks>
+    private val plugins: DaggerSet<ActivityLifecycleCallbacks>
 ) : PluginPoint<ActivityLifecycleCallbacks> {
     override fun getPlugins(): Collection<ActivityLifecycleCallbacks> {
         return plugins.sortedBy { it.javaClass.simpleName }
@@ -51,11 +60,11 @@ private class ActivityLifecycleCallbacksPluginPoint(
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class ActivityLifecycleCallbacksModule {
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun provideActivityLifecycleCallbacksPluginPoint(
-        plugins: Set<@JvmSuppressWildcards ActivityLifecycleCallbacks>
+        plugins: DaggerSet<ActivityLifecycleCallbacks>
     ): PluginPoint<ActivityLifecycleCallbacks> = ActivityLifecycleCallbacksPluginPoint(plugins)
 }

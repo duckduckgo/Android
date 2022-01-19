@@ -27,7 +27,7 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -109,7 +109,10 @@ class LocationPermissionsViewModel(
         _viewState.value = _viewState.value?.copy(locationPermissionEnabled = enabled)
     }
 
-    override fun onSiteLocationPermissionSelected(domain: String, permission: LocationPermissionType) {
+    override fun onSiteLocationPermissionSelected(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         when (permission) {
             LocationPermissionType.ALLOW_ALWAYS -> {
                 pixel.fire(AppPixelName.PRECISE_LOCATION_SITE_DIALOG_ALLOW_ALWAYS)
@@ -135,7 +138,7 @@ class LocationPermissionsViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class LocationPermissionsViewModelFactory @Inject constructor(
     private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
     private val geoLocationPermissions: Provider<GeoLocationPermissions>,
@@ -146,7 +149,15 @@ class LocationPermissionsViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (LocationPermissionsViewModel(locationPermissionsRepository.get(), geoLocationPermissions.get(), dispatcherProvider.get(), settingsDataStore.get(), pixel.get()) as T)
+                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (
+                    LocationPermissionsViewModel(
+                        locationPermissionsRepository.get(),
+                        geoLocationPermissions.get(),
+                        dispatcherProvider.get(),
+                        settingsDataStore.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

@@ -28,7 +28,7 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -59,7 +59,11 @@ class BookmarkFoldersViewModel(
         viewState.value = ViewState()
     }
 
-    fun fetchBookmarkFolders(selectedFolderId: Long, rootFolderName: String, currentFolder: BookmarkFolder?) {
+    fun fetchBookmarkFolders(
+        selectedFolderId: Long,
+        rootFolderName: String,
+        currentFolder: BookmarkFolder?
+    ) {
         saveCurrentFolderAndSelectedFolderId(currentFolder, selectedFolderId)
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
@@ -67,7 +71,10 @@ class BookmarkFoldersViewModel(
         }
     }
 
-    private fun saveCurrentFolderAndSelectedFolderId(currentFolder: BookmarkFolder?, selectedFolderId: Long) {
+    private fun saveCurrentFolderAndSelectedFolderId(
+        currentFolder: BookmarkFolder?,
+        selectedFolderId: Long
+    ) {
         viewState.value = currentViewState().copy(currentFolder = currentFolder, selectedFolderId = selectedFolderId)
     }
 
@@ -98,7 +105,7 @@ class BookmarkFoldersViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BookmarkFoldersViewModelFactory @Inject constructor(
     private val bookmarksRepository: Provider<BookmarksRepository>,
     private val dispatcherProvider: Provider<DispatcherProvider>

@@ -22,18 +22,24 @@ import androidx.work.WorkManager
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorker
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
-import com.duckduckgo.mobile.android.vpn.waitlist.api.*
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPInviteCodeResponse
+import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeResponse
+import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
+import com.duckduckgo.mobile.android.vpn.waitlist.api.WaitlistResponse
+import com.duckduckgo.mobile.android.vpn.waitlist.api.WaitlistStatusResponse
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -49,6 +55,7 @@ class AppTPWaitlistViewModelTest {
     private var service: AppTrackingProtectionWaitlistService = mock()
     private var workManager: WorkManager = mock()
     private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = mock()
+    private val deviceShieldPixels: DeviceShieldPixels = mock()
 
     private lateinit var viewModel: AppTPWaitlistViewModel
 
@@ -58,11 +65,11 @@ class AppTPWaitlistViewModelTest {
     @Before
     fun before() {
         whenever(manager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
-        viewModel = AppTPWaitlistViewModel(manager, service, workManager, waitlistBuilder)
+        viewModel = AppTPWaitlistViewModel(manager, service, workManager, waitlistBuilder, deviceShieldPixels)
     }
 
     @Test
-    fun whenUserJoinsWaitlistSuccesfullyThenNotificationDialogIsShown() = coroutineRule.runBlocking {
+    fun whenUserJoinsWaitlistSuccesfullyThenNotificationDialogIsShown() = runTest {
         val success = WaitlistResponse("token", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -74,13 +81,14 @@ class AppTPWaitlistViewModelTest {
 
             verify(manager).joinWaitlist(any(), any())
             verify(workManager).enqueue(expectedWorkRequest)
+            verify(deviceShieldPixels).didShowWaitlistDialog()
 
             assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
         }
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageisShown() = coroutineRule.runBlocking {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageisShown() = runTest {
         val success = WaitlistResponse("", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -91,7 +99,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageisShown() = coroutineRule.runBlocking {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageisShown() = runTest {
         val success = WaitlistResponse("token", null)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -102,8 +110,8 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserCantJoinsWaitlistThenErrorMessageIsShown() = coroutineRule.runBlocking {
-        viewModel = AppTPWaitlistViewModel(manager, FailWaitlistService(), workManager, waitlistBuilder)
+    fun whenUserCantJoinsWaitlistThenErrorMessageIsShown() = runTest {
+        viewModel = AppTPWaitlistViewModel(manager, FailWaitlistService(), workManager, waitlistBuilder, deviceShieldPixels)
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
@@ -112,14 +120,14 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenWaitlistStateIsNotJoined() = coroutineRule.runBlocking {
+    fun whenViewModelCreatedThenWaitlistStateIsNotJoined() = runTest {
         viewModel.viewState.test {
             assert(awaitItem().waitlist is WaitlistState.NotJoinedQueue)
         }
     }
 
     @Test
-    fun whenUserHasAnInviteCodeThenEnterInviteCodeCommandSent() = coroutineRule.runBlocking {
+    fun whenUserHasAnInviteCodeThenEnterInviteCodeCommandSent() = runTest {
         viewModel.commands.test {
             viewModel.haveAnInviteCode()
             assert(awaitItem() is AppTPWaitlistViewModel.Command.EnterInviteCode)
@@ -127,7 +135,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserWantsToLearnMoreThenOpenUrlCommandSent() = coroutineRule.runBlocking {
+    fun whenUserWantsToLearnMoreThenOpenUrlCommandSent() = runTest {
         viewModel.commands.test {
             viewModel.learnMore()
             assertEquals(AppTPWaitlistViewModel.Command.LaunchBetaInstructions, awaitItem())
@@ -135,13 +143,15 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserWantsToBeNotifiedThenWaitlistManagerStoresIt() = coroutineRule.runBlocking {
+    fun whenUserWantsToBeNotifiedThenWaitlistManagerStoresIt() = runTest {
         viewModel.onNotifyMeClicked()
+
         verify(manager).notifyOnJoinedWaitlist()
+        verify(deviceShieldPixels).didPressWaitlistDialogNotifyMe()
     }
 
     @Test
-    fun whenUserWantsToGetStartedThenShowOnboardingCommandSent() = coroutineRule.runBlocking {
+    fun whenUserWantsToGetStartedThenShowOnboardingCommandSent() = runTest {
         viewModel.commands.test {
             viewModel.getStarted()
             assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
@@ -149,18 +159,26 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserDismissedDialogThenWaitlistStateIsJoinedQueue() = coroutineRule.runBlocking {
+    fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
         val waitlistState = WaitlistState.JoinedQueue(false)
         whenever(manager.waitlistState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onDialogDismissed()
+
+            verify(deviceShieldPixels, never()).didPressWaitlistDialogDismiss()
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(waitlistState)), awaitEvent())
         }
     }
 
     @Test
-    fun whenCodeRedeemSuccessThenWaitlistStateIsCodeRedeemed() = coroutineRule.runBlocking {
+    fun whenUserDismissedDialogThenWaitlistStateIsJoinedQueue() = runTest {
+        viewModel.onNoThanksClicked()
+        verify(deviceShieldPixels).didPressWaitlistDialogDismiss()
+    }
+
+    @Test
+    fun whenCodeRedeemSuccessThenWaitlistStateIsCodeRedeemed() = runTest {
         val waitlistState = WaitlistState.CodeRedeemed
         whenever(manager.waitlistState()).thenReturn(waitlistState)
         viewModel.viewState.test {
@@ -171,7 +189,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenCodeRedeemFailsThenWaitlistStateIsCodeRedeemed() = coroutineRule.runBlocking {
+    fun whenCodeRedeemFailsThenWaitlistStateIsCodeRedeemed() = runTest {
         val waitlistState = WaitlistState.CodeRedeemed
         whenever(manager.waitlistState()).thenReturn(waitlistState)
         viewModel.viewState.test {
@@ -183,12 +201,14 @@ class AppTPWaitlistViewModelTest {
 
     class FailWaitlistService : AppTrackingProtectionWaitlistService {
 
-        override suspend fun joinWaitlist(): WaitlistResponse { throw java.lang.Exception() }
+        override suspend fun joinWaitlist(): WaitlistResponse {
+            throw java.lang.Exception()
+        }
+
         override suspend fun waitlistStatus(): WaitlistStatusResponse = WaitlistStatusResponse(1234)
         override suspend fun getCode(token: String): AppTPInviteCodeResponse = AppTPInviteCodeResponse("token")
         override suspend fun redeemCode(code: String): AppTPRedeemCodeResponse {
             TODO("Not yet implemented")
         }
     }
-
 }

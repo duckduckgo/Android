@@ -49,7 +49,10 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         binding.fireAnimationView.playAnimation()
     }
 
-    private fun configureFireAnimationView(fireAnimation: FireAnimation, fireAnimationView: LottieAnimationView) {
+    private fun configureFireAnimationView(
+        fireAnimation: FireAnimation,
+        fireAnimationView: LottieAnimationView
+    ) {
         fireAnimationView.setAnimation(fireAnimation.resId)
         fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
         fireAnimationView.enableMergePathsForKitKatAndAbove(true)
@@ -81,7 +84,10 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         private const val ANIMATION_MAX_SPEED = 1.4f
         private const val ANIMATION_SPEED_INCREMENT = 0.15f
 
-        fun intent(context: Context, fireAnimation: FireAnimation): Intent {
+        fun intent(
+            context: Context,
+            fireAnimation: FireAnimation
+        ): Intent {
             val intent = Intent(context, FireAnimationActivity::class.java)
             intent.putExtra(FIRE_ANIMATION_EXTRA, fireAnimation)
             return intent

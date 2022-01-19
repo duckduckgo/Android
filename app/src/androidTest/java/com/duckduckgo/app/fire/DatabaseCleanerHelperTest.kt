@@ -17,12 +17,19 @@
 package com.duckduckgo.app.fire
 
 import androidx.test.platform.app.InstrumentationRegistry
-import kotlinx.coroutines.runBlocking
+import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class DatabaseCleanerHelperTest {
+
+    @get:Rule
+    private val coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -31,16 +38,16 @@ class DatabaseCleanerHelperTest {
 
     @Before
     fun before() {
-        testee = DatabaseCleanerHelper()
+        testee = DatabaseCleanerHelper(coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenCleanDatabaseThenReturnTrue() = runBlocking {
+    fun whenCleanDatabaseThenReturnTrue() = runTest {
         assertTrue(testee.cleanDatabase(databaseLocator.getDatabasePath()))
     }
 
     @Test
-    fun whenChangeJournalModeToDeleteThenReturnTrue() = runBlocking {
+    fun whenChangeJournalModeToDeleteThenReturnTrue() = runTest {
         assertTrue(testee.changeJournalModeToDelete(databaseLocator.getDatabasePath()))
     }
 }

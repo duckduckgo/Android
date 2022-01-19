@@ -19,8 +19,8 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.statistics.Variant
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -78,5 +78,9 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
-    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int, val variant: Variant)
+    data class TestCase(
+        val defaultBrowserPage: Boolean,
+        val expectedPageCount: Int,
+        val variant: Variant
+    )
 }

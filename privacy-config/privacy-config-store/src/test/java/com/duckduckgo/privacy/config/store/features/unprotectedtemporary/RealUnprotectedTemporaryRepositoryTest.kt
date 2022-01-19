@@ -17,24 +17,25 @@
 package com.duckduckgo.privacy.config.store.features.unprotectedtemporary
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.reset
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
-import kotlinx.coroutines.test.TestCoroutineScope
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 
+@ExperimentalCoroutinesApi
 class RealUnprotectedTemporaryRepositoryTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealUnprotectedTemporaryRepository
 
@@ -44,57 +45,56 @@ class RealUnprotectedTemporaryRepositoryTest {
     @Before
     fun before() {
         whenever(mockDatabase.unprotectedTemporaryDao()).thenReturn(mockUnprotectedTemporaryDao)
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealUnprotectedTemporaryRepository(
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
     }
 
     @Test
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenUnprotectedTemporaryDaoContainsExceptions()
 
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+        testee =
+            RealUnprotectedTemporaryRepository(
+                mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+            )
 
         assertEquals(unprotectedTemporaryException, testee.exceptions.first())
     }
 
     @Test
-    fun whenUpdateAllThenUpdateAllCalled() = coroutineRule.runBlocking {
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
+    fun whenUpdateAllThenUpdateAllCalled() =
+        runTest {
+            testee =
+                RealUnprotectedTemporaryRepository(
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        verify(mockUnprotectedTemporaryDao).updateAll(ArgumentMatchers.anyList())
-    }
+            verify(mockUnprotectedTemporaryDao).updateAll(ArgumentMatchers.anyList())
+        }
 
     @Test
-    fun whenUpdateAllThenPreviousExceptionsAreCleared() = coroutineRule.runBlocking {
-        givenUnprotectedTemporaryDaoContainsExceptions()
-        testee = RealUnprotectedTemporaryRepository(
-            mockDatabase,
-            TestCoroutineScope(),
-            coroutineRule.testDispatcherProvider
-        )
-        assertEquals(1, testee.exceptions.size)
-        reset(mockUnprotectedTemporaryDao)
+    fun whenUpdateAllThenPreviousExceptionsAreCleared() =
+        runTest {
+            givenUnprotectedTemporaryDaoContainsExceptions()
+            testee =
+                RealUnprotectedTemporaryRepository(
+                    mockDatabase, TestScope(), coroutineRule.testDispatcherProvider
+                )
+            assertEquals(1, testee.exceptions.size)
+            reset(mockUnprotectedTemporaryDao)
 
-        testee.updateAll(listOf())
+            testee.updateAll(listOf())
 
-        assertEquals(0, testee.exceptions.size)
-    }
+            assertEquals(0, testee.exceptions.size)
+        }
 
     private fun givenUnprotectedTemporaryDaoContainsExceptions() {
-        whenever(mockUnprotectedTemporaryDao.getAll()).thenReturn(listOf(unprotectedTemporaryException))
+        whenever(mockUnprotectedTemporaryDao.getAll())
+            .thenReturn(listOf(unprotectedTemporaryException))
     }
 
     companion object {

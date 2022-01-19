@@ -25,7 +25,7 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -36,9 +36,15 @@ class ChangeIconViewModel @Inject constructor(
     private val pixel: Pixel
 ) : ViewModel() {
 
-    data class IconViewData(val appIcon: AppIcon, val selected: Boolean) {
+    data class IconViewData(
+        val appIcon: AppIcon,
+        val selected: Boolean
+    ) {
         companion object {
-            fun from(appIcon: AppIcon, selectedAppIcon: AppIcon): IconViewData {
+            fun from(
+                appIcon: AppIcon,
+                selectedAppIcon: AppIcon
+            ): IconViewData {
                 return if (appIcon.componentName == selectedAppIcon.componentName) {
                     IconViewData(appIcon, true)
                 } else {
@@ -79,7 +85,7 @@ class ChangeIconViewModel @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ChangeIconViewModelFactory @Inject constructor(
     private val settingsDataStore: Provider<SettingsDataStore>,
     private val appIconModifier: Provider<IconModifier>,
@@ -88,7 +94,13 @@ class ChangeIconViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ChangeIconViewModel::class.java) -> (ChangeIconViewModel(settingsDataStore.get(), appIconModifier.get(), pixel.get()) as T)
+                isAssignableFrom(ChangeIconViewModel::class.java) -> (
+                    ChangeIconViewModel(
+                        settingsDataStore.get(),
+                        appIconModifier.get(),
+                        pixel.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

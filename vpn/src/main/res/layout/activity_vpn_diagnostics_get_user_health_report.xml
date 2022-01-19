@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="HardcodedText"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"
+    android:layout_width="match_parent"
+    android:fillViewport="true"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/userHealthSelectionInstructions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:labelFor="@id/userHealthSelection"
+            android:layout_margin="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:text="App Tracking Protection - User Report" />
+
+        <TextView
+            android:id="@+id/userHealthSelectionInstructionsAdditional"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:layout_constraintTop_toBottomOf="@id/userHealthSelectionInstructions"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Are you experiencing a problem with AppTP right now?"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <RadioGroup
+            android:id="@+id/userHealthSelection"
+            android:layout_width="0dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toBottomOf="@id/userHealthSelectionInstructionsAdditional"
+            app:layout_constraintStart_toStartOf="@id/userNotesInstructions"
+            app:layout_constraintEnd_toEndOf="@id/userNotesInstructions"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/goodHealth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:text="Everything seems fine" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/badHealth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:text="Something's not working" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/undetermined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:text="Not sure / skip" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/userNotesInstructions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:labelFor="@id/userHealthNotes"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_marginTop="45dp"
+            android:layout_margin="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/userHealthSelection"
+            android:text="Additional notes (optional)" />
+
+        <EditText
+            android:id="@+id/userHealthNotes"
+            android:layout_width="0dp"
+            android:importantForAutofill="no"
+            android:overScrollMode="always"
+            android:scrollbarStyle="insideInset"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:scrollbars="vertical"
+            android:maxLength="200"
+            android:inputType="text|textMultiLine"
+            android:maxLines="3"
+            app:layout_constraintStart_toStartOf="@id/userNotesInstructions"
+            app:layout_constraintEnd_toEndOf="@id/userNotesInstructions"
+            app:layout_constraintTop_toBottomOf="@id/userNotesInstructions" />
+
+        <TextView
+            android:id="@+id/submissionInstructions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:layout_constraintTop_toBottomOf="@id/userHealthNotes"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Information in this screen will be combined with anonymous diagnostics data and sent to DuckDuckGo to help improve App Tracking Protection."
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/doneButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/DeviceShield.Button.Blue"
+            app:layout_constraintTop_toBottomOf="@id/submissionInstructions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="14dp"
+            android:padding="20dp"
+            app:layout_constraintHorizontal_bias="0.8"
+            android:text="Submit" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

@@ -31,9 +31,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -57,7 +57,7 @@ class CtaTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
 
         whenever(mockActivity.resources).thenReturn(mockResources)
         whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
@@ -297,7 +297,14 @@ class CtaTest {
     @Test
     fun whenTrackersBlockedReturnThemSortingByPrevalence() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent(
+                "facebook.com",
+                "facebook.com",
+                blocked = true,
+                entity = TestEntity("Facebook", "Facebook", 3.0),
+                categories = null,
+                surrogateId = null
+            ),
             TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
@@ -312,7 +319,14 @@ class CtaTest {
     @Test
     fun whenTrackersBlockedReturnOnlyTrackersWithDisplayName() {
         val trackers = listOf(
-            TrackingEvent("facebook.com", "facebook.com", blocked = true, entity = TestEntity("Facebook", "Facebook", 3.0), categories = null, surrogateId = null),
+            TrackingEvent(
+                "facebook.com",
+                "facebook.com",
+                blocked = true,
+                entity = TestEntity("Facebook", "Facebook", 3.0),
+                categories = null,
+                surrogateId = null
+            ),
             TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)

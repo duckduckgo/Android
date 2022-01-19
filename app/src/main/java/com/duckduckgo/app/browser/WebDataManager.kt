@@ -28,7 +28,11 @@ import java.io.File
 import javax.inject.Inject
 
 interface WebDataManager {
-    suspend fun clearData(webView: WebView, webStorage: WebStorage)
+    suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage
+    )
+
     fun clearWebViewSessions()
 }
 
@@ -40,7 +44,10 @@ class WebViewDataManager @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore
 ) : WebDataManager {
 
-    override suspend fun clearData(webView: WebView, webStorage: WebStorage) {
+    override suspend fun clearData(
+        webView: WebView,
+        webStorage: WebStorage
+    ) {
         clearWebViewCache(webView)
         clearHistory(webView)
         clearWebStorage(webStorage)

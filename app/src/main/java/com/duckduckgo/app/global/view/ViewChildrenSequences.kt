@@ -15,6 +15,7 @@
  */
 
 @file:Suppress("unused")
+
 package com.duckduckgo.app.global.view
 
 import android.view.View

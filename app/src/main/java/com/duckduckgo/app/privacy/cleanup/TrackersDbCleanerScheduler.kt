@@ -18,21 +18,18 @@ package com.duckduckgo.app.privacy.cleanup
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.*
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -46,7 +43,7 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class TrackersDbCleanerSchedulerModule {
 
     @Provides
@@ -83,26 +80,15 @@ class TrackersDbCleanerWorkerInjectorPlugin(
     }
 }
 
-class TrackersDbCleanerScheduler(private val workManager: WorkManager) : LifecycleObserver {
+class TrackersDbCleanerScheduler(private val workManager: WorkManager) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleDbCleaner() {
-        if (isAlreadyScheduled()) {
-            Timber.v("Trackers Blocked DB cleaner worker is already scheduled, no need to schedule again")
-        } else {
-            Timber.v("Scheduling Trackers Blocked DB cleaner")
-            val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
-                .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-                .build()
-            workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
-        }
-    }
-
-    private fun isAlreadyScheduled(): Boolean {
-        return workManager
-            .getWorkInfosByTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
-            .get().any { it.state == WorkInfo.State.ENQUEUED }
+    override fun onCreate(owner: LifecycleOwner) {
+        Timber.v("Scheduling Trackers Blocked DB cleaner")
+        val dbCleanerWorkRequest = PeriodicWorkRequestBuilder<TrackersDbCleanerWorker>(7, TimeUnit.DAYS)
+            .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
     }
 
     companion object {
@@ -110,7 +96,10 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Lifecyc
     }
 }
 
-class TrackersDbCleanerWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams), CoroutineScope {
+class TrackersDbCleanerWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams), CoroutineScope {
 
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
     lateinit var appTrackersDao: VpnTrackerDao

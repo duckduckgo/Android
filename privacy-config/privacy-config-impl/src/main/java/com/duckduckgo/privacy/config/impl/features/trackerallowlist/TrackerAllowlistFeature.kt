@@ -23,10 +23,6 @@ data class TrackerAllowlistFeature(
     val settings: TrackerAllowSettings
 )
 
-data class TrackerAllowSettings(
-    val allowlistedTrackers: Map<String, AllowListedTrackers>
-)
+data class TrackerAllowSettings(val allowlistedTrackers: Map<String, AllowListedTrackers>)
 
-data class AllowListedTrackers(
-    val rules: List<AllowlistRuleEntity>
-)
+data class AllowListedTrackers(val rules: List<AllowlistRuleEntity>)
