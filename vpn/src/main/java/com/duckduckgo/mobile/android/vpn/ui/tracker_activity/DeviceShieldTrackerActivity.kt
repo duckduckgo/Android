@@ -450,6 +450,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchFeedback() {
+        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 

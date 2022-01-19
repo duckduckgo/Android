@@ -116,6 +116,10 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_LAUNCH_FEEDBACK("m_atp_ev_launch_feedback_c"),
     ATP_LAUNCH_FEEDBACK_DAILY("m_atp_ev_launch_feedback_d"),
 
+    ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG("m_atp_submit_disable_app_protection_dialog"),
+    ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG("m_atp_skip_disable_app_protection_dialog"),
+    ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY("m_atp_imp_tracker_activity_report_issues"),
+
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
     ATP_APP_HEALTH_MONITOR_REPORT("m_atp_health_monitor_report"),
     ATP_APP_HEALTH_ALERT_DAILY("m_atp_health_alert_%s_d"),

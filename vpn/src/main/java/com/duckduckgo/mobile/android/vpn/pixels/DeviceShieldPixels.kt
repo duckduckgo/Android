@@ -232,6 +232,15 @@ interface DeviceShieldPixels {
     /** Will fire when the user restores to the default protection list */
     fun launchAppTPFeedback()
 
+    /** Will fire when the user submits the form that disables protection for an app */
+    fun didSubmitManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user skips the form that disables protection for an app */
+    fun didSkipManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user launches the report issues screen from the tracker activity */
+    fun didSubmitReportIssuesFromTrackerActivity()
+
     /**
      * Will fire when the user reports an app breakage
      */
@@ -500,6 +509,18 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun launchAppTPFeedback() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK)
+    }
+
+    override fun didSubmitManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSkipManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSubmitReportIssuesFromTrackerActivity() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY)
     }
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
