@@ -93,8 +93,7 @@ class JsonRemoteMessageMapper {
         return runCatching {
             RemoteMessage(
                 id = this.id.failIfEmpty(),
-                messageType = this.messageType.failIfEmpty(),
-                content = this.content!!.mapToContent(this.messageType),
+                content = this.content!!.mapToContent(this.content.messageType),
                 matchingRules = this.matchingRules.orEmpty(),
                 exclusionRules = this.exclusionRules.orEmpty()
             )

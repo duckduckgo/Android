@@ -3,18 +3,25 @@
   "messages": [
     {
       "id": "26780792-49fe-4e25-ae27-aa6a2e6f013b",
-      "messageType": "unknown",
       "content": {
+        "messageType": "unknown",
         "titleText": "Here goes a title",
         "descriptionText": "description"
       },
-      "matchingRules": [5, 6],
-      "exclusionRules": [7, 8, 9]
+      "matchingRules": [
+        5,
+        6
+      ],
+      "exclusionRules": [
+        7,
+        8,
+        9
+      ]
     },
     {
       "id": "8274589c-8aeb-4322-a737-3852911569e3",
-      "messageType": "big_single_action",
       "content": {
+        "messageType": "big_single_action",
         "titleText": "title",
         "descriptionText": "description",
         "placeholder": "WARNING",
@@ -27,20 +34,22 @@
     },
     {
       "id": "c3549d64-b388-41d8-9649-33e6e2674e8e",
-      "messageType": "medium",
       "content": {
+        "messageType": "medium",
         "titleText": "Here goes a title",
         "descriptionText": "description",
         "placeholder": "UNKNOWN"
       }
     }
   ],
-  "matchingRules": [
+  "rules": [
     {
       "id": 6,
       "attributes": {
         "unknown": {
-          "value": ["en_GB"],
+          "value": [
+            "en_GB"
+          ],
           "fallback": true
         }
       }

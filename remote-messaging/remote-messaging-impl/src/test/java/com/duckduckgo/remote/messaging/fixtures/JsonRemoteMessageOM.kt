@@ -33,6 +33,7 @@ object JsonRemoteMessageOM {
         titleText: String = "title",
         descriptionText: String = "description"
     ) = JsonContent(
+        messageType = "small",
         titleText = titleText,
         descriptionText = descriptionText
     )
@@ -42,6 +43,7 @@ object JsonRemoteMessageOM {
         descriptionText: String = "description",
         placeholder: String = "placeholder"
     ) = JsonContent(
+        messageType = "medium",
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder
@@ -54,6 +56,7 @@ object JsonRemoteMessageOM {
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction()
     ) = JsonContent(
+        messageType = "big_single_action",
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
@@ -70,6 +73,7 @@ object JsonRemoteMessageOM {
         secondaryActionText: String = "Action2",
         secondaryAction: JsonMessageAction = jsonMessageAction()
     ) = JsonContent(
+        messageType = "big_two_action",
         titleText = titleText,
         descriptionText = descriptionText,
         placeholder = placeholder,
@@ -79,83 +83,17 @@ object JsonRemoteMessageOM {
         secondaryAction = secondaryAction
     )
 
-    fun emptyJsonContent() = JsonContent()
+    fun emptyJsonContent(messageType: String = "") = JsonContent(messageType = messageType)
 
     fun aJsonMessage(
         id: String = "id",
-        messageType: String = "small",
-        content: JsonContent? = bigSingleActionJsonContent(),
+        content: JsonContent? = emptyJsonContent(),
         exclusionRules: List<Int>? = emptyList(),
         matchingRules: List<Int>? = emptyList()
     ) = JsonRemoteMessage(
         id = id,
-        messageType = messageType,
         content = content,
         exclusionRules = exclusionRules,
         matchingRules = matchingRules
     )
-
-    fun aSmallJsonMessage(
-        id: String = "id",
-        messageType: String = "small",
-        content: JsonContent = smallJsonContent(),
-        exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList()
-    ): JsonRemoteMessage {
-        return JsonRemoteMessage(
-            id = id,
-            messageType = messageType,
-            content = content,
-            exclusionRules = exclusionRules,
-            matchingRules = matchingRules
-        )
-    }
-
-    fun aMediumJsonMessage(
-        id: String = "id",
-        messageType: String = "medium",
-        content: JsonContent = mediumJsonContent(),
-        exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList()
-    ): JsonRemoteMessage {
-        return JsonRemoteMessage(
-            id = id,
-            messageType = messageType,
-            content = content,
-            exclusionRules = exclusionRules,
-            matchingRules = matchingRules
-        )
-    }
-
-    fun aBigSingleActionJsonMessage(
-        id: String = "id",
-        messageType: String = "big_single_action",
-        content: JsonContent = bigSingleActionJsonContent(),
-        exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList()
-    ): JsonRemoteMessage {
-        return JsonRemoteMessage(
-            id = id,
-            messageType = messageType,
-            content = content,
-            exclusionRules = exclusionRules,
-            matchingRules = matchingRules
-        )
-    }
-
-    fun aBigTwoActionJsonMessage(
-        id: String = "id",
-        messageType: String = "big_two_action",
-        content: JsonContent = bigTwoActionJsonContent(),
-        exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList()
-    ): JsonRemoteMessage {
-        return JsonRemoteMessage(
-            id = id,
-            messageType = messageType,
-            content = content,
-            exclusionRules = exclusionRules,
-            matchingRules = matchingRules
-        )
-    }
 }
