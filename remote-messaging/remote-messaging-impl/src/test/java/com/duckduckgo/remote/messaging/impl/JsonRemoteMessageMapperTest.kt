@@ -16,13 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aBigSingleActionJsonMessage
-import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aBigTwoActionJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
-import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aMediumJsonMessage
-import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aSmallJsonMessage
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigSingleActionJsonContent
+import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigTwoActionJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.emptyJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.mediumJsonContent
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.smallJsonContent
@@ -30,6 +27,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleAction
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -54,10 +52,10 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
         fun parameters() = arrayOf(
             TestCase(
                 listOf(
-                    aSmallJsonMessage(id = "id1"),
-                    aMediumJsonMessage(id = "id2"),
-                    aBigSingleActionJsonMessage(id = "id3"),
-                    aBigTwoActionJsonMessage(id = "id4")
+                    aJsonMessage(id = "id1", content = smallJsonContent()),
+                    aJsonMessage(id = "id2", content = mediumJsonContent()),
+                    aJsonMessage(id = "id3", content = bigSingleActionJsonContent()),
+                    aJsonMessage(id = "id4", content = bigTwoActionJsonContent())
                 ),
                 listOf(
                     aSmallMessage(id = "id1"),
@@ -68,26 +66,31 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
             ),
             TestCase(
                 listOf(
-                    aSmallJsonMessage(id = "id1", content = emptyJsonContent()),
-                    aMediumJsonMessage(id = "id2", content = smallJsonContent()),
-                    aBigSingleActionJsonMessage(id = "id3", content = mediumJsonContent()),
-                    aBigTwoActionJsonMessage(id = "id4", content = mediumJsonContent())
+                    aJsonMessage(id = "id1", content = emptyJsonContent()),
+                    aJsonMessage(id = "id2", content = smallJsonContent()),
+                    aJsonMessage(id = "id3", content = mediumJsonContent()),
+                    aJsonMessage(id = "id4", content = bigSingleActionJsonContent()),
+                    aJsonMessage(id = "id5", content = bigTwoActionJsonContent()),
                 ),
-                emptyList()
+                listOf(
+                    aSmallMessage(id = "id2"),
+                    aMediumMessage(id = "id3"),
+                    aBigSingleActionMessage(id = "id4"),
+                    aBigTwoActionsMessage(id = "id5")
+                )
             ),
             TestCase(
                 listOf(
-                    aSmallJsonMessage(id = "id1", content = emptyJsonContent()),
-                    aMediumJsonMessage(id = "id2", content = emptyJsonContent()),
-                    aBigSingleActionJsonMessage(id = "id3", content = emptyJsonContent()),
-                    aBigTwoActionJsonMessage(id = "id4", content = emptyJsonContent())
+                    aJsonMessage(id = "id1", content = emptyJsonContent()),
+                    aJsonMessage(id = "id1", content = emptyJsonContent(messageType = "small")),
+                    aJsonMessage(id = "id1", content = emptyJsonContent(messageType = "medium"))
                 ),
                 emptyList()
             ),
             TestCase(
                 listOf(
                     aJsonMessage(id = ""),
-                    aJsonMessage(messageType = ""),
+                    aJsonMessage(content = emptyJsonContent()),
                     aJsonMessage(content = null)
                 ),
                 emptyList()

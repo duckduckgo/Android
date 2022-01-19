@@ -77,14 +77,12 @@ object RemoteMessageOM {
 
     fun aSmallMessage(
         id: String = "id",
-        messageType: String = "small",
         content: Content = smallContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList()
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
-            messageType = messageType,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules
@@ -93,14 +91,12 @@ object RemoteMessageOM {
 
     fun aMediumMessage(
         id: String = "id",
-        messageType: String = "medium",
         content: Content = mediumContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList()
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
-            messageType = messageType,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules
@@ -109,14 +105,12 @@ object RemoteMessageOM {
 
     fun aBigSingleActionMessage(
         id: String = "id",
-        messageType: String = "big_single_action",
         content: Content = bigSingleActionContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList()
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
-            messageType = messageType,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules
@@ -125,14 +119,12 @@ object RemoteMessageOM {
 
     fun aBigTwoActionsMessage(
         id: String = "id",
-        messageType: String = "big_two_action",
         content: Content = bigTwoActionsContent(),
         exclusionRules: List<Int> = emptyList(),
         matchingRules: List<Int> = emptyList()
     ): RemoteMessage {
         return RemoteMessage(
             id = id,
-            messageType = messageType,
             content = content,
             exclusionRules = exclusionRules,
             matchingRules = matchingRules

@@ -24,13 +24,13 @@ data class JsonRemoteMessagingConfig(
 
 data class JsonRemoteMessage(
     val id: String,
-    val messageType: String,
     val content: JsonContent?,
     val exclusionRules: List<Int>?,
     val matchingRules: List<Int>?
 )
 
 data class JsonContent(
+    val messageType: String = "",
     val titleText: String = "",
     val descriptionText: String = "",
     val placeholder: String = "",

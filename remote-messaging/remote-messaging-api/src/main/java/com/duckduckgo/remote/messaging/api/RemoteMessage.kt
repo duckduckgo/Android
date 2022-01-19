@@ -16,24 +16,28 @@
 
 package com.duckduckgo.remote.messaging.api
 
+import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
+import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
+import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
+import com.duckduckgo.remote.messaging.api.Content.MessageType.SMALL
+
 data class RemoteMessage(
     val id: String,
-    val messageType: String,
     val content: Content,
     val matchingRules: List<Int>,
     val exclusionRules: List<Int>
 )
 
-sealed class Content {
-    data class Small(val titleText: String, val descriptionText: String) : Content()
-    data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : Content()
+sealed class Content(val messageType: MessageType) {
+    data class Small(val titleText: String, val descriptionText: String) : Content(SMALL)
+    data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : Content(MEDIUM)
     data class BigSingleAction(
         val titleText: String,
         val descriptionText: String,
         val placeholder: String,
         val primaryActionText: String,
         val primaryAction: Action
-    ) : Content()
+    ) : Content(BIG_SINGLE_ACTION)
 
     data class BigTwoActions(
         val titleText: String,
@@ -43,7 +47,14 @@ sealed class Content {
         val primaryAction: Action,
         val secondaryActionText: String,
         val secondaryAction: Action
-    ) : Content()
+    ) : Content(BIG_TWO_ACTION)
+
+    enum class MessageType {
+        SMALL,
+        MEDIUM,
+        BIG_SINGLE_ACTION,
+        BIG_TWO_ACTION
+    }
 }
 
 sealed class Action {
