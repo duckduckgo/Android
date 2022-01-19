@@ -18,7 +18,11 @@ package com.duckduckgo.remote.messaging.impl
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
+import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import junit.framework.Assert.assertEquals
@@ -27,7 +31,7 @@ import org.junit.Test
 
 class AppRemoteMessagingRepositoryTest {
 
-    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val db = Room.inMemoryDatabaseBuilder(context, RemoteMessagingDatabase::class.java)
         .allowMainThreadQueries()
@@ -41,11 +45,10 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenAddMessageThenMessageStored() {
+    fun whenAddMediumMessageThenMessageStored() {
         testee.add(
             RemoteMessage(
                 id = "id",
-                messageType = "nothing",
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
@@ -61,11 +64,116 @@ class AppRemoteMessagingRepositoryTest {
         assertEquals(
             RemoteMessage(
                 id = "id",
-                messageType = "nothing",
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
                     placeholder = "placeholder"
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            ),
+            message
+        )
+    }
+
+    @Test
+    fun whenAddSmallMessageThenMessageStored() {
+        testee.add(
+            RemoteMessage(
+                id = "id",
+                content = Small(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText"
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+
+        val message = testee.message()
+
+        assertEquals(
+            RemoteMessage(
+                id = "id",
+                content = Small(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText"
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            ),
+            message
+        )
+    }
+
+    @Test
+    fun whenAddBigSingleActionMessageThenMessageStored() {
+        testee.add(
+            RemoteMessage(
+                id = "id",
+                content = BigSingleAction(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText"
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+
+        val message = testee.message()
+
+        assertEquals(
+            RemoteMessage(
+                id = "id",
+                content = BigSingleAction(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText"
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            ),
+            message
+        )
+    }
+
+    @Test
+    fun whenAddBigTwoActionMessageThenMessageStored() {
+        testee.add(
+            RemoteMessage(
+                id = "id",
+                content = BigTwoActions(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText",
+                    secondaryActionText = "actionText",
+                    secondaryAction = Action.Dismiss()
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+
+        val message = testee.message()
+
+        assertEquals(
+            RemoteMessage(
+                id = "id",
+                content = BigTwoActions(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText",
+                    secondaryActionText = "actionText",
+                    secondaryAction = Action.Dismiss()
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList()

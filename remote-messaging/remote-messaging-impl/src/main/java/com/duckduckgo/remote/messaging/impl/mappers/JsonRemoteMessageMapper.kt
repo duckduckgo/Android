@@ -74,7 +74,7 @@ class JsonRemoteMessageMapper {
     }
 
     private val dismissActionMapper: (JsonMessageAction) -> Action = {
-        Action.Dismiss
+        Action.Dismiss()
     }
 
     private val playStoreActionMapper: (JsonMessageAction) -> Action = {

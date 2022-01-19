@@ -16,6 +16,10 @@
 
 package com.duckduckgo.remote.messaging.api
 
+import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS
+import com.duckduckgo.remote.messaging.api.Action.ActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.Action.ActionType.URL
+import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
@@ -57,8 +61,14 @@ sealed class Content(val messageType: MessageType) {
     }
 }
 
-sealed class Action {
-    data class Url(val value: String) : Action()
-    data class PlayStore(val value: String) : Action()
-    object Dismiss : Action()
+sealed class Action(val actionType: ActionType) {
+    data class Url(val value: String) : Action(URL)
+    data class PlayStore(val value: String) : Action(PLAYSTORE)
+    data class Dismiss(private val value: String = "") : Action(DISMISS)
+
+    enum class ActionType {
+        URL,
+        PLAYSTORE,
+        DISMISS
+    }
 }

@@ -16,18 +16,22 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.Action
+import com.duckduckgo.remote.messaging.api.Action.ActionType
+import com.duckduckgo.remote.messaging.api.Action.Dismiss
+import com.duckduckgo.remote.messaging.api.Action.PlayStore
+import com.duckduckgo.remote.messaging.api.Action.Url
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
+import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
-import com.duckduckgo.remote.messaging.impl.ContentTest.MediumTest
-import com.duckduckgo.remote.messaging.impl.ContentTest.SmallTest
-import com.duckduckgo.remote.messaging.impl.MessageType.medium
-import com.duckduckgo.remote.messaging.impl.MessageType.small
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULED
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -40,12 +44,7 @@ class AppRemoteMessagingRepository(
     private val messageMapper = MessageMapper()
 
     override fun add(message: RemoteMessage) {
-        val messageContent = when (val content = message.content) {
-            is Small -> SmallTest(content.titleText, content.descriptionText)
-            is Medium -> MediumTest(content.titleText, content.descriptionText, content.placeholder)
-            else -> TODO()
-        }
-        val stringMessage = messageMapper.toString(RemoteMessageTest(message.id, message.messageType, messageContent))
+        val stringMessage = messageMapper.toString(message)
         remoteMessagesDao.insert(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
     }
 
@@ -53,22 +52,16 @@ class AppRemoteMessagingRepository(
         val messageEntity = remoteMessagesDao.messages().firstOrNull() ?: return null
         val message = messageMapper.fromMessage(messageEntity.message) ?: return null
 
-        val messageContent = when (val content = message.content) {
-            is SmallTest -> Small(content.titleText, content.descriptionText)
-            is MediumTest -> Medium(content.titleText, content.descriptionText, content.placeholder)
-            else -> TODO()
-        }
-
-        return RemoteMessage(message.id, "nothing", messageContent, emptyList(), emptyList())
+        return RemoteMessage(message.id, message.content, emptyList(), emptyList())
     }
 
     private class MessageMapper {
 
-        fun toString(sitePayload: RemoteMessageTest): String {
+        fun toString(sitePayload: RemoteMessage): String {
             return messageAdapter.toJson(sitePayload)
         }
 
-        fun fromMessage(payload: String): RemoteMessageTest? {
+        fun fromMessage(payload: String): RemoteMessage? {
             return runCatching {
                 messageAdapter.fromJson(payload)
             }.getOrNull()
@@ -77,36 +70,22 @@ class AppRemoteMessagingRepository(
         companion object {
             var moshi = Moshi.Builder()
                 .add(
-                    PolymorphicJsonAdapterFactory.of(ContentTest::class.java, "messageType")
-                        .withSubtype(SmallTest::class.java, MessageType.small.name)
-                        .withSubtype(MediumTest::class.java, MessageType.medium.name)
+                    PolymorphicJsonAdapterFactory.of(Content::class.java, "messageType")
+                        .withSubtype(Small::class.java, MessageType.SMALL.name)
+                        .withSubtype(Medium::class.java, MessageType.MEDIUM.name)
+                        .withSubtype(BigSingleAction::class.java, MessageType.BIG_SINGLE_ACTION.name)
+                        .withSubtype(BigTwoActions::class.java, MessageType.BIG_TWO_ACTION.name)
+                )
+                .add(
+                    PolymorphicJsonAdapterFactory.of(Action::class.java, "actionType")
+                        .withSubtype(PlayStore::class.java, ActionType.PLAYSTORE.name)
+                        .withSubtype(Url::class.java, ActionType.URL.name)
+                        .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
                 )
                 // if you have more adapters, add them before this line:
                 .add(KotlinJsonAdapterFactory())
                 .build()
-            val messageAdapter: JsonAdapter<RemoteMessageTest> = moshi.adapter(RemoteMessageTest::class.java)
+            val messageAdapter: JsonAdapter<RemoteMessage> = moshi.adapter(RemoteMessage::class.java)
         }
     }
-}
-
-data class RemoteMessageTest(
-    val id: String,
-    val messageType: String,
-    val content: ContentTest
-)
-
-enum class MessageType {
-    small,
-    medium
-}
-
-sealed class ContentTest(@Json(name = "messageType") val messageType: MessageType) {
-    data class SmallTest(val titleText: String, val descriptionText: String) : ContentTest(small)
-    data class MediumTest(val titleText: String, val descriptionText: String, val placeholder: String) : ContentTest(medium)
-}
-
-sealed class Action {
-    data class Url(val value: String) : Action()
-    data class PlayStore(val value: String) : Action()
-    object Dismiss : Action()
 }

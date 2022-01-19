@@ -105,7 +105,7 @@ class RemoteMessagingConfigJsonMapperTest {
                     value = "com.duckduckgo.mobile.android"
                 ),
                 secondaryActionText = "Cancel",
-                secondaryAction = Action.Dismiss,
+                secondaryAction = Action.Dismiss(),
             ),
             matchingRules = emptyList(),
             exclusionRules = emptyList()
