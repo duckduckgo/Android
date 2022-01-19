@@ -22,7 +22,7 @@ import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import com.duckduckgo.remote.messaging.impl.models.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.matchers.Result
 import timber.log.Timber
 
