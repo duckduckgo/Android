@@ -62,10 +62,10 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.NetworkSwitchHandling -> assertFalse(config.isEnabled(setting))
-                AppTpSetting.SetActiveNetworkDns -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.ConnectivityChecks -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.VpnNewNetworkingLayer -> assertFalse(config.isEnabled(setting))
             }
         }
     }

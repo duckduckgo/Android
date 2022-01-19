@@ -182,9 +182,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
                 binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
-                binding.setActiveNetworkDnsToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.transparencyModeToggle.isEnabled = isEnabled
+                binding.vpnNewNetworkingLayerToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
             }
             .launchIn(lifecycleScope)
@@ -313,9 +313,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.SetActiveNetworkDns) {
-            binding.setActiveNetworkDnsToggle.isChecked = appTpConfig.isEnabled(this)
-            binding.setActiveNetworkDnsToggle.setOnCheckedChangeListener { _, isChecked ->
+        with(AppTpSetting.ConnectivityChecks) {
+            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {
@@ -324,9 +324,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.ConnectivityChecks) {
-            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
-            binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
+        with(AppTpSetting.VpnNewNetworkingLayer) {
+            binding.vpnNewNetworkingLayerToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnNewNetworkingLayerToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {
