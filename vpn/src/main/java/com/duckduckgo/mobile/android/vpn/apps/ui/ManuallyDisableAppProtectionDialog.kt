@@ -31,7 +31,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(answer: Int, appName: String, packageName: String, skippedReport: Boolean = false)
+        fun onAppProtectionDisabled(
+            answer: Int,
+            appName: String,
+            packageName: String,
+            skippedReport: Boolean = false
+        )
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener

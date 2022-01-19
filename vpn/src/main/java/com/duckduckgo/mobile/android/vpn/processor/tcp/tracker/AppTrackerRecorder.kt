@@ -61,7 +61,10 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Batched app tracker recorder stopped")
         periodicInsertionJob.cancel()
         coroutineScope.launch(insertionDispatcher) {

@@ -61,18 +61,4 @@
         app:toggleSubTitle="@string/devSettingsScreenTdsVersion"
         app:toggleTitle="@string/devSettingsScreenTdsVersionSubtitle" />
 
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/privacyTest1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/devSettingsScreenMajorScript"
-        app:subtitle="@string/devSettingsScreenMajorScriptSubtitle" />
-
-    <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
-        android:id="@+id/privacyTest2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:title="@string/devSettingsScreenMajorFetch"
-        app:subtitle="@string/devSettingsScreenMajorFetchSubtitle"/>
-
 </LinearLayout>

@@ -28,7 +28,10 @@ import javax.inject.Inject
 class PrivacyFeatureTogglesPlugin @Inject constructor(private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository) :
     FeatureTogglesPlugin {
 
-    override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
+    override fun isEnabled(
+        featureName: FeatureName,
+        defaultValue: Boolean
+    ): Boolean? {
         return if (featureName is PrivacyFeatureName) {
             privacyFeatureTogglesRepository.get(featureName.value, defaultValue)
         } else {

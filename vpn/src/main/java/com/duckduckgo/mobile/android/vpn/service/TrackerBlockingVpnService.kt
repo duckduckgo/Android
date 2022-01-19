@@ -102,7 +102,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     inner class VpnServiceBinder : Binder() {
 
-        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+        override fun onTransact(
+            code: Int,
+            data: Parcel,
+            reply: Parcel?,
+            flags: Int
+        ): Boolean {
             if (code == LAST_CALL_TRANSACTION) {
                 onRevoke()
                 return true
@@ -140,7 +145,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         Timber.e("VPN log onStartCommand: ${intent?.action}")
 
         var returnCode: Int = Service.START_NOT_STICKY
@@ -169,7 +178,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("Failed to establish the TUN interface")
-            restartVpnService(applicationContext)
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
             return@withContext
         }
 
@@ -403,7 +412,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        suspend fun restartVpnService(context: Context, forceGc: Boolean = false) = withContext(Dispatchers.Default) {
+        suspend fun restartVpnService(
+            context: Context,
+            forceGc: Boolean = false
+        ) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
                 Timber.v("VPN log: stopping service")

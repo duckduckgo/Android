@@ -64,22 +64,22 @@ class VpnControllerViewModel(
 
     fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
 
-    data class VpnRunningStatus(val runningTimeMillis: Long, val isRunning: Boolean)
+    data class VpnRunningStatus(
+        val runningTimeMillis: Long,
+        val isRunning: Boolean
+    )
 
     data class AppTrackersBlocked(val trackerList: List<VpnTracker>) {
 
         fun byCompany(): Map<Int, List<VpnTracker>> {
             return trackerList.groupBy { it.trackerCompanyId }
         }
-
     }
 
     data class WebTrackersBlocked(val trackerList: List<WebTrackerBlocked>) {
 
         fun byCompany(): Map<String, List<WebTrackerBlocked>> {
             return trackerList.groupBy { it.trackerCompany }
-
         }
-
     }
 }

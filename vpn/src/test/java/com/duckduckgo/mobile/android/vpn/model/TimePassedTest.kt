@@ -98,5 +98,4 @@ class TimePassedTest {
         val timePassed = TimePassed(0, 10, 10)
         assertEquals("10m ago", timePassed.shortFormat())
     }
-
 }

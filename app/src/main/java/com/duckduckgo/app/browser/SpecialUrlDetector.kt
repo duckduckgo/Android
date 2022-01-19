@@ -38,8 +38,19 @@ interface SpecialUrlDetector {
         class Telephone(val telephoneNumber: String) : UrlType()
         class Email(val emailAddress: String) : UrlType()
         class Sms(val telephoneNumber: String) : UrlType()
-        class AppLink(val appIntent: Intent? = null, val excludedComponents: List<ComponentName>? = null, val uriString: String) : UrlType()
-        class NonHttpAppLink(val uriString: String, val intent: Intent, val fallbackUrl: String?, val fallbackIntent: Intent? = null) : UrlType()
+        class AppLink(
+            val appIntent: Intent? = null,
+            val excludedComponents: List<ComponentName>? = null,
+            val uriString: String
+        ) : UrlType()
+
+        class NonHttpAppLink(
+            val uriString: String,
+            val intent: Intent,
+            val fallbackUrl: String?,
+            val fallbackIntent: Intent? = null
+        ) : UrlType()
+
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
         class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
@@ -121,8 +132,12 @@ class SpecialUrlDetectorImpl(
             resolveInfo.filter != null && !(isBrowserFilter(resolveInfo.filter))
         }
     }
+
     @Throws(URISyntaxException::class)
-    private fun buildNonBrowserIntent(nonBrowserActivity: ResolveInfo, uriString: String): Intent {
+    private fun buildNonBrowserIntent(
+        nonBrowserActivity: ResolveInfo,
+        uriString: String
+    ): Intent {
         val intent = Intent.parseUri(uriString, URI_NO_FLAG)
         intent.component = ComponentName(nonBrowserActivity.activityInfo.packageName, nonBrowserActivity.activityInfo.name)
         return intent
@@ -137,7 +152,10 @@ class SpecialUrlDetectorImpl(
     private fun isBrowserFilter(filter: IntentFilter) =
         filter.countDataAuthorities() == 0 && filter.countDataPaths() == 0
 
-    private fun checkForIntent(scheme: String, uriString: String): UrlType {
+    private fun checkForIntent(
+        scheme: String,
+        uriString: String
+    ): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
         if (scheme.matches(validUriSchemeRegex)) {
             return buildIntent(uriString)

@@ -57,7 +57,11 @@ class DeviceShieldFragment : Fragment() {
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         AndroidSupportInjection.inject(this)
         val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
 

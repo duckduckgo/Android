@@ -64,7 +64,12 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
-            val referenceTest = adapter.fromJson(FileUtilities.loadText(PrivacyConfigMissingReferenceTest::class.java.classLoader!!, "reference_tests/privacyconfig/tests.json"))
+            val referenceTest = adapter.fromJson(
+                FileUtilities.loadText(
+                    PrivacyConfigMissingReferenceTest::class.java.classLoader!!,
+                    "reference_tests/privacyconfig/tests.json"
+                )
+            )
             referenceJsonFile = referenceTest?.localExceptions?.referenceConfig!!
             return referenceTest.localExceptions.tests.filterNot { it.exceptPlatforms.contains("android-browser") }
         }
@@ -84,8 +89,10 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         givenFeatureToggleIsEnabled()
-        when(testCase.featureName) {
-            "contentBlocking" -> { testFeatureEnabledForContentBlocking() }
+        when (testCase.featureName) {
+            "contentBlocking" -> {
+                testFeatureEnabledForContentBlocking()
+            }
         }
     }
 
@@ -112,7 +119,11 @@ class PrivacyConfigLocalExceptionsReferenceTest(private val testCase: TestCase) 
             referenceTestUtilities.privacyRepository,
             db
         )
-        privacyConfigPersister.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
+        privacyConfigPersister.persistPrivacyConfig(
+            referenceTestUtilities.getJsonPrivacyConfig(
+                "reference_tests/privacyconfig/$referenceJsonFile"
+            )
+        )
     }
 
     private fun givenFeatureToggleIsEnabled() {

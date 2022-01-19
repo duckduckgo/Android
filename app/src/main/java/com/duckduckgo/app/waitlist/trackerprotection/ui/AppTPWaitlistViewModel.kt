@@ -92,7 +92,10 @@ class AppTPWaitlistViewModel(
         }
     }
 
-    private fun joinedWaitlist(timestamp: Int, token: String) {
+    private fun joinedWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
         deviceShieldPixels.didShowWaitlistDialog()
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)
@@ -108,14 +111,16 @@ class AppTPWaitlistViewModel(
     }
 
     fun onNotifyMeClicked() {
-        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
         viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogNotifyMe()
             waitlistManager.notifyOnJoinedWaitlist()
         }
     }
 
     fun onNoThanksClicked() {
-        deviceShieldPixels.didPressWaitlistDialogDismiss()
+        viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogDismiss()
+        }
     }
 
     fun onDialogDismissed() {

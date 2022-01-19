@@ -8,15 +8,15 @@ If your PR involves UI changes:
 If your PR does not involve UI changes, you can remove the **UI changes** section
 -->
 
-Task/Issue URL:
+Task/Issue URL: 
 
 ### Description
 
 ### Steps to test this PR
 
 _Feature 1_
-1. 
-2.
+- [ ]
+- [ ]
 
 ### UI changes
 | Before  | After |

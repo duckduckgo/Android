@@ -73,8 +73,10 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         receiver?.unregister()
     }
-
 }

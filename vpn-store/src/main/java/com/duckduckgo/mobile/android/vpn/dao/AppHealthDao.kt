@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.gpc
+package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.duckduckgo.privacy.config.store.GpcExceptionEntity
+import com.duckduckgo.mobile.android.vpn.model.AppHealthState
+import com.duckduckgo.mobile.android.vpn.model.HealthEventType
 
 @Dao
-abstract class GpcDao {
+interface AppHealthDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAll(domains: List<GpcExceptionEntity>)
+    fun insert(appHealthState: AppHealthState)
 
     @Transaction
-    open fun updateAll(domains: List<GpcExceptionEntity>) {
-        deleteAll()
-        insertAll(domains)
+    fun remove(type: HealthEventType): AppHealthState? {
+        return latestHealthState(type)?.also { clear(type) }
     }
 
-    @Query("select * from gpc_exceptions where domain = :domain")
-    abstract fun get(domain: String): GpcExceptionEntity
+    @Query("SELECT * from app_health_state where type=:type ORDER BY localtime DESC LIMIT 1")
+    fun latestHealthState(type: HealthEventType): AppHealthState?
 
-    @Query("select * from gpc_exceptions") abstract fun getAll(): List<GpcExceptionEntity>
+    @Query("delete from app_health_state where type=:type")
+    fun clear(type: HealthEventType)
 
-    @Query("delete from gpc_exceptions") abstract fun deleteAll()
+    @Query("delete from app_health_state")
+    fun clearAll()
 }

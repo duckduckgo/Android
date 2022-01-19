@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
@@ -49,7 +51,9 @@ class UdpPacketProcessor @AssistedInject constructor(
     private val packetPersister: PacketPersister,
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     private val appNameResolver: AppNameResolver,
-    private val channelCache: UdpChannelCache
+    private val channelCache: UdpChannelCache,
+    private val healthMetricCounter: HealthMetricCounter,
+    private val appBuildConfig: AppBuildConfig,
 ) : Runnable {
 
     @AssistedFactory
@@ -72,7 +76,6 @@ class UdpPacketProcessor @AssistedInject constructor(
         if (pollJobNetworkToDevice == null) {
             pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
         }
-
     }
 
     fun stop() {
@@ -127,6 +130,8 @@ class UdpPacketProcessor @AssistedInject constructor(
     private fun deviceToNetworkProcessing() {
         val packet = queues.udpDeviceToNetwork.take() ?: return
 
+        healthMetricCounter.onReadFromDeviceToNetworkQueue(isUdp = true)
+
         val destinationAddress = packet.ip4Header.destinationAddress
         val destinationPort = packet.udpHeader.destinationPort
         val cacheKey = generateCacheKey(packet)
@@ -141,8 +146,13 @@ class UdpPacketProcessor @AssistedInject constructor(
                 return
             }
 
-            val packageId = originatingAppPackageResolver.resolvePackageId(connectionInfo)
-            val appName = appNameResolver.getAppNameForPackageId(packageId).appName
+            // only resolve app name/packageId in debug builds to speed up UDP processing
+            val (packageId, appName) = if (appBuildConfig.isDebug) {
+                val appPackage = originatingAppPackageResolver.resolvePackageId(connectionInfo)
+                appPackage to appNameResolver.getAppNameForPackageId(appPackage).appName
+            } else {
+                "some.package.id" to "some.app.name"
+            }
             channelDetails = ChannelDetails(channel, OriginatingApp(packageId, appName))
             channelCache.put(cacheKey, channelDetails)
         }
@@ -155,7 +165,10 @@ class UdpPacketProcessor @AssistedInject constructor(
         try {
             val payloadBuffer = packet.backingBuffer ?: return
 
-            Timber.d("App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} bytes to ${connectionInfo.destinationAddress}")
+            Timber.d(
+                "App ${channelDetails.originatingApp} attempting to send ${packet.backingBuffer?.remaining()} " +
+                    "bytes to ${connectionInfo.destinationAddress}"
+            )
 
             while (payloadBuffer.hasRemaining()) {
                 val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
@@ -234,10 +247,12 @@ class UdpPacketProcessor @AssistedInject constructor(
         return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
 
-    data class ChannelDetails(val datagramChannel: DatagramChannel, val originatingApp: OriginatingApp)
+    data class ChannelDetails(
+        val datagramChannel: DatagramChannel,
+        val originatingApp: OriginatingApp
+    )
 
     companion object {
         private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE
     }
-
 }

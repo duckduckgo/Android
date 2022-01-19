@@ -94,7 +94,10 @@ class WebsitesAdapter(
         entries.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WebsiteViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): WebsiteViewHolder {
         Timber.d("Whitelist: onCreateViewHolder $viewType ")
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
@@ -131,7 +134,10 @@ class WebsitesAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: WebsiteViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: WebsiteViewHolder,
+        position: Int
+    ) {
         when (holder) {
             is WebsiteViewHolder.WebsiteItemViewHolder -> {
                 holder.bind(entries[getWebsiteItemPosition(position)])
@@ -176,7 +182,10 @@ sealed class WebsiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemVie
             }
         }
 
-        private fun showOverFlowMenu(anchor: View, entity: UserWhitelistedDomain) {
+        private fun showOverFlowMenu(
+            anchor: View,
+            entity: UserWhitelistedDomain
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {

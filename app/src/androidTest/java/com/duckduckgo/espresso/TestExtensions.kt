@@ -28,7 +28,11 @@ import org.hamcrest.Matchers
 import org.hamcrest.StringDescription
 import java.util.concurrent.TimeoutException
 
-fun waitForView(viewMatcher: Matcher<View>, timeout: Long = 10000, waitForDisplayed: Boolean = true): ViewAction {
+fun waitForView(
+    viewMatcher: Matcher<View>,
+    timeout: Long = 10000,
+    waitForDisplayed: Boolean = true
+): ViewAction {
     return object : ViewAction {
         override fun getConstraints(): Matcher<View> {
             return Matchers.any(View::class.java)
@@ -37,10 +41,14 @@ fun waitForView(viewMatcher: Matcher<View>, timeout: Long = 10000, waitForDispla
         override fun getDescription(): String {
             val matcherDescription = StringDescription()
             viewMatcher.describeTo(matcherDescription)
-            return "wait for a specific view <$matcherDescription> to be ${if (waitForDisplayed) "displayed" else "not displayed during $timeout millis."}"
+            return "wait for a specific view <$matcherDescription>" +
+                " to be ${if (waitForDisplayed) "displayed" else "not displayed during $timeout millis."}"
         }
 
-        override fun perform(uiController: UiController, view: View) {
+        override fun perform(
+            uiController: UiController,
+            view: View
+        ) {
             uiController.loopMainThreadUntilIdle()
             val startTime = System.currentTimeMillis()
             val endTime = startTime + timeout

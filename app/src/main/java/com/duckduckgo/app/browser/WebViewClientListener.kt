@@ -35,7 +35,10 @@ interface WebViewClientListener {
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
-    fun onSiteLocationPermissionRequested(origin: String, callback: GeolocationPermissions.Callback)
+    fun onSiteLocationPermissionRequested(
+        origin: String,
+        callback: GeolocationPermissions.Callback
+    )
 
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
@@ -46,8 +49,16 @@ interface WebViewClientListener {
     fun dialTelephoneNumberRequested(telephoneNumber: String)
     fun goFullScreen(view: View)
     fun exitFullScreen()
-    fun showFileChooser(filePathCallback: ValueCallback<Array<Uri>>, fileChooserParams: WebChromeClient.FileChooserParams)
-    fun handleAppLink(appLink: SpecialUrlDetector.UrlType.AppLink, isForMainFrame: Boolean): Boolean
+    fun showFileChooser(
+        filePathCallback: ValueCallback<Array<Uri>>,
+        fileChooserParams: WebChromeClient.FileChooserParams
+    )
+
+    fun handleAppLink(
+        appLink: SpecialUrlDetector.UrlType.AppLink,
+        isForMainFrame: Boolean
+    ): Boolean
+
     fun handleNonHttpAppLink(nonHttpAppLink: SpecialUrlDetector.UrlType.NonHttpAppLink): Boolean
     fun handleCloakedTrackingLink(initialUrl: String)
     fun startProcessingTrackingLink()
@@ -62,7 +73,15 @@ interface WebViewClientListener {
 
     fun loginDetected()
     fun dosAttackDetected()
-    fun iconReceived(url: String, icon: Bitmap)
-    fun iconReceived(visitedUrl: String, iconUrl: String)
+    fun iconReceived(
+        url: String,
+        icon: Bitmap
+    )
+
+    fun iconReceived(
+        visitedUrl: String,
+        iconUrl: String
+    )
+
     fun prefetchFavicon(url: String)
 }

@@ -30,7 +30,11 @@ interface DrmRepository {
     val exceptions: CopyOnWriteArrayList<DrmException>
 }
 
-class RealDrmRepository(val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
+class RealDrmRepository(
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) :
     DrmRepository {
 
     private val drmDao: DrmDao = database.drmDao()

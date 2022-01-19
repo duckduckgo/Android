@@ -22,18 +22,31 @@ const val PACKET_TYPE_UDP = "UDP"
 const val PACKET_TYPE_TCP = "TCP"
 
 interface PacketPersister {
-    fun persistDataSent(packetLength: Int, packetType: String)
-    fun persistDataReceived(packetLength: Int, packetType: String)
+    fun persistDataSent(
+        packetLength: Int,
+        packetType: String
+    )
+
+    fun persistDataReceived(
+        packetLength: Int,
+        packetType: String
+    )
 }
 
 class RoomPacketPersister(val vpnDatabase: VpnDatabase) : PacketPersister {
 
-    override fun persistDataSent(packetLength: Int, packetType: String) {
+    override fun persistDataSent(
+        packetLength: Int,
+        packetType: String
+    ) {
         Timber.v("[%s] Updating data sent: %d bytes of data", packetType, packetLength)
         vpnDatabase.vpnDataStatsDao().upsertDataSent(packetLength)
     }
 
-    override fun persistDataReceived(packetLength: Int, packetType: String) {
+    override fun persistDataReceived(
+        packetLength: Int,
+        packetType: String
+    ) {
         Timber.v("[%s] Updating data received: %d bytes of data", packetType, packetLength)
         vpnDatabase.vpnDataStatsDao().upsertDataReceived(packetLength)
     }
@@ -41,12 +54,17 @@ class RoomPacketPersister(val vpnDatabase: VpnDatabase) : PacketPersister {
 
 class DummyPacketPersister : PacketPersister {
 
-    override fun persistDataSent(packetLength: Int, packetType: String) {
+    override fun persistDataSent(
+        packetLength: Int,
+        packetType: String
+    ) {
         Timber.v("[%s] Updating data sent: %d bytes of data", packetType, packetLength)
     }
 
-    override fun persistDataReceived(packetLength: Int, packetType: String) {
+    override fun persistDataReceived(
+        packetLength: Int,
+        packetType: String
+    ) {
         Timber.v("[%s] Updating data received: %d bytes of data", packetType, packetLength)
     }
-
 }

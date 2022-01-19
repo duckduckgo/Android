@@ -69,7 +69,14 @@ class PrivacyDashboardViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testee: PrivacyDashboardViewModel by lazy {
-        val model = PrivacyDashboardViewModel(mockUserWhitelistDao, mockContentBlocking, networkLeaderboardDao, mockPixel, TestScope(), coroutineRule.testDispatcherProvider)
+        val model = PrivacyDashboardViewModel(
+            mockUserWhitelistDao,
+            mockContentBlocking,
+            networkLeaderboardDao,
+            mockPixel,
+            TestScope(),
+            coroutineRule.testDispatcherProvider
+        )
         model.viewState.observeForever(viewStateObserver)
         model.command.observeForever(commandObserver)
         model

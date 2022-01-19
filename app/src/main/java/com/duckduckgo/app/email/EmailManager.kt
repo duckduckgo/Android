@@ -33,11 +33,20 @@ interface EmailManager {
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
-    fun storeCredentials(token: String, username: String, cohort: String)
+    fun storeCredentials(
+        token: String,
+        username: String,
+        cohort: String
+    )
+
     fun signOut()
     fun getEmailAddress(): String?
     fun waitlistState(): AppEmailManager.WaitlistState
-    fun joinWaitlist(timestamp: Int, token: String)
+    fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    )
+
     fun getInviteCode(): String
     fun doesCodeAlreadyExist(): Boolean
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
@@ -64,7 +73,11 @@ class AppEmailManager(
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
     }
 
-    override fun storeCredentials(token: String, username: String, cohort: String) {
+    override fun storeCredentials(
+        token: String,
+        username: String,
+        cohort: String
+    ) {
         emailDataStore.cohort = cohort
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
@@ -97,9 +110,16 @@ class AppEmailManager(
         return WaitlistState.NotJoinedQueue
     }
 
-    override fun joinWaitlist(timestamp: Int, token: String) {
-        if (emailDataStore.waitlistTimestamp == -1) { emailDataStore.waitlistTimestamp = timestamp }
-        if (emailDataStore.waitlistToken == null) { emailDataStore.waitlistToken = token }
+    override fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
+        if (emailDataStore.waitlistTimestamp == -1) {
+            emailDataStore.waitlistTimestamp = timestamp
+        }
+        if (emailDataStore.waitlistToken == null) {
+            emailDataStore.waitlistToken = token
+        }
     }
 
     override fun getInviteCode(): String {

@@ -52,5 +52,4 @@ class FlipperInitializer @Inject constructor(
             start()
         }
     }
-
 }

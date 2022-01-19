@@ -17,5 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
 interface VpnTrackerDetectorInterceptor {
-    fun interceptTrackerRequest(hostname: String, packageId: String): RequestTrackerType?
+    fun interceptTrackerRequest(
+        hostname: String,
+        packageId: String
+    ): RequestTrackerType?
 }

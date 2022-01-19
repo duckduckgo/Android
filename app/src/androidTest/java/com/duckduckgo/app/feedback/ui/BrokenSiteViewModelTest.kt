@@ -251,5 +251,4 @@ class BrokenSiteViewModelTest {
         private const val url = "http://example.com"
         private const val trackingUrl = "https://foo.com"
     }
-
 }

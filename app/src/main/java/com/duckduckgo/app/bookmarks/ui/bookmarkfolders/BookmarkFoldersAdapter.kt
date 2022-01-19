@@ -60,7 +60,10 @@ class BookmarkFoldersAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkFolderScreenViewHolders {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BookmarkFolderScreenViewHolders {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             BOOKMARK_FOLDER_TYPE -> {
@@ -77,7 +80,10 @@ class BookmarkFoldersAdapter(
 
     override fun getItemCount(): Int = bookmarkFolderItems.size
 
-    override fun onBindViewHolder(holder: BookmarkFolderScreenViewHolders, position: Int) {
+    override fun onBindViewHolder(
+        holder: BookmarkFolderScreenViewHolders,
+        position: Int
+    ) {
         when (holder) {
             is BookmarkFolderScreenViewHolders.BookmarkFoldersViewHolder -> {
                 holder.update((bookmarkFolderItems[position] as BookmarkFolderItem).bookmarkFolder)
@@ -139,7 +145,10 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
             }
         }
 
-        private fun showOverFlowMenu(anchor: ImageView, bookmarkFolder: BookmarkFolder) {
+        private fun showOverFlowMenu(
+            anchor: ImageView,
+            bookmarkFolder: BookmarkFolder
+        ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -160,11 +169,17 @@ sealed class BookmarkFolderScreenViewHolders(itemView: View) : RecyclerView.View
 }
 
 class BookmarkFoldersDiffCallback : DiffUtil.ItemCallback<BookmarkFoldersAdapter.BookmarkFoldersItemTypes>() {
-    override fun areItemsTheSame(oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes, newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes): Boolean {
+    override fun areItemsTheSame(
+        oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes, newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes): Boolean {
+    override fun areContentsTheSame(
+        oldItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes,
+        newItem: BookmarkFoldersAdapter.BookmarkFoldersItemTypes
+    ): Boolean {
         return oldItem == newItem
     }
 }

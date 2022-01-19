@@ -24,7 +24,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
 import com.duckduckgo.privacy.config.store.features.drm.DrmDao
-import com.duckduckgo.privacy.config.store.features.gpc.GpcDao
+import com.duckduckgo.privacy.config.store.features.gpc.GpcExceptionsDao
+import com.duckduckgo.privacy.config.store.features.gpc.GpcHeadersDao
 import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
 import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionDao
@@ -40,6 +41,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         UnprotectedTemporaryEntity::class,
         HttpsExceptionEntity::class,
         GpcExceptionEntity::class,
+        GpcHeaderEnabledSiteEntity::class,
         ContentBlockingExceptionEntity::class,
         DrmExceptionEntity::class,
         PrivacyConfig::class,
@@ -52,7 +54,8 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun trackerAllowlistDao(): TrackerAllowlistDao
     abstract fun unprotectedTemporaryDao(): UnprotectedTemporaryDao
     abstract fun httpsDao(): HttpsDao
-    abstract fun gpcDao(): GpcDao
+    abstract fun gpcExceptionsDao(): GpcExceptionsDao
+    abstract fun gpcHeadersDao(): GpcHeadersDao
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyConfigDao(): PrivacyConfigDao
     abstract fun drmDao(): DrmDao

@@ -99,7 +99,10 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         @Parameterized.Parameters(name = "Test case: {index} - {0}")
         fun testData(): List<TestCase> {
             var surrogateTests: SurrogateTest? = null
-            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(SurrogatesReferenceTest::class.java.classLoader!!, "reference_tests/domain_matching_tests.json")
+            val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
+                SurrogatesReferenceTest::class.java.classLoader!!,
+                "reference_tests/domain_matching_tests.json"
+            )
 
             jsonObject.keys().forEach {
                 if (it == "surrogateTests") {
@@ -175,7 +178,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         tdsDomainEntityDao = db.tdsDomainEntityDao()
 
         entityLookup = TdsEntityLookup(tdsEntityDao, tdsDomainEntityDao)
-        trackerDetector = TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
+        trackerDetector =
+            TrackerDetectorImpl(entityLookup, mockUserWhitelistDao, mockContentBlocking, mockTrackerAllowlist, mockWebTrackersBlockedDao)
 
         val json = FileUtilities.loadText(javaClass.classLoader!!, "reference_tests/tracker_radar_reference.json")
         val adapter = moshi.adapter(TdsJson::class.java)
@@ -198,7 +202,10 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
         resourceSurrogates.loadSurrogates(surrogates)
     }
 
-    private fun assertRedirectCorrectlyDone(response: WebResourceResponse?, expectedRedirect: String) {
+    private fun assertRedirectCorrectlyDone(
+        response: WebResourceResponse?,
+        expectedRedirect: String
+    ) {
         val result = response?.let {
             val test = String(it.data.readBytes()).trim()
             val base64String = Base64.encodeToString(test.toByteArray(), Base64.NO_WRAP)

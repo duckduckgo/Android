@@ -34,7 +34,10 @@ class ActivityViewBindingDelegate<T : ViewBinding>(
     private var binding: T? = null
     private val bindMethod = bindingClass.getMethod("inflate", LayoutInflater::class.java)
 
-    override fun getValue(thisRef: AppCompatActivity, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: AppCompatActivity,
+        property: KProperty<*>
+    ): T {
         binding?.let {
             return it
         }

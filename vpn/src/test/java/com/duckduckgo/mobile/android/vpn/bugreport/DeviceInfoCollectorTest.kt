@@ -27,7 +27,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi

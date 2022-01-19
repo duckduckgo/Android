@@ -31,14 +31,21 @@ class HttpsDataPersister @Inject constructor(
     private val appDatabase: AppDatabase
 ) {
 
-    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray, falsePositives: List<HttpsFalsePositiveDomain>) {
+    fun persistBloomFilter(
+        specification: HttpsBloomFilterSpec,
+        bytes: ByteArray,
+        falsePositives: List<HttpsFalsePositiveDomain>
+    ) {
         appDatabase.runInTransaction {
             persistBloomFilter(specification, bytes)
             persistFalsePositives(falsePositives)
         }
     }
 
-    fun persistBloomFilter(specification: HttpsBloomFilterSpec, bytes: ByteArray) {
+    fun persistBloomFilter(
+        specification: HttpsBloomFilterSpec,
+        bytes: ByteArray
+    ) {
         if (!binaryDataStore.verifyCheckSum(bytes, specification.sha256)) {
             throw IOException("Https binary has incorrect sha, throwing away file")
         }
@@ -55,6 +62,9 @@ class HttpsDataPersister @Inject constructor(
     }
 
     fun isPersisted(specification: HttpsBloomFilterSpec): Boolean {
-        return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(HttpsBloomFilterSpec.HTTPS_BINARY_FILE, specification.sha256)
+        return specification == httpsBloomSpecDao.get() && binaryDataStore.verifyCheckSum(
+            HttpsBloomFilterSpec.HTTPS_BINARY_FILE,
+            specification.sha256
+        )
     }
 }

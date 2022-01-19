@@ -25,7 +25,10 @@ import kotlinx.android.parcel.Parcelize
 
 class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, IssueReport>() {
 
-    override fun createIntent(context: Context, input: ReportBreakageScreen?): Intent {
+    override fun createIntent(
+        context: Context,
+        input: ReportBreakageScreen?
+    ): Intent {
         return when (input) {
             ReportBreakageScreen.ListOfInstalledApps -> ReportBreakageAppListActivity.intent(context)
             is ReportBreakageScreen.IssueDescriptionForm -> {
@@ -38,23 +41,35 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
         }
     }
 
-    override fun parseResult(resultCode: Int, intent: Intent?): IssueReport {
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?
+    ): IssueReport {
         if (resultCode == RESULT_OK) {
             return intent?.getParcelableExtra<IssueReport>(IssueReport::class.java.simpleName) as IssueReport
         }
         return IssueReport.EMPTY
     }
-
 }
 
 sealed class ReportBreakageScreen {
     object ListOfInstalledApps : ReportBreakageScreen()
-    data class IssueDescriptionForm(val appName: String, val appPackageId: String) : ReportBreakageScreen()
-    data class LoginInformation(val appName: String, val appPackageId: String) : ReportBreakageScreen()
+    data class IssueDescriptionForm(
+        val appName: String,
+        val appPackageId: String
+    ) : ReportBreakageScreen()
+
+    data class LoginInformation(
+        val appName: String,
+        val appPackageId: String
+    ) : ReportBreakageScreen()
 }
 
 @Parcelize
-data class BrokenApp(val appName: String, val appPackageId: String) : Parcelable
+data class BrokenApp(
+    val appName: String,
+    val appPackageId: String
+) : Parcelable
 
 @Parcelize
 data class IssueReport(

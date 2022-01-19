@@ -96,7 +96,10 @@ class WhitelistViewModel(
         command.value = ShowEdit(entry)
     }
 
-    fun onEntryEdited(old: UserWhitelistedDomain, new: UserWhitelistedDomain) {
+    fun onEntryEdited(
+        old: UserWhitelistedDomain,
+        new: UserWhitelistedDomain
+    ) {
         if (!UriString.isValidDomain(new.domain)) {
             command.value = ShowWhitelistFormatError
             return

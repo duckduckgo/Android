@@ -58,7 +58,10 @@ class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistW
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }
 
-class AppTPWaitlistWorker(private val context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
+class AppTPWaitlistWorker(
+    private val context: Context,
+    workerParams: WorkerParameters
+) : CoroutineWorker(context, workerParams) {
 
     @Inject
     lateinit var waitlistManager: TrackingProtectionWaitlistManager

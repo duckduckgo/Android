@@ -39,7 +39,10 @@ class BrowserApplicationStateInfo @Inject constructor(
     private var isFreshLaunch: Boolean = false
     private var overrideIsFreshLaunch: Boolean = false
 
-    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+    override fun onActivityCreated(
+        activity: Activity,
+        savedInstanceState: Bundle?
+    ) {
         if (created++ == 0 && !overrideIsFreshLaunch) isFreshLaunch = true
     }
 

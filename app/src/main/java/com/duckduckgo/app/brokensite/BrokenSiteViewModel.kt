@@ -75,7 +75,12 @@ class BrokenSiteViewModel(
         viewState.value = ViewState()
     }
 
-    fun setInitialBrokenSite(url: String, blockedTrackers: String, surrogates: String, upgradedHttps: Boolean) {
+    fun setInitialBrokenSite(
+        url: String,
+        blockedTrackers: String,
+        surrogates: String,
+        upgradedHttps: Boolean
+    ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps

@@ -34,12 +34,14 @@ class VpnUncaughtExceptionHandler(
     private val coroutineScope: CoroutineScope,
 ) : UncaughtExceptionHandler {
 
-    override fun uncaughtException(thread: Thread, throwable: Throwable) {
+    override fun uncaughtException(
+        thread: Thread,
+        throwable: Throwable
+    ) {
         if (throwable is OutOfMemoryError) {
             Timber.e("Out of memory; triggering a VPN restart")
 
             restartVpn()
-
         } else {
             Timber.e(throwable, "VPN uncaughtException")
             originalHandler?.uncaughtException(thread, throwable)
@@ -59,9 +61,11 @@ class VpnExceptionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providesVpnUncaughtExceptionHandler(context: Context, @AppCoroutineScope vpnCoroutineScope: CoroutineScope): VpnUncaughtExceptionHandler {
+    fun providesVpnUncaughtExceptionHandler(
+        context: Context,
+        @AppCoroutineScope vpnCoroutineScope: CoroutineScope
+    ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
         return VpnUncaughtExceptionHandler(context, originalHandler, vpnCoroutineScope)
     }
-
 }

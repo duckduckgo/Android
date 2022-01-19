@@ -62,7 +62,8 @@ constructor(
 
         val a =
             context.theme.obtainStyledAttributes(
-                attrs, R.styleable.ColorAttributeView, defStyleAttr, defStyleRes)
+                attrs, R.styleable.ColorAttributeView, defStyleAttr, defStyleRes
+            )
         attributeText = a.getString(R.styleable.ColorAttributeView_android_text) ?: attributeText
         dotFillColor = a.getColor(R.styleable.ColorAttributeView_colorFillColor, dotFillColor)
         dotStrokeColor = a.getColor(R.styleable.ColorAttributeView_colorStrokeColor, dotStrokeColor)

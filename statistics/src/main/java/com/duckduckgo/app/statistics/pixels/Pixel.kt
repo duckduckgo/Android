@@ -72,6 +72,7 @@ interface Pixel {
         const val BOOKMARK_COUNT = "bco"
         const val COHORT = "cohort"
         const val LAST_USED_DAY = "duck_address_last_used"
+        const val WEBVIEW_VERSION = "webview_version"
     }
 
     object PixelValues {
@@ -100,16 +101,19 @@ interface Pixel {
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun fire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun enqueueFire(
         pixel: PixelName,
         parameters: Map<String, String> = emptyMap(),
         encodedParameters: Map<String, String> = emptyMap()
     )
+
     fun enqueueFire(
         pixelName: String,
         parameters: Map<String, String> = emptyMap(),
@@ -140,8 +144,10 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
                 { Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters") },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-                })
+                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                    )
+                }
+            )
     }
 
     /**
@@ -170,11 +176,14 @@ class RxBasedPixel @Inject constructor(private val pixelSender: PixelSender) : P
             .subscribe(
                 {
                     Timber.v(
-                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters")
+                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters"
+                    )
                 },
                 {
                     Timber.w(
-                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters")
-                })
+                        it, "Pixel failed: $pixelName with params: $parameters $encodedParameters"
+                    )
+                }
+            )
     }
 }

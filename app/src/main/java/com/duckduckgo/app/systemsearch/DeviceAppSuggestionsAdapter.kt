@@ -29,13 +29,19 @@ class DeviceAppSuggestionsAdapter(
 ) : RecyclerView.Adapter<DeviceAppViewHolder>() {
     private var deviceApps: List<DeviceApp> = ArrayList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceAppViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): DeviceAppViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemDeviceAppSuggestionBinding.inflate(inflater, parent, false)
         return DeviceAppViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: DeviceAppViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: DeviceAppViewHolder,
+        position: Int
+    ) {
         holder.apply {
             val app = deviceApps[position]
             binding.title.text = app.shortName
@@ -65,5 +71,4 @@ class DeviceAppSuggestionsAdapter(
     class DeviceAppViewHolder(
         val binding: ItemDeviceAppSuggestionBinding
     ) : RecyclerView.ViewHolder(binding.root)
-
 }

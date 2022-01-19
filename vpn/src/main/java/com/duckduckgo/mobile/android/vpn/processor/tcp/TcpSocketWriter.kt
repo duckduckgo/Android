@@ -41,7 +41,11 @@ import javax.inject.Inject
 
 interface TcpSocketWriter {
     fun writeToSocket(tcb: TCB)
-    fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean)
+    fun addToWriteQueue(
+        pendingWriteData: PendingWriteData,
+        skipQueue: Boolean
+    )
+
     fun removeFromWriteQueue(tcb: TCB)
 }
 
@@ -58,10 +62,18 @@ class RealTcpSocketWriter @Inject constructor(
     // added an initial capacity based on what I observed from the low memory pixels we send
     private val writeQueue = ConcurrentHashMap<TCB, Deque<PendingWriteData>>(10)
 
-    override fun addToWriteQueue(pendingWriteData: PendingWriteData, skipQueue: Boolean) {
+    override fun addToWriteQueue(
+        pendingWriteData: PendingWriteData,
+        skipQueue: Boolean
+    ) {
         val queue = pendingWriteData.tcb.writeQueue()
         if (skipQueue) queue.addFirst(pendingWriteData) else queue.add(pendingWriteData)
-        Timber.v("Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue", queue.size, getLogLabel(pendingWriteData.tcb), writeQueue.keys.size)
+        Timber.v(
+            "Added to write queue. Size is now %d for %s. there are %d TCB instances in the write queue",
+            queue.size,
+            getLogLabel(pendingWriteData.tcb),
+            writeQueue.keys.size
+        )
     }
 
     override fun removeFromWriteQueue(tcb: TCB) {
@@ -109,7 +121,6 @@ class RealTcpSocketWriter @Inject constructor(
                 Timber.w("Partial write. %d bytes remaining to be written for %s", payloadBuffer.remaining(), getLogLabel(tcb))
                 partiallyWritten(writeData, bytesWritten, payloadBuffer, payloadSize)
             }
-
         } while (writeQueue.isNotEmpty())
 
         Timber.v("Nothing more to write, switching to read mode")
@@ -118,7 +129,12 @@ class RealTcpSocketWriter @Inject constructor(
         tcb.channel.register(selector, OP_READ, tcb)
     }
 
-    private fun partiallyWritten(writeData: PendingWriteData, bytesWritten: Int, payloadBuffer: ByteBuffer, payloadSize: Int) {
+    private fun partiallyWritten(
+        writeData: PendingWriteData,
+        bytesWritten: Int,
+        payloadBuffer: ByteBuffer,
+        payloadSize: Int
+    ) {
         Timber.e("Partially written data. %d bytes written. %d bytes remain out of %d", bytesWritten, payloadBuffer.remaining(), payloadSize)
 
         addToWriteQueue(writeData, skipQueue = true)
@@ -127,7 +143,11 @@ class RealTcpSocketWriter @Inject constructor(
         writeData.socket.register(selector, OP_WRITE or OP_READ, writeData.tcb)
     }
 
-    private fun fullyWritten(tcb: TCB, writeData: PendingWriteData, connectionParams: TcpConnectionParams) {
+    private fun fullyWritten(
+        tcb: TCB,
+        writeData: PendingWriteData,
+        connectionParams: TcpConnectionParams
+    ) {
         tcb.acknowledgementNumberToClient = writeData.ackNumber
         tcb.acknowledgementNumberToServer = writeData.seqNumber
 

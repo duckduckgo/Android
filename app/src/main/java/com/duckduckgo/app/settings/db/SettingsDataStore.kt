@@ -239,7 +239,10 @@ class SettingsSharedPreferences @Inject constructor(
             FireAnimation.None -> NONE_PREFS_VALUE
         }
 
-        fun fireAnimationFrom(value: String?, defValue: FireAnimation) = when (value) {
+        fun fireAnimationFrom(
+            value: String?,
+            defValue: FireAnimation
+        ) = when (value) {
             HERO_FIRE_PREFS_VALUE -> FireAnimation.HeroFire
             HERO_WATER_PREFS_VALUE -> FireAnimation.HeroWater
             HERO_ABSTRACT_PREFS_VALUE -> FireAnimation.HeroAbstract

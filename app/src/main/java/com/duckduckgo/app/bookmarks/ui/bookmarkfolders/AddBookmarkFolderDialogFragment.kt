@@ -53,7 +53,10 @@ class AddBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
         const val KEY_PARENT_FOLDER_ID = "KEY_PARENT_FOLDER_ID"
         const val KEY_PARENT_FOLDER_NAME = "KEY_PARENT_FOLDER_NAME"
 
-        fun instance(parentFolderId: Long, parentFolderName: String): AddBookmarkFolderDialogFragment {
+        fun instance(
+            parentFolderId: Long,
+            parentFolderName: String
+        ): AddBookmarkFolderDialogFragment {
             val dialogFragment = AddBookmarkFolderDialogFragment()
             val bundle = Bundle()
             bundle.putLong(KEY_PARENT_FOLDER_ID, parentFolderId)

@@ -72,7 +72,10 @@ class DeviceShieldStatusReporting(
             .build().run { workManager.enqueue(this) }
     }
 
-    class DeviceShieldStatusReportingWorker(private val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class DeviceShieldStatusReportingWorker(
+        private val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
         lateinit var deviceShieldPixels: DeviceShieldPixels
         lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
 

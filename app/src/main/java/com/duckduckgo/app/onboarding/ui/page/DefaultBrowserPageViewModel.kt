@@ -122,7 +122,10 @@ class DefaultBrowserPageViewModel(
         }
     }
 
-    private fun reduceToNewState(origin: Origin, navigateToBrowser: Boolean = false) {
+    private fun reduceToNewState(
+        origin: Origin,
+        navigateToBrowser: Boolean = false
+    ) {
         val newViewState = nextViewState(origin)
 
         if (newViewState == null || navigateToBrowser) {
@@ -209,7 +212,13 @@ class DefaultBrowserPageViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (DefaultBrowserPageViewModel(defaultBrowserDetector.get(), pixel.get(), installStore.get()) as T)
+                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (
+                    DefaultBrowserPageViewModel(
+                        defaultBrowserDetector.get(),
+                        pixel.get(),
+                        installStore.get()
+                    ) as T
+                    )
                 else -> null
             }
         }

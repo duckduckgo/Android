@@ -140,8 +140,6 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -1130,7 +1128,8 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenOmnibarFocusedWithUrlAndUserHasFavoritesThenAutoCompleteShowsFavorites() {
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(favorites = listOf(QuickAccessFavorite(Favorite(1, "title", "http://example.com", 1))))
+        testee.autoCompleteViewState.value =
+            autoCompleteViewState().copy(favorites = listOf(QuickAccessFavorite(Favorite(1, "title", "http://example.com", 1))))
         doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
         testee.onOmnibarInputStateChanged("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
@@ -3317,7 +3316,10 @@ class BrowserTabViewModelTest {
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+        verify(mockPixel).enqueueFire(
+            AppPixelName.EMAIL_USE_ALIAS,
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+        )
     }
 
     @Test
@@ -3353,7 +3355,10 @@ class BrowserTabViewModelTest {
 
         testee.consumeAlias()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ALIAS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+        verify(mockPixel).enqueueFire(
+            AppPixelName.EMAIL_USE_ALIAS,
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+        )
     }
 
     @Test
@@ -3394,7 +3399,10 @@ class BrowserTabViewModelTest {
 
         testee.useAddress()
 
-        verify(mockPixel).enqueueFire(AppPixelName.EMAIL_USE_ADDRESS, mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01"))
+        verify(mockPixel).enqueueFire(
+            AppPixelName.EMAIL_USE_ADDRESS,
+            mapOf(Pixel.PixelParameter.COHORT to "cohort", Pixel.PixelParameter.LAST_USED_DAY to "2021-01-01")
+        )
     }
 
     @Test
@@ -3707,7 +3715,11 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
     }
 
-    private fun buildPendingDownload(url: String, contentDisposition: String?, mimeType: String?): FileDownloader.PendingFileDownload {
+    private fun buildPendingDownload(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): FileDownloader.PendingFileDownload {
         return FileDownloader.PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
@@ -3810,12 +3822,19 @@ class BrowserTabViewModelTest {
         whenever(mockSettingsStore.appLocationPermission).thenReturn(state)
     }
 
-    private fun givenUserAlreadySelectedPermissionForDomain(domain: String, permission: LocationPermissionType) {
+    private fun givenUserAlreadySelectedPermissionForDomain(
+        domain: String,
+        permission: LocationPermissionType
+    ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain, permission))
     }
 
     class StubPermissionCallback : GeolocationPermissions.Callback {
-        override fun invoke(p0: String?, p1: Boolean, p2: Boolean) {
+        override fun invoke(
+            p0: String?,
+            p1: Boolean,
+            p2: Boolean
+        ) {
             // nothing to see
         }
     }
@@ -3846,7 +3865,10 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private fun pixelParams(showedBookmarks: Boolean, bookmarkCapable: Boolean) = mapOf(
+    private fun pixelParams(
+        showedBookmarks: Boolean,
+        bookmarkCapable: Boolean
+    ) = mapOf(
         Pixel.PixelParameter.SHOWED_BOOKMARKS to showedBookmarks.toString(),
         Pixel.PixelParameter.BOOKMARK_CAPABLE to bookmarkCapable.toString()
     )
@@ -3899,23 +3921,37 @@ class BrowserTabViewModelTest {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
     }
 
-    private fun loadUrl(url: String?, title: String? = null, isBrowserShowing: Boolean = true) {
+    private fun loadUrl(
+        url: String?,
+        title: String? = null,
+        isBrowserShowing: Boolean = true
+    ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, title = title))
     }
 
     @Suppress("SameParameterValue")
-    private fun updateUrl(originalUrl: String?, currentUrl: String?, isBrowserShowing: Boolean) {
+    private fun updateUrl(
+        originalUrl: String?,
+        currentUrl: String?,
+        isBrowserShowing: Boolean
+    ) {
         setBrowserShowing(isBrowserShowing)
         testee.navigationStateChanged(buildWebNavigation(originalUrl = originalUrl, currentUrl = currentUrl))
     }
 
     @Suppress("SameParameterValue")
-    private fun onProgressChanged(url: String?, newProgress: Int) {
+    private fun onProgressChanged(
+        url: String?,
+        newProgress: Int
+    ) {
         testee.navigationStateChanged(buildWebNavigation(originalUrl = url, currentUrl = url, progress = newProgress))
     }
 
-    private fun overrideUrl(url: String, isBrowserShowing: Boolean = true) {
+    private fun overrideUrl(
+        url: String,
+        isBrowserShowing: Boolean = true
+    ) {
         setBrowserShowing(isBrowserShowing)
         testee.willOverrideUrl(newUrl = url)
     }

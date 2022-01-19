@@ -165,12 +165,18 @@ class FileBasedFaviconPersisterTest {
         verifyExistingFaviconExcludedFromDeletion(captor.firstValue, newFaviconFilename)
     }
 
-    private fun verifyExistingFaviconExcludedFromDeletion(exclusionList: List<String>, newTabFaviconFilename: String) {
+    private fun verifyExistingFaviconExcludedFromDeletion(
+        exclusionList: List<String>,
+        newTabFaviconFilename: String
+    ) {
         assertEquals(1, exclusionList.size)
         assertTrue(exclusionList.contains(newTabFaviconFilename))
     }
 
-    private fun verifySubfolderUsedAsDirectory(subFolder: String, path: File) {
+    private fun verifySubfolderUsedAsDirectory(
+        subFolder: String,
+        path: File
+    ) {
         assertTrue(path.parent!!.endsWith(subFolder))
     }
 
@@ -178,7 +184,10 @@ class FileBasedFaviconPersisterTest {
         assertTrue(path.startsWith(context.cacheDir.absolutePath))
     }
 
-    private fun verifyDirectoryUse(path: String, directory: String) {
+    private fun verifyDirectoryUse(
+        path: String,
+        directory: String
+    ) {
         assertTrue(path.contains("/$directory"))
     }
 

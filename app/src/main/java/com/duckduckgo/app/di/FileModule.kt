@@ -28,5 +28,4 @@ class FileModule {
     fun providesFileDeleter(): FileDeleter {
         return AndroidFileDeleter()
     }
-
 }

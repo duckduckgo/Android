@@ -384,7 +384,13 @@ class BrowserWebViewClientTest {
     @Test
     fun whenNonHttpAppLinkDetectedAndListenerIsNullThenReturnTrue() = runTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL))
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(
+                SpecialUrlDetector.UrlType.NonHttpAppLink(
+                    EXAMPLE_URL,
+                    Intent(),
+                    EXAMPLE_URL
+                )
+            )
             testee.webViewClientListener = null
             assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
             verify(listener, never()).handleNonHttpAppLink(any())
@@ -394,7 +400,13 @@ class BrowserWebViewClientTest {
     @Test
     fun whenNonHttpAppLinkDetectedAndListenerIsNullOnApiLessThan24ThenReturnTrue() = runTest {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.NonHttpAppLink(EXAMPLE_URL, Intent(), EXAMPLE_URL))
+            whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(
+                SpecialUrlDetector.UrlType.NonHttpAppLink(
+                    EXAMPLE_URL,
+                    Intent(),
+                    EXAMPLE_URL
+                )
+            )
             testee.webViewClientListener = null
             assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener, never()).handleNonHttpAppLink(any())

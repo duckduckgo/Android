@@ -42,5 +42,4 @@ abstract class TdsDomainEntityDao {
         deleteAll()
         insertAll(entities)
     }
-
 }

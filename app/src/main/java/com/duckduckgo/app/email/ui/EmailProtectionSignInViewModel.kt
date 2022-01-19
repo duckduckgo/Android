@@ -125,7 +125,10 @@ class EmailProtectionSignInViewModel(
         }
     }
 
-    private fun joinedWaitlist(timestamp: Int, token: String) {
+    private fun joinedWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
         pixel.fire(AppPixelName.EMAIL_DID_SHOW_WAITLIST_DIALOG)
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
@@ -141,7 +144,6 @@ class EmailProtectionSignInViewModel(
         const val SIGN_UP_URL = "https://duckduckgo.com/email/signup?inviteCode="
         const val LOGIN_URL = "https://duckduckgo.com/email/login"
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)

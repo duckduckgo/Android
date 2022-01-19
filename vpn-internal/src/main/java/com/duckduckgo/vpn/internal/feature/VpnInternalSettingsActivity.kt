@@ -23,6 +23,8 @@ import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
+import com.duckduckgo.mobile.android.vpn.health.BadHealthMitigationFeature
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
@@ -39,6 +41,12 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var vpnBugReporter: VpnBugReporter
 
+    @Inject
+    lateinit var appHealthMonitor: AppHealthMonitor
+
+    @Inject
+    lateinit var badHealthMitigationFeature: BadHealthMitigationFeature
+
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
     private var debugLoggingReceiver: DebugLoggingReceiver? = null
@@ -49,6 +57,18 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         } else {
             TransparencyModeDebugReceiver.turnOffIntent()
         }.also { sendBroadcast(it) }
+    }
+
+    private val badHealthMonitoringToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
+        if (toggleState) {
+            appHealthMonitor.startMonitoring()
+        } else {
+            appHealthMonitor.stopMonitoring()
+        }
+    }
+
+    private val badHealthMitigationFeatureToggle = CompoundButton.OnCheckedChangeListener { _, toggleState ->
+        badHealthMitigationFeature.isEnabled = toggleState
     }
 
     private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
@@ -70,6 +90,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupBugReport()
         setupDeleteTrackingHistory()
         setupViewDiagnosticsView()
+        setupBadHealthMonitoring()
     }
 
     override fun onDestroy() {
@@ -136,6 +157,14 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         }.apply { register() }
 
         binding.transparencyModeToggle.setOnCheckedChangeListener(transparencyToggleListener)
+    }
+
+    private fun setupBadHealthMonitoring() {
+        binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
+        binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
+
+        binding.badHealthMitigationToggle.isChecked = badHealthMitigationFeature.isEnabled
+        binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
     }
 
     private fun setupDebugLogging() {

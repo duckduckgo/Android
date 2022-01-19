@@ -45,5 +45,4 @@ class PlayHttpsPersisterModule {
     ): HttpsEmbeddedDataPersister {
         return PlayHttpsEmbeddedDataPersister(httpsDataPersister, binaryDataStore, httpsBloomSpecDao, context, moshi)
     }
-
 }

@@ -78,5 +78,9 @@ class OnboardingPageManagerPageCountTest(private val testCase: TestCase) {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
     }
 
-    data class TestCase(val defaultBrowserPage: Boolean, val expectedPageCount: Int, val variant: Variant)
+    data class TestCase(
+        val defaultBrowserPage: Boolean,
+        val expectedPageCount: Int,
+        val variant: Variant
+    )
 }

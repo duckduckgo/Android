@@ -28,7 +28,10 @@ class PixelEmailRemovalInterceptor : Interceptor {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
         val url = if (pixels.contains(pixel.substringBefore("_android_"))) {
-            chain.request().url.newBuilder().removeAllQueryParameters(AppUrl.ParamKey.ATB).removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION).build()
+            chain.request().url.newBuilder()
+                .removeAllQueryParameters(AppUrl.ParamKey.ATB)
+                .removeAllQueryParameters(Pixel.PixelParameter.APP_VERSION)
+                .build()
         } else {
             chain.request().url.newBuilder().build()
         }
