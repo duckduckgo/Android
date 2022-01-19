@@ -26,7 +26,6 @@ import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface BookmarksRepository {
@@ -87,8 +86,8 @@ class BookmarksDataRepository(
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
     }
 
-    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder? {
-        return bookmarkFoldersDao.getBookmarkFolders().firstOrNull()?.find { it.id == parentId }
+    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder {
+        return bookmarkFoldersDao.getBookmarkFolderByParentId(parentId)
     }
 
     override fun bookmarks(): Flow<List<Bookmark>> {

@@ -56,7 +56,7 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
         getExistingBookmarkFolderName()?.let {
-            if (it.isNotEmpty()) savedLocation.setText(getExistingBookmarkFolderName())
+            if (it.isNotEmpty()) savedLocation.setText(it)
         }
     }
 

@@ -41,6 +41,9 @@ interface BookmarkFoldersDao {
     @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.parentId = :parentId")
     fun getBookmarkFoldersByParentIdSync(parentId: Long): List<BookmarkFolder>
 
+    @Query("select *, (select count(*) from bookmarks where bookmarks.parentId = bookmark_folders.id) as numBookmarks, (select count(*) from bookmark_folders as inner_bookmark_folders where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders from bookmark_folders where bookmark_folders.id = :parentId")
+    fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkFolder: BookmarkFolderEntity)
 

@@ -1039,11 +1039,9 @@ class BrowserTabViewModel(
     }
 
     private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
-        return if (bookmark == null) null
-        else {
-            withContext(dispatchers.io()) {
-                bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
-            }
+        if (bookmark == null) return null
+        return withContext(dispatchers.io()) {
+            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
         }
     }
 
@@ -1485,10 +1483,9 @@ class BrowserTabViewModel(
         val url = url ?: return
         viewModelScope.launch {
             val bookmark = currentBrowserViewState().bookmark
-            val bookmarkFolder = getBookmarkFolder(bookmark)
             if (bookmark != null) {
                 pixel.fire(AppPixelName.MENU_ACTION_EDIT_BOOKMARK_PRESSED.pixelName)
-                onEditSavedSiteRequested(bookmark, bookmarkFolder)
+                onEditSavedSiteRequested(bookmark)
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                 saveSiteBookmark(url, title ?: "")
@@ -1506,7 +1503,6 @@ class BrowserTabViewModel(
         val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
             command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
-            browserViewState.value = currentBrowserViewState().copy(bookmark = savedBookmark)
         }
     }
 
@@ -1627,8 +1623,21 @@ class BrowserTabViewModel(
         }
     }
 
-    fun onEditSavedSiteRequested(savedSite: SavedSite, bookmarkFolder: BookmarkFolder?) {
-        command.value = ShowEditSavedSiteDialog(SavedSiteChangedViewState(savedSite, bookmarkFolder))
+    fun onEditSavedSiteRequested(savedSite: SavedSite) {
+        viewModelScope.launch(dispatchers.io()) {
+            val bookmarkFolder =
+                if (savedSite is SavedSite.Bookmark) getBookmarkFolder(savedSite)
+                else null
+
+            withContext(dispatchers.main()) {
+                command.value = ShowEditSavedSiteDialog(
+                    SavedSiteChangedViewState(
+                        savedSite,
+                        bookmarkFolder
+                    )
+                )
+            }
+        }
     }
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
@@ -1638,11 +1647,6 @@ class BrowserTabViewModel(
     private suspend fun editBookmark(bookmark: SavedSite.Bookmark) {
         withContext(dispatchers.io()) {
             bookmarksRepository.update(bookmark)
-        }
-        withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(
-                bookmark = bookmark
-            )
         }
     }
 

@@ -1130,7 +1130,7 @@ class BrowserTabFragment :
                 pixel.fire(originPixel)
                 viewModel.onUserSubmittedQuery(it.favorite.url)
             },
-            { viewModel.onEditSavedSiteRequested(it.favorite, null) },
+            { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteQuickAccessItemRequested(it.favorite) }
         )
     }
