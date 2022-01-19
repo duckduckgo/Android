@@ -23,7 +23,9 @@ import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import androidx.webkit.WebResourceErrorCompat
 import androidx.webkit.WebViewClientCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -45,6 +47,8 @@ class UrlExtractingWebViewClient(
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor
 ) : WebViewClientCompat() {
+
+    var urlExtractionListener: UrlExtractionListener? = null
 
     @UiThread
     override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
@@ -137,6 +141,21 @@ class UrlExtractingWebViewClient(
         Timber.d("The certificate authority validation result is $trusted")
         if (trusted is CertificateValidationState.TrustedChain) handler.proceed()
         else super.onReceivedSslError(view, handler, error)
+    }
+
+    override fun onReceivedError(
+        view: WebView,
+        request: WebResourceRequest,
+        error: WebResourceErrorCompat
+    ) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
+            if (error.errorCode == WebViewClient.ERROR_CONNECT) {
+                urlExtractionListener?.onUrlExtractionError()
+            }
+        } else {
+            urlExtractionListener?.onUrlExtractionError()
+        }
+        super.onReceivedError(view, request, error)
     }
 }
 

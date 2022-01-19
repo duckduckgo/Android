@@ -162,6 +162,7 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -760,26 +761,41 @@ class BrowserTabFragment :
     private fun extractUrlFromTrackingLink(initialUrl: String) {
         context?.let {
 
-            Timber.d("Tracking link detection: Creating WebView for URL extraction")
-            urlExtractingWebView = UrlExtractingWebView(requireContext(), urlExtractingWebViewClient.get(), urlExtractorUserAgent.get(), urlExtractor.get())
+            val client = urlExtractingWebViewClient.get()
 
-            urlExtractingWebView?.extractedUrlListener = { extractedUrl ->
-                val destinationUrl: String
-
-                if (extractedUrl != null) {
-                    destinationUrl = extractedUrl
-                    viewModel.updateLastTrackingLink(initialUrl)
-                    Timber.d("Tracking link detection: Success! Loading extracted URL: $destinationUrl")
-                } else {
-                    destinationUrl = initialUrl
-                    Timber.d("Tracking link detection: Failed! Loading initial URL: $destinationUrl")
-                }
-
-                requireActivity().runOnUiThread {
-                    webView?.loadUrl(destinationUrl)
+            val listener = object: UrlExtractionListener {
+                override fun onUrlExtractionError() {
+                    Timber.d("Tracking link detection: Extraction error! Loading initial URL: $initialUrl")
+                    webView?.loadUrl(initialUrl)
                     destroyUrlExtractingWebView()
                 }
+
+                override fun onUrlExtracted(extractedUrl: String?) {
+                    val destinationUrl: String
+
+                    if (extractedUrl != null) {
+                        destinationUrl = extractedUrl
+                        viewModel.updateLastTrackingLink(initialUrl)
+                        Timber.d("Tracking link detection: Success! Loading extracted URL: $destinationUrl")
+                    } else {
+                        destinationUrl = initialUrl
+                        Timber.d("Tracking link detection: Failed! Loading initial URL: $destinationUrl")
+                    }
+
+                    requireActivity().runOnUiThread {
+                        webView?.loadUrl(destinationUrl)
+                        destroyUrlExtractingWebView()
+                    }
+                }
             }
+
+            client.urlExtractionListener = listener
+
+            Timber.d("Tracking link detection: Creating WebView for URL extraction")
+            urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
+
+            urlExtractingWebView?.urlExtractionListener = listener
+
             Timber.d("Tracking link detection: Loading tracking URL for extraction")
             urlExtractingWebView?.loadUrl(initialUrl)
         }

@@ -31,7 +31,7 @@ class UrlExtractingWebView(
     urlExtractor: DOMUrlExtractor
 ) : WebView(context) {
 
-    var extractedUrlListener: ((extractedUrl: String?) -> Unit)? = null
+    var urlExtractionListener: UrlExtractionListener? = null
 
     init {
         settings.apply {
@@ -50,7 +50,7 @@ class UrlExtractingWebView(
         }
 
         urlExtractor.addUrlExtraction(this) { extractedUrl ->
-            extractedUrlListener?.invoke(extractedUrl)
+            urlExtractionListener?.onUrlExtracted(extractedUrl)
         }
     }
 
