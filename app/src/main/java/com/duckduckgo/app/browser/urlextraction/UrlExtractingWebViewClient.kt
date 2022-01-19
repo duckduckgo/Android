@@ -19,13 +19,11 @@ package com.duckduckgo.app.browser.urlextraction
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.net.http.SslError.*
+import android.os.Build
 import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import androidx.webkit.WebResourceErrorCompat
-import androidx.webkit.WebViewClientCompat
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -46,7 +44,7 @@ class UrlExtractingWebViewClient(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor
-) : WebViewClientCompat() {
+) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null
 
@@ -144,12 +142,12 @@ class UrlExtractingWebViewClient(
     }
 
     override fun onReceivedError(
-        view: WebView,
-        request: WebResourceRequest,
-        error: WebResourceErrorCompat
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?
     ) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_ERROR_GET_CODE)) {
-            if (error.errorCode == WebViewClient.ERROR_CONNECT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (error?.errorCode == ERROR_CONNECT) {
                 urlExtractionListener?.onUrlExtractionError()
             }
         } else {
@@ -158,4 +156,3 @@ class UrlExtractingWebViewClient(
         super.onReceivedError(view, request, error)
     }
 }
-
