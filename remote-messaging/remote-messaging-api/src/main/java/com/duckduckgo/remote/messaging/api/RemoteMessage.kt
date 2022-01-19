@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.models
-
-data class RemoteConfig(
-    val messages: List<RemoteMessage>,
-    val rules: Map<Int, List<MatchingAttribute>>
-)
+package com.duckduckgo.remote.messaging.api
 
 data class RemoteMessage(
     val id: String,

@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
+    api project(path: ':remote-messaging-api')
     api project(path: ':remote-messaging-store')
     api project(path: ':browser-api')
 
