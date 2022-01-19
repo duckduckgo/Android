@@ -21,9 +21,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -68,25 +70,30 @@ class AppTPCompanyTrackersViewModelTest {
         }
     }
 
-    private fun getTrackersFlow(trackers: List<VpnTracker>): Flow<List<VpnTracker>> = flow {
+    private fun getTrackersFlow(trackers: List<VpnTrackerCompanySignal>): Flow<List<VpnTrackerCompanySignal>> = flow {
         while (true) {
             emit(trackers)
         }
     }
 
-    private fun someTrackers(): List<VpnTracker> {
+    private fun someTrackers(): List<VpnTrackerCompanySignal> {
+
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val domain: String = "example.com"
         val trackerCompanyId: Int = -1
         val timestamp: String = DatabaseDateFormatter.bucketByHour()
+
         return listOf(
-            VpnTracker(
-                trackerCompanyId = trackerCompanyId,
-                domain = domain,
-                timestamp = timestamp,
-                company = "",
-                companyDisplayName = "",
-                trackingApp = defaultTrackingApp
+            VpnTrackerCompanySignal(
+                VpnTracker(
+                    trackerCompanyId = trackerCompanyId,
+                    domain = domain,
+                    timestamp = timestamp,
+                    company = "",
+                    companyDisplayName = "",
+                    trackingApp = defaultTrackingApp
+                ),
+                AppTrackerEntity(trackerCompanyId, "Google", 100, listOf("unique_identifier"))
             )
         )
     }
