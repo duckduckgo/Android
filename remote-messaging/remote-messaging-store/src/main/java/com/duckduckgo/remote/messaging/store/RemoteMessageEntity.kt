@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,18 @@
 
 package com.duckduckgo.remote.messaging.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Database(
-    exportSchema = true, version = 1,
-    entities = [
-        RemoteMessagingConfig::class,
-        RemoteMessageEntity::class
-    ]
-)
-abstract class RemoteMessagingDatabase : RoomDatabase() {
-    abstract fun remoteMessagingConfigDao(): RemoteMessagingConfigDao
-    abstract fun remoteMessagesDao(): RemoteMessagesDao
+@Entity(tableName = "remote_message")
+data class RemoteMessageEntity(
+    @PrimaryKey val id: String,
+    val message: String,
+    val status: Status
+) {
+    enum class Status {
+        SCHEDULED,
+        CANCELLED,
+        DONE
+    }
 }
-
-val ALL_MIGRATIONS = emptyArray<Migration>()

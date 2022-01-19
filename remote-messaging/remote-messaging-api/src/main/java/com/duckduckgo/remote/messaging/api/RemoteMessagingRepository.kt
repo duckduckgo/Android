@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.store
+package com.duckduckgo.remote.messaging.api
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
-
-@Database(
-    exportSchema = true, version = 1,
-    entities = [
-        RemoteMessagingConfig::class,
-        RemoteMessageEntity::class
-    ]
-)
-abstract class RemoteMessagingDatabase : RoomDatabase() {
-    abstract fun remoteMessagingConfigDao(): RemoteMessagingConfigDao
-    abstract fun remoteMessagesDao(): RemoteMessagesDao
+interface RemoteMessagingRepository {
+    fun add(message: RemoteMessage)
+    fun message(): RemoteMessage?
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()

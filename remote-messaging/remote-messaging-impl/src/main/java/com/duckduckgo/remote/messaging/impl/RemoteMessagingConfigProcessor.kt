@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
@@ -30,6 +31,7 @@ interface RemoteMessagingConfigProcessor {
 class RealRemoteMessagingConfigProcessor(
     private val remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
+    private val remoteMessagingRepository: RemoteMessagingRepository,
     private val remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher
 ) : RemoteMessagingConfigProcessor {
 
@@ -49,6 +51,9 @@ class RealRemoteMessagingConfigProcessor(
             // update version
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
             // TODO: add/store/replace message
+            if (message != null) {
+                remoteMessagingRepository.add(message)
+            }
         } else {
             Timber.i("RMF: skip, same version")
         }

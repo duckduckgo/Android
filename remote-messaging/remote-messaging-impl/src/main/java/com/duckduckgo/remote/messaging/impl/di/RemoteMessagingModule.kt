@@ -25,6 +25,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
@@ -33,6 +34,7 @@ import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
 import com.duckduckgo.remote.messaging.store.ALL_MIGRATIONS
 import com.duckduckgo.remote.messaging.store.LocalRemoteMessagingConfigRepository
+import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import com.squareup.anvil.annotations.ContributesTo
@@ -87,13 +89,31 @@ class DataSourceModule {
     fun providesRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper: RemoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
+        remoteMessagingRepository: RemoteMessagingRepository,
         remoteMessagingConfigMatcher: RemoteMessagingConfigMatcher
     ): RemoteMessagingConfigProcessor {
         return RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigJsonMapper,
             remoteMessagingConfigRepository,
+            remoteMessagingRepository,
             remoteMessagingConfigMatcher
         )
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagingRepository(
+        remoteMessagesDao: RemoteMessagesDao
+    ): RemoteMessagingRepository {
+        return AppRemoteMessagingRepository(remoteMessagesDao)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesRemoteMessagesDao(
+        remoteMessagingDatabase: RemoteMessagingDatabase
+    ): RemoteMessagesDao {
+        return remoteMessagingDatabase.remoteMessagesDao()
     }
 
     @Provides
