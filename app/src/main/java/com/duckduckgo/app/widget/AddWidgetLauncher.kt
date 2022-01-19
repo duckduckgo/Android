@@ -19,8 +19,11 @@ package com.duckduckgo.app.widget
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityOptions
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
@@ -48,13 +51,27 @@ class AddWidgetCompatLauncher @Inject constructor(
 }
 
 class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
+    companion object {
+        const val ACTION_ADD_WIDGET = "actionWidgetAdded"
+        private const val CODE_ADD_WIDGET = 11922
+    }
 
     @SuppressLint("NewApi")
     override fun launchAddWidget(activity: Activity?) {
         activity?.let {
             val provider = ComponentName(it, SearchAndFavoritesWidget::class.java)
-            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, null)
+            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it))
         }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun buildPendingIntent(context: Context): PendingIntent? {
+        return PendingIntent.getBroadcast(
+            context,
+            CODE_ADD_WIDGET,
+            Intent(ACTION_ADD_WIDGET),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        ) // Will not return null since FLAG_UPDATE_CURRENT has been supplied
     }
 }
 

@@ -109,5 +109,6 @@
     <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
 
     <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Widget added to home screen</string>
     <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
 </resources>
