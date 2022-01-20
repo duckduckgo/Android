@@ -105,4 +105,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
 
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
 </resources>

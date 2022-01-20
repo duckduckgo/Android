@@ -69,9 +69,9 @@ class VpnServiceHeartbeat @Inject constructor(
     ) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
-            VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
-            VpnStopReason.SelfStop -> {
-                Timber.v("HB monitor: self stopped $vpnStopReason")
+            VpnStopReason.Error -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
+            VpnStopReason.SelfStop, VpnStopReason.Revoked -> {
+                Timber.v("HB monitor: self stopped or revoked: $vpnStopReason")
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }

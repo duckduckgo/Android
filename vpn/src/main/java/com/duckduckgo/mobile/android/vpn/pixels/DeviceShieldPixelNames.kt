@@ -100,8 +100,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_DID_SHOW_ONBOARDING_FAQ("m_atp_imp_onboarding_faq_c"),
 
-    ATP_TUN_INTERFACE_DOWN_DAILY("m_atp_ev_tun_down_d"),
-    ATP_TUN_INTERFACE_DOWN("m_atp_ev_tun_down_c"),
+    ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_tun_error_d"),
+    ATP_ESTABLISH_TUN_INTERFACE_ERROR("m_atp_ev_establish_tun_error_c"),
 
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
@@ -115,6 +115,13 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_RESTORE_APP_PROTECTION_LIST_DAILY("m_atp_ev_restore_protection_d"),
     ATP_LAUNCH_FEEDBACK("m_atp_ev_launch_feedback_c"),
     ATP_LAUNCH_FEEDBACK_DAILY("m_atp_ev_launch_feedback_d"),
+
+    ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG("m_atp_ev_submit_disable_app_protection_dialog_c"),
+    ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG_DAILY("m_atp_ev_submit_disable_app_protection_dialog_d"),
+    ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG("m_atp_ev_skip_disable_app_protection_dialog_c"),
+    ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG_DAILY("m_atp_ev_skip_disable_app_protection_dialog_d"),
+    ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY("m_atp_imp_tracker_activity_report_issues_c"),
+    ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY("m_atp_imp_tracker_activity_report_issues_d"),
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
     ATP_APP_HEALTH_MONITOR_REPORT("m_atp_health_monitor_report"),

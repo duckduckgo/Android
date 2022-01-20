@@ -33,6 +33,7 @@ import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
@@ -46,7 +47,14 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = AppHealthCallback::class
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = BadHealthMitigationFeature::class
+)
 @SingleInstanceIn(AppScope::class)
 class AppBadHealthStateHandler @Inject constructor(
     private val context: Context,
@@ -55,7 +63,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : AppHealthCallback {
+) : AppHealthCallback, BadHealthMitigationFeature {
 
     private var debounceJob = ConflatedJob()
 
@@ -74,7 +82,18 @@ class AppBadHealthStateHandler @Inject constructor(
             preferences.edit { putString("restartBoundary", value) }
         }
 
+    override var isEnabled: Boolean
+        get() = preferences.getBoolean("isEnabled", true)
+        set(value) {
+            preferences.edit { putBoolean("isEnabled", value) }
+        }
+
     override suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean {
+        if (!isEnabled) {
+            Timber.d("Feature is disabled, skipping mitigation")
+            return false
+        }
+
         return withContext(dispatcherProvider.io()) {
             if (appHealthData.alerts.isNotEmpty()) {
                 // send first-in-day pixels for alerts so what we can gather how many users see a particular alert every day
@@ -171,7 +190,7 @@ class AppBadHealthStateHandler @Inject constructor(
                 mapOf(
                     "manufacturer" to appBuildConfig.manufacturer,
                     // model only in internal builds to avoid privacy issues in production for now
-                    "model" to if (appBuildConfig.flavor.isInternal()) appBuildConfig.flavor.toString() else "redacted",
+                    "model" to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     "restarted" to restarted.toString(),
                     "badHealthData" to encodedData,
                 )
