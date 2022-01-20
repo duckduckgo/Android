@@ -145,7 +145,6 @@ import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -167,6 +166,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
+import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -276,6 +276,8 @@ class BrowserTabFragment :
     private val binding get() = _binding!!
 
     private lateinit var omnibar: IncludeOmnibarToolbarBinding
+
+    private lateinit var quickAccessItems: IncludeQuickAccessItemsBinding
 
     private val findInPage
         get() = omnibar.findInPage
@@ -388,6 +390,7 @@ class BrowserTabFragment :
     ): View? {
         _binding = FragmentBrowserTabBinding.inflate(inflater, container, false)
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
+        quickAccessItems = IncludeQuickAccessItemsBinding.bind(binding.rootView)
         return binding.rootView
     }
 
@@ -1187,14 +1190,14 @@ class BrowserTabFragment :
     }
 
     private fun configureHomeTabQuickAccessGrid() {
-        configureQuickAccessGridLayout(quickAccessRecyclerView)
+        configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         quickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_HOMETAB_ITEM_PRESSED) { viewHolder ->
-            quickAccessRecyclerView.enableAnimation()
+            quickAccessItems.quickAccessRecyclerView.enableAnimation()
             quickAccessItemTouchHelper.startDrag(viewHolder)
         }
-        quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessRecyclerView, quickAccessAdapter)
-        quickAccessRecyclerView.adapter = quickAccessAdapter
-        quickAccessRecyclerView.disableAnimation()
+        quickAccessItemTouchHelper = createQuickAccessItemHolder(quickAccessItems.quickAccessRecyclerView, quickAccessAdapter)
+        quickAccessItems.quickAccessRecyclerView.adapter = quickAccessAdapter
+        quickAccessItems.quickAccessRecyclerView.disableAnimation()
     }
 
     private fun createQuickAccessItemHolder(
@@ -1627,7 +1630,7 @@ class BrowserTabFragment :
         if (ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
-        configureQuickAccessGridLayout(quickAccessRecyclerView)
+        configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
     }
 
@@ -2442,11 +2445,11 @@ class BrowserTabFragment :
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
                 if (hideDaxBackgroundLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
-                quickAccessRecyclerView.gone()
+                quickAccessItems.quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
                 quickAccessAdapter.submitList(favorites)
-                quickAccessRecyclerView.show()
+                quickAccessItems.quickAccessRecyclerView.show()
             }
 
             newTabQuickAcessItemsLayout.show()
