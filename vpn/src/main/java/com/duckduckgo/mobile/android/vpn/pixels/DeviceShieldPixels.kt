@@ -528,6 +528,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_UNIQUE, payload = metadata)
     }
 
     override fun didShowReportBreakageAppList() {
@@ -617,13 +618,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     private fun tryToFireUniquePixel(
         pixel: DeviceShieldPixelNames,
-        tag: String? = null
+        tag: String? = null,
+        payload: Map<String, String> = emptyMap()
     ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return
 
-        this.pixel.fire(pixel).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
     }
 
     private fun String.appendTimestampSuffix(): String {
