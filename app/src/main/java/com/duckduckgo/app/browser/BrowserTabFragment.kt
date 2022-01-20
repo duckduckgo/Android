@@ -144,9 +144,7 @@ import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
-import kotlinx.android.synthetic.main.include_find_in_page.*
 import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
@@ -171,7 +169,6 @@ import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta.*
@@ -280,6 +277,9 @@ class BrowserTabFragment :
 
     private lateinit var omnibar: IncludeOmnibarToolbarBinding
 
+    private val findInPage
+        get() = omnibar.findInPage
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -326,13 +326,13 @@ class BrowserTabFragment :
         get() = activity as? BrowserActivity
 
     private val tabsButton: TabSwitcherButton?
-        get() = omnibar.appBarLayout.tabsMenu
+        get() = omnibar.tabsMenu
 
     private val fireMenuButton: ViewGroup?
-        get() = omnibar.appBarLayout.fireIconMenu
+        get() = omnibar.fireIconMenu
 
     private val menuButton: ViewGroup?
-        get() = omnibar.appBarLayout.browserMenu
+        get() = omnibar.browserMenu
 
     private var webView: DuckDuckGoWebView? = null
 
@@ -343,7 +343,7 @@ class BrowserTabFragment :
 
     private val findInPageTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            viewModel.userFindingInPage(findInPageInput.text.toString())
+            viewModel.userFindingInPage(findInPage.findInPageInput.text.toString())
         }
     }
 
@@ -1246,15 +1246,15 @@ class BrowserTabFragment :
     }
 
     private fun configureFindInPage() {
-        findInPageInput.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus && findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
-                viewModel.userFindingInPage(findInPageInput.text.toString())
+        findInPage.findInPageInput.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && findInPage.findInPageInput.text.toString() != viewModel.findInPageViewState.value?.searchTerm) {
+                viewModel.userFindingInPage(findInPage.findInPageInput.text.toString())
             }
         }
 
-        previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
-        nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
-        closeFindInPagePanel.setOnClickListener {
+        findInPage.previousSearchTermButton.setOnClickListener { webView?.findNext(false) }
+        findInPage.nextSearchTermButton.setOnClickListener { webView?.findNext(true) }
+        findInPage.closeFindInPagePanel.setOnClickListener {
             viewModel.dismissFindInView()
         }
     }
@@ -1408,7 +1408,7 @@ class BrowserTabFragment :
     }
 
     private fun addTextChangedListeners() {
-        findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
+        findInPage.findInPageInput.replaceTextChangedListener(findInPageTextWatcher)
         omnibar.omnibarTextInput.replaceTextChangedListener(omnibarInputTextWatcher)
     }
 
@@ -2509,27 +2509,27 @@ class BrowserTabFragment :
         }
 
         fun hideFindInPage() {
-            if (findInPageContainer.visibility != GONE) {
+            if (findInPage.findInPageContainer.visibility != GONE) {
                 binding.focusDummy.requestFocus()
-                findInPageContainer.gone()
-                findInPageInput.hideKeyboard()
+                findInPage.findInPageContainer.gone()
+                findInPage.findInPageInput.hideKeyboard()
             }
         }
 
         private fun showFindInPageView(viewState: FindInPageViewState) {
 
-            if (findInPageContainer.visibility != VISIBLE) {
-                findInPageContainer.show()
-                findInPageInput.postDelayed(KEYBOARD_DELAY) {
-                    findInPageInput?.showKeyboard()
+            if (findInPage.findInPageContainer.visibility != VISIBLE) {
+                findInPage.findInPageContainer.show()
+                findInPage.findInPageInput.postDelayed(KEYBOARD_DELAY) {
+                    findInPage.findInPageInput?.showKeyboard()
                 }
             }
 
             if (viewState.showNumberMatches) {
-                findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
-                findInPageMatches.show()
+                findInPage.findInPageMatches.text = getString(R.string.findInPageMatches, viewState.activeMatchIndex, viewState.numberMatches)
+                findInPage.findInPageMatches.show()
             } else {
-                findInPageMatches.hide()
+                findInPage.findInPageMatches.hide()
             }
         }
 
