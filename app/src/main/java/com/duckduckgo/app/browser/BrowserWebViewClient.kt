@@ -166,7 +166,8 @@ open class BrowserWebViewClient(
                     false
                 }
                 is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                    if (isForMainFrame && lastPageStarted != trackingLinkDetector.lastTrackingLinkInfo?.destinationUrl) {
+                    val lastTrackingLinkInfo = trackingLinkDetector.lastTrackingLinkInfo
+                    if (isForMainFrame && (lastTrackingLinkInfo == null || lastPageStarted != lastTrackingLinkInfo.destinationUrl)) {
                         webViewClientListener?.let { listener ->
                             listener.handleCloakedTrackingLink(urlType.trackingUrl)
                             return true
