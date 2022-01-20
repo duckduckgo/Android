@@ -140,8 +140,6 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
@@ -168,8 +166,6 @@ import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import kotlinx.android.synthetic.main.fragment_browser_tab.*
-import kotlinx.android.synthetic.main.include_cta.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -282,6 +278,9 @@ class BrowserTabFragment :
 
     private val newBrowserTab
         get() = binding.includeNewBrowserTab
+
+    private val daxDialogCta
+        get() = binding.includeNewBrowserTab.includeDaxDialogCta
 
     var messageFromPreviousTab: Message? = null
 
@@ -2407,8 +2406,8 @@ class BrowserTabFragment :
         private fun showDaxCta(configuration: DaxBubbleCta) {
             hideHomeBackground()
             hideHomeCta()
-            configuration.showCta(daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            configuration.showCta(daxDialogCta.daxCtaContainer)
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
 
             if (configuration is DaxBubbleCta.DaxFireproofCta) {
                 configureFireproofButtons()
@@ -2420,8 +2419,8 @@ class BrowserTabFragment :
         private fun showBubleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
-            configuration.showCta(daxCtaContainer)
-            newBrowserTab.newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            configuration.showCta(daxDialogCta.daxCtaContainer)
+            newBrowserTab.newTabLayout.setOnClickListener { daxDialogCta.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }
 
@@ -2462,8 +2461,8 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            dialogTextCta.cancelAnimation()
-            daxCtaContainer.hide()
+            daxDialogCta.dialogTextCta.cancelAnimation()
+            daxDialogCta.daxCtaContainer.hide()
         }
 
         private fun hideHomeCta() {
@@ -2471,17 +2470,17 @@ class BrowserTabFragment :
         }
 
         private fun configureFireproofButtons() {
-            daxCtaContainer.fireproofButtons.show()
+            daxDialogCta.fireproofButtons.show()
 
-            daxCtaContainer.fireproofButtons.fireproofKeepMeSignedIn.setOnClickListener {
-                daxCtaContainer.fireproofButtons.gone()
-                daxCtaContainer.dialogTextCta.cancelAnimation()
+            daxDialogCta.fireproofKeepMeSignedIn.setOnClickListener {
+                daxDialogCta.fireproofButtons.gone()
+                daxDialogCta.dialogTextCta.cancelAnimation()
                 viewModel.userSelectedFireproofSetting(true)
             }
 
-            daxCtaContainer.fireproofButtons.fireproofBurnEverything.setOnClickListener {
-                daxCtaContainer.fireproofButtons.gone()
-                daxCtaContainer.dialogTextCta.cancelAnimation()
+            daxDialogCta.fireproofBurnEverything.setOnClickListener {
+                daxDialogCta.fireproofButtons.gone()
+                daxDialogCta.dialogTextCta.cancelAnimation()
                 viewModel.userSelectedFireproofSetting(false)
             }
         }
