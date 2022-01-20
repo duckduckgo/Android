@@ -1142,9 +1142,9 @@ class BrowserTabViewModel(
 
     private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
-       return withContext(dispatchers.io()) {
-           bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
-       }
+        return withContext(dispatchers.io()) {
+            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
+        }
     }
 
     private suspend fun getFavorite(url: String): SavedSite.Favorite? {

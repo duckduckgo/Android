@@ -59,7 +59,7 @@ class BookmarkFoldersViewModelTest {
     private val commandCaptor: ArgumentCaptor<BookmarkFoldersViewModel.Command> =
         ArgumentCaptor.forClass(BookmarkFoldersViewModel.Command::class.java)
 
-    private val folderStructure = listOf(
+    private val folderStructure = mutableListOf(
         BookmarkFolderItem(1, BookmarkFolder(1, "folder", 0), true),
         BookmarkFolderItem(1, BookmarkFolder(2, "a folder", 0), false)
     )
@@ -100,5 +100,21 @@ class BookmarkFoldersViewModelTest {
         verify(commandObserver).onChanged(commandCaptor.capture())
 
         assertEquals(folder, (commandCaptor.value as BookmarkFoldersViewModel.Command.SelectFolder).selectedBookmarkFolder)
+    }
+
+    @Test
+    fun newFolderAddedThenCallRepoAndUpdateViewState() = runTest {
+        val newFolder = BookmarkFolder(3, "new folder", 1)
+        val selectedFolderId = 0L
+        val rootFolderName = "Bookmarks"
+
+        testee.newFolderAdded(rootFolderName, selectedFolderId, newFolder)
+        folderStructure.add(BookmarkFolderItem(1, newFolder))
+
+        verify(bookmarksRepository).getFlatFolderStructure(selectedFolderId, newFolder, rootFolderName)
+        verify(viewStateObserver, times(2)).onChanged(viewStateCaptor.capture())
+
+        assertEquals(emptyList<BookmarkFolderItem>(), viewStateCaptor.allValues[0].folderStructure)
+        assertEquals(folderStructure, viewStateCaptor.allValues[1].folderStructure)
     }
 }
