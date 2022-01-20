@@ -1389,7 +1389,9 @@ class BrowserTabFragment :
         val metrics = resources.displayMetrics
         val distanceToTrigger = (DEFAULT_CIRCLE_TARGET_TIMES_1_5 * metrics.density).toInt()
         binding.swipeRefreshContainer.setDistanceToTriggerSync(distanceToTrigger)
-        binding.swipeRefreshContainer.setColorSchemeColors(ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.cornflowerBlue))
+        binding.swipeRefreshContainer.setColorSchemeColors(
+            ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.cornflowerBlue)
+        )
 
         binding.swipeRefreshContainer.setOnRefreshListener {
             onRefreshRequested()
