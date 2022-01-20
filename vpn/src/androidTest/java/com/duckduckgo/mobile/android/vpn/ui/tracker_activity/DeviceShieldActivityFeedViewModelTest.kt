@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
