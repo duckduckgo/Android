@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
@@ -26,6 +27,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -80,6 +82,7 @@ class DeviceShieldActivityFeedViewModelTest {
         db.vpnTrackerDao().insert(dummyTrackers[2])
         db.vpnTrackerDao().insert(dummyTrackers[1])
         db.vpnTrackerDao().insert(dummyTrackers[0])
+        db.vpnAppTrackerBlockingDao().insertTrackerEntities(dummySignals)
 
         viewModel.getMostRecentTrackers(timeWindow, false).test {
             assertEquals(listOf(TrackerFeedItem.TrackerLoadingSkeleton), awaitItem())
@@ -145,6 +148,27 @@ private fun VpnTracker.bucket(): String {
 private val TEST_TIMESTAMP = DatabaseDateFormatter.timestamp()
 private val TEST_TIMESTAMP_IN_THE_PAST = "2021-01-01T10:00:00"
 
+private val dummySignals = listOf(
+    AppTrackerEntity(
+        0,
+        "Google",
+        100,
+        emptyList()
+    ),
+    AppTrackerEntity(
+        1,
+        "Segment",
+        100,
+        emptyList()
+    ),
+    AppTrackerEntity(
+        2,
+        "Facebook",
+        100,
+        emptyList()
+    )
+)
+
 private val dummyTrackers = listOf(
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
@@ -159,7 +183,7 @@ private val dummyTrackers = listOf(
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
+        trackerCompanyId = 1,
         domain = "api.segment.io",
         company = "Segment.io",
         companyDisplayName = "Segment",
@@ -170,7 +194,7 @@ private val dummyTrackers = listOf(
     ),
     VpnTracker(
         timestamp = TEST_TIMESTAMP,
-        trackerCompanyId = 0,
+        trackerCompanyId = 2,
         domain = "crashlyticsreports-pa.googleapis.com",
         company = "Google LLC",
         companyDisplayName = "Google",
