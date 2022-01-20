@@ -23,6 +23,8 @@ import android.webkit.CookieManager
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,10 +34,22 @@ import javax.inject.Inject
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService
+    private val fileService: DownloadFileService,
+    private val appBuildConfig: AppBuildConfig
 ) {
 
     fun download(
+        pendingDownload: PendingFileDownload,
+        callback: FileDownloader.FileDownloadListener
+    ) {
+        if (appBuildConfig.flavor == INTERNAL) {
+            downloadV2(pendingDownload, callback)
+        } else {
+            downloadV1(pendingDownload, callback)
+        }
+    }
+
+    private fun downloadV1(
         pendingDownload: PendingFileDownload,
         callback: FileDownloader.FileDownloadListener
     ) {
@@ -90,6 +104,77 @@ class NetworkFileDownloader @Inject constructor(
                 return
             }
         })
+    }
+
+    private fun downloadV2(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+        Timber.d("Start download for ${pendingDownload.url}.")
+
+        if (!downloadManagerAvailable()) {
+            Timber.d("Download manager not available, end downloading ${pendingDownload.url}.")
+            callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
+            return
+        }
+
+        Timber.d(
+            "Content-Disposition is ${pendingDownload.contentDisposition} and " +
+                "Content-Type is ${pendingDownload.mimeType} for ${pendingDownload.url}."
+        )
+
+        if (pendingDownload.contentDisposition != null && pendingDownload.mimeType != null) {
+            downloadFile(pendingDownload, callback)
+        } else {
+            requestHeaders(pendingDownload, callback)
+        }
+    }
+
+    private fun requestHeaders(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+        Timber.d("Make a HEAD request for ${pendingDownload.url} as there are no values for Content-Disposition or Content-Type.")
+
+        fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                var updatedPendingDownload = pendingDownload.copy()
+
+                if (response.isSuccessful) {
+                    Timber.d("HEAD request successful for ${pendingDownload.url}")
+                    val contentType = response.headers().get("content-type")
+                    val contentDisposition = response.headers().get("content-disposition")
+
+                    Timber.d(
+                        "Retrieved new values from the HEAD request. " +
+                            "Content-Disposition is $contentDisposition and Content-Type is $contentType."
+                    )
+
+                    if (contentType != null) {
+                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = contentType)
+                    }
+
+                    if (contentDisposition != null) {
+                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = contentDisposition)
+                    }
+                } else {
+                    // This is a non-[200..300) response code. Proceed with download using the Download Manager.
+                    Timber.d(
+                        "HEAD request unsuccessful. " +
+                            "Got a non-[200..300) response code for ${pendingDownload.url}. Error body: ${response.errorBody()}"
+                    )
+                }
+
+                downloadFile(updatedPendingDownload, callback)
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
+                callback.downloadFailed(context.getString(R.string.downloadsErrorMessage), DownloadFailReason.ConnectionRefused)
+                return
+            }
+        })
+    }
+
+    private fun downloadFile(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+        when (val extractionResult = filenameExtractor.extract(pendingDownload)) {
+            is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(pendingDownload, extractionResult.filename, callback)
+            is FilenameExtractor.FilenameExtractionResult.Guess -> downloadFile(pendingDownload, extractionResult.bestGuess, callback)
+        }
     }
 
     private fun downloadManagerAvailable(): Boolean {

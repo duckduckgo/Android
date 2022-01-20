@@ -206,7 +206,7 @@ interface DeviceShieldPixels {
      */
     fun privacyReportOnboardingFAQDisplayed()
 
-    fun vpnTunInterfaceIsDown()
+    fun vpnEstablishTunInterfaceError()
 
     /** Will fire when the process has gone to the expendable list */
     fun vpnProcessExpendableLow(payload: Map<String, String>)
@@ -231,6 +231,15 @@ interface DeviceShieldPixels {
 
     /** Will fire when the user restores to the default protection list */
     fun launchAppTPFeedback()
+
+    /** Will fire when the user submits the form that disables protection for an app */
+    fun didSubmitManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user skips the form that disables protection for an app */
+    fun didSkipManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user launches the report issues screen from the tracker activity */
+    fun didSubmitReportIssuesFromTrackerActivity()
 
     /**
      * Will fire when the user reports an app breakage
@@ -463,9 +472,9 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ)
     }
 
-    override fun vpnTunInterfaceIsDown() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN)
+    override fun vpnEstablishTunInterfaceError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR)
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
@@ -500,6 +509,21 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun launchAppTPFeedback() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK)
+    }
+
+    override fun didSubmitManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSkipManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSubmitReportIssuesFromTrackerActivity() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY)
     }
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {

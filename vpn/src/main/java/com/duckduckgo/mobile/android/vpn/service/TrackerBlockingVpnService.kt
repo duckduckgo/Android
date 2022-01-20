@@ -178,7 +178,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("Failed to establish the TUN interface")
-            restartVpnService(applicationContext)
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
             return@withContext
         }
 
