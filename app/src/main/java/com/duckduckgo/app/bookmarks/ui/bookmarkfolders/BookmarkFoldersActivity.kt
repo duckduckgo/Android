@@ -110,7 +110,9 @@ class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
     private fun setNewlyCreatedSelectedFolderResult() {
         viewModel.newFolderAdded(
-            rootFolderName = getString(R.string.bookmarksSectionTitle)
+            rootFolderName = getString(R.string.bookmarksSectionTitle),
+            selectedFolderId = intent.extras?.getLong(KEY_BOOKMARK_FOLDER_ID) ?: 0,
+            currentFolder = intent.extras?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder?
         )
     }
 

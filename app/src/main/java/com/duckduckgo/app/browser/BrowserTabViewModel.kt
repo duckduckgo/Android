@@ -196,7 +196,6 @@ class BrowserTabViewModel(
         val canSharePage: Boolean = false,
         val canAddBookmarks: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
-        val bookmarkFolder: BookmarkFolder? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
         val canFireproofSite: Boolean = false,
@@ -1143,10 +1142,9 @@ class BrowserTabViewModel(
 
     private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
-        return null
-//        return withContext(dispatchers.io()) {
-//            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
-//        }
+       return withContext(dispatchers.io()) {
+           bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
+       }
     }
 
     private suspend fun getFavorite(url: String): SavedSite.Favorite? {

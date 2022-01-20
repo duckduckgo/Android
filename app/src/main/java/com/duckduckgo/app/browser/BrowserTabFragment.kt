@@ -171,6 +171,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
 
@@ -269,6 +270,9 @@ class BrowserTabFragment :
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     var messageFromPreviousTab: Message? = null
 
@@ -1350,7 +1354,7 @@ class BrowserTabFragment :
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
         }
 
-        if (BuildConfig.DEBUG) {
+        if (appBuildConfig.isDebug) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
     }
@@ -2582,7 +2586,7 @@ class BrowserTabFragment :
         context: Context,
         file: File
     ): Intent? {
-        val uri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+        val uri = FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
         val mime = activity?.contentResolver?.getType(uri) ?: return null
         val intent = Intent(Intent.ACTION_VIEW)
         intent.setDataAndType(uri, mime)

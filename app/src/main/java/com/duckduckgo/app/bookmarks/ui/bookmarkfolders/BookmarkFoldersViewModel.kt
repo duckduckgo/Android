@@ -40,17 +40,13 @@ class BookmarkFoldersViewModel(
 ) : ViewModel(), AddBookmarkFolderListener {
 
     data class ViewState(
-        val folderStructure: List<BookmarkFolderItem> = emptyList(),
-        var currentFolder: BookmarkFolder? = null,
-        var selectedFolderId: Long = 0L
+        val folderStructure: List<BookmarkFolderItem> = emptyList()
     )
 
     sealed class Command {
         class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
         object NewFolderCreatedUpdateTheStructure : BookmarkFoldersViewModel.Command()
     }
-
-    private fun currentViewState() = viewState.value ?: ViewState()
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -64,25 +60,17 @@ class BookmarkFoldersViewModel(
         rootFolderName: String,
         currentFolder: BookmarkFolder?
     ) {
-        saveCurrentFolderAndSelectedFolderId(currentFolder, selectedFolderId)
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = bookmarksRepository.getFlatFolderStructure(selectedFolderId, currentFolder, rootFolderName)
             onFolderStructureCreated(folderStructure)
         }
     }
 
-    private fun saveCurrentFolderAndSelectedFolderId(
-        currentFolder: BookmarkFolder?,
-        selectedFolderId: Long
-    ) {
-        viewState.value = currentViewState().copy(currentFolder = currentFolder, selectedFolderId = selectedFolderId)
-    }
-
-    fun newFolderAdded(rootFolderName: String) {
+    fun newFolderAdded(rootFolderName: String, selectedFolderId: Long, currentFolder: BookmarkFolder?) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = bookmarksRepository.getFlatFolderStructure(
-                currentViewState().selectedFolderId,
-                currentViewState().currentFolder,
+                selectedFolderId,
+                currentFolder,
                 rootFolderName
             )
             onFolderStructureCreated(folderStructure)
