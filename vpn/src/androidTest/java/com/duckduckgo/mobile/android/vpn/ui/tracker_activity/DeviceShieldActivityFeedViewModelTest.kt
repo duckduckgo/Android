@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -88,9 +89,9 @@ class DeviceShieldActivityFeedViewModelTest {
                         id = dummyTrackers[0].id(),
                         bucket = dummyTrackers[0].bucket(),
                         trackingApp = dummyTrackers[0].trackingApp,
-                        trackers = listOf(
-                            TrackerInfo(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName, TEST_TIMESTAMP),
-                            TrackerInfo(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName, TEST_TIMESTAMP)
+                        trackingCompanyBadges = listOf(
+                            TrackerCompanyBadge.Company(dummyTrackers[0].company, dummyTrackers[0].companyDisplayName),
+                            TrackerCompanyBadge.Company(dummyTrackers[1].company, dummyTrackers[1].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "just now",
@@ -100,8 +101,8 @@ class DeviceShieldActivityFeedViewModelTest {
                         id = dummyTrackers[2].id(),
                         bucket = dummyTrackers[2].bucket(),
                         trackingApp = dummyTrackers[2].trackingApp,
-                        trackers = listOf(
-                            TrackerInfo(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName, TEST_TIMESTAMP),
+                        trackingCompanyBadges = listOf(
+                            TrackerCompanyBadge.Company(dummyTrackers[2].company, dummyTrackers[2].companyDisplayName),
                         ),
                         timestamp = TEST_TIMESTAMP,
                         displayTimestamp = "just now",
