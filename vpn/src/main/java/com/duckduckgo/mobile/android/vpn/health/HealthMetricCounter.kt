@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +61,12 @@ class HealthMetricCounter @Inject constructor(
         coroutineScope.launch(databaseDispatcher) {
             db.clearAllTables()
             tracerPacketRegister.deleteAll()
+        }
+    }
+
+    fun onTunUnknownPacketReceived() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_READ_UNKNOWN_PACKET())
         }
     }
 

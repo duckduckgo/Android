@@ -287,6 +287,11 @@ interface DeviceShieldPixels {
      * Will send a first-in-day pixel for the given alertName
      */
     fun sendHealthMonitorAlert(alertName: String)
+
+    /**
+     * Will fire when the VPN receives a packet of unknown protocol
+     */
+    fun sendUnknownPacketProtocol(protocol: Int)
 }
 
 @ContributesBinding(AppScope::class)
@@ -583,6 +588,10 @@ class RealDeviceShieldPixels @Inject constructor(
         )
     }
 
+    override fun sendUnknownPacketProtocol(protocol: Int) {
+        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL.pixelName, protocol))
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
@@ -591,7 +600,14 @@ class RealDeviceShieldPixels @Inject constructor(
         p: DeviceShieldPixelNames,
         payload: Map<String, String> = emptyMap()
     ) {
-        pixel.fire(p, payload)
+        firePixel(p.pixelName, payload)
+    }
+
+    private fun firePixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap()
+    ) {
+        pixel.fire(pixelName, payload)
     }
 
     private fun tryToFireDailyPixel(
