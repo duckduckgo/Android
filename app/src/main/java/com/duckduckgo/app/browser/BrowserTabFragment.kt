@@ -140,12 +140,8 @@ import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_settings_general.*
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
-import kotlinx.android.synthetic.main.include_new_browser_tab.*
-import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
@@ -153,6 +149,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
 import android.content.pm.ResolveInfo
+import android.widget.Button
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -167,6 +164,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
+import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -282,6 +280,9 @@ class BrowserTabFragment :
     private val findInPage
         get() = omnibar.findInPage
 
+    private val newBrowserTab
+        get() = binding.includeNewBrowserTab
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -355,7 +356,7 @@ class BrowserTabFragment :
         }
     }
 
-    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(ddgLogo) }
+    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(newBrowserTab.ddgLogo) }
 
     private val ctaViewStateObserver = Observer<CtaViewState> {
         it?.let { renderer.renderCtaViewState(it) }
@@ -606,7 +607,7 @@ class BrowserTabFragment :
         viewModel.clearPreviousAppLink()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
-        newTabLayout.show()
+        newBrowserTab.newTabLayout.show()
         binding.browserLayout.gone()
         omnibar.appBarLayout.setExpanded(true)
         webView?.onPause()
@@ -614,7 +615,7 @@ class BrowserTabFragment :
     }
 
     private fun showBrowser() {
-        newTabLayout.gone()
+        newBrowserTab.newTabLayout.gone()
         binding.browserLayout.show()
         webView?.show()
         webView?.onResume()
@@ -1626,8 +1627,8 @@ class BrowserTabFragment :
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        ddgLogo.setImageResource(R.drawable.logo_full)
-        if (ctaContainer.isNotEmpty()) {
+        newBrowserTab.ddgLogo.setImageResource(R.drawable.logo_full)
+        if (newBrowserTab.ctaContainer.isNotEmpty()) {
             renderer.renderHomeCta()
         }
         configureQuickAccessGridLayout(quickAccessItems.quickAccessRecyclerView)
@@ -1970,61 +1971,61 @@ class BrowserTabFragment :
 
         private fun createPopupMenu() {
             popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
-            val view = popupMenu.contentView
+            val menuBinding = PopupWindowBrowserMenuBinding.bind(popupMenu.contentView)
             popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) {
+                onMenuItemClicked(menuBinding.forwardPopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
-                onMenuItemClicked(view.backPopupMenuItem) {
+                onMenuItemClicked(menuBinding.backPopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
-                onMenuItemClicked(view.refreshPopupMenuItem) {
+                onMenuItemClicked(menuBinding.refreshPopupMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.newTabPopupMenuItem) {
+                onMenuItemClicked(menuBinding.newTabPopupMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.bookmarksPopupMenuItem) {
+                onMenuItemClicked(menuBinding.bookmarksPopupMenuItem) {
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) {
+                onMenuItemClicked(menuBinding.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
+                onMenuItemClicked(menuBinding.addBookmarksPopupMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
-                onMenuItemClicked(view.addFavoritePopupMenuItem) {
+                onMenuItemClicked(menuBinding.addFavoritePopupMenuItem) {
                     viewModel.onFavoriteMenuClicked()
                 }
-                onMenuItemClicked(view.findInPageMenuItem) {
+                onMenuItemClicked(menuBinding.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) {
+                onMenuItemClicked(menuBinding.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
+                onMenuItemClicked(menuBinding.brokenSitePopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
-                onMenuItemClicked(view.settingsPopupMenuItem) {
+                onMenuItemClicked(menuBinding.settingsPopupMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
-                    viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                onMenuItemClicked(menuBinding.requestDesktopSiteCheckMenuItem) {
+                    viewModel.onDesktopSiteModeToggled(menuBinding.requestDesktopSiteCheckMenuItem.isChecked)
                 }
-                onMenuItemClicked(view.sharePageMenuItem) {
+                onMenuItemClicked(menuBinding.sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
-                onMenuItemClicked(view.addToHome) {
+                onMenuItemClicked(menuBinding.addToHome) {
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
-                onMenuItemClicked(view.openInAppMenuItem) {
+                onMenuItemClicked(menuBinding.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(menuBinding.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
@@ -2285,7 +2286,7 @@ class BrowserTabFragment :
             browserShowing: Boolean,
             viewState: BrowserViewState
         ) {
-            popupMenu.contentView.apply {
+            PopupWindowBrowserMenuBinding.bind(popupMenu.contentView).apply {
                 backPopupMenuItem.isEnabled = viewState.canGoBack
                 forwardPopupMenuItem.isEnabled = viewState.canGoForward
                 refreshPopupMenuItem.isEnabled = browserShowing
@@ -2353,7 +2354,7 @@ class BrowserTabFragment :
                 hideFindInPage()
             }
 
-            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            PopupWindowBrowserMenuBinding.bind(popupMenu.contentView).findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
@@ -2407,7 +2408,7 @@ class BrowserTabFragment :
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
-            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            newBrowserTab.newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
 
             if (configuration is DaxBubbleCta.DaxFireproofCta) {
                 configureFireproofButtons()
@@ -2420,12 +2421,12 @@ class BrowserTabFragment :
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
-            newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
+            newBrowserTab.newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
             viewModel.onCtaShown()
         }
 
         private fun removeNewTabLayoutClickListener() {
-            newTabLayout.setOnClickListener(null)
+            newBrowserTab.newTabLayout.setOnClickListener(null)
         }
 
         private fun showHomeCta(
@@ -2433,10 +2434,10 @@ class BrowserTabFragment :
             favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
         ) {
             hideDaxCta()
-            if (ctaContainer.isEmpty()) {
+            if (newBrowserTab.ctaContainer.isEmpty()) {
                 renderHomeCta()
             } else {
-                configuration.showCta(ctaContainer)
+                configuration.showCta(newBrowserTab.ctaContainer)
             }
             showHomeBackground(favorites)
             viewModel.onCtaShown()
@@ -2452,12 +2453,12 @@ class BrowserTabFragment :
                 quickAccessItems.quickAccessRecyclerView.show()
             }
 
-            newTabQuickAcessItemsLayout.show()
+            newBrowserTab.newTabQuickAcessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            newTabQuickAcessItemsLayout.gone()
+            newBrowserTab.newTabQuickAcessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {
@@ -2466,7 +2467,7 @@ class BrowserTabFragment :
         }
 
         private fun hideHomeCta() {
-            ctaContainer.gone()
+            newBrowserTab.ctaContainer.gone()
         }
 
         private fun configureFireproofButtons() {
@@ -2490,22 +2491,22 @@ class BrowserTabFragment :
             val cta = lastSeenCtaViewState?.cta ?: return
             val configuration = if (cta is HomePanelCta) cta else return
 
-            ctaContainer.removeAllViews()
+            newBrowserTab.ctaContainer.removeAllViews()
 
             if (configuration is HomePanelCta.AddReturningUsersWidgetAuto) {
                 hideDaxBackgroundLogo = true
-                inflate(context, R.layout.include_experiment_returning_users_cta, ctaContainer)
+                inflate(context, R.layout.include_experiment_returning_users_cta, newBrowserTab.ctaContainer)
             } else {
-                inflate(context, R.layout.include_cta, ctaContainer)
+                inflate(context, R.layout.include_cta, newBrowserTab.ctaContainer)
             }
 
-            configuration.showCta(ctaContainer)
-            ctaContainer.ctaOkButton.setOnClickListener {
+            configuration.showCta(newBrowserTab.ctaContainer)
+            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaOkButton).setOnClickListener {
                 hideDaxBackgroundLogo = false
                 viewModel.onUserClickCtaOkButton()
             }
 
-            ctaContainer.ctaDismissButton.setOnClickListener {
+            newBrowserTab.ctaContainer.findViewById<Button>(R.id.ctaDismissButton).setOnClickListener {
                 hideDaxBackgroundLogo = false
                 viewModel.onUserDismissedCta()
             }
