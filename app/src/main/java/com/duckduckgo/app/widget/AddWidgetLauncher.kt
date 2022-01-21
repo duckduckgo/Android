@@ -31,6 +31,7 @@ import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Named
 
 interface AddWidgetLauncher {
     fun launchAddWidget(activity: Activity?)
@@ -39,8 +40,8 @@ interface AddWidgetLauncher {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class AddWidgetCompatLauncher @Inject constructor(
-    private val defaultAddWidgetLauncher: AppWidgetManagerAddWidgetLauncher,
-    private val legacyAddWidgetLauncher: LegacyAddWidgetLauncher,
+    @Named("appWidgetManagerAddWidgetLauncher") private val defaultAddWidgetLauncher: AddWidgetLauncher,
+    @Named("legacyAddWidgetLauncher") private val legacyAddWidgetLauncher: AddWidgetLauncher,
     private val widgetCapabilities: WidgetCapabilities
 ) : AddWidgetLauncher {
 
@@ -50,6 +51,9 @@ class AddWidgetCompatLauncher @Inject constructor(
     }
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+@Named("appWidgetManagerAddWidgetLauncher")
 class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
     companion object {
         const val ACTION_ADD_WIDGET = "actionWidgetAdded"
@@ -75,6 +79,9 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLaunche
     }
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+@Named("legacyAddWidgetLauncher")
 class LegacyAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
     override fun launchAddWidget(activity: Activity?) {
         activity?.let {

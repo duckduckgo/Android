@@ -26,8 +26,8 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class AddWidgetCompatLauncherTest {
-    private val defaultAddWidgetLauncher: AppWidgetManagerAddWidgetLauncher = mock()
-    private val legacyAddWidgetLauncher: LegacyAddWidgetLauncher = mock()
+    private val defaultAddWidgetLauncher: AddWidgetLauncher = mock()
+    private val legacyAddWidgetLauncher: AddWidgetLauncher = mock()
     private val widgetCapabilities: WidgetCapabilities = mock()
     private val testee = AddWidgetCompatLauncher(
         defaultAddWidgetLauncher,
