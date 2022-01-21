@@ -26,12 +26,13 @@ import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBui
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorker
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPInviteCodeResponse
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeResponse
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.mobile.android.vpn.waitlist.api.WaitlistResponse
 import com.duckduckgo.mobile.android.vpn.waitlist.api.WaitlistStatusResponse
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -52,6 +53,7 @@ import kotlin.time.ExperimentalTime
 class AppTPWaitlistViewModelTest {
 
     private val manager: AppTPWaitlistManager = mock()
+    private val repository: AtpWaitlistStateRepository = mock()
     private var service: AppTrackingProtectionWaitlistService = mock()
     private var workManager: WorkManager = mock()
     private val waitlistBuilder: AppTPWaitlistWorkRequestBuilder = mock()
@@ -64,8 +66,8 @@ class AppTPWaitlistViewModelTest {
 
     @Before
     fun before() {
-        whenever(manager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
-        viewModel = AppTPWaitlistViewModel(manager, service, workManager, waitlistBuilder, deviceShieldPixels)
+        whenever(repository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+        viewModel = AppTPWaitlistViewModel(manager, repository, service, workManager, waitlistBuilder, deviceShieldPixels)
     }
 
     @Test
@@ -111,7 +113,7 @@ class AppTPWaitlistViewModelTest {
 
     @Test
     fun whenUserCantJoinsWaitlistThenErrorMessageIsShown() = runTest {
-        viewModel = AppTPWaitlistViewModel(manager, FailWaitlistService(), workManager, waitlistBuilder, deviceShieldPixels)
+        viewModel = AppTPWaitlistViewModel(manager, repository, FailWaitlistService(), workManager, waitlistBuilder, deviceShieldPixels)
 
         viewModel.commands.test {
             viewModel.joinTheWaitlist()
@@ -161,7 +163,7 @@ class AppTPWaitlistViewModelTest {
     @Test
     fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
         val waitlistState = WaitlistState.JoinedWaitlist(false)
-        whenever(manager.waitlistState()).thenReturn(waitlistState)
+        whenever(repository.getState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onDialogDismissed()
@@ -180,7 +182,7 @@ class AppTPWaitlistViewModelTest {
     @Test
     fun whenCodeRedeemSuccessThenWaitlistStateIsCodeRedeemed() = runTest {
         val waitlistState = WaitlistState.CodeRedeemed
-        whenever(manager.waitlistState()).thenReturn(waitlistState)
+        whenever(repository.getState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onCodeRedeemed(Activity.RESULT_OK)
@@ -191,7 +193,7 @@ class AppTPWaitlistViewModelTest {
     @Test
     fun whenCodeRedeemFailsThenWaitlistStateIsCodeRedeemed() = runTest {
         val waitlistState = WaitlistState.CodeRedeemed
-        whenever(manager.waitlistState()).thenReturn(waitlistState)
+        whenever(repository.getState()).thenReturn(waitlistState)
         viewModel.viewState.test {
             assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
             viewModel.onCodeRedeemed(Activity.RESULT_CANCELED)
