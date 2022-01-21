@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 
 @Dao
 abstract class RemoteMessagesDao {
@@ -29,4 +30,10 @@ abstract class RemoteMessagesDao {
 
     @Query("select * from remote_message")
     abstract fun messages(): List<RemoteMessageEntity>
+
+    @Query("select * from remote_message where status = \"DISMISSED\"")
+    abstract fun dismissedMessages(): List<RemoteMessageEntity>
+
+    @Query("update remote_message set status = :newState where id = :id")
+    abstract fun udpateState(id: String, newState: Status)
 }

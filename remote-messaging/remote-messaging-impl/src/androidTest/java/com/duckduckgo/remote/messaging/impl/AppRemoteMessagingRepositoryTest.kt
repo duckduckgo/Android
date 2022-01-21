@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import junit.framework.Assert.assertEquals
 import org.junit.After
@@ -37,7 +38,9 @@ class AppRemoteMessagingRepositoryTest {
         .allowMainThreadQueries()
         .build()
 
-    private val testee = AppRemoteMessagingRepository(db.remoteMessagesDao())
+    private val dao = db.remoteMessagesDao()
+
+    private val testee = AppRemoteMessagingRepository(dao)
 
     @After
     fun after() {
@@ -180,5 +183,54 @@ class AppRemoteMessagingRepositoryTest {
             ),
             message
         )
+    }
+
+    @Test
+    fun whenDismissMessageThenUpdateState() {
+        testee.add(
+            RemoteMessage(
+                id = "id",
+                content = BigTwoActions(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText",
+                    secondaryActionText = "actionText",
+                    secondaryAction = Action.Dismiss()
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+
+        testee.dismissMessage("id")
+
+        val messages = dao.messages()
+        assertEquals(Status.DISMISSED, messages.first().status)
+    }
+
+    @Test
+    fun whenGetDismisedMessagesThenReturnDismissedMessageIds() {
+        testee.add(
+            RemoteMessage(
+                id = "id",
+                content = BigTwoActions(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = "placeholder",
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText",
+                    secondaryActionText = "actionText",
+                    secondaryAction = Action.Dismiss()
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+        testee.dismissMessage("id")
+
+        val dismissedMessages = testee.dismissedMessages()
+        assertEquals("id", dismissedMessages.first())
     }
 }

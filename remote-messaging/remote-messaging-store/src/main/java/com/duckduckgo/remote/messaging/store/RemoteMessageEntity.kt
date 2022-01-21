@@ -27,7 +27,7 @@ data class RemoteMessageEntity(
 ) {
     enum class Status {
         SCHEDULED,
-        CANCELLED,
+        DISMISSED,
         DONE
     }
 }

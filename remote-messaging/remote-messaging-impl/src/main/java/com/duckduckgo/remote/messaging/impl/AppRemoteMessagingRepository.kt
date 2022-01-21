@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
+import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULED
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
 import com.squareup.moshi.JsonAdapter
@@ -53,6 +54,14 @@ class AppRemoteMessagingRepository(
         val message = messageMapper.fromMessage(messageEntity.message) ?: return null
 
         return RemoteMessage(message.id, message.content, emptyList(), emptyList())
+    }
+
+    override fun dismissMessage(id: String) {
+        remoteMessagesDao.udpateState(id, Status.DISMISSED)
+    }
+
+    override fun dismissedMessages(): List<String> {
+        return remoteMessagesDao.dismissedMessages().map { it.id }.toList()
     }
 
     private class MessageMapper {

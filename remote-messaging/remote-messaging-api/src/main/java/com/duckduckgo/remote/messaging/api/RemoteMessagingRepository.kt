@@ -19,5 +19,7 @@ package com.duckduckgo.remote.messaging.api
 interface RemoteMessagingRepository {
     fun add(message: RemoteMessage)
     fun message(): RemoteMessage?
+    fun dismissMessage(id: String)
+    fun dismissedMessages(): List<String>
 }
 
