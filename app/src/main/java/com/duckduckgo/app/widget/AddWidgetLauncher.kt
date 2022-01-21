@@ -24,6 +24,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
@@ -57,6 +58,7 @@ class AddWidgetCompatLauncher @Inject constructor(
 class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
     companion object {
         const val ACTION_ADD_WIDGET = "actionWidgetAdded"
+        const val EXTRA_WIDGET_ADDED_LABEL = "extraWidgetAddedLabel"
         private const val CODE_ADD_WIDGET = 11922
     }
 
@@ -70,10 +72,13 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLaunche
 
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun buildPendingIntent(context: Context): PendingIntent? {
+        val intent = Intent(ACTION_ADD_WIDGET).run {
+            putExtra(EXTRA_WIDGET_ADDED_LABEL, context.getString(R.string.favoritesWidgetLabel))
+        }
         return PendingIntent.getBroadcast(
             context,
             CODE_ADD_WIDGET,
-            Intent(ACTION_ADD_WIDGET),
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT
         ) // Will not return null since FLAG_UPDATE_CURRENT has been supplied
     }

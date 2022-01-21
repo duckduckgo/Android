@@ -61,7 +61,8 @@ class WidgetAddedReceiver @Inject constructor(
     ) {
         if (!IGNORE_MANUFACTURERS_LIST.contains(Build.MANUFACTURER)) {
             context?.let {
-                Toast.makeText(it, it.getString(R.string.homeScreenWidgetAdded), Toast.LENGTH_SHORT).show()
+                val title = intent?.getStringExtra(AppWidgetManagerAddWidgetLauncher.EXTRA_WIDGET_ADDED_LABEL) ?: ""
+                Toast.makeText(it, it.getString(R.string.homeScreenWidgetAdded, title), Toast.LENGTH_SHORT).show()
             }
         }
     }
