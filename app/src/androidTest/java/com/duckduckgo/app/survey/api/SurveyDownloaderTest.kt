@@ -214,7 +214,7 @@ class SurveyDownloaderTest {
 
     private fun surveyWithAllocationForAppTPWaitlist(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, true, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, true, true, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
