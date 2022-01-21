@@ -27,8 +27,8 @@
     <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \" &#x2807;\" icon and select Add Favorite.]]></string>
     <string name="daxFavoritesOnboardingCtaContentDescription">Visit your favorite sites in a flash! Go to a site you love. Then tap the browser menu icon and select Add Favorite.</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
-    <string name="favoritesWidgetLabel">Favorites Widget</string>
-    <string name="searchWidgetLabel">Search Widget</string>
+    <string name="favoritesWidgetLabel">Favorites</string>
+    <string name="searchWidgetLabel">Search</string>
 
     <!-- Treat returning users differently Experiment -->
     <string name="returningUsersNewUserButton">I\'m new!</string>
