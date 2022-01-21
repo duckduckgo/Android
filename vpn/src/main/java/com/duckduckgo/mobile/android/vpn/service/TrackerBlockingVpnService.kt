@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.net.Network
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
@@ -35,7 +36,10 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
+import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -62,7 +66,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator, NetworkConnectionListener {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -109,6 +113,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private var vpnStateServiceReference: IBinder? = null
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
+    private var connectionMonitor: ConnectionMonitor? = null
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -228,6 +235,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        connectionMonitor?.onSopMonitoring()
+        connectionMonitor = connectionMonitorFactory.create(this@TrackerBlockingVpnService).apply { onStartMonitoring() }
     }
 
     private suspend fun establishVpnInterface() {
@@ -307,6 +317,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
+        connectionMonitor?.onSopMonitoring()
+        connectionMonitor = null
         tunInterface?.close()
         tunInterface = null
 
@@ -479,6 +491,36 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
+    }
+
+    @SuppressLint("NewApi")
+    override fun onNetworkDisconnected() {
+        // for now just in internal builds to ensure it doesn't have side effects
+        if (appBuildConfig.flavor != INTERNAL) return
+
+        // TODO maybe at some point show the user?
+        Timber.w("No network")
+        if (appBuildConfig.sdkInt >= 22) {
+            setUnderlyingNetworks(null)
+        }
+    }
+
+    @SuppressLint("NewApi")
+    override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
+        // for now just in internal builds to ensure it doesn't have side effects
+        if (appBuildConfig.flavor != INTERNAL) return
+
+        if (appBuildConfig.sdkInt >= 22) {
+            Timber.w("set underlying networks: $networks")
+            if (networks.isEmpty()) {
+                // this should never happen. If networks.isEmpty() onNetworkDisconnected() should be called instead.
+                // just safeguard
+                Timber.w("onNetworkConnected called with empty networks...setting underlying networks to default")
+                setUnderlyingNetworks(null)
+            } else {
+                setUnderlyingNetworks(networks.toTypedArray())
+            }
+        }
     }
 
     override fun createDatagramChannel(): DatagramChannel {
