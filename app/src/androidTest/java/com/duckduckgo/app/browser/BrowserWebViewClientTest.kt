@@ -42,6 +42,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -83,6 +84,7 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
+    private val trackingLinkDetector: TrackingLinkDetector = mock()
 
     @UiThreadTest
     @Before
@@ -104,7 +106,8 @@ class BrowserWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
-            accessibilitySettings
+            accessibilitySettings,
+            trackingLinkDetector
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
