@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
@@ -41,8 +42,9 @@ class RemoteMessagingConfigMatcherTest {
     private val deviceAttributeMatcher: DeviceAttributeMatcher = mock()
     private val androidAppAttributeMatcher: AndroidAppAttributeMatcher = mock()
     private val userAttributeMatcher: UserAttributeMatcher = mock()
+    private val remoteMessagingRepository: RemoteMessagingRepository = mock()
 
-    private val testee = RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
+    private val testee = RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
 
     private val printlnTree = object : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
@@ -283,6 +285,27 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
+    fun whenUserDismissedMessagesAndDeviceMatchesMultipleMessagesThenReturnFistMatchNotDismissed() = runBlocking {
+        givenDeviceMatches(Api(max = 19), EmailEnabled(value = true))
+        givenUserDismissed("1")
+        val rules = mapOf(
+            rule(1, Api(max = 19))
+        )
+
+        val message = testee.evaluate(
+            RemoteConfig(
+                messages = listOf(
+                    aSmallMessage(id = "1", matchingRules = rules(1)),
+                    aMediumMessage(id = "2", matchingRules = rules(1))
+                ),
+                rules = rules
+            )
+        )
+
+        assertEquals(aMediumMessage(id = "2", matchingRules = rules(1)), message)
+    }
+
+    @Test
     fun whenDeviceMatchesAnyRuleThenReturnFirstMatch() = runBlocking {
         givenDeviceMatches(Api(max = 19), Locale(value = listOf("en_US")))
         val rules = mapOf(
@@ -367,6 +390,10 @@ class RemoteMessagingConfigMatcherTest {
             whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
             whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
         }
+    }
+
+    private fun givenUserDismissed(vararg ids: String) {
+        whenever(remoteMessagingRepository.dismissedMessages()).thenReturn(ids.asList())
     }
 
     private fun rule(id: Int, vararg matchingAttributes: MatchingAttribute) = Pair(id, matchingAttributes.asList())

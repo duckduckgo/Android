@@ -142,9 +142,10 @@ class DataSourceModule {
     fun providesRemoteMessagingConfigMatcher(
         deviceAttributeMatcher: DeviceAttributeMatcher,
         androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+        remoteMessagingRepository: RemoteMessagingRepository,
         userAttributeMatcher: UserAttributeMatcher
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
+        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
     }
 
     @Provides

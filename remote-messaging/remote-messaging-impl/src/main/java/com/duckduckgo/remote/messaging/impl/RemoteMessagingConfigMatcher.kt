@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
@@ -29,12 +30,14 @@ import timber.log.Timber
 class RemoteMessagingConfigMatcher(
     val deviceAttributeMatcher: DeviceAttributeMatcher,
     val androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+    val remoteMessagingRepository: RemoteMessagingRepository,
     val userAttributeMatcher: UserAttributeMatcher
 ) {
     suspend fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules
+        val dismissedMessages = remoteMessagingRepository.dismissedMessages()
 
-        remoteConfig.messages.forEach { message ->
+        remoteConfig.messages.filter { !dismissedMessages.contains(it.id) }.forEach { message ->
             val matchingRules = if (message.matchingRules.isEmpty() && message.exclusionRules.isEmpty()) return message else message.matchingRules
 
             val matchingResult = matchingRules.evaluateMatchingRules(rules)
