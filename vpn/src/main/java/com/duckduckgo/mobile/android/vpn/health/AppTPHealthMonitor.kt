@@ -105,7 +105,7 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val memoryAlerts = object : HealthRule("memoryAlerts", samplesToWaitBeforeAlerting = MEMORY_ALERT_SAMPLES) {}.also { healthRules.add(it) }
-    private val tracerPacketsAlerts = object : HealthRule("tracerPacketsAlerts", samplesToWaitBeforeAlerting = 1) {}.also { healthRules.add(it) }
+    private val tracerPacketsAlerts = object : HealthRule("tracerPacketsAlerts", samplesToWaitBeforeAlerting = 2) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
         val timeWindow = now - SLIDING_WINDOW_DURATION_MS

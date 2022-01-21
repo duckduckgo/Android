@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class ExclusionRulesRepository @Inject constructor(
@@ -57,7 +56,6 @@ class ExclusionRulesRepository @Inject constructor(
                 rule = it.rule,
                 packageNames = it.packageNames.toMutableSet().apply { remove(appPackageName) }.toList()
             )
-            Timber.v("aitorr rule $it / $updatedRule")
             blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
         }
     }
