@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import okio.ByteString.Companion.toByteString
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
@@ -77,6 +78,7 @@ class TunPacketWriter @AssistedInject constructor(
 
             if (bufferFromNetwork.get(0) == (-1).toByte()) {
                 processTracerPacket(bufferFromNetwork)
+                ByteBufferPool.release(bufferFromNetwork)
                 return
             }
 
@@ -90,6 +92,8 @@ class TunPacketWriter @AssistedInject constructor(
             }
         } catch (e: IOException) {
             Timber.w(e, "Failed writing to the TUN")
+            bufferFromNetwork.rewind()
+            Timber.d("Failed writing to the TUN. Buffer: ${bufferFromNetwork.toByteString().hex()}")
             healthMetricCounter.onTunWriteIOException()
         } finally {
             ByteBufferPool.release(bufferFromNetwork)
