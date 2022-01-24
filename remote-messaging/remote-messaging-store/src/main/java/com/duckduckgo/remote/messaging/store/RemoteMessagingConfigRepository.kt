@@ -17,7 +17,6 @@
 package com.duckduckgo.remote.messaging.store
 
 import org.threeten.bp.LocalDateTime
-import java.time.temporal.TemporalField
 
 interface RemoteMessagingConfigRepository {
     fun insert(remoteMessagingConfig: RemoteMessagingConfig)
