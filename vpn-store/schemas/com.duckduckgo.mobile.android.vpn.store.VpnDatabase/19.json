@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "d683be5ff8d34422f26e050b3522918d",
+    "identityHash": "2df4da3c9c8d7b1a065d03c5d6970721",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -594,44 +594,6 @@
             "id"
           ],
           "autoGenerate": true
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "vpn_app_tracker_entities",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trackerCompanyId` INTEGER NOT NULL, `entityName` TEXT NOT NULL, `score` INTEGER NOT NULL, `signals` TEXT NOT NULL, PRIMARY KEY(`trackerCompanyId`))",
-        "fields": [
-          {
-            "fieldPath": "trackerCompanyId",
-            "columnName": "trackerCompanyId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "entityName",
-            "columnName": "entityName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "score",
-            "columnName": "score",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "signals",
-            "columnName": "signals",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "trackerCompanyId"
-          ],
-          "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
