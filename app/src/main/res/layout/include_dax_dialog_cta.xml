@@ -140,6 +140,7 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
+        android:layout_marginTop="12dp"
         app:backgroundTint="@color/cornflowerBlue"
         android:text="@string/onboardingLetsDoItButton"
         android:textAllCaps="false"
