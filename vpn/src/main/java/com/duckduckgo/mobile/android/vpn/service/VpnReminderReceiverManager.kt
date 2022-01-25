@@ -20,7 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
@@ -32,7 +32,7 @@ interface VpnReminderReceiverManager {
     fun showReminderNotificationIfVpnDisabled(context: Context)
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class AndroidVpnReminderReceiverManager @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
@@ -67,5 +67,4 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     private fun prefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
     }
-
 }

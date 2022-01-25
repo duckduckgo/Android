@@ -25,9 +25,9 @@ import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -43,7 +43,10 @@ class TrackerDataDevReceiver(
         context.registerReceiver(this, IntentFilter(intentAction))
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 
@@ -52,16 +55,17 @@ class TrackerDataDevReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class TrackerDataDevReceiverRegister @Inject constructor(
     private val context: Context,
-    private val trackderDataDownloader: TrackerDataDownloader
+    private val trackderDataDownloader: TrackerDataDownloader,
+    private val appBuildConfig: AppBuildConfig,
 ) : LifecycleObserver {
 
     @SuppressLint("CheckResult")
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun register() {
-        if (!BuildConfig.DEBUG) {
+        if (!appBuildConfig.isDebug) {
             Timber.i("Will not register TrackerDataDevReceiverRegister, not in DEBUG mode")
             return
         }

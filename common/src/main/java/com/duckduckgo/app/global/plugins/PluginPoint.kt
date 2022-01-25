@@ -16,12 +16,8 @@
 
 package com.duckduckgo.app.global.plugins
 
-/**
- * A PluginPoint provides a list of plugins of a particular type T
- */
+/** A PluginPoint provides a list of plugins of a particular type T */
 interface PluginPoint<T> {
-    /**
-     * @return the list of plugins of type <T>
-     */
+    /** @return the list of plugins of type <T> */
     fun getPlugins(): Collection<T>
 }

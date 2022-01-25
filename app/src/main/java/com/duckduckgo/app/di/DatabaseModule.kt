@@ -22,22 +22,26 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
 class DatabaseModule {
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     fun provideWebviewDatabase(context: Context): WebViewDatabase {
         return WebViewDatabase.getInstance(context)
     }
 
     @Provides
-    @Singleton
-    fun provideAppDatabase(context: Context, migrationsProvider: MigrationsProvider): AppDatabase {
+    @SingleInstanceIn(AppScope::class)
+    fun provideAppDatabase(
+        context: Context,
+        migrationsProvider: MigrationsProvider
+    ): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, "app.db")
             .addMigrations(*migrationsProvider.ALL_MIGRATIONS.toTypedArray())
             .addCallback(migrationsProvider.BOOKMARKS_DB_ON_CREATE)

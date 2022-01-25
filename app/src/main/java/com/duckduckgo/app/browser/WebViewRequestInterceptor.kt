@@ -135,7 +135,11 @@ class WebViewRequestInterceptor(
         return getWebResourceResponse(request, documentUrl, null)
     }
 
-    private fun getWebResourceResponse(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): WebResourceResponse? {
+    private fun getWebResourceResponse(
+        request: WebResourceRequest,
+        documentUrl: String?,
+        webViewClientListener: WebViewClientListener?
+    ): WebResourceResponse? {
         val trackingEvent = trackingEvent(request, documentUrl, webViewClientListener)
         if (trackingEvent?.blocked == true) {
             trackingEvent.surrogateId?.let { surrogateId ->
@@ -166,7 +170,10 @@ class WebViewRequestInterceptor(
         return (request.isForMainFrame && request.method == "GET" && gpc.canUrlAddHeaders(request.url.toString(), existingHeaders))
     }
 
-    private suspend fun requestWasInTheStack(url: Uri, webView: WebView): Boolean {
+    private suspend fun requestWasInTheStack(
+        url: Uri,
+        webView: WebView
+    ): Boolean {
         return withContext(Dispatchers.Main) {
             val webBackForwardList = webView.copyBackForwardList()
             webBackForwardList.currentItem?.url == url.toString()
@@ -197,7 +204,11 @@ class WebViewRequestInterceptor(
     private fun shouldUpgrade(request: WebResourceRequest) =
         request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
-    private fun trackingEvent(request: WebResourceRequest, documentUrl: String?, webViewClientListener: WebViewClientListener?): TrackingEvent? {
+    private fun trackingEvent(
+        request: WebResourceRequest,
+        documentUrl: String?,
+        webViewClientListener: WebViewClientListener?
+    ): TrackingEvent? {
         val url = request.url.toString()
 
         if (request.isForMainFrame || documentUrl == null) {

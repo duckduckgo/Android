@@ -25,6 +25,7 @@ import android.os.Handler
 import android.os.Message
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
@@ -50,7 +51,6 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.ui.LocationPermissionsActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
@@ -73,7 +73,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
+// open class so that we can test BrowserApplicationStateInfo
+open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var settingsDataStore: SettingsDataStore
@@ -121,6 +122,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
 
     private var openMessageInNewTabJob: Job? = null
+
+    @VisibleForTesting
+    var destroyedByBackPress: Boolean = false
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -171,7 +175,11 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    private fun openNewTab(tabId: String, url: String? = null, skipHome: Boolean): BrowserTabFragment {
+    private fun openNewTab(
+        tabId: String,
+        url: String? = null,
+        skipHome: Boolean
+    ): BrowserTabFragment {
         Timber.i("Opening new tab, url: $url, tabId: $tabId")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         addOrReplaceNewTab(fragment, tabId)
@@ -187,7 +195,10 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         return fragment
     }
 
-    private fun addOrReplaceNewTab(fragment: BrowserTabFragment, tabId: String) {
+    private fun addOrReplaceNewTab(
+        fragment: BrowserTabFragment,
+        tabId: String
+    ) {
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -384,13 +395,19 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         launch { viewModel.onNewTabRequested() }
     }
 
-    fun openInNewTab(query: String, sourceTabId: String?) {
+    fun openInNewTab(
+        query: String,
+        sourceTabId: String?
+    ) {
         launch {
             viewModel.onOpenInNewTabRequested(query = query, sourceTabId = sourceTabId)
         }
     }
 
-    fun openMessageInNewTab(message: Message, sourceTabId: String?) {
+    fun openMessageInNewTab(
+        message: Message,
+        sourceTabId: String?
+    ) {
         openMessageInNewTabJob = launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
@@ -410,7 +427,11 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         startActivity(BookmarksActivity.intent(this))
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         if (requestCode == DASHBOARD_REQUEST_CODE) {
             viewModel.receivedDashboardResult(resultCode)
         } else {
@@ -420,6 +441,9 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     override fun onBackPressed() {
         if (currentTab?.onBackPressed() != true) {
+            // signal user press back button to exit the app so that BrowserApplicationStateInfo
+            // can call the right callback
+            destroyedByBackPress = true
             super.onBackPressed()
         }
     }
@@ -523,6 +547,8 @@ class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
         playStoreUtils.launchPlayStore()
     }
 
-    private data class CombinedInstanceState(val originalInstanceState: Bundle?, val newInstanceState: Bundle?)
-
+    private data class CombinedInstanceState(
+        val originalInstanceState: Bundle?,
+        val newInstanceState: Bundle?
+    )
 }

@@ -29,7 +29,10 @@ import javax.inject.Inject
 interface FileDownloader {
 
     @WorkerThread
-    fun download(pending: PendingFileDownload, callback: FileDownloadListener)
+    fun download(
+        pending: PendingFileDownload,
+        callback: FileDownloadListener
+    )
 
     data class PendingFileDownload(
         val url: String,
@@ -43,9 +46,21 @@ interface FileDownloader {
     interface FileDownloadListener {
         fun downloadStartedDataUri()
         fun downloadStartedNetworkFile()
-        fun downloadFinishedDataUri(file: File, mimeType: String?)
-        fun downloadFinishedNetworkFile(file: File, mimeType: String?)
-        fun downloadFailed(message: String, downloadFailReason: DownloadFailReason)
+        fun downloadFinishedDataUri(
+            file: File,
+            mimeType: String?
+        )
+
+        fun downloadFinishedNetworkFile(
+            file: File,
+            mimeType: String?
+        )
+
+        fun downloadFailed(
+            message: String,
+            downloadFailReason: DownloadFailReason
+        )
+
         fun downloadCancelled()
         fun downloadOpened()
     }
@@ -57,7 +72,10 @@ class AndroidFileDownloader @Inject constructor(
 ) : FileDownloader {
 
     @WorkerThread
-    override fun download(pending: PendingFileDownload, callback: FileDownloadListener) {
+    override fun download(
+        pending: PendingFileDownload,
+        callback: FileDownloadListener
+    ) {
         when {
             pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)

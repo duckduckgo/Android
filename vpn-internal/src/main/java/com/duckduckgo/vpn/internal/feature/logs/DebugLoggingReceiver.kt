@@ -18,7 +18,7 @@ package com.duckduckgo.vpn.internal.feature.logs
 
 import android.content.Context
 import android.content.Intent
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
@@ -42,6 +42,7 @@ class DebugLoggingReceiver(
                 putExtra("turn", "on")
             }
         }
+
         fun turnOffIntent(): Intent {
             return Intent(ACTION).apply {
                 putExtra("turn", "off")
@@ -58,7 +59,7 @@ class DebugLoggingReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
     private val context: Context
 ) : VpnServiceCallbacks {
@@ -81,7 +82,10 @@ class DebugLoggingReceiverRegister @Inject constructor(
         }.apply { register() }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         receiver?.unregister()
     }
 }

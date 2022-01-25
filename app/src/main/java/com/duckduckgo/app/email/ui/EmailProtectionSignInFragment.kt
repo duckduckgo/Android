@@ -24,10 +24,11 @@ import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
-import com.duckduckgo.app.email.waitlist.WaitlistNotificationDialog
+import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -97,6 +98,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     private fun executeCommand(command: EmailProtectionSignInViewModel.Command) {
         when (command) {
             is EmailProtectionSignInViewModel.Command.OpenUrl -> openWebsite(command.url)
+            is EmailProtectionSignInViewModel.Command.OpenUrlInBrowserTab -> openBrowserTab(command.url)
             is EmailProtectionSignInViewModel.Command.ShowErrorMessage -> renderErrorMessage()
             is EmailProtectionSignInViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
         }
@@ -107,6 +109,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
             val dialog = WaitlistNotificationDialog.create()
             dialog.show(it, NOTIFICATION_DIALOG_TAG)
             dialog.onNotifyClicked = { viewModel.onNotifyMeClicked() }
+            dialog.onNoThanksClicked = { viewModel.onNoThanksClicked() }
             dialog.onDialogDismissed = { viewModel.onDialogDismissed() }
         }
     }
@@ -131,7 +134,11 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         if (notify) {
             setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithNotification, listOf(readBlogSpan))
         } else {
-            setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithoutNotification, listOf(getNotificationSpan, readBlogSpan))
+            setClickableSpan(
+                binding.emailPrivacyDescription,
+                R.string.emailProtectionDescriptionJoinedWithoutNotification,
+                listOf(getNotificationSpan, readBlogSpan)
+            )
         }
     }
 
@@ -150,7 +157,11 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         setClickableSpan(binding.footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan))
     }
 
-    private fun setClickableSpan(view: MaterialTextView, stringId: Int, span: List<NonUnderlinedClickableSpan>) {
+    private fun setClickableSpan(
+        view: MaterialTextView,
+        stringId: Int,
+        span: List<NonUnderlinedClickableSpan>
+    ) {
         context?.let {
             val htmlString = getString(stringId).html(it)
             val spannableString = SpannableStringBuilder(htmlString)
@@ -170,6 +181,13 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
                 text = spannableString
                 movementMethod = LinkMovementMethod.getInstance()
             }
+        }
+    }
+
+    private fun openBrowserTab(url: String) {
+        context?.let {
+            startActivity(BrowserActivity.intent(it, url))
+            activity?.finish()
         }
     }
 

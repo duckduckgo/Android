@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.LocalDate
 import org.threeten.bp.temporal.ChronoUnit
@@ -27,7 +27,7 @@ interface CohortCalculator {
     fun calculateCohortForDate(localDate: LocalDate): String
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class RealCohortCalculator @Inject constructor() : CohortCalculator {
 
     override fun calculateCohortForDate(localDate: LocalDate): String {
@@ -53,7 +53,7 @@ class RealCohortCalculator @Inject constructor() : CohortCalculator {
     }
 
     private fun weeklyCohortName(localDate: LocalDate): String {
-        return "${localDate.year}-week-${weekOfYear(localDate)}"
+        return "${weekBasedYear(localDate)}-week-${weekOfYear(localDate)}"
     }
 
     private fun monthlyCohortName(localDate: LocalDate): String {
@@ -75,6 +75,10 @@ class RealCohortCalculator @Inject constructor() : CohortCalculator {
 
     private fun weekOfYear(localDate: LocalDate): Int {
         return localDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+    }
+
+    private fun weekBasedYear(localDate: LocalDate): Int {
+        return localDate.get(IsoFields.WEEK_BASED_YEAR)
     }
 
     companion object {

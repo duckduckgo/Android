@@ -18,7 +18,6 @@ package com.duckduckgo.app.notification
 
 import android.app.IntentService
 import android.app.PendingIntent
-import android.app.TaskStackBuilder
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
@@ -62,6 +61,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var dispatcher: DispatcherProvider
 
+    @Inject
+    lateinit var taskStackBuilderFactory: TaskStackBuilderFactory
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -91,7 +93,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onEmailWaitlistCodeReceived(pixelSuffix: String) {
         Timber.i("Email waitlist code received launched!")
         val intent = EmailProtectionActivity.intent(context)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -100,16 +102,19 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onAppTPWaitlistCodeReceived(pixelSuffix: String) {
         Timber.i("App Tracking Protection waitlist code received launched!")
         val intent = AppTPWaitlistActivity.intent(context)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
-    private fun onWebsiteNotification(intent: Intent, pixelSuffix: String) {
+    private fun onWebsiteNotification(
+        intent: Intent,
+        pixelSuffix: String
+    ) {
         val url = intent.getStringExtra(WebsiteNotificationSpecification.WEBSITE_KEY)
         val newIntent = BrowserActivity.intent(context, queryExtra = url)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(newIntent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -117,7 +122,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onCustomizeIconLaunched(pixelSuffix: String) {
         val intent = ChangeIconActivity.intent(context)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -125,7 +130,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     private fun onAppLaunched(pixelSuffix: String) {
         val intent = BrowserActivity.intent(context, newSearch = true)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -134,7 +139,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     private fun onClearDataLaunched(pixelSuffix: String) {
         Timber.i("Clear Data Launched!")
         val intent = SettingsActivity.intent(context)
-        TaskStackBuilder.create(context)
+        taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
         pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
@@ -168,7 +173,11 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         const val NOTIFICATION_SYSTEM_ID_EXTRA = "NOTIFICATION_SYSTEM_ID"
         const val NOTIFICATION_AUTO_CANCEL = "NOTIFICATION_AUTO_CANCEL"
 
-        fun pendingNotificationHandlerIntent(context: Context, eventType: String, specification: NotificationSpec): PendingIntent {
+        fun pendingNotificationHandlerIntent(
+            context: Context,
+            eventType: String,
+            specification: NotificationSpec
+        ): PendingIntent {
             val intent = Intent(context, NotificationHandlerService::class.java)
             intent.type = eventType
             intent.putExtras(specification.bundle)

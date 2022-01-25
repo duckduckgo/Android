@@ -23,7 +23,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 
 interface DefaultBrowserDetector {
@@ -33,7 +33,8 @@ interface DefaultBrowserDetector {
 }
 
 class AndroidDefaultBrowserDetector(
-    private val context: Context
+    private val context: Context,
+    private val appBuildConfig: AppBuildConfig
 ) : DefaultBrowserDetector {
 
     override fun deviceSupportsDefaultBrowserConfiguration(): Boolean {
@@ -42,7 +43,7 @@ class AndroidDefaultBrowserDetector(
 
     override fun isDefaultBrowser(): Boolean {
         val defaultBrowserPackage = defaultBrowserPackage()
-        val defaultAlready = defaultBrowserPackage == BuildConfig.APPLICATION_ID
+        val defaultAlready = defaultBrowserPackage == appBuildConfig.applicationId
         Timber.i("Default browser identified as $defaultBrowserPackage")
         return defaultAlready
     }

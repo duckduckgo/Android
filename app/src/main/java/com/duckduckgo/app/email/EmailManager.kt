@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.email
 
-import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -30,15 +29,24 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
-interface EmailManager : LifecycleObserver {
+interface EmailManager {
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
-    fun storeCredentials(token: String, username: String, cohort: String)
+    fun storeCredentials(
+        token: String,
+        username: String,
+        cohort: String
+    )
+
     fun signOut()
     fun getEmailAddress(): String?
     fun waitlistState(): AppEmailManager.WaitlistState
-    fun joinWaitlist(timestamp: Int, token: String)
+    fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    )
+
     fun getInviteCode(): String
     fun doesCodeAlreadyExist(): Boolean
     suspend fun fetchInviteCode(): AppEmailManager.FetchCodeResult
@@ -56,8 +64,6 @@ class AppEmailManager(
     private val appCoroutineScope: CoroutineScope
 ) : EmailManager {
 
-    private val nextAliasFlow = emailDataStore.nextAliasFlow()
-
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
     override fun signedInFlow(): StateFlow<Boolean> = isSignedInStateFlow.asStateFlow()
 
@@ -67,7 +73,11 @@ class AppEmailManager(
         return !emailDataStore.emailToken.isNullOrBlank() && !emailDataStore.emailUsername.isNullOrBlank()
     }
 
-    override fun storeCredentials(token: String, username: String, cohort: String) {
+    override fun storeCredentials(
+        token: String,
+        username: String,
+        cohort: String
+    ) {
         emailDataStore.cohort = cohort
         emailDataStore.emailToken = token
         emailDataStore.emailUsername = username
@@ -100,9 +110,16 @@ class AppEmailManager(
         return WaitlistState.NotJoinedQueue
     }
 
-    override fun joinWaitlist(timestamp: Int, token: String) {
-        if (emailDataStore.waitlistTimestamp == -1) { emailDataStore.waitlistTimestamp = timestamp }
-        if (emailDataStore.waitlistToken == null) { emailDataStore.waitlistToken = token }
+    override fun joinWaitlist(
+        timestamp: Int,
+        token: String
+    ) {
+        if (emailDataStore.waitlistTimestamp == -1) {
+            emailDataStore.waitlistTimestamp = timestamp
+        }
+        if (emailDataStore.waitlistToken == null) {
+            emailDataStore.waitlistToken = token
+        }
     }
 
     override fun getInviteCode(): String {
@@ -154,7 +171,7 @@ class AppEmailManager(
     }
 
     private fun consumeAlias(): String? {
-        val alias = nextAliasFlow.value
+        val alias = emailDataStore.nextAlias
         emailDataStore.clearNextAlias()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             generateNewAlias()

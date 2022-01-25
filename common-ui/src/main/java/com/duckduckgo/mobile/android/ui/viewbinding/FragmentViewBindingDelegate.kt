@@ -27,7 +27,8 @@ import androidx.viewbinding.ViewBinding
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-inline fun <reified T : ViewBinding> Fragment.viewBinding() = FragmentViewBindingDelegate(T::class.java, this)
+inline fun <reified T : ViewBinding> Fragment.viewBinding() =
+    FragmentViewBindingDelegate(T::class.java, this)
 
 class FragmentViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
@@ -35,33 +36,42 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 ) : ReadOnlyProperty<Fragment, T> {
 
     // LazyThreadSafetyMode.NONE because it will never be initialised from ore than one thread
-    private val nullifyBindingHandler by lazy(LazyThreadSafetyMode.NONE) { Handler(Looper.getMainLooper()) }
+    private val nullifyBindingHandler by
+    lazy(LazyThreadSafetyMode.NONE) { Handler(Looper.getMainLooper()) }
     private var binding: T? = null
 
     private val bindMethod = bindingClass.getMethod("bind", View::class.java)
 
     init {
         fragment.viewLifecycleOwnerLiveData.observe(fragment) { lifecycleOwner ->
-            lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-                @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                fun onDestroy() {
-                    nullifyBindingHandler.post { binding = null }
-                }
-            })
+            lifecycleOwner.lifecycle.addObserver(
+                object : LifecycleObserver {
+                    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                    fun onDestroy() {
+                        nullifyBindingHandler.post { binding = null }
+                    }
+                })
         }
     }
 
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+    override fun getValue(
+        thisRef: Fragment,
+        property: KProperty<*>
+    ): T {
 
         // onCreateView maybe be called between the onDestroyView and the next Main thread run-loop.
-        // Because nullifyBindingHandler has to post to null the binding, it may happen that [binding]
-        // refers to the previous fragment view. When that happens, ie. bindings's root view does not match
+        // Because nullifyBindingHandler has to post to null the binding, it may happen that
+        // [binding]
+        // refers to the previous fragment view. When that happens, ie. bindings's root view does
+        // not match
         // the current fragment, we just null the [binding] here too
         if (binding != null && binding?.root !== thisRef.view) {
             binding = null
         }
 
-        binding?.let { return it }
+        binding?.let {
+            return it
+        }
 
         val lifecycle = thisRef.viewLifecycleOwner.lifecycle
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
@@ -72,8 +82,6 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 
         return binding!!
     }
-
 }
 
-@Suppress("UNCHECKED_CAST")
-private fun <T> Any.cast(): T = this as T
+@Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T

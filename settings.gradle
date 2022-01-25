@@ -2,6 +2,7 @@ plugins {
     id("de.fayard.refreshVersions") version "0.23.0"
 }
 
+include ':browser-api'
 include ':vpn'
 include ':vpn-store'
 include ':vpn-main'
@@ -13,6 +14,7 @@ include ':statistics'
 include ':common'
 include ':common-ui'
 include ':app-store'
+include ':appbuildconfig-api'
 
 include ':feature-toggles-api'
 include ':feature-toggles-impl'
@@ -21,6 +23,13 @@ include ':privacy-config-api'
 include ':privacy-config-impl'
 include ':privacy-config-store'
 
+include ':traces-api'
+include ':traces-impl'
+
+include ':anrs-api'
+include ':anrs-impl'
+include ':anrs-store'
+
 include ':common-test'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
@@ -28,6 +37,13 @@ project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
 project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
 project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
+
+project(':traces-api').projectDir = new File('traces/traces-api')
+project(':traces-impl').projectDir = new File('traces/traces-impl')
+
+project(':anrs-api').projectDir = new File('anrs/anrs-api')
+project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
+project(':anrs-store').projectDir = new File('anrs/anrs-store')
 
 rootProject.children.each { subproject ->
 
@@ -38,9 +54,31 @@ rootProject.children.each { subproject ->
 
 
 buildCache {
+
+    def getFile = { dir, filename ->
+        File file = new File("$dir$File.separator$filename")
+        file?.exists() ? file : null
+    }
+
+    def getLocalProperties = { dir ->
+        def file = getFile(dir, "local.properties")
+        if (!file) {
+            return null
+        }
+
+        Properties properties = new Properties()
+        properties.load(file.newInputStream())
+        return properties
+    }
+
     local {
+        def properties = getLocalProperties(rootDir)
+        if (properties != null) {
+            enabled = "true" == properties.getProperty("local.build.cache", "true")
+        } else {
+            enabled = true
+        }
         // configure local build cache directory so that it is local to the project dir
-        enabled = true
         directory = new File(rootDir, 'build-cache')
         removeUnusedEntriesAfterDays = 7
     }

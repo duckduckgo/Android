@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -51,16 +51,31 @@ class NotificationScheduler(
 
         when {
             privacyNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(), PRIVACY_DELAY_DURATION_IN_DAYS, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+                scheduleNotification(
+                    OneTimeWorkRequestBuilder<PrivacyNotificationWorker>(),
+                    PRIVACY_DELAY_DURATION_IN_DAYS,
+                    TimeUnit.DAYS,
+                    UNUSED_APP_WORK_REQUEST_TAG
+                )
             }
             clearDataNotification.canShow() -> {
-                scheduleNotification(OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(), CLEAR_DATA_DELAY_DURATION_IN_DAYS, TimeUnit.DAYS, UNUSED_APP_WORK_REQUEST_TAG)
+                scheduleNotification(
+                    OneTimeWorkRequestBuilder<ClearDataNotificationWorker>(),
+                    CLEAR_DATA_DELAY_DURATION_IN_DAYS,
+                    TimeUnit.DAYS,
+                    UNUSED_APP_WORK_REQUEST_TAG
+                )
             }
             else -> Timber.v("Notifications not enabled for this variant")
         }
     }
 
-    private fun scheduleNotification(builder: OneTimeWorkRequest.Builder, duration: Long, unit: TimeUnit, tag: String) {
+    private fun scheduleNotification(
+        builder: OneTimeWorkRequest.Builder,
+        duration: Long,
+        unit: TimeUnit,
+        tag: String
+    ) {
         Timber.v("Scheduling notification for $duration")
         val request = builder
             .addTag(tag)
@@ -72,12 +87,25 @@ class NotificationScheduler(
 
     // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
     // delete this as part of https://app.asana.com/0/414730916066338/1119619712088571
-    class ShowClearDataNotification(context: Context, params: WorkerParameters) : ClearDataNotificationWorker(context, params)
+    class ShowClearDataNotification(
+        context: Context,
+        params: WorkerParameters
+    ) : ClearDataNotificationWorker(context, params)
 
-    open class ClearDataNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
-    class PrivacyNotificationWorker(context: Context, params: WorkerParameters) : SchedulableNotificationWorker(context, params)
+    open class ClearDataNotificationWorker(
+        context: Context,
+        params: WorkerParameters
+    ) : SchedulableNotificationWorker(context, params)
 
-    open class SchedulableNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+    class PrivacyNotificationWorker(
+        context: Context,
+        params: WorkerParameters
+    ) : SchedulableNotificationWorker(context, params)
+
+    open class SchedulableNotificationWorker(
+        val context: Context,
+        params: WorkerParameters
+    ) : CoroutineWorker(context, params) {
 
         lateinit var notificationSender: NotificationSender
         lateinit var notification: SchedulableNotification
@@ -95,7 +123,7 @@ class NotificationScheduler(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationSender: NotificationSender,
     private val clearDataNotification: ClearDataNotification
@@ -111,7 +139,7 @@ class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
     private val notificationSender: NotificationSender,
     private val privacyProtectionNotification: PrivacyProtectionNotification

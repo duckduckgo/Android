@@ -27,19 +27,36 @@ import java.io.FileOutputStream
 
 interface WebViewPreviewPersister {
 
-    fun fullPathForFile(tabId: String, previewName: String): String
-    suspend fun save(bitmap: Bitmap, tabId: String): String
+    fun fullPathForFile(
+        tabId: String,
+        previewName: String
+    ): String
+
+    suspend fun save(
+        bitmap: Bitmap,
+        tabId: String
+    ): String
+
     suspend fun deleteAll()
-    suspend fun deletePreviewsForTab(tabId: String, currentPreviewImage: String?)
+    suspend fun deletePreviewsForTab(
+        tabId: String,
+        currentPreviewImage: String?
+    )
 }
 
-class FileBasedWebViewPreviewPersister(val context: Context, private val fileDeleter: FileDeleter) : WebViewPreviewPersister {
+class FileBasedWebViewPreviewPersister(
+    val context: Context,
+    private val fileDeleter: FileDeleter
+) : WebViewPreviewPersister {
 
     override suspend fun deleteAll() {
         fileDeleter.deleteDirectory(previewDestinationDirectory())
     }
 
-    override suspend fun save(bitmap: Bitmap, tabId: String): String {
+    override suspend fun save(
+        bitmap: Bitmap,
+        tabId: String
+    ): String {
         return withContext(Dispatchers.IO) {
 
             val previewFile = prepareDestinationFile(tabId)
@@ -50,7 +67,10 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
         }
     }
 
-    override suspend fun deletePreviewsForTab(tabId: String, currentPreviewImage: String?) {
+    override suspend fun deletePreviewsForTab(
+        tabId: String,
+        currentPreviewImage: String?
+    ) {
         val directoryToDelete = directoryForTabPreviews(tabId)
 
         if (currentPreviewImage == null) {
@@ -66,11 +86,17 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
         Timber.i("Does tab preview directory still exist? ${directoryToDelete.exists()}")
     }
 
-    override fun fullPathForFile(tabId: String, previewName: String): String {
+    override fun fullPathForFile(
+        tabId: String,
+        previewName: String
+    ): String {
         return fileForPreview(tabId, previewName).absolutePath
     }
 
-    private fun fileForPreview(tabId: String, previewName: String): File {
+    private fun fileForPreview(
+        tabId: String,
+        previewName: String
+    ): File {
         val tabPreviewDirectory = directoryForTabPreviews(tabId)
         return File(tabPreviewDirectory, previewName)
     }
@@ -87,7 +113,10 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
         return File(previewFileDestination, "$timestamp.jpg")
     }
 
-    private fun writeBytesToFile(previewFile: File, bitmap: Bitmap) {
+    private fun writeBytesToFile(
+        previewFile: File,
+        bitmap: Bitmap
+    ) {
         FileOutputStream(previewFile).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
             outputStream.flush()
@@ -101,5 +130,4 @@ class FileBasedWebViewPreviewPersister(val context: Context, private val fileDel
     companion object {
         const val TAB_PREVIEW_DIRECTORY = "tabPreviews"
     }
-
 }

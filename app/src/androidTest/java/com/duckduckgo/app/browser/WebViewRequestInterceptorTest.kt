@@ -25,6 +25,7 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -33,9 +34,9 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -43,6 +44,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.MockitoAnnotations
 
+@ExperimentalCoroutinesApi
 class WebViewRequestInterceptorTest {
 
     @ExperimentalCoroutinesApi
@@ -58,7 +60,7 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider(DEFAULT, mock(), provideUserAgentOverridePluginPoint())
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ DEFAULT }, mock(), provideUserAgentOverridePluginPoint())
 
     private var webView: WebView = mock()
 
@@ -80,7 +82,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenUpgraderInvoked() = runTest {
         configureShouldUpgrade()
         testee.shouldIntercept(
             request = mockRequest,
@@ -93,7 +95,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenCancelledResponseReturned() = runTest {
         configureShouldUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -106,7 +108,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedButNotOnMainFrameThenNotUpgraded() = runTest {
         configureShouldUpgrade()
         whenever(mockRequest.isForMainFrame).thenReturn(false)
         testee.shouldIntercept(
@@ -120,7 +122,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedButUrlIsNullThenNotUpgraded() = runTest {
         configureShouldUpgrade()
         whenever(mockRequest.url).thenReturn(null)
         testee.shouldIntercept(
@@ -134,7 +136,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runBlocking<Unit> {
+    fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runTest {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
@@ -147,7 +149,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenDocumentUrlIsNullThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -159,7 +161,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDuckGo_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -172,7 +174,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DontTrack_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -185,7 +187,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_SpreadPrivacy_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -198,7 +200,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDuckHack_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -211,7 +213,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_PrivateBrowsingMyths_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -224,7 +226,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() = runBlocking<Unit> {
+    fun whenIsTrustedSite_DuckDotCo_ThenShouldContinueToLoad() = runTest {
         configureShouldNotUpgrade()
         val response = testee.shouldIntercept(
             request = mockRequest,
@@ -237,7 +239,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpRequestThenHttpRequestListenerCalled() = runBlocking<Unit> {
+    fun whenIsHttpRequestThenHttpRequestListenerCalled() = runTest {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("http://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -254,7 +256,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() = runBlocking<Unit> {
+    fun whenIsHttpsRequestThenHttpRequestListenerNotCalled() = runTest {
         configureShouldNotUpgrade()
         whenever(mockRequest.url).thenReturn(Uri.parse("https://example.com"))
         val mockListener = mock<WebViewClientListener>()
@@ -271,7 +273,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
+    fun whenRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runTest {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
@@ -287,7 +289,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
+    fun whenRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runTest {
         val availableSurrogate = SurrogateResponse(
             scriptId = "testId",
             responseAvailable = true,
@@ -309,7 +311,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldBlockButThereIsASurrogateThenCallSurrogateDetected() = runBlocking<Unit> {
+    fun whenRequestShouldBlockButThereIsASurrogateThenCallSurrogateDetected() = runTest {
         val availableSurrogate = SurrogateResponse(
             scriptId = "testId",
             responseAvailable = true,
@@ -332,7 +334,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedThenNotifyWebViewClientListener() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedThenNotifyWebViewClientListener() = runTest {
         configureShouldUpgrade()
         val mockWebViewClientListener: WebViewClientListener = mock()
         testee.shouldIntercept(
@@ -346,7 +348,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+    fun whenUrlShouldBeUpgradedAndGcpActiveThenLoadUrlWithGpcHeaders() = runTest {
         configureShouldUpgrade()
         configureShouldAddGpcHeader()
         val mockWebViewClientListener: WebViewClientListener = mock()
@@ -362,7 +364,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersThenRedirectTriggeredByGpcCalled() = runTest {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
@@ -379,7 +381,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersThenLoadUrlWithGpcHeaders() = runTest {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlDoesNotExistInTheStack()
@@ -396,7 +398,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersButUrlExistsInTheStackThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersButUrlExistsInTheStackThenLoadUrlNotCalled() = runTest {
         configureShouldNotUpgrade()
         configureShouldAddGpcHeader()
         configureUrlExistsInTheStack()
@@ -413,7 +415,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldAddGcpHeadersButAlreadyContainsHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldAddGcpHeadersButAlreadyContainsHeadersThenLoadUrlNotCalled() = runTest {
         configureShouldNotUpgrade()
         configureRequestContainsGcpHeader()
 
@@ -430,7 +432,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = runBlocking<Unit> {
+    fun whenRequestShouldNotAddGcpHeadersThenLoadUrlNotCalled() = runTest {
         configureShouldNotUpgrade()
         configureShouldNotAddGpcHeader()
         val mockWebViewClientListener: WebViewClientListener = mock()
@@ -446,7 +448,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentShouldChangeThenReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentShouldChangeThenReloadUrl() = runTest {
         configureUserAgentShouldChange()
         configureUrlDoesNotExistInTheStack()
 
@@ -462,7 +464,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentShouldChangeAndUrlAlreadyWasInTheStackButIsNotTheLastElementThenDoNotReloadUrl() = runTest {
         configureUserAgentShouldChange()
         configureUrlExistsInTheStack("https://m.facebook.com".toUri())
 
@@ -478,7 +480,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = runBlocking<Unit> {
+    fun whenUserAgentHasNotChangedThenDoNotReloadUrl() = runTest {
         configureShouldNotUpgrade()
         configureUrlDoesNotExistInTheStack()
 
@@ -494,7 +496,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockAndNoSurrogateThenCancellingResponseReturned() = runTest {
         whenever(mockResourceSurrogates.get(any())).thenReturn(SurrogateResponse(responseAvailable = false))
 
         configureShouldNotUpgrade()
@@ -508,7 +510,7 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndRequestShouldBlockButThereIsASurrogateThenResponseReturnedContainsTheSurrogateData() = runTest {
         val availableSurrogate = SurrogateResponse(
             scriptId = "testId",
             responseAvailable = true,
@@ -528,12 +530,12 @@ class WebViewRequestInterceptorTest {
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndRequestIsNullThenReturnNull() = runTest {
         assertNull(testee.shouldInterceptFromServiceWorker(request = null, documentUrl = "foo.com"))
     }
 
     @Test
-    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = runBlocking<Unit> {
+    fun whenInterceptFromServiceWorkerAndDocumentUrlIsNullThenReturnNull() = runTest {
         assertNull(testee.shouldInterceptFromServiceWorker(request = mockRequest, documentUrl = null))
     }
 
@@ -572,41 +574,41 @@ class WebViewRequestInterceptorTest {
         configureUrlExistsInTheStack()
     }
 
-    private fun configureRequestContainsGcpHeader() = runBlocking<Unit> {
+    private fun configureRequestContainsGcpHeader() = runTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
         whenever(mockRequest.requestHeaders).thenReturn(mapOf(GPC_HEADER to "test"))
 
     }
 
-    private fun configureShouldAddGpcHeader() = runBlocking<Unit> {
+    private fun configureShouldAddGpcHeader() = runTest {
         whenever(mockGpc.isEnabled()).thenReturn(true)
         whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
         whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureShouldNotAddGpcHeader() = runBlocking<Unit> {
+    private fun configureShouldNotAddGpcHeader() = runTest {
         whenever(mockGpc.isEnabled()).thenReturn(false)
         whenever(mockGpc.getHeaders(anyString())).thenReturn(mapOf("test" to "test"))
         whenever(mockGpc.canUrlAddHeaders(any(), any())).thenReturn(false)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureUserAgentShouldChange() = runBlocking<Unit> {
+    private fun configureUserAgentShouldChange() = runTest {
         whenever(mockRequest.url).thenReturn(Uri.parse("https://m.facebook.com"))
         whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockRequest.method).thenReturn("GET")
     }
 
-    private fun configureShouldUpgrade() = runBlocking<Unit> {
+    private fun configureShouldUpgrade() = runTest {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(true)
         whenever(mockHttpsUpgrader.upgrade(any())).thenReturn(validHttpsUri())
         whenever(mockRequest.url).thenReturn(validUri())
         whenever(mockRequest.isForMainFrame).thenReturn(true)
     }
 
-    private fun configureShouldNotUpgrade() = runBlocking<Unit> {
+    private fun configureShouldNotUpgrade() = runTest {
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
 
         whenever(mockRequest.url).thenReturn(validUri())
@@ -631,6 +633,7 @@ class WebViewRequestInterceptorTest {
 
     companion object {
         const val DEFAULT =
-            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
+            "Mozilla/5.0 (Linux; Android 8.1.0; Nexus 6P Build/OPM3.171019.014) AppleWebKit/537.36 " +
+                "(KHTML, like Gecko) Version/4.0 Chrome/64.0.3282.137 Mobile Safari/537.36"
     }
 }

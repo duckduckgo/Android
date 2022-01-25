@@ -20,6 +20,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -30,8 +31,7 @@ import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsDao
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
@@ -86,7 +86,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedThenOnlyNonFireproofedSitesAreDeleted() = coroutineRule.runBlocking {
+    fun whenClearingAllPermissionsButFireproofedThenOnlyNonFireproofedSitesAreDeleted() = runTest {
         givenFireproofWebsiteDomain("anotherdomain.com")
         givenLocationPermissionsDomain("https://domain.com")
 
@@ -106,7 +106,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() = coroutineRule.runBlocking {
+    fun whenClearingAllPermissionsButFireproofedAndNoFireproofedSitesThenAllSitePermissionsAreDeleted() = runTest {
         givenLocationPermissionsDomain("https://domain.com")
 
         val oldLocationPermissions = locationPermissionsDao.allPermissions()
@@ -119,7 +119,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsButFireproofedAndSiteIsFireproofedThenNothingIsDeleted() = coroutineRule.runBlocking {
+    fun whenClearingAllPermissionsButFireproofedAndSiteIsFireproofedThenNothingIsDeleted() = runTest {
         givenFireproofWebsiteDomain("domain.com")
         givenLocationPermissionsDomain("https://domain.com")
 
@@ -139,7 +139,7 @@ class GeoLocationPermissionsTest {
     }
 
     @Test
-    fun whenClearingAllPermissionsThenAllPermissionsAreDeleted() = coroutineRule.runBlocking {
+    fun whenClearingAllPermissionsThenAllPermissionsAreDeleted() = runTest {
         givenLocationPermissionsDomain("https://domain.com")
 
         val oldLocationPermissions = locationPermissionsDao.allPermissions()
@@ -157,7 +157,10 @@ class GeoLocationPermissionsTest {
         }
     }
 
-    private fun givenLocationPermissionsDomain(domain: String, permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS) {
+    private fun givenLocationPermissionsDomain(
+        domain: String,
+        permissionType: LocationPermissionType = LocationPermissionType.ALLOW_ALWAYS
+    ) {
         locationPermissionsDao.insert(LocationPermissionEntity(domain = domain, permission = permissionType))
     }
 }

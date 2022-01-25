@@ -17,15 +17,20 @@
 package com.duckduckgo.privacy.config.impl.plugins
 
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 
 interface PrivacyFeaturePlugin {
-    fun store(name: String, jsonString: String): Boolean
+    fun store(
+        name: String,
+        jsonString: String
+    ): Boolean
+
     val featureName: PrivacyFeatureName
 }
 
 class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: Set<@JvmSuppressWildcards PrivacyFeaturePlugin>
+    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
 ) : PluginPoint<PrivacyFeaturePlugin> {
     override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
         return privacyFeatures

@@ -16,13 +16,13 @@
 
 package com.duckduckgo.vpn.internal.feature.waitlist
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(
-    scope = AppObjectGraph::class,
+    scope = AppScope::class,
     priority = ContributesBinding.Priority.HIGHEST
 )
 class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
@@ -46,5 +46,4 @@ class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppT
     override fun canUseEncryption(): Boolean {
         return false
     }
-
 }

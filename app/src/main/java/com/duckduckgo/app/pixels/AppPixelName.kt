@@ -112,6 +112,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
 
+    DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
+    DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
+    DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),
+
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
@@ -240,6 +244,9 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     EMAIL_USE_ALIAS("email_filled_random"),
     EMAIL_USE_ADDRESS("email_filled_main"),
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
+    EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),
+    EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
+    EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
     BOOKMARK_IMPORT_SUCCESS("m_bi_s"),
     BOOKMARK_IMPORT_ERROR("m_bi_e"),

@@ -570,16 +570,6 @@
         <item name="android:drawablePadding">18dp</item>
     </style>
 
-    <style name="DeviceShield.PrivacyReport.Label.Yellow">
-        <item name="android:background">@drawable/background_yellow_tooltip</item>
-        <item name="android:drawableStart">@drawable/ic_alert_color_24</item>
-    </style>
-
-    <style name="DeviceShield.PrivacyReport.Label.Blue">
-        <item name="android:background">@drawable/background_blue_tooltip</item>
-        <item name="android:drawableStart">@drawable/ic_check_color_24</item>
-    </style>
-
     <style name="DeviceShield.PrivacyReport.Toggle">
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">@color/blue</item>

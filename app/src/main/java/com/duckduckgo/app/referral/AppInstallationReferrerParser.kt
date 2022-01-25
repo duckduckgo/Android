@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.referral
 
-import com.duckduckgo.app.referral.ParsedReferrerResult.*
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.app.referral.ParsedReferrerResult.CampaignReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.EuAuctionReferrerFound
+import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -28,7 +30,7 @@ interface AppInstallationReferrerParser {
 }
 
 @Suppress("SameParameterValue")
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
@@ -72,7 +74,10 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return ReferrerNotFound()
     }
 
-    private fun extractCampaignNameSuffix(part: String, prefix: String): ParsedReferrerResult {
+    private fun extractCampaignNameSuffix(
+        part: String,
+        prefix: String
+    ): ParsedReferrerResult {
         Timber.i("Found target campaign name prefix $prefix in $part")
         val suffix = stripCampaignName(part, prefix)
 
@@ -86,7 +91,10 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
         return CampaignReferrerFound(condensedSuffix)
     }
 
-    private fun stripCampaignName(fullCampaignName: String, prefix: String): String {
+    private fun stripCampaignName(
+        fullCampaignName: String,
+        prefix: String
+    ): String {
         return fullCampaignName.substringAfter(prefix, "")
     }
 
@@ -104,7 +112,11 @@ class QueryParamReferrerParser @Inject constructor() : AppInstallationReferrerPa
 
 sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
     data class EuAuctionReferrerFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
-    data class CampaignReferrerFound(val campaignSuffix: String, override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
+    data class CampaignReferrerFound(
+        val campaignSuffix: String,
+        override val fromCache: Boolean = false
+    ) : ParsedReferrerResult(fromCache)
+
     data class ReferrerNotFound(override val fromCache: Boolean = false) : ParsedReferrerResult(fromCache)
     data class ParseFailure(val reason: ParseFailureReason) : ParsedReferrerResult()
     object ReferrerInitialising : ParsedReferrerResult()

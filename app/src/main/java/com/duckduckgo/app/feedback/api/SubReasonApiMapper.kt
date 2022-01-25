@@ -83,5 +83,4 @@ class SubReasonApiMapper @Inject constructor() {
         private const val OTHER = "other"
         private const val GENERIC = "submit"
     }
-
 }

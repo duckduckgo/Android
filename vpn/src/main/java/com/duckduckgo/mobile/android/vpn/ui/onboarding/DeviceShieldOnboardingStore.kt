@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.Context
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ interface DeviceShieldOnboardingStore {
     fun didShowOnboarding(): Boolean
 }
 
-@ContributesBinding(AppObjectGraph::class)
+@ContributesBinding(AppScope::class)
 class DeviceShieldOnboardingImpl @Inject constructor(
     context: Context
 ) : DeviceShieldOnboardingStore {

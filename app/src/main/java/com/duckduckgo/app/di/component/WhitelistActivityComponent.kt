@@ -16,39 +16,38 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.di.ActivityScoped
 import com.duckduckgo.app.privacy.ui.WhitelistActivity
-import com.duckduckgo.di.scopes.AppObjectGraph
-
-import com.duckduckgo.di.scopes.ActivityObjectGraph
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.Binds
 import dagger.Module
+import dagger.SingleInstanceIn
 import dagger.Subcomponent
 import dagger.android.AndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
-@ActivityScoped
+@SingleInstanceIn(ActivityScope::class)
 @MergeSubcomponent(
-    scope = ActivityObjectGraph::class
+    scope = ActivityScope::class
 )
 interface WhitelistActivityComponent : AndroidInjector<WhitelistActivity> {
     @Subcomponent.Factory
     interface Factory : AndroidInjector.Factory<WhitelistActivity>
 }
 
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 interface WhitelistActivityComponentProvider {
     fun provideWhitelistActivityComponentFactory(): WhitelistActivityComponent.Factory
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 abstract class WhitelistActivityBindingModule {
     @Binds
     @IntoMap
     @ClassKey(WhitelistActivity::class)
-    abstract fun bindWhitelistActivityComponentFactory(factory: WhitelistActivityComponent.Factory): AndroidInjector.Factory<*>
+    abstract fun WhitelistActivityComponent.Factory.bind(): AndroidInjector.Factory<*>
 }

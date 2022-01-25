@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -73,7 +73,10 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
             }
     }
 
-    private suspend fun aggregateDataPerApp(trackerData: List<BucketizedVpnTracker>, showHeadings: Boolean): List<TrackerFeedItem> {
+    private suspend fun aggregateDataPerApp(
+        trackerData: List<BucketizedVpnTracker>,
+        showHeadings: Boolean
+    ): List<TrackerFeedItem> {
         val sourceData = mutableListOf<TrackerFeedItem>()
         val perSessionData = trackerData.groupBy { it.bucket }
 
@@ -132,14 +135,17 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         return sourceData
     }
 
-    data class TimeWindow(val value: Long, val unit: TimeUnit) {
+    data class TimeWindow(
+        val value: Long,
+        val unit: TimeUnit
+    ) {
         fun asString(): String {
             return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
         }
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeviceShieldActivityFeedViewModelFactory @Inject constructor(
     private val deviceShieldActivityFeedViewModel: Provider<DeviceShieldActivityFeedViewModel>
 ) : ViewModelFactoryPlugin {

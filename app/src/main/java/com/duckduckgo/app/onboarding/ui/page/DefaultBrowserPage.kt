@@ -220,7 +220,11 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         when (requestCode) {
             DEFAULT_BROWSER_REQUEST_CODE_SETTINGS -> {
                 viewModel.handleResult(DefaultBrowserPageViewModel.Origin.Settings)

@@ -21,14 +21,14 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -206,7 +206,7 @@ interface DeviceShieldPixels {
      */
     fun privacyReportOnboardingFAQDisplayed()
 
-    fun vpnTunInterfaceIsDown()
+    fun vpnEstablishTunInterfaceError()
 
     /** Will fire when the process has gone to the expendable list */
     fun vpnProcessExpendableLow(payload: Map<String, String>)
@@ -226,20 +226,20 @@ interface DeviceShieldPixels {
     /** Will fire when the system is running extremely low on memory */
     fun vpnMemoryRunningCritical(payload: Map<String, String>)
 
-    /** Will fire when the user disables protection for a specific app */
-    fun disableAppProtection(payload: Map<String, String>)
-
-    /** Will fire when the user skips submitting the reason that made them disable app protection for a specific app */
-    fun disableAppProtectionReportingSkipped()
-
-    /** Will fire when the user enables protection for a specific app */
-    fun enableAppProtection(payload: Map<String, String>)
-
     /** Will fire when the user restores to the default protection list */
     fun restoreDefaultProtectionList()
 
     /** Will fire when the user restores to the default protection list */
     fun launchAppTPFeedback()
+
+    /** Will fire when the user submits the form that disables protection for an app */
+    fun didSubmitManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user skips the form that disables protection for an app */
+    fun didSkipManuallyDisableAppProtectionDialog()
+
+    /** Will fire when the user launches the report issues screen from the tracker activity */
+    fun didSubmitReportIssuesFromTrackerActivity()
 
     /**
      * Will fire when the user reports an app breakage
@@ -262,10 +262,35 @@ interface DeviceShieldPixels {
     fun didChooseToDisableOneAppFromDialog()
 
     fun didChooseToCancelTrackingProtectionDialog()
+
+    /**
+     * Will fire when the waitlist dialog is showed to the user
+     */
+    fun didShowWaitlistDialog()
+
+    /**
+     * Will fire when the user presses "notify me" CTA in the waitlist dialog
+     */
+    fun didPressWaitlistDialogNotifyMe()
+
+    /**
+     * Will fire when the user presses dismisses the waitlist dialog
+     */
+    fun didPressWaitlistDialogDismiss()
+
+    /**
+     * Will fire when user submits a health monitor report
+     */
+    fun sendHealthMonitorReport(healthMetrics: Map<String, String>)
+
+    /**
+     * Will send a first-in-day pixel for the given alertName
+     */
+    fun sendHealthMonitorAlert(alertName: String)
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
@@ -447,9 +472,9 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ)
     }
 
-    override fun vpnTunInterfaceIsDown() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_TUN_INTERFACE_DOWN)
+    override fun vpnEstablishTunInterfaceError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ESTABLISH_TUN_INTERFACE_ERROR)
     }
 
     override fun vpnProcessExpendableLow(payload: Map<String, String>) {
@@ -476,20 +501,6 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_PROCESS_MEMORY_CRITICAL_DAILY, payload)
     }
 
-    override fun disableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_DISABLE_APP_PROTECTION, payload)
-    }
-
-    override fun disableAppProtectionReportingSkipped() {
-        firePixel(DeviceShieldPixelNames.ATP_APP_PROTECTION_DIALOG_REPORTING_SKIPPED)
-    }
-
-    override fun enableAppProtection(payload: Map<String, String>) {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP_DAILY, payload)
-        firePixel(DeviceShieldPixelNames.ATP_ENABLE_APP_PROTECTION_APP, payload)
-    }
-
     override fun restoreDefaultProtectionList() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_RESTORE_APP_PROTECTION_LIST_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_RESTORE_APP_PROTECTION_LIST)
@@ -498,6 +509,21 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun launchAppTPFeedback() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_LAUNCH_FEEDBACK)
+    }
+
+    override fun didSubmitManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSkipManuallyDisableAppProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didSubmitReportIssuesFromTrackerActivity() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY)
     }
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
@@ -535,19 +561,50 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
     }
 
+    override fun didShowWaitlistDialog() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_WAITLIST_DIALOG)
+    }
+
+    override fun didPressWaitlistDialogNotifyMe() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
+    }
+
+    override fun didPressWaitlistDialogDismiss() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS)
+    }
+
+    override fun sendHealthMonitorReport(healthMetrics: Map<String, String>) {
+        firePixel(DeviceShieldPixelNames.ATP_APP_HEALTH_MONITOR_REPORT, healthMetrics)
+    }
+
+    override fun sendHealthMonitorAlert(alertName: String) {
+        tryToFireDailyPixel(
+            String.format(Locale.US, DeviceShieldPixelNames.ATP_APP_HEALTH_ALERT_DAILY.pixelName, alertName)
+        )
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
 
-    private fun firePixel(p: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun firePixel(
+        p: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         pixel.fire(p, payload)
     }
 
-    private fun tryToFireDailyPixel(pixel: DeviceShieldPixelNames, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixel: DeviceShieldPixelNames,
+        payload: Map<String, String> = emptyMap()
+    ) {
         tryToFireDailyPixel(pixel.pixelName, payload)
     }
 
-    private fun tryToFireDailyPixel(pixelName: String, payload: Map<String, String> = emptyMap()) {
+    private fun tryToFireDailyPixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap()
+    ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
@@ -558,7 +615,10 @@ class RealDeviceShieldPixels @Inject constructor(
         }
     }
 
-    private fun tryToFireUniquePixel(pixel: DeviceShieldPixelNames, tag: String? = null) {
+    private fun tryToFireUniquePixel(
+        pixel: DeviceShieldPixelNames,
+        tag: String? = null
+    ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return

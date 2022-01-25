@@ -23,10 +23,13 @@ import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotG
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import timber.log.Timber
 import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel
 ) {
 
@@ -48,7 +51,10 @@ class FilenameExtractor @Inject constructor(
         return bestGuess(guesses)
     }
 
-    private fun evaluateGuessQuality(guesses: Guesses, pathSegments: List<String>): GuessQuality {
+    private fun evaluateGuessQuality(
+        guesses: Guesses,
+        pathSegments: List<String>
+    ): GuessQuality {
         val latestGuess = guesses.latestGuess
         val bestGuess = guesses.bestGuess
 
@@ -62,9 +68,16 @@ class FilenameExtractor @Inject constructor(
         return NotGoodEnough
     }
 
-    private fun guessFilename(url: String, contentDisposition: String?, mimeType: String?): String {
+    private fun guessFilename(
+        url: String,
+        contentDisposition: String?,
+        mimeType: String?
+    ): String {
         val tidiedUrl = url.removeSuffix("/")
-        var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
+        var guessedFilename = when (appBuildConfig.flavor) {
+            BuildFlavor.INTERNAL -> DownloaderUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
+            else -> URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
+        }
 
         // we only want to keep the default .bin filetype on the guess if the URL actually has that too
         if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {
@@ -106,6 +119,8 @@ class FilenameExtractor @Inject constructor(
         data class Guess(val bestGuess: String) : FilenameExtractionResult()
     }
 
-    data class Guesses(var latestGuess: String, var bestGuess: String? = null)
-
+    data class Guesses(
+        var latestGuess: String,
+        var bestGuess: String? = null
+    )
 }

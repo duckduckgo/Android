@@ -22,7 +22,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.VpnService
-import android.os.*
+import android.os.Binder
+import android.os.Build
+import android.os.IBinder
+import android.os.Parcel
+import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
@@ -37,11 +41,18 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
-import java.util.concurrent.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
@@ -83,9 +94,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private lateinit var tcpPacketProcessor: TcpPacketProcessor
     private var executorService: ExecutorService? = null
 
+    @Inject
+    lateinit var tunPacketReaderFactory: TunPacketReader.Factory
+
+    @Inject
+    lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
+
     inner class VpnServiceBinder : Binder() {
 
-        override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
+        override fun onTransact(
+            code: Int,
+            data: Parcel,
+            reply: Parcel?,
+            flags: Int
+        ): Boolean {
             if (code == LAST_CALL_TRANSACTION) {
                 onRevoke()
                 return true
@@ -123,7 +145,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onDestroy()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         Timber.e("VPN log onStartCommand: ${intent?.action}")
 
         var returnCode: Int = Service.START_NOT_STICKY
@@ -135,7 +161,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                stopVpn(VpnStopReason.SelfStop)
+                launch { stopVpn(VpnStopReason.SelfStop) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -150,13 +176,19 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         establishVpnInterface()
 
+        if (tunInterface == null) {
+            Timber.e("Failed to establish the TUN interface")
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            return@withContext
+        }
+
         tunInterface?.let { vpnInterface ->
             executorService?.shutdownNow()
             val processors = listOf(
                 tcpPacketProcessor,
                 udpPacketProcessor,
-                TunPacketReader(vpnInterface, queues),
-                TunPacketWriter(vpnInterface, queues)
+                tunPacketReaderFactory.create(vpnInterface),
+                tunPacketWriterFactory.create(vpnInterface)
             )
             executorService = Executors.newFixedThreadPool(processors.size).also { executorService ->
                 processors.forEach { executorService.submit(it) }
@@ -188,7 +220,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(16_000)
+            setMtu(16_384)
             configureMeteredConnection()
 
             if (vpnPreferences.isCustomDnsServerSet()) {
@@ -239,8 +271,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private fun stopVpn(reason: VpnStopReason) {
-        Timber.i("VPN log: Stopping VPN")
+    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+        Timber.i("VPN log: Stopping VPN.")
 
         queues.clearAll()
         executorService?.shutdownNow()
@@ -276,7 +308,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        stopVpn(VpnStopReason.Revoked)
+        launch { stopVpn(VpnStopReason.Revoked) }
     }
 
     override fun onLowMemory() {
@@ -380,7 +412,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             }
         }
 
-        suspend fun restartVpnService(context: Context, forceGc: Boolean = false) = withContext(Dispatchers.Default) {
+        suspend fun restartVpnService(
+            context: Context,
+            forceGc: Boolean = false
+        ) = withContext(Dispatchers.Default) {
             val applicationContext = context.applicationContext
             if (isServiceRunning(applicationContext)) {
                 Timber.v("VPN log: stopping service")

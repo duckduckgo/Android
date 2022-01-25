@@ -24,14 +24,15 @@ import android.util.AttributeSet
 import android.view.View
 import com.duckduckgo.mobile.android.R
 
-/**
- * Simple view that draws a filled circle with a stroke.
- */
-class ColorDotView @JvmOverloads constructor(
+/** Simple view that draws a filled circle with a stroke. */
+class ColorDotView
+@JvmOverloads
+constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) :
+    View(context, attrs, defStyleAttr) {
 
     var fillColor: Int = Color.LTGRAY
         set(value) {
@@ -45,33 +46,36 @@ class ColorDotView @JvmOverloads constructor(
             field = value
         }
 
-    private val paintFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        color = Color.RED
-    }
+    private val paintFill =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            color = Color.RED
+        }
 
-    private val paintStroke = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        color = Color.BLACK
-    }
+    private val paintStroke =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE
+            color = Color.BLACK
+        }
 
     private var cx: Float = 0F
     private var cy: Float = 0F
     private var radius: Float = 0F
 
     init {
-        val a = context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.ColorDotView,
-            defStyleAttr,
-            0
-        )
+        val a =
+            context.theme.obtainStyledAttributes(attrs, R.styleable.ColorDotView, defStyleAttr, 0)
         fillColor = a.getColor(R.styleable.ColorDotView_colorFillColor, fillColor)
         strokeColor = a.getColor(R.styleable.ColorDotView_colorStrokeColor, strokeColor)
         a.recycle()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         cx = w / 2F
         cy = h / 2F

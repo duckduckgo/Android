@@ -21,14 +21,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class VpnServiceHeartbeatMonitorModule {
 
     @Provides
@@ -54,7 +54,10 @@ class VpnReminderNotificationWorkerInjectorPlugin(
     }
 }
 
-class VpnReminderNotificationWorker(val context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class VpnReminderNotificationWorker(
+    val context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
     lateinit var vpnReminderReceiverManager: VpnReminderReceiverManager
 
     override suspend fun doWork(): Result {
@@ -66,5 +69,4 @@ class VpnReminderNotificationWorker(val context: Context, params: WorkerParamete
         const val WORKER_VPN_REMINDER_UNDESIRED_TAG = "VpnReminderNotificationUndesiredWorker"
         const val WORKER_VPN_REMINDER_DAILY_TAG = "VpnReminderNotificationDailyWorker"
     }
-
 }

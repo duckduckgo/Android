@@ -22,7 +22,12 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 
 class PrivacyUpgradeRenderer {
 
-    fun heading(context: Context, before: PrivacyGrade, after: PrivacyGrade, privacyOn: Boolean): String {
+    fun heading(
+        context: Context,
+        before: PrivacyGrade,
+        after: PrivacyGrade,
+        privacyOn: Boolean
+    ): String {
         if (before != after) {
             return context.getString(R.string.privacyProtectionUpgraded, before.smallIcon(), after.smallIcon())
         }

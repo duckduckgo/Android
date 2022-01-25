@@ -16,27 +16,29 @@
 
 package com.duckduckgo.privacy.config.impl
 
-import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class RealPrivacyConfigDownloaderTest {
 
-    @get:Rule
-    var coroutineRule = CoroutineTestRule()
+    @get:Rule var coroutineRule = CoroutineTestRule()
 
     lateinit var testee: RealPrivacyConfigDownloader
 
@@ -48,22 +50,26 @@ class RealPrivacyConfigDownloaderTest {
     }
 
     @Test
-    fun whenDownloadIsNotSuccessfulThenReturnFalse() = coroutineRule.runBlocking {
-        testee = RealPrivacyConfigDownloader(TestFailingPrivacyConfigService(), mockPrivacyConfigPersister)
-        assertFalse(testee.download())
-    }
+    fun whenDownloadIsNotSuccessfulThenReturnFalse() =
+        runTest {
+            testee =
+                RealPrivacyConfigDownloader(
+                    TestFailingPrivacyConfigService(), mockPrivacyConfigPersister
+                )
+            assertFalse(testee.download())
+        }
 
     @Test
-    fun whenDownloadIsSuccessfulThenReturnTrue() = coroutineRule.runBlocking {
-        assertTrue(testee.download())
-    }
+    fun whenDownloadIsSuccessfulThenReturnTrue() =
+        runTest { assertTrue(testee.download()) }
 
     @Test
-    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() = coroutineRule.runBlocking {
-        testee.download()
+    fun whenDownloadIsSuccessfulThenPersistPrivacyConfigCalled() =
+        runTest {
+            testee.download()
 
-        verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
-    }
+            verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
+        }
 
     class TestFailingPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
@@ -73,7 +79,12 @@ class RealPrivacyConfigDownloaderTest {
 
     class TestPrivacyConfigService : PrivacyConfigService {
         override suspend fun privacyConfig(): JsonPrivacyConfig {
-            return JsonPrivacyConfig(version = 1, readme = "readme", features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)), unprotectedTemporaryList)
+            return JsonPrivacyConfig(
+                version = 1,
+                readme = "readme",
+                features = mapOf(FEATURE_NAME to JSONObject(FEATURE_JSON)),
+                unprotectedTemporaryList
+            )
         }
     }
 

@@ -18,10 +18,10 @@ package com.duckduckgo.app.email.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,7 +50,7 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenEmitEmailState() = coroutineRule.runBlocking {
+    fun whenViewModelCreatedThenEmitEmailState() = runTest {
         testee.viewState.test {
             assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
 
@@ -59,7 +59,7 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsFalseThenViewStateFlowEmitsEmailState() = runTest {
         testee.viewState.test {
             emailStateFlow.emit(false)
             (awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedIn)
@@ -69,7 +69,7 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() = coroutineRule.runBlocking {
+    fun whenSignedInIfFeatureIsSupportedAndFlowEmitsTrueThenViewStateFlowEmitsEmailState() = runTest {
         testee.viewState.test {
             emailStateFlow.emit(true)
             assert(awaitItem().emailState is EmailProtectionViewModel.EmailState.SignedOut)
@@ -79,7 +79,7 @@ class EmailProtectionViewModelTest {
     }
 
     @Test
-    fun whenFeatureIsNotSupportedThenEmitNotSupportedState() = coroutineRule.runBlocking {
+    fun whenFeatureIsNotSupportedThenEmitNotSupportedState() = runTest {
         whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
         testee.viewState.test {
             emailStateFlow.emit(true)
@@ -88,5 +88,4 @@ class EmailProtectionViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
-
 }

@@ -22,10 +22,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.global.db.AppDatabase
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -63,25 +63,25 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenInsertBookmarkFolderThenReturnId() = runBlocking {
+    fun whenInsertBookmarkFolderThenReturnId() = runTest {
         val id = repository.insert(BookmarkFolder(id = 1, name = "name", parentId = 0))
         assertEquals(1, id)
     }
 
     @Test
-    fun whenInsertBookmarkThenPopulateDB() = runBlocking {
+    fun whenInsertBookmarkThenPopulateDB() = runTest {
         repository.insert(bookmark)
         assertEquals(listOf(bookmarkEntity), bookmarksDao.getBookmarks().first())
     }
 
     @Test
-    fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runBlocking {
+    fun whenInsertBookmarkByTitleAndUrlThenPopulateDB() = runTest {
         repository.insert(title = bookmark.title, url = bookmark.url, parentId = bookmark.parentId)
         assertEquals(listOf(bookmarkEntity), bookmarksDao.getBookmarks().first())
     }
 
     @Test
-    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runBlocking {
+    fun whenUpdateBookmarkThenUpdateBookmarkInDB() = runTest {
         repository.insert(bookmark)
 
         val updatedBookmark = SavedSite.Bookmark(id = bookmark.id, title = "new title", url = "example.com", parentId = 2)
@@ -94,14 +94,14 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenDeleteBookmarkThenRemoveBookmarkFromDB() = runBlocking {
+    fun whenDeleteBookmarkThenRemoveBookmarkFromDB() = runTest {
         repository.insert(bookmark)
         repository.delete(bookmark)
         assertFalse(bookmarksDao.hasBookmarks())
     }
 
     @Test
-    fun whenGetBookmarkFoldersByParentIdThenReturnBookmarkFoldersForParentId() = runBlocking {
+    fun whenGetBookmarkFoldersByParentIdThenReturnBookmarkFoldersForParentId() = runTest {
         val folder = BookmarkFolder(id = 1, name = "name", parentId = 2)
         repository.insert(folder)
         val folders = repository.getBookmarkFoldersByParentId(2)
@@ -111,7 +111,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenGetBookmarksByParentIdThenReturnBookmarksForParentId() = runBlocking {
+    fun whenGetBookmarksByParentIdThenReturnBookmarksForParentId() = runTest {
         val bookmark = SavedSite.Bookmark(id = 1, title = "name", url = "foo.com", parentId = 2)
         repository.insert(bookmark)
         val bookmarks = repository.getBookmarksByParentId(2)
@@ -121,16 +121,22 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenUpdateBookmarkFolderThenUpdateBookmarkFolderCalled() = runBlocking {
+    fun whenUpdateBookmarkFolderThenUpdateBookmarkFolderCalled() = runTest {
         repository = BookmarksDataRepository(mockBookmarkFoldersDao, bookmarksDao, db)
         val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         repository.update(bookmarkFolder)
 
-        verify(mockBookmarkFoldersDao).update(BookmarkFolderEntity(id = bookmarkFolder.id, name = bookmarkFolder.name, parentId = bookmarkFolder.parentId))
+        verify(mockBookmarkFoldersDao).update(
+            BookmarkFolderEntity(
+                id = bookmarkFolder.id,
+                name = bookmarkFolder.name,
+                parentId = bookmarkFolder.parentId
+            )
+        )
     }
 
     @Test
-    fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runBlocking {
+    fun whenGetBookmarkFolderBranchThenReturnFoldersAndBookmarksForBranch() = runTest {
         val parentFolder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         val childFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
         val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
@@ -144,7 +150,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenGetBranchFoldersThenReturnFolderListForBranch() = runBlocking {
+    fun whenGetBranchFoldersThenReturnFolderListForBranch() = runTest {
         val parentFolderEntity = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         val childFolderEntity = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
 
@@ -159,7 +165,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenDeleteFolderBranchThenDeletedBookmarksAndFoldersAreNoLongerInDB() = runBlocking {
+    fun whenDeleteFolderBranchThenDeletedBookmarksAndFoldersAreNoLongerInDB() = runTest {
         val parentFolderEntity = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         val childFolderEntity = BookmarkFolderEntity(id = 2, name = "another name", parentId = 1)
         val childBookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
@@ -175,7 +181,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenFetchBookmarksAndFoldersWithNullParentIdThenFetchAllBookmarksAndFolders() = runBlocking {
+    fun whenFetchBookmarksAndFoldersWithNullParentIdThenFetchAllBookmarksAndFolders() = runTest {
         val folder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         val bookmark = BookmarkEntity(id = 1, title = "title", url = "www.example.com", parentId = 1)
 
@@ -184,12 +190,15 @@ class BookmarksDataRepositoryTest {
 
         val bookmarksAndFolders = repository.fetchBookmarksAndFolders(null)
 
-        assertEquals(listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(
+            listOf(SavedSite.Bookmark(bookmark.id, bookmark.title ?: "", bookmark.url, bookmark.parentId)),
+            bookmarksAndFolders.first().first
+        )
         assertEquals(listOf(BookmarkFolder(folder.id, folder.name, folder.parentId, numBookmarks = 1)), bookmarksAndFolders.first().second)
     }
 
     @Test
-    fun whenFetchBookmarksAndFoldersWithParentIdThenFetchBookmarksAndFoldersForParentId() = runBlocking {
+    fun whenFetchBookmarksAndFoldersWithParentIdThenFetchBookmarksAndFoldersForParentId() = runTest {
         val folder = BookmarkFolderEntity(id = 1, name = "name", parentId = 0)
         val anotherFolder = BookmarkFolderEntity(id = 2, name = "another name", parentId = 0)
         val childFolder = BookmarkFolderEntity(id = 3, name = "child folder", parentId = 2)
@@ -201,12 +210,15 @@ class BookmarksDataRepositoryTest {
 
         val bookmarksAndFolders = repository.fetchBookmarksAndFolders(2)
 
-        assertEquals(listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)), bookmarksAndFolders.first().first)
+        assertEquals(
+            listOf(SavedSite.Bookmark(anotherBookmark.id, anotherBookmark.title ?: "", anotherBookmark.url, anotherBookmark.parentId)),
+            bookmarksAndFolders.first().first
+        )
         assertEquals(listOf(BookmarkFolder(childFolder.id, childFolder.name, childFolder.parentId)), bookmarksAndFolders.first().second)
     }
 
     @Test
-    fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runBlocking {
+    fun whenBuildFlatStructureThenReturnFolderListWithDepth() = runTest {
         val parentFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         val childFolder = BookmarkFolder(id = 2, name = "another name", parentId = 1)
         val folder = BookmarkFolder(id = 3, name = "folder name", parentId = 0)
@@ -232,7 +244,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runBlocking {
+    fun whenBuildFlatStructureThenReturnFolderListWithDepthWithoutCurrentFolderBranch() = runTest {
         val parentFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)
         val childFolder = BookmarkFolder(id = 2, name = "another name", parentId = 1)
         val folder = BookmarkFolder(id = 3, name = "folder name", parentId = 0)
@@ -256,7 +268,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenBookmarksRequestedAndAvailableThenReturnListOfBookmarks() = runBlocking {
+    fun whenBookmarksRequestedAndAvailableThenReturnListOfBookmarks() = runTest {
         val firstBookmark = SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0)
         val secondBookmark = SavedSite.Bookmark(id = 2, title = "other title", url = "www.other-website.com", parentId = 0)
 
@@ -269,14 +281,14 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenBookmarksRequestedAndNoneAvailableThenReturnEmptyList() = runBlocking {
+    fun whenBookmarksRequestedAndNoneAvailableThenReturnEmptyList() = runTest {
         val bookmarks = repository.bookmarks()
 
         assertEquals(emptyList<SavedSite.Bookmark>(), bookmarks.first())
     }
 
     @Test
-    fun whenBookmarkByUrlRequestedAndAvailableThenReturnBookmark() = runBlocking {
+    fun whenBookmarkByUrlRequestedAndAvailableThenReturnBookmark() = runTest {
         val firstBookmark = SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0)
         val secondBookmark = SavedSite.Bookmark(id = 2, title = "other title", url = "www.other-website.com", parentId = 0)
 
@@ -289,7 +301,7 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenBookmarkByUrlRequestedAndNotAvailableThenReturnNull() = runBlocking {
+    fun whenBookmarkByUrlRequestedAndNotAvailableThenReturnNull() = runTest {
         val firstBookmark = SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0)
         val secondBookmark = SavedSite.Bookmark(id = 2, title = "other title", url = "www.other-website.com", parentId = 0)
 
@@ -302,21 +314,21 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
-    fun whenBookmarkByUrlRequestedAndNoBookmarksAvailableThenReturnNull() = runBlocking {
+    fun whenBookmarkByUrlRequestedAndNoBookmarksAvailableThenReturnNull() = runTest {
         val bookmark = repository.getBookmark("www.test.com")
 
         assertNull(bookmark)
     }
 
     @Test
-    fun whenHasBookmarksRequestedAndNoBookmarksAvailableThenReturnFalse() = runBlocking {
+    fun whenHasBookmarksRequestedAndNoBookmarksAvailableThenReturnFalse() = runTest {
         val result = repository.hasBookmarks()
 
         assertFalse(result)
     }
 
     @Test
-    fun whenHasBookmarksRequestedAndBookmarksAvailableThenReturnTrue() = runBlocking {
+    fun whenHasBookmarksRequestedAndBookmarksAvailableThenReturnTrue() = runTest {
         repository.insert(SavedSite.Bookmark(id = 1, title = "title", url = "www.website.com", parentId = 0))
 
         val result = repository.hasBookmarks()

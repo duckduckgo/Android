@@ -27,7 +27,7 @@ import android.os.ResultReceiver
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
@@ -37,7 +37,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
@@ -48,7 +48,11 @@ class DeviceShieldAlertNotificationBuilderModule {
 
 interface DeviceShieldAlertNotificationBuilder {
 
-    fun buildReminderNotification(context: Context, silent: Boolean): Notification
+    fun buildReminderNotification(
+        context: Context,
+        silent: Boolean
+    ): Notification
+
     fun buildDeviceShieldNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
@@ -66,13 +70,21 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         }
     }
 
-    override fun buildReminderNotification(context: Context, silent: Boolean): Notification {
+    override fun buildReminderNotification(
+        context: Context,
+        silent: Boolean
+    ): Notification {
         registerAlertChannel(context)
 
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_disabled)
 
         val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
-            addNextIntentWithParentStack(Intent(context, Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")))
+            addNextIntentWithParentStack(
+                Intent(
+                    context,
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
+                )
+            )
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
@@ -130,7 +142,12 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         return R.drawable.ic_apptb_default
     }
 
-    private fun buildNotification(context: Context, content: RemoteViews, silent: Boolean, resultReceiver: ResultReceiver? = null): Notification {
+    private fun buildNotification(
+        context: Context,
+        content: RemoteViews,
+        silent: Boolean,
+        resultReceiver: ResultReceiver? = null
+    ): Notification {
         registerAlertChannel(context)
 
         val vpnControllerIntent = DeviceShieldTrackerActivity.intent(context = context, onLaunchCallback = resultReceiver)
@@ -157,7 +174,5 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         private const val TRACKER_COMPANY_GOOGLE = "Google"
         private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
         private const val TRACKER_COMPANY_AMAZON = "Amazon"
-
     }
-
 }

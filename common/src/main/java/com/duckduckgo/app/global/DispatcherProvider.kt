@@ -25,7 +25,6 @@ interface DispatcherProvider {
     fun default(): CoroutineDispatcher = Dispatchers.Default
     fun io(): CoroutineDispatcher = Dispatchers.IO
     fun unconfined(): CoroutineDispatcher = Dispatchers.Unconfined
-
 }
 
 class DefaultDispatcherProvider : DispatcherProvider

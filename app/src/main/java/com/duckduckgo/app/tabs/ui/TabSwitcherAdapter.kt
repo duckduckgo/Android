@@ -52,7 +52,10 @@ class TabSwitcherAdapter(
 ) :
     ListAdapter<TabEntity, TabViewHolder>(TabEntityDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TabViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): TabViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemTabBinding.inflate(inflater, parent, false)
 
@@ -67,7 +70,10 @@ class TabSwitcherAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: TabViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: TabViewHolder,
+        position: Int
+    ) {
         val context = holder.binding.root.context
         val tab = getItem(position)
         val glide = GlideApp.with(context)
@@ -81,17 +87,27 @@ class TabSwitcherAdapter(
         attachClickListeners(holder, tab)
     }
 
-    private fun extractTabTitle(tab: TabEntity, context: Context): String {
+    private fun extractTabTitle(
+        tab: TabEntity,
+        context: Context
+    ): String {
         var title = tab.displayTitle(context)
         title = title.removeSuffix(DUCKDUCKGO_TITLE_SUFFIX)
         return title
     }
 
-    private fun updateUnreadIndicator(holder: TabViewHolder, tab: TabEntity) {
+    private fun updateUnreadIndicator(
+        holder: TabViewHolder,
+        tab: TabEntity
+    ) {
         holder.tabUnread.visibility = if (tab.viewed) View.INVISIBLE else View.VISIBLE
     }
 
-    override fun onBindViewHolder(holder: TabViewHolder, position: Int, payloads: MutableList<Any>) {
+    override fun onBindViewHolder(
+        holder: TabViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
             return
@@ -120,14 +136,21 @@ class TabSwitcherAdapter(
         }
     }
 
-    private fun loadFavicon(tab: TabEntity, view: ImageView) {
+    private fun loadFavicon(
+        tab: TabEntity,
+        view: ImageView
+    ) {
         val url = tab.url ?: return
         lifecycleOwner.lifecycleScope.launch {
             faviconManager.loadToViewFromLocalOrFallback(tab.tabId, url, view)
         }
     }
 
-    private fun loadTabPreviewImage(tab: TabEntity, glide: GlideRequests, holder: TabViewHolder) {
+    private fun loadTabPreviewImage(
+        tab: TabEntity,
+        glide: GlideRequests,
+        holder: TabViewHolder
+    ) {
         val previewFile = tab.tabPreviewFile
         if (previewFile == null) {
             glide.clear(holder.tabPreview)
@@ -146,7 +169,10 @@ class TabSwitcherAdapter(
             .into(holder.tabPreview)
     }
 
-    private fun attachClickListeners(holder: TabViewHolder, tab: TabEntity) {
+    private fun attachClickListeners(
+        holder: TabViewHolder,
+        tab: TabEntity
+    ) {
         holder.binding.root.setOnClickListener {
             itemClickListener.onTabSelected(tab)
         }

@@ -18,20 +18,20 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.runBlocking
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.apps.Command.LaunchFeedback
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog.Companion.STOPPED_WORKING
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen.IssueDescriptionForm
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.verifyNoInteractions
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -56,23 +56,39 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenPackageNameIsExcludedThenProtectedAppsExcludesIt() = coroutineRule.runBlocking {
+    fun whenPackageNameIsExcludedThenProtectedAppsExcludesIt() = runTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport = false)
 
-        verifyZeroInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
     @Test
-    fun whenPackageNameIsExcludedBecauseStoppedWorkingThenProtectedAppsExcludesItAndLaunchesFeedback() = coroutineRule.runBlocking {
+    fun whenAppProtectionisDisabledAndReportIsSkippedThenDisablePixelIsSent() = runTest {
+        val packageName = "com.package.name"
+        val skippedReport = true
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
+
+        verify(deviceShieldPixels).didSkipManuallyDisableAppProtectionDialog()
+    }
+
+    @Test
+    fun whenAppProtectionisSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
+        val packageName = "com.package.name"
+        val skippedReport = false
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
+
+        verify(deviceShieldPixels).didSubmitManuallyDisableAppProtectionDialog()
+    }
+
+    @Test
+    fun whenPackageNameIsExcludedBecauseStoppedWorkingThenProtectedAppsExcludesItAndLaunchesFeedback() = runTest {
         viewModel.commands().test {
             val packageName = "com.package.name"
             val appName = "name"
             viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName, skippedReport = false)
 
             verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-            verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to "com.package.name", "reason" to STOPPED_WORKING.toString()))
 
             assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), awaitItem())
             cancelAndConsumeRemainingEvents()
@@ -80,34 +96,32 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenPackageNameIsExcludedAndWasPreviouslyExcludedThenProtectedAppsExcludesItAndPixelIsSent() = coroutineRule.runBlocking {
+    fun whenPackageNameIsExcludedAndWasPreviouslyExcludedThenProtectedAppsExcludesItAndPixelIsSent() = runTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName, skippedReport = false)
 
-        verify(deviceShieldPixels).disableAppProtection(mapOf("packageName" to packageName, "reason" to ManuallyDisableAppProtectionDialog.DONT_USE.toString()))
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
     @Test
-    fun whenPackageNameIsEnabledAndAppHasNoIssuesThenProtectedAppsEnablesIt() = coroutineRule.runBlocking {
+    fun whenPackageNameIsEnabledAndAppHasNoIssuesThenProtectedAppsEnablesIt() = runTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 0)
 
-        verifyZeroInteractions(deviceShieldPixels)
+        verifyNoInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
     @Test
-    fun whenPackageNameIsEnabledAndAppHasIssuesThenProtectedAppsEnablesItAndSendsPixel() = coroutineRule.runBlocking {
+    fun whenPackageNameIsEnabledAndAppHasIssuesThenProtectedAppsEnablesItAndSendsPixel() = runTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName, 1, true)
 
-        verify(deviceShieldPixels).enableAppProtection(mapOf("packageName" to packageName, "reason" to 1.toString()))
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
     @Test
-    fun whenUserWantsToRestoreDefaultThenDefaultListIsRestoredAndVpnRestarted() = coroutineRule.runBlocking {
+    fun whenUserWantsToRestoreDefaultThenDefaultListIsRestoredAndVpnRestarted() = runTest {
         viewModel.commands().test {
             viewModel.restoreProtectedApps()
             assertEquals(Command.RestartVpn, awaitItem())
@@ -118,7 +132,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = coroutineRule.runBlocking {
+    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(0, packageName, packageName, skippedReport = true)
 
@@ -130,7 +144,27 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = coroutineRule.runBlocking {
+    fun whenOnAppProtectionDisabledSkipDialogThenDoNotLaunchFeedback() = runTest {
+        val packageName = "com.package.name"
+        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = true)
+
+        viewModel.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenOnAppProtectionDisabledSkipFalseDialogThenLaunchFeedback() = runTest {
+        val packageName = "com.package.name"
+        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = false)
+
+        viewModel.commands().test {
+            assertEquals(LaunchFeedback(IssueDescriptionForm(packageName, packageName)), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
         viewModel.commands().test {
             viewModel.onLeavingScreen()
             expectNoEvents()
@@ -139,7 +173,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppWithKnownIssuesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppWithKnownIssuesIsEnabledThenEnableProtectionDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithKnownIssues, 0, true)
             assertEquals(Command.ShowEnableProtectionDialog(appWithKnownIssues, 0), awaitItem())
@@ -148,7 +182,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppWithKnownIssuesIsDisabledThenNoDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppWithKnownIssuesIsDisabledThenNoDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithKnownIssues, 0, false)
             expectNoEvents()
@@ -157,7 +191,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppLoadsWebsitesIsEnabledThenEnableProtectionDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppLoadsWebsitesIsEnabledThenEnableProtectionDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appLoadsWebsites, 0, true)
             assertEquals(Command.ShowEnableProtectionDialog(appLoadsWebsites, 0), awaitItem())
@@ -166,7 +200,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppLoadsWebsitesIsDisabledThenNoDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppLoadsWebsitesIsDisabledThenNoDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appLoadsWebsites, 0, false)
             expectNoEvents()
@@ -175,7 +209,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppWithNoIssuesIsEnabledThenNoDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppWithNoIssuesIsEnabledThenNoDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, true)
             expectNoEvents()
@@ -184,7 +218,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppWithNoIssuesIsDisabledThenDisabledDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appWithoutIssues, 0, false)
             assertEquals(Command.ShowDisableProtectionDialog(appWithoutIssues), awaitItem())
@@ -193,7 +227,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppManuallyDisabledIsEnabledThenNoDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppManuallyDisabledIsEnabledThenNoDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, true)
             expectNoEvents()
@@ -202,7 +236,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = coroutineRule.runBlocking {
+    fun whenAppManuallyDisabledIsDisabledThenDisableDialogIsShown() = runTest {
         viewModel.commands().test {
             viewModel.onAppProtectionChanged(appManuallyExcluded, 0, false)
             assertEquals(Command.ShowDisableProtectionDialog(appManuallyExcluded), awaitItem())

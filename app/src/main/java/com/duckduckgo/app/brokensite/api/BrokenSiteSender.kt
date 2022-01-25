@@ -16,19 +16,20 @@
 
 package com.duckduckgo.app.brokensite.api
 
-import android.os.Build
+import android.net.Uri
 import com.duckduckgo.app.brokensite.model.BrokenSite
-import com.duckduckgo.app.browser.BuildConfig
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.absoluteString
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -43,23 +44,26 @@ class BrokenSiteSubmitter(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val appCoroutineScope: CoroutineScope
+    private val appCoroutineScope: CoroutineScope,
+    private val appBuildConfig: AppBuildConfig,
+    private val dispatcherProvider: DispatcherProvider
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
         val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+        val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
-        appCoroutineScope.launch(Dispatchers.IO) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
             val params = mapOf(
                 CATEGORY_KEY to brokenSite.category,
-                SITE_URL_KEY to brokenSite.siteUrl,
+                SITE_URL_KEY to absoluteUrl,
                 UPGRADED_HTTPS_KEY to brokenSite.upgradeHttps.toString(),
                 TDS_ETAG_KEY to tdsMetadataDao.eTag().orEmpty(),
-                APP_VERSION_KEY to BuildConfig.VERSION_NAME,
+                APP_VERSION_KEY to appBuildConfig.versionName,
                 ATB_KEY to atbWithVariant(),
-                OS_KEY to Build.VERSION.SDK_INT.toString(),
-                MANUFACTURER_KEY to Build.MANUFACTURER,
-                MODEL_KEY to Build.MODEL,
+                OS_KEY to appBuildConfig.sdkInt.toString(),
+                MANUFACTURER_KEY to appBuildConfig.manufacturer,
+                MODEL_KEY to appBuildConfig.model,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
                 GPC to isGpcEnabled

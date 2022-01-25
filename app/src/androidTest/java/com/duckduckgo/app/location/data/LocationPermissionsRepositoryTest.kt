@@ -20,12 +20,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.runBlocking
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import dagger.Lazy
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
@@ -57,7 +57,7 @@ class LocationPermissionsRepositoryTest {
 
     @Before
     fun before() {
-        MockitoAnnotations.initMocks(this)
+        MockitoAnnotations.openMocks(this)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -71,7 +71,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenPermissionIsValidThenItIsStored() = coroutineRule.runBlocking {
+    fun whenPermissionIsValidThenItIsStored() = runTest {
         val permissionType = LocationPermissionType.ALLOW_ALWAYS
         val permission = LocationPermissionEntity(domain, permissionType)
         val permissionStored = repository.savePermission(domain, LocationPermissionType.ALLOW_ALWAYS)
@@ -79,28 +79,28 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenGetAllPermissionsAsyncThenReturnLiveDataWithAllItemsFromDatabase() = coroutineRule.runBlocking {
+    fun whenGetAllPermissionsAsyncThenReturnLiveDataWithAllItemsFromDatabase() = runTest {
         givenPermissionStored("example.com", "example2.com")
         val entities = repository.getLocationPermissionsAsync().blockingObserve()!!
         assertEquals(entities.size, 2)
     }
 
     @Test
-    fun whenGetAllPermissionsSyncThenReturnListWithAllItemsFromDatabase() = coroutineRule.runBlocking {
+    fun whenGetAllPermissionsSyncThenReturnListWithAllItemsFromDatabase() = runTest {
         givenPermissionStored("example.com", "example2.com")
         val entities = repository.getLocationPermissionsSync()
         assertEquals(entities.size, 2)
     }
 
     @Test
-    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = coroutineRule.runBlocking {
+    fun whenGetAllFireproofWebsitesThenReturnLiveDataWithAllItemsFromDatabase() = runTest {
         givenPermissionStored("example.com", "example2.com")
         val entities = repository.getLocationPermissionsAsync().blockingObserve()!!
         assertEquals(entities.size, 2)
     }
 
     @Test
-    fun whenDeletePermissionStoredThenItemRemovedFromDatabase() = coroutineRule.runBlocking {
+    fun whenDeletePermissionStoredThenItemRemovedFromDatabase() = runTest {
         givenPermissionStored("example.com", "example2.com")
 
         assertEquals(dao.allPermissions().size, 2)
@@ -111,7 +111,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenDeletePermissionNotStoredThenNotingIsRemovedFromDatabase() = coroutineRule.runBlocking {
+    fun whenDeletePermissionNotStoredThenNotingIsRemovedFromDatabase() = runTest {
         givenPermissionStored("example.com", "example2.com")
 
         assertEquals(dao.allPermissions().size, 2)
@@ -122,7 +122,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenRetrievingStoredPermissionThenItCanBeRetrieved() = coroutineRule.runBlocking {
+    fun whenRetrievingStoredPermissionThenItCanBeRetrieved() = runTest {
         givenPermissionStored("example.com", "example2.com")
 
         val retrieved = repository.getDomainPermission("example2.com")!!
@@ -131,7 +131,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenRetrievingNotStoredPermissionThenNothingCanBeRetrieved() = coroutineRule.runBlocking {
+    fun whenRetrievingNotStoredPermissionThenNothingCanBeRetrieved() = runTest {
         givenPermissionStored("example.com", "example2.com")
 
         val retrieved = repository.getDomainPermission("exampl3.com")
@@ -140,7 +140,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenDeletePermissionStoredThenDeletePersistedFavicon() = coroutineRule.runBlocking {
+    fun whenDeletePermissionStoredThenDeletePersistedFavicon() = runTest {
         givenPermissionStored("example.com")
 
         repository.deletePermission("example.com")
@@ -149,7 +149,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenPermissionEntitiesCountByDomainAndNoWebsitesMatchThenReturnZero() = coroutineRule.runBlocking {
+    fun whenPermissionEntitiesCountByDomainAndNoWebsitesMatchThenReturnZero() = runTest {
         givenPermissionStored("example.com")
 
         val count = repository.permissionEntitiesCountByDomain("test.com")
@@ -158,7 +158,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenPermissionEntitiesCountByDomainAndWebsitsMatchThenReturnCount() = coroutineRule.runBlocking {
+    fun whenPermissionEntitiesCountByDomainAndWebsitsMatchThenReturnCount() = runTest {
         val query = "%example%"
         givenPermissionStored("example.com")
 

@@ -71,7 +71,10 @@ class BrowserWebViewClient(
      * This is the new method of url overriding available from API 24 onwards
      */
     @RequiresApi(Build.VERSION_CODES.N)
-    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+    override fun shouldOverrideUrlLoading(
+        view: WebView,
+        request: WebResourceRequest
+    ): Boolean {
         val url = request.url
         return shouldOverride(view, url, request.isForMainFrame)
     }
@@ -80,7 +83,10 @@ class BrowserWebViewClient(
      * * This is the old, deprecated method of url overriding available until API 23
      */
     @Suppress("OverridingDeprecatedMember")
-    override fun shouldOverrideUrlLoading(view: WebView, urlString: String): Boolean {
+    override fun shouldOverrideUrlLoading(
+        view: WebView,
+        urlString: String
+    ): Boolean {
         val url = Uri.parse(urlString)
         return shouldOverride(view, url, isForMainFrame = true)
     }
@@ -88,7 +94,11 @@ class BrowserWebViewClient(
     /**
      * API-agnostic implementation of deciding whether to override url or not
      */
-    private fun shouldOverride(webView: WebView, url: Uri, isForMainFrame: Boolean): Boolean {
+    private fun shouldOverride(
+        webView: WebView,
+        url: Uri,
+        isForMainFrame: Boolean
+    ): Boolean {
 
         Timber.v("shouldOverride $url")
         try {
@@ -146,7 +156,7 @@ class BrowserWebViewClient(
                 }
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, SHOULD_OVERRIDE_REQUEST)
                 throw e
             }
@@ -155,7 +165,11 @@ class BrowserWebViewClient(
     }
 
     @UiThread
-    override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(
+        webView: WebView,
+        url: String?,
+        favicon: Bitmap?
+    ) {
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
             url?.let {
@@ -173,7 +187,7 @@ class BrowserWebViewClient(
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
                 throw e
             }
@@ -181,7 +195,10 @@ class BrowserWebViewClient(
     }
 
     @UiThread
-    override fun onPageFinished(webView: WebView, url: String?) {
+    override fun onPageFinished(
+        webView: WebView,
+        url: String?
+    ) {
         try {
             accessibilityManager.onPageFinished(webView, url)
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
@@ -192,14 +209,17 @@ class BrowserWebViewClient(
             }
             flushCookies()
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
                 throw e
             }
         }
     }
 
-    private fun injectGpcToDom(webView: WebView, url: String?) {
+    private fun injectGpcToDom(
+        webView: WebView,
+        url: String?
+    ) {
         url?.let {
             if (gpc.canGpcBeUsedByUrl(url)) {
                 webView.evaluateJavascript("javascript:${gpc.getGpcJs()}", null)
@@ -214,7 +234,10 @@ class BrowserWebViewClient(
     }
 
     @WorkerThread
-    override fun shouldInterceptRequest(webView: WebView, request: WebResourceRequest): WebResourceResponse? {
+    override fun shouldInterceptRequest(
+        webView: WebView,
+        request: WebResourceRequest
+    ): WebResourceResponse? {
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }
@@ -231,7 +254,10 @@ class BrowserWebViewClient(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
+    override fun onRenderProcessGone(
+        view: WebView?,
+        detail: RenderProcessGoneDetail?
+    ): Boolean {
         Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
         if (detail?.didCrash() == true) {
             offlinePixelCountDataStore.webRendererGoneCrashCount += 1
@@ -244,7 +270,12 @@ class BrowserWebViewClient(
     }
 
     @UiThread
-    override fun onReceivedHttpAuthRequest(view: WebView?, handler: HttpAuthHandler?, host: String?, realm: String?) {
+    override fun onReceivedHttpAuthRequest(
+        view: WebView?,
+        handler: HttpAuthHandler?,
+        host: String?,
+        realm: String?
+    ) {
         try {
             Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
             if (handler != null) {
@@ -266,14 +297,18 @@ class BrowserWebViewClient(
                 super.onReceivedHttpAuthRequest(view, handler, host, realm)
             }
         } catch (e: Throwable) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_HTTP_AUTH_REQUEST)
                 throw e
             }
         }
     }
 
-    override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler, error: SslError) {
+    override fun onReceivedSslError(
+        view: WebView?,
+        handler: SslErrorHandler,
+        error: SslError
+    ) {
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
         when (error.primaryError) {
             SSL_UNTRUSTED -> {

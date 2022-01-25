@@ -34,16 +34,17 @@ import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
+import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Module
 class EmailModule {
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesEmailManager(
         emailService: EmailService,
@@ -55,7 +56,11 @@ class EmailModule {
     }
 
     @Provides
-    fun providesEmailInjector(emailManager: EmailManager, duckDuckGoUrlDetector: DuckDuckGoUrlDetector, dispatcherProvider: DispatcherProvider): EmailInjector {
+    fun providesEmailInjector(
+        emailManager: EmailManager,
+        duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+        dispatcherProvider: DispatcherProvider
+    ): EmailInjector {
         return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider)
     }
 
@@ -63,12 +68,11 @@ class EmailModule {
     fun providesEmailDataStore(
         context: Context,
         pixel: Pixel,
-        @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): EmailDataStore {
-        return EmailEncryptedSharedPreferences(context, pixel, appCoroutineScope)
+        return EmailEncryptedSharedPreferences(context, pixel)
     }
 
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesWaitlistCodeFetcher(
         workManager: WorkManager,
@@ -82,7 +86,7 @@ class EmailModule {
     }
 
     @Provides
-    @Singleton
+    @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun providesWaitlistCodeFetcherObserver(emailWaitlistCodeFetcher: EmailWaitlistCodeFetcher): LifecycleObserver = emailWaitlistCodeFetcher
 }

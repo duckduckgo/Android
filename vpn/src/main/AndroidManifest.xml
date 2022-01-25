@@ -9,6 +9,11 @@
         android:theme="@style/AppTheme">
 
         <activity
+            android:name="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"
+            android:parentActivityName="dummy.ui.VpnDiagnosticsActivity"
+            android:process=":vpn"/>
+
+        <activity
             android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
             android:label="@string/atp_name"
@@ -80,7 +85,6 @@
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
-            android:process=":vpn"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
             android:screenOrientation="portrait"/>
 
@@ -91,9 +95,9 @@
             android:screenOrientation="portrait"/>
 
         <activity
-                android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
-                android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-                android:screenOrientation="portrait"/>
+            android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".service.TrackerBlockingVpnService"
@@ -103,7 +107,7 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
             <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
-                       android:value="false"/>
+                android:value="false"/>
         </service>
 
         <service

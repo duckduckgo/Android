@@ -21,7 +21,14 @@ import com.duckduckgo.app.global.UriString
 import javax.inject.Inject
 
 interface AppLinksHandler {
-    fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean
+    fun handleAppLink(
+        isForMainFrame: Boolean,
+        urlString: String,
+        appLinksEnabled: Boolean,
+        shouldHaltWebNavigation: Boolean,
+        launchAppLink: () -> Unit
+    ): Boolean
+
     fun updatePreviousUrl(urlString: String?)
     fun setUserQueryState(state: Boolean)
     fun isUserQuery(): Boolean
@@ -32,7 +39,13 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
     var previousUrl: String? = null
     var isAUserQuery = false
 
-    override fun handleAppLink(isForMainFrame: Boolean, urlString: String, appLinksEnabled: Boolean, shouldHaltWebNavigation: Boolean, launchAppLink: () -> Unit): Boolean {
+    override fun handleAppLink(
+        isForMainFrame: Boolean,
+        urlString: String,
+        appLinksEnabled: Boolean,
+        shouldHaltWebNavigation: Boolean,
+        launchAppLink: () -> Unit
+    ): Boolean {
 
         if (!appLinksEnabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !isForMainFrame) {
             return false

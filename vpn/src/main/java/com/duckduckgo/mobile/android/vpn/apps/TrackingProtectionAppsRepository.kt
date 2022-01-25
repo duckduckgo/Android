@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -30,7 +30,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
+import kotlinx.coroutines.flow.flowOn
 
 interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
@@ -49,8 +50,8 @@ interface TrackingProtectionAppsRepository {
     suspend fun restoreDefaultProtectedList()
 }
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
@@ -59,8 +60,8 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
-    override suspend fun getProtectedApps() = withContext(dispatcherProvider.io()) {
-        appTrackerRepository.getAppExclusionListFlow()
+    override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
+        return appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
                 Timber.d("getProtectedApps flow")
                 installedApps
@@ -80,7 +81,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                     .toList()
             }.onStart {
                 refreshInstalledApps()
-            }
+            }.flowOn(dispatcherProvider.io())
     }
 
     private fun refreshInstalledApps() {
@@ -102,7 +103,15 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || appInfo.isSystemApp()
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverriden(appInfo)
+    }
+
+    private fun isSystemAppAndNotOverriden(appInfo: ApplicationInfo): Boolean {
+        return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
+            false
+        } else {
+            appInfo.isSystemApp()
+        }
     }
 
     private fun shouldBeExcluded(
@@ -111,7 +120,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            appInfo.isSystemApp() ||
+            isSystemAppAndNotOverriden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 

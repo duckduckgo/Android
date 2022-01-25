@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
@@ -28,13 +28,19 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.URI
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
-@ContributesBinding(AppObjectGraph::class)
-@Singleton
-class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepository: TrackerAllowlistRepository, private val featureToggle: FeatureToggle) : TrackerAllowlist {
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class RealTrackerAllowlist @Inject constructor(
+    private val trackerAllowlistRepository: TrackerAllowlistRepository,
+    private val featureToggle: FeatureToggle
+) : TrackerAllowlist {
 
-    override fun isAnException(documentURL: String, url: String): Boolean {
+    override fun isAnException(
+        documentURL: String,
+        url: String
+    ): Boolean {
         return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName(), true) == true) {
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
@@ -45,7 +51,11 @@ class RealTrackerAllowlist @Inject constructor(private val trackerAllowlistRepos
         }
     }
 
-    private fun matches(url: String, documentUrl: String, trackerAllowlist: TrackerAllowlistEntity): Boolean {
+    private fun matches(
+        url: String,
+        documentUrl: String,
+        trackerAllowlist: TrackerAllowlistEntity
+    ): Boolean {
         val cleanedUrl = removePortFromUrl(url.toUri())
         return trackerAllowlist.rules.any {
             val regex = ".*${it.rule}.*".toRegex()

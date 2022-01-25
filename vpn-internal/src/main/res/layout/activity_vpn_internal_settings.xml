@@ -96,6 +96,31 @@
                 android:text="Delete Tracking History"
             />
 
+            <TextView
+                android:id="@+id/viewDiagnostics"
+                style="@style/SettingsItemClickable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="View Diagnostics Data"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/badHealthMonitorToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bad health monitoring"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/badHealthMitigationToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bad health mitigation action"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
         </LinearLayout>
 
     </ScrollView>

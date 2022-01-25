@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
@@ -33,7 +33,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class AppTrackerListUpdateWorker(
+    context: Context,
+    workerParameters: WorkerParameters
+) : CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
 
@@ -67,7 +70,8 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 }
 
                 Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
+                vpnDatabase.vpnAppTrackerBlockingDao()
+                    .updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
 
                 return Result.success()
             }
@@ -107,7 +111,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : LifecycleObserver {
@@ -127,7 +131,7 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppTrackerListUpdateWorkerPlugin @Inject constructor(
     private val appTrackerListDownloader: AppTrackerListDownloader,
     private val vpnDatabase: VpnDatabase

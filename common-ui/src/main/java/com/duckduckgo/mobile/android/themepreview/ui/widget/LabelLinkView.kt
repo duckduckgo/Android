@@ -23,17 +23,19 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 
 /**
- * Composite view to show an (optional) leading icon, followed by a text label, followed by
- * a trailing icon.
+ * Composite view to show an (optional) leading icon, followed by a text label, followed by a
+ * trailing icon.
  *
  * Clicking on this view's trailing icon will launch [linkUrl].
  */
-class LabelLinkView @JvmOverloads constructor(
+class LabelLinkView
+@JvmOverloads
+constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -79,12 +81,10 @@ class LabelLinkView @JvmOverloads constructor(
         trailingImageView = view.findViewById(R.id.label_trailing_image_view)
         trailingImageView.setOnClickListener(onLinkClickedListener)
 
-        val a = context.theme.obtainStyledAttributes(
-            attrs,
-            R.styleable.LabelLinkView,
-            defStyleAttr,
-            defStyleRes
-        )
+        val a =
+            context.theme.obtainStyledAttributes(
+                attrs, R.styleable.LabelLinkView, defStyleAttr, defStyleRes
+            )
         leadingIcon = a.getDrawable(R.styleable.LabelLinkView_leadingIcon)
         label = a.getString(R.styleable.LabelLinkView_android_text) ?: label
         linkUrl = a.getString(R.styleable.LabelLinkView_linkUrl) ?: linkUrl

@@ -21,9 +21,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.global.device.ContextDeviceInfo
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 class ApiRequestInterceptorTest {
 
@@ -31,17 +35,24 @@ class ApiRequestInterceptorTest {
 
     private lateinit var userAgentProvider: UserAgentProvider
 
+    @Mock private lateinit var appBuildConfig: AppBuildConfig
+
     @Before
     fun before() {
+        MockitoAnnotations.openMocks(this)
+
+        whenever(appBuildConfig.versionName).thenReturn("name")
+
         userAgentProvider = UserAgentProvider(
-            WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context),
+            { WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context) },
             ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context),
             provideUserAgentOverridePluginPoint()
         )
 
         testee = ApiRequestInterceptor(
             InstrumentationRegistry.getInstrumentation().context,
-            userAgentProvider
+            userAgentProvider,
+            appBuildConfig
         )
     }
 
@@ -62,7 +73,8 @@ class ApiRequestInterceptorTest {
 
         val response = testee.intercept(fakeChain)
         val header = response.request.header(Header.USER_AGENT)!!
-        val regex = "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
+        val regex =
+            "Mozilla/.* \\(Linux; Android.*\\) AppleWebKit/.* \\(KHTML, like Gecko\\) Version/.* Chrome/.* Mobile DuckDuckGo/.* Safari/.*".toRegex()
         assertTrue(header.matches(regex))
     }
 }

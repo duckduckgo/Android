@@ -44,7 +44,7 @@ import com.duckduckgo.app.privacy.ui.PrivacyDashboardActivity.Companion.RELOAD_R
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -140,7 +140,11 @@ class BrowserViewModel(
         }
     }
 
-    suspend fun onOpenInNewTabRequested(query: String, sourceTabId: String? = null, skipHome: Boolean = false): String {
+    suspend fun onOpenInNewTabRequested(
+        query: String,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false
+    ): String {
         return if (sourceTabId != null) {
             tabRepository.addFromSourceTab(
                 url = queryUrlConverter.convertQueryToUrl(query),
@@ -241,7 +245,7 @@ class BrowserViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BrowserViewModelFactory @Inject constructor(
     val tabRepository: Provider<TabRepository>,
     val queryUrlConverter: Provider<QueryUrlConverter>,
@@ -255,7 +259,16 @@ class BrowserViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(tabRepository.get(), queryUrlConverter.get(), dataClearer.get(), appEnjoymentPromptEmitter.get(), appEnjoymentUserEventRecorder.get(), dispatchers, pixel.get(), userEventsStore.get()) as T
+                isAssignableFrom(BrowserViewModel::class.java) -> BrowserViewModel(
+                    tabRepository.get(),
+                    queryUrlConverter.get(),
+                    dataClearer.get(),
+                    appEnjoymentPromptEmitter.get(),
+                    appEnjoymentUserEventRecorder.get(),
+                    dispatchers,
+                    pixel.get(),
+                    userEventsStore.get()
+                ) as T
                 else -> null
             }
         }

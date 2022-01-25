@@ -36,6 +36,7 @@ import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
+import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesActivity
@@ -146,8 +147,16 @@ class SettingsActivity :
         with(viewsOther) {
             provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
             about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
+            privacyPolicy.setOnClickListener {
+                startActivity(
+                    WebViewActivity.intent(
+                        this@SettingsActivity,
+                        PRIVACY_POLICY_WEB_LINK,
+                        getString(R.string.settingsPrivacyPolicyDuckduckgo)
+                    )
+                )
+            }
         }
-
     }
 
     private fun configureInternalFeatures() {
@@ -287,7 +296,10 @@ class SettingsActivity :
         }
     }
 
-    private fun updateDeviceShieldSettings(appTPEnabled: Boolean, waitlistState: WaitlistState) {
+    private fun updateDeviceShieldSettings(
+        appTPEnabled: Boolean,
+        waitlistState: WaitlistState
+    ) {
         with(viewsPrivacy) {
             if (waitlistState != WaitlistState.InBeta) {
                 deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
@@ -404,7 +416,11 @@ class SettingsActivity :
     }
 
     @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
         when (requestCode) {
             FEEDBACK_REQUEST_CODE -> handleFeedbackResult(resultCode)
             else -> super.onActivityResult(requestCode, resultCode, data)
@@ -446,6 +462,7 @@ class SettingsActivity :
         private const val CLEAR_WHEN_DIALOG_TAG = "CLEAR_WHEN_DIALOG_FRAGMENT"
         private const val FEEDBACK_REQUEST_CODE = 100
         private const val CHANGE_APP_ICON_REQUEST_CODE = 101
+        private const val PRIVACY_POLICY_WEB_LINK = "https://duckduckgo.com/privacy"
 
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)

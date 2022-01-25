@@ -29,8 +29,10 @@ import timber.log.Timber
 class AppUpdateReceiver : BroadcastReceiver() {
 
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(
+        context: Context?,
+        intent: Intent?
+    ) {
         Timber.i("Notified of app update")
     }
-
 }

@@ -19,6 +19,7 @@ package com.duckduckgo.app.dev.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.app.browser.useragent.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentOverride
 import com.duckduckgo.di.scopes.AppObjectGraph
@@ -32,8 +33,8 @@ interface DevSettingsDataStore {
     var selectedUA: UAOverride
 }
 
-@ContributesBinding(AppObjectGraph::class, DevSettingsDataStore::class)
-@ContributesMultibinding(AppObjectGraph::class, UserAgentOverride::class)
+@ContributesBinding(AppScope::class, DevSettingsDataStore::class)
+@ContributesMultibinding(AppScope::class, UserAgentOverride::class)
 class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore, UserAgentOverride {
     override var nextTdsEnabled: Boolean
         get() = preferences.getBoolean(KEY_NEXT_TDS_ENABLED, false)

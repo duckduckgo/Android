@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -96,7 +96,10 @@ class WhitelistViewModel(
         command.value = ShowEdit(entry)
     }
 
-    fun onEntryEdited(old: UserWhitelistedDomain, new: UserWhitelistedDomain) {
+    fun onEntryEdited(
+        old: UserWhitelistedDomain,
+        new: UserWhitelistedDomain
+    ) {
         if (!UriString.isValidDomain(new.domain)) {
             command.value = ShowWhitelistFormatError
             return
@@ -126,7 +129,7 @@ class WhitelistViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class WhitelistViewModelFactory @Inject constructor(
     private val dao: Provider<UserWhitelistDao>,
     private val appCoroutineScope: Provider<CoroutineScope>

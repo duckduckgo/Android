@@ -35,7 +35,7 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
@@ -67,7 +67,11 @@ class BookmarksViewModel(
         class OpenBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class ShowEditBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
         class DeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder) : Command()
-        class ConfirmDeleteBookmarkFolder(val bookmarkFolder: BookmarkFolder, val folderBranch: BookmarkFolderBranch) : Command()
+        class ConfirmDeleteBookmarkFolder(
+            val bookmarkFolder: BookmarkFolder,
+            val folderBranch: BookmarkFolderBranch
+        ) : Command()
+
         data class ImportedSavedSites(val importSavedSitesResult: ImportSavedSitesResult) : Command()
         data class ExportedSavedSites(val exportSavedSitesResult: ExportSavedSitesResult) : Command()
     }
@@ -227,7 +231,10 @@ class BookmarksViewModel(
         }
     }
 
-    private fun onBookmarkItemsChanged(bookmarks: List<Bookmark>, bookmarkFolders: List<BookmarkFolder>) {
+    private fun onBookmarkItemsChanged(
+        bookmarks: List<Bookmark>,
+        bookmarkFolders: List<BookmarkFolder>
+    ) {
         viewState.value = viewState.value?.copy(
             bookmarks = bookmarks,
             bookmarkFolders = bookmarkFolders,
@@ -242,7 +249,7 @@ class BookmarksViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class BookmarksViewModelFactory @Inject constructor(
     private val favoritesRepository: Provider<FavoritesRepository>,
     private val bookmarksRepository: Provider<BookmarksRepository>,

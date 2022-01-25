@@ -85,7 +85,6 @@ class TdsEntityDaoTest {
         entityDao.updateAll(list)
 
         assertEquals(1, entityDao.count())
-
     }
 
     @Test
@@ -116,5 +115,4 @@ class TdsEntityDaoTest {
     fun whenDatabaseIsNewThenItIsEmpty() {
         assertEquals(0, entityDao.count())
     }
-
 }

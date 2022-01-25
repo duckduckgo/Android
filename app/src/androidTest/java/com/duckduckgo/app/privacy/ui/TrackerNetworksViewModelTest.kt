@@ -21,14 +21,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.TestEntity
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,6 +37,7 @@ import org.junit.Rule
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 
+@ExperimentalCoroutinesApi
 @ExperimentalTime
 class TrackerNetworksViewModelTest {
 
@@ -56,7 +58,7 @@ class TrackerNetworksViewModelTest {
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
+    fun whenNoDataThenDefaultValuesAreUsed() = runTest {
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
         testee.trackers("1").test {
@@ -68,7 +70,7 @@ class TrackerNetworksViewModelTest {
     }
 
     @Test
-    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = coroutineTestRule.runBlocking {
+    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -80,7 +82,7 @@ class TrackerNetworksViewModelTest {
     }
 
     @Test
-    fun whenTrackersUpdatedWithNoTrackersThenViewModelListIsEmpty() = coroutineTestRule.runBlocking {
+    fun whenTrackersUpdatedWithNoTrackersThenViewModelListIsEmpty() = runTest {
         val input = listOf(TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null))
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -97,7 +99,7 @@ class TrackerNetworksViewModelTest {
     }
 
     @Test
-    fun whenTrackersUpdatedThenViewModelUpdatedWithDistinctEntitiesOrderedBy() = coroutineTestRule.runBlocking {
+    fun whenTrackersUpdatedThenViewModelUpdatedWithDistinctEntitiesOrderedBy() = runTest {
         val input = listOf(
             // Minor entity with 3 distinct trackers
             TrackingEvent(Url.DOCUMENT, Url.tracker(1), null, Entity.MINOR_ENTITY_A, true, null),
@@ -133,7 +135,10 @@ class TrackerNetworksViewModelTest {
         }
     }
 
-    private fun site(url: String = "", trackingEvents: List<TrackingEvent> = emptyList()): Site {
+    private fun site(
+        url: String = "",
+        trackingEvents: List<TrackingEvent> = emptyList()
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
@@ -154,5 +159,4 @@ class TrackerNetworksViewModelTest {
 
         fun tracker(number: Int): String = String.format(TRACKER, number)
     }
-
 }

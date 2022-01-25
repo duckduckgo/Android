@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor.requestingapp.requestingapp
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageModern
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.net.InetAddress
@@ -82,6 +82,17 @@ class DetectOriginatingAppPackageModernTest {
         captureSourceAddress()
 
         assertEquals(40123, addressCaptor.firstValue.port)
+    }
+
+    @Test
+    fun whenGetConnectionOwnerUidThrowsThenReturnUnknown() {
+        val connection = aConnectionInfo(sourcePort = 40123)
+
+        whenever(connectivityManager.getConnectionOwnerUid(any(), any(), any())).thenThrow(SecurityException())
+
+        val packateId = testee.resolvePackageId(connection)
+        assertEquals("unknown", packateId)
+        verify(packageManager).getPackagesForUid(-1)
     }
 
     private fun captureDestinationAddress() {

@@ -17,22 +17,33 @@
 package com.duckduckgo.app.settings
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     interface Listener {
         fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption)
+    }
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -41,7 +52,7 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
         val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
 
-        if (BuildConfig.DEBUG) {
+        if (appBuildConfig.isDebug) {
             showDebugOnlyOption(rootView)
         }
 
@@ -70,7 +81,10 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         return alertBuilder.create()
     }
 
-    private fun updateCurrentSelect(currentOption: ClearWhenOption, radioGroup: RadioGroup) {
+    private fun updateCurrentSelect(
+        currentOption: ClearWhenOption,
+        radioGroup: RadioGroup
+    ) {
         val selectedId = currentOption.radioButtonId()
         radioGroup.check(selectedId)
     }
@@ -106,5 +120,4 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
             return fragment
         }
     }
-
 }

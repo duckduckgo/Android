@@ -70,7 +70,10 @@ class Grade(
     private var entitiesNotBlocked: Map<String, Double> = mapOf()
     private var entitiesBlocked: Map<String, Double> = mapOf()
 
-    fun updateData(privacyScore: Int?, parentEntity: Entity?) {
+    fun updateData(
+        privacyScore: Int?,
+        parentEntity: Entity?
+    ) {
         this.privacyScore = privacyScore
         parentEntity?.let {
             setParentEntity(parentEntity)
@@ -195,5 +198,4 @@ class Grade(
         const val UNKNOWN_PRIVACY_SCORE = 2
         const val MAX_PRIVACY_SCORE = 10
     }
-
 }

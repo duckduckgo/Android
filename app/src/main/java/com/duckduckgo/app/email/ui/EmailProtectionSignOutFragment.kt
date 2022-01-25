@@ -18,6 +18,7 @@ package com.duckduckgo.app.email.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
@@ -33,7 +34,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
+class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
 
     private val viewModel by bindViewModel<EmailProtectionSignOutViewModel>()
 
@@ -54,6 +55,8 @@ class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtection
     override fun configureUi() {
         configureUiEventHandlers()
         setClickableSpan()
+
+        val emailAddress = requireArguments()[EMAIL_ADDRESS_EXTRA] as String
         binding.primaryAddress.setSubtitle(emailAddress)
     }
 
@@ -106,9 +109,14 @@ class EmailProtectionSignOutFragment(val emailAddress: String) : EmailProtection
 
     companion object {
         private const val SIGN_OUT_DIALOG_TAG = "SIGN_OUT_DIALOG_TAG"
+        private const val EMAIL_ADDRESS_EXTRA = "EMAIL_ADDRESS_EXTRA"
 
         fun instance(emailAddress: String): EmailProtectionSignOutFragment {
-            return EmailProtectionSignOutFragment(emailAddress)
+            val fragment = EmailProtectionSignOutFragment()
+            fragment.arguments = Bundle().also {
+                it.putString(EMAIL_ADDRESS_EXTRA, emailAddress)
+            }
+            return fragment
         }
     }
 }

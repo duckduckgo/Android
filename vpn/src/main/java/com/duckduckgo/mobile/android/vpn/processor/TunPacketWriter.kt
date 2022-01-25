@@ -17,18 +17,39 @@
 package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
+import android.os.Process
+import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.health.TracedState.REMOVED_FROM_NETWORK_TO_DEVICE_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.TracerEvent
+import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import okio.ByteString.Companion.toByteString
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 
-class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private val queues: VpnQueues) : Runnable {
+class TunPacketWriter @AssistedInject constructor(
+    @Assisted private val tunInterface: ParcelFileDescriptor,
+    private val queues: VpnQueues,
+    private val tracerPacketRegister: TracerPacketRegister,
+    private val healthMetricCounter: HealthMetricCounter
+) : Runnable {
 
     private var running = false
 
+    @AssistedFactory
+    interface Factory {
+        fun create(tunInterface: ParcelFileDescriptor): TunPacketWriter
+    }
+
     override fun run() {
+        Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_DISPLAY)
         Timber.w("TunPacketWriter started")
 
         running = true
@@ -55,6 +76,12 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
         try {
             bufferFromNetwork.flip()
 
+            if (bufferFromNetwork.get(0) == (-1).toByte()) {
+                processTracerPacket(bufferFromNetwork)
+                ByteBufferPool.release(bufferFromNetwork)
+                return
+            }
+
             while (bufferFromNetwork.hasRemaining()) {
                 val bytesWrittenToVpn = vpnOutput.write(bufferFromNetwork)
                 if (bytesWrittenToVpn == 0) {
@@ -65,6 +92,9 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
             }
         } catch (e: IOException) {
             Timber.w(e, "Failed writing to the TUN")
+            bufferFromNetwork.rewind()
+            Timber.d("Failed writing to the TUN. Buffer: ${bufferFromNetwork.toByteString().hex()}")
+            healthMetricCounter.onTunWriteIOException()
         } finally {
             ByteBufferPool.release(bufferFromNetwork)
         }
@@ -73,5 +103,21 @@ class TunPacketWriter(private val tunInterface: ParcelFileDescriptor, private va
     fun stop() {
         running = false
         Timber.w("TunPacketWriter stopped")
+    }
+
+    private fun processTracerPacket(bufferFromNetwork: ByteBuffer) {
+        val timeReceived = System.nanoTime()
+        bufferFromNetwork.get()
+        val tracerIdLength = bufferFromNetwork.int
+        val bytes = ByteArray(tracerIdLength)
+        bufferFromNetwork.get(bytes)
+        val tracerId = String(bytes)
+        tracerPacketRegister.logTracerPacketEvent(
+            TracerEvent(
+                tracerId,
+                REMOVED_FROM_NETWORK_TO_DEVICE_QUEUE,
+                timeReceived,
+            ),
+        )
     }
 }

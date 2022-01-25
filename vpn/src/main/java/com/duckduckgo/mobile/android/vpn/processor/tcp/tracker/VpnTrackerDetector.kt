@@ -139,7 +139,11 @@ class DomainBasedTrackerDetector(
         }
     }
 
-    private fun recordTrackerBlocked(trackerType: ThirdParty, tcb: TCB, requestingApp: OriginatingApp) {
+    private fun recordTrackerBlocked(
+        trackerType: ThirdParty,
+        tcb: TCB,
+        requestingApp: OriginatingApp
+    ) {
         Timber.d(
             "Determined %s to be a 3rd party tracker for %s, tracker owned by %s [%s]",
             tcb.hostName,
@@ -150,13 +154,19 @@ class DomainBasedTrackerDetector(
         insertTracker(trackerType.tracker, requestingApp)
     }
 
-    private fun isTrackerInExceptionRules(tracker: RequestTrackerType.Tracker, originatingApp: OriginatingApp): Boolean {
+    private fun isTrackerInExceptionRules(
+        tracker: RequestTrackerType.Tracker,
+        originatingApp: OriginatingApp
+    ): Boolean {
         val exceptionRule = vpnDatabase.vpnAppTrackerBlockingDao().getRuleByTrackerDomain(tracker.hostName)
 
         return exceptionRule != null && exceptionRule.packageNames.contains(originatingApp.packageId)
     }
 
-    private fun insertTracker(tracker: AppTracker, requestingApp: OriginatingApp) {
+    private fun insertTracker(
+        tracker: AppTracker,
+        requestingApp: OriginatingApp
+    ) {
         if (requestingApp.isInvalid()) {
             // FIXME exclude false positive of DDG app
             // we don't yet know the reason why the DDG app appears sometimes in the list of of tracking apps

@@ -18,35 +18,51 @@ package com.duckduckgo.privacy.config.store.features.gpc
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
+import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.toGpcException
+import com.duckduckgo.privacy.config.store.toGpcHeaderEnabledSite
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.util.concurrent.CopyOnWriteArrayList
 
 interface GpcRepository {
-    fun updateAll(exceptions: List<GpcExceptionEntity>)
+    fun updateAll(
+        exceptions: List<GpcExceptionEntity>,
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+    )
+
     fun enableGpc()
     fun disableGpc()
     fun isGpcEnabled(): Boolean
     val exceptions: CopyOnWriteArrayList<GpcException>
+    val headerEnabledSites: CopyOnWriteArrayList<GpcHeaderEnabledSite>
 }
 
-class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: PrivacyConfigDatabase, coroutineScope: CoroutineScope, dispatcherProvider: DispatcherProvider) :
-    GpcRepository {
+class RealGpcRepository(
+    private val gpcDataStore: GpcDataStore,
+    val database: PrivacyConfigDatabase,
+    coroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider
+) : GpcRepository {
 
-    private val gpcDao: GpcDao = database.gpcDao()
+    private val gpcExceptionsDao: GpcExceptionsDao = database.gpcExceptionsDao()
+    private val gpcHeadersDao: GpcHeadersDao = database.gpcHeadersDao()
     override val exceptions = CopyOnWriteArrayList<GpcException>()
+    override val headerEnabledSites = CopyOnWriteArrayList<GpcHeaderEnabledSite>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadToMemory()
-        }
+        coroutineScope.launch(dispatcherProvider.io()) { loadToMemory() }
     }
 
-    override fun updateAll(exceptions: List<GpcExceptionEntity>) {
-        gpcDao.updateAll(exceptions)
+    override fun updateAll(
+        exceptions: List<GpcExceptionEntity>,
+        headerEnabledSites: List<GpcHeaderEnabledSiteEntity>
+    ) {
+        gpcExceptionsDao.updateAll(exceptions)
+        gpcHeadersDao.updateAll(headerEnabledSites)
         loadToMemory()
     }
 
@@ -62,8 +78,8 @@ class RealGpcRepository(private val gpcDataStore: GpcDataStore, val database: Pr
 
     private fun loadToMemory() {
         exceptions.clear()
-        gpcDao.getAll().map {
-            exceptions.add(it.toGpcException())
-        }
+        headerEnabledSites.clear()
+        gpcExceptionsDao.getAll().map { exceptions.add(it.toGpcException()) }
+        gpcHeadersDao.getAll().map { headerEnabledSites.add(it.toGpcHeaderEnabledSite()) }
     }
 }

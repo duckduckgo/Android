@@ -19,6 +19,8 @@ package com.duckduckgo.app.dev.settings
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MenuItem
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.Toast
@@ -50,6 +52,10 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         viewModel.onNextTdsToggled(isChecked)
     }
 
+    private val startupTraceToggleListener = OnCheckedChangeListener { _, isChecked ->
+        viewModel.onStartupTraceToggled(isChecked)
+    }
+
     private val overrideUAListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onOverrideUAToggled(isChecked)
     }
@@ -69,8 +75,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureUiEventHandlers() {
-        binding.privacyTest1.setOnClickListener { viewModel.goToPrivacyTest1() }
-        binding.privacyTest2.setOnClickListener { viewModel.goToPrivacyTest2() }
+        binding.triggerAnr.setOnClickListener {
+            Handler(Looper.getMainLooper()).post {
+                Thread.sleep(10000)
+            }
+        }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
     }
 
@@ -80,6 +89,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     binding.nextTdsEnabled.quietlySetIsChecked(it.nextTdsEnabled, nextTdsToggleListener)
+                    binding.enableAppStartupTrace.quietlySetIsChecked(it.startupTraceEnabled, startupTraceToggleListener)
                     binding.overrideUserAgentToggle.quietlySetIsChecked(it.overrideUA, overrideUAListener)
                     binding.overrideUserAgentSelector.isEnabled = it.overrideUA
                     binding.overrideUserAgentSelector.setSubtitle(it.userAgent)
@@ -95,7 +105,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun processCommand(it: Command?) {
         when (it) {
             is Command.SendTdsIntent -> sendTdsIntent()
-            is Command.GoToUrl -> goToUrl(it.url)
             is Command.OpenUASelector -> showUASelector(R.menu.user_agent_menu)
             else -> TODO()
         }

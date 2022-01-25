@@ -17,13 +17,15 @@
 package com.duckduckgo.app.global
 
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.nhaarman.mockitokotlin2.*
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -36,23 +38,27 @@ class AlertingUncaughtExceptionHandlerTest {
     private val mockDefaultExceptionHandler: Thread.UncaughtExceptionHandler = mock()
     private val mockPixelCountDataStore: OfflinePixelCountDataStore = mock()
     private val mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun setup() {
+        whenever(mockAppBuildConfig.isDebug).thenReturn(true)
+
         testee = AlertingUncaughtExceptionHandler(
             mockDefaultExceptionHandler,
             mockPixelCountDataStore,
             mockUncaughtExceptionRepository,
             coroutineTestRule.testDispatcherProvider,
-            TestCoroutineScope()
+            TestScope(),
+            mockAppBuildConfig
         )
     }
 
     @Test
-    fun whenExceptionIsNotInIgnoreListThenCrashRecordedInDatabase() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun whenExceptionIsNotInIgnoreListThenCrashRecordedInDatabase() = runTest {
         testee.uncaughtException(Thread.currentThread(), NullPointerException("Deliberate"))
         advanceUntilIdle()
 
@@ -60,7 +66,7 @@ class AlertingUncaughtExceptionHandlerTest {
     }
 
     @Test
-    fun whenExceptionIsNotInIgnoreListThenDefaultExceptionHandlerCalled() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun whenExceptionIsNotInIgnoreListThenDefaultExceptionHandlerCalled() = runTest {
         val exception = NullPointerException("Deliberate")
         testee.uncaughtException(Thread.currentThread(), exception)
         advanceUntilIdle()
@@ -69,7 +75,7 @@ class AlertingUncaughtExceptionHandlerTest {
     }
 
     @Test
-    fun whenExceptionIsInterruptedIoExceptionThenCrashNotRecorded() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun whenExceptionIsInterruptedIoExceptionThenCrashNotRecorded() = runTest {
         testee.uncaughtException(Thread.currentThread(), InterruptedIOException("Deliberate"))
         advanceUntilIdle()
 
@@ -77,7 +83,7 @@ class AlertingUncaughtExceptionHandlerTest {
     }
 
     @Test
-    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun whenExceptionIsInterruptedExceptionThenCrashNotRecorded() = runTest {
         testee.uncaughtException(Thread.currentThread(), InterruptedException("Deliberate"))
         advanceUntilIdle()
 
@@ -85,7 +91,7 @@ class AlertingUncaughtExceptionHandlerTest {
     }
 
     @Test
-    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() = coroutineTestRule.testDispatcher.runBlockingTest {
+    fun whenExceptionIsNotRecordedButInDebugModeThenDefaultExceptionHandlerCalled() = runTest {
         val exception = InterruptedIOException("Deliberate")
         testee.uncaughtException(Thread.currentThread(), exception)
         advanceUntilIdle()

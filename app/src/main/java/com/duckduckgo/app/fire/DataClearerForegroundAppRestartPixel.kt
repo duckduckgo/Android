@@ -29,9 +29,10 @@ import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
@@ -39,7 +40,7 @@ import javax.inject.Singleton
  *
  * When writing values here to SharedPreferences, it is crucial to use `commit = true`. As otherwise the change can be lost in the process restart.
  */
-@Singleton
+@SingleInstanceIn(AppScope::class)
 class DataClearerForegroundAppRestartPixel @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
@@ -86,14 +87,20 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
         resetCount()
     }
 
-    private fun incrementCount(counter: Int, sharedPrefKey: String) {
+    private fun incrementCount(
+        counter: Int,
+        sharedPrefKey: String
+    ) {
         val updated = counter + 1
         preferences.edit(commit = true) {
             putInt(sharedPrefKey, updated)
         }
     }
 
-    private fun firePendingPixels(counter: Int, pixelName: Pixel.PixelName) {
+    private fun firePendingPixels(
+        counter: Int,
+        pixelName: Pixel.PixelName
+    ) {
         if (counter > 0) {
             for (i in 1..counter) {
                 Timber.i("Fired pixel: ${pixelName.pixelName}/$counter")

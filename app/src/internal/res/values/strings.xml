@@ -18,15 +18,16 @@
     <!-- Developer settings -->
     <string name="devSettingsTitle" translatable="false">Developer Settings</string>
     <string name="devSettingsSubtitle" translatable="false">Features useful for devs and debugging</string>
-    <string name="devSettingsScreenTitle" translatable="false">Welcome to the Developer Settings</string>
     <string name="devSettingsScreenPrivacySection" translatable="false">PRIVACY</string>
+    <string name="devSettingsScreenGeneralSection" translatable="false">GENERAL</string>
     <string name="devSettingsScreenTdsVersion" translatable="false">TDS version</string>
     <string name="devSettingsScreenTdsVersionSubtitle" translatable="false">Use next TDS version</string>
-    <string name="devSettingsScreenMajorScript" translatable="false">Major via script</string>
-    <string name="devSettingsScreenMajorScriptSubtitle" translatable="false">Check DoubleCLick is blocked</string>
-    <string name="devSettingsScreenMajorFetch" translatable="false">Major via fetch</string>
-    <string name="devSettingsScreenMajorFetchSubtitle" translatable="false">Check Facebook is blocked</string>
     <string name="devSettingsScreenTdsWait" translatable="false">Please wait while we download the tds version</string>
+    <string name="devStartupTracing" translatable="false">Start-up tracing</string>
+    <string name="devStartupTracingByline" translatable="false">Enable/disable start-up tracing</string>
+    <string name="devSettingsTriggerAnr" translatable="false">Trigger ANR</string>
+    <string name="devSettingsTriggerAnrSubtitle" translatable="false">Click here to trigger an ANR in the app</string>
+
     <string name="devSettingsScreenUserAgentSection" translatable="false">USER AGENT</string>
     <string name="devSettingsScreenUserAgentOverride" translatable="false">Override UserAgent</string>
     <string name="devSettingsScreenUserAgentSelectorTitle" translatable="false">UserAgent</string>
@@ -36,4 +37,37 @@
     <string name="devSettingsScreenUserAgentFirefox" translatable="false">Firefox</string>
     <string name="devSettingsScreenUserAgentDuckDuckGo" translatable="false">DuckDuckGo</string>
     <string name="devSettingsScreenUserAgentWebView" translatable="false">WebView</string>
+    <!-- Privacy Audit settings -->
+    <string name="auditSettingsTitle" translatable="false">Audit Settings</string>
+    <string name="auditSettingsSubtitle" translatable="false">Features useful for doing our privacy audit</string>
+    <string name="auditSettingsScreenPrivacyAuditSection" translatable="false">PRIVACY AUDIT</string>
+    <string name="auditSettingsScreenRefTestsSection" translatable="false">REFERENCE TESTS</string>
+    <string name="auditStep1Title" translatable="false">Step 1: Visit cnn.com</string>
+    <string name="auditStep1Subtitle" translatable="false">Add as bookmark. Visit bookmarks Activity</string>
+    <string name="auditStep2Title" translatable="false">Step 2: Visit gizmodo.com</string>
+    <string name="auditStep2Subtitle" translatable="false">Accept cookies. Fireproof site. Visit fireproofed sites in settings.</string>
+    <string name="auditStep3Title" translatable="false">Step 3: Basic auth database check</string>
+    <string name="auditStep3Subtitle" translatable="false">Enter username=u password=pw</string>
+    <string name="requestBlockingTitle" translatable="false">Request Blocking</string>
+    <string name="requestBlockingSubtitle" translatable="false">Wait for the page to fully load.\nAll boxes should be gray or red.</string>
+    <string name="requestBlockingDisabledTitle" translatable="false">Request Blocking Disabled</string>
+    <string name="requestBlockingDisabledSubtitle" translatable="false">Wait for the page to fully load.\nAll boxes should be green (apart from websocket).</string>
+    <string name="httpsUpgradesTitle" translatable="false">Https Upgrades</string>
+    <string name="httpsUpgradesSubtitle" translatable="false">Click on Start test.\nClick for details.\nUpgrade navigation should be https. We don\'t support the rest.</string>
+    <string name="fireButtonStoreTitle" translatable="false">Fire Button store</string>
+    <string name="fireButtonStoreSubtitle" translatable="false">This will store the data in browser storage.</string>
+    <string name="fireButtonRetrieveTitle" translatable="false">Fire Button retrieve</string>
+    <string name="fireButtonRetrieveSubtitle" translatable="false">This will try to read data from the data stores.\nAll storages, except for browser cache, should report empty (undefined, null or error message).</string>
+    <string name="cookies3pStoreTitle" translatable="false">3rd Party Cookies store</string>
+    <string name="cookies3pStoreSubtitle" translatable="false">This will attempt to store third party cookies.</string>
+    <string name="cookies3pRetrieveTitle" translatable="false">3rd Party Cookies retrieve</string>
+    <string name="cookies3pRetrieveSubtitle" translatable="false">This will try to read third party cookies.\nAll third party cookie tests, both "safe" and tracking", should report no cookie (null or error message).</string>
+    <string name="gpcTitle" translatable="false">GPC</string>
+    <string name="gpcSubtitle" translatable="false">Top frame JS API should return "true".</string>
+    <string name="gpcOtherTitle" translatable="false">GPC Second test</string>
+    <string name="gpcOtherSubtitle" translatable="false">Header and DOM signal should be present.</string>
+    <string name="surrogatesTitle" translatable="false">Surrogates</string>
+    <string name="surrogatesSubtitle" translatable="false">Main frame and iFrame should be green.</string>
+    <string name="surrogatesDisabledTitle" translatable="false">Surrogates Disabled</string>
+    <string name="surrogatesDisabledSubtitle" translatable="false">Main frame and iFrame should be red.</string>
 </resources>

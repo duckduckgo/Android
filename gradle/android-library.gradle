@@ -45,6 +45,10 @@ android {
     }
 }
 
+tasks.register('checks') {
+    dependsOn 'jvm_checks', 'android_checks'
+}
+
 tasks.register('android_checks') {
     dependsOn 'connectedDebugAndroidTest'
 }

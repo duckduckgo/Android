@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
@@ -28,13 +28,16 @@ import javax.inject.Inject
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ContentBlockingPlugin @Inject constructor(
     private val contentBlockingRepository: ContentBlockingRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: String): Boolean {
+    override fun store(
+        name: String,
+        jsonString: String
+    ): Boolean {
         if (name == featureName.value) {
             val contentBlockingExceptions = mutableListOf<ContentBlockingExceptionEntity>()
             val moshi = Moshi.Builder().build()

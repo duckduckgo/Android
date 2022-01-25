@@ -30,19 +30,22 @@ import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
-import com.duckduckgo.app.drm.DrmRequestManager
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
-import com.nhaarman.mockitokotlin2.*
+import com.duckduckgo.privacy.config.api.Drm
+import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
 
+@ExperimentalCoroutinesApi
 class BrowserChromeClientTest {
 
     private lateinit var testee: BrowserChromeClient
@@ -51,14 +54,19 @@ class BrowserChromeClientTest {
     private lateinit var mockUncaughtExceptionRepository: UncaughtExceptionRepository
     private lateinit var mockFilePathCallback: ValueCallback<Array<Uri>>
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
+    private lateinit var mockDrm: Drm
     private val fakeView = View(getInstrumentation().targetContext)
+
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
 
     @ExperimentalCoroutinesApi
     @UiThreadTest
     @Before
     fun setup() {
         mockUncaughtExceptionRepository = mock()
-        testee = BrowserChromeClient(mockUncaughtExceptionRepository, DrmRequestManager(), TestCoroutineScope())
+        mockDrm = mock()
+        testee = BrowserChromeClient(mockUncaughtExceptionRepository, mockDrm, TestScope(), coroutineTestRule.testDispatcherProvider)
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
@@ -96,7 +104,7 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenCustomViewShownThrowsExceptionThenRecordException() = runBlocking {
+    fun whenCustomViewShownThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.goFullScreen(any())).thenThrow(exception)
         testee.onShowCustomView(fakeView, null)
@@ -104,13 +112,13 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() {
+    fun whenHideCustomViewCalledThenListenerInstructedToExistFullScreen() = runTest {
         testee.onHideCustomView()
         verify(mockWebViewClientListener).exitFullScreen()
     }
 
     @Test
-    fun whenHideCustomViewThrowsExceptionThenRecordException() = runBlocking {
+    fun whenHideCustomViewThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.exitFullScreen()).thenThrow(exception)
         testee.onHideCustomView()
@@ -133,7 +141,7 @@ class BrowserChromeClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnProgressChangedThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnProgressChangedThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.progressChanged(anyInt())).thenThrow(exception)
         testee.onProgressChanged(webView, 10)
@@ -152,7 +160,7 @@ class BrowserChromeClientTest {
     @Test
     fun whenOnCreateWindowWithoutUserGestureThenNewTabNotOpened() {
         testee.onCreateWindow(webView, isDialog = false, isUserGesture = false, resultMsg = mockMsg)
-        verifyZeroInteractions(mockWebViewClientListener)
+        verifyNoInteractions(mockWebViewClientListener)
     }
 
     @Test
@@ -170,7 +178,7 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenOnReceivedTitleThrowsExceptionThenRecordException() = runBlocking {
+    fun whenOnReceivedTitleThrowsExceptionThenRecordException() = runTest {
         val exception = RuntimeException()
         whenever(mockWebViewClientListener.titleReceived(anyString())).thenThrow(exception)
         testee.onReceivedTitle(webView, "")
@@ -184,10 +192,12 @@ class BrowserChromeClientTest {
     }
 
     @Test
-    fun whenShowFileChooserThrowsExceptionThenRecordException() = runBlocking {
-        val exception = RuntimeException()
+    fun whenShowFileChooserThrowsExceptionThenRecordException() = runTest {
+        val exception = RuntimeException("deliberate")
+
         whenever(mockWebViewClientListener.showFileChooser(any(), any())).thenThrow(exception)
-        assertTrue(testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams))
+        testee.onShowFileChooser(webView, mockFilePathCallback, mockFileChooserParams)
+
         verify(mockUncaughtExceptionRepository).recordUncaughtException(exception, UncaughtExceptionSource.SHOW_FILE_CHOOSER)
         verify(mockFilePathCallback).onReceiveValue(null)
     }
@@ -198,6 +208,7 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
+        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
 
         testee.onPermissionRequest(mockPermission)
 
@@ -210,6 +221,7 @@ class BrowserChromeClientTest {
         val mockPermission: PermissionRequest = mock()
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
+        whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 

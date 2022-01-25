@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.job.ConfigurationDownloader
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Single
 import timber.log.Timber
@@ -44,7 +44,10 @@ class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
     }
 }
 
-class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) : RxWorker(context, workerParams) {
+class AppConfigurationWorker(
+    context: Context,
+    workerParams: WorkerParameters
+) : RxWorker(context, workerParams) {
 
     @Inject
     lateinit var appConfigurationDownloader: ConfigurationDownloader
@@ -63,7 +66,7 @@ class AppConfigurationWorker(context: Context, workerParams: WorkerParameters) :
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class AppConfigurationWorkerInjectorPlugin @Inject constructor(
     private val configurationDownloader: ConfigurationDownloader
 ) : WorkerInjectorPlugin {

@@ -37,7 +37,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -117,7 +117,10 @@ class PrivacyDashboardViewModel(
         )
     }
 
-    private fun showTrackerNetworkLeaderboard(siteVisitedCount: Int, networkCount: Int): Boolean {
+    private fun showTrackerNetworkLeaderboard(
+        siteVisitedCount: Int,
+        networkCount: Int
+    ): Boolean {
         return siteVisitedCount > LEADERBOARD_MIN_DOMAINS_EXCLUSIVE && networkCount >= LEADERBOARD_MIN_NETWORKS
     }
 
@@ -213,7 +216,7 @@ class PrivacyDashboardViewModel(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class PrivacyDashboardViewModelFactory @Inject constructor(
     private val userWhitelistDao: Provider<UserWhitelistDao>,
     private val contentBlocking: Provider<ContentBlocking>,
@@ -224,7 +227,13 @@ class PrivacyDashboardViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(userWhitelistDao.get(), contentBlocking.get(), networkLeaderboardDao.get(), pixel.get(), appCoroutineScope.get()) as T
+                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
+                    userWhitelistDao.get(),
+                    contentBlocking.get(),
+                    networkLeaderboardDao.get(),
+                    pixel.get(),
+                    appCoroutineScope.get()
+                ) as T
                 else -> null
             }
         }

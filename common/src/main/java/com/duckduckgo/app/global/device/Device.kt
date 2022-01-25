@@ -46,17 +46,14 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
         info.versionName.orEmpty()
     }
 
-    override val majorAppVersion by lazy {
-        appVersion.split(".").first()
-    }
+    override val majorAppVersion by lazy { appVersion.split(".").first() }
 
-    override val language: String by lazy {
-        Locale.getDefault().language
-    }
+    override val language: String by lazy { Locale.getDefault().language }
 
     override val country: String by lazy {
         val telephonyCountry = telephonyManager.networkCountryIso
-        val deviceCountry = if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
+        val deviceCountry =
+            if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
         deviceCountry.toLowerCase()
     }
 
@@ -67,7 +64,12 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
     override fun formFactor(): DeviceInfo.FormFactor {
         val metrics = context.resources.displayMetrics
         val smallestSize = Math.min(metrics.widthPixels, metrics.heightPixels)
-        val tabletSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 600f, context.resources.displayMetrics).toInt()
-        return if (smallestSize >= tabletSize) DeviceInfo.FormFactor.TABLET else DeviceInfo.FormFactor.PHONE
+        val tabletSize =
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 600f, context.resources.displayMetrics
+            )
+                .toInt()
+        return if (smallestSize >= tabletSize) DeviceInfo.FormFactor.TABLET
+        else DeviceInfo.FormFactor.PHONE
     }
 }

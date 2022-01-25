@@ -1,0 +1,208 @@
+{
+  "readme": "This configuration has all features enabled with individual exceptions for sites.",
+  "features": {
+    "https": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        },
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "contentBlocking": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        },
+        {
+          "domain": "dont.block.co.uk",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "trackerAllowlist": {
+      "state": "enabled",
+      "settings": {
+        "allowlistedTrackers": {}
+      },
+      "exceptions": []
+    },
+    "trackingCookies3p": {
+      "state": "enabled",
+      "settings": {
+        "excludedCookieDomains": [
+          {
+            "domain": "exception.com",
+            "reason": "Feature should be disabled for given domain."
+          }
+        ]
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "trackingCookies1p": {
+      "state": "enabled",
+      "settings": {
+        "firstPartyTrackerCookiePolicy": {
+          "threshold": 86400,
+          "maxAge": 86400
+        }
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "clickToPlay": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingCanvas": {
+      "state": "enabled",
+      "settings": {
+        "aboutBlankEnabled": "disabled"
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingAudio": {
+      "state": "enabled",
+      "settings": {
+        "aboutBlankSites": [
+          {
+            "domain": "blank-iframe.com",
+            "reason": "about blank iframes should not include this feature on this site"
+          }
+        ]
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingTemporaryStorage": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "referrer": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingBattery": {
+      "state": "enabled",
+      "settings": {
+        "scripts": [
+          {
+            "domain": "^https?:\\/\\/([^/]+\\.)?skip\\.third-party\\.com",
+            "reason": "Feature should not be disabled if requested by script from this domain"
+          }
+        ]
+      },
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingScreenSize": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "fingerprintingHardware": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "floc": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "gpc": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "autofill": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    },
+    "eme": {
+      "state": "enabled",
+      "exceptions": [
+        {
+          "domain": "exception.com",
+          "reason": "Feature should be disabled for given domain."
+        }
+      ]
+    }
+  },
+  "version": 1635943904459,
+  "unprotectedTemporary": [
+    {
+      "domain": "global-exception.com",
+      "reason": "This exception should disable all features"
+    },
+    {
+      "domain": "dont.global-block.co.uk",
+      "reason": "This exception should disable all features"
+    }
+  ]
+}

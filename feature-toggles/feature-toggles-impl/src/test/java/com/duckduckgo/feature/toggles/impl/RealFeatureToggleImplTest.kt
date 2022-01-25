@@ -24,7 +24,8 @@ import org.junit.Test
 
 class RealFeatureToggleImplTest {
 
-    private val testee: RealFeatureToggleImpl = RealFeatureToggleImpl(FakeFeatureTogglePluginPoint())
+    private val testee: RealFeatureToggleImpl =
+        RealFeatureToggleImpl(FakeFeatureTogglePluginPoint())
 
     @Test
     fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {
@@ -40,7 +41,10 @@ class RealFeatureToggleImplTest {
     }
 
     class FakeTruePlugin : FeatureTogglesPlugin {
-        override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
+        override fun isEnabled(
+            featureName: FeatureName,
+            defaultValue: Boolean
+        ): Boolean? {
             return if (featureName is TrueFeatureName) {
                 true
             } else {

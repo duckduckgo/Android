@@ -17,20 +17,31 @@
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Provider
 
 class DeviceShieldOnboardingViewModel(
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
+    private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
-    data class OnboardingPage(val imageHeader: Int, val title: Int, val text: Int)
+    data class OnboardingPage(
+        val imageHeader: Int,
+        val title: Int,
+        val text: Int
+    )
 
     val pages = listOf(
         OnboardingPage(
@@ -57,20 +68,30 @@ class DeviceShieldOnboardingViewModel(
 
     fun onDeviceShieldEnabled() {
         Timber.i("App Tracking Protection, is now enabled")
-        deviceShieldPixels.enableFromOnboarding()
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            deviceShieldPixels.enableFromOnboarding()
+        }
     }
-
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class DeviceShieldOnboardingViewModelFactory @Inject constructor(
-    private val deviceShieldPixels: DeviceShieldPixels,
-    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
+    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
+    @AppCoroutineScope private val appCoroutineScope: Provider<CoroutineScope>,
+    private val dispatcherProvider: Provider<DispatcherProvider>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (DeviceShieldOnboardingViewModel(deviceShieldPixels, deviceShieldOnboardingStore) as T)
+                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (
+                    DeviceShieldOnboardingViewModel(
+                        deviceShieldPixels.get(),
+                        deviceShieldOnboardingStore.get(),
+                        appCoroutineScope.get(),
+                        dispatcherProvider.get(),
+                    ) as T
+                    )
                 else -> null
             }
         }

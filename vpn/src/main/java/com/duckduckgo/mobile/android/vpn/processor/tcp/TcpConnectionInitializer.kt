@@ -42,11 +42,13 @@ interface ConnectionInitializer {
         fun key(): String {
             return "$destinationAddress:$destinationPort:$sourcePort"
         }
-
     }
 }
 
-class TcpConnectionInitializer(private val queues: VpnQueues, private val networkChannelCreator: NetworkChannelCreator) : ConnectionInitializer {
+class TcpConnectionInitializer(
+    private val queues: VpnQueues,
+    private val networkChannelCreator: NetworkChannelCreator
+) : ConnectionInitializer {
 
     override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
         val key = params.key()

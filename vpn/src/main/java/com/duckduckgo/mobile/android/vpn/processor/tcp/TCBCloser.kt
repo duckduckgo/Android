@@ -35,7 +35,12 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
     }
 
     @Synchronized
-    fun sendResetPacket(tcb: TCB, queues: VpnQueues, packet: Packet, payloadSize: Int) {
+    fun sendResetPacket(
+        tcb: TCB,
+        queues: VpnQueues,
+        packet: Packet,
+        payloadSize: Int
+    ) {
         val buffer = ByteBufferPool.acquire()
 
         var responseAck = tcb.acknowledgementNumberToClient + payloadSize
@@ -60,5 +65,4 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
 
         closeConnection(tcb)
     }
-
 }

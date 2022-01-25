@@ -20,7 +20,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
@@ -50,14 +50,20 @@ class ExceptionRulesDebugReceiver(
         context.registerReceiver(this, IntentFilter(intentAction))
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent
+    ) {
         receiver(intent)
     }
 
     companion object {
         private const val ACTION = "rule"
 
-        fun ruleIntent(packageId: String, domain: String): Intent {
+        fun ruleIntent(
+            packageId: String,
+            domain: String
+        ): Intent {
             return Intent(ACTION).apply {
                 putExtra("app", packageId)
                 putExtra("domain", domain)
@@ -66,7 +72,7 @@ class ExceptionRulesDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ExceptionRulesDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val exclusionRulesRepository: ExclusionRulesRepository,
@@ -93,7 +99,10 @@ class ExceptionRulesDebugReceiverRegister @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.i("Debug receiver ExceptionRulesDebugReceiver restoring exception rules")
 
         coroutineScope.launch(Dispatchers.IO) {

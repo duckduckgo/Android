@@ -20,11 +20,12 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
+import com.duckduckgo.di.scopes.AppScope
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 
 @Dao
-@Singleton
+@SingleInstanceIn(AppScope::class)
 abstract class TabsDao {
 
     @Query("select * from tabs where deletable is 0 order by position limit 1")
@@ -127,7 +128,10 @@ abstract class TabsDao {
     }
 
     @Transaction
-    open fun deleteTabAndUpdateSelection(tab: TabEntity, newSelectedTab: TabEntity? = null) {
+    open fun deleteTabAndUpdateSelection(
+        tab: TabEntity,
+        newSelectedTab: TabEntity? = null
+    ) {
         deleteTab(tab)
 
         if (newSelectedTab != null) {
@@ -158,6 +162,10 @@ abstract class TabsDao {
     }
 
     @Query("update tabs set url=:url, title=:title, viewed=:viewed where tabId=:tabId")
-    abstract fun updateUrlAndTitle(tabId: String, url: String?, title: String?, viewed: Boolean)
-
+    abstract fun updateUrlAndTitle(
+        tabId: String,
+        url: String?,
+        title: String?,
+        viewed: Boolean
+    )
 }

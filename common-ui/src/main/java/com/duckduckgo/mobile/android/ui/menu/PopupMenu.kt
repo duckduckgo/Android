@@ -25,8 +25,11 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 
-class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = inflate(layoutInflater, resourceId)) :
-    PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
+class PopupMenu(
+    layoutInflater: LayoutInflater,
+    resourceId: Int,
+    view: View = inflate(layoutInflater, resourceId)
+) : PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
 
     init {
         if (SDK_INT <= 22) {
@@ -39,14 +42,20 @@ class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = in
         animationStyle = android.R.style.Animation_Dialog
     }
 
-    fun onMenuItemClicked(menuView: View, onClick: () -> Unit) {
+    fun onMenuItemClicked(
+        menuView: View,
+        onClick: () -> Unit
+    ) {
         menuView.setOnClickListener {
             onClick()
             dismiss()
         }
     }
 
-    fun show(rootView: View, anchorView: View) {
+    fun show(
+        rootView: View,
+        anchorView: View
+    ) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
         val x = MARGIN
@@ -54,12 +63,19 @@ class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = in
         showAtLocation(rootView, Gravity.TOP or Gravity.END, x, y)
     }
 
-    fun show(rootView: View, anchorView: View, onDismiss: () -> Unit) {
+    fun show(
+        rootView: View,
+        anchorView: View,
+        onDismiss: () -> Unit
+    ) {
         show(rootView, anchorView)
         setOnDismissListener(onDismiss)
     }
 
-    fun showAnchoredToView(rootView: View, anchorView: View) {
+    fun showAnchoredToView(
+        rootView: View,
+        anchorView: View
+    ) {
         val anchorLocation = IntArray(2)
         anchorView.getLocationOnScreen(anchorLocation)
         val x = anchorLocation[0] + MARGIN
@@ -72,7 +88,10 @@ class PopupMenu(layoutInflater: LayoutInflater, resourceId: Int, view: View = in
         private const val MARGIN = 16
         private const val ELEVATION = 6f
 
-        fun inflate(layoutInflater: LayoutInflater, resourceId: Int): View {
+        fun inflate(
+            layoutInflater: LayoutInflater,
+            resourceId: Int
+        ): View {
             return layoutInflater.inflate(resourceId, null)
         }
     }

@@ -18,17 +18,26 @@ package com.duckduckgo.privacy.config.store
 
 interface PrivacyFeatureTogglesRepository {
     fun deleteAll()
-    fun get(featureName: String, defaultValue: Boolean): Boolean?
+    fun get(
+        featureName: String,
+        defaultValue: Boolean
+    ): Boolean?
+
     fun insert(toggle: PrivacyFeatureToggles)
 }
 
-class RealPrivacyFeatureTogglesRepository(private val privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore) : PrivacyFeatureTogglesRepository {
+class RealPrivacyFeatureTogglesRepository(
+    private val privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
+) : PrivacyFeatureTogglesRepository {
 
     override fun deleteAll() {
         privacyFeatureTogglesDataStore.deleteAll()
     }
 
-    override fun get(featureName: String, defaultValue: Boolean): Boolean? {
+    override fun get(
+        featureName: String,
+        defaultValue: Boolean
+    ): Boolean? {
         return privacyFeatureTogglesDataStore.get(featureName, defaultValue)
     }
 

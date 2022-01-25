@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.service
 
 import android.os.SystemClock
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -26,7 +26,7 @@ import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Singleton
+import dagger.SingleInstanceIn
 import kotlin.math.min
 
 interface VpnQueuesTimeLogger {
@@ -48,8 +48,8 @@ interface VpnQueuesTimeLogger {
 
 // This is in the App object graph because we need to share it
 // in more than one dagger subcomponent
-@Singleton
-@ContributesBinding(AppObjectGraph::class)
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     val tcpDeviceToNetwork: BlockingDeque<Packet> = LoggingLinkedBlockingDeque()
     val udpDeviceToNetwork: BlockingQueue<Packet> = LoggingLinkedBlockingDeque()
@@ -91,7 +91,11 @@ private class LoggingLinkedBlockingDeque<T> : LinkedBlockingDeque<T>() {
         return super.offer(e)
     }
 
-    override fun offer(e: T, timeout: Long, unit: TimeUnit?): Boolean {
+    override fun offer(
+        e: T,
+        timeout: Long,
+        unit: TimeUnit?
+    ): Boolean {
         updateLastOffer()
         return super.offer(e, timeout, unit)
     }

@@ -130,7 +130,10 @@ class DetectOriginatingAppPackageLegacy(
         }
     }
 
-    private data class SearchFile(val filename: String, val pattern: Pattern)
+    private data class SearchFile(
+        val filename: String,
+        val pattern: Pattern
+    )
 
     companion object {
         private const val fileNameTcpV4 = "proc/net/tcp"
@@ -140,10 +143,10 @@ class DetectOriginatingAppPackageLegacy(
 
         private const val regexFlags = Pattern.CASE_INSENSITIVE or Pattern.UNIX_LINES or Pattern.DOTALL
         private fun regex(addressLength: Int): String =
-            "\\s+\\d+:\\s([0-9A-F]{$addressLength}):([0-9A-F]{4})\\s([0-9A-F]{$addressLength}):([0-9A-F]{4})\\s([0-9A-F]{2})\\s[0-9A-F]{8}:[0-9A-F]{8}\\s[0-9A-F]{2}:[0-9A-F]{8}\\s[0-9A-F]{8}\\s+([0-9A-F]+)"
+            "\\s+\\d+:\\s([0-9A-F]{$addressLength}):([0-9A-F]{4})\\s([0-9A-F]" +
+                "{$addressLength}):([0-9A-F]{4})\\s([0-9A-F]{2})\\s[0-9A-F]{8}:[0-9A-F]{8}\\s[0-9A-F]{2}:[0-9A-F]{8}\\s[0-9A-F]{8}\\s+([0-9A-F]+)"
 
         fun ipv4RegexPattern(): Pattern = Pattern.compile(regex(8), regexFlags)
         fun ipv6RegexPattern(): Pattern = Pattern.compile(regex(32), regexFlags)
     }
-
 }

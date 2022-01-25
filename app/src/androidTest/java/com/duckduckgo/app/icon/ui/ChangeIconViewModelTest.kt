@@ -24,9 +24,9 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -96,5 +96,4 @@ class ChangeIconViewModelTest {
         verify(mockSettingsDataStore).appIcon = selectedIcon
         verify(mockCommandObserver).onChanged(Mockito.any(ChangeIconViewModel.Command.IconChanged::class.java))
     }
-
 }

@@ -20,23 +20,23 @@ import android.content.Context
 import android.os.Process
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.di.scopes.VpnObjectGraph
-import com.duckduckgo.mobile.android.vpn.di.VpnScope
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
-    scope = VpnObjectGraph::class,
+    scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@VpnScope
-class VpnServiceHeartbeatImpl @Inject constructor(
+@SingleInstanceIn(VpnScope::class)
+class VpnServiceHeartbeat @Inject constructor(
     private val context: Context,
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider
@@ -63,12 +63,15 @@ class VpnServiceHeartbeatImpl @Inject constructor(
         }
     }
 
-    override fun onVpnStopped(coroutineScope: CoroutineScope, vpnStopReason: VpnStopReason) {
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
-            VpnStopReason.Error, VpnStopReason.Revoked -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
-            VpnStopReason.SelfStop -> {
-                Timber.v("HB monitor: self stopped $vpnStopReason")
+            VpnStopReason.Error -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
+            VpnStopReason.SelfStop, VpnStopReason.Revoked -> {
+                Timber.v("HB monitor: self stopped or revoked: $vpnStopReason")
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
         }

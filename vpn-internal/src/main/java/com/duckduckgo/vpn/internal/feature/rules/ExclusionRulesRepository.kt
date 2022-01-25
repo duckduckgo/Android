@@ -20,7 +20,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRule
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 class ExclusionRulesRepository @Inject constructor(
@@ -29,7 +28,10 @@ class ExclusionRulesRepository @Inject constructor(
 ) {
     private val blockingDao = vpnDatabase.vpnAppTrackerBlockingDao()
 
-    suspend fun upsertRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
+    suspend fun upsertRule(
+        appPackageName: String,
+        domain: String
+    ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         if (rule != null) {
             val updatedRule = rule.copy(
@@ -44,14 +46,16 @@ class ExclusionRulesRepository @Inject constructor(
         }
     }
 
-    suspend fun removeRule(appPackageName: String, domain: String) = withContext(dispatcherProvider.io()) {
+    suspend fun removeRule(
+        appPackageName: String,
+        domain: String
+    ) = withContext(dispatcherProvider.io()) {
         val rule = blockingDao.getRuleByTrackerDomain(domain)
         rule?.let {
             val updatedRule = it.copy(
                 rule = it.rule,
                 packageNames = it.packageNames.toMutableSet().apply { remove(appPackageName) }.toList()
             )
-            Timber.v("aitorr rule $it / $updatedRule")
             blockingDao.insertTrackerExceptionRules(listOf(updatedRule))
         }
     }

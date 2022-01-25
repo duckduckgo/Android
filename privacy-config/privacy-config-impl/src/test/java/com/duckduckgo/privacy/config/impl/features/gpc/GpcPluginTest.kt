@@ -16,16 +16,16 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
-import com.duckduckgo.privacy.config.impl.FileUtilities
+import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyList
 
 class GpcPluginTest {
     lateinit var testee: GpcPlugin
@@ -50,7 +50,7 @@ class GpcPluginTest {
 
     @Test
     fun whenFeatureNameMatchesGpcAndIsEnabledThenStoreFeatureEnabled() {
-        val jsonString = FileUtilities.loadText("json/gpc.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/gpc.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -59,7 +59,7 @@ class GpcPluginTest {
 
     @Test
     fun whenFeatureNameMatchesGpcAndIsNotEnabledThenStoreFeatureDisabled() {
-        val jsonString = FileUtilities.loadText("json/gpc_disabled.json")
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/gpc_disabled.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
@@ -67,12 +67,12 @@ class GpcPluginTest {
     }
 
     @Test
-    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptions() {
-        val jsonString = FileUtilities.loadText("json/gpc.json")
+    fun whenFeatureNameMatchesGpcThenUpdateAllExistingExceptionsAndHeaders() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/gpc.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockGpcRepository).updateAll(ArgumentMatchers.anyList())
+        verify(mockGpcRepository).updateAll(anyList(), anyList())
     }
 
     companion object {

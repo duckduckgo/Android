@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
-import com.duckduckgo.mobile.android.themepreview.ui.component.Component.*
 import com.google.android.material.snackbar.Snackbar
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -33,44 +32,35 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         // Override in subclass if needed.
     }
 
-    class ButtonComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_buttons))
+    class ButtonComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_buttons))
 
-    class TopAppBarComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar))
+    class TopAppBarComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_top_app_bar))
 
-    class SwitchComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_switch))
+    class SwitchComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_switch))
 
-    class RadioButtonComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_radio_button))
+    class RadioButtonComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_radio_button))
 
-    class CheckboxComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
+    class CheckboxComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_checkbox))
 
     class InfoPanelComponentViewHolder(
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel))
 
     @SuppressLint("ShowToast")
-    class SnackbarComponentViewHolder(
-        parent: ViewGroup
-    ) : ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
+    class SnackbarComponentViewHolder(parent: ViewGroup) :
+        ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
 
         init {
             val container: FrameLayout = view.findViewById(R.id.snackbar_container)
-            val snackbarView = Snackbar.make(
-                container,
-                "This is a Snackbar message",
-                Snackbar.LENGTH_INDEFINITE
-            )
-                .setAction("Action") { }
-                .view
+            val snackbarView =
+                Snackbar.make(container, "This is a Snackbar message", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Action") {}
+                    .view
             (snackbarView.layoutParams as FrameLayout.LayoutParams).gravity = Gravity.CENTER
 
             container.addView(snackbarView)
@@ -83,18 +73,23 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             viewType: Int
         ): ComponentViewHolder {
             return when (Component.values()[viewType]) {
-                BUTTON -> ButtonComponentViewHolder(parent)
-                TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
-                SWITCH -> SwitchComponentViewHolder(parent)
-                RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
-                CHECKBOX -> CheckboxComponentViewHolder(parent)
-                SNACKBAR -> SnackbarComponentViewHolder(parent)
-                INFO_PANEL -> InfoPanelComponentViewHolder(parent)
-                else -> TODO()
+                Component.BUTTON -> ButtonComponentViewHolder(parent)
+                Component.TOP_APP_BAR -> TopAppBarComponentViewHolder(parent)
+                Component.SWITCH -> SwitchComponentViewHolder(parent)
+                Component.RADIO_BUTTON -> RadioButtonComponentViewHolder(parent)
+                Component.CHECKBOX -> CheckboxComponentViewHolder(parent)
+                Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
+                Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
+                else -> {
+                    TODO()
+                }
             }
         }
 
-        private fun inflate(parent: ViewGroup, layout: Int): View {
+        private fun inflate(
+            parent: ViewGroup,
+            layout: Int
+        ): View {
             return LayoutInflater.from(parent.context).inflate(layout, parent, false)
         }
     }

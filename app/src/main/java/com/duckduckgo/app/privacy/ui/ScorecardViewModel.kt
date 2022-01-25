@@ -30,7 +30,7 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.*
@@ -69,7 +69,12 @@ class ScorecardViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
-    private fun updatedState(site: Site, domain: String, isWhitelisted: Boolean, isSiteAContentBlockingException: Boolean): ViewState {
+    private fun updatedState(
+        site: Site,
+        domain: String,
+        isWhitelisted: Boolean,
+        isSiteAContentBlockingException: Boolean
+    ): ViewState {
         val grades = site.calculateGrades()
         val grade = grades.grade
         val improvedGrade = grades.improvedGrade
@@ -91,7 +96,7 @@ class ScorecardViewModel @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class ScorecardViewModelFactory @Inject constructor(
     private val viewModel: Provider<ScorecardViewModel>
 ) : ViewModelFactoryPlugin {

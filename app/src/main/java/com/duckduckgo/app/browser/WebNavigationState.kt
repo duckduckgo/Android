@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.webkit.WebBackForwardList
 import androidx.core.net.toUri
-import com.duckduckgo.app.browser.WebNavigationStateChange.*
+import com.duckduckgo.app.browser.WebNavigationStateChange.Unchanged
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
 interface WebNavigationState {
@@ -33,7 +33,11 @@ interface WebNavigationState {
 }
 
 sealed class WebNavigationStateChange {
-    data class NewPage(val url: String, val title: String?) : WebNavigationStateChange()
+    data class NewPage(
+        val url: String,
+        val title: String?
+    ) : WebNavigationStateChange()
+
     data class UrlUpdated(val url: String) : WebNavigationStateChange()
     object PageCleared : WebNavigationStateChange()
     object Unchanged : WebNavigationStateChange()
@@ -43,21 +47,21 @@ sealed class WebNavigationStateChange {
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {
     if (this == previous) {
-        return Unchanged
+        return WebNavigationStateChange.Unchanged
     }
 
     if (this is EmptyNavigationState)
-        return PageNavigationCleared
+        return WebNavigationStateChange.PageNavigationCleared
 
     if (originalUrl == null && previous?.originalUrl != null) {
-        return PageCleared
+        return WebNavigationStateChange.PageCleared
     }
 
-    val latestUrl = currentUrl ?: return Other
+    val latestUrl = currentUrl ?: return WebNavigationStateChange.Other
 
     // A new page load is identified by the original url changing
     if (originalUrl != previous?.originalUrl) {
-        return NewPage(latestUrl, title)
+        return WebNavigationStateChange.NewPage(latestUrl, title)
     }
 
     // The most up-to-date record of the url is the current one, this may change many times during a page load
@@ -65,16 +69,19 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
     if (currentUrl != previous?.currentUrl) {
 
         if (currentUrl?.toUri()?.host != previous?.currentUrl?.toUri()?.host) {
-            return NewPage(latestUrl, title)
+            return WebNavigationStateChange.NewPage(latestUrl, title)
         }
 
-        return UrlUpdated(latestUrl)
+        return WebNavigationStateChange.UrlUpdated(latestUrl)
     }
 
-    return Other
+    return WebNavigationStateChange.Other
 }
 
-data class WebViewNavigationState(private val stack: WebBackForwardList, override val progress: Int? = null) : WebNavigationState {
+data class WebViewNavigationState(
+    private val stack: WebBackForwardList,
+    override val progress: Int? = null
+) : WebNavigationState {
 
     override val originalUrl: String? = stack.originalUrl
 

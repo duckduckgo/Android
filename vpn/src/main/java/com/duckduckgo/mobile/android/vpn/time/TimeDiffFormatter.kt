@@ -29,7 +29,10 @@ import javax.inject.Inject
 
 class TimeDiffFormatter @Inject constructor(private val context: Context) {
 
-    fun formatTimePassedInDays(endLocalDateTime: LocalDateTime = LocalDateTime.now(), startLocalDateTime: LocalDateTime): String {
+    fun formatTimePassedInDays(
+        endLocalDateTime: LocalDateTime = LocalDateTime.now(),
+        startLocalDateTime: LocalDateTime
+    ): String {
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
             .run { FORMATTER_DAYS.parse(this) }
         val endDate = DatabaseDateFormatter.timestamp(endLocalDateTime).substringBefore("T")
@@ -44,7 +47,10 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
         }
     }
 
-    fun formatTimePassed(endLocalDateTime: LocalDateTime = LocalDateTime.now(), startLocalDateTime: LocalDateTime): String {
+    fun formatTimePassed(
+        endLocalDateTime: LocalDateTime = LocalDateTime.now(),
+        startLocalDateTime: LocalDateTime
+    ): String {
         val timeDifferenceMillis = Duration.between(startLocalDateTime, endLocalDateTime).toMillis()
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
             .run { FORMATTER_DAYS.parse(this) }

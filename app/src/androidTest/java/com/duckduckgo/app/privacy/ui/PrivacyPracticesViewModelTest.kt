@@ -21,15 +21,15 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
+import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.POOR
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
-import com.duckduckgo.app.runBlocking
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -58,7 +58,7 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenNoDataThenDefaultValuesAreUsed() = coroutineTestRule.runBlocking {
+    fun whenNoDataThenDefaultValuesAreUsed() = runTest {
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
 
         testee.privacyPractices("1").test {
@@ -71,7 +71,7 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = coroutineTestRule.runBlocking {
+    fun whenUrlIsUpdatedThenViewModelDomainIsUpdated() = runTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
@@ -83,7 +83,7 @@ class PrivacyPracticesViewModelTest {
     }
 
     @Test
-    fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() = coroutineTestRule.runBlocking {
+    fun whenPrivacyPracticesAreUpdatedThenViewModelPracticesAndTermsListsAreUpdated() = runTest {
         val privacyPractices = PrivacyPractices.Practices(0, POOR, listOf("good", "also good"), listOf("bad"))
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
@@ -98,12 +98,14 @@ class PrivacyPracticesViewModelTest {
         }
     }
 
-    private fun site(url: String = "", privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN): Site {
+    private fun site(
+        url: String = "",
+        privacyPractices: PrivacyPractices.Practices = PrivacyPractices.UNKNOWN
+    ): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(url)
         whenever(site.uri).thenReturn(Uri.parse(url))
         whenever(site.privacyPractices).thenReturn(privacyPractices)
         return site
     }
-
 }

@@ -21,22 +21,23 @@ import android.content.res.Resources
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.GpcException
+import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.R
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import java.io.ByteArrayInputStream
+import java.util.concurrent.CopyOnWriteArrayList
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.ByteArrayInputStream
-import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(AndroidJUnit4::class)
 class RealGpcTest {
@@ -49,12 +50,18 @@ class RealGpcTest {
 
     @Before
     fun setup() {
-        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(EXCEPTION_URL)) }
+        val exceptions =
+            CopyOnWriteArrayList<GpcException>().apply { add(GpcException(EXCEPTION_URL)) }
+        val headers =
+            CopyOnWriteArrayList<GpcHeaderEnabledSite>().apply { add(GpcHeaderEnabledSite(VALID_CONSUMER_URL)) }
         whenever(mockContext.resources).thenReturn(mockResources)
-        whenever(mockResources.openRawResource(any())).thenReturn(ByteArrayInputStream("".toByteArray()))
+        whenever(mockResources.openRawResource(any()))
+            .thenReturn(ByteArrayInputStream("".toByteArray()))
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
+        whenever(mockGpcRepository.headerEnabledSites).thenReturn(headers)
 
-        testee = RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
+        testee =
+            RealGpc(mockContext, mockFeatureToggle, mockGpcRepository, mockUnprotectedTemporary)
     }
 
     @Test
@@ -129,7 +136,9 @@ class RealGpcTest {
     fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndAndUrlIsInConsumersListsAndHeaderAlreadyExistsThenReturnFalse() {
         givenFeatureAndGpcAreEnabled()
 
-        assertFalse(testee.canUrlAddHeaders(VALID_CONSUMER_URL, mapOf(GPC_HEADER to GPC_HEADER_VALUE)))
+        assertFalse(
+            testee.canUrlAddHeaders(VALID_CONSUMER_URL, mapOf(GPC_HEADER to GPC_HEADER_VALUE))
+        )
     }
 
     @Test
@@ -148,7 +157,8 @@ class RealGpcTest {
 
     @Test
     fun whenCanUrlAddHeadersIfFeatureAndGpcAreEnabledAndUrlIsInConsumersButInTheExceptionListThenReturnFalse() {
-        val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(VALID_CONSUMER_URL)) }
+        val exceptions =
+            CopyOnWriteArrayList<GpcException>().apply { add(GpcException(VALID_CONSUMER_URL)) }
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
         givenFeatureAndGpcAreEnabled()
 
@@ -206,17 +216,20 @@ class RealGpcTest {
     }
 
     private fun givenFeatureAndGpcAreEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+            .thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }
 
     private fun givenFeatureIsEnabledButGpcIsNot() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+            .thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
     }
 
     private fun givenFeatureIsNotEnabledButGpcIsEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true)).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+            .thenReturn(false)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }
 

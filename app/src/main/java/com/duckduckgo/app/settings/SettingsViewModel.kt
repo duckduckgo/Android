@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.*
-import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -35,7 +34,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -71,7 +71,8 @@ class SettingsViewModel(
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val appBuildConfig: AppBuildConfig
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -292,7 +293,10 @@ class SettingsViewModel(
         pixel.fire(pixelName)
     }
 
-    private fun getAppLinksSettingsState(appLinksEnabled: Boolean, showAppLinksPrompt: Boolean): AppLinkSettingType {
+    private fun getAppLinksSettingsState(
+        appLinksEnabled: Boolean,
+        showAppLinksPrompt: Boolean
+    ): AppLinkSettingType {
         return if (appLinksEnabled) {
             if (showAppLinksPrompt) {
                 AppLinkSettingType.ASK_EVERYTIME
@@ -306,7 +310,7 @@ class SettingsViewModel(
 
     private fun obtainVersion(variantKey: String): String {
         val formattedVariantKey = if (variantKey.isBlank()) " " else " $variantKey "
-        return "${BuildConfig.VERSION_NAME}$formattedVariantKey(${BuildConfig.VERSION_CODE})"
+        return "${appBuildConfig.versionName}$formattedVariantKey(${appBuildConfig.versionCode})"
     }
 
     fun onAutomaticallyWhatOptionSelected(clearWhatNewSetting: ClearWhatOption) {
@@ -428,7 +432,7 @@ enum class AppLinkSettingType {
     NEVER
 }
 
-@ContributesMultibinding(AppObjectGraph::class)
+@ContributesMultibinding(AppScope::class)
 class SettingsViewModelFactory @Inject constructor(
     private val context: Provider<Context>,
     private val themingDataStore: Provider<ThemingDataStore>,
@@ -441,6 +445,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>,
     private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
+    private val appBuildConfig: Provider<AppBuildConfig>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -457,7 +462,8 @@ class SettingsViewModelFactory @Inject constructor(
                         deviceShieldOnboardingStore.get(),
                         gpc.get(),
                         featureToggle.get(),
-                        pixel.get()
+                        pixel.get(),
+                        appBuildConfig.get()
                     ) as T
                     )
                 else -> null

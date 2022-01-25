@@ -109,7 +109,10 @@ class BrokenSiteDataTest {
         assertEquals("surrogate.com", BrokenSiteData.fromSite(site).surrogates)
     }
 
-    private fun buildSite(url: String, httpsUpgraded: Boolean = false): Site {
+    private fun buildSite(
+        url: String,
+        httpsUpgraded: Boolean = false
+    ): Site {
         return SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
     }
 
