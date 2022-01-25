@@ -124,7 +124,6 @@ class AppBadHealthStateHandler @Inject constructor(
                 return@withContext false
             }
         }
-
     }
 
     private fun resetBackoff() {
@@ -175,7 +174,10 @@ class AppBadHealthStateHandler @Inject constructor(
         return (boundary == null || now >= boundary)
     }
 
-    private fun debouncedPixelBadHealth(badHealthJsonString: String, restarted: Boolean = false) {
+    private fun debouncedPixelBadHealth(
+        badHealthJsonString: String,
+        restarted: Boolean = false
+    ) {
         if (debounceJob.isActive) {
             Timber.v("debouncing bad health pixel firing")
             return

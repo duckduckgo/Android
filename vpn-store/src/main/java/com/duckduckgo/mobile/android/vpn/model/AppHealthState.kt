@@ -45,5 +45,6 @@ data class AppHealthState(
 }
 
 enum class HealthEventType {
-    BAD_HEALTH, GOOD_HEALTH
+    BAD_HEALTH,
+    GOOD_HEALTH
 }

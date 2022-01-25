@@ -32,8 +32,7 @@
         android:clipToPadding="false"
         android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listItem="@layout/view_device_shield_activity_entry"
-        />
+        tools:listItem="@layout/view_device_shield_activity_entry"/>
 
 </LinearLayout>
 

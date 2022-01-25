@@ -20,5 +20,9 @@
     <!-- Night / Dark theme colors -->
     <color name="primaryTextColor">@color/white</color>
     <color name="secondaryTextColor">@color/gray20</color>
+    <color name="splitterBg">@color/gray85</color>
 
+    <color name="primaryIconColor">@color/gray85</color>
+    <color name="accentIconColor">@color/gray80</color>
+    <color name="accentTextColor">@color/gray30</color>
 </resources>
