@@ -17,36 +17,38 @@
 package com.duckduckgo.app.browser.useragent
 
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.scopes.AppObjectGraph
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
+import dagger.SingleInstanceIn
 import dagger.multibindings.Multibinds
-import javax.inject.Singleton
 
-class UserAgentOverridePluginPoint(
-    private val userAgentOverride: Set<@JvmSuppressWildcards UserAgentOverride>
-) : PluginPoint<UserAgentOverride> {
-    override fun getPlugins(): Collection<UserAgentOverride> {
-        return userAgentOverride
+class UserAgentInterceptorPluginPoint(
+    private val userAgentInterceptor: Set<@JvmSuppressWildcards UserAgentInterceptor>
+) : PluginPoint<UserAgentInterceptor> {
+    override fun getPlugins(): Collection<UserAgentInterceptor> {
+        return userAgentInterceptor
     }
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
-abstract class UserAgentOverrideBindingModule {
+@ContributesTo(AppScope::class)
+abstract class UserAgentInterceptorBindingModule {
 
     @Multibinds
-    abstract fun provideUserAgentOverridePlugins(): Set<@JvmSuppressWildcards UserAgentOverride>
+    abstract fun provideUserAgentInterceptorPlugins(): Set<@JvmSuppressWildcards UserAgentInterceptor>
 }
 
 @Module
-@ContributesTo(AppObjectGraph::class)
+@ContributesTo(AppScope::class)
 class UserAgentPluginPointModule {
 
     @Provides
-    @Singleton
-    fun provideUserAgentOverridePluginPoint(userAgentOverride: Set<@JvmSuppressWildcards UserAgentOverride>): PluginPoint<UserAgentOverride> {
-        return UserAgentOverridePluginPoint(userAgentOverride)
+    @SingleInstanceIn(AppScope::class)
+    fun provideUserAgentInterceptorPluginPoint(
+        userAgentInterceptor: Set<@JvmSuppressWildcards UserAgentInterceptor>
+    ): PluginPoint<UserAgentInterceptor> {
+        return UserAgentInterceptorPluginPoint(userAgentInterceptor)
     }
 }

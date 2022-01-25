@@ -41,7 +41,7 @@ import javax.inject.Provider
 class UserAgentProvider constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
     private val device: DeviceInfo,
-    private val userAgentOverridePluginPoint: PluginPoint<UserAgentOverride>
+    private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -78,27 +78,14 @@ class UserAgentProvider constructor(
         }
 
         val application = if (!omitApplicationComponent) applicationComponent else null
-        return concatWithSpaces(prefix, application, safariComponent)
-    }
+        var userAgent = concatWithSpaces(prefix, application, safariComponent)
 
-    /*
-    fun userAgent(url: String? = null, isDesktop: Boolean = false): String {
-        var userAgent = UAOverride.DDG
-
-        userAgentOverridePluginPoint.getPlugins().forEach {
-            userAgent = it.overrideUserAgent()
+        userAgentInterceptorPluginPoint.getPlugins().forEach {
+            userAgent = it.intercept(userAgent)
         }
 
-        return when (userAgent) {
-            UAOverride.NO_APP_ID -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "")
-            UAOverride.NO_VERSION -> defaultDDGUserAgent(url, isDesktop).replace(AgentRegex.version, "")
-            UAOverride.DDG -> defaultDDGUserAgent(url, isDesktop)
-            UAOverride.CHROME -> defaultDDGUserAgent(url, isDesktop).replace(applicationComponent, "").replace(AgentRegex.version, "")
-            UAOverride.FIREFOX -> "Mozilla/5.0 (Android 11; Mobile; rv:94.0) Gecko/94.0 Firefox/94.0"
-            UAOverride.WEBVIEW -> defaultUserAgent
-        }
+        return userAgent
     }
-     */
 
     private fun containsExcludedPath(
         url: String?,

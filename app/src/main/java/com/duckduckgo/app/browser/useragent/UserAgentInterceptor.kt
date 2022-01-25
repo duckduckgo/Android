@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.useragent
 
-interface UserAgentOverride {
-    fun overrideUserAgent(): UAOverride
+interface UserAgentInterceptor {
+    fun intercept(userAgent: String): String
 }
 
 enum class UAOverride {

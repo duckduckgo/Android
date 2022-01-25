@@ -136,9 +136,9 @@ class UserAgentProviderTest {
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
-        userAgentOverridePluginPoint: PluginPoint<UserAgentOverride> = provideUserAgentOverridePluginPoint()
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentOverridePluginPoint()
     ): UserAgentProvider {
-        return UserAgentProvider({ Agent.DEFAULT }, device, userAgentOverridePluginPoint)
+        return UserAgentProvider({ Agent.DEFAULT }, device, userAgentInterceptorPluginPoint)
     }
 
     companion object {

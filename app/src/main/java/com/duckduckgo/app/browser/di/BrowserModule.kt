@@ -44,7 +44,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.browser.useragent.UserAgentOverride
+import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailInjector
@@ -195,9 +195,9 @@ class BrowserModule {
     fun userAgentProvider(
         @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
         deviceInfo: DeviceInfo,
-        userAgentOverridePluginPoint: PluginPoint<UserAgentOverride>
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentOverridePluginPoint)
+        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint)
     }
 
     @Provides

@@ -19,11 +19,9 @@ package com.duckduckgo.app.dev.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.app.browser.useragent.UAOverride
-import com.duckduckgo.app.browser.useragent.UserAgentOverride
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 interface DevSettingsDataStore {
@@ -32,9 +30,8 @@ interface DevSettingsDataStore {
     var selectedUA: UAOverride
 }
 
-@ContributesBinding(AppScope::class, DevSettingsDataStore::class)
-@ContributesMultibinding(AppScope::class, UserAgentOverride::class)
-class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore, UserAgentOverride {
+@ContributesBinding(AppScope::class)
+class DevSettingsSharedPreferences @Inject constructor(private val context: Context) : DevSettingsDataStore {
     override var nextTdsEnabled: Boolean
         get() = preferences.getBoolean(KEY_NEXT_TDS_ENABLED, false)
         set(enabled) = preferences.edit { putBoolean(KEY_NEXT_TDS_ENABLED, enabled) }
@@ -53,10 +50,6 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
     private fun selectedUASavedValue(): UAOverride {
         val savedValue = preferences.getString(KEY_SELECTED_UA, null) ?: return UAOverride.DDG
         return UAOverride.valueOf(savedValue)
-    }
-
-    override fun overrideUserAgent(): UAOverride {
-        return if (overrideUA) return selectedUA else UAOverride.DDG
     }
 
     companion object {

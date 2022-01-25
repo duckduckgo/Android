@@ -18,9 +18,9 @@ package com.duckduckgo.app.browser.useragent
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 
-fun provideUserAgentOverridePluginPoint(): PluginPoint<UserAgentOverride> {
-    return object : PluginPoint<UserAgentOverride> {
-        override fun getPlugins(): Collection<UserAgentOverride> {
+fun provideUserAgentOverridePluginPoint(): PluginPoint<UserAgentInterceptor> {
+    return object : PluginPoint<UserAgentInterceptor> {
+        override fun getPlugins(): Collection<UserAgentInterceptor> {
             return listOf()
         }
     }
