@@ -19,12 +19,3 @@ package com.duckduckgo.app.browser.useragent
 interface UserAgentInterceptor {
     fun intercept(userAgent: String): String
 }
-
-enum class UAOverride {
-    NO_APP_ID,
-    NO_VERSION,
-    CHROME,
-    FIREFOX,
-    DDG,
-    WEBVIEW
-}

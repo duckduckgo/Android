@@ -19,7 +19,6 @@ package com.duckduckgo.app.dev.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.duckduckgo.app.browser.useragent.UAOverride
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -58,4 +57,13 @@ class DevSettingsSharedPreferences @Inject constructor(private val context: Cont
         const val KEY_OVERRIDE_UA = "KEY_OVERRIDE_UA"
         const val KEY_SELECTED_UA = "KEY_SELECTED_UA"
     }
+}
+
+enum class UAOverride {
+    NO_APP_ID,
+    NO_VERSION,
+    CHROME,
+    FIREFOX,
+    DDG,
+    WEBVIEW
 }

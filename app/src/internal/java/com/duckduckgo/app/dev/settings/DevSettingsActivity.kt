@@ -32,7 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
-import com.duckduckgo.app.browser.useragent.UAOverride
+import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
