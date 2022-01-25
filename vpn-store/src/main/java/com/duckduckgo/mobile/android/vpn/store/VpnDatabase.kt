@@ -124,7 +124,7 @@ abstract class VpnDatabase : RoomDatabase() {
             context: Context,
             vpnDatabase: VpnDatabase
         ) {
-            context.resources.openRawResource(R.raw.full_app_trackers_blocklist_v2).bufferedReader()
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
                 .use { it.readText() }
                 .also {
                     val blocklist = getFullAppTrackerBlockingList(it)
@@ -199,6 +199,27 @@ abstract class VpnDatabase : RoomDatabase() {
                         " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
                         "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
                 )
+
+                // I hate this with all my guts but...:shrug:
+                val classLoader = this.javaClass.classLoader ?: return
+
+                val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
+                val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
+
+                classLoader.getResourceAsStream("res/raw/full_app_trackers_blocklist.json").bufferedReader()
+                    .use { it.readText() }
+                    .also {
+                        val blocklist = getFullAppTrackerBlockingList(it)
+                        blocklist.entities.forEach { entity ->
+                            val signals = stringListAdapter.toJson(entity.signals)
+                            database.execSQL(
+                                """
+                                INSERT INTO `vpn_app_tracker_entities` (trackerCompanyId, entityName, score, signals)
+                                VALUES (${entity.trackerCompanyId}, '${entity.entityName}', ${entity.score}, '$signals')
+                                """.trimIndent()
+                            )
+                        }
+                    }
             }
         }
 
