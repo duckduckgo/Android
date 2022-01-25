@@ -262,6 +262,7 @@ class DeviceShieldTrackerActivity :
 
     override fun onTurnAppTrackingProtectionOff() {
         deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        deviceShieldPixels.didChooseToDisableTrackingProtectionFromDialog()
         viewModel.onAppTpManuallyDisabled()
     }
 
