@@ -85,7 +85,6 @@
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
-            android:process=":vpn"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
             android:screenOrientation="portrait"/>
 

@@ -220,7 +220,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             setBlocking(true)
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
-            setMtu(16_000)
+            setMtu(16_384)
             configureMeteredConnection()
 
             if (vpnPreferences.isCustomDnsServerSet()) {
