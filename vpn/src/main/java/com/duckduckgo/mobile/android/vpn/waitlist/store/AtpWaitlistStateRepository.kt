@@ -30,7 +30,7 @@ interface AtpWaitlistStateRepository {
 @ContributesBinding(AppScope::class)
 class WaitlistStateRepository @Inject constructor(
     private val dataStore: AppTrackingProtectionWaitlistDataStore
-): AtpWaitlistStateRepository{
+) : AtpWaitlistStateRepository {
 
     override fun getState(): WaitlistState {
         if (didJoinBeta()) {
@@ -41,7 +41,6 @@ class WaitlistStateRepository @Inject constructor(
         }
         return WaitlistState.NotJoinedQueue
     }
-
 
     fun didJoinBeta(): Boolean = dataStore.inviteCode != null
 

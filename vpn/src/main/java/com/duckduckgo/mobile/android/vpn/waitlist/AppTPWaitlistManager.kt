@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.waitlist
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.cohort.CohortStore
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTPRedeemCodeError
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
@@ -50,7 +49,6 @@ class AndroidAppTPWaitlistManager @Inject constructor(
     private val repository: AtpWaitlistStateRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : AppTPWaitlistManager {
-
 
     override suspend fun fetchInviteCode(): FetchCodeResult {
         val token = dataStore.waitlistToken
@@ -137,4 +135,3 @@ sealed class RedeemCodeResult {
     object AlreadyRedeemed : RedeemCodeResult()
     object Failure : RedeemCodeResult()
 }
-

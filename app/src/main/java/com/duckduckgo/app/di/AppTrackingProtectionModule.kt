@@ -48,7 +48,9 @@ class AppTrackingProtectionModule {
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope
     ): TrackingProtectionWaitlistCodeFetcher {
-        return AppTrackingProtectionWaitlistCodeFetcher(workManager, atpWaitlistStateRepository, manager, notification, notificationSender, dispatcherProvider, appCoroutineScope)
+        return AppTrackingProtectionWaitlistCodeFetcher(
+            workManager, atpWaitlistStateRepository, manager, notification, notificationSender, dispatcherProvider, appCoroutineScope
+        )
     }
 
     @Provides
