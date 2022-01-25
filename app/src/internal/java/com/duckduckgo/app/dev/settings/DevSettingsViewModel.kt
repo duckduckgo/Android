@@ -18,7 +18,6 @@ package com.duckduckgo.app.dev.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.useragent.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore

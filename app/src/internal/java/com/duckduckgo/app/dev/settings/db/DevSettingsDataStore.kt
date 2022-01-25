@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.app.browser.useragent.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentOverride
-import com.duckduckgo.di.scopes.AppObjectGraph
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject

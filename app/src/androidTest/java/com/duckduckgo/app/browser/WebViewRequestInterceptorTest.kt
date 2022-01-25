@@ -25,7 +25,6 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
-import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates

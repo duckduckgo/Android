@@ -133,7 +133,11 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
-    private fun getUserAgentProvider(defaultUserAgent: String, device: DeviceInfo, userAgentOverridePluginPoint: PluginPoint<UserAgentOverride> = provideUserAgentOverridePluginPoint()): UserAgentProvider {
+    private fun getUserAgentProvider(
+        defaultUserAgent: String,
+        device: DeviceInfo,
+        userAgentOverridePluginPoint: PluginPoint<UserAgentOverride> = provideUserAgentOverridePluginPoint()
+    ): UserAgentProvider {
         return UserAgentProvider({ Agent.DEFAULT }, device, userAgentOverridePluginPoint)
     }
 
