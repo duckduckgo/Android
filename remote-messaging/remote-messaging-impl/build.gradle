@@ -46,7 +46,14 @@ dependencies {
     kapt AndroidX.room.compiler
 
     testImplementation project(path: ':common-test')
+    testImplementation "org.threeten:threetenbp:_"
     testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 
     androidTestImplementation project(path: ':common-test')
     androidTestImplementation AndroidX.archCore.testing

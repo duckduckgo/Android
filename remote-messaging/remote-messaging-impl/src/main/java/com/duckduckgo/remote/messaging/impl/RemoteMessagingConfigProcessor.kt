@@ -18,13 +18,12 @@ package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
-import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import timber.log.Timber
 
 interface RemoteMessagingConfigProcessor {
-    suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig
+    suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig)
 }
 
 class RealRemoteMessagingConfigProcessor(
@@ -32,7 +31,7 @@ class RealRemoteMessagingConfigProcessor(
     private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository
 ) : RemoteMessagingConfigProcessor {
 
-    override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
+    override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {
         Timber.i("RMF: process ${jsonRemoteMessagingConfig.version}")
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
@@ -50,7 +49,5 @@ class RealRemoteMessagingConfigProcessor(
         } else {
             Timber.i("RMF: skip")
         }
-
-        return RemoteConfig(emptyList(), emptyMap())
     }
 }
