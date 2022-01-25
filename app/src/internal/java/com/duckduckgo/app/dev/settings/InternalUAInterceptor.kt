@@ -29,7 +29,7 @@ import javax.inject.Provider
 @ContributesMultibinding(AppScope::class)
 class InternalUAInterceptor @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
-    private val device: DeviceInfo,
+    device: DeviceInfo,
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
 ) : UserAgentInterceptor {
 
