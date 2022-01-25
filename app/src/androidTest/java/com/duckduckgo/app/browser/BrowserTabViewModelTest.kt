@@ -3732,6 +3732,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
         testee.handleCloakedTrackingLink(initialUrl = "example.com")
+        verify(mockTrackingLinkDetector).isProcessingTrackingLink = true
         assertCommandIssued<Command.ExtractUrlFromTrackingLink>()
     }
 
@@ -3740,6 +3741,7 @@ class BrowserTabViewModelTest {
         val trackingLinkInfo = TrackingLinkInfo("https://foo.com")
         whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingLinkDetector).isProcessingTrackingLink = false
         assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
         assertEquals("http://twitter.com/explore", trackingLinkInfo.destinationUrl)
     }
@@ -3749,6 +3751,7 @@ class BrowserTabViewModelTest {
         val trackingLinkInfo = TrackingLinkInfo("https://foo.com", "https://bar.com")
         whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingLinkDetector).isProcessingTrackingLink = false
         assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
         assertEquals("https://bar.com", trackingLinkInfo.destinationUrl)
     }
@@ -3758,6 +3761,7 @@ class BrowserTabViewModelTest {
         val trackingLinkInfo = null
         whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingLinkDetector).isProcessingTrackingLink = false
         assertNull(trackingLinkInfo)
     }
 

@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.urlextraction
 
 import android.webkit.CookieManager
 import android.webkit.WebView
+import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.*
@@ -27,11 +28,15 @@ import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class UrlExtractingWebViewClientTest {
@@ -71,5 +76,50 @@ class UrlExtractingWebViewClientTest {
     fun whenOnPageStartedCalledThenInjectUrlExtractionJS() {
         testee.onPageStarted(mockWebView, BrowserWebViewClientTest.EXAMPLE_URL, null)
         verify(urlExtractor).injectUrlExtractionJS(mockWebView)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledIfUrlIsNullThenDoNotInjectGpcToDom() = runTest {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, null, null)
+        verify(gpc, never()).getGpcJs()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledIfUrlIsValidThenInjectGpcToDom() = runTest {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(true)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        verify(gpc).getGpcJs()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledIfUrlIsNotAndValidThenDoNotInjectGpcToDom() = runTest {
+        whenever(gpc.canGpcBeUsedByUrl(any())).thenReturn(false)
+
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        verify(gpc, never()).getGpcJs()
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedCalledThenProcessUriForThirdPartyCookiesCalled() = runTest {
+        testee.onPageStarted(mockWebView, EXAMPLE_URL, null)
+        verify(thirdPartyCookieManager).processUriForThirdPartyCookies(mockWebView, EXAMPLE_URL.toUri())
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageFinishedCalledThenFlushCookies() {
+        testee.onPageFinished(mockWebView, null)
+        verify(cookieManager).flush()
+    }
+
+    companion object {
+        const val EXAMPLE_URL = "example.com"
     }
 }
