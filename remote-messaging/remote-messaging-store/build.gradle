@@ -25,4 +25,10 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+
+    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
 }
