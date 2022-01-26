@@ -36,8 +36,11 @@ class RealRemoteMessagingConfigProcessorTest {
 
     private val remoteMessagingConfigJsonMapper = mock<RemoteMessagingConfigJsonMapper>()
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
+    private val remoteMessagingConfigMatcher = mock<RemoteMessagingConfigMatcher>()
 
-    private val testee = RealRemoteMessagingConfigProcessor(remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository)
+    private val testee = RealRemoteMessagingConfigProcessor(
+        remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository, remoteMessagingConfigMatcher
+    )
 
     @Test
     fun whenNewVersionThenEvaluate() = runTest {
