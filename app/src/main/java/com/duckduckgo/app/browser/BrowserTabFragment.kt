@@ -20,7 +20,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
-import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -133,11 +132,9 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_settings_general.*
@@ -170,6 +167,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
@@ -272,6 +270,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     var messageFromPreviousTab: Message? = null
 
@@ -727,8 +728,7 @@ class BrowserTabFragment :
                 )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
-            is Command.LaunchAddWidget -> launchAddWidget()
-            is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
@@ -1766,19 +1766,6 @@ class BrowserTabFragment :
         context?.let {
             startActivity(SurveyActivity.intent(it, survey))
         }
-    }
-
-    @SuppressLint("NewApi")
-    private fun launchAddWidget() {
-        val context = context ?: return
-        val provider = ComponentName(context, SearchAndFavoritesWidget::class.java)
-        AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
-    }
-
-    private fun launchLegacyAddWidget() {
-        val context = context ?: return
-        val options = ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
-        startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
     private fun finishTrackerAnimation() {

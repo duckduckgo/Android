@@ -648,6 +648,17 @@ class SettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenHomeScreenWidgetSettingClickedThenEmitCommandLaunchAddHomeScreenWidget() = runTest {
+        testee.commands().test {
+            testee.userRequestedToAddHomeScreenWidget()
+
+            assertEquals(Command.LaunchAddHomeScreenWidget, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
