@@ -50,7 +50,6 @@ import javax.inject.Inject
 class HealthMetricCounter @Inject constructor(
     val context: Context,
     @VpnCoroutineScope val coroutineScope: CoroutineScope,
-    val tracerPacketRegister: TracerPacketRegister
 ) {
 
     private val db = Room.inMemoryDatabaseBuilder(context, HealthStatsDatabase::class.java).build()
@@ -60,7 +59,6 @@ class HealthMetricCounter @Inject constructor(
     fun clearAllMetrics() {
         coroutineScope.launch(databaseDispatcher) {
             db.clearAllTables()
-            tracerPacketRegister.deleteAll()
         }
     }
 
@@ -129,13 +127,5 @@ class HealthMetricCounter @Inject constructor(
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.purgeOldMetrics()
         }
-    }
-
-    fun getAllPacketTraces(timeWindowMillis: Long): List<TracerPacketRegister.TracerSummary> {
-        return tracerPacketRegister.getAllTraces(timeWindowMillis)
-    }
-
-    fun logTracerPacketEvent(tracerEvent: TracerEvent) {
-        tracerPacketRegister.logTracerPacketEvent(tracerEvent)
     }
 }
