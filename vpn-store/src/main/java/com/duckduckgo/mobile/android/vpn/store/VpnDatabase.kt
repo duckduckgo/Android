@@ -109,6 +109,12 @@ abstract class VpnDatabase : RoomDatabase() {
                             prepopulateAppTrackerExceptionRules(context, getInstance(context))
                         }
                     }
+
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        ioThread {
+                            prepopulateTrackerEntities(context, getInstance(context))
+                        }
+                    }
                 })
                 .build()
         }
@@ -117,6 +123,22 @@ abstract class VpnDatabase : RoomDatabase() {
             val uuid = UUID.randomUUID().toString()
             getInstance(context).vpnStateDao().insert(VpnState(uuid = uuid))
             Timber.w("VPNDatabase: UUID pre-populated as $uuid")
+        }
+
+        internal fun prepopulateTrackerEntities(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+                .use { it.readText() }
+                .also {
+                    val blocklist = getFullAppTrackerBlockingList(it)
+                    with(vpnDatabase.vpnAppTrackerBlockingDao()) {
+                        if (!hasTrackerEntities()){
+                            insertTrackerEntities(blocklist.entities)
+                        }
+                    }
+                }
         }
 
         @VisibleForTesting
@@ -199,27 +221,6 @@ abstract class VpnDatabase : RoomDatabase() {
                         " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
                         "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
                 )
-
-                // I hate this with all my guts but...:shrug:
-                val classLoader = this.javaClass.classLoader ?: return
-
-                val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
-                val stringListAdapter: JsonAdapter<List<String>> = Moshi.Builder().build().adapter(stringListType)
-
-                classLoader.getResourceAsStream("res/raw/full_app_trackers_blocklist.json").bufferedReader()
-                    .use { it.readText() }
-                    .also {
-                        val blocklist = getFullAppTrackerBlockingList(it)
-                        blocklist.entities.forEach { entity ->
-                            val signals = stringListAdapter.toJson(entity.signals)
-                            database.execSQL(
-                                """
-                                INSERT INTO `vpn_app_tracker_entities` (trackerCompanyId, entityName, score, signals)
-                                VALUES (${entity.trackerCompanyId}, '${entity.entityName}', ${entity.score}, '$signals')
-                                """.trimIndent()
-                            )
-                        }
-                    }
             }
         }
 
