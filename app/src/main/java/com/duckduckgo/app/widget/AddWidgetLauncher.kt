@@ -30,7 +30,6 @@ import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -39,7 +38,6 @@ interface AddWidgetLauncher {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class AddWidgetCompatLauncher @Inject constructor(
     @Named("appWidgetManagerAddWidgetLauncher") private val defaultAddWidgetLauncher: AddWidgetLauncher,
     @Named("legacyAddWidgetLauncher") private val legacyAddWidgetLauncher: AddWidgetLauncher,
@@ -53,7 +51,6 @@ class AddWidgetCompatLauncher @Inject constructor(
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 @Named("appWidgetManagerAddWidgetLauncher")
 class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
     companion object {
@@ -85,7 +82,6 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor() : AddWidgetLaunche
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 @Named("legacyAddWidgetLauncher")
 class LegacyAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
     override fun launchAddWidget(activity: Activity?) {
