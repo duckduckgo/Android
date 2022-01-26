@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,6 @@
 
 package com.duckduckgo.remote.messaging.store
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
-@Entity(tableName = "remote_messaging")
-data class RemoteMessagingConfig(
-    @PrimaryKey
-    val id: Int = 1,
-    val version: Long,
-    val invalidate: Boolean = false,
-    val evaluationTimestamp: String = databaseTimestampFormatter().format(LocalDateTime.now())
-)
+internal fun databaseTimestampFormatter() = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")

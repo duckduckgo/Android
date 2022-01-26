@@ -16,10 +16,14 @@
 
 package com.duckduckgo.remote.messaging.store
 
+import org.threeten.bp.LocalDateTime
+
 interface RemoteMessagingConfigRepository {
     fun insert(remoteMessagingConfig: RemoteMessagingConfig)
     fun get(): RemoteMessagingConfig
     fun delete()
+    fun expired(): Boolean
+    fun invalidated(): Boolean
 }
 
 class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : RemoteMessagingConfigRepository {
@@ -36,5 +40,14 @@ class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : 
 
     override fun delete() {
         dao.delete()
+    }
+
+    override fun expired(): Boolean {
+        val yesterday = databaseTimestampFormatter().format(LocalDateTime.now().minusDays(1L))
+        return get().evaluationTimestamp < yesterday
+    }
+
+    override fun invalidated(): Boolean {
+        return get().invalidate
     }
 }
