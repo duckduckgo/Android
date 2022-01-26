@@ -39,6 +39,7 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
         rawMetrics["tunInputs"] = Metric(tunInputs.toString())
+        rawMetrics["unknownPackets"] = Metric(queueReads.unknownPackets.toString())
         rawMetrics["queueReads"] = Metric(queueReads.queueReads.toString())
         rawMetrics["queueTCPReads"] = Metric(queueReads.queueTCPReads.toString())
         rawMetrics["queueUDPReads"] = Metric(queueReads.queueUDPReads.toString())
@@ -177,4 +178,5 @@ data class QueueReads(
     val queueReads: Long,
     val queueTCPReads: Long,
     val queueUDPReads: Long,
+    val unknownPackets: Long,
 )

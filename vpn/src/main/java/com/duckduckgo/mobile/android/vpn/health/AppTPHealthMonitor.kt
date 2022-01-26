@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
@@ -171,13 +172,19 @@ class AppTPHealthMonitor @Inject constructor(
         healthAlerts: HealthRule
     ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
+        val unknownPackets = healthMetricCounter.getStat(TUN_READ_UNKNOWN_PACKET(), timeWindow)
         val readFromNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val readFromTCPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val readFromUDPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
 
         val state = healthClassifier.determineHealthTunInputQueueReadRatio(
             tunReads,
-            QueueReads(queueReads = readFromNetworkQueue, queueTCPReads = readFromTCPNetworkQueue, queueUDPReads = readFromUDPNetworkQueue)
+            QueueReads(
+                queueReads = readFromNetworkQueue,
+                queueTCPReads = readFromTCPNetworkQueue,
+                queueUDPReads = readFromUDPNetworkQueue,
+                unknownPackets = unknownPackets
+            )
         )
         healthAlerts.updateAlert(state)
         return state
