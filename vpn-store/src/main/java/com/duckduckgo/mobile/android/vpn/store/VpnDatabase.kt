@@ -134,7 +134,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 .also {
                     val blocklist = getFullAppTrackerBlockingList(it)
                     with(vpnDatabase.vpnAppTrackerBlockingDao()) {
-                        if (!hasTrackerEntities()){
+                        if (!hasTrackerEntities()) {
                             insertTrackerEntities(blocklist.entities)
                         }
                     }
