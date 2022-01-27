@@ -50,6 +50,9 @@ interface VpnAppTrackerBlockingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAppPackages(appPackages: List<AppTrackerPackage>)
 
+    @Query("select count(1) > 0 from vpn_app_tracker_entities")
+    fun hasTrackerEntities(): Boolean
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTrackerEntities(signals: List<AppTrackerEntity>)
 

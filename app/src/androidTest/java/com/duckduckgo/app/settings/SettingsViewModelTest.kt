@@ -38,8 +38,8 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import org.mockito.kotlin.*
@@ -84,7 +84,7 @@ class SettingsViewModelTest {
     lateinit var mockContext: Context
 
     @Mock
-    private lateinit var appTPWaitlistManager: TrackingProtectionWaitlistManager
+    private lateinit var appTPRepository: AtpWaitlistStateRepository
 
     @Mock
     private lateinit var mockGpc: Gpc
@@ -112,7 +112,7 @@ class SettingsViewModelTest {
             mockDefaultBrowserDetector,
             mockVariantManager,
             mockFireAnimationLoader,
-            appTPWaitlistManager,
+            appTPRepository,
             mockDeviceShieldOnboarding,
             mockGpc,
             mockFeatureToggle,
@@ -125,7 +125,7 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
+        whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
@@ -570,7 +570,7 @@ class SettingsViewModelTest {
         testee.commands().test {
 
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
-            whenever(appTPWaitlistManager.didJoinBeta()).thenReturn(true)
+            whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
             testee.onAppTPSettingClicked()
 
@@ -585,7 +585,7 @@ class SettingsViewModelTest {
         testee.commands().test {
 
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
-            whenever(appTPWaitlistManager.didJoinBeta()).thenReturn(true)
+            whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
             testee.onAppTPSettingClicked()
 
@@ -599,7 +599,7 @@ class SettingsViewModelTest {
     fun whenUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
         testee.commands().test {
 
-            whenever(appTPWaitlistManager.didJoinBeta()).thenReturn(false)
+            whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
 
             testee.onAppTPSettingClicked()
 
@@ -613,7 +613,7 @@ class SettingsViewModelTest {
     fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
-            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.NotJoinedQueue)
+            whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
 
             testee.onAppTPSettingClicked()
 
@@ -627,7 +627,7 @@ class SettingsViewModelTest {
     fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
-            whenever(appTPWaitlistManager.waitlistState()).thenReturn(WaitlistState.JoinedQueue(false))
+            whenever(appTPRepository.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
 
             testee.onAppTPSettingClicked()
 
@@ -643,6 +643,17 @@ class SettingsViewModelTest {
             testee.onEmailProtectionSettingClicked()
 
             assertEquals(Command.LaunchEmailProtection, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenHomeScreenWidgetSettingClickedThenEmitCommandLaunchAddHomeScreenWidget() = runTest {
+        testee.commands().test {
+            testee.userRequestedToAddHomeScreenWidget()
+
+            assertEquals(Command.LaunchAddHomeScreenWidget, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

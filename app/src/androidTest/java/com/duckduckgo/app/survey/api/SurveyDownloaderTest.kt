@@ -23,6 +23,8 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import org.mockito.kotlin.*
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -37,8 +39,9 @@ class SurveyDownloaderTest {
     private var mockService: SurveyService = mock()
     private var mockEmailManager: EmailManager = mock()
     private var mockAtpCohortManager: AtpCohortManager = mock()
+    private var mockAtpWaitlistState: AtpWaitlistStateRepository = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager)
+    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager, mockAtpWaitlistState)
 
     @get:Rule
     @Suppress("unused")
@@ -62,6 +65,34 @@ class SurveyDownloaderTest {
 
         verify(mockService, never()).survey()
         verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsWaitlistSurveyAndUserHasJoinedWaitlistThenReturnAppTpWaitlistSurvey() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPWaitlist("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+        whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsWaitlistSurveyAndUserHasNotJoinedWaitlistThenNoSurveyScheduled() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPWaitlist("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+        whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao, never()).insert(any())
         verify(mockDao).deleteUnusedSurveys()
     }
 
@@ -153,30 +184,37 @@ class SurveyDownloaderTest {
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAtp(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, null, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
+        )
+        return SurveyGroup(id, surveyOptions)
+    }
+
+    private fun surveyWithAllocationForAppTPWaitlist(id: String): SurveyGroup {
+        val surveyOptions = listOf(
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, true, true, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }

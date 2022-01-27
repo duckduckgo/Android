@@ -20,7 +20,6 @@ import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
-import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
@@ -74,7 +73,6 @@ constructor(
     tcpSocketWriter: TcpSocketWriter,
     recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope,
-    tracerPacketRegister: TracerPacketRegister,
     healthMetricCounter: HealthMetricCounter
 ) : Runnable {
 
@@ -116,7 +114,6 @@ constructor(
             payloadBytesExtractor = payloadBytesExtractor,
             recentAppTrackerCache = recentAppTrackerCache,
             vpnCoroutineScope = vpnCoroutineScope,
-            tracerRegister = tracerPacketRegister,
             healthMetricCounter = healthMetricCounter
         )
 

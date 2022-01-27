@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.processor
 import android.os.ParcelFileDescriptor
 import android.os.Process
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -33,7 +34,8 @@ import java.nio.channels.FileChannel
 class TunPacketReader @AssistedInject constructor(
     @Assisted private val tunInterface: ParcelFileDescriptor,
     private val queues: VpnQueues,
-    private val healthMetricCounter: HealthMetricCounter
+    private val healthMetricCounter: HealthMetricCounter,
+    private val deviceShieldPixels: DeviceShieldPixels,
 ) : Runnable {
 
     private var running = false
@@ -97,6 +99,9 @@ class TunPacketReader @AssistedInject constructor(
         } else if (packet.isTCP) {
             queues.tcpDeviceToNetwork.offer(packet)
             healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+        } else {
+            healthMetricCounter.onTunUnknownPacketReceived()
+            deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
         }
     }
 

@@ -109,6 +109,12 @@ abstract class VpnDatabase : RoomDatabase() {
                             prepopulateAppTrackerExceptionRules(context, getInstance(context))
                         }
                     }
+
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        ioThread {
+                            prepopulateTrackerEntities(context, getInstance(context))
+                        }
+                    }
                 })
                 .build()
         }
@@ -119,12 +125,28 @@ abstract class VpnDatabase : RoomDatabase() {
             Timber.w("VPNDatabase: UUID pre-populated as $uuid")
         }
 
+        internal fun prepopulateTrackerEntities(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+                .use { it.readText() }
+                .also {
+                    val blocklist = getFullAppTrackerBlockingList(it)
+                    with(vpnDatabase.vpnAppTrackerBlockingDao()) {
+                        if (!hasTrackerEntities()) {
+                            insertTrackerEntities(blocklist.entities)
+                        }
+                    }
+                }
+        }
+
         @VisibleForTesting
         internal fun prepopulateAppTrackerBlockingList(
             context: Context,
             vpnDatabase: VpnDatabase
         ) {
-            context.resources.openRawResource(R.raw.full_app_trackers_blocklist_v2).bufferedReader()
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
                 .use { it.readText() }
                 .also {
                     val blocklist = getFullAppTrackerBlockingList(it)

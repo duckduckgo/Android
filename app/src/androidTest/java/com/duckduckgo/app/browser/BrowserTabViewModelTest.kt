@@ -2060,11 +2060,11 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchLegacyAddWidgetCommand() {
+    fun whenUserClickedLegacyAddWidgetCtaButtonThenLaunchAddWidgetCommand() {
         val cta = HomePanelCta.AddWidgetInstructions
         setCta(cta)
         testee.onUserClickCtaOkButton()
-        assertCommandIssued<Command.LaunchLegacyAddWidget>()
+        assertCommandIssued<Command.LaunchAddWidget>()
     }
 
     @Test

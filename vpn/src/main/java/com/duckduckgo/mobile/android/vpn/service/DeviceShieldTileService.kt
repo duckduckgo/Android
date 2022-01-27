@@ -26,7 +26,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import dagger.android.AndroidInjection
 import dagger.binding.TileServiceBingingKey
 import javax.inject.Inject
@@ -37,7 +38,7 @@ import timber.log.Timber
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
-    @Inject lateinit var waitlistManager: TrackingProtectionWaitlistManager
+    @Inject lateinit var repository: AtpWaitlistStateRepository
 
     private var deviceShieldStatePollingJob = ConflatedJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -48,7 +49,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     override fun onClick() {
-        if (waitlistManager.didJoinBeta()) {
+        if (repository.getState() == WaitlistState.InBeta) {
             respondToTile()
         } else {
             launchActivity(Class.forName("com.duckduckgo.app.settings.SettingsActivity"))

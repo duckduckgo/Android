@@ -20,7 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +36,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCoroutinesApi
 class AppTPWaitlistRedeemCodeViewModelTest {
 
-    private val manager: TrackingProtectionWaitlistManager = mock()
+    private val manager: AppTPWaitlistManager = mock()
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
