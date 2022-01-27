@@ -106,8 +106,10 @@ class BrokenSiteViewModel(
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
 
-            val brokenSite = if (trackingLinkDetector.lastTrackingLinkInfo?.destinationUrl == url) {
-                getBrokenSite(trackingLinkDetector.lastTrackingLinkInfo!!.trackingLink, webViewVersion)
+            val lastTrackingInfo = trackingLinkDetector.lastTrackingLinkInfo
+
+            val brokenSite = if (lastTrackingInfo?.destinationUrl == url) {
+                getBrokenSite(lastTrackingInfo.trackingLink, webViewVersion)
             } else {
                 getBrokenSite(url, webViewVersion)
             }
