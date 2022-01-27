@@ -59,4 +59,13 @@ class UrlExtractingWebView(
     private fun disableWebSql(settings: WebSettings) {
         settings.databaseEnabled = false
     }
+
+    fun destroyWebView() {
+        stopLoading()
+        clearHistory()
+        loadUrl("about:blank")
+        onPause()
+        removeAllViews()
+        destroy()
+    }
 }

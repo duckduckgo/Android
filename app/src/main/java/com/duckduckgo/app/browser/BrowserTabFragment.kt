@@ -822,12 +822,7 @@ class BrowserTabFragment :
     }
 
     private fun destroyUrlExtractingWebView() {
-        urlExtractingWebView?.stopLoading()
-        urlExtractingWebView?.clearHistory()
-        urlExtractingWebView?.loadUrl("about:blank")
-        urlExtractingWebView?.onPause()
-        urlExtractingWebView?.removeAllViews()
-        urlExtractingWebView?.destroy()
+        urlExtractingWebView?.destroyWebView()
         urlExtractingWebView = null
     }
 
