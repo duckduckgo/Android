@@ -46,7 +46,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
-open class BrowserWebViewClient(
+class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
