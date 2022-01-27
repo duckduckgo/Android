@@ -21,14 +21,13 @@ import android.webkit.WebView
 import androidx.annotation.UiThread
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionJavascriptInterface.Companion.URL_EXTRACTION_JAVASCRIPT_INTERFACE_NAME
-import javax.inject.Inject
 
 interface DOMUrlExtractor {
     fun addUrlExtraction(webView: WebView, onUrlExtracted: (extractedUrl: String?) -> Unit)
     fun injectUrlExtractionJS(webView: WebView)
 }
 
-class JsUrlExtractor @Inject constructor() : DOMUrlExtractor {
+class JsUrlExtractor : DOMUrlExtractor {
     private val javaScriptDetector = JavaScriptDetector()
 
     override fun addUrlExtraction(webView: WebView, onUrlExtracted: (extractedUrl: String?) -> Unit) {
