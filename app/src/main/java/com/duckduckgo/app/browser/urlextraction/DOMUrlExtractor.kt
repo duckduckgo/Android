@@ -36,25 +36,17 @@ class JsUrlExtractor : DOMUrlExtractor {
 
     @UiThread
     override fun injectUrlExtractionJS(webView: WebView) {
-        webView.evaluateJavascript("javascript:${javaScriptDetector.urlExtractionEventsDetector(webView.context)}", null)
+        webView.evaluateJavascript("javascript:${javaScriptDetector.getUrlExtractionJS(webView.context)}", null)
     }
 
     private class JavaScriptDetector {
-        private lateinit var handlers: String
+        private lateinit var functions: String
 
-        fun urlExtractionEventsDetector(context: Context): String {
-            return wrapIntoAnonymousFunction(getUrlExtractionJS(context))
-        }
-
-        private fun getUrlExtractionJS(context: Context): String {
-            if (!this::handlers.isInitialized) {
-                handlers = context.resources.openRawResource(R.raw.url_extraction).bufferedReader().use { it.readText() }
+        fun getUrlExtractionJS(context: Context): String {
+            if (!this::functions.isInitialized) {
+                functions = context.resources.openRawResource(R.raw.url_extraction).bufferedReader().use { it.readText() }
             }
-            return handlers
-        }
-
-        private fun wrapIntoAnonymousFunction(rawJavaScript: String): String {
-            return "(function() { $rawJavaScript })();"
+            return functions
         }
     }
 }
