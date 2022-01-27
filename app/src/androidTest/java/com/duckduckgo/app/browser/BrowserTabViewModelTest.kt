@@ -3733,7 +3733,7 @@ class BrowserTabViewModelTest {
     fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
         testee.handleCloakedTrackingLink(initialUrl = "example.com")
         verify(mockTrackingLinkDetector).isProcessingTrackingLink = true
-        assertCommandIssued<Command.ExtractUrlFromTrackingLink>()
+        assertCommandIssued<Command.ExtractUrlFromCloakedTrackingLink>()
     }
 
     @Test
@@ -3778,8 +3778,8 @@ class BrowserTabViewModelTest {
             .thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromTrackingLink }
-        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromTrackingLink).initialUrl)
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromCloakedTrackingLink }
+        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromCloakedTrackingLink).initialUrl)
     }
 
     @Test

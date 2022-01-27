@@ -743,7 +743,7 @@ class BrowserTabFragment :
                     headers = it.headers
                 )
             }
-            is Command.ExtractUrlFromTrackingLink -> {
+            is Command.ExtractUrlFromCloakedTrackingLink -> {
                 extractUrlFromTrackingLink(it.initialUrl)
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)

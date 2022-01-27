@@ -51,7 +51,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Inva
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
-import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
@@ -336,7 +335,7 @@ class BrowserTabViewModel(
 
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
-        class ExtractUrlFromTrackingLink(val initialUrl: String) : Command()
+        class ExtractUrlFromCloakedTrackingLink(val initialUrl: String) : Command()
         class AddHomeShortcut(
             val title: String,
             val url: String,
@@ -2443,7 +2442,7 @@ class BrowserTabViewModel(
 
     override fun handleCloakedTrackingLink(initialUrl: String) {
         startProcessingTrackingLink()
-        command.value = ExtractUrlFromTrackingLink(initialUrl)
+        command.value = ExtractUrlFromCloakedTrackingLink(initialUrl)
     }
 
     override fun startProcessingTrackingLink() {
