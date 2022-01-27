@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.di.scopes.AppScope
@@ -31,6 +32,7 @@ import javax.inject.Provider
 
 class OnboardingViewModel(
     private val userStageStore: UserStageStore,
+    private val onboardingStore: OnboardingStore,
     private val pageLayoutManager: OnboardingPageManager,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
@@ -50,7 +52,8 @@ class OnboardingViewModel(
     fun onOnboardingDone() {
         // Executing this on IO to avoid any delay changing threads between Main-IO.
         viewModelScope.launch(dispatchers.io()) {
-            userStageStore.stageCompleted(AppStage.NEW)
+            val newAppStage = if (onboardingStore.userMarkedAsReturningUser) AppStage.DAX_ONBOARDING else AppStage.NEW
+            userStageStore.stageCompleted(newAppStage)
         }
     }
 }
@@ -58,6 +61,7 @@ class OnboardingViewModel(
 @ContributesMultibinding(AppScope::class)
 class OnboardingViewModelFactory @Inject constructor(
     private val userStageStore: Provider<UserStageStore>,
+    private val onboardingStore: Provider<OnboardingStore>,
     private val pageLayoutManager: Provider<OnboardingPageManager>,
     private val dispatchers: Provider<DispatcherProvider>
 ) : ViewModelFactoryPlugin {
@@ -67,6 +71,7 @@ class OnboardingViewModelFactory @Inject constructor(
                 isAssignableFrom(OnboardingViewModel::class.java) -> (
                     OnboardingViewModel(
                         userStageStore.get(),
+                        onboardingStore.get(),
                         pageLayoutManager.get(),
                         dispatchers.get()
                     ) as T
