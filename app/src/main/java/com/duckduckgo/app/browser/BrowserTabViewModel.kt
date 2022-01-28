@@ -468,6 +468,7 @@ class BrowserTabViewModel(
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
+    private var isProcessingTrackingLink = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1099,7 +1100,7 @@ class BrowserTabViewModel(
                 lastTrackingInfo.destinationUrl = url
             }
         }
-        finishProcessingTrackingLink()
+        isProcessingTrackingLink = false
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1239,11 +1240,10 @@ class BrowserTabViewModel(
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
 
-        val isLoading = newProgress < 100
+        val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
-        val isProcessingAmpLink = trackingLinkDetector.isProcessingTrackingLink
         if (progress.progress == newProgress) return
-        val visualProgress = if (newProgress < FIXED_PROGRESS || isProcessingAmpLink) {
+        val visualProgress = if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
             FIXED_PROGRESS
         } else {
             newProgress
@@ -1253,8 +1253,8 @@ class BrowserTabViewModel(
 
         val showLoadingGrade = progress.privacyOn || isLoading
         privacyGradeViewState.value = currentPrivacyGradeState().copy(
-            shouldAnimate = isLoading || isProcessingAmpLink,
-            showEmptyGrade = showLoadingGrade || isProcessingAmpLink
+            shouldAnimate = isLoading,
+            showEmptyGrade = showLoadingGrade
         )
 
         if (newProgress == 100) {
@@ -2441,16 +2441,12 @@ class BrowserTabViewModel(
     }
 
     override fun handleCloakedTrackingLink(initialUrl: String) {
-        startProcessingTrackingLink()
+        isProcessingTrackingLink = true
         command.value = ExtractUrlFromCloakedTrackingLink(initialUrl)
     }
 
     override fun startProcessingTrackingLink() {
-        trackingLinkDetector.isProcessingTrackingLink = true
-    }
-
-    private fun finishProcessingTrackingLink() {
-        trackingLinkDetector.isProcessingTrackingLink = false
+        isProcessingTrackingLink = true
     }
 
     fun updateLastTrackingLink(url: String) {
