@@ -36,7 +36,7 @@ class RealCohortCalculatorTest {
 
     @Test
     fun whenLocalDateIsFirstDayOfLastDayOf2021ThenReturnCohort() {
-        val date = LocalDate.of(2022, 1, 1,)
+        val date = LocalDate.of(2022, 1, 1)
 
         assertEquals("2021-week-52", cohortCalculator.calculateCohortForDate(date))
     }

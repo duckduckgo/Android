@@ -22,7 +22,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +32,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class AppTPWaitlistRedeemCodeViewModel(
-    private val waitlistManager: TrackingProtectionWaitlistManager,
+    private val waitlistManager: AppTPWaitlistManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -67,7 +67,7 @@ class AppTPWaitlistRedeemCodeViewModel(
 
 @ContributesMultibinding(AppScope::class)
 class AppTPWaitlistRedeemCodeViewModelFactory @Inject constructor(
-    private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
+    private val waitlistManager: Provider<AppTPWaitlistManager>,
     private val dispatcherProvider: Provider<DispatcherProvider>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {

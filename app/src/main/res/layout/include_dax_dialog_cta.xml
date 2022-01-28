@@ -25,9 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="16dp"
         app:srcCompat="@drawable/ic_dax_icon"
-        app:layout_constraintBottom_toTopOf="@id/cardView"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.cardview.widget.CardView
@@ -39,7 +38,7 @@
         android:layout_marginBottom="24dp"
         android:backgroundTint="?attr/daxDialogBackgroundColor"
         app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/logo"
+        app:layout_constraintTop_toBottomOf="@id/triangle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -129,9 +128,10 @@
         android:id="@+id/triangle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:elevation="6dp"
         android:src="@drawable/ic_triangle_bubble"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/logo"
         app:layout_constraintEnd_toEndOf="@id/logo"
         app:layout_constraintStart_toStartOf="@id/logo" />
 
@@ -140,14 +140,13 @@
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         app:backgroundTint="@color/cornflowerBlue"
         android:text="@string/onboardingLetsDoItButton"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:letterSpacing="0.0"
         app:cornerRadius="22dp"
-        app:layout_constraintBottom_toTopOf="@id/returningUserCta"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
@@ -155,18 +154,19 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/returningUserCta"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="60dp"
+        android:layout_marginBottom="20dp"
         android:letterSpacing="0.0"
-        android:text="@string/returningUsersReturningUserButton"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
         android:textAllCaps="false"
-        android:textColor="@color/cornflowerBlue"
+        android:textColor="@color/brownishGrayTwo"
         android:visibility="gone"
         app:backgroundTint="@color/white"
         app:cornerRadius="22dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/cardView"
-        app:layout_constraintStart_toStartOf="@id/cardView"
-        app:layout_constraintTop_toBottomOf="@id/primaryCta" />
+        app:layout_constraintStart_toStartOf="@id/cardView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

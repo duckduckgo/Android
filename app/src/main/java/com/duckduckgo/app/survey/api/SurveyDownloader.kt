@@ -25,6 +25,8 @@ import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import io.reactivex.Completable
 import retrofit2.Response
 import timber.log.Timber
@@ -36,7 +38,8 @@ class SurveyDownloader @Inject constructor(
     private val service: SurveyService,
     private val surveyDao: SurveyDao,
     private val emailManager: EmailManager,
-    private val atpCohortManager: AtpCohortManager
+    private val atpCohortManager: AtpCohortManager,
+    private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
@@ -130,6 +133,9 @@ class SurveyDownloader @Inject constructor(
     private fun canSurveyBeScheduled(surveyOption: SurveyOption): Boolean {
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
+        } else if (surveyOption.isAtpWaitlistRequired == true) {
+            // we only want users that have joined the waitlist and haven't joined the Beta yet
+            atpWaitlistStateRepository.getState() is WaitlistState.JoinedWaitlist && atpCohortManager.getCohort() == null
         } else if (surveyOption.isAtpEverEnabledRequired == true) {
             atpCohortManager.getCohort() != null
         } else {

@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.health
+package com.duckduckgo.mobile.android.ui.view
 
-data class Tracer(
-    val tracerId: String,
-    val creationTimestampMillis: Long,
-    val events: List<TracerEvent>
-)
+import android.content.Context
+import android.util.AttributeSet
+import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 
-data class TracerEvent(
-    val tracerId: String,
-    val event: TracedState,
-    val timestampNanos: Long = System.nanoTime()
-)
+class Chip @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0,
+) : TextView(context, attrs, defStyleAttr) {
 
-enum class TracedState {
-    CREATED,
-    ADDED_TO_DEVICE_TO_NETWORK_QUEUE,
-    REMOVED_FROM_DEVICE_TO_NETWORK_QUEUE,
-    ADDED_TO_NETWORK_TO_DEVICE_QUEUE,
-    REMOVED_FROM_NETWORK_TO_DEVICE_QUEUE,
+    fun setChipText(@StringRes textResource: Int) {
+        setText(textResource)
+    }
+
+    fun setChipIcon(@DrawableRes iconResource: Int) {
+        leftDrawable(iconResource)
+    }
 }

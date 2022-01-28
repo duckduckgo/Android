@@ -27,16 +27,14 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class AppTrackerListUpdateWorker(
-    context: Context,
-    workerParameters: WorkerParameters
-) : CoroutineWorker(context, workerParameters) {
+class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) :
+    CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
 
@@ -61,7 +59,8 @@ class AppTrackerListUpdateWorker(
         val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
         when (blocklist.etag) {
             is ETag.ValidETag -> {
-                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag
+                val currentEtag =
+                    vpnDatabase.vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag
                 val updatedEtag = blocklist.etag.value
 
                 if (updatedEtag == currentEtag) {
@@ -70,8 +69,14 @@ class AppTrackerListUpdateWorker(
                 }
 
                 Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao()
-                    .updateTrackerBlocklist(blocklist.blocklist, blocklist.appPackages, AppTrackerMetadata(eTag = blocklist.etag.value))
+                vpnDatabase
+                    .vpnAppTrackerBlockingDao()
+                    .updateTrackerBlocklist(
+                        blocklist.blocklist,
+                        blocklist.appPackages,
+                        AppTrackerMetadata(eTag = blocklist.etag.value),
+                        blocklist.entities
+                    )
 
                 return Result.success()
             }
@@ -87,7 +92,8 @@ class AppTrackerListUpdateWorker(
         val exceptionRules = appTrackerListDownloader.downloadAppTrackerExceptionRules()
         when (exceptionRules.etag) {
             is ETag.ValidETag -> {
-                val currentEtag = vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag
+                val currentEtag =
+                    vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag
                 val updatedEtag = exceptionRules.etag.value
 
                 if (updatedEtag == currentEtag) {
@@ -96,10 +102,12 @@ class AppTrackerListUpdateWorker(
                 }
 
                 Timber.d("Updating the app tracker rules, eTag: ${exceptionRules.etag.value}")
-                vpnDatabase.vpnAppTrackerBlockingDao().updateTrackerExceptionRules(
-                    exceptionRules.trackerExceptionRules,
-                    AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value)
-                )
+                vpnDatabase
+                    .vpnAppTrackerBlockingDao()
+                    .updateTrackerExceptionRules(
+                        exceptionRules.trackerExceptionRules,
+                        AppTrackerExceptionRuleMetadata(eTag = exceptionRules.etag.value)
+                    )
 
                 return Result.success()
             }
@@ -119,11 +127,14 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleBlocklistUpdateWork() {
         Timber.v("Scheduling tracker blocklist update worker")
-        val workerRequest = PeriodicWorkRequestBuilder<AppTrackerListUpdateWorker>(12, TimeUnit.HOURS)
-            .addTag(APP_TRACKER_LIST_UPDATE_WORKER_TAG)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build()
-        workManager.enqueueUniquePeriodicWork(APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+        val workerRequest =
+            PeriodicWorkRequestBuilder<AppTrackerListUpdateWorker>(12, TimeUnit.HOURS)
+                .addTag(APP_TRACKER_LIST_UPDATE_WORKER_TAG)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+                .build()
+        workManager.enqueueUniquePeriodicWork(
+            APP_TRACKER_LIST_UPDATE_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest
+        )
     }
 
     companion object {
@@ -132,7 +143,9 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppTrackerListUpdateWorkerPlugin @Inject constructor(
+class AppTrackerListUpdateWorkerPlugin
+@Inject
+constructor(
     private val appTrackerListDownloader: AppTrackerListDownloader,
     private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {

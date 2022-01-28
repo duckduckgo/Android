@@ -23,34 +23,59 @@ class AppTrackerJsonParser {
 
     companion object {
 
-        fun parseAppTrackerJson(
-            moshi: Moshi,
-            json: String
-        ): Pair<List<AppTracker>, List<AppTrackerPackage>> {
-            val adapter: JsonAdapter<JsonAppBlockingList> = moshi.adapter(JsonAppBlockingList::class.java)
+        fun parseAppTrackerJson(moshi: Moshi, json: String): AppTrackerBlocklist {
+            val adapter: JsonAdapter<JsonAppBlockingList> =
+                moshi.adapter(JsonAppBlockingList::class.java)
             val parsed = adapter.fromJson(json)
+            val version = parseBlocklistVersion(parsed)
             val appTrackers = parseAppTrackers(parsed)
             val appPackages = parseAppPackages(parsed)
-            return Pair(appTrackers, appPackages)
+            val entities = parseTrackerEntities(parsed)
+            return AppTrackerBlocklist(version, appTrackers, appPackages, entities)
         }
 
-        fun parseAppTrackers(parsed: JsonAppBlockingList?) = parsed?.trackers.orEmpty()
-            .filter { !it.value.isCdn }
-            .mapValues {
-                AppTracker(
-                    hostname = it.key,
-                    trackerCompanyId = it.value.owner.name.hashCode(),
-                    owner = it.value.owner,
-                    app = it.value.app,
-                    isCdn = it.value.isCdn
-                )
-            }.map { it.value }
+        fun parseBlocklistVersion(parsed: JsonAppBlockingList?) = parsed?.version.orEmpty()
+
+        fun parseAppTrackers(parsed: JsonAppBlockingList?) =
+            parsed
+                ?.trackers
+                .orEmpty()
+                .filter { !it.value.isCdn }
+                .mapValues {
+                    AppTracker(
+                        hostname = it.key,
+                        trackerCompanyId = it.value.owner.name.hashCode(),
+                        owner = it.value.owner,
+                        app = it.value.app,
+                        isCdn = it.value.isCdn
+                    )
+                }
+                .map { it.value }
 
         fun parseAppPackages(response: JsonAppBlockingList?): List<AppTrackerPackage> {
-            return response?.packageNames.orEmpty()
-                .mapValues {
-                    AppTrackerPackage(packageName = it.key, entityName = it.value)
-                }.map { it.value }
+            return response
+                ?.packageNames
+                .orEmpty()
+                .mapValues { AppTrackerPackage(packageName = it.key, entityName = it.value) }
+                .map { it.value }
         }
+
+        fun parseTrackerEntities(response: JsonAppBlockingList?): List<AppTrackerEntity> {
+            return response
+                ?.entities
+                .orEmpty()
+                .mapValues {
+                    AppTrackerEntity(
+                        trackerCompanyId = it.key.hashCode(),
+                        entityName = it.key,
+                        score = it.value.score,
+                        signals = it.value.signals
+                    )
+                }
+                .map { it.value }
+                .sortedBy { it.score }
+        }
+
     }
+
 }
