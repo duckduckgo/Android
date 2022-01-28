@@ -25,9 +25,9 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 interface TrackingLinkDetectionRepository {
     fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)
-    val exceptions: CopyOnWriteArrayList<TrackingLinkException>
-    val ampLinkFormats: CopyOnWriteArrayList<Regex>
-    val ampKeywords: CopyOnWriteArrayList<String>
+    val exceptions: List<TrackingLinkException>
+    val ampLinkFormats: List<Regex>
+    val ampKeywords: List<String>
 }
 
 class RealTrackingLinkDetectionRepository(
