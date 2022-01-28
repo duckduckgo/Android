@@ -68,7 +68,7 @@ interface BookmarkFoldersDao {
             "where inner_bookmark_folders.parentId = bookmark_folders.id) as numFolders " +
             "from bookmark_folders where bookmark_folders.id = :parentId"
     )
-    fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder
+    fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder?
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun update(bookmarkFolder: BookmarkFolderEntity)

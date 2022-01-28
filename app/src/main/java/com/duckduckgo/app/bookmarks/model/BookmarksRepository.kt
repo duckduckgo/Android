@@ -100,7 +100,7 @@ class BookmarksDataRepository(
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
     }
 
-    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder {
+    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder? {
         return bookmarkFoldersDao.getBookmarkFolderByParentId(parentId)
     }
 
