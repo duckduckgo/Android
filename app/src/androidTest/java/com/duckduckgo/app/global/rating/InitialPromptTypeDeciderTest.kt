@@ -52,6 +52,7 @@ class InitialPromptTypeDeciderTest {
             initialPromptDecider = mockInitialPromptDecider,
             secondaryPromptDecider = mockSecondaryPromptDecider,
             context = InstrumentationRegistry.getInstrumentation().targetContext,
+            onboardingStore = mockOnboardingStore,
             appBuildConfig = mockAppBuildConfig
         )
 
@@ -89,6 +90,12 @@ class InitialPromptTypeDeciderTest {
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
         val type = testee.determineInitialPromptType() as AppEnjoymentPromptOptions.ShowEnjoymentPrompt
         assertSecondPrompt(type.promptCount)
+    }
+
+    @Test
+    fun whenUsersMarkedAsReturningUserThenNoPromptShown() = runTest {
+        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+        assertPromptNotShown(testee.determineInitialPromptType())
     }
 
     private fun assertPromptNotShown(prompt: AppEnjoymentPromptOptions) {

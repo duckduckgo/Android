@@ -39,7 +39,6 @@
             android:id="@+id/fireCtaViewStub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
             android:layout="@layout/include_dax_dialog_cta" />
 
         <androidx.constraintlayout.widget.ConstraintLayout

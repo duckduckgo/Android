@@ -20,7 +20,7 @@
     android:id="@+id/longDescriptionContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/onboarding_background"
+    android:background="@drawable/onboarding_background_large"
     android:tag="onboardingDefaultBrowser"
     tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 

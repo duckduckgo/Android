@@ -26,7 +26,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
@@ -93,24 +92,19 @@ class WelcomePage : OnboardingPageFragment() {
             welcomePageViewModel.screenContent.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect {
                     when (it) {
-                        is WelcomePageViewModel.ViewState.ContinueWithoutPrivacyTipsState ->
-                            renderNewOrReturningUsers(R.string.returningUsersContinuesWithoutPrivacyTipsButtonLabel)
-                        is WelcomePageViewModel.ViewState.SkipTutorialState ->
-                            renderNewOrReturningUsers(R.string.returningUsersSkipTutorialButtonLabel)
-                        is WelcomePageViewModel.ViewState.DefaultOnboardingState ->
-                            renterDefaultOnboarding()
+                        is WelcomePageViewModel.ViewState.NewOrReturningUsersState -> renderNewOrReturningUsers()
+                        is WelcomePageViewModel.ViewState.DefaultOnboardingState -> renterDefaultOnboarding()
                     }
                 }
         }
     }
 
-    private fun renderNewOrReturningUsers(@StringRes returningUserButtonRes: Int) {
+    private fun renderNewOrReturningUsers() {
         returningUserCta.visibility = VISIBLE
-        returningUserCta.text = getString(returningUserButtonRes)
         returningUserCta.setOnClickListener { event(WelcomePageView.Event.OnReturningUserClicked) }
-        ctaText = getString(R.string.onboardingDaxText)
+        ctaText = getString(R.string.returningUsersOnboardingDaxText)
         hiddenTextCta.text = ctaText.html(requireContext())
-        primaryCta.text = getString(R.string.returningUsersLetsDoItButtonLabel)
+        primaryCta.text = getString(R.string.returningUsersNewUserButton)
     }
 
     private fun renterDefaultOnboarding() {
