@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.rating.db.AppEnjoymentRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.rating.*
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreAndroidUtils
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
@@ -73,6 +74,7 @@ class RatingModule {
         @Named(INITIAL_PROMPT_DECIDER_NAME) initialPromptDecider: ShowPromptDecider,
         @Named(SECONDARY_PROMPT_DECIDER_NAME) secondaryPromptDecider: ShowPromptDecider,
         context: Context,
+        onboardingStore: OnboardingStore,
         appBuildConfig: AppBuildConfig
     ): PromptTypeDecider {
         return InitialPromptTypeDecider(
@@ -81,6 +83,7 @@ class RatingModule {
             initialPromptDecider,
             secondaryPromptDecider,
             context,
+            onboardingStore,
             appBuildConfig
         )
     }

@@ -31,9 +31,9 @@
     <string name="searchWidgetLabel">Search</string>
 
     <!-- Treat returning users differently Experiment -->
-    <string name="returningUsersLetsDoItButtonLabel">Let\'s Do It</string>
-    <string name="returningUsersContinuesWithoutPrivacyTipsButtonLabel">Continue Without Privacy Tips</string>
-    <string name="returningUsersSkipTutorialButtonLabel">Skip Tutorial</string>
+    <string name="returningUsersNewUserButton">I\'m new!</string>
+    <string name="returningUsersReturningUserButton">I\'ve been here before.</string>
+    <string name="returningUsersOnboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.<br/><br/>Let\'s get started 👍]]></string>
     <string name="returningUsersWidgetPromptTitle">Add the DuckDuckGo widget to your home screen</string>
     <string name="returningUsersWidgetDismissButtonLabel">No Thanks</string>
 

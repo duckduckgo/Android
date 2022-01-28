@@ -64,7 +64,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 42,
+    exportSchema = true, version = 41,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -527,28 +527,17 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    // todo: This is VPN project migration, KEEP IT ALWAYS LAST
     val MIGRATION_40_TO_41: Migration = object : Migration(40, 41) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                     "trackerUrl TEXT NOT NULL, trackerCompany TEXT NOT NULL, timestamp TEXT NOT NULL)"
             )
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    val MIGRATION_41_TO_42: Migration = object : Migration(41, 42) {
-        val onboardingStore: OldOnboardingStore = OldOnboardingStore()
-
-        override fun migrate(database: SupportSQLiteDatabase) {
-            if (!onboardingStore.isReturningUser()) {
-                return
-            }
-
-            database.execSQL(
-                "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
-                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\""
-            )
+            // place here new migrations from the main app
+            // this avoids crashes and forcing to uninstall the appTP app every time a new migration
+            // is added to the main app
+            MIGRATION_39_TO_40.migrate(database)
         }
     }
 
@@ -618,7 +607,6 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_38_TO_39,
             MIGRATION_39_TO_40,
             MIGRATION_40_TO_41,
-            MIGRATION_41_TO_42
         )
 
     @Deprecated(
@@ -633,11 +621,6 @@ class MigrationsProvider(val context: Context) {
         fun shouldShow(): Boolean {
             val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getInt(keyVersion, 0) < currentVersion
-        }
-
-        fun isReturningUser(): Boolean {
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-            return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
         }
     }
 }
