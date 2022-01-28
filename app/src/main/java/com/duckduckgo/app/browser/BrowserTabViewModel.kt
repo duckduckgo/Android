@@ -73,6 +73,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
@@ -165,7 +166,7 @@ class BrowserTabViewModel(
     private val variantManager: VariantManager,
     private val trackingLinkDetector: TrackingLinkDetector
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -336,6 +337,7 @@ class BrowserTabViewModel(
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
         class ExtractUrlFromCloakedTrackingLink(val initialUrl: String) : Command()
+        class LoadExtractedUrl(val extractedUrl: String) : Command()
         class AddHomeShortcut(
             val title: String,
             val url: String,
@@ -2451,6 +2453,22 @@ class BrowserTabViewModel(
 
     fun updateLastTrackingLink(url: String) {
         trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url)
+    }
+
+    override fun onUrlExtractionError(initialUrl: String) {
+        command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
+    }
+
+    override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
+        val destinationUrl: String = if (extractedUrl != null) {
+            trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = initialUrl)
+            Timber.d("Tracking link detection: Success! Loading extracted URL: $extractedUrl")
+            extractedUrl
+        } else {
+            Timber.d("Tracking link detection: Failed! Loading initial URL: $initialUrl")
+            initialUrl
+        }
+        command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
     companion object {

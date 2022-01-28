@@ -47,6 +47,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
@@ -3812,6 +3813,31 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is Navigate }
         assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
+    fun whenUrlExtractionErrorThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtractionError("http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
+        testee.onUrlExtracted("http://foo.com", "http://example.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = "http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNullThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtracted("http://foo.com", null)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
     private fun givenUrlCanUseGpc() {

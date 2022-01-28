@@ -142,17 +142,21 @@ class UrlExtractingWebViewClient(
     }
 
     override fun onReceivedError(
-        view: WebView?,
+        webView: WebView?,
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (error?.errorCode == ERROR_CONNECT) {
-                urlExtractionListener?.onUrlExtractionError()
+        if (webView != null) {
+            val initialUrl = (webView as UrlExtractingWebView).initialUrl
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (error?.errorCode == ERROR_CONNECT) {
+                    urlExtractionListener?.onUrlExtractionError(initialUrl)
+                }
+            } else {
+                urlExtractionListener?.onUrlExtractionError(initialUrl)
             }
-        } else {
-            urlExtractionListener?.onUrlExtractionError()
         }
-        super.onReceivedError(view, request, error)
+        super.onReceivedError(webView, request, error)
     }
 }

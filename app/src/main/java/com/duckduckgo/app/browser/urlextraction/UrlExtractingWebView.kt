@@ -32,6 +32,7 @@ class UrlExtractingWebView(
 ) : WebView(context) {
 
     var urlExtractionListener: UrlExtractionListener? = null
+    lateinit var initialUrl: String
 
     init {
         settings.apply {
@@ -49,7 +50,7 @@ class UrlExtractingWebView(
         }
 
         urlExtractor.addUrlExtraction(this) { extractedUrl ->
-            urlExtractionListener?.onUrlExtracted(extractedUrl)
+            urlExtractionListener?.onUrlExtracted(initialUrl, extractedUrl)
         }
     }
 
@@ -58,6 +59,11 @@ class UrlExtractingWebView(
      */
     private fun disableWebSql(settings: WebSettings) {
         settings.databaseEnabled = false
+    }
+
+    override fun loadUrl(url: String) {
+        initialUrl = url
+        super.loadUrl(url)
     }
 
     fun destroyWebView() {
