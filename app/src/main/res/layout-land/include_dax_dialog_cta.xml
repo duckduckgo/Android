@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -132,6 +132,7 @@
         android:elevation="6dp"
         android:src="@drawable/ic_triangle_bubble"
         app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintBottom_toTopOf="@id/cardView"
         app:layout_constraintEnd_toEndOf="@id/logo"
         app:layout_constraintStart_toStartOf="@id/logo" />
 
@@ -142,11 +143,13 @@
         android:layout_height="60dp"
         android:layout_marginTop="12dp"
         app:backgroundTint="@color/cornflowerBlue"
+        android:layout_marginBottom="16dp"
         android:text="@string/onboardingLetsDoItButton"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:letterSpacing="0.0"
         app:cornerRadius="22dp"
+        app:layout_constraintBottom_toTopOf="@id/returningUserCta"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
@@ -154,7 +157,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/returningUserCta"
         style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="60dp"
         android:layout_marginBottom="20dp"
         android:letterSpacing="0.0"
@@ -165,7 +168,7 @@
         android:visibility="gone"
         app:backgroundTint="@color/white"
         app:cornerRadius="22dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/primaryCta"
         app:layout_constraintEnd_toEndOf="@id/cardView"
         app:layout_constraintStart_toStartOf="@id/cardView" />
 

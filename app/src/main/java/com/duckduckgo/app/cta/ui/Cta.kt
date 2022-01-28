@@ -392,9 +392,9 @@ sealed class HomePanelCta(
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {
-        view.ctaIcon?.setImageResource(image)
-        view.ctaTitle?.text = view.context.getString(title)
-        view.ctaSubtitle?.text = view.context.getString(description)
+        view.ctaIcon.setImageResource(image)
+        view.ctaTitle.text = view.context.getString(title)
+        view.ctaSubtitle.text = view.context.getString(description)
         view.ctaOkButton.text = view.context.getString(okButton)
         view.ctaDismissButton.text = view.context.getString(dismissButton)
         view.show()
@@ -437,18 +437,6 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        AppPixelName.WIDGET_CTA_SHOWN,
-        AppPixelName.WIDGET_CTA_LAUNCHED,
-        AppPixelName.WIDGET_CTA_DISMISSED
-    )
-
-    object AddReturningUsersWidgetAuto : HomePanelCta(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaAutoLaunchButton,
-        R.string.returningUsersWidgetDismissButtonLabel,
         AppPixelName.WIDGET_CTA_SHOWN,
         AppPixelName.WIDGET_CTA_LAUNCHED,
         AppPixelName.WIDGET_CTA_DISMISSED

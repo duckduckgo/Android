@@ -172,28 +172,28 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenReturningUsersNoOnboardingEnabledShowExpectedState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
+    fun whenReturningUsersContinueWithoutPrivacyTipsShowExpectedState() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
 
         viewModel.screenContent.test {
             val viewState = awaitItem()
-            assertTrue(viewState is WelcomePageViewModel.ViewState.NewOrReturningUsersState)
+            assertTrue(viewState is WelcomePageViewModel.ViewState.ContinueWithoutPrivacyTipsState)
         }
     }
 
     @Test
-    fun whenReturningUsersWidgetPromotionEnabledShowExpectedState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
+    fun whenReturningUsersSkipTutorialEnabledShowExpectedState() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
 
         viewModel.screenContent.test {
             val viewState = awaitItem()
-            assertTrue(viewState is WelcomePageViewModel.ViewState.NewOrReturningUsersState)
+            assertTrue(viewState is WelcomePageViewModel.ViewState.SkipTutorialState)
         }
     }
 
     @Test
     fun whenControlEnabledShowDefaultOnboardingState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zk" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zd" })
 
         viewModel.screenContent.test {
             val viewState = awaitItem()
@@ -202,8 +202,8 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndReturningUsersNoOnboardingEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
+    fun whenOnPrimaryCtaClickedAndReturningUsersContinueWithoutPrivacyTipsEnabledThenEmitShowDialog() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
@@ -218,8 +218,8 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnPrimaryCtaClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
+    fun whenOnPrimaryCtaClickedAndReturningUsersSkipTutorialEnabledThenEmitShowDialog() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
@@ -234,8 +234,8 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnReturningUserClickedAndReturningUsersNoOnboardingEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zv" })
+    fun whenOnReturningUserClickedAndReturningUsersContinueWithoutPrivacyTipsEnabledThenEmitShowDialog() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
@@ -250,8 +250,8 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun whenOnReturningUserClickedAndReturningUsersWidgetPromotionEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zz" })
+    fun whenOnReturningUserClickedAndReturningUsersSkipTutorialEnabledThenEmitShowDialog() = runTest {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
         whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
         val intent = Intent()
         whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
