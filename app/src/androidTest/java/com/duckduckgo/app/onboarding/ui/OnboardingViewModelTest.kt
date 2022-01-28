@@ -19,12 +19,14 @@ package com.duckduckgo.app.onboarding.ui
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.whenever
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class OnboardingViewModelTest {
@@ -38,15 +40,25 @@ class OnboardingViewModelTest {
 
     private var userStageStore: UserStageStore = mock()
 
+    private var onboardingStore: OnboardingStore = mock()
+
     private val pageLayout: OnboardingPageManager = mock()
 
     private val testee: OnboardingViewModel by lazy {
-        OnboardingViewModel(userStageStore, pageLayout, coroutineRule.testDispatcherProvider)
+        OnboardingViewModel(userStageStore, onboardingStore, pageLayout, coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenOnboardingDoneThenCompleteStage() = runTest {
+    fun whenOnboardingDoneWithNewUserThenCompleteStageNew() = runTest {
+        whenever(onboardingStore.userMarkedAsReturningUser).thenReturn(false)
         testee.onOnboardingDone()
         verify(userStageStore).stageCompleted(AppStage.NEW)
+    }
+
+    @Test
+    fun whenOnboardingDoneWithReturningUserThenCompleteStageDaxOnboarding() = runTest {
+        whenever(onboardingStore.userMarkedAsReturningUser).thenReturn(true)
+        testee.onOnboardingDone()
+        verify(userStageStore).stageCompleted(AppStage.DAX_ONBOARDING)
     }
 }
