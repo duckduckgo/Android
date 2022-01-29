@@ -81,6 +81,15 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
+    fun determineHealthTunWriteMemoryExceptions(numberExceptions: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("tun-ioWriteMemoryExceptions", rawMetrics)
+
+        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 })
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
     fun determineHealthBufferAllocations(bufferAllocations: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("buffer-allocations", rawMetrics, informational = true)

@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -100,6 +101,7 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketWriteExceptionAlerts = object : HealthRule("socketWriteExceptionAlerts") {}.also { healthRules.add(it) }
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
+    private val tunWriteIOMemoryExceptionsAlerts = object : HealthRule("tunWriteIOMemoryExceptions") {}.also { healthRules.add(it) }
     private val bufferAllocationsAlerts =
         object : HealthRule("bufferAllocationAlerts", samplesToWaitBeforeAlerting = Int.MAX_VALUE) {}.also { healthRules.add(it) }
 
@@ -112,6 +114,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleSocketWriteExceptions(timeWindow, socketWriteExceptionAlerts)
         healthStates += sampleSocketConnectExceptions(timeWindow, socketConnectExceptionAlerts)
         healthStates += sampleTunWriteExceptions(timeWindow, tunWriteExceptionAlerts)
+        healthStates += sampleTunWriteNoMemoryExceptions(timeWindow, tunWriteIOMemoryExceptionsAlerts)
         healthStates += sampleBufferAllocations(timeWindow, bufferAllocationsAlerts)
 
         /*
@@ -204,6 +207,16 @@ class AppTPHealthMonitor @Inject constructor(
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions)
+        healthAlerts.updateAlert(state)
+        return state
+    }
+
+    private fun sampleTunWriteNoMemoryExceptions(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_MEMORY_EXCEPTION(), timeWindow)
+        val state = healthClassifier.determineHealthTunWriteMemoryExceptions(numberExceptions)
         healthAlerts.updateAlert(state)
         return state
     }
