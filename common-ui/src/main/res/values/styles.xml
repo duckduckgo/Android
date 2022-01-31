@@ -770,4 +770,36 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
+    <style name="MessageCta"/>
+
+    <style name="MessageCta.Title" parent="TextAppearance.DuckDuckGo.Headline4">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MessageCta.Description" parent="TextAppearance.DuckDuckGo.Body2">
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MessageCta.Button">
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="MessageCta.Button.Primary" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/button_primary_bg</item>
+    </style>
+
+    <style name="MessageCta.Button.Secondary" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/cornflowerDark</item>
+        <item name="android:background">@drawable/button_secondary_bg</item>
+    </style>
+
 </resources>

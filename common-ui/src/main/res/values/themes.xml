@@ -125,6 +125,9 @@
         <item name="listItemSeparatorColor">@color/charcoalGrey</item>
         <item name="textInputOutlinedBoxColor">@color/grayish</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
+
+        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
+        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -228,6 +231,9 @@
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
+
+        <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
+        <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

@@ -84,4 +84,7 @@
     <attr name="textInputOutlinedBoxColor" format="color" />
     <attr name="textInputOutlinedBoxColorHighlight" format="color" />
 
+    <attr name="dialogPrimaryButtonColor" format="color" />
+    <attr name="dialogSecondaryButtonColor" format="color" />
+
 </resources>

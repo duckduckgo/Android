@@ -182,4 +182,12 @@
         <item name="android:textColor">@color/almostBlackDark</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.MessageCta">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_message_cta</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:layout_margin">@dimen/keyline_4</item>
+    </style>
+
 </resources>
