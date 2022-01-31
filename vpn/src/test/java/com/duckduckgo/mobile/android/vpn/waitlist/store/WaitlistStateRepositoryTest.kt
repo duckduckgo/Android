@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
-import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpSocketWriter
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import org.junit.Assert.*
 import org.junit.Test

@@ -44,7 +44,7 @@ class WaitlistStateRepository @Inject constructor(
     }
 
     override fun joinedAfterCuttingDate(): Boolean {
-       return dataStore.waitlistTimestamp > CUTTING_DATE
+        return dataStore.waitlistTimestamp > CUTTING_DATE
     }
 
     private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
