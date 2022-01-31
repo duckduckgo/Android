@@ -95,7 +95,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-emul-${{ matrix.api-level }}
+          key: avd-emula-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -105,6 +105,7 @@ jobs:
           ndk: 21.0.6113669
           arch: x86_64
           profile: Nexus 5
+          ram-size: 4096M
           force-avd-creation: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: false
@@ -117,6 +118,7 @@ jobs:
           ndk: 21.0.6113669
           arch: x86_64
           profile: Nexus 5
+          ram-size: 4096M
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
