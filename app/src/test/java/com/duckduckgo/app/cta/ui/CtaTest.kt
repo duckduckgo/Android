@@ -305,7 +305,14 @@ class CtaTest {
                 categories = null,
                 surrogateId = null
             ),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestingEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
+            TrackingEvent(
+                "other.com",
+                "other.com",
+                blocked = true,
+                entity = TestingEntity("Other", "Other", 9.0),
+                categories = null,
+                surrogateId = null
+            )
         )
         val site = site(events = trackers)
 
