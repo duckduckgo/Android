@@ -22,7 +22,9 @@ import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.appwidget.AppWidgetManager
 import android.content.*
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.Configuration
 import android.media.MediaScannerConnection
 import android.net.Uri
@@ -69,7 +71,18 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
+import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
+import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
+import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -119,13 +132,13 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
@@ -134,14 +147,19 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.widget.SearchAndFavoritesWidget
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
+import kotlinx.android.synthetic.main.include_cta.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
@@ -156,23 +174,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import android.content.pm.ApplicationInfo
-import android.content.pm.ResolveInfo
-import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
-import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import kotlinx.android.synthetic.main.include_cta.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -2347,12 +2348,42 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
+
+                if (viewState.message != null) {
+                    Timber.i("RMF: render ${viewState.message}")
+                    messageCta.show()
+                    val message = (viewState.message as Small)
+                    messageCta.setMessage(
+                        MessageCta.Message(
+                            illustration = R.drawable.set_as_default_browser_illustration_dialog,
+                            title = message.titleText,
+                            subtitle = message.descriptionText,
+                            action = "Button",
+                            action2 = "Button"
+                        )
+                    )
+                    messageCta.onCloseButtonClicked {
+                        viewModel.onMessageCloseButtonClicked()
+                    }
+                    messageCta.onPrimaryActionClicked {
+                        viewModel.onMessagePrimaryButtonClicked()
+                    }
+                    messageCta.onSecondaryActionClicked {
+                        viewModel.onMessageSecondaryButtonClicked()
+                    }
+                } else {
+                    messageCta.hide()
+                }
+
                 if (viewState.cta != null) {
                     showCta(viewState.cta, viewState.favorites)
                 } else {
-                    hideHomeCta()
                     hideDaxCta()
                     showHomeBackground(viewState.favorites)
+                }
+
+                if (viewState.cta != null || viewState.message != null) {
+                    hideHomeCta()
                 }
             }
         }
