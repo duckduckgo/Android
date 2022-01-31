@@ -24,6 +24,7 @@ import javax.inject.Inject
 
 interface AtpWaitlistStateRepository {
     fun getState(): WaitlistState
+    fun joinedAfterCuttingDate(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -42,9 +43,18 @@ class WaitlistStateRepository @Inject constructor(
         return WaitlistState.NotJoinedQueue
     }
 
-    fun didJoinBeta(): Boolean = dataStore.inviteCode != null
+    override fun joinedAfterCuttingDate(): Boolean {
+        return dataStore.waitlistTimestamp > CUTOFF_DATE
+    }
 
-    fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
+    private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
+
+    private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
+
+    companion object {
+        // Cutoff date set to 1/1/2022 https://app.asana.com/0/1174433894299346/1201742199841250
+        const val CUTOFF_DATE = 1641071328
+    }
 }
 
 sealed class WaitlistState {
