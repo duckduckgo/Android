@@ -87,6 +87,6 @@ class AppHealthStateCollector @Inject constructor(
         private const val SECONDS_AGO = "secondsAgo"
         private const val BAD_HEALTH_DATA = "badHealthData"
         private const val SUSTAINED_BAD_HEALTH_SEC = "secondsSustained"
-        private const val IS_CURRENTLY_IN_GOOD_HEALTH = "isCurrentlyGooHealth"
+        private const val IS_CURRENTLY_IN_GOOD_HEALTH = "isCurrentlyGoodHealth"
     }
 }
