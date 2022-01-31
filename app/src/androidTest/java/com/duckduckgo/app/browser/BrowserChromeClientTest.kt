@@ -33,6 +33,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
@@ -55,6 +56,7 @@ class BrowserChromeClientTest {
     private lateinit var mockFilePathCallback: ValueCallback<Array<Uri>>
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
     private lateinit var mockDrm: Drm
+    private lateinit var mockAppBuildConfig: AppBuildConfig
     private val fakeView = View(getInstrumentation().targetContext)
 
     @get:Rule
@@ -66,7 +68,14 @@ class BrowserChromeClientTest {
     fun setup() {
         mockUncaughtExceptionRepository = mock()
         mockDrm = mock()
-        testee = BrowserChromeClient(mockUncaughtExceptionRepository, mockDrm, TestScope(), coroutineTestRule.testDispatcherProvider)
+        mockAppBuildConfig = mock()
+        testee = BrowserChromeClient(
+            mockUncaughtExceptionRepository,
+            mockDrm,
+            mockAppBuildConfig,
+            TestScope(),
+            coroutineTestRule.testDispatcherProvider
+        )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
         mockFileChooserParams = mock()
