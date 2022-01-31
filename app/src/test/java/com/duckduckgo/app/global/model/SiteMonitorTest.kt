@@ -19,7 +19,7 @@ package com.duckduckgo.app.global.model
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import org.junit.Assert.assertEquals
@@ -42,8 +42,8 @@ class SiteMonitorTest {
 
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
 
-        private val network = TestEntity("Network", "Network", 1.0)
-        private val majorNetwork = TestEntity("MajorNetwork", "MajorNetwork", 10.0)
+        private val network = TestingEntity("Network", "Network", 1.0)
+        private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", 10.0)
 
         private val unknownPractices = PrivacyPractices.UNKNOWN
     }

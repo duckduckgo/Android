@@ -26,7 +26,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.TestEntity
+import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.CTA_SHOWN
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -270,9 +270,9 @@ class CtaTest {
     @Test
     fun whenMoreThanTwoTrackersBlockedReturnFirstTwoWithMultipleString() {
         val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Other", "Other", 9.0),
-            TestEntity("Amazon", "Amazon", 9.0)
+            TestingEntity("Facebook", "Facebook", 9.0),
+            TestingEntity("Other", "Other", 9.0),
+            TestingEntity("Amazon", "Amazon", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -284,8 +284,8 @@ class CtaTest {
     @Test
     fun whenTwoTrackersBlockedReturnThemWithZeroString() {
         val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Other", "Other", 9.0)
+            TestingEntity("Facebook", "Facebook", 9.0),
+            TestingEntity("Other", "Other", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")
@@ -301,11 +301,11 @@ class CtaTest {
                 "facebook.com",
                 "facebook.com",
                 blocked = true,
-                entity = TestEntity("Facebook", "Facebook", 3.0),
+                entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
                 surrogateId = null
             ),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestingEntity("Other", "Other", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
 
@@ -323,11 +323,11 @@ class CtaTest {
                 "facebook.com",
                 "facebook.com",
                 blocked = true,
-                entity = TestEntity("Facebook", "Facebook", 3.0),
+                entity = TestingEntity("Facebook", "Facebook", 3.0),
                 categories = null,
                 surrogateId = null
             ),
-            TrackingEvent("other.com", "other.com", blocked = true, entity = TestEntity("Other", "", 9.0), categories = null, surrogateId = null)
+            TrackingEvent("other.com", "other.com", blocked = true, entity = TestingEntity("Other", "", 9.0), categories = null, surrogateId = null)
         )
         val site = site(events = trackers)
 
@@ -341,9 +341,9 @@ class CtaTest {
     @Test
     fun whenMultipleTrackersFromSameNetworkBlockedReturnOnlyOneWithZeroString() {
         val trackers = listOf(
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Facebook", "Facebook", 9.0),
-            TestEntity("Facebook", "Facebook", 9.0)
+            TestingEntity("Facebook", "Facebook", 9.0),
+            TestingEntity("Facebook", "Facebook", 9.0),
+            TestingEntity("Facebook", "Facebook", 9.0)
         )
 
         val testee = DaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, "http://www.trackers.com")

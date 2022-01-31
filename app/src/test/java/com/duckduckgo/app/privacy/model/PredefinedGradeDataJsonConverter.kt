@@ -86,6 +86,6 @@ private fun entity(
     name: String?,
     prevalence: Double?
 ): Entity {
-    if (name == null) return TestEntity("", "", 0.0)
-    return TestEntity(name, name, prevalence ?: 0.0)
+    if (name == null) return TestingEntity("", "", 0.0)
+    return TestingEntity(name, name, prevalence ?: 0.0)
 }
