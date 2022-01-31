@@ -44,7 +44,7 @@ class WaitlistStateRepository @Inject constructor(
     }
 
     override fun joinedAfterCuttingDate(): Boolean {
-        return dataStore.waitlistTimestamp > CUTTING_DATE
+        return dataStore.waitlistTimestamp > CUTOFF_DATE
     }
 
     private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
@@ -52,7 +52,8 @@ class WaitlistStateRepository @Inject constructor(
     private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
 
     companion object {
-        const val CUTTING_DATE = 1640380128
+        // Cutoff date set to 1/1/2022 https://app.asana.com/0/1174433894299346/1201742199841250
+        const val CUTOFF_DATE = 1641071328
     }
 }
 
