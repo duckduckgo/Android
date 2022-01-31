@@ -59,7 +59,7 @@ class SurveyDownloaderTest {
     }
 
     @Test
-    fun whenAppTpSurveyContainsSurveyThenReturnAppTpSurvey() {
+    fun whenAppTpSurveyContainsSurveyAndUserJoinedAfterCutDateThenReturnAppTpSurvey() {
         val mockAppTPCall = mock<Call<SurveyGroup?>>()
         whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocation("abc")))
         whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
@@ -72,16 +72,32 @@ class SurveyDownloaderTest {
     }
 
     @Test
-    fun whenAppTpSurveyContainsWaitlistSurveyAndUserHasJoinedWaitlistThenReturnAppTpWaitlistSurvey() {
+    fun whenAppTpSurveyContainsWaitlistSurveyAndUserHasJoinedWaitlistAfterCutDateThenReturnAppTpWaitlistSurvey() {
         val mockAppTPCall = mock<Call<SurveyGroup?>>()
         whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPWaitlist("abc")))
         whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
         whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
+        whenever(mockAtpWaitlistState.joinedAfterCuttingDate()).thenReturn(true)
 
         testee.download().blockingAwait()
 
         verify(mockService, never()).survey()
         verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsWaitlistSurveyAndUserHasJoinedWaitlistBeforeCutDateThenReturnAppTpWaitlistSurvey() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPWaitlist("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+        whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
+        whenever(mockAtpWaitlistState.joinedAfterCuttingDate()).thenReturn(false)
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao, never()).insert(any())
         verify(mockDao).deleteUnusedSurveys()
     }
 
@@ -181,6 +197,7 @@ class SurveyDownloaderTest {
         whenever(mockAtpCohortManager.getCohort()).thenReturn("cohort")
         whenever(mockCall.execute()).thenReturn(Response.success(surveyWithAllocationForAtp("abc")))
         whenever(mockService.survey()).thenReturn(mockCall)
+
         testee.download().blockingAwait()
         verify(mockDao).insert(Survey("abc", SURVEY_URL_WITH_ATP_COHORT, -1, SCHEDULED))
     }

@@ -29,7 +29,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 
 @Database(
-    exportSchema = true, version = 3,
+    exportSchema = true, version = 4,
     entities = [
         AppHealthState::class
     ]

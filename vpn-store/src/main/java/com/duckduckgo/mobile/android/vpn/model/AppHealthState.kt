@@ -28,6 +28,7 @@ data class AppHealthState(
     val localtime: String = DatabaseDateFormatter.timestamp(),
     val alerts: List<String>,
     val healthDataJsonString: String,
+    val restartedAtEpochSeconds: Long?,
 ) {
     object HealthEventTypeConverter {
         @TypeConverter

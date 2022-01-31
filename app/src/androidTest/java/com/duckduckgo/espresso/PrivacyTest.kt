@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.appbuildconfig.api
+package com.duckduckgo.espresso
 
-interface AppBuildConfig {
-    val isTest: Boolean
-    val isDebug: Boolean
-    val applicationId: String
-    val buildType: String
-    val versionCode: Int
-    val versionName: String
-    val flavor: BuildFlavor
-    val sdkInt: Int
-    val manufacturer: String
-    val model: String
-}
-
-enum class BuildFlavor {
-    INTERNAL,
-    FDROID,
-    PLAY
-}
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class PrivacyTest
