@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import androidx.test.platform.app.InstrumentationRegistry
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +28,6 @@ class RealCohortCalculatorTest {
 
     @Before
     fun setup() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         cohortCalculator = RealCohortCalculator()
     }
 

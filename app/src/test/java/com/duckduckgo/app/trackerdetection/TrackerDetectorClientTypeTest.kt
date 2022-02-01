@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 
 package com.duckduckgo.app.trackerdetection
 
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
-import com.jakewharton.threetenabp.AndroidThreeTen
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -31,7 +30,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class TrackerDetectorClientTypeTest {
 
     private var mockEntityLookup: EntityLookup = mock()
@@ -46,8 +47,6 @@ class TrackerDetectorClientTypeTest {
 
     @Before
     fun before() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext.applicationContext)
-
         whenever(mockUserWhitelistDao.contains(any())).thenReturn(false)
 
         whenever(mockBlockingClient.matches(eq(Url.BLOCKED), any())).thenReturn(Client.Result(true))

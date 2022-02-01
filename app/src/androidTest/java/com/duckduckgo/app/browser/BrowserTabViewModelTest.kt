@@ -3216,14 +3216,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenFirePulsingAnimationStartsThenItStopsAfterOneHour() = runTest {
+    fun whenFirePulsingAnimationStartsThenItStopsAfterMoreThanOneHour() = runTest {
         givenFireButtonPulsing()
         val observer = ValueCaptorObserver<BrowserTabViewModel.BrowserViewState>(false)
         testee.browserViewState.observeForever(observer)
 
         testee.onViewVisible()
 
-        advanceTimeBy(3_600_001)
+        advanceTimeBy(4_600_000)
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON))
         verify(mockDismissedCtaDao).insert(DismissedCta(CtaId.DAX_FIRE_BUTTON_PULSE))
     }
