@@ -134,8 +134,10 @@ class SurveyDownloader @Inject constructor(
         return if (surveyOption.isEmailSignedInRequired == true) {
             emailManager.isSignedIn()
         } else if (surveyOption.isAtpWaitlistRequired == true) {
-            // we only want users that have joined the waitlist and haven't joined the Beta yet
-            atpWaitlistStateRepository.getState() is WaitlistState.JoinedWaitlist && atpCohortManager.getCohort() == null
+            // we only want users that have joined the waitlist after the cutting date 24.12.2021 and haven't joined the Beta yet
+            atpWaitlistStateRepository.getState() is WaitlistState.JoinedWaitlist &&
+                atpWaitlistStateRepository.joinedAfterCuttingDate() &&
+                atpCohortManager.getCohort() == null
         } else if (surveyOption.isAtpEverEnabledRequired == true) {
             atpCohortManager.getCohort() != null
         } else {

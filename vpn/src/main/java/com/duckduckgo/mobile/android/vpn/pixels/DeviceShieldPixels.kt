@@ -292,6 +292,21 @@ interface DeviceShieldPixels {
      * Will fire when the VPN receives a packet of unknown protocol
      */
     fun sendUnknownPacketProtocol(protocol: Int)
+
+    /**
+     * Will fire when the VPN detected bad health, restarted and fixex the bad health
+     */
+    fun badHealthResolvedByRestart(data: Map<String, String>)
+
+    /**
+     * Will fire when the VPN detected bad health but it resolved itself
+     */
+    fun badHealthResolvedItself(data: Map<String, String>)
+
+    /**
+     * Will fire when the VPN restarted as a result of a bad health mitigation
+     */
+    fun didRestartVpnOnBadHealth()
 }
 
 @ContributesBinding(AppScope::class)
@@ -591,6 +606,21 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendUnknownPacketProtocol(protocol: Int) {
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL.pixelName, protocol))
+    }
+
+    override fun badHealthResolvedByRestart(data: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART_DAILY, data)
+        firePixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART, data)
+    }
+
+    override fun badHealthResolvedItself(data: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_ITSELF_DAILY, data)
+        firePixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_ITSELF, data)
+    }
+
+    override fun didRestartVpnOnBadHealth() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH)
     }
 
     private fun suddenKill() {

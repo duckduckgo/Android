@@ -82,7 +82,7 @@ class TunPacketWriter @AssistedInject constructor(
         } catch (e: IOException) {
             Timber.w(e, "Failed writing to the TUN")
             bufferFromNetwork.rewind()
-            Timber.d("Failed writing to the TUN. Buffer: ${bufferFromNetwork.toByteString().hex()}")
+            Timber.d("Failed writing to the TUN. Buffer: %s", bufferFromNetwork.toByteString().hex())
             healthMetricCounter.onTunWriteIOException()
         } finally {
             ByteBufferPool.release(bufferFromNetwork)

@@ -301,8 +301,6 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
-    private var hideDaxBackgroundLogo = false
-
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome, favoritesOnboarding)
@@ -1320,6 +1318,7 @@ class BrowserTabFragment :
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
@@ -2414,7 +2413,7 @@ class BrowserTabFragment :
 
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
-                if (hideDaxBackgroundLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
+                homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
@@ -2462,21 +2461,14 @@ class BrowserTabFragment :
 
             ctaContainer.removeAllViews()
 
-            if (configuration is HomePanelCta.AddReturningUsersWidgetAuto) {
-                hideDaxBackgroundLogo = true
-                inflate(context, R.layout.include_experiment_returning_users_cta, ctaContainer)
-            } else {
-                inflate(context, R.layout.include_cta, ctaContainer)
-            }
+            inflate(context, R.layout.include_cta, ctaContainer)
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                hideDaxBackgroundLogo = false
                 viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                hideDaxBackgroundLogo = false
                 viewModel.onUserDismissedCta()
             }
         }

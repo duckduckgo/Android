@@ -19,6 +19,8 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersContinueWithoutPrivacyTips
+import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersSkipTutorial
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.*
@@ -30,8 +32,8 @@ interface VariantManager {
     sealed class VariantFeature {
         object FireproofExperiment : VariantFeature()
 
-        object ReturningUsersNoOnboarding : VariantFeature()
-        object ReturningUsersWidgetPromotion : VariantFeature()
+        object ReturningUsersContinueWithoutPrivacyTips : VariantFeature()
+        object ReturningUsersSkipTutorial : VariantFeature()
     }
 
     companion object {
@@ -44,17 +46,17 @@ interface VariantManager {
         val ACTIVE_VARIANTS = listOf(
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
-            Variant(key = "sc", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 1.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // Fireproof experiment
             Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
-            // Returning users
-            Variant(key = "zk", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zv", weight = 0.0, features = listOf(VariantFeature.ReturningUsersNoOnboarding), filterBy = { isEnglishLocale() }),
-            Variant(key = "zz", weight = 0.0, features = listOf(VariantFeature.ReturningUsersWidgetPromotion), filterBy = { isEnglishLocale() }),
+            // Returning users - second experiment
+            Variant(key = "zd", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zg", weight = 1.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
+            Variant(key = "zh", weight = 1.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -186,8 +188,8 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
-fun VariantManager.returningUsersNoOnboardingEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.ReturningUsersNoOnboarding)
-fun VariantManager.returningUsersWidgetPromotionEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.ReturningUsersWidgetPromotion)
+fun VariantManager.returningUsersContinueWithoutPrivacyTips() = this.getVariant().hasFeature(ReturningUsersContinueWithoutPrivacyTips)
+fun VariantManager.returningUsersSkipTutorial() = this.getVariant().hasFeature(ReturningUsersSkipTutorial)
 
 /**
  * A variant which can be used for experimentation.
