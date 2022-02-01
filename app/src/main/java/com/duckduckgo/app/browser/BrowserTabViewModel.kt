@@ -51,7 +51,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Inva
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
-import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
@@ -113,6 +112,8 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -149,6 +150,7 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val remoteMessagingRepository: RemoteMessagingRepository,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -174,6 +176,7 @@ class BrowserTabViewModel(
 
     data class CtaViewState(
         val cta: Cta? = null,
+        val message: RemoteMessage? = null,
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
@@ -559,6 +562,14 @@ class BrowserTabViewModel(
         bookmarksRepository.bookmarks().onEach { bookmarks ->
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
+        }.launchIn(viewModelScope)
+
+        remoteMessagingRepository.messageFlow().onEach { activeMessage ->
+            withContext(dispatchers.main()) {
+                ctaViewState.value = currentCtaViewState().copy(
+                    message = activeMessage
+                )
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -2083,6 +2094,22 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onMessageCloseButtonClicked() {
+        Timber.i("RMF: onMessageCloseButtonClicked")
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingRepository.dismissMessage(message.id)
+        }
+    }
+
+    fun onMessagePrimaryButtonClicked() {
+        Timber.i("RMF: onMessagePrimaryButtonClicked")
+    }
+
+    fun onMessageSecondaryButtonClicked() {
+        Timber.i("RMF: onMessageSecondaryButtonClicked")
+    }
+
     fun onUserHideDaxDialog() {
         val cta = currentCtaViewState().cta ?: return
         command.value = DaxCommand.HideDaxDialog(cta)
@@ -2450,6 +2477,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val specialUrlDetector: Provider<SpecialUrlDetector>,
     private val faviconManager: Provider<FaviconManager>,
     private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
+    private val remoteMessagingRepository: Provider<RemoteMessagingRepository>,
     private val ctaViewModel: Provider<CtaViewModel>,
     private val searchCountDao: Provider<SearchCountDao>,
     private val pixel: Provider<Pixel>,
@@ -2489,6 +2517,7 @@ class BrowserTabViewModelFactory @Inject constructor(
                     specialUrlDetector.get(),
                     faviconManager.get(),
                     addToHomeCapabilityDetector.get(),
+                    remoteMessagingRepository.get(),
                     ctaViewModel.get(),
                     searchCountDao.get(),
                     pixel.get(),

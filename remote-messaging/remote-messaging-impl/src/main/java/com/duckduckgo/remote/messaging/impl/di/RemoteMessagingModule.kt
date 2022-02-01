@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
@@ -103,9 +104,10 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingRepository(
-        remoteMessagesDao: RemoteMessagesDao
+        remoteMessagesDao: RemoteMessagesDao,
+        dispatchers: DispatcherProvider
     ): RemoteMessagingRepository {
-        return AppRemoteMessagingRepository(remoteMessagesDao)
+        return AppRemoteMessagingRepository(remoteMessagesDao, dispatchers)
     }
 
     @Provides
