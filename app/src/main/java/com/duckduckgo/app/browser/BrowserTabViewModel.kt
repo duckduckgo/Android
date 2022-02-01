@@ -346,7 +346,6 @@ class BrowserTabViewModel(
 
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
-        object LaunchLegacyAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(
             val request: BasicAuthenticationRequest,
@@ -2099,8 +2098,7 @@ class BrowserTabViewModel(
         ctaViewModel.onUserClickCtaOkButton(cta)
         command.value = when (cta) {
             is HomePanelCta.Survey -> LaunchSurvey(cta.survey)
-            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddReturningUsersWidgetAuto -> LaunchAddWidget
-            is HomePanelCta.AddWidgetInstructions -> LaunchLegacyAddWidget
+            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
             else -> return
         }
     }

@@ -20,7 +20,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
-import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -133,11 +132,9 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_settings_general.*
@@ -171,6 +168,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.include_cta.*
@@ -274,6 +272,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
+
     var messageFromPreviousTab: Message? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
@@ -300,8 +301,6 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
-
-    private var hideDaxBackgroundLogo = false
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -728,8 +727,7 @@ class BrowserTabFragment :
                 )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
-            is Command.LaunchAddWidget -> launchAddWidget()
-            is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
@@ -1321,6 +1319,7 @@ class BrowserTabFragment :
                 builtInZoomControls = true
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
                 setSupportMultipleWindows(true)
                 disableWebSql(this)
                 setSupportZoom(true)
@@ -1771,19 +1770,6 @@ class BrowserTabFragment :
         context?.let {
             startActivity(SurveyActivity.intent(it, survey))
         }
-    }
-
-    @SuppressLint("NewApi")
-    private fun launchAddWidget() {
-        val context = context ?: return
-        val provider = ComponentName(context, SearchAndFavoritesWidget::class.java)
-        AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
-    }
-
-    private fun launchLegacyAddWidget() {
-        val context = context ?: return
-        val options = ActivityOptions.makeSceneTransitionAnimation(activity).toBundle()
-        startActivity(AddWidgetInstructionsActivity.intent(context), options)
     }
 
     private fun finishTrackerAnimation() {
@@ -2432,7 +2418,7 @@ class BrowserTabFragment :
 
         private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
             if (favorites.isEmpty()) {
-                if (hideDaxBackgroundLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
+                homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
@@ -2480,21 +2466,14 @@ class BrowserTabFragment :
 
             ctaContainer.removeAllViews()
 
-            if (configuration is HomePanelCta.AddReturningUsersWidgetAuto) {
-                hideDaxBackgroundLogo = true
-                inflate(context, R.layout.include_experiment_returning_users_cta, ctaContainer)
-            } else {
-                inflate(context, R.layout.include_cta, ctaContainer)
-            }
+            inflate(context, R.layout.include_cta, ctaContainer)
 
             configuration.showCta(ctaContainer)
             ctaContainer.ctaOkButton.setOnClickListener {
-                hideDaxBackgroundLogo = false
                 viewModel.onUserClickCtaOkButton()
             }
 
             ctaContainer.ctaDismissButton.setOnClickListener {
-                hideDaxBackgroundLogo = false
                 viewModel.onUserDismissedCta()
             }
         }

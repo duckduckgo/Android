@@ -24,7 +24,7 @@ import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
@@ -64,7 +64,7 @@ class AppTPWaitlistWorker(
 ) : CoroutineWorker(context, workerParams) {
 
     @Inject
-    lateinit var waitlistManager: TrackingProtectionWaitlistManager
+    lateinit var waitlistManager: AppTPWaitlistManager
 
     @Inject
     lateinit var notificationSender: NotificationSender
@@ -88,7 +88,7 @@ class AppTPWaitlistWorker(
 
 @ContributesMultibinding(AppScope::class)
 class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val waitlistManager: TrackingProtectionWaitlistManager,
+    private val waitlistManager: AppTPWaitlistManager,
     private val notificationSender: NotificationSender,
     private val notification: AppTPWaitlistCodeNotification,
     private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
