@@ -61,7 +61,9 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:visibility="visible" />
 
-    <include layout="@layout/include_new_browser_tab"
+    <include
+        android:id="@+id/includeNewBrowserTab"
+        layout="@layout/include_new_browser_tab"
         android:visibility="gone"/>
 
     <FrameLayout
