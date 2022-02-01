@@ -104,6 +104,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -152,7 +153,6 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.view.*
-import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -2352,16 +2352,7 @@ class BrowserTabFragment :
                 if (viewState.message != null) {
                     Timber.i("RMF: render ${viewState.message}")
                     messageCta.show()
-                    val message = (viewState.message as Small)
-                    messageCta.setMessage(
-                        MessageCta.Message(
-                            illustration = R.drawable.set_as_default_browser_illustration_dialog,
-                            title = message.titleText,
-                            subtitle = message.descriptionText,
-                            action = "Button",
-                            action2 = "Button"
-                        )
-                    )
+                    messageCta.setMessage(viewState.message.asMessage())
                     messageCta.onCloseButtonClicked {
                         viewModel.onMessageCloseButtonClicked()
                     }
@@ -2372,7 +2363,7 @@ class BrowserTabFragment :
                         viewModel.onMessageSecondaryButtonClicked()
                     }
                 } else {
-                    messageCta.hide()
+                    messageCta.gone()
                 }
 
                 if (viewState.cta != null) {

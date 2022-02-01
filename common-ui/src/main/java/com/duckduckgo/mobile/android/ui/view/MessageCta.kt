@@ -68,9 +68,8 @@ class MessageCta : FrameLayout {
 
     fun setMessage(message: Message) {
         if (message.illustration == -1) {
-            binding.secondaryActionButton.gone()
+            binding.illustration.gone()
         } else {
-            binding.secondaryActionButton.text = message.action2
             val drawable = AppCompatResources.getDrawable(context, message.illustration)
             binding.illustration.setImageDrawable(drawable)
             binding.illustration.show()
