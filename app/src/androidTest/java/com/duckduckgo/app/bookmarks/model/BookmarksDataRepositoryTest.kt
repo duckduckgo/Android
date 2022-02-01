@@ -122,7 +122,7 @@ class BookmarksDataRepositoryTest {
 
     @Test
     fun whenGetBookmarkFolderByParentIdThenReturnBookmarkFolderForParentId() = runTest {
-        val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 11)
+        val bookmarkFolder = BookmarkFolder(id = 11, name = "name", parentId = 121)
         bookmarkFoldersDao.insert(
             BookmarkFolderEntity(
                 id = bookmarkFolder.id,
