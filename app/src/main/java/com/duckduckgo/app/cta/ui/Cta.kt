@@ -20,6 +20,9 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.view.accessibility.AccessibilityNodeInfo
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.AnyRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -31,9 +34,9 @@ import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.DaxDialog
+import com.duckduckgo.app.global.view.TypeAnimationTextView
 import com.duckduckgo.app.global.view.TypewriterDaxDialog
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,9 +45,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
-import kotlinx.android.synthetic.main.include_cta_buttons.view.*
-import kotlinx.android.synthetic.main.include_cta_content.view.*
-import kotlinx.android.synthetic.main.include_dax_dialog_cta.view.*
 
 interface DialogCta {
     fun createCta(activity: FragmentActivity): DaxDialog
@@ -236,9 +236,9 @@ sealed class DaxBubbleCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).hide()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
@@ -302,9 +302,10 @@ sealed class BubbleCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.hide()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).hide()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()
@@ -333,7 +334,7 @@ sealed class BubbleCta(
                     }
                 }
             // Using braille unicode inside textview (to simulate the overflow icon), override description for accessibility
-            view.dialogTextCta.accessibilityDelegate = accessibilityDelegate
+            view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).accessibilityDelegate = accessibilityDelegate
         }
     }
 }
@@ -353,9 +354,9 @@ sealed class DaxFireDialogCta(
         val daxText = view.context.getString(description)
         view.show()
         view.alpha = 1f
-        view.hiddenTextCta.text = daxText.html(view.context)
-        view.primaryCta.gone()
-        view.dialogTextCta.startTypingAnimation(daxText, true)
+        view.findViewById<TextView>(R.id.hiddenTextCta).text = daxText.html(view.context)
+        view.findViewById<View>(R.id.primaryCta).gone()
+        view.findViewById<TypeAnimationTextView>(R.id.dialogTextCta).startTypingAnimation(daxText, true)
     }
 
     override fun pixelCancelParameters(): Map<String, String> = emptyMap()
@@ -392,11 +393,11 @@ sealed class HomePanelCta(
 ) : Cta, ViewCta {
 
     override fun showCta(view: View) {
-        view.ctaIcon?.setImageResource(image)
-        view.ctaTitle?.text = view.context.getString(title)
-        view.ctaSubtitle?.text = view.context.getString(description)
-        view.ctaOkButton.text = view.context.getString(okButton)
-        view.ctaDismissButton.text = view.context.getString(dismissButton)
+        view.findViewById<ImageView>(R.id.ctaIcon).setImageResource(image)
+        view.findViewById<TextView>(R.id.ctaTitle).text = view.context.getString(title)
+        view.findViewById<TextView>(R.id.ctaSubtitle).text = view.context.getString(description)
+        view.findViewById<Button>(R.id.ctaOkButton).text = view.context.getString(okButton)
+        view.findViewById<Button>(R.id.ctaDismissButton).text = view.context.getString(dismissButton)
         view.show()
     }
 
@@ -437,18 +438,6 @@ sealed class HomePanelCta(
         R.string.addWidgetCtaDescription,
         R.string.addWidgetCtaAutoLaunchButton,
         R.string.addWidgetCtaDismissButton,
-        AppPixelName.WIDGET_CTA_SHOWN,
-        AppPixelName.WIDGET_CTA_LAUNCHED,
-        AppPixelName.WIDGET_CTA_DISMISSED
-    )
-
-    object AddReturningUsersWidgetAuto : HomePanelCta(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaAutoLaunchButton,
-        R.string.returningUsersWidgetDismissButtonLabel,
         AppPixelName.WIDGET_CTA_SHOWN,
         AppPixelName.WIDGET_CTA_LAUNCHED,
         AppPixelName.WIDGET_CTA_DISMISSED
