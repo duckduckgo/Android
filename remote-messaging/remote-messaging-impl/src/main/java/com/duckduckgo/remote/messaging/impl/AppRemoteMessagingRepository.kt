@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.ActionType
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
@@ -37,9 +38,14 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class AppRemoteMessagingRepository(
-    private val remoteMessagesDao: RemoteMessagesDao
+    private val remoteMessagesDao: RemoteMessagesDao,
+    private val dispatchers: DispatcherProvider
 ) : RemoteMessagingRepository {
 
     private val messageMapper = MessageMapper()
@@ -56,8 +62,23 @@ class AppRemoteMessagingRepository(
         return RemoteMessage(message.id, message.content, emptyList(), emptyList())
     }
 
-    override fun dismissMessage(id: String) {
-        remoteMessagesDao.udpateState(id, Status.DISMISSED)
+    override fun messageFlow(): Flow<RemoteMessage?> {
+        return remoteMessagesDao.messagesFlow().distinctUntilChanged().map {
+            if (it == null || it.message.isEmpty()) return@map null
+
+            val message = messageMapper.fromMessage(it.message) ?: return@map null
+            RemoteMessage(
+                id = it.id,
+                content = message.content,
+                emptyList(), emptyList()
+            )
+        }
+    }
+
+    override suspend fun dismissMessage(id: String) {
+        withContext(dispatchers.io()) {
+            remoteMessagesDao.udpateState(id, Status.DISMISSED)
+        }
     }
 
     override fun dismissedMessages(): List<String> {

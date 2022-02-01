@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class RemoteMessagesDao {
@@ -36,4 +37,7 @@ abstract class RemoteMessagesDao {
 
     @Query("update remote_message set status = :newState where id = :id")
     abstract fun udpateState(id: String, newState: Status)
+
+    @Query("select * from remote_message where status = \"SCHEDULED\"")
+    abstract fun messagesFlow(): Flow<RemoteMessageEntity?>
 }
