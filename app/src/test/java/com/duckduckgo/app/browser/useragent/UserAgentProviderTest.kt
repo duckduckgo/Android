@@ -19,12 +19,12 @@ package com.duckduckgo.app.browser.useragent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class UserAgentProviderTest {
@@ -139,7 +139,7 @@ class UserAgentProviderTest {
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
-        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentOverridePluginPoint()
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentFakePluginPoint()
     ): UserAgentProvider {
         return UserAgentProvider({ defaultUserAgent }, device, userAgentInterceptorPluginPoint)
     }
