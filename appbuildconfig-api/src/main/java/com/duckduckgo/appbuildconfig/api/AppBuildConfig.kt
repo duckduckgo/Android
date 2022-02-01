@@ -17,6 +17,7 @@
 package com.duckduckgo.appbuildconfig.api
 
 interface AppBuildConfig {
+    val isTest: Boolean
     val isDebug: Boolean
     val applicationId: String
     val buildType: String

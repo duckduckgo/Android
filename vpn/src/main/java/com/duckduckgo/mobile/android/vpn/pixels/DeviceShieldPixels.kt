@@ -287,6 +287,26 @@ interface DeviceShieldPixels {
      * Will send a first-in-day pixel for the given alertName
      */
     fun sendHealthMonitorAlert(alertName: String)
+
+    /**
+     * Will fire when the VPN receives a packet of unknown protocol
+     */
+    fun sendUnknownPacketProtocol(protocol: Int)
+
+    /**
+     * Will fire when the VPN detected bad health, restarted and fixex the bad health
+     */
+    fun badHealthResolvedByRestart(data: Map<String, String>)
+
+    /**
+     * Will fire when the VPN detected bad health but it resolved itself
+     */
+    fun badHealthResolvedItself(data: Map<String, String>)
+
+    /**
+     * Will fire when the VPN restarted as a result of a bad health mitigation
+     */
+    fun didRestartVpnOnBadHealth()
 }
 
 @ContributesBinding(AppScope::class)
@@ -528,6 +548,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun sendAppBreakageReport(metadata: Map<String, String>) {
         firePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT, metadata)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_APP_BREAKAGE_REPORT_UNIQUE, payload = metadata)
     }
 
     override fun didShowReportBreakageAppList() {
@@ -583,6 +604,25 @@ class RealDeviceShieldPixels @Inject constructor(
         )
     }
 
+    override fun sendUnknownPacketProtocol(protocol: Int) {
+        firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL.pixelName, protocol))
+    }
+
+    override fun badHealthResolvedByRestart(data: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART_DAILY, data)
+        firePixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART, data)
+    }
+
+    override fun badHealthResolvedItself(data: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_ITSELF_DAILY, data)
+        firePixel(DeviceShieldPixelNames.ATP_APP_BAD_HEALTH_RESOLVED_ITSELF, data)
+    }
+
+    override fun didRestartVpnOnBadHealth() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH)
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
@@ -591,7 +631,14 @@ class RealDeviceShieldPixels @Inject constructor(
         p: DeviceShieldPixelNames,
         payload: Map<String, String> = emptyMap()
     ) {
-        pixel.fire(p, payload)
+        firePixel(p.pixelName, payload)
+    }
+
+    private fun firePixel(
+        pixelName: String,
+        payload: Map<String, String> = emptyMap()
+    ) {
+        pixel.fire(pixelName, payload)
     }
 
     private fun tryToFireDailyPixel(
@@ -617,13 +664,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     private fun tryToFireUniquePixel(
         pixel: DeviceShieldPixelNames,
-        tag: String? = null
+        tag: String? = null,
+        payload: Map<String, String> = emptyMap()
     ) {
         val didExecuteAlready = preferences.getBoolean(tag ?: pixel.pixelName, false)
 
         if (didExecuteAlready) return
 
-        this.pixel.fire(pixel).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
     }
 
     private fun String.appendTimestampSuffix(): String {

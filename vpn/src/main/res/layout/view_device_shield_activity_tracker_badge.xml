@@ -16,9 +16,38 @@
   ~ limitations under the License.
   -->
 
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tracker_company_icon"
-    android:layout_width="20dp"
-    android:layout_height="20dp"
-    android:layout_margin="2dp"
-    />
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp">
+
+    <ImageView
+        android:id="@+id/tracker_company_badge_icon"
+        android:visibility="gone"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"/>
+
+    <TextView
+        android:id="@+id/tracker_company_badge_text"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:background="@drawable/background_circular_text"
+        android:textColor="?accentTextColor"
+        android:textAlignment="center"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"/>
+
+    <TextView
+        android:id="@+id/tracker_company_large_badge_text"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium"
+        android:background="@drawable/background_radius_text"
+        android:textColor="?accentTextColor"
+        android:textAlignment="center"
+        android:layout_width="wrap_content"
+        android:minWidth="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"/>
+
+</FrameLayout>
+

@@ -17,8 +17,6 @@
 <resources>
 
     <attr name="daxLogoTextColor" format="color" />
-    <attr name="normalTextColor" format="color" />
-    <attr name="secondaryTextColor" format="color" />
     <attr name="headerDescriptionColor" format="color" />
     <attr name="dialogBgColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
@@ -83,5 +81,13 @@
     <attr name="listItemSeparatorColor" format="color" />
     <attr name="textInputOutlinedBoxColor" format="color" />
     <attr name="textInputOutlinedBoxColorHighlight" format="color" />
+
+    <attr name="normalTextColor" format="color" />
+    <attr name="secondaryTextColor" format="color" />
+    <attr name="accentTextColor" format="color" />
+    <attr name="primaryIconColor" format="color" />
+    <attr name="secondaryIconColor" format="color" />
+    <attr name="accentIconColor" format="color" />
+    <attr name="splitterColor" format="color" />
 
 </resources>

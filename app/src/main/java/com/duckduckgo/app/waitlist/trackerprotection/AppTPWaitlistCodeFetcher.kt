@@ -25,8 +25,9 @@ import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,7 +38,8 @@ interface TrackingProtectionWaitlistCodeFetcher : LifecycleObserver {
 
 class AppTrackingProtectionWaitlistCodeFetcher(
     private val workManager: WorkManager,
-    private val manager: TrackingProtectionWaitlistManager,
+    private val atpRepository: AtpWaitlistStateRepository,
+    private val atpTPWaitlistManager: AppTPWaitlistManager,
     private val notification: SchedulableNotification,
     private val notificationSender: NotificationSender,
     private val dispatcherProvider: DispatcherProvider,
@@ -47,7 +49,7 @@ class AppTrackingProtectionWaitlistCodeFetcher(
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun executeWaitlistCodeFetcher() {
         appCoroutineScope.launch {
-            if (manager.waitlistState() is WaitlistState.JoinedQueue) {
+            if (atpRepository.getState() is WaitlistState.JoinedWaitlist) {
                 fetchInviteCode()
             }
         }
@@ -55,7 +57,7 @@ class AppTrackingProtectionWaitlistCodeFetcher(
 
     override suspend fun fetchInviteCode() {
         withContext(dispatcherProvider.io()) {
-            when (manager.fetchInviteCode()) {
+            when (atpTPWaitlistManager.fetchInviteCode()) {
                 FetchCodeResult.CodeExisted -> {
                     workManager.cancelAllWorkByTag(APP_TP_WAITLIST_SYNC_WORK_TAG)
                 }

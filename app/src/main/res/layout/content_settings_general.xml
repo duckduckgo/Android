@@ -82,13 +82,21 @@
         app:layout_constraintTop_toTopOf="@+id/changeAppIconLabel"
         tools:srcCompat="@drawable/ic_app_icon_red_round" />
 
+    <TextView
+        android:id="@+id/homeScreenWidgetSetting"
+        style="@style/SettingsItemClickable"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/settingsAddHomeScreenWidget"
+        app:layout_constraintTop_toBottomOf="@id/changeAppIconLabel" />
+
     <com.duckduckgo.app.settings.SettingsOptionWithSubtitle
         android:id="@+id/selectedFireAnimationSetting"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/changeAppIcon"
+        app:layout_constraintTop_toBottomOf="@id/homeScreenWidgetSetting"
         app:subtitle="@string/settingsHeroFireAnimation"
         app:title="@string/settingsFireAnimation" />
 
