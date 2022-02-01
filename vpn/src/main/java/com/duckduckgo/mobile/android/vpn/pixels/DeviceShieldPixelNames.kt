@@ -116,9 +116,23 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_LAUNCH_FEEDBACK("m_atp_ev_launch_feedback_c"),
     ATP_LAUNCH_FEEDBACK_DAILY("m_atp_ev_launch_feedback_d"),
 
+    ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG("m_atp_ev_submit_disable_app_protection_dialog_c"),
+    ATP_DID_SUBMIT_DISABLE_APP_PROTECTION_DIALOG_DAILY("m_atp_ev_submit_disable_app_protection_dialog_d"),
+    ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG("m_atp_ev_skip_disable_app_protection_dialog_c"),
+    ATP_DID_SKIP_DISABLE_APP_PROTECTION_DIALOG_DAILY("m_atp_ev_skip_disable_app_protection_dialog_d"),
+    ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY("m_atp_imp_tracker_activity_report_issues_c"),
+    ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY("m_atp_imp_tracker_activity_report_issues_d"),
+
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
+    ATP_APP_BREAKAGE_REPORT_UNIQUE("m_atp_breakage_report_u"),
     ATP_APP_HEALTH_MONITOR_REPORT("m_atp_health_monitor_report"),
     ATP_APP_HEALTH_ALERT_DAILY("m_atp_health_alert_%s_d"),
+    ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART("m_atp_bad_health_resolved_by_restart_c"),
+    ATP_APP_BAD_HEALTH_RESOLVED_BY_RESTART_DAILY("m_atp_bad_health_resolved_by_restart_d"),
+    ATP_APP_BAD_HEALTH_RESOLVED_ITSELF("m_atp_bad_health_resolved_itself_c"),
+    ATP_APP_BAD_HEALTH_RESOLVED_ITSELF_DAILY("m_atp_bad_health_resolved_itself_d"),
+    ATP_DID_RESTART_VPN_ON_BAD_HEALTH("m_atp_did_restart_vpn_on_bad_health_c"),
+    ATP_DID_RESTART_VPN_ON_BAD_HEALTH_DAILY("m_atp_did_restart_vpn_on_bad_health_d"),
 
     ATP_ENCRYPTED_IO_EXCEPTION("m_atp_ev_encrypted_io_error_c"),
     ATP_ENCRYPTED_GENERAL_EXCEPTION("m_atp_ev_encrypted_error_c"),
@@ -138,5 +152,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_SHOW_WAITLIST_DIALOG("m_atp_imp_waitlist_dialog_c"),
     ATP_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("m_atp_ev_waitlist_dialog_notify_me_c"),
     ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
+
+    ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL("m_atp_ev_unknown_packet_%d_c"),
     ;
 }

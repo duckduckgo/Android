@@ -21,74 +21,116 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Provider
+import org.threeten.bp.LocalDateTime
 
-class AppTPCompanyTrackersViewModel constructor(
+class AppTPCompanyTrackersViewModel
+@Inject
+constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
+    private val timeDiffFormatter: TimeDiffFormatter,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
 
-    suspend fun getTrackersForAppFromDate(
-        date: String,
-        packageName: String
-    ): Flow<ViewState> = withContext(dispatchers.io()) {
-        return@withContext statsRepository.getTrackersForAppFromDate(date, packageName)
-            .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
-            .map { aggregateDataPerApp(it) }
-            .flowOn(Dispatchers.Default)
-    }
+    private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
 
-    private fun aggregateDataPerApp(trackerData: List<VpnTracker>): ViewState {
+    suspend fun getTrackersForAppFromDate(date: String, packageName: String): Flow<ViewState> =
+        withContext(dispatchers.io()) {
+            return@withContext statsRepository
+                .getTrackersForAppFromDate(date, packageName)
+                .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
+                .map { aggregateDataPerApp(it) }
+                .flowOn(Dispatchers.Default)
+        }
+
+    private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
-        val trackerCompany = trackerData.groupBy { it.trackerCompanyId }
+        val lastTrackerBlockedAgo =
+            if (trackerData.isNotEmpty()) {
+                timeDiffFormatter.formatTimePassed(
+                    LocalDateTime.now(), LocalDateTime.parse(trackerData[0].tracker.timestamp)
+                )
+            } else {
+                ""
+            }
+
+        val trackerCompany =
+            trackerData.sortedByDescending { it.trackerEntity.score }.groupBy {
+                it.tracker.trackerCompanyId
+            }
 
         trackerCompany.forEach { data ->
-            val trackerCompanyName = data.value[0].company
-            val trackerCompanyDisplayName = data.value[0].companyDisplayName
+            val trackerCompanyName = data.value[0].tracker.company
+
+            val trackerCompanyDisplayName = data.value[0].tracker.companyDisplayName
+            val signals = data.value[0].trackerEntity.signals
+            val timestamp = data.value[0].tracker.timestamp
+
+            val trackingSignals = if (trackerCompanies.containsKey(trackerCompanyName)) {
+                trackerCompanies.get(trackerCompanyName)!!
+            } else {
+                val randomTrackingSignals = mapTrackingSignals(signals)
+                trackerCompanies.put(trackerCompanyName, randomTrackingSignals)
+                randomTrackingSignals
+            }
+
             sourceData.add(
                 CompanyTrackingDetails(
                     companyName = trackerCompanyName,
                     companyDisplayName = trackerCompanyDisplayName,
-                    trackingAttempts = data.value.size
+                    trackingAttempts = data.value.size,
+                    timestamp = timestamp,
+                    trackingSignals = trackingSignals
                 )
             )
         }
 
-        return ViewState(trackerData.size, sourceData)
+        return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
+    }
+
+    private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
+        val originalTrackingSignals = signals.map { TrackingSignal.fromTag(it) }
+        val randomElements = originalTrackingSignals.asSequence().shuffled().toList()
+        return randomElements.distinctBy { it.signalDisplayName }
     }
 
     data class ViewState(
         val totalTrackingAttempts: Int,
+        val lastTrackerBlockedAgo: String,
         val trackingCompanies: List<CompanyTrackingDetails>
     )
-
     data class CompanyTrackingDetails(
         val companyName: String,
         val companyDisplayName: String,
-        val trackingAttempts: Int
+        val trackingAttempts: Int,
+        val timestamp: String,
+        val trackingSignals: List<TrackingSignal>,
+        val expanded: Boolean = false
     )
 }
 
 @ContributesMultibinding(AppScope::class)
-class AppTPCompanyTrackersViewModelFactory @Inject constructor(
-    private val repositopryProvider: Provider<AppTrackerBlockingStatsRepository>
-) : ViewModelFactoryPlugin {
+class AppTPCompanyTrackersViewModelFactory
+@Inject
+constructor(private val viewModel: Provider<AppTPCompanyTrackersViewModel>) :
+    ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) -> AppTPCompanyTrackersViewModel(
-                    repositopryProvider.get()
-                ) as T
+                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) ->
+                    (viewModel.get() as T)
                 else -> null
             }
         }

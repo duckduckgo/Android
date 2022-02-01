@@ -10,6 +10,9 @@ dependencies {
     // Dependencies for this Module
     implementation project(path: ':common')
 
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation Square.okHttp3.okHttp
     implementation KotlinX.coroutines.core
     implementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -36,6 +37,7 @@ import javax.inject.Inject
 class BrowserChromeClient @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val drm: Drm,
+    private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider()
 ) : WebChromeClient() {
@@ -158,7 +160,8 @@ class BrowserChromeClient @Inject constructor(
         isUserGesture: Boolean,
         resultMsg: Message?
     ): Boolean {
-        if (isUserGesture && resultMsg?.obj is WebView.WebViewTransport) {
+        val isGesture = if (appBuildConfig.isTest) true else isUserGesture
+        if (isGesture && resultMsg?.obj is WebView.WebViewTransport) {
             webViewClientListener?.openMessageInNewTab(resultMsg)
             return true
         }

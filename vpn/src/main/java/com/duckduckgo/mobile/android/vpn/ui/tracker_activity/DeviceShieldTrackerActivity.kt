@@ -72,7 +72,6 @@ class DeviceShieldTrackerActivity :
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
-
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
@@ -263,6 +262,7 @@ class DeviceShieldTrackerActivity :
 
     override fun onTurnAppTrackingProtectionOff() {
         deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        deviceShieldPixels.didChooseToDisableTrackingProtectionFromDialog()
         viewModel.onAppTpManuallyDisabled()
     }
 
@@ -450,6 +450,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchFeedback() {
+        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 

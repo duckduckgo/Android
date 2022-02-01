@@ -60,8 +60,25 @@ class ExcludedAppsViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport = false)
 
-        verifyNoInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
+    }
+
+    @Test
+    fun whenAppProtectionisDisabledAndReportIsSkippedThenDisablePixelIsSent() = runTest {
+        val packageName = "com.package.name"
+        val skippedReport = true
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
+
+        verify(deviceShieldPixels).didSkipManuallyDisableAppProtectionDialog()
+    }
+
+    @Test
+    fun whenAppProtectionisSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
+        val packageName = "com.package.name"
+        val skippedReport = false
+        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
+
+        verify(deviceShieldPixels).didSubmitManuallyDisableAppProtectionDialog()
     }
 
     @Test

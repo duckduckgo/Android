@@ -744,14 +744,6 @@
         <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
-    <style name="SearchWidgetCtaTitle">
-        <item name="android:textAlignment">center</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/normalTextColor</item>
-        <item name="android:textSize">20sp</item>
-        <item name="lineHeight">23dp</item>
-    </style>
-
     <style name="SavedSiteFullScreenDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowTranslucentStatus">true</item>

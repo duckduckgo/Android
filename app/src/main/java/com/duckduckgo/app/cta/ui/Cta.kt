@@ -443,18 +443,6 @@ sealed class HomePanelCta(
         AppPixelName.WIDGET_CTA_DISMISSED
     )
 
-    object AddReturningUsersWidgetAuto : HomePanelCta(
-        CtaId.ADD_WIDGET,
-        R.drawable.add_widget_cta_icon,
-        R.string.addWidgetCtaTitle,
-        R.string.addWidgetCtaDescription,
-        R.string.addWidgetCtaAutoLaunchButton,
-        R.string.returningUsersWidgetDismissButtonLabel,
-        AppPixelName.WIDGET_CTA_SHOWN,
-        AppPixelName.WIDGET_CTA_LAUNCHED,
-        AppPixelName.WIDGET_CTA_DISMISSED
-    )
-
     object AddWidgetInstructions : HomePanelCta(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,

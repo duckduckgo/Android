@@ -17,9 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
-import com.duckduckgo.mobile.android.vpn.health.TracedState
-import com.duckduckgo.mobile.android.vpn.health.TracerEvent
-import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
@@ -81,7 +78,6 @@ class TcpDeviceToNetwork(
     private val payloadBytesExtractor: PayloadBytesExtractor,
     private val recentAppTrackerCache: RecentAppTrackerCache,
     private val vpnCoroutineScope: CoroutineScope,
-    private val tracerRegister: TracerPacketRegister,
     private val healthMetricCounter: HealthMetricCounter
 ) {
 
@@ -91,11 +87,6 @@ class TcpDeviceToNetwork(
      */
     fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
-
-        if (packet.isTracer) {
-            processTracerPacker(packet)
-            return
-        }
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue()
 
@@ -121,26 +112,6 @@ class TcpDeviceToNetwork(
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
         }
-    }
-
-    private fun processTracerPacker(packet: Packet) {
-        val tracerId = packet.tracerId
-        tracerRegister.logTracerPacketEvent(
-            TracerEvent(tracerId, TracedState.REMOVED_FROM_DEVICE_TO_NETWORK_QUEUE)
-        )
-
-        val idLength = tracerId.length
-        val idBytes = tracerId.toByteArray()
-
-        val byteBuffer = ByteBufferPool.acquire()
-        byteBuffer.put(-1)
-        byteBuffer.putInt(idLength)
-        byteBuffer.put(idBytes)
-
-        tracerRegister.logTracerPacketEvent(
-            TracerEvent(tracerId, TracedState.ADDED_TO_NETWORK_TO_DEVICE_QUEUE)
-        )
-        queues.networkToDevice.offer(byteBuffer)
     }
 
     private fun processPacketTcbNotInitialized(

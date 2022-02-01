@@ -29,6 +29,7 @@ public class ByteBufferPool {
         if (buffer == null) {
             buffer = ByteBuffer.allocateDirect(BUFFER_SIZE); // Using DirectBuffer for zero-copy
         }
+        buffer.clear();
         return buffer;
     }
 

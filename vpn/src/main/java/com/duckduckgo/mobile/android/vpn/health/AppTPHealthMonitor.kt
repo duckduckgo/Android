@@ -29,6 +29,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
@@ -66,7 +67,6 @@ class AppTPHealthMonitor @Inject constructor(
     @VpnCoroutineScope private val coroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter,
     private val healthClassifier: HealthClassifier,
-    private val tracerPacketBuilder: TracerPacketBuilder,
     private val vpnQueues: VpnQueues,
     private val callbacks: PluginPoint<AppHealthCallback>
 ) : AppHealthMonitor {
@@ -77,7 +77,6 @@ class AppTPHealthMonitor @Inject constructor(
         const val SLIDING_WINDOW_DURATION_MS: Long = 60_000
 
         private const val MONITORING_FREQUENCY_MS: Long = 30_000
-        private const val TRACER_INJECTION_FREQUENCY_MS: Long = 5_000
         private const val OLD_METRIC_CLEANUP_FREQUENCY_MS: Long = 60_000
 
         private val MEMORY_ALERT_SAMPLES: Int = (15.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
@@ -91,7 +90,6 @@ class AppTPHealthMonitor @Inject constructor(
     val healthState: StateFlow<SystemHealthData> = _healthState
 
     private val monitoringJob = ConflatedJob()
-    private val tracerInjectionJob = ConflatedJob()
     private val oldMetricCleanupJob = ConflatedJob()
 
     private var simulatedGoodHealth: Boolean? = null
@@ -105,7 +103,6 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val memoryAlerts = object : HealthRule("memoryAlerts", samplesToWaitBeforeAlerting = MEMORY_ALERT_SAMPLES) {}.also { healthRules.add(it) }
-    private val tracerPacketsAlerts = object : HealthRule("tracerPacketsAlerts", samplesToWaitBeforeAlerting = 1) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
         val timeWindow = now - SLIDING_WINDOW_DURATION_MS
@@ -116,7 +113,6 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleSocketWriteExceptions(timeWindow, socketWriteExceptionAlerts)
         healthStates += sampleSocketConnectExceptions(timeWindow, socketConnectExceptionAlerts)
         healthStates += sampleTunWriteExceptions(timeWindow, tunWriteExceptionAlerts)
-        healthStates += sampleTracerPackets(timeWindow, tracerPacketsAlerts)
         // healthStates += sampleMemoryUsage(memoryAlerts)
 
         /*
@@ -150,34 +146,24 @@ class AppTPHealthMonitor @Inject constructor(
         }
     }
 
-    private fun sampleMemoryUsage(healthAlerts: HealthRule): HealthState {
-        val state = healthClassifier.determineHealthMemory()
-        healthAlerts.updateAlert(state)
-        return state
-    }
-
-    private fun sampleTracerPackets(
-        timeWindowMillis: Long,
-        healthAlerts: HealthRule
-    ): HealthState {
-        val allTraces = healthMetricCounter.getAllPacketTraces(timeWindowMillis)
-        val state = healthClassifier.determineHealthTracerPackets(allTraces)
-        healthAlerts.updateAlert(state)
-        return state
-    }
-
     private fun sampleTunReadQueueReadRate(
         timeWindow: Long,
         healthAlerts: HealthRule
     ): HealthState {
         val tunReads = healthMetricCounter.getStat(TUN_READ(), timeWindow)
+        val unknownPackets = healthMetricCounter.getStat(TUN_READ_UNKNOWN_PACKET(), timeWindow)
         val readFromNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val readFromTCPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
         val readFromUDPNetworkQueue = healthMetricCounter.getStat(REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
 
         val state = healthClassifier.determineHealthTunInputQueueReadRatio(
             tunReads,
-            QueueReads(queueReads = readFromNetworkQueue, queueTCPReads = readFromTCPNetworkQueue, queueUDPReads = readFromUDPNetworkQueue)
+            QueueReads(
+                queueReads = readFromNetworkQueue,
+                queueTCPReads = readFromTCPNetworkQueue,
+                queueUDPReads = readFromUDPNetworkQueue,
+                unknownPackets = unknownPackets
+            )
         )
         healthAlerts.updateAlert(state)
         return state
@@ -272,13 +258,6 @@ class AppTPHealthMonitor @Inject constructor(
             }
         }
 
-        tracerInjectionJob += coroutineScope.launch {
-            while (isActive) {
-                injectTracerPacket()
-                delay(TRACER_INJECTION_FREQUENCY_MS)
-            }
-        }
-
         oldMetricCleanupJob += coroutineScope.launch {
             while (isActive) {
                 Timber.i("Cleaning up old health metrics")
@@ -292,19 +271,11 @@ class AppTPHealthMonitor @Inject constructor(
         Timber.v("AppTp Health - stop monitoring")
 
         monitoringJob.cancel()
-        tracerInjectionJob.cancel()
         oldMetricCleanupJob.cancel()
     }
 
     override fun isMonitoringStarted(): Boolean {
         return monitoringJob.isActive
-    }
-
-    private fun injectTracerPacket() {
-        val packet = tracerPacketBuilder.build()
-        healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.CREATED))
-        healthMetricCounter.logTracerPacketEvent(TracerEvent(packet.tracerId, TracedState.ADDED_TO_DEVICE_TO_NETWORK_QUEUE))
-        vpnQueues.tcpDeviceToNetwork.offer(packet)
     }
 
     sealed class HealthState(open val metrics: RawMetricsSubmission?) {
