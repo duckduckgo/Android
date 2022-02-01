@@ -49,7 +49,7 @@ abstract class TrackingLinkDetectionDao {
         insertAllAmpKeywords(ampKeywords)
     }
 
-    @Query("select * from tracking_link_exceptions")
+    @Query("select * from amp_exceptions")
     abstract fun getAllExceptions(): List<TrackingLinkExceptionEntity>
 
     @Query("select * from amp_link_formats")
@@ -58,7 +58,7 @@ abstract class TrackingLinkDetectionDao {
     @Query("select * from amp_keywords")
     abstract fun getAllAmpKeywords(): List<AmpKeywordEntity>
 
-    @Query("delete from tracking_link_exceptions")
+    @Query("delete from amp_exceptions")
     abstract fun deleteAllExceptions()
 
     @Query("delete from amp_link_formats")

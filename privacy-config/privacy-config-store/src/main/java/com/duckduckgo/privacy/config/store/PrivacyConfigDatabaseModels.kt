@@ -121,7 +121,7 @@ data class AmpKeywordEntity(
     @PrimaryKey val keyword: String
 )
 
-@Entity(tableName = "tracking_link_exceptions")
+@Entity(tableName = "amp_exceptions")
 data class TrackingLinkExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String
