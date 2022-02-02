@@ -43,6 +43,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -79,7 +80,7 @@ class NetworkTypeCollector @Inject constructor(
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(null)
+            updateNetworkInfo(NetworkType.NO_NETWORK)
         }
     }
 
@@ -89,7 +90,7 @@ class NetworkTypeCollector @Inject constructor(
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(null)
+            updateNetworkInfo(NetworkType.NO_NETWORK)
         }
     }
 
@@ -116,16 +117,36 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
-    private fun updateNetworkInfo(networkType: NetworkType?) {
+    private fun updateNetworkInfo(networkType: NetworkType) {
         coroutineScope.launch(databaseDispatcher) {
             try {
-                val previousNetwork: String? = currentNetworkInfo?.let { adapter.fromJson(it)?.currentNetwork }
+                val previousNetworkInfo: NetworkInfo? = currentNetworkInfo?.let { adapter.fromJson(it) }
+
+                // Calculate timestamp for when the network type last switched
+                val previousNetworkType = previousNetworkInfo?.let { NetworkType.valueOf(it.currentNetwork) }
+                val didSwitch = previousNetworkType != networkType
+                val lastSwitchTimestampMillis = if (didSwitch) {
+                    SystemClock.elapsedRealtime()
+                } else {
+                    previousNetworkInfo?.lastSwitchTimestampMillis ?: UNKNOWN
+                }
+
+                // Calculate how long ago the network type last switched
+                val previousNetwork: String? = previousNetworkInfo?.currentNetwork
+                val secondsSinceLastSwitch = if (didSwitch) {
+                    0
+                } else {
+                    previousNetworkInfo?.let {
+                        TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - it.lastSwitchTimestampMillis)
+                    } ?: SystemClock.elapsedRealtime()
+                }
                 val jsonInfo =
                     adapter.toJson(
                         NetworkInfo(
                             currentNetwork = networkType.toString(),
                             previousNetwork = previousNetwork,
-                            secondsSinceLastSwitch = SystemClock.elapsedRealtime()
+                            lastSwitchTimestampMillis = lastSwitchTimestampMillis,
+                            secondsSinceLastSwitch = secondsSinceLastSwitch
                         )
                     )
                 currentNetworkInfo = jsonInfo
@@ -145,17 +166,21 @@ class NetworkTypeCollector @Inject constructor(
     internal data class NetworkInfo(
         val currentNetwork: String,
         val previousNetwork: String? = null,
+        val lastSwitchTimestampMillis: Long,
         val secondsSinceLastSwitch: Long
     )
 
     internal enum class NetworkType {
         WIFI,
-        CELLULAR
+        CELLULAR,
+        NO_NETWORK,
     }
 
     companion object {
         private const val FILENAME = "network.type.collector.file"
-        private const val NETWORK_INFO_KEY = "NETWORK_INFO_KEY"
+        private const val NETWORK_INFO_KEY = "network.info.key"
+
+        private const val UNKNOWN = -1L
     }
 }
 
