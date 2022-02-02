@@ -37,15 +37,19 @@ class RemoteMessagingModel @Inject constructor(
 
     val activeMessages = remoteMessagingRepository.messageFlow()
 
+    suspend fun onMessageShown(remoteMessage: RemoteMessage) {
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_SHOWN, remoteMessage.asPixelParams())
+    }
+
     suspend fun onMessageDismissed(remoteMessage: RemoteMessage) {
-        pixel.fire(AppPixelName.REMOTE_MESSAGE_DISMISSED)
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, remoteMessage.asPixelParams())
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
     }
 
     suspend fun onPrimaryActionClicked(remoteMessage: RemoteMessage): Action? {
-        pixel.fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED)
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, remoteMessage.asPixelParams())
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
@@ -53,7 +57,7 @@ class RemoteMessagingModel @Inject constructor(
     }
 
     suspend fun onSecondaryActionClicked(remoteMessage: RemoteMessage): Action? {
-        pixel.fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED)
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, remoteMessage.asPixelParams())
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
@@ -80,4 +84,6 @@ class RemoteMessagingModel @Inject constructor(
             else -> null
         }
     }
+
+    private fun RemoteMessage.asPixelParams(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to this.id)
 }

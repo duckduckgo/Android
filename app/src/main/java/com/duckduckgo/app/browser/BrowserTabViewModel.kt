@@ -2098,6 +2098,14 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onMessageShown() {
+        Timber.i("RMF: onMessageShown")
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageShown(message)
+        }
+    }
+
     fun onMessageCloseButtonClicked() {
         Timber.i("RMF: onMessageCloseButtonClicked")
         val message = currentCtaViewState().message ?: return

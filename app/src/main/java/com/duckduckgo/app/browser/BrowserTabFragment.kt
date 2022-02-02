@@ -2364,21 +2364,26 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                val newMessage = viewState.message?.id == lastSeenCtaViewState?.message?.id
                 lastSeenCtaViewState = viewState
+                Timber.i("RMF: viewstate ${lastSeenCtaViewState}")
                 removeNewTabLayoutClickListener()
 
                 if (viewState.message != null) {
-                    Timber.i("RMF: render ${viewState.message}")
-                    messageCta.show()
-                    messageCta.setMessage(viewState.message.asMessage())
-                    messageCta.onCloseButtonClicked {
-                        viewModel.onMessageCloseButtonClicked()
-                    }
-                    messageCta.onPrimaryActionClicked {
-                        viewModel.onMessagePrimaryButtonClicked()
-                    }
-                    messageCta.onSecondaryActionClicked {
-                        viewModel.onMessageSecondaryButtonClicked()
+                    if (newMessage) {
+                        Timber.i("RMF: render ${viewState.message}")
+                        messageCta.show()
+                        viewModel.onMessageShown()
+                        messageCta.setMessage(viewState.message.asMessage())
+                        messageCta.onCloseButtonClicked {
+                            viewModel.onMessageCloseButtonClicked()
+                        }
+                        messageCta.onPrimaryActionClicked {
+                            viewModel.onMessagePrimaryButtonClicked()
+                        }
+                        messageCta.onSecondaryActionClicked {
+                            viewModel.onMessageSecondaryButtonClicked()
+                        }
                     }
                 } else {
                     messageCta.gone()
@@ -2391,7 +2396,7 @@ class BrowserTabFragment :
                     showHomeBackground(viewState.favorites)
                 }
 
-                if (viewState.cta != null || viewState.message != null) {
+                if (viewState.cta is HomePanelCta && viewState.message != null) {
                     hideHomeCta()
                 }
             }
