@@ -130,6 +130,7 @@ import com.duckduckgo.app.global.view.enableAnimation
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.global.view.isDifferent
 import com.duckduckgo.app.global.view.isImmersiveModeEnabled
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
@@ -735,6 +736,7 @@ class BrowserTabFragment :
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> launchAddWidget()
+            is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
@@ -1784,6 +1786,12 @@ class BrowserTabFragment :
         val context = context ?: return
         val provider = ComponentName(context, SearchAndFavoritesWidget::class.java)
         AppWidgetManager.getInstance(context).requestPinAppWidget(provider, null, null)
+    }
+
+    private fun launchDefaultBrowser() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            requireActivity().launchDefaultAppActivity()
+        }
     }
 
     private fun launchLegacyAddWidget() {

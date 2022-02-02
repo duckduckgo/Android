@@ -18,8 +18,8 @@ package com.duckduckgo.remote.messaging.api
 
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS
 import com.duckduckgo.remote.messaging.api.Action.ActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.api.Action.ActionType.DEFAULT_BROWSER
 import com.duckduckgo.remote.messaging.api.Action.ActionType.URL
-import com.duckduckgo.remote.messaging.api.Content.MessageType
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_SINGLE_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.BIG_TWO_ACTION
 import com.duckduckgo.remote.messaging.api.Content.MessageType.MEDIUM
@@ -64,12 +64,14 @@ sealed class Content(val messageType: MessageType) {
 sealed class Action(val actionType: ActionType) {
     data class Url(val value: String) : Action(URL)
     data class PlayStore(val value: String) : Action(PLAYSTORE)
+    data class DefaultBrowser(private val value: String = "") : Action(DEFAULT_BROWSER)
     // Using data class instead of Object. Object can't be serialized
     data class Dismiss(private val value: String = "") : Action(DISMISS)
 
     enum class ActionType {
         URL,
         PLAYSTORE,
+        DEFAULT_BROWSER,
         DISMISS
     }
 }

@@ -21,6 +21,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.ActionType
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
+import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -111,6 +112,7 @@ class AppRemoteMessagingRepository(
                         .withSubtype(PlayStore::class.java, ActionType.PLAYSTORE.name)
                         .withSubtype(Url::class.java, ActionType.URL.name)
                         .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
+                        .withSubtype(DefaultBrowser::class.java, ActionType.DEFAULT_BROWSER.name)
                 )
                 // if you have more adapters, add them before this line:
                 .add(KotlinJsonAdapterFactory())

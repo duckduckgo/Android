@@ -81,10 +81,15 @@ class JsonRemoteMessageMapper {
         Action.PlayStore(it.value)
     }
 
+    private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
+        Action.DefaultBrowser()
+    }
+
     private val actionMappers = mapOf(
         Pair("url", urlActionMapper),
         Pair("dismiss", dismissActionMapper),
-        Pair("playstore", playStoreActionMapper)
+        Pair("playstore", playStoreActionMapper),
+        Pair("defaultBrowser", defaultBrowserActionMapper)
     )
 
     fun map(jsonMessages: List<JsonRemoteMessage>): List<RemoteMessage> = jsonMessages.mapNotNull { it.map() }

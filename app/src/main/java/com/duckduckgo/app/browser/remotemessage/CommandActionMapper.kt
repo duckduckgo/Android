@@ -17,18 +17,17 @@
 package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.*
 import com.duckduckgo.remote.messaging.api.Action
-import com.duckduckgo.remote.messaging.api.Action.Dismiss
-import com.duckduckgo.remote.messaging.api.Action.PlayStore
-import com.duckduckgo.remote.messaging.api.Action.Url
+import com.duckduckgo.remote.messaging.api.Action.*
 
 fun Action.asBrowserTabCommand(): Command? {
     return when (this) {
         is Dismiss -> {
             null
         }
-        is PlayStore -> Command.LaunchPlayStore(this.value)
+        is PlayStore -> LaunchPlayStore(this.value)
         is Url -> SubmitUrl(this.value)
+        is DefaultBrowser -> LaunchDefaultBrowser
     }
 }
