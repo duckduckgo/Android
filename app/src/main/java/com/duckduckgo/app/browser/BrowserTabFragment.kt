@@ -143,6 +143,9 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
 import android.widget.Button
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
@@ -164,6 +167,7 @@ import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
+import javax.inject.Provider
 
 class BrowserTabFragment :
     Fragment(),
@@ -266,6 +270,17 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+
+    @Inject
+    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+
+    @Inject
+    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+
+    private var urlExtractingWebView: UrlExtractingWebView? = null
 
     private var _binding: FragmentBrowserTabBinding? = null
     private val binding get() = _binding!!
@@ -737,6 +752,13 @@ class BrowserTabFragment :
                     headers = it.headers
                 )
             }
+            is Command.ExtractUrlFromCloakedTrackingLink -> {
+                extractUrlFromTrackingLink(it.initialUrl)
+            }
+            is Command.LoadExtractedUrl -> {
+                webView?.loadUrl(it.extractedUrl)
+                destroyUrlExtractingWebView()
+            }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
@@ -767,6 +789,26 @@ class BrowserTabFragment :
                 omnibar.omnibarTextInput.setSelection(it.query.length)
             }
         }
+    }
+
+    private fun extractUrlFromTrackingLink(initialUrl: String) {
+        context?.let {
+            val client = urlExtractingWebViewClient.get()
+            client.urlExtractionListener = viewModel
+
+            Timber.d("Tracking link detection: Creating WebView for URL extraction")
+            urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
+
+            urlExtractingWebView?.urlExtractionListener = viewModel
+
+            Timber.d("Tracking link detection: Loading tracking URL for extraction")
+            urlExtractingWebView?.loadUrl(initialUrl)
+        }
+    }
+
+    private fun destroyUrlExtractingWebView() {
+        urlExtractingWebView?.destroyWebView()
+        urlExtractingWebView = null
     }
 
     private fun injectEmailAddress(alias: String) {

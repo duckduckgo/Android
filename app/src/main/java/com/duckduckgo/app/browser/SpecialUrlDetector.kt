@@ -24,6 +24,8 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkType
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -51,11 +53,14 @@ interface SpecialUrlDetector {
 
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
+        class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
+        class CloakedTrackingLink(val trackingUrl: String) : UrlType()
     }
 }
 
 class SpecialUrlDetectorImpl(
-    private val packageManager: PackageManager
+    private val packageManager: PackageManager,
+    private val trackingLinkDetector: TrackingLinkDetector
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
@@ -67,7 +72,7 @@ class SpecialUrlDetectorImpl(
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> checkForAppLink(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(uriString)
             ABOUT_SCHEME -> UrlType.Unknown(uriString)
             JAVASCRIPT_SCHEME -> UrlType.SearchQuery(uriString)
             null -> UrlType.SearchQuery(uriString)
@@ -86,7 +91,7 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    private fun checkForAppLink(uriString: String): UrlType {
+    private fun processUrl(uriString: String): UrlType {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)
@@ -102,6 +107,14 @@ class SpecialUrlDetectorImpl(
                 }
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
+            }
+        }
+
+        trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { trackingLinkType ->
+            if (trackingLinkType is TrackingLinkType.ExtractedTrackingLink) {
+                return UrlType.ExtractedTrackingLink(extractedUrl = trackingLinkType.extractedUrl)
+            } else if (trackingLinkType is TrackingLinkType.CloakedTrackingLink) {
+                return UrlType.CloakedTrackingLink(trackingUrl = trackingLinkType.trackingUrl)
             }
         }
         return UrlType.Web(uriString)

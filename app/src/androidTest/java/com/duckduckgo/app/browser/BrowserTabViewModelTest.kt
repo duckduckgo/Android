@@ -47,6 +47,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
@@ -115,9 +116,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
@@ -290,6 +289,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
 
+    @Mock
+    private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -420,7 +422,8 @@ class BrowserTabViewModelTest {
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            trackingLinkDetector = mockTrackingLinkDetector
         )
 
         testee.loadData("abc", null, false, false)
@@ -923,6 +926,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
+        setBrowserShowing(true)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
     fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
         setBrowserShowing(true)
         testee.progressChanged(50)
@@ -945,6 +964,15 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
         testee.progressChanged(100)
         assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
     }
 
     @Test
@@ -3725,6 +3753,91 @@ class BrowserTabViewModelTest {
             subfolder = "folder",
             userAgent = "user_agent"
         )
+    }
+
+    @Test
+    fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
+        testee.handleCloakedTrackingLink(initialUrl = "example.com")
+        assertCommandIssued<Command.ExtractUrlFromCloakedTrackingLink>()
+    }
+
+    @Test
+    fun whenPageChangedThenUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("http://twitter.com/explore", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoHasDestinationUrlThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com", "https://bar.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("https://bar.com", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoIsNullThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = null
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertNull(trackingLinkInfo)
+    }
+
+    @Test
+    fun whenUpdateLastTrackingLinkThenUpdateTrackingLinkInfo() {
+        testee.updateLastTrackingLink("https://foo.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo("https://foo.com")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsCloakedTrackingLinkThenHandleCloakedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromCloakedTrackingLink }
+        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromCloakedTrackingLink).initialUrl)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsExtractedTrackingLinkThenNavigateToExtractedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
+    fun whenUrlExtractionErrorThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtractionError("http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
+        testee.onUrlExtracted("http://foo.com", "http://example.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = "http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNullThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtracted("http://foo.com", null)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
     private fun givenUrlCanUseGpc() {
