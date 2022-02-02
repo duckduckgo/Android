@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.remotemessage
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.Action
@@ -37,12 +38,14 @@ class RemoteMessagingModel @Inject constructor(
     val activeMessages = remoteMessagingRepository.messageFlow()
 
     suspend fun onMessageDismissed(remoteMessage: RemoteMessage) {
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_DISMISSED)
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
     }
 
     suspend fun onPrimaryActionClicked(remoteMessage: RemoteMessage): Action? {
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED)
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
@@ -50,6 +53,7 @@ class RemoteMessagingModel @Inject constructor(
     }
 
     suspend fun onSecondaryActionClicked(remoteMessage: RemoteMessage): Action? {
+        pixel.fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED)
         withContext(dispatchers.io()) {
             remoteMessagingRepository.dismissMessage(remoteMessage.id)
         }
