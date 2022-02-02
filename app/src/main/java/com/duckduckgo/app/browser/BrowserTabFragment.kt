@@ -728,6 +728,7 @@ class BrowserTabFragment :
                 )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
+            is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> launchAddWidget()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)

@@ -71,6 +71,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.cta.ui.*
@@ -150,7 +152,7 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
-    private val remoteMessagingRepository: RemoteMessagingRepository,
+    private val remoteMessagingModel: RemoteMessagingModel,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -342,6 +344,7 @@ class BrowserTabViewModel(
             val icon: Bitmap? = null
         ) : Command()
 
+        class SubmitUrl(val url: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()
@@ -564,7 +567,7 @@ class BrowserTabViewModel(
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
 
-        remoteMessagingRepository.messageFlow().onEach { activeMessage ->
+        remoteMessagingModel.activeMessages.onEach { activeMessage ->
             withContext(dispatchers.main()) {
                 ctaViewState.value = currentCtaViewState().copy(
                     message = activeMessage
@@ -2098,16 +2101,26 @@ class BrowserTabViewModel(
         Timber.i("RMF: onMessageCloseButtonClicked")
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
-            remoteMessagingRepository.dismissMessage(message.id)
+            remoteMessagingModel.onMessageDismissed(message)
         }
     }
 
     fun onMessagePrimaryButtonClicked() {
         Timber.i("RMF: onMessagePrimaryButtonClicked")
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            Timber.i("RMF: emit $action")
+            command.value = action.asBrowserTabCommand()
+        }
     }
 
     fun onMessageSecondaryButtonClicked() {
         Timber.i("RMF: onMessageSecondaryButtonClicked")
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+        }
     }
 
     fun onUserHideDaxDialog() {
@@ -2477,7 +2490,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val specialUrlDetector: Provider<SpecialUrlDetector>,
     private val faviconManager: Provider<FaviconManager>,
     private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
-    private val remoteMessagingRepository: Provider<RemoteMessagingRepository>,
+    private val remoteMessagingModel: Provider<RemoteMessagingModel>,
     private val ctaViewModel: Provider<CtaViewModel>,
     private val searchCountDao: Provider<SearchCountDao>,
     private val pixel: Provider<Pixel>,
@@ -2517,7 +2530,7 @@ class BrowserTabViewModelFactory @Inject constructor(
                     specialUrlDetector.get(),
                     faviconManager.get(),
                     addToHomeCapabilityDetector.get(),
-                    remoteMessagingRepository.get(),
+                    remoteMessagingModel.get(),
                     ctaViewModel.get(),
                     searchCountDao.get(),
                     pixel.get(),
