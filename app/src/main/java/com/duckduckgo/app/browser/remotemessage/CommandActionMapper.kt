@@ -28,7 +28,7 @@ fun Action.asBrowserTabCommand(): Command? {
         is Dismiss -> {
             null
         }
-        is PlayStore -> TODO()
+        is PlayStore -> Command.LaunchPlayStore(this.value)
         is Url -> SubmitUrl(this.value)
     }
 }

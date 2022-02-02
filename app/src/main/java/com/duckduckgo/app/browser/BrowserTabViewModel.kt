@@ -344,6 +344,7 @@ class BrowserTabViewModel(
         ) : Command()
 
         class SubmitUrl(val url: String) : Command()
+        class LaunchPlayStore(val appPackage: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
         object LaunchAddWidget : Command()
         object LaunchLegacyAddWidget : Command()

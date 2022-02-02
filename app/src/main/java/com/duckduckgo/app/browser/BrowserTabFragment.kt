@@ -137,6 +137,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
@@ -266,6 +267,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
+
+    @Inject
+    lateinit var playStoreUtils: PlayStoreUtils
 
     @Inject
     @AppCoroutineScope
@@ -728,6 +732,7 @@ class BrowserTabFragment :
                 )
             }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
+            is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
             is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> launchAddWidget()
             is Command.LaunchLegacyAddWidget -> launchLegacyAddWidget()
@@ -1768,6 +1773,10 @@ class BrowserTabFragment :
         context?.let {
             startActivity(SurveyActivity.intent(it, survey))
         }
+    }
+
+    private fun launchPlayStore(appPackage: String) {
+        playStoreUtils.launchPlayStore(appPackage)
     }
 
     @SuppressLint("NewApi")
