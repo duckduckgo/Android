@@ -64,6 +64,7 @@ sealed class Content(val messageType: MessageType) {
 sealed class Action(val actionType: ActionType) {
     data class Url(val value: String) : Action(URL)
     data class PlayStore(val value: String) : Action(PLAYSTORE)
+    // Using data class instead of Object. Object can't be serialized
     data class Dismiss(private val value: String = "") : Action(DISMISS)
 
     enum class ActionType {

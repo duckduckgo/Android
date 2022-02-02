@@ -115,7 +115,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -2111,7 +2110,7 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
             Timber.i("RMF: emit $action")
-            command.value = action.asBrowserTabCommand()
+            command.value = action.asBrowserTabCommand() ?: return@launch
         }
     }
 
@@ -2120,6 +2119,8 @@ class BrowserTabViewModel(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            Timber.i("RMF: emit $action")
+            command.value = action.asBrowserTabCommand() ?: return@launch
         }
     }
 
