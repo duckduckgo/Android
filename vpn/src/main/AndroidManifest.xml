@@ -138,8 +138,9 @@
             android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
             android:enabled="false"
             android:process=":vpn">
-            <intent-filter>
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
 
