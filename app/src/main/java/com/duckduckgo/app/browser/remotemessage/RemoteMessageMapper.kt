@@ -16,11 +16,17 @@
 
 package com.duckduckgo.app.browser.remotemessage
 
-import com.duckduckgo.app.browser.R
+
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
@@ -51,6 +57,11 @@ fun RemoteMessage.asMessage(): Message {
     }
 }
 
-private fun String.drawable(): Int {
-    return R.drawable.set_as_default_browser_illustration_dialog
+private fun Placeholder.drawable(): Int {
+    return when(this) {
+        ANNOUNCE -> R.drawable.ic_announce
+        DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
+        CRITICAL_UPDATE -> R.drawable.ic_critical_update
+        APP_UPDATE -> R.drawable.ic_app_update
+    }
 }

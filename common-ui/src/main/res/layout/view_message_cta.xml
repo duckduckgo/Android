@@ -35,7 +35,7 @@
         android:layout_width="@dimen/messageCtaIllustrationSize"
         android:layout_height="@dimen/messageCtaIllustrationSize"
         android:layout_marginTop="@dimen/keyline_2"
-        android:scaleType="fitCenter"
+        android:scaleType="center"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

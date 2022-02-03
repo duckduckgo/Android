@@ -18,6 +18,7 @@ package com.duckduckgo.remote.messaging.impl.mappers
 
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
@@ -36,7 +37,7 @@ class JsonRemoteMessageMapper {
         Content.Medium(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty()
+            placeholder = jsonContent.placeholder.asPlaceholder()
         )
     }
 
@@ -44,7 +45,7 @@ class JsonRemoteMessageMapper {
         Content.BigSingleAction(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty(),
+            placeholder = jsonContent.placeholder.asPlaceholder(),
             primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
             primaryAction = jsonContent.primaryAction!!.toAction()
         )
@@ -54,7 +55,7 @@ class JsonRemoteMessageMapper {
         Content.BigTwoActions(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty(),
+            placeholder = jsonContent.placeholder.asPlaceholder(),
             primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
             primaryAction = jsonContent.primaryAction!!.toAction(),
             secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
@@ -116,4 +117,6 @@ class JsonRemoteMessageMapper {
     }
 
     private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
+
+    private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)
 }
