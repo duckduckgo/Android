@@ -159,6 +159,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
@@ -673,8 +674,8 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
-            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSite)
-            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite)
+            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
+            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
@@ -1513,20 +1514,24 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private fun savedSiteAdded(savedSite: SavedSite) {
-        val snackbarMessage = when (savedSite) {
+    private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        val snackbarMessage = when (savedSiteChangedViewState.savedSite) {
             is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
             is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
         binding.browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                editSavedSite(savedSite)
+                editSavedSite(savedSiteChangedViewState)
             }
             .show()
     }
 
-    private fun editSavedSite(savedSite: SavedSite) {
-        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
+    private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSiteChangedViewState.savedSite,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: 0,
+            savedSiteChangedViewState.bookmarkFolder?.name
+        )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
     }

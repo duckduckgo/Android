@@ -40,6 +40,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -180,6 +181,11 @@ class BrowserTabViewModel(
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
+    data class SavedSiteChangedViewState(
+        val savedSite: SavedSite,
+        val bookmarkFolder: BookmarkFolder?
+    )
+
     data class BrowserViewState(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
@@ -313,8 +319,8 @@ class BrowserTabViewModel(
             val requestUserConfirmation: Boolean
         ) : Command()
 
-        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite) : Command()
-        class ShowEditSavedSiteDialog(val savedSite: SavedSite) : Command()
+        class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
+        class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
@@ -1146,13 +1152,23 @@ class BrowserTabViewModel(
         val bookmark = getBookmark(url)
         val favorite = getFavorite(url)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark, favorite = favorite)
+            browserViewState.value = currentBrowserViewState().copy(
+                bookmark = bookmark,
+                favorite = favorite
+            )
         }
     }
 
     private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
         return withContext(dispatchers.io()) {
             bookmarksRepository.getBookmark(url)
+        }
+    }
+
+    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+        if (bookmark == null) return null
+        return withContext(dispatchers.io()) {
+            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
         }
     }
 
@@ -1633,8 +1649,9 @@ class BrowserTabViewModel(
             }
             bookmarksRepository.insert(title, url)
         }
+        val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
-            command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
+            command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
         }
     }
 
@@ -1678,7 +1695,7 @@ class BrowserTabViewModel(
             }
             favorite?.let {
                 withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(it)
+                    command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
                 }
             }
         }
@@ -1759,7 +1776,20 @@ class BrowserTabViewModel(
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
-        command.value = ShowEditSavedSiteDialog(savedSite)
+        viewModelScope.launch(dispatchers.io()) {
+            val bookmarkFolder =
+                if (savedSite is SavedSite.Bookmark) getBookmarkFolder(savedSite)
+                else null
+
+            withContext(dispatchers.main()) {
+                command.value = ShowEditSavedSiteDialog(
+                    SavedSiteChangedViewState(
+                        savedSite,
+                        bookmarkFolder
+                    )
+                )
+            }
+        }
     }
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
