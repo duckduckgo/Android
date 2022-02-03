@@ -100,6 +100,10 @@
             android:screenOrientation="portrait"/>
 
         <service
+            android:name=".service.state.VpnStateMonitorService" >
+        </service>
+
+        <service
             android:name=".service.TrackerBlockingVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">

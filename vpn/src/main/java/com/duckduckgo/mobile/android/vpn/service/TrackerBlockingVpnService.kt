@@ -18,8 +18,10 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.app.ActivityManager
 import android.app.Service
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Binder
@@ -36,6 +38,7 @@ import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
+import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
@@ -99,6 +102,22 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject
     lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
+    private var vpnStateServiceReference: IBinder? = null
+
+    private val vpnStateServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            name: ComponentName?,
+            service: IBinder?
+        ) {
+            Timber.d("Connected to state monitor service")
+            vpnStateServiceReference = service
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Timber.d("Disconnected from state monitor service")
+            vpnStateServiceReference = null
+        }
+    }
 
     inner class VpnServiceBinder : Binder() {
 
@@ -199,6 +218,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             Timber.v("VPN log: starting ${it.javaClass} callback")
             it.onVpnStarted(this)
         }
+
+        Intent(applicationContext, VpnStateMonitorService::class.java).also {
+            bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
+        }
     }
 
     private suspend fun establishVpnInterface() {
@@ -285,6 +308,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: stopping ${it.javaClass} callback")
             it.onVpnStopped(this, reason)
+        }
+
+        vpnStateServiceReference?.let {
+            unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null }
         }
 
         stopForeground(true)
