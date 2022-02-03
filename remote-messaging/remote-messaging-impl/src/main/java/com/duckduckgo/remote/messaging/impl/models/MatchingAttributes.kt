@@ -175,5 +175,7 @@ fun Any?.toIntOrDefault(default: Int): Int = this?.let { it as Int } ?: default
 
 fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
+internal fun Locale.asJsonFormat() = "${language}-${country}"
+
 const val MATCHING_ATTR_INT_DEFAULT_VALUE = -1
 const val MATCHING_ATTR_STRING_DEFAULT_VALUE = ""

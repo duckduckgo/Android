@@ -37,7 +37,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en_US"))
+            MatchingAttribute.Locale(value = listOf("en-US"))
         )
 
         assertEquals(Result.Match, result)
@@ -48,7 +48,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("fr_FR", "fr_CA", "en_US"))
+            MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US"))
         )
 
         assertEquals(Result.Match, result)

@@ -16,24 +16,31 @@
 
 package com.duckduckgo.remote.messaging.impl.mappers
 
+import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
+import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
+import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
+import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import timber.log.Timber
 
-class JsonRemoteMessageMapper {
+class JsonRemoteMessageMapper constructor(private val deviceProperties: DeviceProperties) {
     private val smallMapper: (JsonContent) -> Content = { jsonContent ->
-        Content.Small(
+        Small(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty()
         )
     }
 
     private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
-        Content.Medium(
+        Medium(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
             placeholder = jsonContent.placeholder.failIfEmpty()
@@ -41,7 +48,7 @@ class JsonRemoteMessageMapper {
     }
 
     private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonContent ->
-        Content.BigSingleAction(
+        BigSingleAction(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
             placeholder = jsonContent.placeholder.failIfEmpty(),
@@ -51,7 +58,7 @@ class JsonRemoteMessageMapper {
     }
 
     private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent ->
-        Content.BigTwoActions(
+        BigTwoActions(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
             placeholder = jsonContent.placeholder.failIfEmpty(),
@@ -91,15 +98,25 @@ class JsonRemoteMessageMapper {
 
     private fun JsonRemoteMessage.map(): RemoteMessage? {
         return runCatching {
-            RemoteMessage(
+            val remoteMessage = RemoteMessage(
                 id = this.id.failIfEmpty(),
                 content = this.content!!.mapToContent(this.content.messageType),
                 matchingRules = this.matchingRules.orEmpty(),
                 exclusionRules = this.exclusionRules.orEmpty()
             )
+            remoteMessage.localizeMessage(this.translations)
         }.onFailure {
             Timber.e("RMF: error $it")
         }.getOrNull()
+    }
+
+    private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>): RemoteMessage {
+        val locale = deviceProperties.deviceLocale()
+        return translations[locale.asJsonFormat()]?.let {
+            this.copy(content = this.content.localize(it))
+        } ?: translations[locale.language]?.let {
+            this.copy(content = this.content.localize(it))
+        } ?: this
     }
 
     private fun JsonContent.mapToContent(messageType: String): Content {
@@ -111,4 +128,31 @@ class JsonRemoteMessageMapper {
     }
 
     private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
+}
+
+private fun Content.localize(translations: JsonContentTranslations): Content {
+    return when (this) {
+        is BigSingleAction -> this.copy(
+            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+        )
+        is BigTwoActions -> this.copy(
+            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+            primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
+            secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText
+        )
+        is Medium -> this.copy(
+            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+        )
+        is Small -> this.copy(
+            titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
+            descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
+        )
+    }
 }

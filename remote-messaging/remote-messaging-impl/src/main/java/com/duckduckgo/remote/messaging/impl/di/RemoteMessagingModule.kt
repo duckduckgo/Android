@@ -127,8 +127,10 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesJsonRemoteMessageMapper(): JsonRemoteMessageMapper {
-        return JsonRemoteMessageMapper()
+    fun providesJsonRemoteMessageMapper(
+        deviceProperties: DeviceProperties
+    ): JsonRemoteMessageMapper {
+        return JsonRemoteMessageMapper(deviceProperties)
     }
 
     @Provides

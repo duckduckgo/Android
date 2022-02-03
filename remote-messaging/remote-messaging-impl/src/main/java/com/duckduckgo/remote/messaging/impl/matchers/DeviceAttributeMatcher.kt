@@ -21,6 +21,7 @@ import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import timber.log.Timber
 
 class DeviceAttributeMatcher(
@@ -33,7 +34,7 @@ class DeviceAttributeMatcher(
                 return matchingAttribute.matches(deviceProperties.osApiLevel())
             }
             is MatchingAttribute.Locale -> {
-                return matchingAttribute.matches(deviceProperties.deviceLocale().toString())
+                return matchingAttribute.matches(deviceProperties.deviceLocale().asJsonFormat())
             }
             is MatchingAttribute.WebView -> {
                 if (matchingAttribute == MatchingAttribute.WebView()) return Result.Fail

@@ -17,6 +17,7 @@
 package com.duckduckgo.remote.messaging.fixtures
 
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
+import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
@@ -91,12 +92,14 @@ object JsonRemoteMessageOM {
         id: String = "id",
         content: JsonContent? = emptyJsonContent(),
         exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList()
+        matchingRules: List<Int>? = emptyList(),
+        translations: Map<String, JsonContentTranslations> = emptyMap()
     ) = JsonRemoteMessage(
         id = id,
         content = content,
         exclusionRules = exclusionRules,
-        matchingRules = matchingRules
+        matchingRules = matchingRules,
+        translations = translations
     )
 
     fun aJsonRemoteMessagingConfig(
