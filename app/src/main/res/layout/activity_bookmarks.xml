@@ -43,11 +43,14 @@
                 android:theme="@style/ToolbarTheme"
                 app:popupTheme="@style/PopUpOverflowMenu" />
 
-            <com.duckduckgo.app.bookmarks.ui.SearchBarView
+            <com.duckduckgo.mobile.android.ui.view.SearchBarView
                 android:id="@+id/searchBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp" />
+                android:layout_margin="8dp"
+                android:visibility="gone"
+                app:searchHint="@string/search"
+                app:clearActionContentDescription="@string/clearButtonContentDescription"/>
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

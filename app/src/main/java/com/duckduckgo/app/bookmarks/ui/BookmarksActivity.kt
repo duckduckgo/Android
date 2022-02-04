@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
