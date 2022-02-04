@@ -71,6 +71,7 @@ class SearchBarView @JvmOverloads constructor(
                 binding.root.visibility = GONE
             }
             SearchBar.Event.ShowSearchBar -> {
+                clearText()
                 binding.omnibarTextInput.requestFocus()
                 binding.root.visibility = VISIBLE
             }
