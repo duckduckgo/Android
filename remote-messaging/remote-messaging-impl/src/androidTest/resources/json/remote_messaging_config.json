@@ -23,7 +23,7 @@
           "titleText": "Добавить закладку",
           "descriptionText": "Введите поисковый запрос или адрес сайта"
         },
-        "en_us": {
+        "en-US": {
           "titleText": "title",
           "descriptionText": "description"
         }

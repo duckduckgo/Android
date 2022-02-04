@@ -61,8 +61,8 @@
         },
         "osApi": {
           "value": [
-            "en_US",
-            "en_GB"
+            "en-US",
+            "en-GB"
           ],
           "fallback": true
         },
