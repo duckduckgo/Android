@@ -21,8 +21,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View.VISIBLE
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
@@ -68,7 +69,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private lateinit var contentBookmarksBinding: ContentBookmarksBinding
 
     private val toolbar
-        get() = binding.includeToolbar.toolbar
+        get() = binding.toolbar
+
+    private val searchBar
+        get() = binding.searchBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -249,8 +253,6 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         searchMenuItem = menu?.findItem(R.id.action_search)
         setSearchMenuItemVisibility()
-        val searchView = searchMenuItem?.actionView as SearchView
-
         searchMenuItem?.setOnActionExpandListener(
             object : MenuItem.OnActionExpandListener {
                 override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
@@ -264,8 +266,37 @@ class BookmarksActivity : DuckDuckGoActivity() {
                 }
             }
         )
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter))
+
+        initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun initializeSearchBar() {
+        val listener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchMenuItem?.setOnMenuItemClickListener {
+            searchBar.handle(SearchBar.Event.ShowSearchBar)
+            return@setOnMenuItemClickListener true
+        }
+
+        searchBar.onAction {
+            when (it) {
+                is SearchBar.Action.PerformUpAction -> hideSearchBar()
+                is SearchBar.Action.PerformSearch -> listener.onQueryTextChange(it.searchText)
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (searchBar.isVisible) {
+            hideSearchBar()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun hideSearchBar() {
+        toolbar.visibility = VISIBLE
+        searchBar.handle(SearchBar.Event.DismissSearchBar)
     }
 
     private fun setSearchMenuItemVisibility() {

@@ -17,16 +17,40 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bookmarkRootView"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bookmarkRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.duckduckgo.app.bookmarks.ui.BookmarksActivity">
 
-    <include
-        android:id="@+id/includeToolbar"
-        layout="@layout/include_default_toolbar" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ToolbarTheme">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/toolbarBgColor"
+                android:theme="@style/ToolbarTheme"
+                app:popupTheme="@style/PopUpOverflowMenu" />
+
+            <com.duckduckgo.app.bookmarks.ui.SearchBarView
+                android:id="@+id/searchBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp" />
+        </FrameLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_bookmarks" />
 
