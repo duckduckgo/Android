@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -120,10 +121,11 @@ class RemoteMessagingConfigJsonMapperTest {
         assertEquals(3, config.rules.size)
 
         assertEquals(21, config.rules[5]?.size)
-        val localeMA = Locale(listOf("en_US", "en_GB"), fallback = true)
+        val localeMA = Locale(listOf("en-US", "en-GB"), fallback = true)
         assertEquals(localeMA, config.rules[5]?.first())
+        assertTrue(config.rules[5]?.get(1) is Api)
 
-        val locale2MA = Locale(listOf("en_GB"), fallback = null)
+        val locale2MA = Locale(listOf("en-GB"), fallback = null)
         assertEquals(locale2MA, config.rules[6]?.first())
         assertEquals(1, config.rules[6]?.size)
 

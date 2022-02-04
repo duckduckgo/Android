@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.remotemessage
 
-
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.view.MessageCta.Message
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -58,7 +57,7 @@ fun RemoteMessage.asMessage(): Message {
 }
 
 private fun Placeholder.drawable(): Int {
-    return when(this) {
+    return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
         DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
         CRITICAL_UPDATE -> R.drawable.ic_critical_update

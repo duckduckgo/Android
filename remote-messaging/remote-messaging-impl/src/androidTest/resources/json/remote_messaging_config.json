@@ -105,8 +105,8 @@
       "attributes": {
         "locale": {
           "value": [
-            "en_US",
-            "en_GB"
+            "en-US",
+            "en-GB"
           ],
           "fallback": true
         },
@@ -190,7 +190,7 @@
       "attributes": {
         "locale": {
           "value": [
-            "en_GB"
+            "en-GB"
           ]
         }
       }

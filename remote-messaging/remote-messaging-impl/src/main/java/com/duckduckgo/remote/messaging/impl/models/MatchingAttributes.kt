@@ -171,7 +171,7 @@ interface DateMatchingAttribute {
 @Suppress("UNCHECKED_CAST")
 fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
 
-fun Any?.toIntOrDefault(default: Int): Int = this?.let { it as Int } ?: default
+fun Any?.toIntOrDefault(default: Int): Int = this?.let { (it as Double).toInt() } ?: default
 
 fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
