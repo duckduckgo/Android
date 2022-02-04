@@ -18,6 +18,8 @@ package com.duckduckgo.remote.messaging.fixtures
 
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
 object RemoteMessageOM {
@@ -36,7 +38,7 @@ object RemoteMessageOM {
     fun mediumContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder"
+        placeholder: Placeholder = ANNOUNCE
     ) = Content.Medium(
         titleText = titleText,
         descriptionText = descriptionText,
@@ -46,7 +48,7 @@ object RemoteMessageOM {
     fun bigSingleActionContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder",
+        placeholder: Placeholder = ANNOUNCE,
         primaryActionText: String = "Action1",
         primaryAction: Action = urlAction()
     ) = Content.BigSingleAction(
@@ -60,7 +62,7 @@ object RemoteMessageOM {
     fun bigTwoActionsContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder",
+        placeholder: Placeholder = ANNOUNCE,
         primaryActionText: String = "Action1",
         primaryAction: Action = urlAction(),
         secondaryActionText: String = "Action2",

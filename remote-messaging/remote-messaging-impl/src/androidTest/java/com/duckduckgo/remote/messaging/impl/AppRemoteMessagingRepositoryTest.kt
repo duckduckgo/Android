@@ -18,19 +18,28 @@ package com.duckduckgo.remote.messaging.impl
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Rule
 import org.junit.Test
 
 class AppRemoteMessagingRepositoryTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -40,7 +49,7 @@ class AppRemoteMessagingRepositoryTest {
 
     private val dao = db.remoteMessagesDao()
 
-    private val testee = AppRemoteMessagingRepository(dao)
+    private val testee = AppRemoteMessagingRepository(dao, coroutineRule.testDispatcherProvider)
 
     @After
     fun after() {
@@ -55,7 +64,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder"
+                    placeholder = ANNOUNCE
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList()
@@ -70,7 +79,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder"
+                    placeholder = ANNOUNCE
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList()
@@ -117,7 +126,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigSingleAction(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText"
                 ),
@@ -134,7 +143,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigSingleAction(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText"
                 ),
@@ -153,7 +162,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -172,7 +181,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -186,14 +195,14 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenDismissMessageThenUpdateState() {
+    fun whenDismissMessageThenUpdateState() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -211,14 +220,14 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenGetDismisedMessagesThenReturnDismissedMessageIds() {
+    fun whenGetDismisedMessagesThenReturnDismissedMessageIds() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",

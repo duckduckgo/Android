@@ -7,7 +7,7 @@
         "messageType": "big_single_action",
         "titleText": "title",
         "descriptionText": "description",
-        "placeholder": "WARNING",
+        "placeholder": "Announce",
         "primaryActionText": "Ok",
         "primaryAction": {
           "type": "url",
@@ -35,7 +35,7 @@
         "messageType": "big_single_action",
         "titleText": "Kedvenc hozzáadása",
         "descriptionText": "Kedvenc eltávolítása",
-        "placeholder": "WARNING",
+        "placeholder": "DDGAnnounce",
         "primaryActionText": "Ok",
         "primaryAction": {
           "type": "url",
@@ -76,7 +76,7 @@
         "messageType": "medium",
         "titleText": "Here goes a title",
         "descriptionText": "description",
-        "placeholder": "WARNING"
+        "placeholder": "CriticalUpdate"
       }
     },
     {
@@ -85,7 +85,7 @@
         "messageType": "big_two_action",
         "titleText": "Here goes a title",
         "descriptionText": "description",
-        "placeholder": "WARNING",
+        "placeholder": "AppUpdate",
         "primaryActionText": "Ok",
         "primaryAction": {
           "type": "playstore",
