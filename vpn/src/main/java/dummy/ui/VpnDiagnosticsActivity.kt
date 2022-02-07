@@ -185,14 +185,18 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         binding.stopVpnButton.setOnClickListener { TrackerBlockingVpnService.stopService(this) }
 
         binding.simulateGoodHealth.setOnClickListener {
-            appTPHealthMonitor.simulateHealthState(true)
+            appTPHealthMonitor.simulateGoodHealthState()
         }
 
         binding.simulateBadHealth.setOnClickListener {
-            appTPHealthMonitor.simulateHealthState(false)
+            appTPHealthMonitor.simulateBadHealthState()
         }
 
-        binding.noSimulation.setOnClickListener { appTPHealthMonitor.simulateHealthState(null) }
+        binding.simulateCriticalBadHealth.setOnClickListener {
+            appTPHealthMonitor.simulateCriticalHealthState()
+        }
+
+        binding.noSimulation.setOnClickListener { appTPHealthMonitor.stopHealthSimulation() }
 
         binding.sendBadHealthReportButton.setOnClickListener {
             userHealthReportActivityResult.launch(
