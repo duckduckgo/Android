@@ -116,6 +116,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkInfo
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -165,7 +166,8 @@ class BrowserTabViewModel(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
     private val variantManager: VariantManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val trackingLinkDetector: TrackingLinkDetector,
+    private val trackingParameters: TrackingParameters
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
@@ -1108,6 +1110,13 @@ class BrowserTabViewModel(
                 lastTrackingInfo.destinationUrl = url
             }
         }
+
+        trackingParameters.lastCleanedUrl?.let {
+            trackingParameters.lastCleanedUrl = null
+            site?.urlParametersRemoved = true
+            onSiteChanged()
+        }
+
         isProcessingTrackingLink = false
     }
 
@@ -2548,7 +2557,8 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val appCoroutineScope: Provider<CoroutineScope>,
     private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
     private val variantManager: Provider<VariantManager>,
-    private val trackingLinkDetector: Provider<TrackingLinkDetector>
+    private val trackingLinkDetector: Provider<TrackingLinkDetector>,
+    private val trackingParameters: Provider<TrackingParameters>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -2588,7 +2598,8 @@ class BrowserTabViewModelFactory @Inject constructor(
                     appCoroutineScope.get(),
                     appLinksHandler.get(),
                     variantManager.get(),
-                    trackingLinkDetector.get()
+                    trackingLinkDetector.get(),
+                    trackingParameters.get()
                 ) as T
                 else -> null
             }

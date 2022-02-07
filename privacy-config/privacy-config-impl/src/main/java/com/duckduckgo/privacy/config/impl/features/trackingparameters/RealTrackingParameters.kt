@@ -37,6 +37,8 @@ class RealTrackingParameters @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary
 ) : TrackingParameters {
 
+    override var lastCleanedUrl: String? = null
+
     override fun isAnException(url: String): Boolean {
         return matches(url) || unprotectedTemporary.isAnException(url)
     }
@@ -61,8 +63,11 @@ class RealTrackingParameters @Inject constructor(
         if (preservedParameters.size == queryParameters.size) {
             return null
         }
-        val cleanedUri = uri.replaceQueryParameters(preservedParameters)
-        return cleanedUri.toString()
+        val cleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
+
+        lastCleanedUrl = cleanedUrl
+
+        return cleanedUrl
     }
 
     private fun getPreservedParameters(

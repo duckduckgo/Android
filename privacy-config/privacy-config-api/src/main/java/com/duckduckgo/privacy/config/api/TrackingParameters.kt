@@ -31,6 +31,9 @@ interface TrackingParameters {
      * @return the URL [String] or `null` if the [url] does not contain tracking parameters.
      */
     fun cleanTrackingParameters(url: String): String?
+
+    /** The last tracking parameter cleaned URL. */
+    var lastCleanedUrl: String?
 }
 
 /** Public data class for Tracking Parameter Exceptions. */

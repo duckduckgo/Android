@@ -292,6 +292,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
 
+    @Mock
+    private lateinit var mockTrackingParameters: TrackingParameters
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -423,7 +426,8 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager,
-            trackingLinkDetector = mockTrackingLinkDetector
+            trackingLinkDetector = mockTrackingLinkDetector,
+            trackingParameters = mockTrackingParameters
         )
 
         testee.loadData("abc", null, false, false)
@@ -3838,6 +3842,22 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenPageChangedThenClearLastCleanedUrlAndUpdateSite() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn("https://foo.com")
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters).lastCleanedUrl = null
+        assertTrue(testee.siteLiveData.value?.urlParametersRemoved!!)
+    }
+
+    @Test
+    fun whenPageChangedAndLastCleanedUrlIsNullThenDoNothing() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn(null)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters, times(0))
+        assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
     }
 
     private fun givenUrlCanUseGpc() {
