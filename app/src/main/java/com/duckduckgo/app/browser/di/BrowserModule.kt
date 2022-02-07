@@ -76,6 +76,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -219,8 +220,9 @@ class BrowserModule {
     @Provides
     fun specialUrlDetector(
         packageManager: PackageManager,
-        trackingLinkDetector: TrackingLinkDetector
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector)
+        trackingLinkDetector: TrackingLinkDetector,
+        trackingParameters: TrackingParameters
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector, trackingParameters)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

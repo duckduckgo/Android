@@ -175,6 +175,15 @@ class BrowserWebViewClient(
                     }
                     false
                 }
+                is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.startProcessingTrackingLink()
+                        Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+                        webView.loadUrl(urlType.cleanedUrl)
+                        return true
+                    }
+                    false
+                }
             }
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {

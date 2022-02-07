@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -53,10 +54,17 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var mockTrackingLinkDetector: TrackingLinkDetector
 
+    @Mock
+    lateinit var mockTrackingParameters: TrackingParameters
+
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = SpecialUrlDetectorImpl(packageManager = mockPackageManager, trackingLinkDetector = mockTrackingLinkDetector)
+        testee = SpecialUrlDetectorImpl(
+            packageManager = mockPackageManager,
+            trackingLinkDetector = mockTrackingLinkDetector,
+            trackingParameters = mockTrackingParameters
+        )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
 
@@ -309,6 +317,15 @@ class SpecialUrlDetectorImplTest {
         val actual = testee.determineType("https://www.example.com/amp")
         assertEquals(expected, actual::class)
         assertEquals("https://www.example.com/amp", (actual as CloakedTrackingLink).trackingUrl)
+    }
+
+    @Test
+    fun whenUrlIsTrackingParameterLinkThenTrackingParameterLinkTypeDetected() {
+        whenever(mockTrackingParameters.cleanTrackingParameters(anyString())).thenReturn("https://www.example.com/query.html")
+        val expected = TrackingParameterLink::class
+        val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
+        assertEquals(expected, actual::class)
+        assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
     }
 
     private fun randomString(length: Int): String {

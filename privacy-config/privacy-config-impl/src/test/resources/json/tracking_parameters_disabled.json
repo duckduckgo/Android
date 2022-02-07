@@ -1,0 +1,14 @@
+{
+  "state": "disabled",
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "reason"
+    }
+  ],
+  "settings": {
+    "parameters": [
+      "parameter"
+    ]
+  }
+}

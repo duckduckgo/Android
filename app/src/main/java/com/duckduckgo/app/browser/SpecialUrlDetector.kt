@@ -26,6 +26,7 @@ import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import timber.log.Timber
 import java.net.URISyntaxException
 
@@ -55,12 +56,14 @@ interface SpecialUrlDetector {
         class Unknown(val uriString: String) : UrlType()
         class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
         class CloakedTrackingLink(val trackingUrl: String) : UrlType()
+        class TrackingParameterLink(val cleanedUrl: String) : UrlType()
     }
 }
 
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val trackingLinkDetector: TrackingLinkDetector,
+    private val trackingParameters: TrackingParameters
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
@@ -108,6 +111,10 @@ class SpecialUrlDetectorImpl(
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
             }
+        }
+
+        trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
+            return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
         trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { trackingLinkType ->
