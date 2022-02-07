@@ -19,9 +19,9 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Action.ActionType
+import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.Dismiss
 import com.duckduckgo.remote.messaging.api.Action.PlayStore
-import com.duckduckgo.remote.messaging.api.Action.DefaultBrowser
 import com.duckduckgo.remote.messaging.api.Action.Url
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -35,6 +35,7 @@ import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status.SCHEDULED
 import com.duckduckgo.remote.messaging.store.RemoteMessagesDao
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
@@ -45,6 +46,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class AppRemoteMessagingRepository(
+    private val remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
     private val remoteMessagesDao: RemoteMessagesDao,
     private val dispatchers: DispatcherProvider
 ) : RemoteMessagingRepository {
@@ -79,6 +81,7 @@ class AppRemoteMessagingRepository(
     override suspend fun dismissMessage(id: String) {
         withContext(dispatchers.io()) {
             remoteMessagesDao.udpateState(id, Status.DISMISSED)
+            remoteMessagingConfigRepository.invalidate()
         }
     }
 

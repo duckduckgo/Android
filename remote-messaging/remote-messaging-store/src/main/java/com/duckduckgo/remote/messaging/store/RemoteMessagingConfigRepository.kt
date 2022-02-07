@@ -24,6 +24,7 @@ interface RemoteMessagingConfigRepository {
     fun delete()
     fun expired(): Boolean
     fun invalidated(): Boolean
+    fun invalidate()
 }
 
 class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : RemoteMessagingConfigRepository {
@@ -49,5 +50,9 @@ class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : 
 
     override fun invalidated(): Boolean {
         return get().invalidate
+    }
+
+    override fun invalidate() {
+        return dao.invalidate()
     }
 }

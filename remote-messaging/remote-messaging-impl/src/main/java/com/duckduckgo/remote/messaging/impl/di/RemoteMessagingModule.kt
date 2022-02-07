@@ -104,10 +104,11 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingRepository(
+        remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
         dispatchers: DispatcherProvider
     ): RemoteMessagingRepository {
-        return AppRemoteMessagingRepository(remoteMessagesDao, dispatchers)
+        return AppRemoteMessagingRepository(remoteMessagingConfigRepository, remoteMessagesDao, dispatchers)
     }
 
     @Provides

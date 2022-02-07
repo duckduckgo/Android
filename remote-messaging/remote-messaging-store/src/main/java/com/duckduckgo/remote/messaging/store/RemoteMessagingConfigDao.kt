@@ -32,4 +32,7 @@ abstract class RemoteMessagingConfigDao {
 
     @Query("delete from remote_messaging")
     abstract fun delete()
+
+    @Query("update remote_messaging set invalidate = 1")
+    abstract fun invalidate()
 }
