@@ -104,6 +104,7 @@ class AppBadHealthStateHandler @Inject constructor(
                 val (badHealthMetrics, _) = appHealthData.systemHealth.rawMetrics.partition {
                     (it.isInBadHealth() || it.informational) && !it.redacted
                 }
+                val isCriticalBadHealth = badHealthMetrics.any { it.containsCriticalMetric() }
                 val badHealthData = appHealthData.copy(systemHealth = appHealthData.systemHealth.copy(rawMetrics = badHealthMetrics))
                 val jsonAdapter = Moshi.Builder().build().run {
                     adapter(AppHealthData::class.java)
@@ -128,7 +129,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     )
                 )
 
-                if (shouldRestartVpn) restartVpn()
+                if (shouldRestartVpn) restartVpn(isCriticalBadHealth)
 
                 return@withContext shouldRestartVpn
             } else {
@@ -181,11 +182,20 @@ class AppBadHealthStateHandler @Inject constructor(
         }
     }
 
-    private suspend fun restartVpn() {
+    private suspend fun restartVpn(isCriticalBadHealth: Boolean) {
         // place this in a different job to ensure the restart completes successfully and nobody can cancel it by mistake
         appCoroutineScope.launch {
-            deviceShieldPixels.didRestartVpnOnBadHealth()
-            TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
+            if (appBuildConfig.flavor.isInternal() && isCriticalBadHealth) {
+                Timber.d("Internal build and critical bad health, killing VPN process...")
+                deviceShieldPixels.didRestartVpnProcessOnBadHealth()
+                // delay a bit to ensure pixel is sent. This is not great but our pixel API doesn't leave an option in this case
+                delay(300)
+                Runtime.getRuntime().exit(0)
+            } else {
+                Timber.d("Bad health, stop/restart VPN...")
+                deviceShieldPixels.didRestartVpnOnBadHealth()
+                TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
+            }
         }.join()
     }
 

@@ -85,7 +85,8 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("tun-ioWriteMemoryExceptions", rawMetrics)
 
-        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 })
+        // this is marked as isCritical because we may want to take extreme measures when bad health happens here
+        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 }, isCritical = true)
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
