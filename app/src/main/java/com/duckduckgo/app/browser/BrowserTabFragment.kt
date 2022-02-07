@@ -94,6 +94,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
@@ -155,6 +156,7 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -2369,42 +2371,51 @@ class BrowserTabFragment :
                 Timber.i("RMF: viewstate ${lastSeenCtaViewState}")
                 removeNewTabLayoutClickListener()
 
-                if (viewState.message != null) {
-                    if (newMessage) {
-                        Timber.i("RMF: render ${viewState.message}")
-                        messageCta.show()
-                        viewModel.onMessageShown()
-                        messageCta.setMessage(viewState.message.asMessage())
-                        messageCta.onCloseButtonClicked {
-                            viewModel.onMessageCloseButtonClicked()
-                        }
-                        messageCta.onPrimaryActionClicked {
-                            viewModel.onMessagePrimaryButtonClicked()
-                        }
-                        messageCta.onSecondaryActionClicked {
-                            viewModel.onMessageSecondaryButtonClicked()
-                        }
+                val cta = viewState.cta?.takeUnless {
+                    it -> viewState.message != null && it is HomePanelCta
+                }
+                when {
+                    cta != null -> {
+                        showCta(cta, viewState.favorites)
                     }
-                } else {
-                    messageCta.gone()
+                    viewState.message != null -> {
+                        showRemoteMessage(viewState.message, newMessage)
+                        hideHomeCta()
+                    }
+                    else -> {
+                        hideHomeCta()
+                        hideDaxCta()
+                        messageCta.gone()
+                        showHomeBackground(viewState.favorites)
+                    }
                 }
+            }
+        }
 
-                if (viewState.cta != null) {
-                    showCta(viewState.cta, viewState.favorites)
-                } else {
-                    hideDaxCta()
-                    showHomeBackground(viewState.favorites)
+        private fun showRemoteMessage(
+            message: RemoteMessage,
+            newMessage: Boolean
+        ) {
+            if (newMessage) {
+                Timber.i("RMF: render $message")
+                messageCta.show()
+                viewModel.onMessageShown()
+                messageCta.setMessage(message.asMessage())
+                messageCta.onCloseButtonClicked {
+                    viewModel.onMessageCloseButtonClicked()
                 }
-
-                if (viewState.cta is HomePanelCta && viewState.message != null) {
-                    hideHomeCta()
+                messageCta.onPrimaryActionClicked {
+                    viewModel.onMessagePrimaryButtonClicked()
+                }
+                messageCta.onSecondaryActionClicked {
+                    viewModel.onMessageSecondaryButtonClicked()
                 }
             }
         }
 
         private fun showCta(
             configuration: Cta,
-            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
@@ -2412,6 +2423,7 @@ class BrowserTabFragment :
                 is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
+            messageCta.gone()
         }
 
         private fun showDaxDialogCta(configuration: DialogCta) {
