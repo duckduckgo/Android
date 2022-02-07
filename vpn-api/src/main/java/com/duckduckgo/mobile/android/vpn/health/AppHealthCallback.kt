@@ -37,7 +37,8 @@ data class SystemHealthData(
 data class RawMetricsSubmission(
     val name: String,
     val metrics: Map<String, Metric> = emptyMap(),
-    val redacted: Boolean = false
+    val redacted: Boolean = false,
+    val informational: Boolean = false,
 )
 
 data class Metric(
