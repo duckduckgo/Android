@@ -768,6 +768,9 @@ class BrowserTabViewModel(
                 if (type is SpecialUrlDetector.UrlType.ExtractedTrackingLink) {
                     Timber.d("Tracking link detection: Using extracted URL: ${type.extractedUrl}")
                     urlToNavigate = type.extractedUrl
+                } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
+                    Timber.d("Loading parameter cleaned URL: ${type.cleanedUrl}")
+                    urlToNavigate = type.cleanedUrl
                 }
 
                 if (shouldClearHistoryOnNewQuery()) {

@@ -3820,6 +3820,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryIsTrackingParameterLinkThenNavigateToCleanedUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
     fun whenUrlExtractionErrorThenIssueLoadExtractedUrlCommandWithInitialUrl() {
         testee.onUrlExtractionError("http://foo.com")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
