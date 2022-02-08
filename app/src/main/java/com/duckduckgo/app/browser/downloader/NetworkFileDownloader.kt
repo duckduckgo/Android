@@ -23,8 +23,6 @@ import android.webkit.CookieManager
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -34,79 +32,10 @@ import javax.inject.Inject
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService,
-    private val appBuildConfig: AppBuildConfig
+    private val fileService: DownloadFileService
 ) {
 
-    fun download(
-        pendingDownload: PendingFileDownload,
-        callback: FileDownloader.FileDownloadListener
-    ) {
-        if (appBuildConfig.flavor == INTERNAL) {
-            downloadV2(pendingDownload, callback)
-        } else {
-            downloadV1(pendingDownload, callback)
-        }
-    }
-
-    private fun downloadV1(
-        pendingDownload: PendingFileDownload,
-        callback: FileDownloader.FileDownloadListener
-    ) {
-
-        if (!downloadManagerAvailable()) {
-            callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
-            return
-        }
-
-        fileService.getFileDetails(pendingDownload.url)?.enqueue(object : Callback<Void> {
-            override fun onResponse(
-                call: Call<Void>,
-                response: Response<Void>
-            ) {
-                if (response.isSuccessful) {
-                    var updatedPendingDownload = pendingDownload.copy()
-
-                    val contentType = response.headers().get("content-type")
-                    val contentDisposition = response.headers().get("content-disposition")
-
-                    if (contentType != null) {
-                        updatedPendingDownload = updatedPendingDownload.copy(mimeType = contentType)
-                    }
-
-                    if (contentDisposition != null) {
-                        updatedPendingDownload = updatedPendingDownload.copy(contentDisposition = contentDisposition)
-                    }
-
-                    when (val extractionResult = filenameExtractor.extract(updatedPendingDownload)) {
-                        is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(
-                            updatedPendingDownload,
-                            extractionResult.filename,
-                            callback
-                        )
-                        is FilenameExtractor.FilenameExtractionResult.Guess -> {
-                            downloadFile(updatedPendingDownload, extractionResult.bestGuess, callback)
-                        }
-                    }
-                } else {
-                    // TODO [Improve downloads] This is not a connection failed error, but a non-[200..300) response code.
-                    Timber.d("Connection failed ${response.errorBody()}")
-                    callback.downloadFailed("Connection failed", DownloadFailReason.ConnectionRefused)
-                }
-            }
-
-            override fun onFailure(
-                call: Call<Void>,
-                t: Throwable
-            ) {
-                // TODO [Improve downloads] This is a connection failed, the reason provided is misleading.
-                callback.downloadFailed(context.getString(R.string.downloadManagerDisabled), DownloadFailReason.DownloadManagerDisabled)
-                return
-            }
-        })
-    }
-
-    private fun downloadV2(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
+    fun download(pendingDownload: PendingFileDownload, callback: FileDownloader.FileDownloadListener) {
         Timber.d("Start download for ${pendingDownload.url}.")
 
         if (!downloadManagerAvailable()) {

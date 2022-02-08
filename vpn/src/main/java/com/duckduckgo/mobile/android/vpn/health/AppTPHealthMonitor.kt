@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
-import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -67,7 +67,6 @@ class AppTPHealthMonitor @Inject constructor(
     @VpnCoroutineScope private val coroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter,
     private val healthClassifier: HealthClassifier,
-    private val vpnQueues: VpnQueues,
     private val callbacks: PluginPoint<AppHealthCallback>
 ) : AppHealthMonitor {
 
@@ -79,7 +78,6 @@ class AppTPHealthMonitor @Inject constructor(
         private const val MONITORING_FREQUENCY_MS: Long = 30_000
         private const val OLD_METRIC_CLEANUP_FREQUENCY_MS: Long = 60_000
 
-        private val MEMORY_ALERT_SAMPLES: Int = (15.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
         private val TUN_READ_ALERT_SAMPLES: Int = (4.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
     }
 
@@ -102,7 +100,8 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketWriteExceptionAlerts = object : HealthRule("socketWriteExceptionAlerts") {}.also { healthRules.add(it) }
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
-    private val memoryAlerts = object : HealthRule("memoryAlerts", samplesToWaitBeforeAlerting = MEMORY_ALERT_SAMPLES) {}.also { healthRules.add(it) }
+    private val bufferAllocationsAlerts =
+        object : HealthRule("bufferAllocationAlerts", samplesToWaitBeforeAlerting = Int.MAX_VALUE) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
         val timeWindow = now - SLIDING_WINDOW_DURATION_MS
@@ -113,7 +112,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleSocketWriteExceptions(timeWindow, socketWriteExceptionAlerts)
         healthStates += sampleSocketConnectExceptions(timeWindow, socketConnectExceptionAlerts)
         healthStates += sampleTunWriteExceptions(timeWindow, tunWriteExceptionAlerts)
-        // healthStates += sampleMemoryUsage(memoryAlerts)
+        healthStates += sampleBufferAllocations(timeWindow, bufferAllocationsAlerts)
 
         /*
          * useful for testing notifications; can trigger good or bad health from diagnostics screen
@@ -205,6 +204,16 @@ class AppTPHealthMonitor @Inject constructor(
     ): HealthState {
         val numberExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
         val state = healthClassifier.determineHealthTunWriteExceptions(numberExceptions)
+        healthAlerts.updateAlert(state)
+        return state
+    }
+
+    private fun sampleBufferAllocations(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val allocations = ByteBufferPool.allocations.get()
+        val state = healthClassifier.determineHealthBufferAllocations(allocations)
         healthAlerts.updateAlert(state)
         return state
     }

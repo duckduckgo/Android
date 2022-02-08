@@ -81,6 +81,16 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
+    fun determineHealthBufferAllocations(bufferAllocations: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("buffer-allocations", rawMetrics, informational = true)
+
+        // never trigger an alert for this. We just one the info
+        rawMetrics["numberAllocations"] = Metric(bufferAllocations.toString(), badHealthIf { false })
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
     fun determineHealthMemory(): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("memory", rawMetrics, redacted = true)

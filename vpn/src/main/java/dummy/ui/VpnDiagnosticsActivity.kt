@@ -84,6 +84,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 
 class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
@@ -291,6 +292,13 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             ),
         )
 
+        healthMetricsStrings.add(
+            String.format(
+                "\n\nBuffer allocations: %d",
+                healthMetricsInfo.bufferAllocations,
+            ),
+        )
+
         val sb = StringBuilder()
         healthMetricsStrings.forEach { sb.append(it) }
 
@@ -332,6 +340,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         val socketConnectExceptions =
             healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
         val tunWriteIOExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
+        val bufferAllocations = ByteBufferPool.allocations.get()
 
         return HealthMetricsInfo(
             tunPacketReceived = tunPacketReceived,
@@ -346,6 +355,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             socketWriteExceptions = socketWriteExceptions,
             socketConnectException = socketConnectExceptions,
             tunWriteIOExceptions = tunWriteIOExceptions,
+            bufferAllocations = bufferAllocations
         )
     }
 
@@ -628,7 +638,8 @@ data class HealthMetricsInfo(
     val socketReadExceptions: Long,
     val socketWriteExceptions: Long,
     val socketConnectException: Long,
-    val tunWriteIOExceptions: Long
+    val tunWriteIOExceptions: Long,
+    val bufferAllocations: Long,
 )
 
 data class NetworkInfo(
