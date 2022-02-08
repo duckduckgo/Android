@@ -30,7 +30,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -51,12 +53,6 @@ class NotificationRegistrar @Inject constructor(
     private val pixel: Pixel
 ) : LifecycleObserver {
 
-    data class Channel(
-        val id: String,
-        @StringRes val name: Int,
-        val priority: Int
-    )
-
     object NotificationId {
         const val ClearData = 100
         const val PrivacyProtection = 101
@@ -68,7 +64,7 @@ class NotificationRegistrar @Inject constructor(
     object ChannelType {
         val FILE_DOWNLOADING = Channel(
             "com.duckduckgo.downloading",
-            R.string.notificationChannelFileDownloading,
+            string.notificationChannelFileDownloading,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
         val FILE_DOWNLOADED = Channel(

@@ -109,18 +109,6 @@ class NotificationModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesNotificationSender(
-        context: Context,
-        pixel: Pixel,
-        manager: NotificationManagerCompat,
-        factory: NotificationFactory,
-        notificationDao: NotificationDao
-    ): NotificationSender {
-        return AppNotificationSender(context, pixel, manager, factory, notificationDao)
-    }
-
-    @Provides
     fun provideAppTpWaitlistCodeNotification(
         context: Context,
         notificationDao: NotificationDao,

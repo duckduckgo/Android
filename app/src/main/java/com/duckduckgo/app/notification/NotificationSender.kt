@@ -23,13 +23,16 @@ import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesTo
+import dagger.SingleInstanceIn
 import timber.log.Timber
+import javax.inject.Inject
 
-interface NotificationSender {
-    suspend fun sendNotification(notification: SchedulableNotification)
-}
-
-class AppNotificationSender(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class AppNotificationSender @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
     private val manager: NotificationManagerCompat,
