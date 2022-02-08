@@ -90,7 +90,7 @@ class AppBadHealthStateHandlerTest {
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
             "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\"" +
-                ":[{\"informational\":false,\"metrics\":{\"metric\":{\"isBadState\":true,\"value\":\"value\"}}" +
+                ":[{\"informational\":false,\"metrics\":{\"metric\":{\"isBadState\":true,\"isCritical\":false,\"value\":\"value\"}}" +
                 ",\"name\":\"rawMetric\",\"redacted\":false}]}}",
             state?.healthDataJsonString
         )
