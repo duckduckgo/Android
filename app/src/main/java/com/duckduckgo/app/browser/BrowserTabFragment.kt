@@ -1011,6 +1011,7 @@ class BrowserTabFragment :
 
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
+            appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(appLink.appIntent)
         } else if (appLink.excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
@@ -1032,6 +1033,7 @@ class BrowserTabFragment :
         excludedComponents: List<ComponentName>
     ): Intent {
         val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
+        urlIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val chooserIntent = Intent.createChooser(urlIntent, title)
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
         return chooserIntent

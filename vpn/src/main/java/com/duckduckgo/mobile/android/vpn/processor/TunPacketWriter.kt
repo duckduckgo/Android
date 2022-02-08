@@ -83,7 +83,11 @@ class TunPacketWriter @AssistedInject constructor(
             Timber.w(e, "Failed writing to the TUN")
             bufferFromNetwork.rewind()
             Timber.d("Failed writing to the TUN. Buffer: %s", bufferFromNetwork.toByteString().hex())
-            healthMetricCounter.onTunWriteIOException()
+            if (e.message?.lowercase()?.contains("no buffer space available") == true) {
+                healthMetricCounter.onTunWriteIOExceptionNoBufferSpace()
+            } else {
+                healthMetricCounter.onTunWriteIOException()
+            }
         } finally {
             ByteBufferPool.release(bufferFromNetwork)
         }

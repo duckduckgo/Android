@@ -254,21 +254,31 @@
 
                     <Button
                         android:id="@+id/simulateGoodHealth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Good Health" />
 
                     <Button
                         android:id="@+id/simulateBadHealth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Bad Health" />
 
                     <Button
-                        android:id="@+id/noSimulation"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/simulateCriticalBadHealth"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
-                        android:text="No simulation" />
+                        android:text="Critical Health" />
+
+                    <Button
+                        android:id="@+id/noSimulation"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="No Simulation" />
 
                 </LinearLayout>
 
