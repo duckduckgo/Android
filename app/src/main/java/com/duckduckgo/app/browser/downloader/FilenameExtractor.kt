@@ -16,20 +16,16 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import android.webkit.URLUtil
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.TriedAllOptions
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import timber.log.Timber
 import javax.inject.Inject
 
 class FilenameExtractor @Inject constructor(
-    private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel
 ) {
 
@@ -74,10 +70,7 @@ class FilenameExtractor @Inject constructor(
         mimeType: String?
     ): String {
         val tidiedUrl = url.removeSuffix("/")
-        var guessedFilename = when (appBuildConfig.flavor) {
-            BuildFlavor.INTERNAL -> DownloaderUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
-            else -> URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
-        }
+        var guessedFilename = DownloaderUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
 
         // we only want to keep the default .bin filetype on the guess if the URL actually has that too
         if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {

@@ -101,7 +101,9 @@ class AppBadHealthStateHandler @Inject constructor(
 
                 // we don't include raw metrics marked as "redacted" as they can contain information that could
                 // be used to fingerprint.
-                val (badHealthMetrics, _) = appHealthData.systemHealth.rawMetrics.partition { it.isInBadHealth() && !it.redacted }
+                val (badHealthMetrics, _) = appHealthData.systemHealth.rawMetrics.partition {
+                    (it.isInBadHealth() || it.informational) && !it.redacted
+                }
                 val badHealthData = appHealthData.copy(systemHealth = appHealthData.systemHealth.copy(rawMetrics = badHealthMetrics))
                 val jsonAdapter = Moshi.Builder().build().run {
                     adapter(AppHealthData::class.java)

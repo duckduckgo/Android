@@ -24,6 +24,7 @@ import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
+import com.duckduckgo.privacy.config.api.TrackingLinkException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -109,6 +110,26 @@ data class PrivacyConfig(
     val version: Long,
     val readme: String
 )
+
+@Entity(tableName = "amp_link_formats")
+data class AmpLinkFormatEntity(
+    @PrimaryKey val format: String
+)
+
+@Entity(tableName = "amp_keywords")
+data class AmpKeywordEntity(
+    @PrimaryKey val keyword: String
+)
+
+@Entity(tableName = "amp_exceptions")
+data class TrackingLinkExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String
+)
+
+fun TrackingLinkExceptionEntity.toTrackingLinkException(): TrackingLinkException {
+    return TrackingLinkException(domain = this.domain, reason = this.reason)
+}
 
 class Adapters {
     companion object {

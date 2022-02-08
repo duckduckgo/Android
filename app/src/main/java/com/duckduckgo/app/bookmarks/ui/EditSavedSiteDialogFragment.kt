@@ -42,8 +42,9 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
             setToolbarTitle(getString(R.string.bookmarkDialogTitleEdit))
             binding.savedSiteLocationContainer.visibility = View.VISIBLE
         }
+        showAddFolderMenu = true
 
-        populateFields(binding.titleInput, binding.urlInput)
+        populateFields(binding.titleInput, binding.urlInput, binding.savedSiteLocation)
 
         binding.urlInput.addTextChangedListener(urlTextWatcher)
     }
@@ -56,10 +57,14 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
 
     private fun populateFields(
         titleInput: EditText,
-        urlInput: EditText
+        urlInput: EditText,
+        savedLocation: EditText
     ) {
         titleInput.setText(getExistingTitle())
         urlInput.setText(getExistingUrl())
+        getExistingBookmarkFolderName()?.let {
+            if (it.isNotEmpty()) savedLocation.setText(it)
+        }
     }
 
     override fun onConfirmation() {
@@ -102,6 +107,8 @@ class EditSavedSiteDialogFragment : SavedSiteDialogFragment() {
     private fun getSavedSite(): SavedSite = requireArguments().getSerializable(KEY_SAVED_SITE) as SavedSite
     private fun getExistingTitle(): String = getSavedSite().title
     private fun getExistingUrl(): String = getSavedSite().url
+    private fun getExistingBookmarkFolderName(): String? =
+        requireArguments().getSerializable(AddBookmarkFolderDialogFragment.KEY_PARENT_FOLDER_NAME) as String?
 
     private fun validateBundleArguments() {
         if (arguments == null) throw IllegalArgumentException("Missing arguments bundle")

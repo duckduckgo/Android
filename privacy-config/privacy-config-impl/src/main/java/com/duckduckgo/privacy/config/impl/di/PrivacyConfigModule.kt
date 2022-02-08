@@ -48,6 +48,8 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.RealTrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
+import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.RealTrackingLinkDetectionRepository
+import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -191,5 +193,15 @@ class DatabaseModule {
         dispatcherProvider: DispatcherProvider
     ): DrmRepository {
         return RealDrmRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideTrackingLinkDetectionRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): TrackingLinkDetectionRepository {
+        return RealTrackingLinkDetectionRepository(database, coroutineScope, dispatcherProvider)
     }
 }
