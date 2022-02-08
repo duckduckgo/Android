@@ -3867,7 +3867,7 @@ class BrowserTabViewModelTest {
     fun whenPageChangedAndLastCleanedUrlIsNullThenDoNothing() {
         whenever(mockTrackingParameters.lastCleanedUrl).thenReturn(null)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        verify(mockTrackingParameters, times(0))
+        verify(mockTrackingParameters, times(0)).lastCleanedUrl = null
         assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
     }
 
