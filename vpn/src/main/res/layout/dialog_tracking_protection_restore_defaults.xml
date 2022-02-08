@@ -76,7 +76,7 @@
 
     <Button
         android:id="@+id/trackingProtectionRestoreDefaultsRestore"
-        style="@style/DeviceShield.Button.Blue"
+        style="@style/Widget.DuckDuckGo.Button.Primary"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialogButtonHeight"
         android:layout_marginTop="24dp"
@@ -89,7 +89,7 @@
 
     <Button
         android:id="@+id/trackingProtectionRestoreDefaultsCancel"
-        style="@style/Widget.AppCompat.Button.Borderless"
+        style="@style/Widget.DuckDuckGo.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/dialogButtonHeight"
         android:layout_marginTop="24dp"
