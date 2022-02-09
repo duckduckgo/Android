@@ -34,11 +34,11 @@ data class RemoteMessage(
 
 sealed class Content(val messageType: MessageType) {
     data class Small(val titleText: String, val descriptionText: String) : Content(SMALL)
-    data class Medium(val titleText: String, val descriptionText: String, val placeholder: String) : Content(MEDIUM)
+    data class Medium(val titleText: String, val descriptionText: String, val placeholder: Placeholder) : Content(MEDIUM)
     data class BigSingleAction(
         val titleText: String,
         val descriptionText: String,
-        val placeholder: String,
+        val placeholder: Placeholder,
         val primaryActionText: String,
         val primaryAction: Action
     ) : Content(BIG_SINGLE_ACTION)
@@ -46,7 +46,7 @@ sealed class Content(val messageType: MessageType) {
     data class BigTwoActions(
         val titleText: String,
         val descriptionText: String,
-        val placeholder: String,
+        val placeholder: Placeholder,
         val primaryActionText: String,
         val primaryAction: Action,
         val secondaryActionText: String,
@@ -58,6 +58,19 @@ sealed class Content(val messageType: MessageType) {
         MEDIUM,
         BIG_SINGLE_ACTION,
         BIG_TWO_ACTION
+    }
+
+    enum class Placeholder(val jsonValue: String) {
+        ANNOUNCE("Announce"),
+        DDG_ANNOUNCE("DDGAnnounce"),
+        CRITICAL_UPDATE("CriticalUpdate"),
+        APP_UPDATE("AppUpdate");
+
+        companion object {
+            fun from(jsonValue: String): Placeholder {
+                return values().first { it.jsonValue == jsonValue }
+            }
+        }
     }
 }
 

@@ -287,6 +287,22 @@ class UriUtilsFilenameExtractorTest {
         verify(mockedPixel).fire(AppPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
     }
 
+    @Test
+    fun whenUrlContainsFilenameAndMimeTypeIsTextXPython3AndContentDispositionIsEmptyThenFilenameIsReturned() {
+        val url = """
+            https://ddg-name-test-ubsgiobgibsdgsbklsdjgm.netlify.app/uploads/qwertyuiopasdfghjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnm/bat.py
+        """.trimIndent()
+        val mimeType = "text/x-python3; charset=UTF-8"
+        val contentDisposition = ""
+
+        val extractionResult = testee.extract(buildPendingDownload(url, contentDisposition, mimeType))
+        assertTrue(extractionResult is FilenameExtractor.FilenameExtractionResult.Extracted)
+
+        extractionResult as FilenameExtractor.FilenameExtractionResult.Extracted
+
+        assertEquals("bat.py", extractionResult.filename)
+    }
+
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,

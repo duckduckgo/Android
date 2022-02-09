@@ -33,11 +33,11 @@ android {
         }
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-            androidTest.resources.srcDirs += files("$projectDir/../submodules/".toString())
             main {
                 java {
                     resources {
                         srcDirs += files("$projectDir/../submodules/autofill/dist/".toString())
+                        srcDirs += files("$projectDir/../submodules/".toString())
                     }
                 }
             }
@@ -180,6 +180,7 @@ dependencies {
 
     // ThreeTenABP
     implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
@@ -251,6 +252,7 @@ dependencies {
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
+    androidTestImplementation "androidx.test.espresso:espresso-web:_"
     androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

@@ -27,8 +27,8 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.returningUsersNoOnboardingEnabled
-import com.duckduckgo.app.statistics.returningUsersWidgetPromotionEnabled
+import com.duckduckgo.app.statistics.returningUsersContinueWithoutPrivacyTips
+import com.duckduckgo.app.statistics.returningUsersSkipTutorial
 import kotlinx.coroutines.flow.*
 
 @SuppressLint("StaticFieldLeak")
@@ -42,15 +42,16 @@ class WelcomePageViewModel(
 ) : ViewModel() {
 
     sealed class ViewState {
-        object NewOrReturningUsersState : ViewState()
+        object ContinueWithoutPrivacyTipsState : ViewState()
+        object SkipTutorialState : ViewState()
         object DefaultOnboardingState : ViewState()
     }
 
     val screenContent = flow {
-        if (variantManager.returningUsersNoOnboardingEnabled() || variantManager.returningUsersWidgetPromotionEnabled()) {
-            emit(ViewState.NewOrReturningUsersState)
-        } else {
-            emit(ViewState.DefaultOnboardingState)
+        when {
+            variantManager.returningUsersContinueWithoutPrivacyTips() -> emit(ViewState.ContinueWithoutPrivacyTipsState)
+            variantManager.returningUsersSkipTutorial() -> emit(ViewState.SkipTutorialState)
+            else -> emit(ViewState.DefaultOnboardingState)
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.DefaultOnboardingState)
 
@@ -90,8 +91,8 @@ class WelcomePageViewModel(
 
     private fun firePrimaryCtaPressed() {
         when {
-            variantManager.returningUsersNoOnboardingEnabled() ||
-                variantManager.returningUsersWidgetPromotionEnabled() -> pixel.fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
+            variantManager.returningUsersContinueWithoutPrivacyTips() ||
+                variantManager.returningUsersSkipTutorial() -> pixel.fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
             else -> pixel.fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
         }
     }

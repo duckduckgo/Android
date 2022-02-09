@@ -32,6 +32,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
 
     override fun configureUI() {
         setToolbarTitle(getString(R.string.editFolder))
+        showAddFolderMenu = true
         arguments?.getSerializable(BookmarkFoldersActivity.KEY_CURRENT_FOLDER)?.let {
             binding.titleInput.setText((it as BookmarkFolder).name)
         }

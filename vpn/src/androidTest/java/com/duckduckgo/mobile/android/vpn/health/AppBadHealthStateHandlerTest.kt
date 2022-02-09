@@ -21,6 +21,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -30,15 +31,19 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.ZoneOffset
 
 @ExperimentalCoroutinesApi
 class AppBadHealthStateHandlerTest {
@@ -78,14 +83,15 @@ class AppBadHealthStateHandlerTest {
 
     @Test
     fun whenOnAppHealthUpdateWithBadHealthDataThenStoreInDbAndSendPixel() = runTest {
-        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
+        assertTrue(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
 
-        val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
+        val state = db.appHealthDao().latestHealthStateByType(BAD_HEALTH)
 
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
             "{\"alerts\":[\"alert\"],\"systemHealth\":{\"isBadHealth\":true,\"rawMetrics\"" +
-                ":[{\"metrics\":{\"metric\":{\"isBadState\":true,\"value\":\"value\"}},\"name\":\"rawMetric\",\"redacted\":false}]}}",
+                ":[{\"informational\":false,\"metrics\":{\"metric\":{\"isBadState\":true,\"isCritical\":false,\"value\":\"value\"}}" +
+                ",\"name\":\"rawMetric\",\"redacted\":false}]}}",
             state?.healthDataJsonString
         )
 
@@ -94,9 +100,9 @@ class AppBadHealthStateHandlerTest {
 
     @Test
     fun whenOnAppHealthUpdateWithRedactedBadHealthDataThenSkipRedactedMetricsFromDbAndSendPixel() = runTest {
-        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(REDACTED_BAD_HEALTH_DATA))
+        assertTrue(appBadHealthStateHandler.onAppHealthUpdate(REDACTED_BAD_HEALTH_DATA))
 
-        val state = db.appHealthDao().latestHealthState(BAD_HEALTH)
+        val state = db.appHealthDao().latestHealthStateByType(BAD_HEALTH)
 
         assertEquals(listOf("alert"), state?.alerts)
         assertEquals(
@@ -111,10 +117,62 @@ class AppBadHealthStateHandlerTest {
     fun whenOnAppHealthUpdateWithGoodHealthDataThenStoreInDb() = runTest {
         assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
 
-        val state = db.appHealthDao().latestHealthState(GOOD_HEALTH)
+        val state = db.appHealthDao().latestHealthStateByType(GOOD_HEALTH)
 
         assertEquals(GOOD_HEALTH, state?.type)
         assertEquals(listOf<String>(), state?.alerts)
+    }
+
+    @Test
+    fun whenAlertResolvesByRestartSendPixel() = runTest {
+        assertTrue(appBadHealthStateHandler.onAppHealthUpdate(BAD_HEALTH_DATA))
+        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
+
+        val state = db.appHealthDao().latestHealthStateByType(GOOD_HEALTH)
+        assertEquals(GOOD_HEALTH, state?.type)
+
+        verify(deviceShieldPixels).badHealthResolvedByRestart(any())
+        verify(deviceShieldPixels, never()).badHealthResolvedItself(any())
+    }
+
+    @Test
+    fun whenAlertResolvesSoonEnoughAfterRestartSendResolvedByRestartPixel() = runTest {
+        db.appHealthDao().insert(
+            AppHealthState(
+                type = BAD_HEALTH,
+                alerts = listOf("alert"),
+                healthDataJsonString = "",
+                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 30
+            )
+        )
+
+        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
+
+        val state = db.appHealthDao().latestHealthStateByType(GOOD_HEALTH)
+        assertEquals(GOOD_HEALTH, state?.type)
+
+        verify(deviceShieldPixels).badHealthResolvedByRestart(any())
+        verify(deviceShieldPixels, never()).badHealthResolvedItself(any())
+    }
+
+    @Test
+    fun whenAlertResolvesWayAfterRestartSendResolvedItselfPixel() = runTest {
+        db.appHealthDao().insert(
+            AppHealthState(
+                type = BAD_HEALTH,
+                alerts = listOf("alert"),
+                healthDataJsonString = "",
+                restartedAtEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - 60
+            )
+        )
+
+        assertFalse(appBadHealthStateHandler.onAppHealthUpdate(EMPTY_HEALTH_DATA))
+
+        val state = db.appHealthDao().latestHealthStateByType(GOOD_HEALTH)
+        assertEquals(GOOD_HEALTH, state?.type)
+
+        verify(deviceShieldPixels).badHealthResolvedItself(any())
+        verify(deviceShieldPixels, never()).badHealthResolvedByRestart(any())
     }
 
     companion object {
@@ -145,6 +203,21 @@ class AppBadHealthStateHandlerTest {
                             "rawMetric",
                             metrics = mapOf("metric" to Metric("value", isBadState = true)),
                             redacted = true
+                        )
+                    )
+                )
+            )
+
+        private val BAD_HEALTH_DATA_NO_ALERT =
+            AppHealthData(
+                listOf(),
+                SystemHealthData(
+                    true,
+                    listOf(
+                        RawMetricsSubmission(
+                            "rawMetric",
+                            metrics = mapOf("metric" to Metric("value", isBadState = true)),
+                            redacted = false
                         )
                     )
                 )

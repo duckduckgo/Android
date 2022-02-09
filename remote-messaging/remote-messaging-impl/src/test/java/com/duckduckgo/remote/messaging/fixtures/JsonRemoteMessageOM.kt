@@ -44,7 +44,7 @@ object JsonRemoteMessageOM {
     fun mediumJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder"
+        placeholder: String = "Announce"
     ) = JsonContent(
         messageType = "medium",
         titleText = titleText,
@@ -55,7 +55,7 @@ object JsonRemoteMessageOM {
     fun bigSingleActionJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder",
+        placeholder: String = "Announce",
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction()
     ) = JsonContent(
@@ -70,7 +70,7 @@ object JsonRemoteMessageOM {
     fun bigTwoActionJsonContent(
         titleText: String = "title",
         descriptionText: String = "description",
-        placeholder: String = "placeholder",
+        placeholder: String = "Announce",
         primaryActionText: String = "Action1",
         primaryAction: JsonMessageAction = jsonMessageAction(),
         secondaryActionText: String = "Action2",

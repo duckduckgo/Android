@@ -23,16 +23,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/appBarLayout"
-    android:theme="@style/ToolbarTheme"
-    tools:showIn="@layout/activity_tracker_networks">
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
-        android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/PopUpOverflowMenu" />
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
 </com.google.android.material.appbar.AppBarLayout>
 

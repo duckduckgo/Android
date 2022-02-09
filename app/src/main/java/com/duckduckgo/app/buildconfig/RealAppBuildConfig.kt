@@ -42,4 +42,12 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
     override val sdkInt: Int = Build.VERSION.SDK_INT
     override val manufacturer: String = Build.MANUFACTURER
     override val model: String = Build.MODEL
+    override val isTest by lazy {
+        try {
+            Class.forName("org.junit.Test")
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

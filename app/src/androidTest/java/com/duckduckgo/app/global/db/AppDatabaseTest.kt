@@ -452,6 +452,11 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(40, 41, migrationsProvider.MIGRATION_40_TO_41)
     }
 
+    @Test
+    fun whenMigratingFromVersion41To42ThenValidationSucceeds() {
+        createDatabaseAndMigrate(41, 42, migrationsProvider.MIGRATION_41_TO_42)
+    }
+
     private fun givenUserStageIs(
         database: SupportSQLiteDatabase,
         appStage: AppStage

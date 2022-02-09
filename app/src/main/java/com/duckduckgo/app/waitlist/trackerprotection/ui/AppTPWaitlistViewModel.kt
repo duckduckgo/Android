@@ -24,9 +24,10 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -38,7 +39,8 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class AppTPWaitlistViewModel(
-    private val waitlistManager: TrackingProtectionWaitlistManager,
+    private val waitlistManager: AppTPWaitlistManager,
+    private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
     private val waitlistService: AppTrackingProtectionWaitlistService,
     private val workManager: WorkManager,
     private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
@@ -46,7 +48,7 @@ class AppTPWaitlistViewModel(
 ) : ViewModel() {
 
     private val viewStateFlow: MutableStateFlow<ViewState> =
-        MutableStateFlow(ViewState(waitlistManager.waitlistState()))
+        MutableStateFlow(ViewState(atpWaitlistStateRepository.getState()))
     val viewState: StateFlow<ViewState> = viewStateFlow
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -111,19 +113,21 @@ class AppTPWaitlistViewModel(
     }
 
     fun onNotifyMeClicked() {
-        deviceShieldPixels.didPressWaitlistDialogNotifyMe()
         viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogNotifyMe()
             waitlistManager.notifyOnJoinedWaitlist()
         }
     }
 
     fun onNoThanksClicked() {
-        deviceShieldPixels.didPressWaitlistDialogDismiss()
+        viewModelScope.launch {
+            deviceShieldPixels.didPressWaitlistDialogDismiss()
+        }
     }
 
     fun onDialogDismissed() {
         viewModelScope.launch {
-            viewStateFlow.emit(ViewState(waitlistManager.waitlistState()))
+            viewStateFlow.emit(ViewState(atpWaitlistStateRepository.getState()))
         }
     }
 
@@ -138,7 +142,8 @@ class AppTPWaitlistViewModel(
 
 @ContributesMultibinding(AppScope::class)
 class AppTPWaitlistViewModelFactory @Inject constructor(
-    private val waitlistManager: Provider<TrackingProtectionWaitlistManager>,
+    private val waitlistManager: Provider<AppTPWaitlistManager>,
+    private val atpWaitlistStateRepository: Provider<AtpWaitlistStateRepository>,
     private val waitlistService: Provider<AppTrackingProtectionWaitlistService>,
     private val workManager: Provider<WorkManager>,
     private val workRequestBuilder: Provider<AppTPWaitlistWorkRequestBuilder>,
@@ -150,6 +155,7 @@ class AppTPWaitlistViewModelFactory @Inject constructor(
                 isAssignableFrom(AppTPWaitlistViewModel::class.java) -> (
                     AppTPWaitlistViewModel(
                         waitlistManager.get(),
+                        atpWaitlistStateRepository.get(),
                         waitlistService.get(),
                         workManager.get(),
                         workRequestBuilder.get(),

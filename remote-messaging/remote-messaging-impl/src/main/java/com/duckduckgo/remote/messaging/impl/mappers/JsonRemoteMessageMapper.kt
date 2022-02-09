@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl.mappers
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
@@ -43,7 +44,7 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
         Medium(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty()
+            placeholder = jsonContent.placeholder.asPlaceholder()
         )
     }
 
@@ -51,7 +52,7 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
         BigSingleAction(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty(),
+            placeholder = jsonContent.placeholder.asPlaceholder(),
             primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
             primaryAction = jsonContent.primaryAction!!.toAction()
         )
@@ -61,7 +62,7 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
         BigTwoActions(
             titleText = jsonContent.titleText.failIfEmpty(),
             descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.failIfEmpty(),
+            placeholder = jsonContent.placeholder.asPlaceholder(),
             primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
             primaryAction = jsonContent.primaryAction!!.toAction(),
             secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
@@ -88,10 +89,15 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
         Action.PlayStore(it.value)
     }
 
+    private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
+        Action.DefaultBrowser()
+    }
+
     private val actionMappers = mapOf(
         Pair("url", urlActionMapper),
         Pair("dismiss", dismissActionMapper),
-        Pair("playstore", playStoreActionMapper)
+        Pair("playstore", playStoreActionMapper),
+        Pair("defaultBrowser", defaultBrowserActionMapper)
     )
 
     fun map(jsonMessages: List<JsonRemoteMessage>): List<RemoteMessage> = jsonMessages.mapNotNull { it.map() }
@@ -128,6 +134,8 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
     }
 
     private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
+
+    private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)
 }
 
 private fun Content.localize(translations: JsonContentTranslations): Content {
