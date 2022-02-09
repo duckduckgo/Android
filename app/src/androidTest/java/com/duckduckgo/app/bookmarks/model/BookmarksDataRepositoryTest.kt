@@ -121,6 +121,21 @@ class BookmarksDataRepositoryTest {
     }
 
     @Test
+    fun whenGetBookmarkFolderByParentIdThenReturnBookmarkFolderForParentId() = runTest {
+        val bookmarkFolder = BookmarkFolder(id = 11, name = "name", parentId = 121)
+        bookmarkFoldersDao.insert(
+            BookmarkFolderEntity(
+                id = bookmarkFolder.id,
+                name = bookmarkFolder.name,
+                parentId = bookmarkFolder.parentId
+            )
+        )
+
+        val anotherBookmarkFolder = repository.getBookmarkFolderByParentId(11)
+        assertEquals(bookmarkFolder, anotherBookmarkFolder)
+    }
+
+    @Test
     fun whenUpdateBookmarkFolderThenUpdateBookmarkFolderCalled() = runTest {
         repository = BookmarksDataRepository(mockBookmarkFoldersDao, bookmarksDao, db)
         val bookmarkFolder = BookmarkFolder(id = 1, name = "name", parentId = 0)

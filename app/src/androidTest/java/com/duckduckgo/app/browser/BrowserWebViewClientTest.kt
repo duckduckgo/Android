@@ -42,6 +42,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -83,6 +84,7 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
+    private val trackingLinkDetector: TrackingLinkDetector = mock()
 
     @UiThreadTest
     @Before
@@ -104,7 +106,8 @@ class BrowserWebViewClientTest {
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
-            accessibilitySettings
+            accessibilitySettings,
+            trackingLinkDetector
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -411,6 +414,40 @@ class BrowserWebViewClientTest {
             assertTrue(testee.shouldOverrideUrlLoading(webView, EXAMPLE_URL))
             verify(listener, never()).handleNonHttpAppLink(any())
         }
+    }
+
+    @Test
+    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        val mockWebView = mock<WebView>()
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView).loadUrl(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        val mockWebView = mock<WebView>()
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView, never()).loadUrl(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenCloakedTrackingLinkDetectedAndIsForMainFrameThenHandleCloakedTrackingLink() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener).handleCloakedTrackingLink(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenCloakedTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+        whenever(webResourceRequest.isForMainFrame).thenReturn(false)
+        assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
+        verify(listener, never()).handleCloakedTrackingLink(any())
     }
 
     private class TestWebView(context: Context) : WebView(context)

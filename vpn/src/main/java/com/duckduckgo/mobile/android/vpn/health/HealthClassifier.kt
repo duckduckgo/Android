@@ -19,9 +19,7 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.content.Context
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.*
-import com.duckduckgo.mobile.android.vpn.health.TracerPacketRegister.TracerSummary.Completed
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class HealthClassifier @Inject constructor(val applicationContext: Context) {
@@ -39,6 +37,7 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
 
         rawMetrics["tunInputsQueueReadRate"] = Metric(percentage.toString(), badHealthIf { percentage < 70 })
         rawMetrics["tunInputs"] = Metric(tunInputs.toString())
+        rawMetrics["unknownPackets"] = Metric(queueReads.unknownPackets.toString())
         rawMetrics["queueReads"] = Metric(queueReads.queueReads.toString())
         rawMetrics["queueTCPReads"] = Metric(queueReads.queueTCPReads.toString())
         rawMetrics["queueUDPReads"] = Metric(queueReads.queueUDPReads.toString())
@@ -82,37 +81,22 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
-    fun determineHealthTracerPackets(allTraces: List<TracerPacketRegister.TracerSummary>): HealthState {
-        if (allTraces.size < 10) {
-            Timber.v("Tracer packet health: Initializing, as only %d tracers encountered", allTraces.size)
-            return Initializing
-        }
-
+    fun determineHealthTunWriteMemoryExceptions(numberExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
-        val metricSummary = RawMetricsSubmission("tracers", rawMetrics)
+        val metricSummary = RawMetricsSubmission("tun-ioWriteMemoryExceptions", rawMetrics)
 
-        val successfulTraces = allTraces
-            .filterIsInstance<Completed>()
-            .filter { it.timeToCompleteNanos <= TimeUnit.MILLISECONDS.toNanos(300) }
+        // this is marked as isCritical because we may want to take extreme measures when bad health happens here
+        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 }, isCritical = true)
 
-        val successRate = percentage(successfulTraces.size.toLong(), allTraces.size.toLong())
-        val numberFailed = allTraces.size - successfulTraces.size
-        val meanCompletedNs =
-            if (successfulTraces.isEmpty()) 0.0 else successfulTraces.sumOf { it.timeToCompleteNanos }.toDouble() / successfulTraces.size
-        val meanCompletedMs = meanCompletedNs / 1_000_000
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
 
-        rawMetrics["successRate"] = Metric(successRate.toString(), badHealthIf { successRate < 85 })
-        rawMetrics["numberFailed"] = Metric(numberFailed.toString())
-        rawMetrics["numberSucceeded"] = Metric(successfulTraces.size.toString())
-        rawMetrics["meanDurationMs"] = Metric(meanCompletedMs.toString())
+    fun determineHealthBufferAllocations(bufferAllocations: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("buffer-allocations", rawMetrics, informational = true)
 
-        Timber.v(
-            "Tracer packet health: \nSuccessful: %d Failed: %d Total: %d - Success rate: %.2f %%",
-            successfulTraces.size,
-            numberFailed,
-            allTraces.size,
-            successRate
-        )
+        // never trigger an alert for this. We just one the info
+        rawMetrics["numberAllocations"] = Metric(bufferAllocations.toString(), badHealthIf { false })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
@@ -177,4 +161,5 @@ data class QueueReads(
     val queueReads: Long,
     val queueTCPReads: Long,
     val queueUDPReads: Long,
+    val unknownPackets: Long,
 )

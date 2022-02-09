@@ -48,7 +48,7 @@
       "attributes": {
         "unknown": {
           "value": [
-            "en_GB"
+            "en-GB"
           ],
           "fallback": true
         }

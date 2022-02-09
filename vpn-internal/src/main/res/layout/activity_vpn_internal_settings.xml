@@ -112,6 +112,15 @@
                     android:theme="@style/SettingsSwitchTheme"
             />
 
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/badHealthMitigationToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bad health mitigation action"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
         </LinearLayout>
 
     </ScrollView>

@@ -27,6 +27,7 @@ data class SurveyGroup(
         val ratioOfUsersToShow: Double,
         val isEmailSignedInRequired: Boolean?,
         val isAtpEverEnabledRequired: Boolean?,
+        val isAtpWaitlistRequired: Boolean?,
         val urlParameters: List<String>?
     )
 }

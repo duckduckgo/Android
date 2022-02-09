@@ -22,7 +22,9 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
-import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.*
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.AddBookmarkFolderDialogFragment.AddBookmarkFolderListener
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.NewFolderCreatedUpdateTheStructure
+import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -35,7 +37,7 @@ import javax.inject.Provider
 class BookmarkFoldersViewModel(
     val bookmarksRepository: BookmarksRepository,
     private val dispatcherProvider: DispatcherProvider
-) : ViewModel() {
+) : ViewModel(), AddBookmarkFolderListener {
 
     data class ViewState(
         val folderStructure: List<BookmarkFolderItem> = emptyList()
@@ -43,6 +45,7 @@ class BookmarkFoldersViewModel(
 
     sealed class Command {
         class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : BookmarkFoldersViewModel.Command()
+        object NewFolderCreatedUpdateTheStructure : BookmarkFoldersViewModel.Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -63,12 +66,30 @@ class BookmarkFoldersViewModel(
         }
     }
 
+    fun newFolderAdded(rootFolderName: String, selectedFolderId: Long, currentFolder: BookmarkFolder?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val folderStructure = bookmarksRepository.getFlatFolderStructure(
+                selectedFolderId,
+                currentFolder,
+                rootFolderName
+            )
+            onFolderStructureCreated(folderStructure)
+        }
+    }
+
     private fun onFolderStructureCreated(folderStructure: List<BookmarkFolderItem>) {
         viewState.postValue(viewState.value?.copy(folderStructure = folderStructure))
     }
 
     fun onItemSelected(bookmarkFolder: BookmarkFolder) {
         command.value = SelectFolder(bookmarkFolder)
+    }
+
+    override fun onBookmarkFolderAdded(bookmarkFolder: BookmarkFolder) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            bookmarksRepository.insert(bookmarkFolder)
+        }
+        command.value = NewFolderCreatedUpdateTheStructure
     }
 }
 

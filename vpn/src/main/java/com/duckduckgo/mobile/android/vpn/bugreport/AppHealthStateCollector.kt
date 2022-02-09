@@ -71,17 +71,14 @@ class AppHealthStateCollector @Inject constructor(
         goodHealth: AppHealthState?
     ): Long? {
         if (badHealth == null || goodHealth == null) {
-            Timber.v("aitor no health")
             return null
         }
 
         val secondsSustained = DatabaseDateFormatter.duration(goodHealth.localtime, badHealth.localtime).seconds
 
         return if (secondsSustained > 0) {
-            Timber.v("aitor sustained")
             secondsSustained
         } else {
-            Timber.v("aitor not sustained bad=${badHealth.localtime}, good=${goodHealth.localtime}")
             null
         }
     }
@@ -90,6 +87,6 @@ class AppHealthStateCollector @Inject constructor(
         private const val SECONDS_AGO = "secondsAgo"
         private const val BAD_HEALTH_DATA = "badHealthData"
         private const val SUSTAINED_BAD_HEALTH_SEC = "secondsSustained"
-        private const val IS_CURRENTLY_IN_GOOD_HEALTH = "isCurrentlyGooHealth"
+        private const val IS_CURRENTLY_IN_GOOD_HEALTH = "isCurrentlyGoodHealth"
     }
 }
