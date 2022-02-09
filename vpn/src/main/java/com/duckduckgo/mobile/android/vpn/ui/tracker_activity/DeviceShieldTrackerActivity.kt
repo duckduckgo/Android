@@ -234,6 +234,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps -> launchExcludedApps(it.shouldListBeEnabled)
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog()
         }
     }
 
@@ -252,6 +253,16 @@ class DeviceShieldTrackerActivity :
         dialog.show(
             supportFragmentManager,
             AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+        )
+    }
+
+    private fun launchVPNConflictDialog(){
+        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        deviceShieldPixels.didShowVpnConflictDialog()
+        val dialog = AppTPVPNConflictDialog.instance()
+        dialog.show(
+            supportFragmentManager,
+            AppTPVPNConflictDialog.TAG_VPN_CONFLICT_DIALOG
         )
     }
 

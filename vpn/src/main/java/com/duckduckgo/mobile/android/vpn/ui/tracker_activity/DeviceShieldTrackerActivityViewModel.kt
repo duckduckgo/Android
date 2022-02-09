@@ -24,6 +24,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
+import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -40,11 +41,12 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Provider
 
-class DeviceShieldTrackerActivityViewModel(
+class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val applicationContext: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
+    private val vpnDetector: VpnDetector,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -79,16 +81,19 @@ class DeviceShieldTrackerActivityViewModel(
     }
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
-        if (enabled) {
-            deviceShieldPixels.enableFromSummaryTrackerActivity()
-        }
-
-        viewModelScope.launch {
-            if (enabled) {
-                command.send(Command.StartDeviceShield)
-            } else {
-                command.send(Command.ShowDisableConfirmationDialog)
+        when {
+            vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+            enabled == true -> {
+                sendCommand(Command.StartDeviceShield)
+                deviceShieldPixels.enableFromSummaryTrackerActivity()
             }
+            enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
+        }
+    }
+
+    private fun sendCommand(newCommand: Command){
+        viewModelScope.launch {
+            command.send(newCommand)
         }
     }
 
@@ -152,29 +157,19 @@ class DeviceShieldTrackerActivityViewModel(
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
         object ShowDisableConfirmationDialog : Command()
+        object ShowVpnConflictDialog : Command()
     }
 }
 
 @ContributesMultibinding(AppScope::class)
 class PastWeekTrackerActivityViewModelFactory @Inject constructor(
-    private val applicationContext: Provider<Context>,
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
-    private val vpnPreferences: Provider<VpnPreferences>,
-    private val appTrackerBlockingStatsRepository: Provider<AppTrackerBlockingStatsRepository>,
-    private val dispatcherProvider: Provider<DispatcherProvider>
+    private val viewModelProvider: Provider<DeviceShieldTrackerActivityViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(DeviceShieldTrackerActivityViewModel::class.java) -> (
-                    DeviceShieldTrackerActivityViewModel(
-                        applicationContext.get(),
-                        deviceShieldPixels.get(),
-                        vpnPreferences.get(),
-                        appTrackerBlockingStatsRepository.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
+                    (viewModelProvider.get()) as T)
                 else -> null
             }
         }
