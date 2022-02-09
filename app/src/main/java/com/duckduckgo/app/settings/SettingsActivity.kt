@@ -57,6 +57,7 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -64,6 +65,7 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
+import kotlinx.android.synthetic.main.content_settings_more.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -106,6 +108,9 @@ class SettingsActivity :
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
+    private val viewsMore
+        get() = binding.includeSettings.contentSettingsMore
+
     private val viewsOther
         get() = binding.includeSettings.contentSettingsOther
 
@@ -144,9 +149,13 @@ class SettingsActivity :
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
-            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
+        }
+
+        with(viewsMore) {
+            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
         }
 
         with(viewsOther) {
@@ -287,6 +296,7 @@ class SettingsActivity :
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
+            is Command.LaunchMacOs -> launchMacOsScreen()
             null -> TODO()
         }
     }
@@ -382,6 +392,10 @@ class SettingsActivity :
         startActivity(EmailProtectionActivity.intent(this), options)
     }
 
+    private fun launchMacOsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(MacOsWaitlistActivity.intent(this), options)
+    }
     private fun launchAppTPTrackersScreen() {
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }

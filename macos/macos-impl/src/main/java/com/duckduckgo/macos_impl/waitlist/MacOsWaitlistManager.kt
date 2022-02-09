@@ -49,7 +49,7 @@ class RealMacOsWaitlistManager @Inject constructor(
     override suspend fun fetchInviteCode(): FetchCodeResult {
         val token = repository.getToken()
         val timestamp = repository.getTimestamp()
-        if (repository.getState() == InBeta) return CodeExisted
+        if (repository.getState() is InBeta) return CodeExisted
         return withContext(dispatcherProvider.io()) {
             try {
                 val waitlistTimestamp = service.waitlistStatus().timestamp

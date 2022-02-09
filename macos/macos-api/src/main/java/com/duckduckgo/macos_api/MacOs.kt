@@ -5,7 +5,7 @@ interface MacOsWaitlist
 sealed class MacOsWaitlistState {
     object NotJoinedQueue : MacOsWaitlistState()
     data class JoinedWaitlist(val notify: Boolean = false) : MacOsWaitlistState()
-    object InBeta : MacOsWaitlistState()
+    data class InBeta(val inviteCode: String) : MacOsWaitlistState()
 }
 
 object MacOsNotificationEvent {

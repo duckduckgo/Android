@@ -15,18 +15,18 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/blue70">
+    android:color="@color/cornflowerDark">
     <item>
         <selector>
             <item android:state_enabled="true">
                 <shape android:shape="rectangle">
-                    <solid android:color="@color/blue50" />
+                    <solid android:color="@color/cornflowerBlue" />
                     <corners android:radius="8dp"/>
                 </shape>
             </item>
             <item android:state_hovered="true">
                 <shape android:shape="rectangle">
-                    <solid android:color="@color/blue60" />
+                    <solid android:color="@color/cornflowerDark" />
                     <corners android:radius="8dp"/>
                 </shape>
             </item>

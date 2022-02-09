@@ -61,7 +61,7 @@ class RealMacOsWaitlistRepository(
 
     override fun getState(): MacOsWaitlistState {
         if (didJoinBeta()) {
-            return MacOsWaitlistState.InBeta
+            return MacOsWaitlistState.InBeta(dataStore.inviteCode!!)
         }
         if (didJoinWaitlist()) {
             return MacOsWaitlistState.JoinedWaitlist(dataStore.sendNotification)

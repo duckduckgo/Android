@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -46,40 +46,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="22dp"
         android:layout_marginEnd="32dp"
-        android:text="@string/macos_waitlist_title"
         android:textAlignment="center"
-        android:textColor="?attr/settingsItemTextColor"
+        android:text="@string/macos_waitlist_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerImage" />
 
     <TextView
         android:id="@+id/waitlistDescription"
+        style="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:fontFamily="sans-serif"
-        android:lineSpacingExtra="4sp"
         android:text="@string/macos_waitlist_description"
         android:textAlignment="center"
         android:textColor="?attr/settingsMinorTextColor"
-        android:textSize="14sp"
-        android:textStyle="normal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/statusTitle" />
 
     <Button
         android:id="@+id/waitListButton"
-        style="@style/EmailButton.Primary"
+        style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="38dp"
         android:layout_marginEnd="24dp"
         android:text="@string/macos_join_waitlist"
         app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +84,7 @@
 
     <Button
         android:id="@+id/notifyMeButton"
-        style="@style/EmailButton.Primary"
+        style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -115,6 +111,39 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+   <LinearLayout
+       android:id="@+id/codeFrame"
+       app:layout_constraintTop_toBottomOf="@+id/waitlistDescription"
+       app:layout_constraintEnd_toEndOf="parent"
+       android:layout_marginTop="28dp"
+       app:layout_constraintStart_toStartOf="parent"
+       android:background="@drawable/background_code_frame"
+       android:layout_width="220dp"
+       android:layout_height="100dp"
+       android:orientation="vertical">
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Invite Code"
+          android:layout_gravity="center"
+          style="@style/TextAppearance.DuckDuckGo.Body1"
+          android:textColor="@color/white"
+         />
+
+      <TextView
+         android:id="@+id/inviteCode"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+         android:layout_margin="4dp"
+         android:gravity="center"
+         android:textSize="34sp"
+         android:textStyle="bold"
+         android:textColor="@color/almostBlack"
+         android:text="F20LPOPSD"
+         android:fontFamily="monospace"
+         android:background="@drawable/background_code_text"
+   </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

@@ -29,19 +29,20 @@ import com.duckduckgo.macos_api.MacOsWaitlistState.JoinedWaitlist
 import com.duckduckgo.macos_api.MacOsWaitlistState.NotJoinedQueue
 import com.duckduckgo.macos_impl.R
 import com.duckduckgo.macos_impl.databinding.ActivityMacosWaitlistBinding
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.ShowNotificationDialog
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.ViewState
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.ViewState
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.android.synthetic.main.activity_macos_waitlist.view.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class MacOsWaitlistActivity : DuckDuckGoActivity() {
 
-    private val viewModel: AppTPWaitlistViewModel by bindViewModel()
+    private val viewModel: MacOsWaitlistViewModel by bindViewModel()
     private val binding: ActivityMacosWaitlistBinding by viewBinding()
 
     private val toolbar
@@ -72,7 +73,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         when (val state = viewState.waitlist) {
             is NotJoinedQueue -> renderNotJoinedQueue()
             is JoinedWaitlist -> renderJoinedQueue(state.notify)
-            is InBeta -> renderInBeta()
+            is InBeta -> renderInBeta(state.inviteCode)
         }
     }
 
@@ -85,40 +86,39 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderInBeta() {
-        // binding.headerImage.setImageResource(R.drawable.ic_apptp_icon)
-        // binding.statusTitle.text = getString(R.string.atp_WaitlistStatusInBeta)
+    private fun renderInBeta(inviteCode: String) {
+        binding.headerImage.setImageResource(R.drawable.ic_donations_large)
+        binding.statusTitle.text = getString(R.string.macos_waitlist_code_title)
+        binding.waitlistDescription.text = getText(R.string.macos_waitlist_code_description)
         binding.waitListButton.gone()
         binding.footerDescription.gone()
+        binding.notifyMeButton.gone()
+        binding.codeFrame.show()
+        binding.codeFrame.inviteCode.text = inviteCode
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
-        // binding.headerImage.setImageResource(R.drawable.we_hatched)
         binding.waitListButton.gone()
         binding.footerDescription.gone()
-        // binding.statusTitle.text = getString(R.string.atp_WaitlistStatusJoined)
-        // if (notify) {
-        //     binding.appTPDescription.addClickableSpan(
-        //         getText(R.string.atp_WaitlistJoinedWithNotification),
-        //         listOf(Pair("beta_link", readBlogSpan))
-        //     )
-        // } else {
-        //     binding.appTPDescription.addClickableSpan(
-        //         getText(R.string.atp_WaitlistJoinedWithoutNotification),
-        //         listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan))
-        //     )
-        // }
+        binding.codeFrame.gone()
+        binding.headerImage.setImageResource(R.drawable.ic_list)
+        binding.statusTitle.text = getString(R.string.macos_waitlist_on_the_list_title)
+        if (notify) {
+            binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_notification)
+            binding.notifyMeButton.gone()
+        } else {
+            binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_no_notification)
+            binding.notifyMeButton.show()
+        }
     }
 
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.ic_privacy_simplified)
         binding.waitListButton.show()
-        // binding.getStartedButton.gone()
-        // binding.inviteCodeButton.show()
-        // binding.footerInviteCodeButton.gone()
-        // binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
-        //     viewModel.learnMore()
-        // }
+        binding.footerDescription.show()
+        binding.notifyMeButton.gone()
+        binding.codeFrame.gone()
+        binding.waitlistDescription.text = getText(R.string.macos_waitlist_description)
     }
 
     private fun renderErrorMessage() {

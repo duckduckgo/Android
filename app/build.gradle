@@ -142,6 +142,8 @@ dependencies {
     implementation project(path: ':privacy-config-impl')
     implementation project(path: ':anrs-api')
     implementation project(path: ':anrs-impl')
+    implementation project(path: ':macos-api')
+    implementation project(path: ':macos-impl')
 
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')

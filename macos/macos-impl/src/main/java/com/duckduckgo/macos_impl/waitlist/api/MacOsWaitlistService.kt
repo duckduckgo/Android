@@ -20,21 +20,21 @@ import retrofit2.http.*
 
 interface MacOsWaitlistService {
 
-    @POST("https://quack.duckduckgo.com/api/auth/waitlist/apptp/join")
-    suspend fun joinWaitlist(): WaitlistResponse
+    @POST("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/join")
+    suspend fun joinWaitlist(): MacOsWaitlistResponse
 
-    @GET("https://quack.duckduckgo.com/api/auth/waitlist/apptp/status")
-    suspend fun waitlistStatus(): WaitlistStatusResponse
+    @GET("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/status")
+    suspend fun waitlistStatus(): MacOsWaitlistStatusResponse
 
     @FormUrlEncoded
-    @POST("https://quack.duckduckgo.com/api/auth/waitlist/apptp/code")
+    @POST("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/code")
     suspend fun getCode(@Field("token") token: String): MacOsInviteCodeResponse
 }
 
-data class WaitlistResponse(
-    val token: String?,
-    val timestamp: Int?
-)
-
-data class WaitlistStatusResponse(val timestamp: Int)
+data class MacOsWaitlistResponse(val token: String?, val timestamp: Int?)
+data class MacOsWaitlistStatusResponse(val timestamp: Int)
 data class MacOsInviteCodeResponse(val code: String)
+
+object Url {
+    const val API = "https://quack.duckduckgo.com"
+}

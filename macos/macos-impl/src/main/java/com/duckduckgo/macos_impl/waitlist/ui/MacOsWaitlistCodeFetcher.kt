@@ -26,6 +26,7 @@ import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.macos_api.MacOsWaitlistState
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.CodeExisted
+import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.NoCode
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
 import kotlinx.coroutines.CoroutineScope
@@ -64,7 +65,9 @@ class RealMacOsWaitlistCodeFetcher(
                     workManager.cancelAllWorkByTag(MACOS_WAITLIST_SYNC_WORK_TAG)
                     notificationSender.sendNotification(notification)
                 }
-                else -> {}
+                NoCode -> {
+                    // NOOP
+                }
             }
         }
     }

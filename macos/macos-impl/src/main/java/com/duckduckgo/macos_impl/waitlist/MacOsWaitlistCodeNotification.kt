@@ -23,17 +23,21 @@ import com.duckduckgo.app.notification.NotificationRepository
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_api.MacOsNotificationEvent.MACOS_WAITLIST_CODE
 import com.duckduckgo.macos_impl.R
+import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
+import javax.inject.Inject
 
-class MacOsWaitlistCodeNotification(
+@ContributesBinding(AppScope::class)
+class MacOsWaitlistCodeNotification @Inject constructor(
     private val context: Context,
     private val notificationRepository: NotificationRepository,
     private val manager: MacOsWaitlistManager
 ) : SchedulableNotification {
 
-    override val id = "com.duckduckgo.vpn.waitlist"
+    override val id = "com.duckduckgo.macos.waitlist"
     override val launchIntent = MACOS_WAITLIST_CODE
     override val cancelIntent = "com.duckduckgo.notification.cancel"
 
@@ -54,7 +58,7 @@ class MacOsWaitlistCodeNotification(
 
 class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
     val MACOS_WAITLIST = Channel(
-        "com.duckduckgo.email",
+        "com.duckduckgo.macos",
         R.string.notification_channel_macos_waitlist,
         NotificationManagerCompat.IMPORTANCE_HIGH
     )
@@ -62,7 +66,7 @@ class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val channel = MACOS_WAITLIST
     override val systemId = 200
     override val name = context.getString(R.string.macos_notification_title)
-    override val icon = R.drawable.notification_logo
+    override val icon = R.drawable.ic_privacy_simplified
     override val title: String = context.getString(R.string.macos_notification_title)
     override val description: String = context.getString(R.string.macos_notification_text)
     override val launchButton: String? = null
@@ -70,5 +74,5 @@ class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val pixelSuffix = "macos"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = R.color.ic_launcher_red_background
+    override val color: Int = com.duckduckgo.mobile.android.R.color.accentBlue
 }

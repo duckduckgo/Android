@@ -19,11 +19,22 @@
     <string name="macos_waitlist_title">Try DuckDuckGo for Mac!</string>
     <string name="macos_waitlist_description">DuckDuckGo Privacy Browser for Mac has the speed you need, the browsing features you expect, and comes packed with our best-in-class privacy essentials.</string>
     <string name="macos_join_waitlist">Join the Private Waitlist</string>
-    <string name="macos_waitlist_footer">You won’t need to share any personal information to join the waitlist. You’ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it’s your turn.</string>
+    <string name="macos_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
+
+    <string name="macos_waitlist_on_the_list_title">You\'re on the list!</string>
+    <string name="macos_waitlist_on_the_list_no_notification">Your invite to try DuckDuckGo for Mac will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
+    <string name="macos_waitlist_on_the_list_notification">We\'ll send you a notification when your copy of DuckDuckGo for Mac is ready for download. </string>
+
     <string name="notification_channel_macos_waitlist">macos waitlist</string>
     <string name="macos_notification_title" tools:ignore="ExtraTranslation">DuckDuckGo for Mac is ready!</string>
     <string name="macos_notification_text" tools:ignore="ExtraTranslation">Open your invite</string>
-    <string name="macos_notification_dialog_description" tools:ignore="ExtraTranslation">Would you like us to send you a notification when it’s your turn?</string>
+    <string name="macos_notification_dialog_description" tools:ignore="ExtraTranslation">Would you like us to send you a notification when it\'s your turn?</string>
     <string name="macos_notification_dialog_no_thanks" tools:ignore="ExtraTranslation">No Thanks</string>
     <string name="macos_notification_dialog_notify_me" tools:ignore="ExtraTranslation">Notify Me</string>
+
+    <string name="macos_waitlist_code_title">You\'re invited!</string>
+    <string name="macos_waitlist_code_description"><![CDATA[Ready to start browsing privately on your Mac?<br/><br/><b>Step 1</b><br/>On your Mac, go to:<br/><a href=""><b>duckduckgo.com/macbeta</b></a><br/><br/><b>Step 2</b><br/>Open and install the downloaded file. When prompted, enter your invite code to unlock.]]></string>
+    <!-- Settings -->
+    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+    <string name="macos_settings_description">Browse privately with our app for Mac</string>
 </resources>

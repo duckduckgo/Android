@@ -25,11 +25,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_api.MacOsWaitlistState
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistService
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.EnterInviteCode
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.LaunchBetaInstructions
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.ShowNotificationDialog
-import com.duckduckgo.macos_impl.waitlist.ui.AppTPWaitlistViewModel.Command.ShowOnboarding
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.EnterInviteCode
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.LaunchBetaInstructions
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowOnboarding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
-class AppTPWaitlistViewModel(
+class MacOsWaitlistViewModel(
     private val waitlistManager: MacOsWaitlistManager,
     private val waitlistService: MacOsWaitlistService,
     private val workManager: WorkManager,
@@ -142,8 +142,8 @@ class AppTPWaitlistViewModelFactory @Inject constructor(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(AppTPWaitlistViewModel::class.java) -> (
-                    AppTPWaitlistViewModel(
+                isAssignableFrom(MacOsWaitlistViewModel::class.java) -> (
+                    MacOsWaitlistViewModel(
                         waitlistManager.get(),
                         waitlistService.get(),
                         workManager.get(),

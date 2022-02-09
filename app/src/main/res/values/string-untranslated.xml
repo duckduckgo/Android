@@ -46,6 +46,7 @@
     <string name="settingsTheme">Theme</string>
     <string name="settingsDarkTheme">Dark</string>
     <string name="settingsSystemTheme">System Default</string>
+    <string name="settingsHeadingMore">More from DuckDuckGo</string>
 
     <!-- Theme Settings -->
     <string name="settingsThemeDialogSave">Set Theme</string>

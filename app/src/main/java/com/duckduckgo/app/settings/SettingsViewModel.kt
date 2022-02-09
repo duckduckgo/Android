@@ -119,6 +119,7 @@ class SettingsViewModel(
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
+        object LaunchMacOs : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -242,6 +243,10 @@ class SettingsViewModel(
 
     fun onEmailProtectionSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
+    }
+
+    fun onMacOsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchMacOs) }
     }
 
     fun onDefaultBrowserToggled(enabled: Boolean) {
