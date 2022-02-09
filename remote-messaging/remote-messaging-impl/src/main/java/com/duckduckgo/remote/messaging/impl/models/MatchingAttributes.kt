@@ -180,7 +180,7 @@ fun Any?.toIntOrDefault(default: Int): Int = when {
 
 fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
-internal fun Locale.asJsonFormat() = "${language}-${country}"
+internal fun Locale.asJsonFormat() = "$language-$country"
 
 const val MATCHING_ATTR_INT_DEFAULT_VALUE = -1
 const val MATCHING_ATTR_STRING_DEFAULT_VALUE = ""

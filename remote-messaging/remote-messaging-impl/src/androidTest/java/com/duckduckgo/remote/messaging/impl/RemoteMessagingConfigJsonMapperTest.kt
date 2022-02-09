@@ -23,11 +23,9 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
-import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
-import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.squareup.moshi.Moshi
