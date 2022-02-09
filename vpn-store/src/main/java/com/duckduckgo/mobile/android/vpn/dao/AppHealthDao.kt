@@ -32,11 +32,14 @@ interface AppHealthDao {
 
     @Transaction
     fun remove(type: HealthEventType): AppHealthState? {
-        return latestHealthState(type)?.also { clear(type) }
+        return latestHealthStateByType(type)?.also { clear(type) }
     }
 
     @Query("SELECT * from app_health_state where type=:type ORDER BY localtime DESC LIMIT 1")
-    fun latestHealthState(type: HealthEventType): AppHealthState?
+    fun latestHealthStateByType(type: HealthEventType): AppHealthState?
+
+    @Query("SELECT * from app_health_state ORDER BY localtime DESC LIMIT 1")
+    fun latestHealthState(): AppHealthState?
 
     @Query("delete from app_health_state where type=:type")
     fun clear(type: HealthEventType)

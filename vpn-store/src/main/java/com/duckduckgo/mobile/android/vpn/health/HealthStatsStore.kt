@@ -48,6 +48,7 @@ data class SimpleEvent(
     companion object {
         fun build(type: String) = SimpleEvent(type = type, timestamp = System.currentTimeMillis())
 
+        fun TUN_READ_UNKNOWN_PACKET() = build("TUN_READ_UNKNOWN_PACKET")
         fun TUN_READ() = build("TUN_READ")
         fun ADD_TO_DEVICE_TO_NETWORK_QUEUE() = build("ADD_TO_DEVICE_TO_NETWORK_QUEUE")
         fun ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE() = build("ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE")
@@ -59,6 +60,7 @@ data class SimpleEvent(
         fun SOCKET_CHANNEL_WRITE_EXCEPTION() = build("SOCKET_CHANNEL_WRITE_EXCEPTION")
         fun SOCKET_CHANNEL_CONNECT_EXCEPTION() = build("SOCKET_CHANNEL_CONNECT_EXCEPTION")
         fun TUN_WRITE_IO_EXCEPTION() = build("TUN_WRITE_IO_EXCEPTION")
+        fun TUN_WRITE_IO_MEMORY_EXCEPTION() = build("TUN_WRITE_IO_EXCEPTION_NO_BUFFER_SPACE")
     }
 }
 

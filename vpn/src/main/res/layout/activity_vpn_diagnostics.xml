@@ -191,26 +191,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"
-                    android:text="Tracer Packets"
-                    android:textSize="18sp"
-                    android:layout_marginTop="16dp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tracerStats"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
-                    android:textSize="16sp"
-                    tools:text="Tracer completion time: 15ms" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginEnd="32dp"
                     android:text="Other Metrics"
                     android:textSize="18sp"
                     android:layout_marginTop="16dp"
@@ -274,21 +254,31 @@
 
                     <Button
                         android:id="@+id/simulateGoodHealth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Good Health" />
 
                     <Button
                         android:id="@+id/simulateBadHealth"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
                         android:text="Bad Health" />
 
                     <Button
-                        android:id="@+id/noSimulation"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/simulateCriticalBadHealth"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
                         android:layout_height="match_parent"
-                        android:text="No simulation" />
+                        android:text="Critical Health" />
+
+                    <Button
+                        android:id="@+id/noSimulation"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:text="No Simulation" />
 
                 </LinearLayout>
 

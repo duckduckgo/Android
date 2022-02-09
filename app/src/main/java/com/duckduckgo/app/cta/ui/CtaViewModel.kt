@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -39,8 +40,8 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.returningUsersNoOnboardingEnabled
-import com.duckduckgo.app.statistics.returningUsersWidgetPromotionEnabled
+import com.duckduckgo.app.statistics.returningUsersContinueWithoutPrivacyTips
+import com.duckduckgo.app.statistics.returningUsersSkipTutorial
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -251,14 +252,12 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) getWidgetAuto() else HomePanelCta.AddWidgetInstructions
-
-    private fun getWidgetAuto() =
-        if (variantManager.returningUsersWidgetPromotionEnabled() && onboardingStore.userMarkedAsReturningUser)
-            HomePanelCta.AddReturningUsersWidgetAuto else HomePanelCta.AddWidgetAuto
+    private fun getWidget(): HomePanelCta = if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
 
     private fun getWidgetCta(): HomePanelCta? {
-        if (variantManager.returningUsersNoOnboardingEnabled() && onboardingStore.userMarkedAsReturningUser) {
+        if ((variantManager.returningUsersContinueWithoutPrivacyTips() || variantManager.returningUsersSkipTutorial()) &&
+            onboardingStore.userMarkedAsReturningUser
+        ) {
             onboardingStore.countNewTabForReturningUser++
             if (onboardingStore.hasReachedThresholdToShowWidgetForReturningUser()) {
                 return getWidget()

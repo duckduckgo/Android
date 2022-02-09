@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.downloader
 
-import android.webkit.URLUtil
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor.GuessQuality.NotGoodEnough
@@ -71,7 +70,7 @@ class FilenameExtractor @Inject constructor(
         mimeType: String?
     ): String {
         val tidiedUrl = url.removeSuffix("/")
-        var guessedFilename = URLUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
+        var guessedFilename = DownloaderUtil.guessFileName(tidiedUrl, contentDisposition, mimeType)
 
         // we only want to keep the default .bin filetype on the guess if the URL actually has that too
         if (guessedFilename.endsWith(DEFAULT_FILE_TYPE) && !tidiedUrl.endsWith(DEFAULT_FILE_TYPE)) {

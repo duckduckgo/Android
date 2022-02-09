@@ -56,13 +56,14 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -84,6 +85,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var internalFeaturePlugins: PluginPoint<InternalFeaturePlugin>
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -128,6 +132,7 @@ class SettingsActivity :
             autocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
             setAsDefaultBrowserSetting.setOnCheckedChangeListener(defaultBrowserChangeListener)
             changeAppIconLabel.setOnClickListener { viewModel.userRequestedToChangeIcon() }
+            homeScreenWidgetSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             selectedFireAnimationSetting.setOnClickListener { viewModel.userRequestedToChangeFireAnimation() }
             accessibilitySetting.setOnClickListener { viewModel.onAccessibilitySettingClicked() }
         }
@@ -281,6 +286,7 @@ class SettingsActivity :
             is Command.LaunchFireAnimationSettings -> launchFireAnimationSelector(it.animation)
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
+            is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
             null -> TODO()
         }
     }
@@ -393,6 +399,11 @@ class SettingsActivity :
     private fun launchAppTPWaitlist() {
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this)
         appTPWaitlistActivityResult.launch(AppTPWaitlistActivity.intent(this), options)
+    }
+
+    private fun launchAddHomeScreenWidget() {
+        pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
+        addWidgetLauncher.launchAddWidget(this)
     }
 
     override fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {

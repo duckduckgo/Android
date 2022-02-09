@@ -37,7 +37,7 @@
     <Button
         android:id="@+id/primary_button"
         android:text="Primary Button"
-        style="@style/DeviceShield.Button.Blue"
+        style="@style/Widget.DuckDuckGo.Button.Primary"
         android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
 
     <Button
         android:id="@+id/secondary_button"
-        style="@style/DeviceShield.Button.Border"
+        style="@style/Widget.DuckDuckGo.Button.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Secondary Button"/>

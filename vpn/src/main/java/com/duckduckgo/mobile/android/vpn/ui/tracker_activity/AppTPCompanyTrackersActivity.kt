@@ -19,14 +19,24 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -37,38 +47,69 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val itemsAdapter = AppTPCompanyDetailsAdapter()
 
+    private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
+        if (!it.isEmpty()) {
+            Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME)!!
-        val appName = intent.getStringExtra(EXTRA_APP_NAME)!!
-        val date = intent.getStringExtra(EXTRA_DATE)!!
-
         setContentView(binding.root)
-        with(binding.includeToolbar.defaultToolbar) {
-            setupToolbar(this)
-            this.title = appName
+        with(binding.includeToolbar) {
+            setupToolbar(defaultToolbar)
+            app_name.text = getAppName()
+            Glide.with(applicationContext)
+                .load(packageManager.safeGetApplicationIcon(getPackage()))
+                .error(TextDrawable.asIconDrawable(getAppName()))
+                .into(appIcon)
         }
-        title = appName
 
+        binding.trackingLearnMore.addClickableLink("learn_more_link", getText(R.string.atp_CompanyDetailsTrackingLearnMore)) {
+            DeviceShieldFAQActivity.intent(this).also {
+                startActivity(it)
+            }
+        }
+
+        observeViewModel()
         binding.activityRecyclerView.adapter = itemsAdapter
+    }
 
+    private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.getTrackersForAppFromDate(
-                date,
-                packageName
+                getDate(),
+                getPackage()
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect {
-                    findViewById<TextView>(R.id.tracking_attempts).text =
-                        resources.getQuantityString(
-                            R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
-                            it.totalTrackingAttempts,
-                            it.totalTrackingAttempts
-                        )
+                    binding.trackingAttempts.text = resources.getQuantityString(
+                        R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
+                        it.totalTrackingAttempts, it.totalTrackingAttempts
+                    )
+                    binding.includeToolbar.appTrackdAgo.text = it.lastTrackerBlockedAgo
                     itemsAdapter.updateData(it.trackingCompanies)
                 }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.reportIssue -> {
+                launchFeedback(); true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun launchFeedback() {
+        reportBreakage.launch(ReportBreakageScreen.LoginInformation(getAppName(), getPackage()))
     }
 
     override fun onBackPressed() {
@@ -78,6 +119,18 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun getDate(): String {
+        return intent.getStringExtra(EXTRA_DATE)!!
+    }
+
+    private fun getAppName(): String {
+        return intent.getStringExtra(EXTRA_APP_NAME)!!
+    }
+
+    private fun getPackage(): String {
+        return intent.getStringExtra(EXTRA_PACKAGE_NAME)!!
     }
 
     companion object {
