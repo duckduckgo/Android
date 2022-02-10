@@ -23,6 +23,10 @@
     </item>
     <item>
         <shape android:shape="oval">
+            <padding android:top="@dimen/keyline_2"
+                     android:bottom="@dimen/keyline_2"
+                     android:left="@dimen/keyline_2"
+                     android:right="@dimen/keyline_2"/>
             <solid android:color="@android:color/transparent"/>
         </shape>
     </item>

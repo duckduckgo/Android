@@ -40,6 +40,7 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -88,6 +89,9 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
             viewModel.joinTheWaitlist()
         }
         binding.getStartedButton.setOnClickListener { viewModel.getStarted() }
+        binding.getIconButton.setOnClickListener {
+            Snackbar.make(binding.getIconButton, "Hello", Snackbar.LENGTH_LONG).show()
+        }
     }
 
     private fun render(viewState: AppTPWaitlistViewModel.ViewState) {
