@@ -15,14 +15,18 @@
  */
 
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    id 'java-library'
+    id 'kotlin'
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+apply from: "$rootProject.projectDir/spotless.gradle"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
 }
