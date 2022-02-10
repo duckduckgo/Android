@@ -48,6 +48,14 @@
         style="@style/Widget.DuckDuckGo.Button.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Secondary Button"/>
+        android:text="Secondary Button"
+        android:layout_marginBottom="16dp"/>
+
+    <com.duckduckgo.mobile.android.ui.view.IconButton
+        android:layout_gravity="center"
+        android:id="@+id/getIconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_union" />
 
 </LinearLayout>
