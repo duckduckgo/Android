@@ -40,7 +40,6 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
