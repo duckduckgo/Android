@@ -17,9 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -59,17 +61,21 @@ class DeviceShieldStatusReportingModule {
 
 class DeviceShieldStatusReporting(
     private val workManager: WorkManager
-) : LifecycleObserver {
+) : LifecycleEventObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleDeviceShieldStatusReporting() {
+    override fun onStateChanged(source: LifecycleOwner, event: Event) {
+        if (event == ON_CREATE) {
+            scheduleDeviceShieldStatusReporting()
+        }
+    }
+
+    private fun scheduleDeviceShieldStatusReporting() {
         Timber.v("Scheduling the DeviceShieldStatusReporting worker")
-        workManager.cancelAllWorkByTag(WORKER_STATUS_REPORTING_TAG)
 
-        PeriodicWorkRequestBuilder<DeviceShieldStatusReportingWorker>(12, TimeUnit.HOURS)
+        PeriodicWorkRequestBuilder<DeviceShieldStatusReportingWorker>(24, TimeUnit.HOURS)
             .addTag(WORKER_STATUS_REPORTING_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-            .build().run { workManager.enqueue(this) }
+            .build().run { workManager.enqueueUniquePeriodicWork(WORKER_STATUS_REPORTING_TAG, ExistingPeriodicWorkPolicy.KEEP, this) }
     }
 
     class DeviceShieldStatusReportingWorker(

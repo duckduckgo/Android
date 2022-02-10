@@ -167,7 +167,7 @@
 
             <Button
                     android:id="@+id/trackingProtectionExcludeAppDialogSubmit"
-                    style="@style/DeviceShield.Button.Blue"
+                    style="@style/Widget.DuckDuckGo.Button.Primary"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dialogButtonHeight"
                     android:layout_marginStart="8dp"
@@ -183,7 +183,7 @@
 
             <Button
                     android:id="@+id/trackingProtectionExcludeAppDialogSkip"
-                    style="@style/DeviceShield.Button.Borderless"
+                    style="@style/Widget.DuckDuckGo.Button.Borderless"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dialogButtonHeight"
                     android:layout_marginTop="16dp"

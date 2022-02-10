@@ -41,8 +41,8 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
-import com.duckduckgo.mobile.android.vpn.waitlist.TrackingProtectionWaitlistManager
-import com.duckduckgo.mobile.android.vpn.waitlist.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -67,7 +67,7 @@ class SettingsViewModel(
     private val defaultWebBrowserCapability: DefaultBrowserDetector,
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
-    private val appTPWaitlistManager: TrackingProtectionWaitlistManager,
+    private val atpRepository: AtpWaitlistStateRepository,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
@@ -108,6 +108,7 @@ class SettingsViewModel(
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
+        object LaunchAddHomeScreenWidget : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
         data class LaunchThemeSettings(val theme: DuckDuckGoTheme) : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
@@ -151,7 +152,7 @@ class SettingsViewModel(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = appTPWaitlistManager.waitlistState()
+                    appTrackingProtectionWaitlistState = atpRepository.getState()
                 )
             )
         }
@@ -194,6 +195,10 @@ class SettingsViewModel(
 
     fun userRequestedToChangeIcon() {
         viewModelScope.launch { command.send(Command.LaunchAppIcon) }
+    }
+
+    fun userRequestedToAddHomeScreenWidget() {
+        viewModelScope.launch { command.send(Command.LaunchAddHomeScreenWidget) }
     }
 
     fun userRequestedToChangeFireAnimation() {
@@ -250,7 +255,7 @@ class SettingsViewModel(
     }
 
     fun onAppTPSettingClicked() {
-        if (appTPWaitlistManager.didJoinBeta()) {
+        if (atpRepository.getState() == WaitlistState.InBeta) {
             if (deviceShieldOnboardingStore.didShowOnboarding()) {
                 viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
             } else {
@@ -443,7 +448,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val gpc: Provider<Gpc>,
     private val featureToggle: Provider<FeatureToggle>,
     private val pixel: Provider<Pixel>,
-    private val appTPWaitlistManager: Provider<TrackingProtectionWaitlistManager>,
+    private val atpRepository: Provider<AtpWaitlistStateRepository>,
     private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
     private val appBuildConfig: Provider<AppBuildConfig>,
 ) : ViewModelFactoryPlugin {
@@ -458,7 +463,7 @@ class SettingsViewModelFactory @Inject constructor(
                         defaultWebBrowserCapability.get(),
                         variantManager.get(),
                         fireAnimationLoader.get(),
-                        appTPWaitlistManager.get(),
+                        atpRepository.get(),
                         deviceShieldOnboardingStore.get(),
                         gpc.get(),
                         featureToggle.get(),

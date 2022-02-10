@@ -35,7 +35,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 19,
+    exportSchema = true, version = 20,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -56,6 +56,7 @@ import java.util.concurrent.Executors
         AppTrackerManualExcludedApp::class,
         AppTrackerSystemAppOverridePackage::class,
         AppTrackerSystemAppOverrideListMetadata::class,
+        AppTrackerEntity::class
     ]
 )
 
@@ -108,6 +109,12 @@ abstract class VpnDatabase : RoomDatabase() {
                             prepopulateAppTrackerExceptionRules(context, getInstance(context))
                         }
                     }
+
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        ioThread {
+                            prepopulateTrackerEntities(context, getInstance(context))
+                        }
+                    }
                 })
                 .build()
         }
@@ -118,6 +125,22 @@ abstract class VpnDatabase : RoomDatabase() {
             Timber.w("VPNDatabase: UUID pre-populated as $uuid")
         }
 
+        internal fun prepopulateTrackerEntities(
+            context: Context,
+            vpnDatabase: VpnDatabase
+        ) {
+            context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+                .use { it.readText() }
+                .also {
+                    val blocklist = getFullAppTrackerBlockingList(it)
+                    with(vpnDatabase.vpnAppTrackerBlockingDao()) {
+                        if (!hasTrackerEntities()) {
+                            insertTrackerEntities(blocklist.entities)
+                        }
+                    }
+                }
+        }
+
         @VisibleForTesting
         internal fun prepopulateAppTrackerBlockingList(
             context: Context,
@@ -126,10 +149,11 @@ abstract class VpnDatabase : RoomDatabase() {
             context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
                 .use { it.readText() }
                 .also {
-                    val trackers = getFullAppTrackerBlockingList(it)
+                    val blocklist = getFullAppTrackerBlockingList(it)
                     with(vpnDatabase.vpnAppTrackerBlockingDao()) {
-                        insertTrackerBlocklist(trackers.first)
-                        insertAppPackages(trackers.second)
+                        insertTrackerBlocklist(blocklist.trackers)
+                        insertAppPackages(blocklist.packages)
+                        insertTrackerEntities(blocklist.entities)
                     }
                 }
         }
@@ -159,7 +183,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 }
         }
 
-        private fun getFullAppTrackerBlockingList(json: String): Pair<List<AppTracker>, List<AppTrackerPackage>> {
+        private fun getFullAppTrackerBlockingList(json: String): AppTrackerBlocklist {
             return parseAppTrackerJson(Moshi.Builder().build(), json)
         }
 
@@ -190,9 +214,20 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_19_TO_20: Migration = object : Migration(19, 20) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `vpn_app_tracker_entities`" +
+                        " (`trackerCompanyId` INTEGER PRIMARY KEY NOT NULL, `entityName` TEXT NOT NULL, " +
+                        "`score` INTEGER NOT NULL, `signals` TEXT NOT NULL)"
+                )
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
+                MIGRATION_19_TO_20
             )
     }
 }

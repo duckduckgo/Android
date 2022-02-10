@@ -54,6 +54,8 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     private var initialParentFolderId: Long? = null
     private var folderChanged = false
 
+    var showAddFolderMenu: Boolean = false
+
     var launcher = registerForActivityResult(StartActivityForResult()) { result ->
         result.data?.let { data ->
             storeFolderIdFromIntent(data)
@@ -147,9 +149,16 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
             context?.let { context ->
                 arguments?.getLong(KEY_BOOKMARK_FOLDER_ID)?.let {
                     if (arguments?.getSerializable(KEY_CURRENT_FOLDER) != null) {
-                        launcher.launch(BookmarkFoldersActivity.intent(context, it, arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder))
+                        launcher.launch(
+                            BookmarkFoldersActivity.intent(
+                                context,
+                                it,
+                                arguments?.getSerializable(KEY_CURRENT_FOLDER) as BookmarkFolder,
+                                showAddFolderMenu
+                            )
+                        )
                     } else {
-                        launcher.launch(BookmarkFoldersActivity.intent(context, it))
+                        launcher.launch(BookmarkFoldersActivity.intent(context, it, showAddFolderMenu = showAddFolderMenu))
                     }
                 }
             }

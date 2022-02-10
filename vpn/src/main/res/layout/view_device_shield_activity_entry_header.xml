@@ -19,7 +19,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           android:id="@+id/timestamp_header"
           style="@style/SettingsSectionTitle"
-          android:background="?attr/listItemBackgroundColor"
+          android:background="?attr/colorPrimaryDark"
           android:layout_height="wrap_content"
           android:layout_width="match_parent"
           android:paddingStart="16dp"

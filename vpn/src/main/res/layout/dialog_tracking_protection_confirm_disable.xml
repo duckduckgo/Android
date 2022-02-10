@@ -48,7 +48,7 @@
 
     <Button
             android:id="@+id/disableConfirmationDialogOneApp"
-            style="@style/DeviceShield.Button.Borderless"
+            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
@@ -57,7 +57,7 @@
             android:text="@string/atp_DisableConfirmationDisableApp"/>
     <Button
             android:id="@+id/disableConfirmationDialogAllApps"
-            style="@style/DeviceShield.Button.Borderless"
+            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
@@ -67,7 +67,7 @@
     <Button
             android:id="@+id/disableConfirmationDialogCancel"
             android:layout_gravity="end"
-            style="@style/DeviceShield.Button.Borderless"
+            style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"

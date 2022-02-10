@@ -85,7 +85,6 @@
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
-            android:process=":vpn"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
             android:screenOrientation="portrait"/>
 
@@ -99,6 +98,10 @@
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
             android:screenOrientation="portrait"/>
+
+        <service
+            android:name=".service.state.VpnStateMonitorService" >
+        </service>
 
         <service
             android:name=".service.TrackerBlockingVpnService"
@@ -135,8 +138,9 @@
             android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
             android:enabled="false"
             android:process=":vpn">
-            <intent-filter>
+            <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
 

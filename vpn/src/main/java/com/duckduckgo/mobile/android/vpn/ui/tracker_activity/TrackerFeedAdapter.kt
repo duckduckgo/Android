@@ -32,10 +32,11 @@ import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
+import com.duckduckgo.mobile.android.ui.view.hide
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerInfo
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -54,7 +55,11 @@ class TrackerFeedAdapter @Inject constructor(
         position: Int
     ) {
         when (holder) {
-            is TrackerFeedViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData, onAppClick)
+            is TrackerFeedViewHolder -> holder.bind(
+                trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
+                onAppClick,
+                position == trackerFeedItems.size,
+            )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
         }
@@ -164,6 +169,7 @@ class TrackerFeedAdapter @Inject constructor(
         val context: Context = view.context
         var activityMessage: TextView = view.findViewById(R.id.activity_message)
         var timeSinceTrackerBlocked: TextView = view.findViewById(R.id.activity_time_since)
+        var splitter: View = view.findViewById(R.id.entry_splitter)
         var trackingAppIcon: ImageView = view.findViewById(R.id.tracking_app_icon)
         var trackerBadgesView: RecyclerView = view.findViewById<RecyclerView>(R.id.tracker_badges).apply {
             adapter = TrackerBadgeAdapter()
@@ -173,15 +179,26 @@ class TrackerFeedAdapter @Inject constructor(
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
-            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit
+            onAppClick: (TrackerFeedItem.TrackerFeedData) -> Unit,
+            isLastPosition: Boolean
         ) {
             tracker?.let { item ->
                 with(activityMessage) {
+                    val trackingAttempts =
+                        resources.getQuantityString(
+                            R.plurals.atp_ActivityTrackersCompanyBlocked,
+                            tracker.trackersTotalCount, tracker.trackersTotalCount
+                        )
+                    val companies = resources.getQuantityString(
+                        R.plurals.atp_ActivityTrackersBlockedCompanyCount,
+                        tracker.trackingCompanyBadges.size, tracker.trackingCompanyBadges.size
+                    )
                     val styledText = HtmlCompat
                         .fromHtml(
                             context.getString(
                                 R.string.atp_ActivityTrackersBlocked,
-                                item.trackersTotalCount,
+                                trackingAttempts,
+                                companies,
                                 item.trackingApp.appDisplayName
                             ),
                             FROM_HTML_MODE_COMPACT
@@ -189,8 +206,7 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                val trackerInfoMessage = "${item.trackers.asInfoMessage()} · ${item.displayTimestamp}"
-                timeSinceTrackerBlocked.text = trackerInfoMessage
+                timeSinceTrackerBlocked.text = "${item.displayTimestamp}"
 
                 Glide.with(trackingAppIcon.context.applicationContext)
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
@@ -200,25 +216,22 @@ class TrackerFeedAdapter @Inject constructor(
                 with(trackerBadgesView) {
                     // click through recyvlerview
                     suppressLayout(false)
-                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackers)
+                    (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
                     suppressLayout(true)
                 }
                 itemView.setOnClickListener {
                     onAppClick(item)
+                }
+                if (isLastPosition) {
+                    splitter.hide()
+                } else {
+                    splitter.show()
                 }
             }
         }
 
         private fun String.asIconDrawable(): TextDrawable {
             return TextDrawable.builder().buildRound(this.take(1), Color.DKGRAY)
-        }
-
-        private fun List<TrackerInfo>.asInfoMessage(): String {
-            return when (size) {
-                1 -> context.getString(R.string.atp_ActivityTrackersCountOne, first().companyDisplayName)
-                2 -> context.getString(R.string.atp_ActivityTrackersCountTwo, first().companyDisplayName)
-                else -> context.getString(R.string.atp_ActivityTrackersCountMany, first().companyDisplayName, size - 1)
-            }
         }
     }
 

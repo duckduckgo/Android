@@ -52,7 +52,12 @@
         <item name="colorPrimaryDark">@color/darkThemePrimaryDark</item>
         <item name="daxLogoTextColor">@color/white</item>
         <item name="normalTextColor">@color/white</item>
-        <item name="secondaryTextColor">@color/warmerGray</item>
+        <item name="secondaryTextColor">@color/gray50</item>
+        <item name="accentTextColor">@color/gray30</item>
+        <item name="primaryIconColor">@color/gray20</item>
+        <item name="secondaryIconColor">@color/gray70</item>
+        <item name="accentIconColor">@color/gray80</item>
+        <item name="chipBackgroundColor">@color/gray90</item>
         <item name="listItemTitleColor">@color/white</item>
         <item name="listItemSubtitleColor">@color/grayishTwo</item>
         <item name="subtitleTextColor">@color/grayishTwo</item>
@@ -125,6 +130,7 @@
         <item name="listItemSeparatorColor">@color/charcoalGrey</item>
         <item name="textInputOutlinedBoxColor">@color/grayish</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
+        <item name="splitterColor">@color/gray85</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
@@ -163,6 +169,11 @@
         <item name="daxLogoTextColor">@color/almostBlackDark</item>
         <item name="normalTextColor">@color/almostBlackDark</item>
         <item name="secondaryTextColor">@color/warmerGray</item>
+        <item name="accentTextColor">@color/gray70</item>
+        <item name="primaryIconColor">@color/gray95</item>
+        <item name="secondaryIconColor">@color/gray40</item>
+        <item name="accentIconColor">@color/gray30</item>
+        <item name="chipBackgroundColor">@color/gray20</item>
         <item name="toolbarIconColor">@color/almostBlackDark</item>
         <item name="toolbarTextColor">@color/almostBlackDark</item>
         <item name="toolbarBgColor">@color/white</item>
@@ -231,6 +242,7 @@
         <item name="listItemSeparatorColor">@color/whiteSix</item>
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
+        <item name="splitterColor">@color/gray25</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>

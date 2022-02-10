@@ -704,30 +704,32 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndReturningUsersNoOnboardingEnabledTrueAndWidgetCompatibleThenReturnNull() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zv" })
-        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
-        whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(false)
+    fun whenRefreshCtaOnHomeTabAndReturningUsersContinueWithoutPrivacyTipsEnabledTrueAndWidgetCompatibleThenReturnNull() =
+        runTest {
+            whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+            whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+            whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zg" })
+            whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+            whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(false)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertNull(value)
-    }
+            val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+            assertNull(value)
+        }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndReturningUsersNoOnboardingEnabledTrueAndAboveThresholdAndWidgetCompatibleThenReturnWidget() = runTest {
-        whenever(mockSettingsDataStore.hideTips).thenReturn(false)
-        whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zv" })
-        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
-        whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(true)
+    fun whenRefreshCtaOnHomeTabAndReturningUsersContinueWithoutPrivacyTipsEnabledTrueAndAboveThresholdAndWidgetCompatibleThenReturnWidget() =
+        runTest {
+            whenever(mockSettingsDataStore.hideTips).thenReturn(false)
+            whenever(mockWidgetCapabilities.supportsStandardWidgetAdd).thenReturn(true)
+            whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+            whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "zg" })
+            whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(true)
+            whenever(mockOnboardingStore.hasReachedThresholdToShowWidgetForReturningUser()).thenReturn(true)
 
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is HomePanelCta)
-    }
+            val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
+            assertTrue(value is HomePanelCta)
+        }
 
     private suspend fun givenDaxOnboardingActive() {
         whenever(mockUserStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
