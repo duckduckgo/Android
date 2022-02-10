@@ -37,7 +37,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("en_US"))
+            MatchingAttribute.Locale(value = listOf("en-US"))
         )
 
         assertEquals(Result.Match, result)
@@ -48,7 +48,7 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(locale = Locale.US)
 
         val result = testee.evaluate(
-            MatchingAttribute.Locale(value = listOf("fr_FR", "fr_CA", "en_US"))
+            MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US"))
         )
 
         assertEquals(Result.Match, result)
@@ -72,6 +72,24 @@ class DeviceAttributeMatcherTest {
         val result = testee.evaluate(
             MatchingAttribute.Locale(value = listOf(""))
         )
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
+    fun whenDeviceSameAsOsApiLevelThenReturnMatch() {
+        givenDeviceProperties(apiLevel = 21)
+
+        val result = testee.evaluate(MatchingAttribute.Api(value = 21))
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenDeviceDifferentAsOsApiLevelThenReturnFail() {
+        givenDeviceProperties(apiLevel = 21)
+
+        val result = testee.evaluate(MatchingAttribute.Api(value = 19))
 
         assertEquals(Result.Fail, result)
     }
@@ -117,6 +135,24 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(apiLevel = 21)
 
         val result = testee.evaluate(MatchingAttribute.Api())
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
+    fun whenDeviceWVSameAsWVVersionThenReturnMatch() {
+        givenDeviceProperties(webView = "96.0.4664.104")
+
+        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.104"))
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenDeviceWVDifferentAsWVVersionThenReturnMatch() {
+        givenDeviceProperties(webView = "96.0.4664.104")
+
+        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.105"))
 
         assertEquals(Result.Fail, result)
     }

@@ -139,6 +139,28 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
+    fun whenAppVersionSameAsDeviceThenReturnMatch() {
+        givenDeviceProperties(appVersion = "5.100.0")
+
+        val result = testee.evaluate(
+            MatchingAttribute.AppVersion(value = "5.100.0")
+        )
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenAppVersionDifferentToDeviceThenReturnFail() {
+        givenDeviceProperties(appVersion = "5.99.0")
+
+        val result = testee.evaluate(
+            MatchingAttribute.AppVersion(value = "5.100.0")
+        )
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
     fun whenAtbMatchesThenReturnMatch() {
         givenDeviceProperties(atb = "v105-2")
 
