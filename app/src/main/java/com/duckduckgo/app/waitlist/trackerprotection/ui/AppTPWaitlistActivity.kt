@@ -89,9 +89,6 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
             viewModel.joinTheWaitlist()
         }
         binding.getStartedButton.setOnClickListener { viewModel.getStarted() }
-        binding.getIconButton.setOnClickListener {
-            Snackbar.make(binding.getIconButton, "Hello", Snackbar.LENGTH_LONG).show()
-        }
     }
 
     private fun render(viewState: AppTPWaitlistViewModel.ViewState) {
