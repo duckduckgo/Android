@@ -17,30 +17,41 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
-import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.*
-import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
-import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
+import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
+import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.DefaultBrowser
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.WebView
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.BufferedReader
 import java.io.InputStream
+import java.util.Locale.US
 
 class RemoteMessagingConfigJsonMapperTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
+
+    private val deviceProperties = mock<DeviceProperties>().apply {
+        whenever(this.deviceLocale()).thenReturn(US)
+    }
 
     @Test
     fun whenJsonParseThenRemoteConfigReturned() = runTest {
@@ -51,7 +62,7 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -138,7 +149,7 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -162,7 +173,7 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -195,7 +206,7 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = jsonAdapter.fromJson(jsonString)!!
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
             jsonRulesMapper = JsonRulesMapper()
         )
 

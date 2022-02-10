@@ -134,14 +134,12 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aMediumMessage(
                         id = "id2",
                         mediumContent(
-                            placeholder = frenchTranslations().placeholder,
                             titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText
                         )
                     ),
                     aBigSingleActionMessage(
                         id = "id3",
                         bigSingleActionContent(
-                            placeholder = frenchTranslations().placeholder,
                             titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText,
                             primaryActionText = frenchTranslations().primaryActionText
                         )
@@ -149,7 +147,6 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
                     aBigTwoActionsMessage(
                         id = "id4",
                         bigTwoActionsContent(
-                            placeholder = frenchTranslations().placeholder,
                             titleText = frenchTranslations().titleText, descriptionText = frenchTranslations().descriptionText,
                             primaryActionText = frenchTranslations().primaryActionText, secondaryActionText = frenchTranslations().secondaryActionText
                         )
@@ -160,7 +157,6 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
         private fun frenchTranslations() = JsonContentTranslations(
             titleText = "Bonjour", descriptionText = "la description",
-            placeholder = "espace réservé",
             primaryActionText = "action principale",
             secondaryActionText = "action secondaire"
         )

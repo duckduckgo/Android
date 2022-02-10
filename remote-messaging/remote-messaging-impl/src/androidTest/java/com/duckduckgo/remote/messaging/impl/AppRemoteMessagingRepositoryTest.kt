@@ -22,6 +22,7 @@ import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
@@ -55,7 +56,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder"
+                    placeholder = ANNOUNCE
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList()
@@ -70,7 +71,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = Medium(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder"
+                    placeholder = ANNOUNCE
                 ),
                 matchingRules = emptyList(),
                 exclusionRules = emptyList()
@@ -117,7 +118,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigSingleAction(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText"
                 ),
@@ -134,7 +135,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigSingleAction(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText"
                 ),
@@ -153,7 +154,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -172,7 +173,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -193,7 +194,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",
@@ -218,7 +219,7 @@ class AppRemoteMessagingRepositoryTest {
                 content = BigTwoActions(
                     titleText = "titleText",
                     descriptionText = "descriptionText",
-                    placeholder = "placeholder",
+                    placeholder = ANNOUNCE,
                     primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
                     primaryActionText = "actionText",
                     secondaryActionText = "actionText",

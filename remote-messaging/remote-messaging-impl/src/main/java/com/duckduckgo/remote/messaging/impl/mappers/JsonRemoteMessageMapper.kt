@@ -116,7 +116,9 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
         }.getOrNull()
     }
 
-    private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>): RemoteMessage {
+    private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?): RemoteMessage {
+        if (translations == null) return this
+
         val locale = deviceProperties.deviceLocale()
         return translations[locale.asJsonFormat()]?.let {
             this.copy(content = this.content.localize(it))
@@ -141,20 +143,17 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
 private fun Content.localize(translations: JsonContentTranslations): Content {
     return when (this) {
         is BigSingleAction -> this.copy(
-            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
         )
         is BigTwoActions -> this.copy(
-            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
             primaryActionText = translations.primaryActionText.takeUnless { it.isEmpty() } ?: this.primaryActionText,
             secondaryActionText = translations.secondaryActionText.takeUnless { it.isEmpty() } ?: this.secondaryActionText
         )
         is Medium -> this.copy(
-            placeholder = translations.placeholder.takeUnless { it.isEmpty() } ?: this.placeholder,
             titleText = translations.titleText.takeUnless { it.isEmpty() } ?: this.titleText,
             descriptionText = translations.descriptionText.takeUnless { it.isEmpty() } ?: this.descriptionText,
         )
