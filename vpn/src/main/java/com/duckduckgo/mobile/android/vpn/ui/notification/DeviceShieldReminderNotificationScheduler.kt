@@ -60,12 +60,19 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     ) {
         when (vpnStopReason) {
             is VpnStopReason.SelfStop -> onVPNManuallyStopped()
+            is VpnStopReason.Revoked -> onVPNRevoked()
             else -> onVPNUndesiredStop()
         }
     }
 
     private fun onVPNManuallyStopped() {
         showImmediateReminderNotification()
+        cancelUndesiredStopReminderAlarm()
+        scheduleReminderForTomorrow()
+    }
+
+    private fun onVPNRevoked() {
+        showImmediateRevokedNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
     }
@@ -101,12 +108,17 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun showImmediateReminderNotification() {
-        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
+        notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+    }
+
+    private fun showImmediateRevokedNotification() {
+        val notification = deviceShieldAlertNotificationBuilder.buildRevokedNotification(context)
         notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
     }
 
     private fun scheduleReminderForTomorrow() {
-        Timber.v("Scheduling the VpnReminderNotification worker a week from now")
+        Timber.v("Scheduling the VpnReminderNotification worker for tomorrow")
         val request = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
             .setInitialDelay(24, TimeUnit.HOURS)
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
@@ -115,7 +127,6 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
     }
 
-    //
     private fun enableReminderReceiver() {
         val receiver = ComponentName(context, VpnReminderReceiver::class.java)
 
