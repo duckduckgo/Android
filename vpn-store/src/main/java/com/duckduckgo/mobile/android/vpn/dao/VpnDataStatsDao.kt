@@ -21,7 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import kotlinx.coroutines.flow.Flow
 
 @Dao
