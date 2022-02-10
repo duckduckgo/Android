@@ -21,7 +21,6 @@ import org.threeten.bp.LocalDateTime
 interface RemoteMessagingConfigRepository {
     fun insert(remoteMessagingConfig: RemoteMessagingConfig)
     fun get(): RemoteMessagingConfig
-    fun delete()
     fun expired(): Boolean
     fun invalidated(): Boolean
 }
@@ -36,10 +35,6 @@ class LocalRemoteMessagingConfigRepository(database: RemoteMessagingDatabase) : 
 
     override fun get(): RemoteMessagingConfig {
         return dao.get() ?: RemoteMessagingConfig(version = 0)
-    }
-
-    override fun delete() {
-        dao.delete()
     }
 
     override fun expired(): Boolean {

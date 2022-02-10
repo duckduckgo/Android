@@ -41,7 +41,7 @@ class LocalRemoteMessagingConfigRepositoryTest {
     }
 
     @Test
-    fun whenRemoteConfigTimestampGreaterThan1DayThenReturnExpired() {
+    fun whenRemoteConfigTimestampGreaterThan1DayThenConfigExpired() {
         remoteConfigDao.insert(
             RemoteMessagingConfig(
                 version = 0,
@@ -55,7 +55,7 @@ class LocalRemoteMessagingConfigRepositoryTest {
     }
 
     @Test
-    fun whenRemoteConfigTimestampLessThan1DayThenReturnExpired() {
+    fun whenRemoteConfigTimestampLessThan1DayThenConfigIsNotExpired() {
         remoteConfigDao.insert(
             RemoteMessagingConfig(
                 version = 0,

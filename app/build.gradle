@@ -143,7 +143,7 @@ dependencies {
     implementation project(path: ':anrs-api')
     implementation project(path: ':anrs-impl')
 
-    implementation project(path: ':remote-messaging-impl')
+    implementation project(path: ':remote-messaging-api')
 
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')

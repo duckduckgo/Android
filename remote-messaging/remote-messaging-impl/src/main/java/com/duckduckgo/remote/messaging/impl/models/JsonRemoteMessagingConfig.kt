@@ -57,3 +57,17 @@ data class JsonMessageAction(
     val type: String,
     val value: String
 )
+
+sealed class JsonActionType(val jsonValue: String) {
+    object URL : JsonActionType("url")
+    object PLAYSTORE : JsonActionType("playstore")
+    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
+    object DISMISS : JsonActionType("dismiss")
+}
+
+sealed class JsonMessageType(val jsonValue: String) {
+    object SMALL : JsonMessageType("small")
+    object MEDIUM : JsonMessageType("medium")
+    object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
+    object BIG_TWO_ACTION : JsonMessageType("big_two_action")
+}
