@@ -25,18 +25,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPDisableConfirmationDialog : DialogFragment() {
 
-    interface AppTPDisableConfirmationDialogListener {
+    interface Listener {
         fun onOpenAppProtection()
         fun onTurnAppTrackingProtectionOff()
         fun onDisableDialogCancelled()
     }
 
-    val listener: AppTPDisableConfirmationDialogListener
+    val listener: Listener
         get() {
-            return if (parentFragment is AppTPDisableConfirmationDialogListener) {
-                parentFragment as AppTPDisableConfirmationDialogListener
+            return if (parentFragment is Listener) {
+                parentFragment as Listener
             } else {
-                activity as AppTPDisableConfirmationDialogListener
+                activity as Listener
             }
         }
 

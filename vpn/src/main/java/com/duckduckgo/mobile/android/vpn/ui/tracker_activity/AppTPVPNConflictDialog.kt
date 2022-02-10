@@ -25,18 +25,17 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPVPNConflictDialog : DialogFragment() {
 
-    interface AppTPDisableConfirmationDialogListener {
-        fun onOpenAppProtection()
-        fun onTurnAppTrackingProtectionOff()
-        fun onDisableDialogCancelled()
+    interface Listener {
+        fun onDismissConflictDialog()
+        fun onOpenSettings()
     }
 
-    val listener: AppTPDisableConfirmationDialogListener
+    val listener: Listener
         get() {
-            return if (parentFragment is AppTPDisableConfirmationDialogListener) {
-                parentFragment as AppTPDisableConfirmationDialogListener
+            return if (parentFragment is Listener) {
+                parentFragment as Listener
             } else {
-                activity as AppTPDisableConfirmationDialogListener
+                activity as Listener
             }
         }
 
@@ -47,11 +46,10 @@ class AppTPVPNConflictDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_confirm_disable, null)
+        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_vpn_conflict, null)
 
-        val disableOneApp = rootView.findViewById<Button>(R.id.disableConfirmationDialogOneApp)
-        val disableAllApps = rootView.findViewById<Button>(R.id.disableConfirmationDialogAllApps)
-        val cancel = rootView.findViewById<Button>(R.id.disableConfirmationDialogCancel)
+        val openSettings = rootView.findViewById<Button>(R.id.vpnConflictDialogOpenSettings)
+        val dismiss = rootView.findViewById<Button>(R.id.vpnConflictDialogDismiss)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
@@ -61,27 +59,22 @@ class AppTPVPNConflictDialog : DialogFragment() {
 
         isCancelable = false
 
-        configureListeners(disableOneApp, disableAllApps, cancel)
+        configureListeners(openSettings, dismiss)
 
         return alertDialog.create()
     }
 
     private fun configureListeners(
-        disableOneApp: Button,
-        disableAllApps: Button,
-        cancel: Button
+        openSettings: Button,
+        dismiss: Button
     ) {
-        disableOneApp.setOnClickListener {
+        openSettings.setOnClickListener {
             dismiss()
-            listener.onOpenAppProtection()
+            listener.onOpenSettings()
         }
-        disableAllApps.setOnClickListener {
+        dismiss.setOnClickListener {
             dismiss()
-            listener.onTurnAppTrackingProtectionOff()
-        }
-        cancel.setOnClickListener {
-            dismiss()
-            listener.onDisableDialogCancelled()
+            listener.onDismissConflictDialog()
         }
     }
 

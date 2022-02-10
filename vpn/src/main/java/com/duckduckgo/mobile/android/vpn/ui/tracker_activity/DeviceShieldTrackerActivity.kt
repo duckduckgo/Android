@@ -18,9 +18,11 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.Intent
+import android.net.VpnManager
 import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
+import android.provider.Settings
 import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
@@ -56,7 +58,6 @@ import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,7 +69,8 @@ import javax.inject.Inject
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
-    AppTPDisableConfirmationDialog.AppTPDisableConfirmationDialogListener {
+    AppTPDisableConfirmationDialog.Listener,
+    AppTPVPNConflictDialog.Listener{
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -281,6 +283,18 @@ class DeviceShieldTrackerActivity :
         deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
     }
 
+    override fun onDismissConflictDialog() {
+        deviceShieldPixels.didChooseToDismissVpnConflicDialog()
+    }
+
+    override fun onOpenSettings() {
+        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflicDialog()
+
+        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
     private fun launchBetaInstructions() {
         val intent = Intent(this, Class.forName("com.duckduckgo.app.browser.webview.WebViewActivity"))
         intent.putExtra("URL_EXTRA", getString(R.string.atp_WaitlistBetaBlogPost))
@@ -487,4 +501,5 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
+
 }
