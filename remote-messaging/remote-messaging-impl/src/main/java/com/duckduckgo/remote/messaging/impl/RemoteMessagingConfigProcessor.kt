@@ -33,7 +33,7 @@ class RealRemoteMessagingConfigProcessor(
 ) : RemoteMessagingConfigProcessor {
 
     override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {
-        Timber.i("RMF: process ${jsonRemoteMessagingConfig.version}")
+        Timber.v("RMF: process ${jsonRemoteMessagingConfig.version}")
         val currentVersion = remoteMessagingConfigRepository.get().version
         val newVersion = jsonRemoteMessagingConfig.version
 
@@ -45,7 +45,7 @@ class RealRemoteMessagingConfigProcessor(
             val message = remoteMessagingConfigMatcher.evaluate(config)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
         } else {
-            Timber.i("RMF: skip")
+            Timber.v("RMF: skip")
         }
     }
 }

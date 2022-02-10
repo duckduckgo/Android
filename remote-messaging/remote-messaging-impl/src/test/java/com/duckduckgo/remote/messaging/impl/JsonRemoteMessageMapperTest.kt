@@ -48,7 +48,7 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters()
+        @Parameterized.Parameters
         fun parameters() = arrayOf(
             TestCase(
                 listOf(
