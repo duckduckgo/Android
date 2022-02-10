@@ -34,7 +34,7 @@
             android:orientation="vertical"
             android:textAlignment="viewStart"
             android:textColor="?normalTextColor"
-            android:text="@string/atp_DisableConfirmationDialogTitle"/>
+            android:text="@string/atp_VpnConflictDialogTitle"/>
 
     <TextView
             android:id="@+id/vpnConflictDialogMessage"
@@ -44,13 +44,14 @@
             android:textAlignment="viewStart"
             android:textColor="?attr/settingsMinorTextColor"
             android:layout_marginTop="@dimen/keyline_3"
-            android:text="@string/atp_DisableConfirmationDialogMessage"/>
+            android:text="@string/atp_VpnConflictDialogMessage"/>
 
     <LinearLayout
+        android:layout_marginTop="@dimen/keyline_3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="end">
+        android:gravity="end">
 
         <Button
             android:id="@+id/vpnConflictDialogOpenSettings"
@@ -58,14 +59,13 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
-            android:text="@string/atp_DisableConfirmationDisableApp"/>
+            android:text="@string/atp_VpnConflictDialogLearnMore"/>
         <Button
             android:id="@+id/vpnConflictDialogDismiss"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:text="@string/atp_DisableConfirmationDisableAllApps"/>
+            android:text="@string/atp_VpnConflictDialogGotIt"/>
 
     </LinearLayout>
 
