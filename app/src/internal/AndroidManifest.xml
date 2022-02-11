@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.app.browser">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+          package="com.duckduckgo.app.browser">
 
     <application>
         <activity
@@ -11,6 +11,19 @@
             android:name="com.duckduckgo.app.audit.AuditSettingsActivity"
             android:label="@string/auditSettingsTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+
+        <service
+                android:name="com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService"
+                android:permission="android.permission.BIND_VPN_SERVICE"
+                android:process=":vpn">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+            <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                       tools:replace="value"
+                       android:value="true"/>
+        </service>
+
     </application>
 
 </manifest>
