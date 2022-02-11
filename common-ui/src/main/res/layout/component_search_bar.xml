@@ -33,7 +33,6 @@
 
     <com.duckduckgo.mobile.android.ui.view.SearchBarView
         android:id="@+id/search_bar"
-        style="@style/SearchBarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"

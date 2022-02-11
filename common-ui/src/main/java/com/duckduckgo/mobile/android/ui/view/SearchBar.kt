@@ -42,16 +42,22 @@ interface SearchBar {
 class SearchBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = R.style.Widget_DuckDuckGo_SearchBarView
 ) : ConstraintLayout(context, attrs, defStyleAttr), SearchBar {
     private val binding: ViewSearchBarBinding by viewBinding()
 
     init {
-        val styledAttributes = context.obtainStyledAttributes(attrs, R.styleable.SearchBarView)
-        binding.root.background = styledAttributes.getDrawable(R.styleable.SearchBarView_android_background)
-        binding.omnibarTextInput.hint = styledAttributes.getString(R.styleable.SearchBarView_searchHint)
-        binding.clearTextButton.contentDescription = styledAttributes.getString(R.styleable.SearchBarView_clearActionContentDescription)
-        styledAttributes.recycle()
+        context.obtainStyledAttributes(
+            attrs,
+            R.styleable.SearchBarView,
+            0,
+            R.style.Widget_DuckDuckGo_SearchBarView
+        ).apply {
+            binding.root.background = getDrawable(R.styleable.SearchBarView_android_background)
+            binding.omnibarTextInput.hint = getString(R.styleable.SearchBarView_searchHint)
+            binding.clearTextButton.contentDescription = getString(R.styleable.SearchBarView_clearActionContentDescription)
+            recycle()
+        }
     }
 
     override fun onAction(actionHandler: (SearchBar.Action) -> Unit) {

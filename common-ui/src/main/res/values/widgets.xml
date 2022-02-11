@@ -235,4 +235,9 @@
         <item name="android:padding">@dimen/keyline_5</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.SearchBarView">
+        <item name="android:background">@drawable/omnibar_field_background</item>
+        <item name="android:layout_margin">@dimen/keyline_2</item>
+    </style>
+
 </resources>

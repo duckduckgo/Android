@@ -19,8 +19,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="6dp"
-    android:paddingEnd="6dp"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <FrameLayout
@@ -31,13 +29,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <com.duckduckgo.mobile.android.ui.view.IconButton
             android:id="@+id/upAction"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="8dp"
-            android:src="@drawable/ic_back_24" />
+            android:padding="@dimen/keyline_2"
+            app:srcCompat="@drawable/ic_back_24" />
 
     </FrameLayout>
 
@@ -51,8 +49,6 @@
         android:imeOptions="flagNoExtractUi|actionGo|flagNoPersonalizedLearning"
         android:inputType="textUri|textNoSuggestions"
         android:maxLines="1"
-        android:paddingStart="5dp"
-        android:paddingEnd="8dp"
         android:selectAllOnFocus="true"
         android:textColor="?attr/omnibarTextColor"
         android:textColorHint="?attr/omnibarHintColor"
@@ -63,19 +59,19 @@
         app:layout_constraintEnd_toStartOf="@id/clearTextButton"
         app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginEnd="@dimen/keyline_2"
         tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
 
-    <ImageView
+    <com.duckduckgo.mobile.android.ui.view.IconButton
         android:id="@+id/clearTextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
-        android:padding="8dp"
-        android:src="@drawable/ic_close_24dp"
+        android:padding="@dimen/keyline_2"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_24dp"
         tools:visibility="visible" />
 
 </merge>

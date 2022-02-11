@@ -737,9 +737,4 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="SearchBarView">
-        <item name="android:background">@drawable/omnibar_field_background</item>
-        <item name="android:layout_margin">8dp</item>
-    </style>
-
 </resources>
