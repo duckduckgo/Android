@@ -230,4 +230,9 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.IconButton">
+        <item name="android:background">@drawable/background_icon_button</item>
+        <item name="android:padding">@dimen/keyline_5</item>
+    </style>
+
 </resources>

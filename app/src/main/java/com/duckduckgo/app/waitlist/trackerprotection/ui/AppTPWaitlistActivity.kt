@@ -32,7 +32,7 @@ import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
+import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -51,13 +51,13 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
-    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
+    private val getNotificationSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             showNotificationDialog()
         }
     }
 
-    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
+    private val readBlogSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.learnMore()
         }

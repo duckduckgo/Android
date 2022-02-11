@@ -29,8 +29,8 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
-import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -44,19 +44,19 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     private val binding: FragmentEmailProtectionSignInBinding by viewBinding()
 
-    private val getNotificationSpan = object : NonUnderlinedClickableSpan() {
+    private val getNotificationSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             showNotificationDialog()
         }
     }
 
-    private val readBlogSpan = object : NonUnderlinedClickableSpan() {
+    private val readBlogSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.readBlogPost()
         }
     }
 
-    private val privacyGuaranteeSpan = object : NonUnderlinedClickableSpan() {
+    private val privacyGuaranteeSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             viewModel.readPrivacyGuarantees()
         }
@@ -160,7 +160,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     private fun setClickableSpan(
         view: MaterialTextView,
         stringId: Int,
-        span: List<NonUnderlinedClickableSpan>
+        span: List<DuckDuckGoClickableSpan>
     ) {
         context?.let {
             val htmlString = getString(stringId).html(it)
