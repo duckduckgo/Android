@@ -45,7 +45,9 @@ class RemoteMessagingConfigMatcherTest {
     private val userAttributeMatcher: UserAttributeMatcher = mock()
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
 
-    private val testee = RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
+    private val testee = RemoteMessagingConfigMatcher(
+        deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher
+    )
 
     @Test
     fun whenEmptyConfigThenReturnNull() = runBlocking {
