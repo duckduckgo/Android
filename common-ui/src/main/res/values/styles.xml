@@ -740,8 +740,8 @@
     <style name="MessageCta"/>
 
     <style name="MessageCta.Title" parent="TextAppearance.DuckDuckGo.Headline4">
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">normal</item>
         <item name="android:gravity">center</item>
     </style>
 
