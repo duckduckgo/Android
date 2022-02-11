@@ -77,7 +77,7 @@ class AppRemoteMessagingRepository(
         }
 
         companion object {
-            var moshi = Moshi.Builder()
+            private val moshi = Moshi.Builder()
                 .add(
                     PolymorphicJsonAdapterFactory.of(Content::class.java, "messageType")
                         .withSubtype(Small::class.java, MessageType.SMALL.name)
@@ -91,7 +91,6 @@ class AppRemoteMessagingRepository(
                         .withSubtype(Url::class.java, ActionType.URL.name)
                         .withSubtype(Dismiss::class.java, ActionType.DISMISS.name)
                 )
-                // if you have more adapters, add them before this line:
                 .add(KotlinJsonAdapterFactory())
                 .build()
             val messageAdapter: JsonAdapter<RemoteMessage> = moshi.adapter(RemoteMessage::class.java)

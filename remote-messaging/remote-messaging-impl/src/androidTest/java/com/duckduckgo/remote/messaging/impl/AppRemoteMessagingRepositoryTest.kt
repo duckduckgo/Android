@@ -31,6 +31,7 @@ import junit.framework.Assert.assertEquals
 import org.junit.After
 import org.junit.Test
 
+// TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
 class AppRemoteMessagingRepositoryTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
