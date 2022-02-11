@@ -109,7 +109,8 @@ class NotificationRegistrar @Inject constructor(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
         ChannelType.TUTORIALS,
-        ChannelType.EMAIL_WAITLIST
+        ChannelType.EMAIL_WAITLIST,
+        ChannelType.APP_TP_WAITLIST
     )
 
     private fun registerApp() {

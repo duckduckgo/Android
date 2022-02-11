@@ -16,10 +16,18 @@
 
 package com.duckduckgo.macos_impl.waitlist.ui
 
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,23 +38,38 @@ import com.duckduckgo.macos_api.MacOsWaitlistState.NotJoinedQueue
 import com.duckduckgo.macos_impl.R
 import com.duckduckgo.macos_impl.databinding.ActivityMacosWaitlistBinding
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.ViewState
+import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.android.synthetic.main.activity_macos_waitlist.view.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
+import javax.inject.Inject
 
 class MacOsWaitlistActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var clipboardManager: ClipboardManager
 
     private val viewModel: MacOsWaitlistViewModel by bindViewModel()
     private val binding: ActivityMacosWaitlistBinding by viewBinding()
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
+
+    private val macOsSpan = object : DuckDuckGoClickableSpan() {
+        override fun onClick(widget: View) {
+            viewModel.onCopyToClipboard(onlyCode = false)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +89,8 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
             it.isEnabled = false
             viewModel.joinTheWaitlist()
         }
-        // binding.getStartedButton.setOnClickListener { viewModel.getStarted() }
+        binding.notifyMeButton.setOnClickListener { showNotificationDialog() }
+        binding.shareImage.setOnClickListener { viewModel.onShareClicked() }
     }
 
     private fun render(viewState: ViewState) {
@@ -81,26 +105,33 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         when (command) {
             is ShowErrorMessage -> renderErrorMessage()
             is ShowNotificationDialog -> showNotificationDialog()
-            // is ShowOnboarding -> showOnboarding()
-            // is EnterInviteCode -> openRedeemCode()
+            is ShareInviteCode -> launchSharePageChooser(command.inviteCode)
+            is CopyInviteToClipboard -> copyToClipboard(command.inviteCode, command.onlyCode)
         }
     }
 
     private fun renderInBeta(inviteCode: String) {
         binding.headerImage.setImageResource(R.drawable.ic_donations_large)
         binding.statusTitle.text = getString(R.string.macos_waitlist_code_title)
-        binding.waitlistDescription.text = getText(R.string.macos_waitlist_code_description)
+        binding.waitlistDescription.addClickableSpan(
+            getText(R.string.macos_waitlist_code_description),
+            listOf(Pair("beta_link", macOsSpan))
+        )
+
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.notifyMeButton.gone()
         binding.codeFrame.show()
+        binding.shareImage.show()
         binding.codeFrame.inviteCode.text = inviteCode
+        binding.codeFrame.inviteCode.setOnClickListener { viewModel.onCopyToClipboard(onlyCode = true) }
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.gone()
+        binding.shareImage.gone()
         binding.headerImage.setImageResource(R.drawable.ic_list)
         binding.statusTitle.text = getString(R.string.macos_waitlist_on_the_list_title)
         if (notify) {
@@ -118,6 +149,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.footerDescription.show()
         binding.notifyMeButton.gone()
         binding.codeFrame.gone()
+        binding.shareImage.gone()
         binding.waitlistDescription.text = getText(R.string.macos_waitlist_description)
     }
 
@@ -137,8 +169,40 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun launchSharePageChooser(inviteCode: String) {
+        val intent = Intent(Intent.ACTION_SEND).also {
+            it.type = "text/plain"
+            it.putExtra(Intent.EXTRA_TEXT, getInviteText(inviteCode))
+        }
+        try {
+            startActivity(Intent.createChooser(intent, null))
+        } catch (e: ActivityNotFoundException) {
+            Timber.w(e, "Activity not found")
+        }
+    }
+
+    private fun copyToClipboard(inviteCode: String, onlyCode: Boolean) {
+        val clipboard: ClipboardManager? = ContextCompat.getSystemService(this, ClipboardManager::class.java)
+        var text = getInviteText(inviteCode)
+        var toastText = getString(R.string.macos_waitlist_clipboard_invite_copied)
+
+        if (onlyCode) {
+            text = SpannableString(inviteCode)
+            toastText = getString(R.string.macos_waitlist_clipboard_code_copied)
+        }
+
+        val clip: ClipData = ClipData.newPlainText(CLIPBOARD_LABEL, text)
+        clipboard?.setPrimaryClip(clip)
+        Toast.makeText(this, toastText, Toast.LENGTH_LONG).show()
+    }
+
+    private fun getInviteText(inviteCode: String): Spanned {
+        return HtmlCompat.fromHtml(getString(R.string.macos_waitlist_code_share_text, inviteCode), 0)
+    }
+
     companion object {
         const val NOTIFICATION_DIALOG_TAG = "NOTIFICATION_DIALOG_FRAGMENT"
+        const val CLIPBOARD_LABEL = "INVITE_CODE"
 
         fun intent(context: Context): Intent {
             return Intent(context, MacOsWaitlistActivity::class.java)

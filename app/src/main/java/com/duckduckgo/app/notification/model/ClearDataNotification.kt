@@ -19,8 +19,8 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
+import com.duckduckgo.app.notification.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.settings.clear.ClearWhatOption

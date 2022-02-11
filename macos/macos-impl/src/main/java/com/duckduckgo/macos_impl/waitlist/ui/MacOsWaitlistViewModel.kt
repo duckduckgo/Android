@@ -25,11 +25,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_api.MacOsWaitlistState
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistService
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.EnterInviteCode
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.LaunchBetaInstructions
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowOnboarding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -56,26 +55,13 @@ class MacOsWaitlistViewModel(
     val commands = commandChannel.receiveAsFlow()
 
     sealed class Command {
-        object LaunchBetaInstructions : Command()
-        object EnterInviteCode : Command()
         object ShowErrorMessage : Command()
         object ShowNotificationDialog : Command()
-        object ShowOnboarding : Command()
+        data class ShareInviteCode(val inviteCode: String) : Command()
+        data class CopyInviteToClipboard(val inviteCode: String, val onlyCode: Boolean) : Command()
     }
 
     data class ViewState(val waitlist: MacOsWaitlistState)
-
-    fun getStarted() {
-        viewModelScope.launch {
-            commandChannel.send(ShowOnboarding)
-        }
-    }
-
-    fun haveAnInviteCode() {
-        viewModelScope.launch {
-            commandChannel.send(EnterInviteCode)
-        }
-    }
 
     fun joinTheWaitlist() {
         viewModelScope.launch {
@@ -106,9 +92,11 @@ class MacOsWaitlistViewModel(
         }
     }
 
-    fun learnMore() {
-        viewModelScope.launch {
-            commandChannel.send(LaunchBetaInstructions)
+    fun onShareClicked() {
+        waitlistManager.getInviteCode()?.let {
+            viewModelScope.launch {
+                commandChannel.send(ShareInviteCode(it))
+            }
         }
     }
 
@@ -127,6 +115,14 @@ class MacOsWaitlistViewModel(
     fun onDialogDismissed() {
         viewModelScope.launch {
             viewStateFlow.emit(ViewState(waitlistManager.getState()))
+        }
+    }
+
+    fun onCopyToClipboard(onlyCode: Boolean) {
+        waitlistManager.getInviteCode()?.let {
+            viewModelScope.launch {
+                commandChannel.send(CopyInviteToClipboard(it, onlyCode))
+            }
         }
     }
 }

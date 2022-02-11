@@ -19,12 +19,13 @@ package com.duckduckgo.macos_impl.waitlist
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.notification.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRepository
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.macos_api.MacOsNotificationEvent.MACOS_WAITLIST_CODE
+import com.duckduckgo.macos_api.MacOsNotificationsEvent.MACOS_WAITLIST_CODE
 import com.duckduckgo.macos_impl.R
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
@@ -39,7 +40,7 @@ class MacOsWaitlistCodeNotification @Inject constructor(
 
     override val id = "com.duckduckgo.macos.waitlist"
     override val launchIntent = MACOS_WAITLIST_CODE
-    override val cancelIntent = "com.duckduckgo.notification.cancel"
+    override val cancelIntent = CANCEL
 
     override suspend fun canShow(): Boolean {
 

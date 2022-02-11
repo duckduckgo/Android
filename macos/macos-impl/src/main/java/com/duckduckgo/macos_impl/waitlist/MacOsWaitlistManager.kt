@@ -36,6 +36,7 @@ interface MacOsWaitlistManager {
     fun joinWaitlist(timestamp: Int, token: String)
     fun getState(): MacOsWaitlistState
     fun isNotificationEnabled(): Boolean
+    fun getInviteCode(): String?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -54,7 +55,8 @@ class RealMacOsWaitlistManager @Inject constructor(
             try {
                 val waitlistTimestamp = service.waitlistStatus().timestamp
                 if (waitlistTimestamp >= timestamp && token != null) {
-                    val inviteCode = service.getCode(token).code
+                    val res = service.getCode(token)
+                    val inviteCode = res.code
                     if (inviteCode.isNotEmpty()) {
                         repository.setInviteCode(inviteCode)
                         return@withContext Code
@@ -80,6 +82,8 @@ class RealMacOsWaitlistManager @Inject constructor(
     override fun isNotificationEnabled(): Boolean {
         return repository.isNotificationEnabled()
     }
+
+    override fun getInviteCode(): String? = repository.getInviteCode()
 }
 
 sealed class FetchCodeResult {
