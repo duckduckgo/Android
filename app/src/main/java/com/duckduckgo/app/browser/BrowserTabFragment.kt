@@ -1262,7 +1262,7 @@ class BrowserTabFragment :
             QuickAccessDragTouchItemListener(
                 apapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+                    override fun onListChanged(listElements: List<QuickAccessFavorite>) {
                         viewModel.onQuickAccessListChanged(listElements)
                         recyclerView.disableAnimation()
                     }
@@ -2435,7 +2435,7 @@ class BrowserTabFragment :
                     }
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)
-                        showHomeBackground(viewState.favorites)
+                        showHomeBackground(viewState.favorites, hideLogo = true)
                         hideHomeCta()
                     }
                     else -> {
@@ -2526,7 +2526,7 @@ class BrowserTabFragment :
 
         private fun showHomeCta(
             configuration: HomePanelCta,
-            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>
         ) {
             hideDaxCta()
             if (newBrowserTab.ctaContainer.isEmpty()) {
@@ -2538,9 +2538,9 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
             if (favorites.isEmpty()) {
-                homeBackgroundLogo.showLogo()
+                if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessItems.quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()
