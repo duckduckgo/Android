@@ -56,6 +56,7 @@ class SearchBarView @JvmOverloads constructor(
             binding.root.background = getDrawable(R.styleable.SearchBarView_android_background)
             binding.omnibarTextInput.hint = getString(R.styleable.SearchBarView_searchHint)
             binding.clearTextButton.contentDescription = getString(R.styleable.SearchBarView_clearActionContentDescription)
+            binding.upAction.contentDescription = getString(R.styleable.SearchBarView_upActionContentDescription)
             recycle()
         }
     }
