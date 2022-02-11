@@ -16,6 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
+import com.duckduckgo.remote.messaging.impl.matchers.Result
+import com.duckduckgo.remote.messaging.impl.matchers.defaultValue
+import com.duckduckgo.remote.messaging.impl.matchers.toResult
+import timber.log.Timber
 import java.util.*
 
 sealed class MatchingAttribute {
@@ -166,6 +170,68 @@ interface StringArrayMatchingAttribute {
 interface DateMatchingAttribute {
     val since: Date
     val value: Int
+}
+
+fun StringArrayMatchingAttribute.matches(value: String): Result {
+    this.value.find { it.equals(value, true) } ?: return false.toResult()
+    return true.toResult()
+}
+
+fun BooleanMatchingAttribute.matches(value: Boolean): Result {
+    return (this.value == value).toResult()
+}
+
+fun IntMatchingAttribute.matches(value: Int): Result {
+    return (this.value == value).toResult()
+}
+
+fun RangeIntMatchingAttribute.matches(value: Int): Result {
+    if ((this.min.defaultValue() || value >= this.min) &&
+        (this.max.defaultValue() || value <= this.max)
+    ) {
+        return true.toResult()
+    }
+
+    return false.toResult()
+}
+
+fun DateMatchingAttribute.matches(value: Int): Result {
+    if ((this.value.defaultValue() || value == this.value)) {
+        return true.toResult()
+    }
+    return false.toResult()
+}
+
+fun StringMatchingAttribute.matches(value: String): Result {
+    return this.value.equals(value, ignoreCase = true).toResult()
+}
+
+fun RangeStringMatchingAttribute.matches(value: String): Result {
+    Timber.i("RMF: device value: $value")
+    if (!value.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
+
+    val versionAsIntList = value.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+    val minVersionAsIntList = this.min.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+    val maxVersionAsIntList = this.max.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
+
+    if (versionAsIntList.isEmpty()) return false.toResult()
+    if (versionAsIntList.compareTo(minVersionAsIntList) <= -1) return false.toResult()
+    if (versionAsIntList.compareTo(maxVersionAsIntList) >= 1) return false.toResult()
+
+    return true.toResult()
+}
+
+private fun List<Int>.compareTo(other: List<Int>): Int {
+    val otherSize = other.size
+
+    for (index in this.indices) {
+        if (index > otherSize - 1) return 0
+        val value = this[index]
+        if (value < other[index]) return -1
+        if (value > other[index]) return 1
+    }
+
+    return 0
 }
 
 @Suppress("UNCHECKED_CAST")

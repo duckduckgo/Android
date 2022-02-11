@@ -30,9 +30,6 @@ abstract class RemoteMessagingConfigDao {
     @Query("select * from remote_messaging LIMIT 1")
     abstract fun get(): RemoteMessagingConfig?
 
-    @Query("delete from remote_messaging")
-    abstract fun delete()
-
     @Query("update remote_messaging set invalidate = 1")
     abstract fun invalidate()
 }

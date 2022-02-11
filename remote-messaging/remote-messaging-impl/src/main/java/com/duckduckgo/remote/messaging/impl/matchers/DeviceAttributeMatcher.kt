@@ -17,12 +17,15 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.DeviceProperties
+import com.duckduckgo.remote.messaging.impl.models.IntMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
-import timber.log.Timber
+import com.duckduckgo.remote.messaging.impl.models.matches
 
 class DeviceAttributeMatcher(
     val deviceProperties: DeviceProperties
@@ -31,9 +34,14 @@ class DeviceAttributeMatcher(
         when (matchingAttribute) {
             is MatchingAttribute.Api -> {
                 if (matchingAttribute == MatchingAttribute.Api()) return Result.Fail
-                return matchingAttribute.matches(deviceProperties.osApiLevel())
+
+                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+                    return (matchingAttribute as IntMatchingAttribute).matches(deviceProperties.osApiLevel())
+                }
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(deviceProperties.osApiLevel())
             }
             is MatchingAttribute.Locale -> {
+                if (matchingAttribute == MatchingAttribute.Locale()) return Result.Fail
                 return matchingAttribute.matches(deviceProperties.deviceLocale().asJsonFormat())
             }
             is MatchingAttribute.WebView -> {
@@ -46,32 +54,4 @@ class DeviceAttributeMatcher(
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
-}
-
-fun RangeStringMatchingAttribute.matches(value: String): Result {
-    Timber.i("RMF: device WV: $value")
-    if (!value.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
-
-    val webViewVersion = value.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-    val minWebViewVersion = this.min.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-    val maxWebViewVersion = this.max.split(".").filter { it.isNotEmpty() }.map { it.toInt() }
-
-    if (webViewVersion.isEmpty()) return false.toResult()
-    if (webViewVersion.compareTo(minWebViewVersion) <= -1) return false.toResult()
-    if (webViewVersion.compareTo(maxWebViewVersion) >= 1) return false.toResult()
-
-    return true.toResult()
-}
-
-private fun List<Int>.compareTo(other: List<Int>): Int {
-    val otherSize = other.size
-
-    for (index in this.indices) {
-        if (index > otherSize - 1) return 0
-        val value = this[index]
-        if (value < other[index]) return -1
-        if (value > other[index]) return 1
-    }
-
-    return 0
 }

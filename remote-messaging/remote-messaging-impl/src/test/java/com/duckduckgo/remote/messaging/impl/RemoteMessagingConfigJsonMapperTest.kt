@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,19 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.DefaultBrow
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Locale
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.WebView
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import java.io.BufferedReader
-import java.io.InputStream
 import java.util.Locale.US
 
+@ExperimentalCoroutinesApi
 class RemoteMessagingConfigJsonMapperTest {
 
     @get:Rule
@@ -56,12 +56,8 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonParseThenRemoteConfigReturned() = runTest {
-        val jsonString = FileUtilities.loadText("json/remote_messaging_config.json")
-        // val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
-        val result = jsonAdapter.fromJson(jsonString)!!
+    fun whenValidJsonParsedThenMessagesMappedIntoRemoteConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
@@ -127,6 +123,18 @@ class RemoteMessagingConfigJsonMapperTest {
             exclusionRules = emptyList()
         )
         assertEquals(bigTwoActions, config.messages[4])
+    }
+
+    @Test
+    fun whenValidJsonParsedThenRulesMappedIntoRemoteConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
+            jsonRulesMapper = JsonRulesMapper()
+        )
+
+        val config = testee.map(result)
 
         assertEquals(3, config.rules.size)
 
@@ -145,11 +153,8 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonHasUnknownItemsThenMessageNotParsed() = runTest {
-        val jsonString = FileUtilities.loadText("json/remote_messaging_config_unsupported_items.json")
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
-        val result = jsonAdapter.fromJson(jsonString)!!
+    fun whenJsonMessagesHaveUnknownTypesThenMessagesNotMappedIntoConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
@@ -159,6 +164,19 @@ class RemoteMessagingConfigJsonMapperTest {
         val config = testee.map(result)
 
         assertEquals(0, config.messages.size)
+    }
+
+    @Test
+    fun whenJsonMessagesHaveUnknownTypesThenRulesMappedIntoConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
+            jsonRulesMapper = JsonRulesMapper()
+        )
+
+        val config = testee.map(result)
+
         assertEquals(2, config.rules.size)
 
         val unknown = Unknown(fallback = true)
@@ -169,11 +187,8 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonMalformedThenMessageNotParsed() = runTest {
-        val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
-        val result = jsonAdapter.fromJson(jsonString)!!
+    fun whenJsonMessagesMalformedOrMissingInformationThenMessagesNotParsedIntoConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
@@ -193,6 +208,18 @@ class RemoteMessagingConfigJsonMapperTest {
             exclusionRules = listOf(7, 8, 9)
         )
         assertEquals(smallMessage, config.messages[0])
+    }
+
+    @Test
+    fun whenJsonMatchingAttributesMalformedThenParsedAsUnknwonIntoConfig() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
+
+        val testee = RemoteMessagingConfigJsonMapper(
+            jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
+            jsonRulesMapper = JsonRulesMapper()
+        )
+
+        val config = testee.map(result)
 
         assertEquals(2, config.rules.size)
         assertEquals(3, config.rules[6]?.size)
@@ -202,11 +229,8 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenMatchingAttributeUnknownNoFallbackThenFallbackToFail() = runTest {
-        val jsonString = FileUtilities.loadText("json/remote_messaging_config_malformed.json")
-        val moshi = Moshi.Builder().build()
-        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
-        val result = jsonAdapter.fromJson(jsonString)!!
+    fun whenUnknownMatchingAttributeDoesNotProvideFallbackThenFallbackIsNull() = runTest {
+        val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
             jsonRemoteMessageMapper = JsonRemoteMessageMapper(deviceProperties),
@@ -217,6 +241,14 @@ class RemoteMessagingConfigJsonMapperTest {
 
         assertEquals(Unknown(null), config.rules[7]?.first())
     }
+
+    private fun getConfigFromJson(resourceName: String): JsonRemoteMessagingConfig {
+        val jsonString = FileUtilities.loadText(resourceName)
+        val moshi = Moshi.Builder().build()
+        val jsonAdapter = moshi.adapter(JsonRemoteMessagingConfig::class.java)
+
+        return jsonAdapter.fromJson(jsonString)!!
+    }
 }
 
 object FileUtilities {
@@ -225,14 +257,5 @@ object FileUtilities {
 
     private fun readResource(resourceName: String): BufferedReader {
         return javaClass.classLoader!!.getResource(resourceName).openStream().bufferedReader()
-    }
-
-    fun loadResource(resourceName: String): InputStream {
-        return javaClass.classLoader!!.getResource(resourceName).openStream()
-    }
-
-    fun getJsonObjectFromFile(filename: String): JSONObject {
-        val json = loadText(filename)
-        return JSONObject(json)
     }
 }

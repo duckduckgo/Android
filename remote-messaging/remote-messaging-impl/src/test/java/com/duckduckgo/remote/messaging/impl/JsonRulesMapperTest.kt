@@ -479,7 +479,7 @@ class JsonRulesMapperTest(private val testCase: TestCase) {
                     MatchingAttribute.AppTheme(value = "light", fallback = true)
                 )
             ),
-            TestCase( // 33
+            TestCase(
                 givenJsonRule(
                     Pair("appId", JsonMatchingAttribute(value = 15)),
                     Pair("atb", JsonMatchingAttribute(value = 15)),

@@ -22,6 +22,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 
+@Suppress("MemberVisibilityCanBePrivate")
 object RemoteMessageOM {
     fun urlAction(
         url: String = "http://example.com"

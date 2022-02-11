@@ -25,4 +25,3 @@ interface RemoteMessagingRepository {
     suspend fun dismissMessage(id: String)
     fun dismissedMessages(): List<String>
 }
-

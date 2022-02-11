@@ -17,14 +17,11 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.remote.messaging.impl.models.BooleanMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RangeStringMatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringArrayMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
-import java.util.*
+import com.duckduckgo.remote.messaging.impl.models.matches
 
 class AndroidAppAttributeMatcher(
     val appProperties: AppProperties
@@ -32,6 +29,7 @@ class AndroidAppAttributeMatcher(
     fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
+                if (matchingAttribute == MatchingAttribute.Flavor()) return Result.Fail
                 return matchingAttribute.matches(appProperties.flavor())
             }
             is MatchingAttribute.AppId -> {
@@ -62,23 +60,4 @@ class AndroidAppAttributeMatcher(
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
-}
-
-fun StringArrayMatchingAttribute.matches(value: String): Result {
-    this.value.find { it.equals(value, true) } ?: return false.toResult()
-    return true.toResult()
-}
-
-fun BooleanMatchingAttribute.matches(value: Boolean): Result {
-    return (this.value == value).toResult()
-}
-
-fun RangeIntMatchingAttribute.matches(value: Int): Result {
-    if ((this.min.defaultValue() || value >= this.min) &&
-        (this.max.defaultValue() || value <= this.max)
-    ) {
-        return true.toResult()
-    }
-
-    return false.toResult()
 }
