@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.time
+package com.duckduckgo.app.global.formatters.time
 
 import android.content.Context
-import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.R
+import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
@@ -41,8 +40,8 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
         val diff = (endDate.time - startDate.time).run { TimeUnit.DAYS.convert(this, TimeUnit.MILLISECONDS) }
 
         return when (diff) {
-            0L -> context.getString(R.string.atp_ActivityToday)
-            1L -> context.getString(R.string.atp_ActivityYesterday)
+            0L -> context.getString(R.string.common_Today)
+            1L -> context.getString(R.string.common_Yesterday)
             else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(startDate)
         }
     }
@@ -61,7 +60,7 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
 
         return when (timeDifferenceDate) {
             0L, 1L -> TimePassed.fromMilliseconds(timeDifferenceMillis).shortFormat()
-            else -> context.getString(R.string.atp_ActivityDaysAgo, timeDifferenceDate)
+            else -> context.getString(R.string.common_DaysAgo, timeDifferenceDate)
         }
     }
 

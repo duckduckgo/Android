@@ -31,11 +31,11 @@ import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.model.DataSizeFormatter
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
+import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
+import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
-import com.duckduckgo.mobile.android.vpn.model.dateOfPreviousMidnight
+import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
+import com.duckduckgo.app.global.formatters.time.model.dateOfPreviousMidnight
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
