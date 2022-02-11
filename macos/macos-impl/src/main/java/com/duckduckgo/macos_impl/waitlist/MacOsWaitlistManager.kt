@@ -18,13 +18,13 @@ package com.duckduckgo.macos_impl.waitlist
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.macos_api.MacOsWaitlistState
-import com.duckduckgo.macos_api.MacOsWaitlistState.InBeta
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.CodeExisted
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.NoCode
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistService
 import com.duckduckgo.macos_store.MacOsWaitlistRepository
+import com.duckduckgo.macos_store.MacOsWaitlistState
+import com.duckduckgo.macos_store.MacOsWaitlistState.InBeta
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext

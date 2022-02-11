@@ -16,8 +16,6 @@
 
 package com.duckduckgo.macos_store
 
-import com.duckduckgo.macos_api.MacOsWaitlistState
-
 interface MacOsWaitlistRepository {
     fun joinWaitlist(timestamp: Int, token: String)
     fun notifyOnJoinedWaitlist()
@@ -76,4 +74,10 @@ class RealMacOsWaitlistRepository(
     private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
 
     private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
+}
+
+sealed class MacOsWaitlistState {
+    object NotJoinedQueue : MacOsWaitlistState()
+    data class JoinedWaitlist(val notify: Boolean = false) : MacOsWaitlistState()
+    data class InBeta(val inviteCode: String) : MacOsWaitlistState()
 }

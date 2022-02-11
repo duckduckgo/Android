@@ -32,9 +32,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.macos_api.MacOsWaitlistState.InBeta
-import com.duckduckgo.macos_api.MacOsWaitlistState.JoinedWaitlist
-import com.duckduckgo.macos_api.MacOsWaitlistState.NotJoinedQueue
 import com.duckduckgo.macos_impl.R
 import com.duckduckgo.macos_impl.databinding.ActivityMacosWaitlistBinding
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command
@@ -43,6 +40,9 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.Shar
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.ViewState
+import com.duckduckgo.macos_store.MacOsWaitlistState.InBeta
+import com.duckduckgo.macos_store.MacOsWaitlistState.JoinedWaitlist
+import com.duckduckgo.macos_store.MacOsWaitlistState.NotJoinedQueue
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone

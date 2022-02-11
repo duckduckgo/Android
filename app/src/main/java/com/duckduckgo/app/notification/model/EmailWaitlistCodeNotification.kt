@@ -20,8 +20,8 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.db.EmailDataStore
-import com.duckduckgo.app.notification.NotificationEvent.CANCEL
-import com.duckduckgo.app.notification.NotificationEvent.EMAIL_WAITLIST_CODE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.EMAIL_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 import timber.log.Timber

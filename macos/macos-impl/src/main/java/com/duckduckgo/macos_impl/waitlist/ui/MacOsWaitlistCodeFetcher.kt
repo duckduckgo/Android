@@ -25,12 +25,12 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.macos_api.MacOsWaitlistState
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.CodeExisted
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.NoCode
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
+import com.duckduckgo.macos_store.MacOsWaitlistState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope

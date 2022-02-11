@@ -20,8 +20,8 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationEvent.WEBSITE
-import com.duckduckgo.app.notification.NotificationEvent.CANCEL
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.db.NotificationDao
 

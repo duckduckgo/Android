@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification
+package com.duckduckgo.app.notification.model
 
-object NotificationEvent {
-    const val APP_LAUNCH = "com.duckduckgo.notification.launch.app"
-    const val CLEAR_DATA_LAUNCH = "com.duckduckgo.notification.launch.clearData"
-    const val CANCEL = "com.duckduckgo.notification.cancel"
-    const val WEBSITE = "com.duckduckgo.notification.website"
-    const val CHANGE_ICON_FEATURE = "com.duckduckgo.notification.app.feature.changeIcon"
-    const val EMAIL_WAITLIST_CODE = "com.duckduckgo.notification.email.waitlist.code"
-    const val APPTP_WAITLIST_CODE = "com.duckduckgo.notification.apptp.waitlist.code"
+interface SchedulableNotificationPlugin {
+    fun getSchedulableNotification(): SchedulableNotification
+    fun onNotificationLaunched()
+    fun onNotificationCancelled()
+    fun getSpecification(): NotificationSpec
 }

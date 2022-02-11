@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
@@ -72,7 +73,7 @@ class MacOsWaitlistWorker(
     lateinit var notificationSender: NotificationSender
 
     @Inject
-    lateinit var notification: MacOsWaitlistCodeNotification
+    lateinit var notification: SchedulableNotification
 
     @Inject
     lateinit var workRequestBuilder: MacOsWaitlistWorkRequestBuilder

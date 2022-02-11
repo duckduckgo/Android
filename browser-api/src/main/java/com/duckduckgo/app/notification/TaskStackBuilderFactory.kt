@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.notification.db
+package com.duckduckgo.app.notification
 
-import com.duckduckgo.app.notification.NotificationRepository
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
-import javax.inject.Inject
+import android.app.TaskStackBuilder
 
-@ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
-class RealNotificationRepository @Inject constructor(val notificationDao: NotificationDao) : NotificationRepository {
-    override suspend fun exists(id: String): Boolean {
-        return notificationDao.exists(id)
-    }
+interface TaskStackBuilderFactory {
+    fun createTaskBuilder(): TaskStackBuilder
 }

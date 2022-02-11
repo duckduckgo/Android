@@ -19,15 +19,17 @@ package com.duckduckgo.macos_impl.waitlist
 import android.content.Context
 import android.os.Bundle
 import androidx.core.app.NotificationManagerCompat
-import com.duckduckgo.app.notification.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRepository
+import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.macos_api.MacOsNotificationsEvent.MACOS_WAITLIST_CODE
 import com.duckduckgo.macos_impl.R
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,8 +41,8 @@ class MacOsWaitlistCodeNotification @Inject constructor(
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.macos.waitlist"
-    override val launchIntent = MACOS_WAITLIST_CODE
-    override val cancelIntent = CANCEL
+    override val launchIntent = "com.duckduckgo.notification.macos.waitlist.code"
+    override val cancelIntent: String = "com.duckduckgo.notification.macos.waitlist.code.cancel"
 
     override suspend fun canShow(): Boolean {
 
@@ -58,16 +60,15 @@ class MacOsWaitlistCodeNotification @Inject constructor(
 }
 
 class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
-    val MACOS_WAITLIST = Channel(
+    override val channel = Channel(
         "com.duckduckgo.macos",
         R.string.notification_channel_macos_waitlist,
         NotificationManagerCompat.IMPORTANCE_HIGH
     )
 
-    override val channel = MACOS_WAITLIST
     override val systemId = 200
     override val name = context.getString(R.string.macos_notification_title)
-    override val icon = R.drawable.ic_privacy_simplified
+    override val icon = com.duckduckgo.mobile.android.R.drawable.notification_logo
     override val title: String = context.getString(R.string.macos_notification_title)
     override val description: String = context.getString(R.string.macos_notification_text)
     override val launchButton: String? = null
@@ -75,5 +76,33 @@ class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val pixelSuffix = "macos"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = com.duckduckgo.mobile.android.R.color.accentBlue
+    override val color: Int = com.duckduckgo.mobile.android.R.color.ic_launcher_red_background
+}
+
+@ContributesMultibinding(AppScope::class)
+class MacOsWaitlistNotificationPlugin @Inject constructor(
+    private val context: Context,
+    private val schedulableNotification: SchedulableNotification,
+    private val taskStackBuilderFactory: TaskStackBuilderFactory
+) : SchedulableNotificationPlugin {
+
+    override fun getSchedulableNotification(): SchedulableNotification {
+        return schedulableNotification
+    }
+
+    override fun getSpecification(): NotificationSpec {
+        return MacOsWaitlistCodeSpecification(context)
+    }
+
+    override fun onNotificationCancelled() {
+        // NOOP
+    }
+
+    override fun onNotificationLaunched() {
+        Timber.i("MacOs waitlist code received launched!")
+        val intent = MacOsWaitlistActivity.intent(context)
+        taskStackBuilderFactory.createTaskBuilder()
+            .addNextIntentWithParentStack(intent)
+            .startActivities()
+    }
 }
