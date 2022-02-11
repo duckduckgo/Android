@@ -22,4 +22,3 @@ interface RemoteMessagingRepository {
     fun dismissMessage(id: String)
     fun dismissedMessages(): List<String>
 }
-
