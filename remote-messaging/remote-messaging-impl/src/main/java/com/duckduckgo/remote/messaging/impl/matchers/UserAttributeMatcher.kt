@@ -17,9 +17,11 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.remote.messaging.impl.models.DateMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.IntMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
-import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.matches
 
 class UserAttributeMatcher(
     val userBrowserProperties: UserBrowserProperties
@@ -30,10 +32,19 @@ class UserAttributeMatcher(
                 return matchingAttribute.matches(userBrowserProperties.appTheme().toString())
             }
             is MatchingAttribute.Bookmarks -> {
-                return matchingAttribute.matches(userBrowserProperties.bookmarks().toInt())
+                if (matchingAttribute == MatchingAttribute.Bookmarks()) return Result.Fail
+                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.bookmarks().toInt())
+                }
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.bookmarks().toInt())
             }
             is MatchingAttribute.DaysSinceInstalled -> {
-                return matchingAttribute.matches(userBrowserProperties.daysSinceInstalled().toInt())
+                if (matchingAttribute == MatchingAttribute.DaysSinceInstalled()) return Result.Fail
+
+                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.daysSinceInstalled().toInt())
+                }
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.daysSinceInstalled().toInt())
             }
             is MatchingAttribute.DaysUsedSince -> {
                 val daysUsedSince = userBrowserProperties.daysUsedSince(matchingAttribute.since)
@@ -46,10 +57,18 @@ class UserAttributeMatcher(
                 return matchingAttribute.matches(userBrowserProperties.emailEnabled())
             }
             is MatchingAttribute.Favorites -> {
-                return matchingAttribute.matches(userBrowserProperties.favorites().toInt())
+                if (matchingAttribute == MatchingAttribute.Favorites()) return Result.Fail
+                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.favorites().toInt())
+                }
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.favorites().toInt())
             }
             is MatchingAttribute.SearchCount -> {
-                return matchingAttribute.matches(userBrowserProperties.searchCount().toInt())
+                if (matchingAttribute == MatchingAttribute.SearchCount()) return Result.Fail
+                if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
+                    return (matchingAttribute as IntMatchingAttribute).matches(userBrowserProperties.searchCount().toInt())
+                }
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(userBrowserProperties.searchCount().toInt())
             }
             is MatchingAttribute.WidgetAdded -> {
                 return matchingAttribute.matches(userBrowserProperties.widgetAdded())
@@ -57,15 +76,4 @@ class UserAttributeMatcher(
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }
     }
-}
-
-fun DateMatchingAttribute.matches(value: Int): Result {
-    if ((this.value.defaultValue() || value == this.value)) {
-        return true.toResult()
-    }
-    return false.toResult()
-}
-
-fun StringMatchingAttribute.matches(value: String): Result {
-    return this.value.equals(value, ignoreCase = true).toResult()
 }

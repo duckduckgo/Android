@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.duckduckgo.remote.messaging.api
 
 import com.duckduckgo.remote.messaging.api.Action.ActionType.DISMISS

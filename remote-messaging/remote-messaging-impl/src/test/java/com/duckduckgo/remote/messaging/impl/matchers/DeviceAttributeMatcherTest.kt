@@ -77,6 +77,24 @@ class DeviceAttributeMatcherTest {
     }
 
     @Test
+    fun whenDeviceSameAsOsApiLevelThenReturnMatch() {
+        givenDeviceProperties(apiLevel = 21)
+
+        val result = testee.evaluate(MatchingAttribute.Api(value = 21))
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenDeviceDifferentAsOsApiLevelThenReturnFail() {
+        givenDeviceProperties(apiLevel = 21)
+
+        val result = testee.evaluate(MatchingAttribute.Api(value = 19))
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
     fun whenDeviceMatchesOsApiLevelThenReturnMatch() {
         givenDeviceProperties(apiLevel = 21)
 
@@ -117,6 +135,24 @@ class DeviceAttributeMatcherTest {
         givenDeviceProperties(apiLevel = 21)
 
         val result = testee.evaluate(MatchingAttribute.Api())
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
+    fun whenDeviceWVSameAsWVVersionThenReturnMatch() {
+        givenDeviceProperties(webView = "96.0.4664.104")
+
+        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.104"))
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenDeviceWVDifferentAsWVVersionThenReturnMatch() {
+        givenDeviceProperties(webView = "96.0.4664.104")
+
+        val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.105"))
 
         assertEquals(Result.Fail, result)
     }

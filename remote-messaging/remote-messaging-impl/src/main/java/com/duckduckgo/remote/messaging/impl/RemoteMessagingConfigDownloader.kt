@@ -28,16 +28,15 @@ class RealRemoteMessagingConfigDownloader constructor(
     private val remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
 ) : RemoteMessagingConfigDownloader {
     override suspend fun download(): Boolean {
-        Timber.v("RMF: downloading config")
-        kotlin.runCatching {
+        val response = kotlin.runCatching {
+            Timber.v("RMF: downloading config")
             remoteConfig.config()
         }.onSuccess {
             remoteMessagingConfigProcessor.process(it)
         }.onFailure {
-            Timber.e("RMF: error at RealRemoteMessagingConfigDownloader!!!!!")
-            throw it
+            Timber.e("RMF: error at RealRemoteMessagingConfigDownloader, %s", it.localizedMessage)
         }
 
-        return true
+        return response.isSuccess
     }
 }

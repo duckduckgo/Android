@@ -19,15 +19,23 @@ package com.duckduckgo.remote.messaging.impl.mappers
 import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
-import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
 import com.duckduckgo.remote.messaging.api.Content.BigTwoActions
 import com.duckduckgo.remote.messaging.api.Content.Medium
+import com.duckduckgo.remote.messaging.api.Content.Placeholder
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DEFAULT_BROWSER
+import com.duckduckgo.remote.messaging.impl.models.JsonActionType.DISMISS
+import com.duckduckgo.remote.messaging.impl.models.JsonActionType.PLAYSTORE
+import com.duckduckgo.remote.messaging.impl.models.JsonActionType.URL
 import com.duckduckgo.remote.messaging.impl.models.JsonContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonMessageAction
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_SINGLE_ACTION
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.BIG_TWO_ACTION
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.MEDIUM
+import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import timber.log.Timber
@@ -71,10 +79,10 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
     }
 
     private val messageMappers = mapOf(
-        Pair("small", smallMapper),
-        Pair("medium", mediumMapper),
-        Pair("big_single_action", bigMessageSingleAcionMapper),
-        Pair("big_two_action", bigMessageTwoAcionMapper)
+        Pair(SMALL.jsonValue, smallMapper),
+        Pair(MEDIUM.jsonValue, mediumMapper),
+        Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleAcionMapper),
+        Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoAcionMapper)
     )
 
     private val urlActionMapper: (JsonMessageAction) -> Action = {
@@ -94,10 +102,10 @@ class JsonRemoteMessageMapper constructor(private val deviceProperties: DevicePr
     }
 
     private val actionMappers = mapOf(
-        Pair("url", urlActionMapper),
-        Pair("dismiss", dismissActionMapper),
-        Pair("playstore", playStoreActionMapper),
-        Pair("defaultBrowser", defaultBrowserActionMapper)
+        Pair(URL.jsonValue, urlActionMapper),
+        Pair(DISMISS.jsonValue, dismissActionMapper),
+        Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
+        Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper)
     )
 
     fun map(jsonMessages: List<JsonRemoteMessage>): List<RemoteMessage> = jsonMessages.mapNotNull { it.map() }

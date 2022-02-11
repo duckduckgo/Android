@@ -19,6 +19,7 @@ package com.duckduckgo.remote.messaging.impl.matchers
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Favorites
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
@@ -50,6 +51,28 @@ class UserAttributeMatcherTest {
 
         val result = testee.evaluate(
             MatchingAttribute.AppTheme(value = "light")
+        )
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
+    fun whenBookmarksMatchesThenReturnMatch() = runBlocking {
+        givenBrowserProperties(bookmarks = 10L)
+
+        val result = testee.evaluate(
+            MatchingAttribute.Bookmarks(value = 10)
+        )
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenBookmarksDoesNotMatchThenReturnFail() = runBlocking {
+        givenBrowserProperties(bookmarks = 10L)
+
+        val result = testee.evaluate(
+            MatchingAttribute.Bookmarks(value = 15)
         )
 
         assertEquals(Result.Fail, result)
@@ -123,11 +146,33 @@ class UserAttributeMatcherTest {
 
     // Favorites
     @Test
+    fun whenFavoritesMatchesThenReturnMatch() = runBlocking {
+        givenBrowserProperties(favorites = 10L)
+
+        val result = testee.evaluate(
+            Favorites(value = 10)
+        )
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenFavoritesDoesNotMatchThenReturnFail() = runBlocking {
+        givenBrowserProperties(favorites = 10L)
+
+        val result = testee.evaluate(
+            Favorites(value = 15)
+        )
+
+        assertEquals(Result.Fail, result)
+    }
+
+    @Test
     fun whenFavoritesEqualOrLowerThanMaxThenReturnMatch() = runBlocking {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(max = 10)
+            Favorites(max = 10)
         )
 
         assertEquals(Result.Match, result)
@@ -138,7 +183,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(max = 5)
+            Favorites(max = 5)
         )
 
         assertEquals(Result.Fail, result)
@@ -149,7 +194,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(min = 10)
+            Favorites(min = 10)
         )
 
         assertEquals(Result.Match, result)
@@ -160,7 +205,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 0L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(min = 10)
+            Favorites(min = 10)
         )
 
         assertEquals(Result.Fail, result)
@@ -171,7 +216,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(min = 9, max = 15)
+            Favorites(min = 9, max = 15)
         )
 
         assertEquals(Result.Match, result)
@@ -182,7 +227,7 @@ class UserAttributeMatcherTest {
         givenBrowserProperties(favorites = 10L)
 
         val result = testee.evaluate(
-            MatchingAttribute.Favorites(min = 3, max = 6)
+            Favorites(min = 3, max = 6)
         )
 
         assertEquals(Result.Fail, result)
@@ -325,6 +370,28 @@ class UserAttributeMatcherTest {
     }
 
     // SearchCount
+    @Test
+    fun whenSearchCountMatchesThenReturnMatch() = runBlocking {
+        givenBrowserProperties(searchCount = 10L)
+
+        val result = testee.evaluate(
+            MatchingAttribute.SearchCount(value = 10)
+        )
+
+        assertEquals(Result.Match, result)
+    }
+
+    @Test
+    fun whenSearchCountDoesNotMatchThenReturnFail() = runBlocking {
+        givenBrowserProperties(searchCount = 10L)
+
+        val result = testee.evaluate(
+            MatchingAttribute.SearchCount(value = 15)
+        )
+
+        assertEquals(Result.Fail, result)
+    }
+
     @Test
     fun whenSearchCountEqualOrLowerThanMaxThenReturnMatch() = runBlocking {
         givenBrowserProperties(searchCount = 10L)
