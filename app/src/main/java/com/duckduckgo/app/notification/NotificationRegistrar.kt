@@ -29,7 +29,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
@@ -66,7 +65,7 @@ class NotificationRegistrar @Inject constructor(
     object ChannelType {
         val FILE_DOWNLOADING = Channel(
             "com.duckduckgo.downloading",
-            string.notificationChannelFileDownloading,
+            R.string.notificationChannelFileDownloading,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
         val FILE_DOWNLOADED = Channel(
