@@ -16,8 +16,10 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -28,16 +30,24 @@ import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
+import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 // TODO: when pattern established, refactor objects to use (create module https://app.asana.com/0/0/1201807285420697/f)
+@ExperimentalCoroutinesApi
 class AppRemoteMessagingRepositoryTest {
+    @get:Rule
+    @Suppress("unused")
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -51,7 +61,9 @@ class AppRemoteMessagingRepositoryTest {
 
     private val dao = db.remoteMessagesDao()
 
-    private val testee = AppRemoteMessagingRepository(dao, coroutineRule.testDispatcherProvider)
+    private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
+
+    private val testee = AppRemoteMessagingRepository(remoteMessagingConfigRepository, dao, coroutineRule.testDispatcherProvider)
 
     @After
     fun after() {
@@ -59,7 +71,7 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenAddMediumMessageThenMessageStored() {
+    fun whenAddMediumMessageThenMessageStored() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
@@ -73,25 +85,28 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        val message = testee.message()
+        testee.messageFlow().test {
+            val message = awaitItem()
 
-        assertEquals(
-            RemoteMessage(
-                id = "id",
-                content = Medium(
-                    titleText = "titleText",
-                    descriptionText = "descriptionText",
-                    placeholder = ANNOUNCE
+            assertEquals(
+                RemoteMessage(
+                    id = "id",
+                    content = Medium(
+                        titleText = "titleText",
+                        descriptionText = "descriptionText",
+                        placeholder = ANNOUNCE
+                    ),
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList()
                 ),
-                matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            ),
-            message
-        )
+                message
+            )
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenAddSmallMessageThenMessageStored() {
+    fun whenAddSmallMessageThenMessageStored() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
@@ -104,24 +119,27 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        val message = testee.message()
+        testee.messageFlow().test {
+            val message = awaitItem()
 
-        assertEquals(
-            RemoteMessage(
-                id = "id",
-                content = Small(
-                    titleText = "titleText",
-                    descriptionText = "descriptionText"
+            assertEquals(
+                RemoteMessage(
+                    id = "id",
+                    content = Small(
+                        titleText = "titleText",
+                        descriptionText = "descriptionText"
+                    ),
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList()
                 ),
-                matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            ),
-            message
-        )
+                message
+            )
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenAddBigSingleActionMessageThenMessageStored() {
+    fun whenAddBigSingleActionMessageThenMessageStored() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
@@ -137,27 +155,30 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        val message = testee.message()
+        testee.messageFlow().test {
+            val message = awaitItem()
 
-        assertEquals(
-            RemoteMessage(
-                id = "id",
-                content = BigSingleAction(
-                    titleText = "titleText",
-                    descriptionText = "descriptionText",
-                    placeholder = ANNOUNCE,
-                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
-                    primaryActionText = "actionText"
+            assertEquals(
+                RemoteMessage(
+                    id = "id",
+                    content = BigSingleAction(
+                        titleText = "titleText",
+                        descriptionText = "descriptionText",
+                        placeholder = ANNOUNCE,
+                        primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                        primaryActionText = "actionText"
+                    ),
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList()
                 ),
-                matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            ),
-            message
-        )
+                message
+            )
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
-    fun whenAddBigTwoActionMessageThenMessageStored() {
+    fun whenAddBigTwoActionMessageThenMessageStored() = runTest {
         testee.add(
             RemoteMessage(
                 id = "id",
@@ -175,25 +196,28 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        val message = testee.message()
+        testee.messageFlow().test {
+            val message = awaitItem()
 
-        assertEquals(
-            RemoteMessage(
-                id = "id",
-                content = BigTwoActions(
-                    titleText = "titleText",
-                    descriptionText = "descriptionText",
-                    placeholder = ANNOUNCE,
-                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
-                    primaryActionText = "actionText",
-                    secondaryActionText = "actionText",
-                    secondaryAction = Action.Dismiss()
+            assertEquals(
+                RemoteMessage(
+                    id = "id",
+                    content = BigTwoActions(
+                        titleText = "titleText",
+                        descriptionText = "descriptionText",
+                        placeholder = ANNOUNCE,
+                        primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                        primaryActionText = "actionText",
+                        secondaryActionText = "actionText",
+                        secondaryAction = Action.Dismiss()
+                    ),
+                    matchingRules = emptyList(),
+                    exclusionRules = emptyList()
                 ),
-                matchingRules = emptyList(),
-                exclusionRules = emptyList()
-            ),
-            message
-        )
+                message
+            )
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -214,11 +238,15 @@ class AppRemoteMessagingRepositoryTest {
                 exclusionRules = emptyList()
             )
         )
+        testee.messageFlow().test {
+            var message = awaitItem()
+            assertTrue(message?.content is BigTwoActions)
 
-        testee.dismissMessage("id")
-
-        val messages = dao.messages()
-        assertEquals(Status.DISMISSED, messages.first().status)
+            testee.dismissMessage("id")
+            message = awaitItem()
+            assertNull(message)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -242,11 +270,12 @@ class AppRemoteMessagingRepositoryTest {
         testee.dismissMessage("id")
 
         val dismissedMessages = testee.dismissedMessages()
+
         assertEquals("id", dismissedMessages.first())
     }
 
     @Test
-    fun whenNewMessageAddedThenPreviousNonDismissedMessagesRemoved() {
+    fun whenNewMessageAddedThenPreviousNonDismissedMessagesRemoved() = runTest {
         dao.insert(
             RemoteMessageEntity(
                 id = "id",
@@ -272,6 +301,14 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        assertEquals("id2", testee.message()!!.id)
+        testee.messageFlow().test {
+            var message = awaitItem()
+            assertEquals("id2", message?.id)
+            testee.dismissMessage("id2")
+
+            message = awaitItem()
+            assertNull(message)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 }
