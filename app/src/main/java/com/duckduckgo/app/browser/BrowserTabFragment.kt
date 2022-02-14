@@ -2424,13 +2424,9 @@ class BrowserTabFragment :
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
 
-                val cta = viewState.cta?.takeUnless { it ->
-                    viewState.message != null && it is HomePanelCta
-                }
-
                 when {
-                    cta != null -> {
-                        showCta(cta, viewState.favorites)
+                    viewState.cta != null -> {
+                        showCta(viewState.cta, viewState.favorites)
                     }
                     viewState.message != null -> {
                         showRemoteMessage(viewState.message, newMessage)

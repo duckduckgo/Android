@@ -444,6 +444,7 @@ class BrowserTabViewModel(
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
+    private var ctaChangedTicker = MutableStateFlow("")
 
     val url: String?
         get() = site?.url
@@ -580,13 +581,25 @@ class BrowserTabViewModel(
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
 
-        remoteMessagingModel.activeMessages.onEach { activeMessage ->
-            withContext(dispatchers.main()) {
-                ctaViewState.value = currentCtaViewState().copy(
-                    message = activeMessage
-                )
-            }
-        }.launchIn(viewModelScope)
+        remoteMessagingModel.activeMessages
+            .combine(ctaChangedTicker.asStateFlow(), ::Pair)
+            .onEach { (activeMessage, ticker) ->
+                Timber.v("RMF: $ticker-$activeMessage")
+
+                if (ticker.isEmpty()) return@onEach
+                if (currentBrowserViewState().browserShowing) return@onEach
+
+                val cta = currentCtaViewState().cta?.takeUnless { it ->
+                    activeMessage != null && it is HomePanelCta
+                }
+
+                withContext(dispatchers.main()) {
+                    ctaViewState.value = currentCtaViewState().copy(
+                        cta = cta,
+                        message = if (cta == null) activeMessage else null
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -2122,6 +2135,7 @@ class BrowserTabViewModel(
                 )
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }
         return null
@@ -2166,6 +2180,7 @@ class BrowserTabViewModel(
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
+            refreshCta()
         }
     }
 
@@ -2174,6 +2189,7 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
         }
     }
 
@@ -2182,6 +2198,7 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
             command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
         }
     }
 
