@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.edit
 import androidx.room.Room
@@ -26,12 +28,14 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -64,6 +68,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Mock private lateinit var appBuildConfig: AppBuildConfig
 
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
+    private val vpnDetector = mock<VpnDetector>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -92,6 +97,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             deviceShieldPixels,
             vpnPreferences,
             appTrackerBlockingStatsRepository,
+            vpnDetector,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -185,25 +191,77 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenToggleIsSwitchedOnThenTrackingProtectionIsEnabled() = runBlocking {
+    fun whenToggleIsSwitchedOnAndOtherVPNIsDisabledThenTrackingProtectionIsEnabled() = runBlocking {
+        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(true)
-
-            verify(deviceShieldPixels).enableFromSummaryTrackerActivity()
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield, awaitItem())
-
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenToggleIsSwitchedOffThenConfirmationDialogIsShown() = runBlocking {
+    fun whenToggleIsSwitchedOffAndOtherVPNIsDisabledThenConfirmationDialogIsShown() = runBlocking {
+        whenever(vpnDetector.isVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
-
-            verifyNoInteractions(deviceShieldPixels)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 
+    @Test
+    fun whenVpnPermissionIsNeededThenVpnPermissionRequestIsLaunched() = runBlocking {
+        viewModel.commands().test {
+            val permissionIntent = Intent()
+            viewModel.onVPNPermissionNeeded(permissionIntent)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission(permissionIntent), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnPermissionResultIsOKThenVpnIsLaunched() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runBlocking {
+        viewModel.commands().test {
+            val permissionIntent = Intent()
+            viewModel.onVPNPermissionNeeded(permissionIntent)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission(permissionIntent), awaitItem())
+
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_CANCELED)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasHigherThanNeededThenVpnIsStopped() = runBlocking {
+        viewModel.commands().test {
+            val permissionIntent = Intent()
+            viewModel.onVPNPermissionNeeded(permissionIntent)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission(permissionIntent), awaitItem())
+
+            delay(2000)
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_CANCELED)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenToggleIsSwitchedOnAndOtherVPNIsEnabledThenVpnConflictDialogIsShown() = runBlocking {
+        whenever(vpnDetector.isVpnDetected()).thenReturn(true)
+        viewModel.commands().test {
+            viewModel.onAppTPToggleSwitched(true)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -214,7 +272,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onAppTpManuallyDisabled()
 
             verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

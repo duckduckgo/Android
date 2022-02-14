@@ -28,17 +28,4 @@ interface VpnDetector {
     fun isVpnDetected(): Boolean
 
 
-    /**
-     * Detects if there is a VPN in Always On mode
-     * This API doesn't work for Android 12
-     *
-     * @return returns a boolean that identifies the connection being routed through a VPN
-     */
-    fun inAlwaysOnMode(): AlwaysOnMode
-
-    enum class AlwaysOnMode{
-        ENABLED,
-        DISABLED,
-        UNKNOWN
-    }
 }

@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
@@ -54,6 +56,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val job = ConflatedJob()
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
+    private var lastVpnRequestTime = -1L;
+
     internal val vpnRunningState = MutableStateFlow(
         RunningState(isRunning = true)
     )
@@ -83,24 +87,43 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
             vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
-            enabled == true -> {
-                sendCommand(Command.StartDeviceShield)
-                deviceShieldPixels.enableFromSummaryTrackerActivity()
-            }
+            enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
         }
     }
 
-    private fun sendCommand(newCommand: Command){
+    private fun sendCommand(newCommand: Command) {
         viewModelScope.launch {
             command.send(newCommand)
+        }
+    }
+
+    fun onVPNPermissionNeeded(permissionIntent : Intent){
+        lastVpnRequestTime = System.currentTimeMillis()
+        sendCommand(Command.RequestVPNPermission(permissionIntent))
+    }
+
+    fun onVPNPermissionResult(resultCode: Int) {
+        when (resultCode) {
+            AppCompatActivity.RESULT_OK -> {
+                sendCommand(Command.LaunchVPN)
+                return
+            }
+            else -> {
+                if (System.currentTimeMillis() - lastVpnRequestTime < 1000){
+                    sendCommand(Command.ShowVpnConflictDialog)
+                } else {
+                    sendCommand(Command.StopVPN)
+                }
+                lastVpnRequestTime = -1
+            }
         }
     }
 
     internal fun onAppTpManuallyDisabled() {
         deviceShieldPixels.disableFromSummaryTrackerActivity()
         viewModelScope.launch {
-            command.send(Command.StopDeviceShield)
+            command.send(Command.StopVPN)
         }
     }
 
@@ -149,8 +172,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object StartDeviceShield : Command()
-        object StopDeviceShield : Command()
+        object StopVPN : Command()
+        object LaunchVPN : Command()
+        object CheckVPNPermission : Command()
+        data class RequestVPNPermission(val vpnIntent: Intent) : Command()
         data class LaunchExcludedApps(val shouldListBeEnabled: Boolean) : Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
@@ -159,6 +184,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowDisableConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
     }
+
 }
 
 @ContributesMultibinding(AppScope::class)

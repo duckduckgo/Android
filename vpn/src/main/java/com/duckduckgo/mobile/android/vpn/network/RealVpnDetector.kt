@@ -24,8 +24,6 @@ import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.network.VpnDetector.AlwaysOn
-import com.duckduckgo.mobile.android.vpn.network.VpnDetector.AlwaysOnMode
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -44,14 +42,6 @@ class RealVpnDetector @Inject constructor(
         }
     }
 
-    override fun inAlwaysOnMode(): AlwaysOnMode {
-        return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            detectAlwaysOnModeLollipop()
-        } else {
-            detectAlwaysOnMode()
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     private fun detectVpn(): Boolean {
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -63,17 +53,6 @@ class RealVpnDetector @Inject constructor(
     private fun detectVpnLollipop(): Boolean {
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connectivityManager.activeNetworkInfo?.type == ConnectivityManager.TYPE_VPN ?: false
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun detectAlwaysOnMode(): AlwaysOnMode {
-
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
-    private fun detectAlwaysOnModeLollipop(): AlwaysOnMode {
-
     }
 
 }

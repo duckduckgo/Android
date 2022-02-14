@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.content.Intent
-import android.net.VpnManager
 import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
@@ -106,6 +105,7 @@ class DeviceShieldTrackerActivity :
         }
     }
 
+
     private val enableAppTPSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppTPToggleSwitched(isChecked)
     }
@@ -158,16 +158,7 @@ class DeviceShieldTrackerActivity :
         data: Intent?
     ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
-            when (resultCode) {
-                RESULT_OK -> {
-                    startVPN()
-                    return
-                }
-                else -> {
-                    deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
-                    Timber.d("Permission not granted")
-                }
-            }
+            viewModel.onVPNPermissionResult(resultCode)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -228,8 +219,10 @@ class DeviceShieldTrackerActivity :
 
     private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command?) {
         when (it) {
-            is DeviceShieldTrackerActivityViewModel.Command.StartDeviceShield -> startVpnIfAllowed()
-            is DeviceShieldTrackerActivityViewModel.Command.StopDeviceShield -> stopDeviceShield()
+            is DeviceShieldTrackerActivityViewModel.Command.StopVPN -> stopDeviceShield()
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchVPN -> startVPN()
+            is DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission -> checkVPNPermission()
+            is DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission -> obtainVpnRequestPermission(it.vpnIntent)
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
@@ -301,6 +294,28 @@ class DeviceShieldTrackerActivity :
         intent.putExtra("TITLE_EXTRA", getString(R.string.atp_ActivityBetaInstructions))
         startActivity(intent)
     }
+
+    private fun checkVPNPermission(){
+        when (val permissionStatus = checkVpnPermissionStatus()) {
+            is VpnPermissionStatus.Granted -> {
+                deviceShieldPixels.enableFromSummaryTrackerActivity()
+                startVPN()
+            }
+            is VpnPermissionStatus.Denied -> {
+                viewModel.onVPNPermissionNeeded(permissionStatus.intent)
+            }
+        }
+    }
+
+    private fun checkVpnPermissionStatus(): VpnPermissionStatus {
+        val intent = VpnService.prepare(applicationContext)
+        return if (intent == null) {
+            VpnPermissionStatus.Granted
+        } else {
+            VpnPermissionStatus.Denied(intent)
+        }
+    }
+
 
     private fun launchAppTrackersFAQ() {
         startActivity(DeviceShieldAppTrackersInfo.intent(this))
@@ -435,9 +450,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.deviceShieldSwitch -> {
-                startVpnIfAllowed(); true
-            }
             R.id.dataScreen -> {
                 startActivity(VpnControllerActivity.intent(this)); true
             }
@@ -450,22 +462,6 @@ class DeviceShieldTrackerActivity :
                 true
             }
             else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun startVpnIfAllowed() {
-        when (val permissionStatus = checkVpnPermission()) {
-            is VpnPermissionStatus.Granted -> startVPN()
-            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
-        }
-    }
-
-    private fun checkVpnPermission(): VpnPermissionStatus {
-        val intent = VpnService.prepare(this)
-        return if (intent == null) {
-            VpnPermissionStatus.Granted
-        } else {
-            VpnPermissionStatus.Denied(intent)
         }
     }
 
