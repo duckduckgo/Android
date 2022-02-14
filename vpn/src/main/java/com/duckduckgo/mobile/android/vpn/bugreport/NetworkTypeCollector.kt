@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -112,8 +113,8 @@ class NetworkTypeCollector @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
-            it.unregisterNetworkCallback(wifiNetworkCallback)
-            it.unregisterNetworkCallback(cellularNetworkCallback)
+            it.safeUnregisterNetworkCallback(wifiNetworkCallback)
+            it.safeUnregisterNetworkCallback(cellularNetworkCallback)
         }
     }
 
@@ -161,6 +162,14 @@ class NetworkTypeCollector @Inject constructor(
         val info = currentNetworkInfo ?: return JSONObject()
 
         return JSONObject(info)
+    }
+
+    private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {
+        kotlin.runCatching {
+            unregisterNetworkCallback(networkCallback)
+        }.onFailure {
+            Timber.e(it, "Error unregistering the network callback")
+        }
     }
 
     internal data class NetworkInfo(
