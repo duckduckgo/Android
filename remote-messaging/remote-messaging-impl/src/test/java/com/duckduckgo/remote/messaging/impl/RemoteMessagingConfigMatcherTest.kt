@@ -68,15 +68,18 @@ class RemoteMessagingConfigMatcherTest {
     }
 
     @Test
-    fun whenNotExistingRuleThenReturnMessage() = runBlocking {
+    fun whenNotExistingRuleThenReturnSkipMessage() = runBlocking {
         val noRulesRemoteConfig = RemoteConfig(
-            messages = listOf(aSmallMessage(matchingRules = rules(1))),
+            messages = listOf(
+                aSmallMessage(matchingRules = rules(1)),
+                aMediumMessage()
+            ),
             rules = emptyMap()
         )
 
         val message = testee.evaluate(noRulesRemoteConfig)
 
-        assertEquals(aSmallMessage(matchingRules = rules(1)), message)
+        assertEquals(aMediumMessage(), message)
     }
 
     @Test

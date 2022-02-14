@@ -42,8 +42,8 @@ dependencies {
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
     implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:1.8.0"
-    implementation("com.squareup.moshi:moshi-adapters:1.8.0")
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
     implementation Google.dagger
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
