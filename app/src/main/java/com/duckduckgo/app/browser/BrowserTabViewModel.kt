@@ -2156,7 +2156,6 @@ class BrowserTabViewModel(
     }
 
     fun onMessageShown() {
-        Timber.i("RMF: onMessageShown")
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageShown(message)
@@ -2164,7 +2163,6 @@ class BrowserTabViewModel(
     }
 
     fun onMessageCloseButtonClicked() {
-        Timber.i("RMF: onMessageCloseButtonClicked")
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             remoteMessagingModel.onMessageDismissed(message)
@@ -2172,21 +2170,17 @@ class BrowserTabViewModel(
     }
 
     fun onMessagePrimaryButtonClicked() {
-        Timber.i("RMF: onMessagePrimaryButtonClicked")
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
-            Timber.i("RMF: emit $action")
             command.value = action.asBrowserTabCommand() ?: return@launch
         }
     }
 
     fun onMessageSecondaryButtonClicked() {
-        Timber.i("RMF: onMessageSecondaryButtonClicked")
         val message = currentCtaViewState().message ?: return
         viewModelScope.launch {
             val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
-            Timber.i("RMF: emit $action")
             command.value = action.asBrowserTabCommand() ?: return@launch
         }
     }

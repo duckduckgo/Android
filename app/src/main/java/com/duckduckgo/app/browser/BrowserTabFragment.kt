@@ -2422,7 +2422,6 @@ class BrowserTabFragment :
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 val newMessage = viewState.message?.id != lastSeenCtaViewState?.message?.id
                 lastSeenCtaViewState = viewState
-                Timber.i("RMF: viewstate $lastSeenCtaViewState")
                 removeNewTabLayoutClickListener()
 
                 val cta = viewState.cta?.takeUnless { it ->
