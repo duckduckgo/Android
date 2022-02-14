@@ -21,13 +21,11 @@ import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldAllTracerActivityBinding
 
 class DeviceShieldMostRecentActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityDeviceShieldAllTracerActivityBinding by viewBinding()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
