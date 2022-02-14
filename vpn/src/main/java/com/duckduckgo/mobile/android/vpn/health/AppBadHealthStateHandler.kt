@@ -185,7 +185,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private suspend fun restartVpn(isCriticalBadHealth: Boolean) {
         // place this in a different job to ensure the restart completes successfully and nobody can cancel it by mistake
         appCoroutineScope.launch {
-            if (appBuildConfig.flavor.isInternal() && isCriticalBadHealth) {
+            if (isCriticalBadHealth) {
                 Timber.d("Internal build and critical bad health, killing VPN process...")
                 deviceShieldPixels.didRestartVpnProcessOnBadHealth()
                 // delay a bit to ensure pixel is sent. This is not great but our pixel API doesn't leave an option in this case
