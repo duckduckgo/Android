@@ -29,6 +29,4 @@ interface SurveyService {
     @GET("https://ddg-sandbox.s3.amazonaws.com/survey/apptp/survey-mobile.json")
     fun surveyAppTp(): Call<SurveyGroup?>
 
-
 }
-

@@ -272,7 +272,6 @@ interface DeviceShieldPixels {
 
     fun didChooseToOpenSettingsFromVpnConflicDialog()
 
-
     /**
      * Will fire when the waitlist dialog is showed to the user
      */

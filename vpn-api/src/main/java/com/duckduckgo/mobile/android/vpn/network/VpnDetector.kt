@@ -16,8 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.network
 
-import org.json.JSONObject
-
 interface VpnDetector {
 
     /**
@@ -26,6 +24,5 @@ interface VpnDetector {
      * @return returns a boolean that identifies the connection being routed through a VPN
      */
     fun isVpnDetected(): Boolean
-
 
 }

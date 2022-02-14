@@ -69,7 +69,7 @@ class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
-    AppTPVPNConflictDialog.Listener{
+    AppTPVPNConflictDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -104,7 +104,6 @@ class DeviceShieldTrackerActivity :
             Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
         }
     }
-
 
     private val enableAppTPSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         viewModel.onAppTPToggleSwitched(isChecked)
@@ -251,7 +250,7 @@ class DeviceShieldTrackerActivity :
         )
     }
 
-    private fun launchVPNConflictDialog(){
+    private fun launchVPNConflictDialog() {
         deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
         deviceShieldPixels.didShowVpnConflictDialog()
         val dialog = AppTPVPNConflictDialog.instance()
@@ -295,7 +294,7 @@ class DeviceShieldTrackerActivity :
         startActivity(intent)
     }
 
-    private fun checkVPNPermission(){
+    private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
                 deviceShieldPixels.enableFromSummaryTrackerActivity()
@@ -315,7 +314,6 @@ class DeviceShieldTrackerActivity :
             VpnPermissionStatus.Denied(intent)
         }
     }
-
 
     private fun launchAppTrackersFAQ() {
         startActivity(DeviceShieldAppTrackersInfo.intent(this))

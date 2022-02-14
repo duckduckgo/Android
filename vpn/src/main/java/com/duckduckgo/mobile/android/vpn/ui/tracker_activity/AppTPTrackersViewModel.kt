@@ -28,9 +28,7 @@ import javax.inject.Provider
 class AppTPTrackersViewModel @Inject constructor(
     val deviceShieldPixels: DeviceShieldPixels,
     val appBuildConfig: AppBuildConfig
-) : ViewModel() {
-
-}
+) : ViewModel()
 
 @ContributesMultibinding(AppScope::class)
 class AppTPTrackersViewModelFactory

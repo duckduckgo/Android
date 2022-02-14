@@ -56,7 +56,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val job = ConflatedJob()
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var lastVpnRequestTime = -1L;
+    private var lastVpnRequestTime = -1L
 
     internal val vpnRunningState = MutableStateFlow(
         RunningState(isRunning = true)
@@ -98,7 +98,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    fun onVPNPermissionNeeded(permissionIntent : Intent){
+    fun onVPNPermissionNeeded(permissionIntent: Intent) {
         lastVpnRequestTime = System.currentTimeMillis()
         sendCommand(Command.RequestVPNPermission(permissionIntent))
     }
@@ -110,7 +110,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 return
             }
             else -> {
-                if (System.currentTimeMillis() - lastVpnRequestTime < 1000){
+                if (System.currentTimeMillis() - lastVpnRequestTime < 1000) {
                     sendCommand(Command.ShowVpnConflictDialog)
                 } else {
                     sendCommand(Command.StopVPN)
@@ -195,7 +195,8 @@ class PastWeekTrackerActivityViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(DeviceShieldTrackerActivityViewModel::class.java) -> (
-                    (viewModelProvider.get()) as T)
+                    (viewModelProvider.get()) as T
+                    )
                 else -> null
             }
         }
