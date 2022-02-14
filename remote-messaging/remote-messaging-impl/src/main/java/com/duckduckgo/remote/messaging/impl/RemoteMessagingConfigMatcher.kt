@@ -53,7 +53,7 @@ class RemoteMessagingConfigMatcher(
         var result: Result = Result.Match
 
         for (rule in this) {
-            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.Match
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.NextMessage
             result = Result.Match
 
             for (attr in attributes) {
@@ -74,7 +74,7 @@ class RemoteMessagingConfigMatcher(
         var result: Result = Result.Fail
 
         for (rule in this) {
-            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.Fail
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.NextMessage
             result = Result.Fail
 
             for (attr in attributes) {
