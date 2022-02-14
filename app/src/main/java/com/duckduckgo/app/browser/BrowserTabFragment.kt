@@ -2420,10 +2420,10 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
-                val newMessage = viewState.message?.id != lastSeenCtaViewState?.message?.id
+                val newMessage = (viewState.message?.id != lastSeenCtaViewState?.message?.id)
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
-
+                Timber.v("RMF: render $newMessage, $viewState")
                 when {
                     viewState.cta != null -> {
                         showCta(viewState.cta, viewState.favorites)
@@ -2447,7 +2447,9 @@ class BrowserTabFragment :
             message: RemoteMessage,
             newMessage: Boolean
         ) {
-            if (newMessage) {
+            val shouldRender = newMessage || newBrowserTab.messageCta.isGone
+
+            if (shouldRender) {
                 Timber.i("RMF: render $message")
                 newBrowserTab.messageCta.show()
                 viewModel.onMessageShown()
