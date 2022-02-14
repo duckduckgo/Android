@@ -20,6 +20,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import kotlinx.coroutines.flow.Flow
 
@@ -40,4 +41,13 @@ abstract class RemoteMessagesDao {
 
     @Query("select * from remote_message where status = \"SCHEDULED\"")
     abstract fun messagesFlow(): Flow<RemoteMessageEntity?>
+
+    @Query("DELETE FROM remote_message WHERE status = \"SCHEDULED\"")
+    abstract fun deleteActiveMessages()
+
+    @Transaction
+    open fun newMessage(messageEntity: RemoteMessageEntity) {
+        deleteActiveMessages()
+        insert(messageEntity)
+    }
 }

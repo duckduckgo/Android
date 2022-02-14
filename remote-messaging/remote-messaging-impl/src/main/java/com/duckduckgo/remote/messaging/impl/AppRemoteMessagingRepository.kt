@@ -55,7 +55,7 @@ class AppRemoteMessagingRepository(
 
     override fun add(message: RemoteMessage) {
         val stringMessage = messageMapper.toString(message)
-        remoteMessagesDao.insert(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
+        remoteMessagesDao.newMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
     }
 
     override fun message(): RemoteMessage? {
