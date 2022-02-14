@@ -34,5 +34,6 @@ enum class Component {
     INFO_PANEL,
     DIALOG,
     BOTTOM_SHEET,
-    IMAGE
+    IMAGE,
+    SEARCH_BAR
 }

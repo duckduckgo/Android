@@ -235,4 +235,16 @@
         <item name="android:padding">@dimen/keyline_5</item>
     </style>
 
+    <style name="Widget.DuckDuckGo.SearchBarView">
+        <item name="android:background">@drawable/omnibar_field_background</item>
+        <item name="android:layout_margin">@dimen/keyline_2</item>
+        <item name="clearActionContentDescription">
+            @string/searchbar_cleartextaction_content_description_default
+        </item>
+        <item name="searchHint">@string/searchbar_searchhint_default</item>
+        <item name="upActionContentDescription">
+            @string/searhbar_upaction_content_description_default
+        </item>
+    </style>
+
 </resources>
