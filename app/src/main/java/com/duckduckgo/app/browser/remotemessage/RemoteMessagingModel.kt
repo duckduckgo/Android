@@ -38,7 +38,18 @@ class RemoteMessagingModel @Inject constructor(
     val activeMessages = remoteMessagingRepository.messageFlow()
 
     suspend fun onMessageShown(remoteMessage: RemoteMessage) {
-        pixel.fire(AppPixelName.REMOTE_MESSAGE_SHOWN, remoteMessage.asPixelParams())
+        withContext(dispatchers.io()) {
+            tryToFireUniquePixel(remoteMessage)
+            pixel.fire(AppPixelName.REMOTE_MESSAGE_SHOWN, remoteMessage.asPixelParams())
+        }
+    }
+
+    private fun tryToFireUniquePixel(remoteMessage: RemoteMessage) {
+        val didShow = remoteMessagingRepository.didShow(remoteMessage.id)
+        if (!didShow) {
+            pixel.fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, remoteMessage.asPixelParams())
+            remoteMessagingRepository.markAsShown(remoteMessage)
+        }
     }
 
     suspend fun onMessageDismissed(remoteMessage: RemoteMessage) {

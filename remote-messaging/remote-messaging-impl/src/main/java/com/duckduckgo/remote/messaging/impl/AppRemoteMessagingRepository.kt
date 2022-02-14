@@ -58,11 +58,11 @@ class AppRemoteMessagingRepository(
         remoteMessagesDao.newMessage(RemoteMessageEntity(id = message.id, message = stringMessage, status = SCHEDULED))
     }
 
-    override fun message(): RemoteMessage? {
-        val messageEntity = remoteMessagesDao.messages().firstOrNull() ?: return null
-        val message = messageMapper.fromMessage(messageEntity.message) ?: return null
+    override fun didShow(id: String) = remoteMessagesDao.messagesById(id)?.shown ?: false
 
-        return RemoteMessage(message.id, message.content, emptyList(), emptyList())
+    override fun markAsShown(remoteMessage: RemoteMessage) {
+        val message = remoteMessagesDao.messagesById(remoteMessage.id) ?: return
+        remoteMessagesDao.insert(message.copy(shown = true))
     }
 
     override fun messageFlow(): Flow<RemoteMessage?> {

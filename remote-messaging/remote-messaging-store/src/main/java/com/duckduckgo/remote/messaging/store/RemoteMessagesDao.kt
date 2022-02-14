@@ -30,8 +30,8 @@ abstract class RemoteMessagesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insert(messageEntity: RemoteMessageEntity)
 
-    @Query("select * from remote_message")
-    abstract fun messages(): List<RemoteMessageEntity>
+    @Query("select * from remote_message where id = :id")
+    abstract fun messagesById(id: String): RemoteMessageEntity?
 
     @Query("select * from remote_message where status = \"DISMISSED\"")
     abstract fun dismissedMessages(): List<RemoteMessageEntity>
