@@ -25,6 +25,7 @@ import com.duckduckgo.remote.messaging.api.Content.Medium
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Small
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity.Status
 import com.duckduckgo.remote.messaging.store.RemoteMessagingDatabase
 import junit.framework.Assert.assertEquals
@@ -234,5 +235,35 @@ class AppRemoteMessagingRepositoryTest {
 
         val dismissedMessages = testee.dismissedMessages()
         assertEquals("id", dismissedMessages.first())
+    }
+
+    @Test
+    fun whenNewMessageAddedThenPreviousNonDismissedMessagesRemoved() {
+        dao.insert(
+            RemoteMessageEntity(
+                id = "id",
+                message = "",
+                status = Status.SCHEDULED
+            )
+        )
+
+        testee.add(
+            RemoteMessage(
+                id = "id2",
+                content = BigTwoActions(
+                    titleText = "titleText",
+                    descriptionText = "descriptionText",
+                    placeholder = ANNOUNCE,
+                    primaryAction = Action.PlayStore(value = "com.duckduckgo.com"),
+                    primaryActionText = "actionText",
+                    secondaryActionText = "actionText",
+                    secondaryAction = Action.Dismiss()
+                ),
+                matchingRules = emptyList(),
+                exclusionRules = emptyList()
+            )
+        )
+
+        assertEquals("id2", testee.message()!!.id)
     }
 }
