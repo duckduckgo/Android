@@ -659,6 +659,17 @@ class SettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenOnMacOsSettingClickedThenEmitCommandLaunchMacOs() = runTest {
+        testee.commands().test {
+            testee.onMacOsSettingClicked()
+
+            assertEquals(Command.LaunchMacOs, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
     private fun givenSelectedFireAnimation(fireAnimation: FireAnimation) {
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(fireAnimation)
         whenever(mockAppSettingsDataStore.isCurrentlySelected(fireAnimation)).thenReturn(true)
