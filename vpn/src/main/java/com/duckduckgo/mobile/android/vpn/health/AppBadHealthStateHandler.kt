@@ -126,7 +126,7 @@ class AppBadHealthStateHandler @Inject constructor(
                         alerts = appHealthData.alerts,
                         healthDataJsonString = json,
                         restartedAtEpochSeconds = restartLocaltime
-                    )
+                    ).updateBadHealthEpochSeconds()
                 )
 
                 if (shouldRestartVpn) restartVpn(isCriticalBadHealth)
@@ -144,6 +144,26 @@ class AppBadHealthStateHandler @Inject constructor(
                 return@withContext false
             }
         }
+    }
+
+    private fun AppHealthState.updateBadHealthEpochSeconds(): AppHealthState {
+        // this case should not happen but just safeguard
+        if (this.type == GOOD_HEALTH) {
+            Timber.d("Provided GOOD_HEALTH state...noop")
+            return this
+        }
+
+        // no previous health state -> bad health happened just now
+        val latestHealthState = appHealthDatabase.appHealthDao().latestHealthState()
+            ?: this.copy(badHealthStartEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+
+        // Previous health state was GOOD, bad health happened just now
+        if (latestHealthState.type == GOOD_HEALTH) {
+            return this.copy(badHealthStartEpochSeconds = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+        }
+
+        // update the start epoch seconds
+        return this.copy(badHealthStartEpochSeconds = latestHealthState.badHealthStartEpochSeconds)
     }
 
     private fun resetBackoff() {
@@ -250,6 +270,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     MANUFACTURER_KEY to appBuildConfig.manufacturer,
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
+                    BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
                     RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
                 )
             )
@@ -259,6 +280,7 @@ class AppBadHealthStateHandler @Inject constructor(
                     MANUFACTURER_KEY to appBuildConfig.manufacturer,
                     MODEL_KEY to if (appBuildConfig.flavor.isInternal()) appBuildConfig.model else "redacted",
                     OS_KEY to appBuildConfig.sdkInt.toString(),
+                    BAD_HEALTH_DURATION_SECONDS to lastState.badHealthSustainDurationSeconds().toString(),
                     RESOLVED_BAD_HEALTH_DATA_KEY to encodedData,
                 )
             )
@@ -267,6 +289,11 @@ class AppBadHealthStateHandler @Inject constructor(
 
     private fun BuildFlavor.isInternal(): Boolean {
         return this == INTERNAL
+    }
+
+    private fun AppHealthState.badHealthSustainDurationSeconds(): Long {
+        val startSeconds = this.badHealthStartEpochSeconds ?: return -1
+        return LocalDateTime.now().toEpochSecond(ZoneOffset.UTC) - startSeconds
     }
 
     companion object {
@@ -282,5 +309,6 @@ class AppBadHealthStateHandler @Inject constructor(
         private const val RESTARTED_KEY = "restarted"
         private const val BAD_HEALTH_DATA_KEY = "badHealthData"
         private const val RESOLVED_BAD_HEALTH_DATA_KEY = "resolvedBadHealthData"
+        private const val BAD_HEALTH_DURATION_SECONDS = "badHealthDurationSeconds"
     }
 }
