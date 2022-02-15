@@ -18,40 +18,48 @@ package com.duckduckgo.app.privacy.ui
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ViewNetworkTrackerPillBinding
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.android.synthetic.main.view_network_tracker_pill.view.*
 
 class TrackerNetworkLeaderboardPillView : FrameLayout {
 
-    private val binding: ViewNetworkTrackerPillBinding by viewBinding()
-
     val renderer = TrackersRenderer()
 
-    constructor(context: Context) : super(context, null)
+    constructor(context: Context) : super(context, null) {
+        initLayout()
+    }
 
     constructor(
         context: Context,
         attrs: AttributeSet?
-    ) : super(context, attrs, 0)
+    ) : super(context, attrs, 0) {
+        initLayout()
+    }
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
         defStyleAttr: Int
-    ) : super(context, attrs, defStyleAttr)
+    ) : super(context, attrs, defStyleAttr) {
+        initLayout()
+    }
+
+    private fun initLayout() {
+        View.inflate(context, R.layout.view_network_tracker_pill, this)
+    }
 
     fun render(
         networkEntity: NetworkLeaderboardEntry?,
         totalSitesVisited: Int
     ) {
         networkEntity ?: return
-        binding.icon.setImageResource(renderer.networkPillIcon(context, networkEntity.networkName) ?: R.drawable.network_pill_generic)
+        icon.setImageResource(renderer.networkPillIcon(context, networkEntity.networkName) ?: R.drawable.network_pill_generic)
         val percentText = renderer.networkPercentage(networkEntity, totalSitesVisited)
-        binding.icon.contentDescription = "${networkEntity.networkName} $percentText"
-        binding.percentage.text = percentText
+        icon.contentDescription = "${networkEntity.networkName} $percentText"
+        percentage.text = percentText
     }
 }

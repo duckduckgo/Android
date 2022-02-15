@@ -17,14 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.breakage
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.ui.safeGetApplicationIcon
-import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldReportAppBreakageEntryBinding
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
+import kotlinx.android.synthetic.main.view_device_shield_report_app_breakage_entry.view.*
 
 class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageAppListViewHolder>() {
 
@@ -43,8 +44,8 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
         viewType: Int
     ): ReportBreakageAppListViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ViewDeviceShieldReportAppBreakageEntryBinding.inflate(inflater, parent, false)
-        return ReportBreakageAppListViewHolder(binding)
+        val view = inflater.inflate(R.layout.view_device_shield_report_app_breakage_entry, parent, false)
+        return ReportBreakageAppListViewHolder(view)
     }
 
     override fun onBindViewHolder(
@@ -97,17 +98,17 @@ class ReportBreakageAppListAdapter(private val listener: Listener) : RecyclerVie
     }
 }
 
-class ReportBreakageAppListViewHolder(private val binding: ViewDeviceShieldReportAppBreakageEntryBinding) : RecyclerView.ViewHolder(binding.root) {
+class ReportBreakageAppListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun bind(
         installedApp: InstalledApp,
         position: Int,
         listener: ReportBreakageAppListAdapter.Listener
     ) {
-        binding.deviceShieldInstalledAppEntryName.text =
+        itemView.deviceShieldInstalledAppEntryName.text =
             String.format(itemView.context.resources.getString(R.string.atp_ReportBreakageAppEntry), installedApp.name)
                 .applyBoldSpanTo(listOf(installedApp.name))
 
-        binding.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
+        itemView.deviceShieldInstalledAppSelector.quietlySetIsChecked(installedApp.isSelected) { _, _ ->
             listener.onInstalledAppSelected(installedApp, position)
         }
 
@@ -117,6 +118,6 @@ class ReportBreakageAppListViewHolder(private val binding: ViewDeviceShieldRepor
         }
 
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(installedApp.packageName)
-        binding.deviceShieldInstalledAppEntryIcon.setImageDrawable(appIcon)
+        itemView.deviceShieldInstalledAppEntryIcon.setImageDrawable(appIcon)
     }
 }
