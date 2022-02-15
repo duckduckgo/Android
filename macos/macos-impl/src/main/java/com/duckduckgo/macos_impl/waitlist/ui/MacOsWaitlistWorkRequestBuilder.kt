@@ -46,13 +46,13 @@ class RealMacOsWaitlistWorkRequestBuilder @Inject constructor() : MacOsWaitlistW
 
     override fun waitlistRequestWork(withBigDelay: Boolean): OneTimeWorkRequest {
         val requestBuilder = OneTimeWorkRequestBuilder<MacOsWaitlistWorker>()
-            // .setConstraints(networkAvailable())
+            .setConstraints(networkAvailable())
             .addTag(MACOS_WAITLIST_SYNC_WORK_TAG)
 
         if (withBigDelay) {
             requestBuilder.setInitialDelay(1, TimeUnit.DAYS)
         } else {
-            requestBuilder.setInitialDelay(10, TimeUnit.SECONDS)
+            requestBuilder.setInitialDelay(5, TimeUnit.MINUTES)
         }
 
         return requestBuilder.build()

@@ -35,7 +35,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -54,7 +53,7 @@ class MacOsWaitlistCodeFetcher @Inject constructor(
 
     override fun onStateChanged(source: LifecycleOwner, event: Event) {
         if (event == Event.ON_START) {
-            appCoroutineScope.launch {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 if (macOsWaitlistManager.getState() is MacOsWaitlistState.JoinedWaitlist) {
                     fetchInviteCode()
                 }
@@ -63,18 +62,16 @@ class MacOsWaitlistCodeFetcher @Inject constructor(
     }
 
     private suspend fun fetchInviteCode() {
-        withContext(dispatcherProvider.io()) {
-            when (macOsWaitlistManager.fetchInviteCode()) {
-                CodeExisted -> {
-                    workManager.cancelAllWorkByTag(MACOS_WAITLIST_SYNC_WORK_TAG)
-                }
-                Code -> {
-                    workManager.cancelAllWorkByTag(MACOS_WAITLIST_SYNC_WORK_TAG)
-                    notificationSender.sendNotification(notification)
-                }
-                NoCode -> {
-                    // NOOP
-                }
+        when (macOsWaitlistManager.fetchInviteCode()) {
+            CodeExisted -> {
+                workManager.cancelAllWorkByTag(MACOS_WAITLIST_SYNC_WORK_TAG)
+            }
+            Code -> {
+                workManager.cancelAllWorkByTag(MACOS_WAITLIST_SYNC_WORK_TAG)
+                notificationSender.sendNotification(notification)
+            }
+            NoCode -> {
+                // NOOP
             }
         }
     }

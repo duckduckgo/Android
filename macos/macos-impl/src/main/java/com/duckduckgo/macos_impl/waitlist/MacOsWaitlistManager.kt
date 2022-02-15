@@ -79,9 +79,7 @@ class RealMacOsWaitlistManager @Inject constructor(
 
     override fun getState(): MacOsWaitlistState = repository.getState()
 
-    override fun isNotificationEnabled(): Boolean {
-        return repository.isNotificationEnabled()
-    }
+    override fun isNotificationEnabled(): Boolean = repository.isNotificationEnabled()
 
     override fun getInviteCode(): String? = repository.getInviteCode()
 }
