@@ -67,9 +67,7 @@ class RealMacOsWaitlistRepository(
         return MacOsWaitlistState.NotJoinedQueue
     }
 
-    override fun isNotificationEnabled(): Boolean {
-        return dataStore.sendNotification
-    }
+    override fun isNotificationEnabled(): Boolean = dataStore.sendNotification
 
     private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
 

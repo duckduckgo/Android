@@ -34,7 +34,7 @@ class MacOsWaitlistDataStoreSharedPreferences constructor(private val context: C
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override var waitlistTimestamp: Int
-        get() = preferences.getInt(KEY_WAITLIST_TIMESTAMP, -1) ?: -1
+        get() = preferences.getInt(KEY_WAITLIST_TIMESTAMP, -1)
         set(value) {
             preferences.edit(commit = true) {
                 putInt(KEY_WAITLIST_TIMESTAMP, value)
