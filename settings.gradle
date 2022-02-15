@@ -30,7 +30,6 @@ include ':anrs-api'
 include ':anrs-impl'
 include ':anrs-store'
 
-include ':macos-api'
 include ':macos-impl'
 include ':macos-store'
 
@@ -49,7 +48,6 @@ project(':anrs-api').projectDir = new File('anrs/anrs-api')
 project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
 project(':anrs-store').projectDir = new File('anrs/anrs-store')
 
-project(':macos-api').projectDir = new File('macos/macos-api')
 project(':macos-impl').projectDir = new File('macos/macos-impl')
 project(':macos-store').projectDir = new File('macos/macos-store')
 

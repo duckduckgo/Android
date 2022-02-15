@@ -23,8 +23,6 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-
-    implementation project(path: ':macos-api')
     implementation project(path: ':common')
 
     implementation Kotlin.stdlib.jdk7

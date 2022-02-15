@@ -26,7 +26,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
-    implementation project(path: ':macos-api')
     implementation project(path: ':common-ui')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
