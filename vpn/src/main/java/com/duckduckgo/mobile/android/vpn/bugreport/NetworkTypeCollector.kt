@@ -129,18 +129,12 @@ class NetworkTypeCollector @Inject constructor(
                 val lastSwitchTimestampMillis = if (didSwitch) {
                     SystemClock.elapsedRealtime()
                 } else {
-                    previousNetworkInfo?.lastSwitchTimestampMillis ?: UNKNOWN
+                    previousNetworkInfo?.lastSwitchTimestampMillis ?: SystemClock.elapsedRealtime()
                 }
 
                 // Calculate how long ago the network type last switched
                 val previousNetwork: String? = previousNetworkInfo?.currentNetwork
-                val secondsSinceLastSwitch = if (didSwitch) {
-                    0
-                } else {
-                    previousNetworkInfo?.let {
-                        TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - it.lastSwitchTimestampMillis)
-                    } ?: SystemClock.elapsedRealtime()
-                }
+                val secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - lastSwitchTimestampMillis)
                 val jsonInfo =
                     adapter.toJson(
                         NetworkInfo(
@@ -158,7 +152,17 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
+    private fun updateSecondsSinceLastSwitch() {
+        val networkInfo: NetworkInfo = currentNetworkInfo?.let { adapter.fromJson(it) } ?: return
+        networkInfo.copy(
+            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis)
+        ).run {
+            currentNetworkInfo = adapter.toJson(this)
+        }
+    }
+
     private fun getNetworkInfoJsonObject(): JSONObject {
+        updateSecondsSinceLastSwitch()
         val info = currentNetworkInfo ?: return JSONObject()
 
         return JSONObject(info)
