@@ -95,6 +95,10 @@ class SpecialUrlDetectorImpl(
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     private fun processUrl(uriString: String): UrlType {
+        trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
+            return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)
@@ -111,10 +115,6 @@ class SpecialUrlDetectorImpl(
             } catch (e: URISyntaxException) {
                 Timber.w(e, "Failed to parse uri $uriString")
             }
-        }
-
-        trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
-            return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
         trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { trackingLinkType ->
