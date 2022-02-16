@@ -33,7 +33,7 @@ class DeviceShieldFAQActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_device_shield_faq)
-        setupToolbar(findViewById(R.id.default_toolbar))
+        setupToolbar(findViewById(com.duckduckgo.mobile.android.R.id.defaultToolbar))
 
         deviceShieldPixels.privacyReportOnboardingFAQDisplayed()
     }
