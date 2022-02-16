@@ -16,7 +16,11 @@
 
 package com.duckduckgo.vpn.internal.feature.transparency
 
+import android.os.Build
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList.Companion
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -27,7 +31,7 @@ import dagger.SingleInstanceIn
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
+class TransparencyTrackerDetectorInterceptor @Inject constructor(val appbuildConfig: AppBuildConfig) : VpnTrackerDetectorInterceptor {
 
     private val enable = AtomicBoolean(false)
 
@@ -37,12 +41,23 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerD
         hostname: String,
         packageId: String
     ): RequestTrackerType? {
-        return if (enable.get()) {
-            Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
-            RequestTrackerType.NotTracker(hostname)
-        } else {
-            Timber.v("Transparency mode: Not intercepting for $packageId / $hostname")
-            null
+       return when {
+            inTransparencyModeForAndroid12(packageId) -> {
+                Timber.v("Transparency mode for Android 12 and DDG: Not Tracker returned for $packageId / $hostname")
+                RequestTrackerType.NotTracker(hostname)
+            }
+            enable.get() -> {
+                Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
+                RequestTrackerType.NotTracker(hostname)
+            }
+            else -> {
+                Timber.v("Transparency mode: Not intercepting for $packageId / $hostname")
+                null
+            }
         }
+    }
+
+    private fun inTransparencyModeForAndroid12(packageId: String): Boolean {
+        return appbuildConfig.sdkInt > Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(packageId)
     }
 }

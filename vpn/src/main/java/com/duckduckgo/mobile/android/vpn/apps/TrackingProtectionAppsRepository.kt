@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
@@ -94,12 +95,13 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     override suspend fun getExclusionAppsList(): List<String> = withContext(dispatcherProvider.io()) {
         val exclusionList = appTrackerRepository.getAppExclusionList()
         val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
-        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        val exclusionAppsList = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .filter { shouldBeExcluded(it, exclusionList, manualExclusionList) }
             .sortedBy { it.name }
             .map { it.packageName }
             .toList()
+        return@withContext exclusionAppsList
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
@@ -119,9 +121,14 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            isSystemAppAndNotOverriden(appInfo) ||
-            isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            return isSystemAppAndNotOverriden(appInfo) ||
+                isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
+        } else {
+            return VpnExclusionList.isDdgApp(appInfo.packageName) ||
+                isSystemAppAndNotOverriden(appInfo) ||
+                isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
+        }
     }
 
     private fun isManuallyExcluded(
