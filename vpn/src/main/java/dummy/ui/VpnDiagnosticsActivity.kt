@@ -36,6 +36,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
+import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnDiagnosticsBinding
@@ -56,8 +57,8 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.UserHealthSubmission
-import com.duckduckgo.mobile.android.vpn.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -184,14 +185,18 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         binding.stopVpnButton.setOnClickListener { TrackerBlockingVpnService.stopService(this) }
 
         binding.simulateGoodHealth.setOnClickListener {
-            appTPHealthMonitor.simulateHealthState(true)
+            appTPHealthMonitor.simulateGoodHealthState()
         }
 
         binding.simulateBadHealth.setOnClickListener {
-            appTPHealthMonitor.simulateHealthState(false)
+            appTPHealthMonitor.simulateBadHealthState()
         }
 
-        binding.noSimulation.setOnClickListener { appTPHealthMonitor.simulateHealthState(null) }
+        binding.simulateCriticalBadHealth.setOnClickListener {
+            appTPHealthMonitor.simulateCriticalHealthState()
+        }
+
+        binding.noSimulation.setOnClickListener { appTPHealthMonitor.stopHealthSimulation() }
 
         binding.sendBadHealthReportButton.setOnClickListener {
             userHealthReportActivityResult.launch(
@@ -294,6 +299,13 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
         healthMetricsStrings.add(
             String.format(
+                "\n\nTun write memory exceptions: %d",
+                healthMetricsInfo.tunWriteIOMemoryExceptions,
+            ),
+        )
+
+        healthMetricsStrings.add(
+            String.format(
                 "\n\nBuffer allocations: %d",
                 healthMetricsInfo.bufferAllocations,
             ),
@@ -340,6 +352,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         val socketConnectExceptions =
             healthMetricCounter.getStat(SOCKET_CHANNEL_CONNECT_EXCEPTION(), timeWindow)
         val tunWriteIOExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_EXCEPTION(), timeWindow)
+        val tunWriteIOMemoryExceptions = healthMetricCounter.getStat(TUN_WRITE_IO_MEMORY_EXCEPTION(), timeWindow)
         val bufferAllocations = ByteBufferPool.allocations.get()
 
         return HealthMetricsInfo(
@@ -355,6 +368,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
             socketWriteExceptions = socketWriteExceptions,
             socketConnectException = socketConnectExceptions,
             tunWriteIOExceptions = tunWriteIOExceptions,
+            tunWriteIOMemoryExceptions = tunWriteIOMemoryExceptions,
             bufferAllocations = bufferAllocations
         )
     }
@@ -639,6 +653,7 @@ data class HealthMetricsInfo(
     val socketWriteExceptions: Long,
     val socketConnectException: Long,
     val tunWriteIOExceptions: Long,
+    val tunWriteIOMemoryExceptions: Long,
     val bufferAllocations: Long,
 )
 

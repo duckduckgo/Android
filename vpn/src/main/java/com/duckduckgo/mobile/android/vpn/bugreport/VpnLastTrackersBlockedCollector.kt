@@ -17,10 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.bugreport
 
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastDay
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi

@@ -32,6 +32,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -113,6 +114,12 @@ class HealthMetricCounter @Inject constructor(
     fun onTunWriteIOException() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(TUN_WRITE_IO_EXCEPTION())
+        }
+    }
+
+    fun onTunWriteIOExceptionNoBufferSpace() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_WRITE_IO_MEMORY_EXCEPTION())
         }
     }
 

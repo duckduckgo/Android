@@ -41,9 +41,15 @@ data class RawMetricsSubmission(
     val informational: Boolean = false,
 )
 
+/**
+ * [value] metric value
+ * [isBadState] `true` if currently in bad health, `false` or `null` otherwise
+ * [isCritical] if metric in [isBadState] the state of the VPN would be critical
+ */
 data class Metric(
     val value: String,
-    val isBadState: Boolean? = null
+    val isBadState: Boolean? = null,
+    val isCritical: Boolean = false,
 ) {
 
     override fun toString(): String {

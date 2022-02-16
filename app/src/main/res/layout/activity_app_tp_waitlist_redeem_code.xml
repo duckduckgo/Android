@@ -87,7 +87,7 @@
 
     <Button
         android:id="@+id/redeemButton"
-        style="@style/DeviceShield.Button.Blue.Lowercase"
+        style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"

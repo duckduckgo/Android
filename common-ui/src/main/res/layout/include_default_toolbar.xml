@@ -2,7 +2,7 @@
 
 
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -17,20 +17,22 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.appbar.AppBarLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/AppTheme.Dark.AppBarOverlay">
+    android:id="@+id/appBarLayout"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/default_toolbar"
+        android:id="@+id/defaultToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
-        android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/AppTheme.Dark.PopupOverlay" />
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu"/>
 
 </com.google.android.material.appbar.AppBarLayout>
 

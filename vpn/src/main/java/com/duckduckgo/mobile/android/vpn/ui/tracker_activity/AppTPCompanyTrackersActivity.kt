@@ -109,7 +109,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun launchFeedback() {
-        reportBreakage.launch(ReportBreakageScreen.LoginInformation(getAppName(), getPackage()))
+        reportBreakage.launch(ReportBreakageScreen.IssueDescriptionForm(getAppName(), getPackage()))
     }
 
     override fun onBackPressed() {

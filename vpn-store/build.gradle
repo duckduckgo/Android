@@ -37,6 +37,8 @@ android {
 
 dependencies {
 
+    implementation project(path: ':common')
+
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
 

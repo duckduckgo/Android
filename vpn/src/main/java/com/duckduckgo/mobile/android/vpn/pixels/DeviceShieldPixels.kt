@@ -307,6 +307,11 @@ interface DeviceShieldPixels {
      * Will fire when the VPN restarted as a result of a bad health mitigation
      */
     fun didRestartVpnOnBadHealth()
+
+    /**
+     * Will fire when the VPN Process is restarted as a result of bad health mitigation
+     */
+    fun didRestartVpnProcessOnBadHealth()
 }
 
 @ContributesBinding(AppScope::class)
@@ -621,6 +626,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didRestartVpnOnBadHealth() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_ON_BAD_HEALTH)
+    }
+
+    override fun didRestartVpnProcessOnBadHealth() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
     }
 
     private fun suddenKill() {

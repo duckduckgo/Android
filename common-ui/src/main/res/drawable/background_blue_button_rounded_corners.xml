@@ -20,7 +20,7 @@
         <selector>
             <item android:state_enabled="true">
                 <shape android:shape="rectangle">
-                    <solid android:color="@color/blue50" />
+                    <solid android:color="@color/cornflowerBlue" />
                     <corners android:radius="8dp"/>
                 </shape>
             </item>

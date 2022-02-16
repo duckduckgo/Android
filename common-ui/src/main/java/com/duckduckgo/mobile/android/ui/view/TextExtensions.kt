@@ -28,6 +28,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 
 fun TextView.addClickableLink(
     annotation: String,
@@ -74,7 +75,7 @@ fun TextView.addClickableLink(
 
 fun TextView.addClickableSpan(
     textSequence: CharSequence,
-    spans: List<Pair<String, ClickableSpan>>
+    spans: List<Pair<String, DuckDuckGoClickableSpan>>
 ) {
     val fullText = textSequence as SpannedString
     val spannableString = SpannableString(fullText)
@@ -85,12 +86,6 @@ fun TextView.addClickableSpan(
             spannableString.apply {
                 setSpan(
                     span.second,
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                setSpan(
-                    UnderlineSpan(),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
