@@ -20,5 +20,6 @@ interface SchedulableNotificationPlugin {
     fun getSchedulableNotification(): SchedulableNotification
     fun onNotificationLaunched()
     fun onNotificationCancelled()
+    fun onNotificationShown()
     fun getSpecification(): NotificationSpec
 }

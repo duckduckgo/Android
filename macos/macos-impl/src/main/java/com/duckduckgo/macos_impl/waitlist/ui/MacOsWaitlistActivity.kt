@@ -16,11 +16,15 @@
 
 package com.duckduckgo.macos_impl.waitlist.ui
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -164,18 +168,31 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
                 onNotifyClicked = { viewModel.onNotifyMeClicked() }
                 onNoThanksClicked = { viewModel.onNoThanksClicked() }
                 onDialogDismissed = { viewModel.onDialogDismissed() }
+                onDialogCreated = { viewModel.onDialogCreated() }
             }
             dialog.show(it, NOTIFICATION_DIALOG_TAG)
         }
     }
 
+    @SuppressLint("UnspecifiedImmutableFlag")
     private fun launchSharePageChooser(inviteCode: String) {
-        val intent = Intent(Intent.ACTION_SEND).also {
-            it.type = "text/plain"
-            it.putExtra(Intent.EXTRA_TEXT, getInviteText(inviteCode))
+        val share = Intent(Intent.ACTION_SEND).apply {
+            type = "text/html"
+            putExtra(Intent.EXTRA_TEXT, getInviteText(inviteCode))
+            putExtra(Intent.EXTRA_TITLE, getString(R.string.macos_waitlist_share_invite))
         }
+
+        val pi = PendingIntent.getBroadcast(
+            this, 0,
+            Intent(this, MacOsInviteShareBroadcastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
         try {
-            startActivity(Intent.createChooser(intent, null))
+            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
+                startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite), pi.intentSender))
+            } else {
+                startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite)))
+            }
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }

@@ -25,7 +25,11 @@ import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationSpec
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_NOTIFICATION_CANCELLED
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_NOTIFICATION_LAUNCHED
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_NOTIFICATION_SHOWN
 import com.duckduckgo.macos_impl.R
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.squareup.anvil.annotations.ContributesBinding
@@ -83,7 +87,8 @@ class MacOsWaitlistCodeSpecification(context: Context) : NotificationSpec {
 class MacOsWaitlistNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: SchedulableNotification,
-    private val taskStackBuilderFactory: TaskStackBuilderFactory
+    private val taskStackBuilderFactory: TaskStackBuilderFactory,
+    private val pixel: Pixel
 ) : SchedulableNotificationPlugin {
 
     override fun getSchedulableNotification(): SchedulableNotification {
@@ -95,11 +100,15 @@ class MacOsWaitlistNotificationPlugin @Inject constructor(
     }
 
     override fun onNotificationCancelled() {
-        // NOOP
+        pixel.fire(MACOS_WAITLIST_NOTIFICATION_CANCELLED)
+    }
+
+    override fun onNotificationShown() {
+        pixel.fire(MACOS_WAITLIST_NOTIFICATION_SHOWN)
     }
 
     override fun onNotificationLaunched() {
-        Timber.i("MacOs waitlist code received launched!")
+        pixel.fire(MACOS_WAITLIST_NOTIFICATION_LAUNCHED)
         val intent = MacOsWaitlistActivity.intent(context)
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)

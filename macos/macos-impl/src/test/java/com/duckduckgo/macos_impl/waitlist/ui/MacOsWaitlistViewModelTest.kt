@@ -28,6 +28,10 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_DISMISS
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_NOTIFY_ME
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_SHOWN
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsInviteCodeResponse
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistResponse
@@ -160,6 +164,33 @@ class MacOsWaitlistViewModelTest {
     }
 
     @Test
+    fun whenOnNotifyMeClickedThenPixelFired() = runTest {
+        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
+
+        testee.onNotifyMeClicked()
+
+        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_NOTIFY_ME)
+    }
+
+    @Test
+    fun whenOnNoThanksClickedThenPixelFired() = runTest {
+        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
+
+        testee.onNoThanksClicked()
+
+        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_DISMISS)
+    }
+
+    @Test
+    fun whenOnDialogCreatedAThenPixelFired() = runTest {
+        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
+
+        testee.onDialogCreated()
+
+        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_SHOWN)
+    }
+
+    @Test
     fun whenOnDialogDismissedThenEmitWaitlistState() = runTest {
         givenJoinWaitlistSuccessful()
 
@@ -190,6 +221,15 @@ class MacOsWaitlistViewModelTest {
             testee.onShareClicked()
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun whenOnShareClickedAThenPixelFired() = runTest {
+        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
+
+        testee.onShareClicked()
+
+        verify(mockPixel).fire(MACOS_WAITLIST_SHARE_PRESSED)
     }
 
     @Test

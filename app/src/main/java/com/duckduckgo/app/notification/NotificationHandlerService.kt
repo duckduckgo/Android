@@ -90,11 +90,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
                 schedulableNotificationPluginPoint.getPlugins().forEach {
                     when (intent.type) {
                         it.getSchedulableNotification().launchIntent -> {
-                            onLaunched(it.getSpecification().pixelSuffix)
                             it.onNotificationLaunched()
                         }
                         it.getSchedulableNotification().cancelIntent -> {
-                            onCancelled(it.getSpecification().pixelSuffix)
                             it.onNotificationCancelled()
                         }
                     }

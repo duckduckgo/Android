@@ -40,6 +40,8 @@
 
     <string name="macos_waitlist_clipboard_invite_copied">Invite copied to clipboard</string>
     <string name="macos_waitlist_clipboard_code_copied">Code copied to clipboard</string>
+
+    <string name="macos_waitlist_share_invite">Share your invite</string>
     <!-- Settings -->
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
     <string name="macos_settings_description">Browse privately with our app for Mac</string>

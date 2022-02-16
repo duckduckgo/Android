@@ -22,5 +22,6 @@
         android:name=".waitlist.ui.MacOsWaitlistActivity"
         android:label="@string/macos_settings_title"
         android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <receiver android:name=".waitlist.ui.MacOsInviteShareBroadcastReceiver" />
     </application>
 </manifest>

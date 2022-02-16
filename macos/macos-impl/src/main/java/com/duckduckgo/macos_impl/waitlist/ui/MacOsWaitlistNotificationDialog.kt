@@ -28,6 +28,7 @@ class MacOsWaitlistNotificationDialog : DialogFragment() {
     var onNotifyClicked: (() -> Unit) = {}
     var onNoThanksClicked: (() -> Unit) = {}
     var onDialogDismissed: (() -> Unit) = {}
+    var onDialogCreated: (() -> Unit) = {}
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertBuilder = AlertDialog.Builder(requireActivity())
@@ -40,6 +41,7 @@ class MacOsWaitlistNotificationDialog : DialogFragment() {
                 onNotifyClicked()
             }
 
+        onDialogCreated()
         return alertBuilder.create()
     }
 

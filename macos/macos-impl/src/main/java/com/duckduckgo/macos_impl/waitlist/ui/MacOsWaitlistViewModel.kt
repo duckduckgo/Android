@@ -22,6 +22,10 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_DISMISS
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_NOTIFY_ME
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_SHOWN
+import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistService
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
@@ -96,6 +100,7 @@ class MacOsWaitlistViewModel(
         waitlistManager.getInviteCode()?.let {
             viewModelScope.launch {
                 commandChannel.send(ShareInviteCode(it))
+                pixel.fire(MACOS_WAITLIST_SHARE_PRESSED)
             }
         }
     }
@@ -103,13 +108,16 @@ class MacOsWaitlistViewModel(
     fun onNotifyMeClicked() {
         viewModelScope.launch {
             waitlistManager.notifyOnJoinedWaitlist()
+            pixel.fire(MACOS_WAITLIST_DIALOG_NOTIFY_ME)
         }
     }
 
     fun onNoThanksClicked() {
-        viewModelScope.launch {
+        pixel.fire(MACOS_WAITLIST_DIALOG_DISMISS)
+    }
 
-        }
+    fun onDialogCreated() {
+        pixel.fire(MACOS_WAITLIST_DIALOG_SHOWN)
     }
 
     fun onDialogDismissed() {

@@ -18,9 +18,11 @@ package com.duckduckgo.app.notification
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.Notification
 import com.duckduckgo.app.notification.model.SchedulableNotification
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import timber.log.Timber
@@ -30,7 +32,8 @@ class AppNotificationSender(
     private val pixel: Pixel,
     private val manager: NotificationManagerCompat,
     private val factory: NotificationFactory,
-    private val notificationDao: NotificationDao
+    private val notificationDao: NotificationDao,
+    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>
 ) : NotificationSender {
 
     override suspend fun sendNotification(notification: SchedulableNotification) {
@@ -45,6 +48,15 @@ class AppNotificationSender(
         val systemNotification = factory.createNotification(specification, launchIntent, cancelIntent)
         notificationDao.insert(Notification(notification.id))
         manager.notify(specification.systemId, systemNotification)
-        pixel.fire("${AppPixelName.NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+
+        val plugin = schedulableNotificationPluginPoint.getPlugins().firstOrNull {
+            notification.javaClass == it.getSchedulableNotification().javaClass
+        }
+
+        if (plugin != null) {
+            plugin.onNotificationShown()
+        } else {
+            pixel.fire("${AppPixelName.NOTIFICATION_SHOWN.pixelName}_${specification.pixelSuffix}")
+        }
     }
 }
