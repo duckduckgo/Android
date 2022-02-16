@@ -18,15 +18,14 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldPastWeekActivityContentBinding
+import kotlinx.android.synthetic.main.view_device_shield_past_week_activity_content.view.*
 
 class PastWeekTrackerActivityContentView : FrameLayout {
-
-    private val binding: ViewDeviceShieldPastWeekActivityContentBinding by viewBinding()
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -39,6 +38,7 @@ class PastWeekTrackerActivityContentView : FrameLayout {
         attrs: AttributeSet?,
         defStyle: Int
     ) : super(context, attrs, defStyle) {
+
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.PastWeekTrackerActivityContentView)
         text = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_android_text) ?: ""
         count = attributes.getString(R.styleable.PastWeekTrackerActivityContentView_count) ?: ""
@@ -46,32 +46,36 @@ class PastWeekTrackerActivityContentView : FrameLayout {
         attributes.recycle()
     }
 
+    private val root: View by lazy {
+        LayoutInflater.from(context).inflate(R.layout.view_device_shield_past_week_activity_content, this, true)
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        binding.root.isVisible = true
+        root.isVisible = true
     }
 
     var count: String
         get() {
-            return binding.contentText.text.toString()
+            return root.content_text.text.toString()
         }
         set(value) {
-            binding.contentText.text = value
+            root.content_text.text = value
         }
 
     var text: String
         get() {
-            return binding.contentTitle.text.toString()
+            return root.content_title.text.toString()
         }
         set(value) {
-            binding.contentTitle.text = value
+            root.content_title.text = value
         }
 
     var footer: String
         get() {
-            return binding.contentFooter.text.toString()
+            return root.content_footer.text.toString()
         }
         set(value) {
-            binding.contentFooter.text = value
+            root.content_footer.text = value
         }
 }
