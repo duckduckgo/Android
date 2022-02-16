@@ -27,6 +27,8 @@ import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.Unprotec
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import timber.log.Timber
+import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -54,20 +56,26 @@ class RealTrackingParameters @Inject constructor(
         val trackingParameters = trackingParametersRepository.parameters
 
         val uri = Uri.parse(url)
-        val queryParameters = uri.queryParameterNames
 
-        if (queryParameters.isEmpty()) {
+        try {
+            val queryParameters = uri.queryParameterNames
+
+            if (queryParameters.isEmpty()) {
+                return null
+            }
+            val preservedParameters = getPreservedParameters(queryParameters, trackingParameters)
+            if (preservedParameters.size == queryParameters.size) {
+                return null
+            }
+            val cleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
+
+            lastCleanedUrl = cleanedUrl
+
+            return cleanedUrl
+        } catch (exception: UnsupportedOperationException) {
+            Timber.e("Tracking Parameter Removal: ${exception.message}")
             return null
         }
-        val preservedParameters = getPreservedParameters(queryParameters, trackingParameters)
-        if (preservedParameters.size == queryParameters.size) {
-            return null
-        }
-        val cleanedUrl = uri.replaceQueryParameters(preservedParameters).toString()
-
-        lastCleanedUrl = cleanedUrl
-
-        return cleanedUrl
     }
 
     private fun getPreservedParameters(
