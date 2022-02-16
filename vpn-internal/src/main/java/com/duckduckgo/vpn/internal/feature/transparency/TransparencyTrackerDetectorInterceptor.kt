@@ -20,7 +20,6 @@ import android.os.Build
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList.Companion
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -41,7 +40,7 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor(val appbuildCon
         hostname: String,
         packageId: String
     ): RequestTrackerType? {
-       return when {
+        return when {
             inTransparencyModeForAndroid12(packageId) -> {
                 Timber.v("Transparency mode for Android 12 and DDG: Not Tracker returned for $packageId / $hostname")
                 RequestTrackerType.NotTracker(hostname)

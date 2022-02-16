@@ -16,12 +16,8 @@
 
 package com.duckduckgo.vpn.internal.feature.transparency
 
-import android.os.Build
-import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
-import kotlinx.coroutines.test.TestScope
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -42,35 +38,34 @@ class TransparencyTrackerDetectorInterceptorTest {
     }
 
     @Test
-    fun returnsNotTrackerWhenTransparencyEnabled(){
+    fun returnsNotTrackerWhenTransparencyEnabled() {
         testee.setEnable(true)
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, SOME_PACKAGE_ID)
-        assertEquals(trackerType,  RequestTrackerType.NotTracker(HOSTNAME))
+        assertEquals(trackerType, RequestTrackerType.NotTracker(HOSTNAME))
     }
 
     @Test
-    fun returnsNullWhenTransparencyDisabled(){
+    fun returnsNullWhenTransparencyDisabled() {
         testee.setEnable(false)
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, SOME_PACKAGE_ID)
         assertNull(trackerType)
     }
 
     @Test
-    fun returnNotTrackersNullWhenDDGAppAndAndroid12(){
+    fun returnNotTrackersNullWhenDDGAppAndAndroid12() {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(32)
 
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
-        assertEquals(trackerType,  RequestTrackerType.NotTracker(HOSTNAME))
+        assertEquals(trackerType, RequestTrackerType.NotTracker(HOSTNAME))
     }
 
     @Test
-    fun returnNullWhenDDGAppAndAndroid11(){
+    fun returnNullWhenDDGAppAndAndroid11() {
         whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
 
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
         assertNull(trackerType)
     }
-
 
     companion object {
         private const val HOSTNAME = "hostname"
