@@ -50,11 +50,6 @@ class MacOsWaitlistNotificationPluginTest {
     }
 
     @Test
-    fun whenGetSpecificationThenReturnSpecification() {
-        assertTrue(testee.getSpecification() is MacOsWaitlistCodeSpecification)
-    }
-
-    @Test
     fun whenOnNotificationCancelledThenPixelFired() {
         testee.onNotificationCancelled()
         verify(mockPixel).fire(MACOS_WAITLIST_NOTIFICATION_CANCELLED)

@@ -20,6 +20,7 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -34,7 +35,6 @@ import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -158,7 +158,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     }
 
     private fun setClickableSpan(
-        view: MaterialTextView,
+        view: TextView,
         stringId: Int,
         span: List<DuckDuckGoClickableSpan>
     ) {

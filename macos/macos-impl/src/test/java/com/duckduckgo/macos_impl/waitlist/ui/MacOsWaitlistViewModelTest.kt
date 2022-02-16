@@ -225,7 +225,7 @@ class MacOsWaitlistViewModelTest {
 
     @Test
     fun whenOnShareClickedAThenPixelFired() = runTest {
-        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
+        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn("inviteCode")
 
         testee.onShareClicked()
 
