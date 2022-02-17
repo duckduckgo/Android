@@ -17,8 +17,11 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.replaceQueryParameters
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -26,23 +29,24 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import timber.log.Timber
 import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealTrackingParameters @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val featureToggle: FeatureToggle,
-    private val unprotectedTemporary: UnprotectedTemporary
+    private val unprotectedTemporary: UnprotectedTemporary,
+    val userWhiteListRepository: UserWhiteListRepository
 ) : TrackingParameters {
 
     override var lastCleanedUrl: String? = null
 
     override fun isAnException(url: String): Boolean {
-        return matches(url) || unprotectedTemporary.isAnException(url)
+        return matches(url) ||
+            unprotectedTemporary.isAnException(url) ||
+            userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
     }
 
     private fun matches(url: String): Boolean {
