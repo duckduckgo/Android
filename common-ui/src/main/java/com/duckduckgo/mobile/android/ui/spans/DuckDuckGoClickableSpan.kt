@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.view
+package com.duckduckgo.mobile.android.ui.spans
 
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 
-abstract class NonUnderlinedClickableSpan : ClickableSpan() {
+abstract class DuckDuckGoClickableSpan(val isUnderline: Boolean = false) : ClickableSpan() {
     override fun updateDrawState(ds: TextPaint) {
         super.updateDrawState(ds)
-        ds.isUnderlineText = false
+        ds.isUnderlineText = isUnderline
     }
 }

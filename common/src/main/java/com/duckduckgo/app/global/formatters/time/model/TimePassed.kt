@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.model
+package com.duckduckgo.app.global.formatters.time.model
 
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import org.threeten.bp.LocalDateTime
 
 fun dateOfPreviousMidnight(): String {

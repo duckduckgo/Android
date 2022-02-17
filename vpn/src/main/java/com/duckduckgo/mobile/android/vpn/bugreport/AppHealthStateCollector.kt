@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.squareup.anvil.annotations.ContributesMultibinding
 import org.json.JSONObject
 import timber.log.Timber

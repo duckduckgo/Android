@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar
+package com.duckduckgo.mobile.android.ui.view
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -27,7 +27,6 @@ import android.util.AttributeSet
 import android.util.Patterns
 import android.view.KeyEvent
 import androidx.appcompat.widget.AppCompatEditText
-import com.duckduckgo.mobile.android.ui.view.showKeyboard
 
 /**
  * Variant of EditText which detects when the user has dismissed the soft keyboard

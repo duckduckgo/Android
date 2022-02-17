@@ -109,6 +109,7 @@ class TcpDeviceToNetwork(
 
         if (tcb == null) {
             processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
+            ByteBufferPool.release(payloadBuffer)
         } else {
             processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
         }
@@ -182,6 +183,7 @@ class TcpDeviceToNetwork(
         val action =
             TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
+        Timber.v("payloadBuffer size: %s", payloadBuffer)
 
         action.events.forEach {
             when (it) {
@@ -189,12 +191,12 @@ class TcpDeviceToNetwork(
                 ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
                 SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
                 SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
-                CloseConnection -> closeConnection(tcb, responseBuffer)
+                CloseConnection -> closeConnection(tcb, responseBuffer, payloadBuffer)
                 SendReset -> tcbCloser.sendResetPacket(tcb, queues, packet, packet.tcpPayloadSize(true))
                 DelayedCloseConnection -> {
                     vpnCoroutineScope.launch {
                         delay(3_000)
-                        closeConnection(tcb, responseBuffer)
+                        closeConnection(tcb, responseBuffer, payloadBuffer)
                     }
                 }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -206,10 +208,12 @@ class TcpDeviceToNetwork(
 
     private fun closeConnection(
         tcb: TCB,
-        responseBuffer: ByteBuffer
+        responseBuffer: ByteBuffer,
+        payloadBuffer: ByteBuffer,
     ) {
         tcbCloser.closeConnection(tcb)
         ByteBufferPool.release(responseBuffer)
+        ByteBufferPool.release(payloadBuffer)
     }
 
     private fun openConnection(params: TcpConnectionParams) {
@@ -264,6 +268,7 @@ class TcpDeviceToNetwork(
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) {
                 Timber.v(" %s Payload Size is 0. There's nothing to Process", tcb.ipAndPort)
+                ByteBufferPool.release(payloadBuffer)
                 return
             }
 
@@ -291,6 +296,7 @@ class TcpDeviceToNetwork(
                     packet,
                     payloadSize
                 )
+                ByteBufferPool.release(payloadBuffer)
                 return
             }
 
@@ -317,6 +323,7 @@ class TcpDeviceToNetwork(
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
+                ByteBufferPool.release(payloadBuffer)
                 Timber.w(e, "Network write error for %s. Wrote %d; %d unwritten", tcb.ipAndPort, bytesWritten, bytesUnwritten)
                 tcbCloser.sendResetPacket(tcb, queues, packet, bytesWritten)
                 return
