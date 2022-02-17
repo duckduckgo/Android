@@ -28,8 +28,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.flowWithLifecycle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
-import com.duckduckgo.app.global.view.NonUnderlinedClickableSpan
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -40,7 +40,7 @@ class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragme
 
     private val binding: FragmentEmailProtectionSignOutBinding by viewBinding()
 
-    private val contactUsSpan = object : NonUnderlinedClickableSpan() {
+    private val contactUsSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
             val intent = Intent(Intent.ACTION_SENDTO)
             intent.data = Uri.parse("mailto:support@duck.com")

@@ -25,6 +25,10 @@ internal fun RawMetricsSubmission.isInBadHealth(): Boolean {
     return metrics.count { it.value.isBadState == true } > 0
 }
 
+internal fun RawMetricsSubmission.containsCriticalMetric(): Boolean {
+    return metrics.any { it.value.isCritical }
+}
+
 internal fun RawMetricsSubmission.badHealthReasons(): List<String> {
     val badHealthReasons = mutableListOf<String>()
     metrics

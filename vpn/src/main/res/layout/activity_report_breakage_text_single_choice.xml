@@ -88,7 +88,7 @@
 
     <Button
         android:id="@+id/ctaNextFormSubmit"
-        style="@style/DeviceShield.Button.Blue"
+        style="@style/Widget.DuckDuckGo.Button.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"

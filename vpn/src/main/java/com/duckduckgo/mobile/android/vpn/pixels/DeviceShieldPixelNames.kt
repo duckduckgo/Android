@@ -133,6 +133,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_APP_BAD_HEALTH_RESOLVED_ITSELF_DAILY("m_atp_bad_health_resolved_itself_d"),
     ATP_DID_RESTART_VPN_ON_BAD_HEALTH("m_atp_did_restart_vpn_on_bad_health_c"),
     ATP_DID_RESTART_VPN_ON_BAD_HEALTH_DAILY("m_atp_did_restart_vpn_on_bad_health_d"),
+    ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH("m_atp_did_restart_vpn_process_on_bad_health_c"),
+    ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY("m_atp_did_restart_vpn_process_on_bad_health_d"),
 
     ATP_ENCRYPTED_IO_EXCEPTION("m_atp_ev_encrypted_io_error_c"),
     ATP_ENCRYPTED_GENERAL_EXCEPTION("m_atp_ev_encrypted_error_c"),

@@ -38,6 +38,7 @@ import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import java.io.IOException
 import java.net.InetSocketAddress
+import java.nio.ByteBuffer
 import java.nio.channels.CancelledKeyException
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
@@ -218,6 +219,8 @@ class UdpPacketProcessor @AssistedInject constructor(
         while (iterator.hasNext()) {
             val key = iterator.next()
 
+            var receiveBufferRef: ByteBuffer? = null
+
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
                     iterator.remove()
@@ -225,6 +228,7 @@ class UdpPacketProcessor @AssistedInject constructor(
                     Timber.v("Got next network-to-device packet [isReadable] after ${SystemClock.uptimeMillis() - startTime}ms wait")
 
                     val receiveBuffer = ByteBufferPool.acquire()
+                    receiveBufferRef = receiveBuffer
                     receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
 
                     val inputChannel = (key.channel() as DatagramChannel)
@@ -239,6 +243,7 @@ class UdpPacketProcessor @AssistedInject constructor(
             }.onFailure {
                 Timber.w(it, "Failure processing selected key for selector")
                 key.cancel()
+                receiveBufferRef?.let { buff -> ByteBufferPool.release(buff) }
             }
         }
     }

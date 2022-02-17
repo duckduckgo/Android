@@ -1,0 +1,64 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "99643ae107f356a3a2b721b02bc09556",
+    "entities": [
+      {
+        "tableName": "app_health_state",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`type` TEXT NOT NULL, `localtime` TEXT NOT NULL, `alerts` TEXT NOT NULL, `healthDataJsonString` TEXT NOT NULL, `restartedAtEpochSeconds` INTEGER, `badHealthStartEpochSeconds` INTEGER, PRIMARY KEY(`type`))",
+        "fields": [
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "localtime",
+            "columnName": "localtime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alerts",
+            "columnName": "alerts",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "healthDataJsonString",
+            "columnName": "healthDataJsonString",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "restartedAtEpochSeconds",
+            "columnName": "restartedAtEpochSeconds",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "badHealthStartEpochSeconds",
+            "columnName": "badHealthStartEpochSeconds",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "type"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '99643ae107f356a3a2b721b02bc09556')"
+    ]
+  }
+}
