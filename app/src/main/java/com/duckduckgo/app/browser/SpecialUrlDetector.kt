@@ -33,6 +33,7 @@ import java.net.URISyntaxException
 interface SpecialUrlDetector {
     fun determineType(uri: Uri): UrlType
     fun determineType(uriString: String?): UrlType
+    fun processUrl(uriString: String): UrlType
 
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
@@ -94,7 +95,7 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    private fun processUrl(uriString: String): UrlType {
+    override fun processUrl(uriString: String): UrlType {
         trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }

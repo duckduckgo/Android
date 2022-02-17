@@ -57,6 +57,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 
 @ExperimentalCoroutinesApi
 class BrowserWebViewClientTest {
@@ -470,6 +471,45 @@ class BrowserWebViewClientTest {
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView, never()).loadUrl(EXAMPLE_URL)
         verify(listener, never()).startProcessingTrackingLink()
+    }
+
+    @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledThenReturnTrueAndLoadCleanedUrl() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.processUrl(anyString())).thenReturn(appLink)
+        whenever(listener.handleAppLink(any(), any())).thenReturn(true)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        val mockWebView = mock<WebView>()
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView).loadUrl(EXAMPLE_URL)
+        verify(listener).startProcessingTrackingLink()
+        verify(listener).handleAppLink(appLink, true)
+    }
+
+    @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.processUrl(anyString())).thenReturn(appLink)
+        whenever(listener.handleAppLink(any(), any())).thenReturn(false)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        val mockWebView = mock<WebView>()
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView).loadUrl(EXAMPLE_URL)
+        verify(listener).startProcessingTrackingLink()
+        verify(listener).handleAppLink(appLink, true)
+    }
+
+    @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndListenerIsNullThenReturnFalse() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
+        val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
+        whenever(specialUrlDetector.processUrl(anyString())).thenReturn(appLink)
+        testee.webViewClientListener = null
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        val mockWebView = mock<WebView>()
+        assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
     }
 
     private class TestWebView(context: Context) : WebView(context)

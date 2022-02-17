@@ -179,8 +179,19 @@ class BrowserWebViewClient(
                     if (isForMainFrame) {
                         webViewClientListener?.startProcessingTrackingLink()
                         Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
-                        webView.loadUrl(urlType.cleanedUrl)
-                        return true
+
+                        val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)
+
+                        if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
+                            webViewClientListener?.let { listener ->
+                                webView.loadUrl(urlType.cleanedUrl)
+                                return listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                            }
+                            return false
+                        } else {
+                            webView.loadUrl(urlType.cleanedUrl)
+                            return true
+                        }
                     }
                     false
                 }
