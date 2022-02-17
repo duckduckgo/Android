@@ -29,6 +29,7 @@ import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
@@ -172,6 +173,7 @@ class RealTcpSocketWriter @Inject constructor(
             tcb.acknowledgementNumberToClient,
             0
         )
+        ByteBufferPool.release(writeData.payloadBuffer)
         queues.networkToDevice.offer(responseBuffer)
     }
 

@@ -41,7 +41,7 @@ class ReportBreakageTextFormActivity : DuckDuckGoActivity() {
     private val binding: ActivityReportBreakageTextFormBinding by viewBinding()
 
     private val toolbar
-        get() = binding.includeToolbar.defaultToolbar
+        get() = binding.includeToolbar.toolbar
 
     private lateinit var brokenApp: BrokenApp
 

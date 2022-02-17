@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
-import com.duckduckgo.mobile.android.vpn.store.DatabaseDateFormatter
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 
 @Entity(tableName = "app_health_state")
 data class AppHealthState(
@@ -29,6 +29,7 @@ data class AppHealthState(
     val alerts: List<String>,
     val healthDataJsonString: String,
     val restartedAtEpochSeconds: Long?,
+    val badHealthStartEpochSeconds: Long? = null,
 ) {
     object HealthEventTypeConverter {
         @TypeConverter
