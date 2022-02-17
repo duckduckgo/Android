@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f8c8ec30168901e968d9155f8a2ad85a",
+    "identityHash": "0ded5773986a83fd7f7b37fe24a474be",
     "entities": [
       {
         "tableName": "remote_messaging",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `version` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `version` INTEGER NOT NULL, `invalidate` INTEGER NOT NULL, `evaluationTimestamp` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -18,6 +18,18 @@
             "fieldPath": "version",
             "columnName": "version",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "invalidate",
+            "columnName": "invalidate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "evaluationTimestamp",
+            "columnName": "evaluationTimestamp",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -34,7 +46,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f8c8ec30168901e968d9155f8a2ad85a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0ded5773986a83fd7f7b37fe24a474be')"
     ]
   }
 }
