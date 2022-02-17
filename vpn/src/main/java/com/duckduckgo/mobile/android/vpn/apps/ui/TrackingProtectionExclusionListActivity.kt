@@ -75,7 +75,7 @@ class TrackingProtectionExclusionListActivity :
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.defaultToolbar)
+        setupToolbar(binding.includeToolbar.toolbar)
         setupRecycler()
 
         bindViews()

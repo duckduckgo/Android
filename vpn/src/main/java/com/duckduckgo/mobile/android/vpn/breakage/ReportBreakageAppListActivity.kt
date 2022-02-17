@@ -57,7 +57,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     private val binding: ActivityReportBreakageAppListBinding by viewBinding()
 
     private val toolbar
-        get() = binding.includeToolbar.defaultToolbar
+        get() = binding.includeToolbar.toolbar
 
     private val reportBreakage = registerForActivityResult(ReportBreakageContract()) { result ->
         if (!result.isEmpty()) {
