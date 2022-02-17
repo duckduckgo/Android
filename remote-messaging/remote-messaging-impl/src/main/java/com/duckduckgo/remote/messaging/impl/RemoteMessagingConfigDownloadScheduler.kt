@@ -17,9 +17,11 @@
 package com.duckduckgo.remote.messaging.impl
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,7 +31,10 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class RemoteMessagingConfigDownloadWorker(context: Context, workerParameters: WorkerParameters) : CoroutineWorker(context, workerParameters) {
+class RemoteMessagingConfigDownloadWorker(
+    context: Context,
+    workerParameters: WorkerParameters
+) : CoroutineWorker(context, workerParameters) {
     lateinit var downloader: RemoteMessagingConfigDownloader
     lateinit var dispatcherProvider: DispatcherProvider
 
@@ -45,13 +50,24 @@ class RemoteMessagingConfigDownloadWorker(context: Context, workerParameters: Wo
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class RemoteMessagingConfigDownloadScheduler @Inject constructor(
     private val workManager: WorkManager
-) : LifecycleObserver {
+) : LifecycleEventObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleDownload() {
+    override fun onStateChanged(
+        source: LifecycleOwner,
+        event: Event
+    ) {
+        if (event == ON_CREATE) {
+            scheduleDownload()
+        }
+    }
+
+    private fun scheduleDownload() {
         Timber.v("RMF: Scheduling remote config worker")
         val workerRequest = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(4, TimeUnit.HOURS)
             .addTag(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG)
