@@ -20,14 +20,14 @@ import retrofit2.http.*
 
 interface MacOsWaitlistService {
 
-    @POST("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/join")
+    @POST("/api/auth/waitlist/macosbrowser/join")
     suspend fun joinWaitlist(): MacOsWaitlistResponse
 
-    @GET("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/status")
+    @GET("/api/auth/waitlist/macosbrowser/status")
     suspend fun waitlistStatus(): MacOsWaitlistStatusResponse
 
     @FormUrlEncoded
-    @POST("https://quackdev.duckduckgo.com/api/auth/waitlist/macosbrowser/code")
+    @POST("/api/auth/waitlist/macosbrowser/code")
     suspend fun getCode(@Field("token") token: String): MacOsInviteCodeResponse
 }
 
