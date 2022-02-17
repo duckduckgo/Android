@@ -27,7 +27,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -125,6 +128,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
+
+    private var tabsjob: Job? = null
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -312,19 +317,20 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 if (it != null) selectTab(it)
             }
         )
-        viewModel.tabs.observe(
-            this,
-            Observer {
-                clearStaleTabs(it)
-                launch { viewModel.onTabsUpdated(it) }
-            }
-        )
+        tabsjob?.cancel()
+        tabsjob = lifecycleScope.launch {
+            viewModel.tabs
+                .flowWithLifecycle(lifecycle, STARTED).collect {
+                    clearStaleTabs(it)
+                    launch { viewModel.onTabsUpdated(it) }
+                }
+        }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
-        viewModel.tabs.removeObservers(this)
+        tabsjob?.cancel()
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {

@@ -175,7 +175,7 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
-import kotlinx.android.synthetic.main.include_cta.*
+import kotlinx.coroutines.flow.cancellable
 
 class BrowserTabFragment :
     Fragment(),
@@ -316,6 +316,8 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
+
+    private var tabsjob: Job? = null
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -589,14 +591,12 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(
-            viewLifecycleOwner,
-            Observer<List<TabEntity>> {
-                it?.let {
-                    decorator.renderTabIcon(it)
-                }
+        tabsjob?.cancel()
+        tabsjob = lifecycleScope.launch {
+            viewModel.tabs.cancellable().collect {
+                decorator.renderTabIcon(it)
             }
-        )
+        }
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -940,7 +940,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        viewModel.tabs.removeObservers(this)
+        tabsjob?.cancel()
         decorator.incrementTabs()
     }
 
