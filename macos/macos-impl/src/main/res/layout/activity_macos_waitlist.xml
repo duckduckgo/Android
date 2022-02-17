@@ -122,6 +122,7 @@
                     style="@style/TextAppearance.DuckDuckGo.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:layout_gravity="center"
                     android:text="@string/macos_waitlist_code_invite"
                     android:textColor="@color/white" />
@@ -130,11 +131,11 @@
                     android:id="@+id/inviteCode"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_margin="4dp"
+                    android:layout_margin="3dp"
                     android:background="@drawable/background_code_text"
-                    android:fontFamily="monospace"
+                    android:fontFamily="@font/roboto_mono"
                     android:gravity="center"
-                    android:text="F20LPOPSD"
+                    tools:text="F20LPOPSD"
                     android:textColor="@color/almostBlack"
                     android:textSize="34sp"
                     android:textStyle="bold" />

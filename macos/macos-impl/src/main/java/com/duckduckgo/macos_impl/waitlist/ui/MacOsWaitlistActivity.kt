@@ -115,7 +115,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderInBeta(inviteCode: String) {
-        binding.headerImage.setImageResource(R.drawable.ic_donations_large)
+        binding.headerImage.setImageResource(R.drawable.ic_gift_large)
         binding.statusTitle.text = getString(R.string.macos_waitlist_code_title)
         binding.waitlistDescription.addClickableSpan(
             getText(R.string.macos_waitlist_code_description),
@@ -159,7 +159,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
 
     private fun renderErrorMessage() {
         binding.waitListButton.isEnabled = true
-        Toast.makeText(this, R.string.macos_join_waitlist, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, R.string.macos_join_waitlist_error, Toast.LENGTH_LONG).show()
     }
 
     private fun showNotificationDialog() {

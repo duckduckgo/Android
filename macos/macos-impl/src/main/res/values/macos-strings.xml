@@ -19,6 +19,7 @@
     <string name="macos_waitlist_title">Try DuckDuckGo for Mac!</string>
     <string name="macos_waitlist_description">DuckDuckGo Privacy Browser for Mac has the speed you need, the browsing features you expect, and comes packed with our best-in-class privacy essentials.</string>
     <string name="macos_join_waitlist">Join the Private Waitlist</string>
+    <string name="macos_join_waitlist_error">An error happened while joining the Waitlist, please try again later</string>
     <string name="macos_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
 
     <string name="macos_waitlist_on_the_list_title">You\'re on the list!</string>
@@ -26,7 +27,7 @@
     <string name="macos_waitlist_on_the_list_notification">We\'ll send you a notification when your copy of DuckDuckGo for Mac is ready for download. </string>
     <string name="macos_waitlist_on_the_list_no_notification_button" tools:ignore="ExtraTranslation">Notify Me</string>
 
-    <string name="notification_channel_macos_waitlist">macos waitlist</string>
+    <string name="notification_channel_macos_waitlist">macOS waitlist</string>
     <string name="macos_notification_title" tools:ignore="ExtraTranslation">DuckDuckGo for Mac is ready!</string>
     <string name="macos_notification_text" tools:ignore="ExtraTranslation">Open your invite</string>
     <string name="macos_notification_dialog_description" tools:ignore="ExtraTranslation">Would you like us to send you a notification when it\'s your turn?</string>
@@ -43,6 +44,6 @@
 
     <string name="macos_waitlist_share_invite">Share your invite</string>
     <!-- Settings -->
-    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
+    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 </resources>
