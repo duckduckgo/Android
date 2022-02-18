@@ -20,6 +20,8 @@ import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMap
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
+import com.duckduckgo.remote.messaging.store.expired
+import com.duckduckgo.remote.messaging.store.invalidated
 import timber.log.Timber
 
 interface RemoteMessagingConfigProcessor {
