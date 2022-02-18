@@ -235,16 +235,16 @@ private fun List<Int>.compareTo(other: List<Int>): Int {
 }
 
 @Suppress("UNCHECKED_CAST")
-fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
+internal fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
 
-fun Any?.toIntOrDefault(default: Int): Int = when {
+internal fun Any?.toIntOrDefault(default: Int): Int = when {
     this == null -> default
     this is Double -> this.toInt()
     this is Long -> this.toInt()
     else -> this as Int
 }
 
-fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
+internal fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
 internal fun Locale.asJsonFormat() = "$language-$country"
 

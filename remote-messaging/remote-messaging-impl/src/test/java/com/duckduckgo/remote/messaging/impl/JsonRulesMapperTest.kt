@@ -16,7 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
+import com.duckduckgo.remote.messaging.impl.mappers.mapToMatchingRules
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.JsonMatchingRule
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
@@ -25,16 +25,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import java.text.SimpleDateFormat
-import java.util.*
 
 @RunWith(Parameterized::class)
 class JsonRulesMapperTest(private val testCase: TestCase) {
 
-    private val testee = JsonRulesMapper()
-
     @Test
     fun whenJsonMatchingAttributeThenReturnMatchingAttribute() {
-        val matchingRule = testee.map(listOf(testCase.jsonMatchingRule))
+        val matchingRule = listOf(testCase.jsonMatchingRule).mapToMatchingRules()
 
         assertEquals(testCase.matchingRules, matchingRule)
     }

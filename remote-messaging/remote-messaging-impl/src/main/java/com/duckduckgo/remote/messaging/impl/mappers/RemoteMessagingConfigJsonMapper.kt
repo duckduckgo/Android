@@ -20,14 +20,11 @@ import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import timber.log.Timber
 
-class RemoteMessagingConfigJsonMapper(
-    private val jsonRemoteMessageMapper: JsonRemoteMessageMapper,
-    private val jsonRulesMapper: JsonRulesMapper
-) {
+class RemoteMessagingConfigJsonMapper() {
     fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
-        val messages = jsonRemoteMessageMapper.map(jsonRemoteMessagingConfig.messages)
+        val messages = jsonRemoteMessagingConfig.messages.mapToRemoteMessage()
         Timber.i("RMF: messages parsed $messages")
-        val rules = jsonRulesMapper.map(jsonRemoteMessagingConfig.rules)
+        val rules = jsonRemoteMessagingConfig.rules.mapToMatchingRules()
         return RemoteConfig(
             messages = messages,
             rules = rules

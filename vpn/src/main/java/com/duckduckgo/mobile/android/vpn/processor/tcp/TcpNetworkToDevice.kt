@@ -122,6 +122,7 @@ class TcpNetworkToDevice(
 
                 if (endOfStream(readBytes)) {
                     handleEndOfStream(tcb, packet, key)
+                    ByteBufferPool.release(receiveBuffer)
                     return
                 } else {
                     packetPersister.persistDataReceived(readBytes, PACKET_TYPE_TCP)
@@ -130,6 +131,7 @@ class TcpNetworkToDevice(
             } catch (e: IOException) {
                 Timber.w(e, "Network read error")
                 healthMetricCounter.onSocketChannelReadError()
+                ByteBufferPool.release(receiveBuffer)
                 sendReset(packet, tcb)
                 return
             }
@@ -216,6 +218,7 @@ class TcpNetworkToDevice(
         Timber.v("Got next network-to-device packet [isConnectable]")
         val tcb = key.attachment() as TCB
         val packet = tcb.referencePacket
+        val responseBuffer = ByteBufferPool.acquire()
         runCatching {
             if (tcb.channel.finishConnect()) {
                 Timber.v("Finished connecting to %s. Sending SYN+ACK.", tcb.ipAndPort)
@@ -224,7 +227,6 @@ class TcpNetworkToDevice(
                 tcb.updateState(MoveClientToState(SYN_SENT))
                 Timber.v("Update TCB %s status: %s", tcb.ipAndPort, tcb.tcbState)
 
-                val responseBuffer = ByteBufferPool.acquire()
                 packet.updateTcpBuffer(
                     responseBuffer,
                     (SYN or ACK).toByte(),
@@ -239,11 +241,12 @@ class TcpNetworkToDevice(
                 tcb.channel.register(selector, OP_NONE)
             } else {
                 Timber.v("Not finished connecting yet %s", tcb.ipAndPort)
+                ByteBufferPool.release(responseBuffer)
                 tcb.channel.register(selector, OP_CONNECT, tcb)
             }
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)
-            val responseBuffer = ByteBufferPool.acquire()
+            responseBuffer.clear()
             packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
 
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)

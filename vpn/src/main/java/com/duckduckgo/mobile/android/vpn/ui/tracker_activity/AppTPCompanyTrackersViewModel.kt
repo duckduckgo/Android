@@ -23,7 +23,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.time.TimeDiffFormatter
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
