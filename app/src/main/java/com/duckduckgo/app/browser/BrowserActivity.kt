@@ -66,6 +66,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -129,7 +130,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
-    private var tabsjob: Job? = null
+    private val tabsJob = ConflatedJob()
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -317,8 +318,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 if (it != null) selectTab(it)
             }
         )
-        tabsjob?.cancel()
-        tabsjob = lifecycleScope.launch {
+
+        tabsJob += lifecycleScope.launch {
             viewModel.tabs
                 .flowWithLifecycle(lifecycle, STARTED).collect {
                     clearStaleTabs(it)
@@ -330,7 +331,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
-        tabsjob?.cancel()
+        tabsJob.cancel()
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {

@@ -171,6 +171,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -317,7 +318,7 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
-    private var tabsjob: Job? = null
+    private val tabsJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -591,8 +592,7 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        tabsjob?.cancel()
-        tabsjob = lifecycleScope.launch {
+        tabsJob += lifecycleScope.launch {
             viewModel.tabs.cancellable().collect {
                 decorator.renderTabIcon(it)
             }
@@ -940,7 +940,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        tabsjob?.cancel()
+        tabsJob.cancel()
         decorator.incrementTabs()
     }
 
