@@ -37,7 +37,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.reflect.jvm.jvmName
 
 @ExperimentalCoroutinesApi
 class AndroidNotificationSchedulerTest {
@@ -81,7 +80,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
     }
 
     @Test
@@ -90,7 +89,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(false)
         testee.scheduleNextNotification()
 
-        assertNotificationScheduled(PrivacyNotificationWorker::class.jvmName)
+        assertNotificationScheduled(PrivacyNotificationWorker::class.javaObjectType.name)
     }
 
     @Test
@@ -99,7 +98,7 @@ class AndroidNotificationSchedulerTest {
         whenever(clearNotification.canShow()).thenReturn(true)
         testee.scheduleNextNotification()
 
-        assertNotificationScheduled(ClearDataNotificationWorker::class.jvmName)
+        assertNotificationScheduled(ClearDataNotificationWorker::class.javaObjectType.name)
     }
 
     @Test
@@ -112,10 +111,14 @@ class AndroidNotificationSchedulerTest {
     }
 
     private fun assertNotificationScheduled(
-        workerName: String,
+        workerName: String?,
         tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG
     ) {
-        assertTrue(getScheduledWorkers(tag).any { it.tags.contains(workerName) })
+        assertTrue(
+            getScheduledWorkers(tag).any {
+                it.tags.contains(workerName)
+            }
+        )
     }
 
     private fun assertNoNotificationScheduled(tag: String = NotificationScheduler.UNUSED_APP_WORK_REQUEST_TAG) {
