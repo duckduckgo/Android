@@ -85,15 +85,13 @@ class MacOsWaitlistViewModel(
         }
     }
 
-    private fun joinedWaitlist(
+    private suspend fun joinedWaitlist(
         timestamp: Int,
         token: String
     ) {
-        viewModelScope.launch {
-            waitlistManager.joinWaitlist(timestamp, token)
-            commandChannel.send(ShowNotificationDialog)
-            workManager.enqueue(workRequestBuilder.waitlistRequestWork(withBigDelay = false))
-        }
+        waitlistManager.joinWaitlist(timestamp, token)
+        commandChannel.send(ShowNotificationDialog)
+        workManager.enqueue(workRequestBuilder.waitlistRequestWork(withBigDelay = false))
     }
 
     fun onShareClicked() {

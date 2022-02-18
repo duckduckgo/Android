@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Provider
 
 interface MacOsWaitlistWorkRequestBuilder {
     fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest
@@ -91,18 +92,18 @@ class MacOsWaitlistWorker(
 
 @ContributesMultibinding(AppScope::class)
 class MacOsWaitlistWorkerInjectorPlugin @Inject constructor(
-    private val waitlistManager: MacOsWaitlistManager,
-    private val notificationSender: NotificationSender,
-    private val notification: MacOsWaitlistCodeNotification,
-    private val workRequestBuilder: MacOsWaitlistWorkRequestBuilder,
+    private val waitlistManager: Provider<MacOsWaitlistManager>,
+    private val notificationSender: Provider<NotificationSender>,
+    private val notification: Provider<MacOsWaitlistCodeNotification>,
+    private val workRequestBuilder: Provider<MacOsWaitlistWorkRequestBuilder>,
 ) : WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is MacOsWaitlistWorker) {
-            worker.waitlistManager = waitlistManager
-            worker.notificationSender = notificationSender
-            worker.notification = notification
-            worker.workRequestBuilder = workRequestBuilder
+            worker.waitlistManager = waitlistManager.get()
+            worker.notificationSender = notificationSender.get()
+            worker.notification = notification.get()
+            worker.workRequestBuilder = workRequestBuilder.get()
             return true
         }
         return false

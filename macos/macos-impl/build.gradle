@@ -54,9 +54,6 @@ dependencies {
     implementation Square.okHttp3.okHttp
     implementation Google.dagger
     implementation AndroidX.core.ktx
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     implementation AndroidX.work.runtimeKtx
 
     // Testing dependencies

@@ -58,8 +58,8 @@ class RealMacOsWaitlistRepository(
     }
 
     override fun getState(): MacOsWaitlistState {
-        if (didJoinBeta()) {
-            return MacOsWaitlistState.InBeta(dataStore.inviteCode!!)
+        dataStore.inviteCode?.let { inviteCode ->
+            return MacOsWaitlistState.InBeta(inviteCode)
         }
         if (didJoinWaitlist()) {
             return MacOsWaitlistState.JoinedWaitlist(dataStore.sendNotification)
@@ -68,8 +68,6 @@ class RealMacOsWaitlistRepository(
     }
 
     override fun isNotificationEnabled(): Boolean = dataStore.sendNotification
-
-    private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
 
     private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
 }

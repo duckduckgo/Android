@@ -65,7 +65,6 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
-import kotlinx.android.synthetic.main.content_settings_more.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -316,7 +315,7 @@ class SettingsActivity :
         appTPEnabled: Boolean,
         waitlistState: WaitlistState
     ) {
-        with(viewsPrivacy) {
+        with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
                 deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {

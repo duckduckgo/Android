@@ -88,6 +88,7 @@ class NotificationRegistrar @Inject constructor(
             R.string.atp_WaitlistActivityWaitlistTitle,
             NotificationManagerCompat.IMPORTANCE_HIGH
         )
+        // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)

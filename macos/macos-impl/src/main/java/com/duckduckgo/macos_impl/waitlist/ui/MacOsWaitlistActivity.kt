@@ -52,7 +52,6 @@ import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.android.synthetic.main.activity_macos_waitlist.view.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -127,8 +126,8 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.notifyMeButton.gone()
         binding.codeFrame.show()
         binding.shareImage.show()
-        binding.codeFrame.inviteCode.text = inviteCode
-        binding.codeFrame.inviteCode.setOnClickListener { viewModel.onCopyToClipboard(onlyCode = true) }
+        binding.inviteCode.text = inviteCode
+        binding.inviteCode.setOnClickListener { viewModel.onCopyToClipboard(onlyCode = true) }
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
