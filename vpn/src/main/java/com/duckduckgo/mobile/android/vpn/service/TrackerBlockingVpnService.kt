@@ -33,6 +33,10 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.ERROR
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -103,8 +107,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
     private var vpnStateServiceReference: IBinder? = null
-
-    private var lastKnownStopReason: VpnStopReason? = null
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -182,7 +184,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch { stopVpn(VpnStopReason.SelfStop) }
+                launch { stopVpn(SELF_STOP) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -271,7 +273,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.Error)
+            stopVpn(ERROR)
         }
     }
 
@@ -307,7 +309,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tunInterface = null
 
         sendStopPixels(reason)
-        lastKnownStopReason = reason
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: stopping ${it.javaClass} callback")
@@ -324,10 +325,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun sendStopPixels(reason: VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */
+            SELF_STOP -> { /* noop */
             }
-            VpnStopReason.Error -> deviceShieldPixels.startError()
-            VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
+            ERROR -> deviceShieldPixels.startError()
+            REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
     }
 
@@ -339,7 +340,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        launch { stopVpn(VpnStopReason.Revoked) }
+        launch { stopVpn(REVOKED) }
     }
 
     override fun onLowMemory() {

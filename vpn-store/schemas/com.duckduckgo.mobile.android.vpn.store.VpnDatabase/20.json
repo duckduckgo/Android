@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 20,
-    "identityHash": "d683be5ff8d34422f26e050b3522918d",
+    "identityHash": "dc6e3395763a09e6953c47ec53d5566e",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -130,7 +130,7 @@
       },
       {
         "tableName": "vpn_service_state_stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL, `stopReason` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -149,6 +149,12 @@
             "columnName": "state",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "stopReason",
+            "columnName": "stopReason",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -640,7 +646,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd683be5ff8d34422f26e050b3522918d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dc6e3395763a09e6953c47ec53d5566e')"
     ]
   }
 }

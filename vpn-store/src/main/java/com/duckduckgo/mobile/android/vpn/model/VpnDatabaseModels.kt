@@ -72,8 +72,15 @@ enum class VpnServiceState {
 data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
-    val state: VpnServiceState
+    val state: VpnServiceState,
+    val stopReason: VpnStopReason? = null
 )
+
+enum class VpnStopReason {
+    SELF_STOP,
+    ERROR,
+    REVOKED
+}
 
 data class BucketizedVpnServiceStateStats(
     val day: String,

@@ -25,6 +25,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.android.AndroidInjection
@@ -62,14 +65,19 @@ class VpnStateMonitorService : Service() {
     override fun onDestroy() {
         Timber.d("onDestroy")
         coroutineScope.launch(dispatcherProvider.io()) {
-            // check last state, if it was enabled then we store disabled state reason unknown
+            maybeUpdateVPNState()
             vpnBringUpIfSuddenKill()
         }
         super.onDestroy()
     }
 
-    private fun maybeUpdateVPNState(){
-        val lastState = vpnDatabase.vpnServiceStateDao().getServiceStateStatsSince()
+    // check last state, if it was enabled then we store disabled state reason unknown
+    private fun maybeUpdateVPNState() {
+        val lastStateStats = vpnDatabase.vpnServiceStateDao().getLastStateStats()
+        if (lastStateStats.state == VpnServiceState.ENABLED) {
+            vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
+        }
+
         // create method in dao that returns last service state
         // create interface in vpn-api Flow<VpnRunningState> (isRunning yes no and vpnstopreason)
         // impl interface in vpn as a Repository

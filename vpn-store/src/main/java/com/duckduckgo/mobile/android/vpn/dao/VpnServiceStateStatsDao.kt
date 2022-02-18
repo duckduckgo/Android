@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.dao
 import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface VpnServiceStateStatsDao {
@@ -28,6 +29,12 @@ interface VpnServiceStateStatsDao {
 
     @Query("SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")
     fun getServiceStateStatsSince(startTime: String): List<BucketizedVpnServiceStateStats>
+
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
+    fun getLastStateStats(): VpnServiceStateStats
+
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
+    fun getStateStats(): Flow<VpnServiceStateStats>
 
     @Query("SELECT COUNT(*) FROM vpn_service_state_stats WHERE state is 'ENABLED'")
     fun getEnableCount(): Int

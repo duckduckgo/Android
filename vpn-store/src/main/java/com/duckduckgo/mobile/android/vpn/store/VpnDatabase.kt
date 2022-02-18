@@ -279,6 +279,22 @@ object VpnTypeConverters {
     fun fromVpnServiceState(vpnServiceState: VpnServiceState): String {
         return vpnServiceState.name
     }
+
+    @TypeConverter
+    @JvmStatic
+    fun toVpnStopReason(stopReason: String): VpnStopReason {
+        return try {
+            VpnStopReason.valueOf(stopReason)
+        } catch (t: Throwable) {
+            VpnStopReason.INVALID
+        }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromVpnStopReason(vpnStopReason: VpnStopReason): String {
+        return vpnStopReason.name
+    }
 }
 
 private val IO_EXECUTOR = Executors.newSingleThreadExecutor()
