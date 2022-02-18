@@ -62,9 +62,18 @@ class VpnStateMonitorService : Service() {
     override fun onDestroy() {
         Timber.d("onDestroy")
         coroutineScope.launch(dispatcherProvider.io()) {
+            // check last state, if it was enabled then we store disabled state reason unknown
             vpnBringUpIfSuddenKill()
         }
         super.onDestroy()
+    }
+
+    private fun maybeUpdateVPNState(){
+        val lastState = vpnDatabase.vpnServiceStateDao().getServiceStateStatsSince()
+        // create method in dao that returns last service state
+        // create interface in vpn-api Flow<VpnRunningState> (isRunning yes no and vpnstopreason)
+        // impl interface in vpn as a Repository
+        // use that repository from PrivacyReportViewModel
     }
 
     @WorkerThread

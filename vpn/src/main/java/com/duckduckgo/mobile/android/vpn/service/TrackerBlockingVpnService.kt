@@ -104,6 +104,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
     private var vpnStateServiceReference: IBinder? = null
 
+    private var lastKnownStopReason: VpnStopReason? = null
+
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
             name: ComponentName?,
@@ -305,6 +307,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tunInterface = null
 
         sendStopPixels(reason)
+        lastKnownStopReason = reason
+
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: stopping ${it.javaClass} callback")
             it.onVpnStopped(this, reason)

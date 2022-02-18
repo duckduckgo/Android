@@ -26,9 +26,12 @@ import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
+import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +40,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class PrivacyReportViewModel(
@@ -44,7 +48,7 @@ class PrivacyReportViewModel(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val applicationContext: Context,
-) : ViewModel(), LifecycleObserver {
+) : ViewModel(), VpnServiceCallbacks, LifecycleObserver {
 
     private val vpnRunningState = MutableStateFlow(
         PrivacyReportView.RunningState(isRunning = true, hasValueChanged = false)
@@ -54,16 +58,50 @@ class PrivacyReportViewModel(
         PrivacyReportView.ViewState(runningState.isRunning, runningState.hasValueChanged, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
     }
 
-    fun pollDeviceShieldState() {
+    private fun pollDeviceShieldState() {
         viewModelScope.launch {
             while (isActive) {
                 val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
                 val oldValue = vpnRunningState.value
                 val hasValueChanged = oldValue.isRunning != isRunning
-                vpnRunningState.emit(PrivacyReportView.RunningState(isRunning, hasValueChanged))
+                vpnRunningState.emit(vpnRunningState.value.copy(isRunning = isRunning, hasValueChanged = hasValueChanged))
 
                 delay(1_000)
             }
+        }
+    }
+
+    private fun checkAppTPState(){
+        Timber.d("PrivacyReportViewModel: checkAppTPState")
+        viewModelScope.launch {
+            Timber.d("PrivacyReportViewModel: checkAppTPState launch")
+                val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
+                val oldValue = vpnRunningState.value
+                val hasValueChanged = oldValue.isRunning != isRunning
+                vpnRunningState.emit(vpnRunningState.value.copy(isRunning = isRunning, hasValueChanged = hasValueChanged))
+        }
+    }
+
+    override fun onVpnStarted(coroutineScope: CoroutineScope) {
+        Timber.d("PrivacyReportViewModel: onVpnStarted")
+        viewModelScope.launch {
+            Timber.d("PrivacyReportViewModel: onVpnStopped launch")
+            val oldValue = vpnRunningState.value
+            val hasValueChanged = oldValue.isRunning != true
+            vpnRunningState.emit(PrivacyReportView.RunningState(true, hasValueChanged))
+        }
+    }
+
+    override fun onVpnStopped(
+        coroutineScope: CoroutineScope,
+        vpnStopReason: VpnStopReason
+    ) {
+        Timber.d("PrivacyReportViewModel: onVpnStopped")
+        viewModelScope.launch {
+            Timber.d("PrivacyReportViewModel: onVpnStopped launch")
+            val oldValue = vpnRunningState.value
+            val hasValueChanged = oldValue.isRunning != false
+            vpnRunningState.emit(PrivacyReportView.RunningState(false, hasValueChanged, vpnStopReason))
         }
     }
 
@@ -81,7 +119,7 @@ class PrivacyReportViewModel(
             }
 
         }.onStart {
-            pollDeviceShieldState()
+            checkAppTPState()
         }
     }
 
@@ -95,7 +133,8 @@ class PrivacyReportViewModel(
 
         data class RunningState(
             val isRunning: Boolean,
-            val hasValueChanged: Boolean
+            val hasValueChanged: Boolean,
+            val stopReason: VpnStopReason? = null
         )
 
         data class TrackersBlocked(
@@ -104,6 +143,7 @@ class PrivacyReportViewModel(
             val trackers: Int
         )
     }
+
 }
 
 @ContributesMultibinding(AppScope::class)

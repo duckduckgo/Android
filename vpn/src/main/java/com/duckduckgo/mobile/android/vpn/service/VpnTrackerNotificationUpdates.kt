@@ -44,6 +44,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
 ) : VpnServiceCallbacks {
+
     private var notificationTickerChannel = MutableStateFlow(System.currentTimeMillis())
     private val notificationTickerJob = ConflatedJob()
     private val newTrackerObserverJob = ConflatedJob()
