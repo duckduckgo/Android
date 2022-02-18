@@ -16,8 +16,6 @@
 
 package com.duckduckgo.remote.messaging.store
 
-import org.threeten.bp.LocalDateTime
-
 interface RemoteMessagingConfigRepository {
     fun insert(remoteMessagingConfig: RemoteMessagingConfig)
     fun get(): RemoteMessagingConfig
