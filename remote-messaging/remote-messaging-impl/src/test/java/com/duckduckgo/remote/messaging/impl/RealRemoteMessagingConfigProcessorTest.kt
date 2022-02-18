@@ -56,8 +56,12 @@ class RealRemoteMessagingConfigProcessorTest {
 
     @Test
     fun whenSameVersionThenDoNothing() = runTest {
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
-            aRemoteMessagingConfig(version = 1L)
+            aRemoteMessagingConfig(
+                version = 1L,
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now())
+            )
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
