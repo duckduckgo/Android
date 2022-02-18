@@ -33,11 +33,12 @@ class RealRemoteMessagingConfigProcessor(
 
     override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {
         Timber.v("RMF: process ${jsonRemoteMessagingConfig.version}")
-        val currentVersion = remoteMessagingConfigRepository.get().version
+        val currentConfig = remoteMessagingConfigRepository.get()
+        val currentVersion = currentConfig.version
         val newVersion = jsonRemoteMessagingConfig.version
 
         val isNewVersion = currentVersion != newVersion
-        val shouldProcess = remoteMessagingConfigRepository.invalidated() || remoteMessagingConfigRepository.expired()
+        val shouldProcess = currentConfig.invalidated() || currentConfig.expired()
 
         if (isNewVersion || shouldProcess) {
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)

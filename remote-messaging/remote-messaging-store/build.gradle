@@ -40,8 +40,7 @@ dependencies {
     kapt AndroidX.room.compiler
     implementation "com.jakewharton.threetenabp:threetenabp:_"
 
-    androidTestImplementation project(path: ':common-test')
-    androidTestImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
+    testImplementation project(path: ':common-test')
+    testImplementation "org.threeten:threetenbp:_"
+    testImplementation Testing.junit4
 }

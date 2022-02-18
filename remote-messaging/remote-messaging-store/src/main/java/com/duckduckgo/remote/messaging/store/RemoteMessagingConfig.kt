@@ -28,3 +28,12 @@ data class RemoteMessagingConfig(
     val invalidate: Boolean = false,
     val evaluationTimestamp: String = databaseTimestampFormatter().format(LocalDateTime.now())
 )
+
+internal fun RemoteMessagingConfig.expired(): Boolean {
+    val yesterday = databaseTimestampFormatter().format(LocalDateTime.now().minusDays(1L))
+    return this.evaluationTimestamp < yesterday
+}
+
+internal fun RemoteMessagingConfig.invalidated(): Boolean {
+    return this.invalidate
+}
