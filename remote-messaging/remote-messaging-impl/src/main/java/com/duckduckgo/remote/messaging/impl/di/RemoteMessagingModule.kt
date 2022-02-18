@@ -19,8 +19,8 @@ package com.duckduckgo.remote.messaging.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
@@ -114,17 +114,19 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesAndroidAppAttributeMatcher(
-        appProperties: AppProperties
+        appProperties: AppProperties,
+        appBuildConfig: AppBuildConfig
     ): AndroidAppAttributeMatcher {
-        return AndroidAppAttributeMatcher(appProperties)
+        return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesDeviceAttributeMatcher(
-        deviceProperties: DeviceProperties
+        appBuildConfig: AppBuildConfig,
+        appProperties: AppProperties
     ): DeviceAttributeMatcher {
-        return DeviceAttributeMatcher(deviceProperties)
+        return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
 
     @Provides

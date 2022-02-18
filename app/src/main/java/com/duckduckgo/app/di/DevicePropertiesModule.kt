@@ -22,7 +22,6 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.store.AndroidAppProperties
-import com.duckduckgo.app.global.store.AndroidDeviceProperties
 import com.duckduckgo.app.global.store.AndroidUserBrowserProperties
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
@@ -31,7 +30,6 @@ import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -43,20 +41,17 @@ import dagger.SingleInstanceIn
 @Module
 @ContributesTo(AppScope::class)
 class DevicePropertiesModule {
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesDeviceProperties(appContext: Context): DeviceProperties {
-        return AndroidDeviceProperties(appContext)
-    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesAppProperties(
+        appContext: Context,
         variantManager: VariantManager,
         playStoreUtils: PlayStoreUtils,
         statisticsStore: StatisticsDataStore
     ): AppProperties {
         return AndroidAppProperties(
+            appContext,
             variantManager,
             playStoreUtils,
             statisticsStore

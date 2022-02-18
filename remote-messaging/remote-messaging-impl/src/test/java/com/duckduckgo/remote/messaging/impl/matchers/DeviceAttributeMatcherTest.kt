@@ -17,20 +17,21 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 import android.os.Build
-import com.duckduckgo.browser.api.DeviceProperties
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.*
 import org.junit.Test
 import java.util.*
-import kotlin.math.max
 
 class DeviceAttributeMatcherTest {
 
-    private val deviceProperties: DeviceProperties = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val appProperties: AppProperties = mock()
 
-    private val testee = DeviceAttributeMatcher(deviceProperties)
+    private val testee = DeviceAttributeMatcher(appBuildConfig, appProperties)
 
     @Test
     fun whenDeviceMatchesLocaleThenReturnMatch() {
@@ -297,8 +298,8 @@ class DeviceAttributeMatcherTest {
         apiLevel: Int = Build.VERSION.SDK_INT,
         webView: String = ""
     ) {
-        whenever(deviceProperties.deviceLocale()).thenReturn(locale)
-        whenever(deviceProperties.osApiLevel()).thenReturn(apiLevel)
-        whenever(deviceProperties.webView()).thenReturn(webView)
+        whenever(appBuildConfig.deviceLocale).thenReturn(locale)
+        whenever(appBuildConfig.sdkInt).thenReturn(apiLevel)
+        whenever(appProperties.webView()).thenReturn(webView)
     }
 }

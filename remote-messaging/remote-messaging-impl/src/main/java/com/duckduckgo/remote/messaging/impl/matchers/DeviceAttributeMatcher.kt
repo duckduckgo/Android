@@ -16,7 +16,8 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
-import com.duckduckgo.browser.api.DeviceProperties
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.IntMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_INT_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
@@ -28,7 +29,8 @@ import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import com.duckduckgo.remote.messaging.impl.models.matches
 
 class DeviceAttributeMatcher(
-    val deviceProperties: DeviceProperties
+    val appBuildConfig: AppBuildConfig,
+    val appProperties: AppProperties
 ) {
     fun evaluate(matchingAttribute: MatchingAttribute): Result {
         when (matchingAttribute) {
@@ -36,20 +38,20 @@ class DeviceAttributeMatcher(
                 if (matchingAttribute == MatchingAttribute.Api()) return Result.Fail
 
                 if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
-                    return (matchingAttribute as IntMatchingAttribute).matches(deviceProperties.osApiLevel())
+                    return (matchingAttribute as IntMatchingAttribute).matches(appBuildConfig.sdkInt)
                 }
-                return (matchingAttribute as RangeIntMatchingAttribute).matches(deviceProperties.osApiLevel())
+                return (matchingAttribute as RangeIntMatchingAttribute).matches(appBuildConfig.sdkInt)
             }
             is MatchingAttribute.Locale -> {
                 if (matchingAttribute == MatchingAttribute.Locale()) return Result.Fail
-                return matchingAttribute.matches(deviceProperties.deviceLocale().asJsonFormat())
+                return matchingAttribute.matches(appBuildConfig.deviceLocale.asJsonFormat())
             }
             is MatchingAttribute.WebView -> {
                 if (matchingAttribute == MatchingAttribute.WebView()) return Result.Fail
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
-                    return (matchingAttribute as StringMatchingAttribute).matches(deviceProperties.webView())
+                    return (matchingAttribute as StringMatchingAttribute).matches(appProperties.webView())
                 }
-                return (matchingAttribute as RangeStringMatchingAttribute).matches(deviceProperties.webView())
+                return (matchingAttribute as RangeStringMatchingAttribute).matches(appProperties.webView())
             }
             else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
         }

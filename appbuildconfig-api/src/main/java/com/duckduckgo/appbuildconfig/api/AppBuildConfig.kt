@@ -16,6 +16,8 @@
 
 package com.duckduckgo.appbuildconfig.api
 
+import java.util.*
+
 interface AppBuildConfig {
     val isTest: Boolean
     val isDebug: Boolean
@@ -27,6 +29,7 @@ interface AppBuildConfig {
     val sdkInt: Int
     val manufacturer: String
     val model: String
+    val deviceLocale: Locale
 }
 
 enum class BuildFlavor {

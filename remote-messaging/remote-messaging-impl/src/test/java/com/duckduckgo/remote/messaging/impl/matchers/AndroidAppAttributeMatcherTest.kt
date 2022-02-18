@@ -16,6 +16,9 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.nhaarman.mockitokotlin2.mock
@@ -26,11 +29,13 @@ import org.junit.Test
 class AndroidAppAttributeMatcherTest {
 
     private val appProperties: AppProperties = mock()
-    private val testee = AndroidAppAttributeMatcher(appProperties)
+    private val appBuildConfig: AppBuildConfig = mock()
+
+    private val testee = AndroidAppAttributeMatcher(appProperties, appBuildConfig)
 
     @Test
     fun whenFlavorMatchesThenReturnMatch() {
-        givenDeviceProperties(flavor = "Internal")
+        givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
             MatchingAttribute.Flavor(value = listOf("internal"))
@@ -41,7 +46,7 @@ class AndroidAppAttributeMatcherTest {
 
     @Test
     fun whenFlavorDoesNotMatchThenReturnFail() {
-        givenDeviceProperties(flavor = "Internal")
+        givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
             MatchingAttribute.Flavor(value = listOf("play"))
@@ -271,7 +276,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     private fun givenDeviceProperties(
-        flavor: String = "play",
+        flavor: BuildFlavor = BuildFlavor.PLAY,
         appId: String = "com.duckduckgo.mobile.android.debug",
         appVersion: String = "5.106.0",
         atb: String = "v105-2",
@@ -280,9 +285,9 @@ class AndroidAppAttributeMatcherTest {
         expVariant: String = "zo",
         installedGPlay: Boolean = true
     ) {
-        whenever(appProperties.flavor()).thenReturn(flavor)
-        whenever(appProperties.appId()).thenReturn(appId)
-        whenever(appProperties.appVersion()).thenReturn(appVersion)
+        whenever(appBuildConfig.flavor).thenReturn(flavor)
+        whenever(appBuildConfig.applicationId).thenReturn(appId)
+        whenever(appBuildConfig.versionName).thenReturn(appVersion)
         whenever(appProperties.atb()).thenReturn(atb)
         whenever(appProperties.appAtb()).thenReturn(appAtb)
         whenever(appProperties.searchAtb()).thenReturn(searchAtb)

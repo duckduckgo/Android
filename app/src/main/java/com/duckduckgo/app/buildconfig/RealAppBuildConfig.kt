@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.lang.IllegalStateException
+import java.util.*
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
@@ -50,4 +51,6 @@ class RealAppBuildConfig @Inject constructor() : AppBuildConfig {
             false
         }
     }
+    override val deviceLocale: Locale
+        get() = Locale.getDefault()
 }
