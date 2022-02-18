@@ -37,98 +37,96 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import timber.log.Timber
 
-class JsonRemoteMessageMapper {
-    private val smallMapper: (JsonContent) -> Content = { jsonContent ->
-        Small(
-            titleText = jsonContent.titleText.failIfEmpty(),
-            descriptionText = jsonContent.descriptionText.failIfEmpty()
-        )
-    }
-
-    private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
-        Medium(
-            titleText = jsonContent.titleText.failIfEmpty(),
-            descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.asPlaceholder()
-        )
-    }
-
-    private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonContent ->
-        BigSingleAction(
-            titleText = jsonContent.titleText.failIfEmpty(),
-            descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.asPlaceholder(),
-            primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-            primaryAction = jsonContent.primaryAction!!.toAction()
-        )
-    }
-
-    private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent ->
-        BigTwoActions(
-            titleText = jsonContent.titleText.failIfEmpty(),
-            descriptionText = jsonContent.descriptionText.failIfEmpty(),
-            placeholder = jsonContent.placeholder.asPlaceholder(),
-            primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
-            primaryAction = jsonContent.primaryAction!!.toAction(),
-            secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
-            secondaryAction = jsonContent.secondaryAction!!.toAction()
-        )
-    }
-
-    private val messageMappers = mapOf(
-        Pair(SMALL.jsonValue, smallMapper),
-        Pair(MEDIUM.jsonValue, mediumMapper),
-        Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleAcionMapper),
-        Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoAcionMapper)
+private val smallMapper: (JsonContent) -> Content = { jsonContent ->
+    Small(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty()
     )
-
-    private val urlActionMapper: (JsonMessageAction) -> Action = {
-        Action.Url(it.value)
-    }
-
-    private val dismissActionMapper: (JsonMessageAction) -> Action = {
-        Action.Dismiss
-    }
-
-    private val playStoreActionMapper: (JsonMessageAction) -> Action = {
-        Action.PlayStore(it.value)
-    }
-
-    private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
-        Action.DefaultBrowser
-    }
-
-    private val actionMappers = mapOf(
-        Pair(URL.jsonValue, urlActionMapper),
-        Pair(DISMISS.jsonValue, dismissActionMapper),
-        Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
-        Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper)
-    )
-
-    fun map(jsonMessages: List<JsonRemoteMessage>): List<RemoteMessage> = jsonMessages.mapNotNull { it.map() }
-
-    private fun JsonRemoteMessage.map(): RemoteMessage? {
-        return runCatching {
-            RemoteMessage(
-                id = this.id.failIfEmpty(),
-                content = this.content!!.mapToContent(this.content.messageType),
-                matchingRules = this.matchingRules.orEmpty(),
-                exclusionRules = this.exclusionRules.orEmpty()
-            )
-        }.onFailure {
-            Timber.e("RMF: error $it")
-        }.getOrNull()
-    }
-
-    private fun JsonContent.mapToContent(messageType: String): Content {
-        return messageMappers[messageType]?.invoke(this) ?: throw IllegalArgumentException("Message type not found")
-    }
-
-    private fun JsonMessageAction.toAction(): Action {
-        return actionMappers[this.type]?.invoke(this) ?: throw IllegalArgumentException("Unknown Action Type")
-    }
-
-    private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
-
-    private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)
 }
+
+private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
+    Medium(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder()
+    )
+}
+
+private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonContent ->
+    BigSingleAction(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder(),
+        primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
+        primaryAction = jsonContent.primaryAction!!.toAction()
+    )
+}
+
+private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent ->
+    BigTwoActions(
+        titleText = jsonContent.titleText.failIfEmpty(),
+        descriptionText = jsonContent.descriptionText.failIfEmpty(),
+        placeholder = jsonContent.placeholder.asPlaceholder(),
+        primaryActionText = jsonContent.primaryActionText.failIfEmpty(),
+        primaryAction = jsonContent.primaryAction!!.toAction(),
+        secondaryActionText = jsonContent.secondaryActionText.failIfEmpty(),
+        secondaryAction = jsonContent.secondaryAction!!.toAction()
+    )
+}
+
+private val messageMappers = mapOf(
+    Pair(SMALL.jsonValue, smallMapper),
+    Pair(MEDIUM.jsonValue, mediumMapper),
+    Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleAcionMapper),
+    Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoAcionMapper)
+)
+
+private val urlActionMapper: (JsonMessageAction) -> Action = {
+    Action.Url(it.value)
+}
+
+private val dismissActionMapper: (JsonMessageAction) -> Action = {
+    Action.Dismiss
+}
+
+private val playStoreActionMapper: (JsonMessageAction) -> Action = {
+    Action.PlayStore(it.value)
+}
+
+private val defaultBrowserActionMapper: (JsonMessageAction) -> Action = {
+    Action.DefaultBrowser
+}
+
+private val actionMappers = mapOf(
+    Pair(URL.jsonValue, urlActionMapper),
+    Pair(DISMISS.jsonValue, dismissActionMapper),
+    Pair(PLAYSTORE.jsonValue, playStoreActionMapper),
+    Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper)
+)
+
+fun List<JsonRemoteMessage>.mapToRemoteMessage(): List<RemoteMessage> = this.mapNotNull { it.map() }
+
+private fun JsonRemoteMessage.map(): RemoteMessage? {
+    return runCatching {
+        RemoteMessage(
+            id = this.id.failIfEmpty(),
+            content = this.content!!.mapToContent(this.content.messageType),
+            matchingRules = this.matchingRules.orEmpty(),
+            exclusionRules = this.exclusionRules.orEmpty()
+        )
+    }.onFailure {
+        Timber.e("RMF: error $it")
+    }.getOrNull()
+}
+
+private fun JsonContent.mapToContent(messageType: String): Content {
+    return messageMappers[messageType]?.invoke(this) ?: throw IllegalArgumentException("Message type not found")
+}
+
+private fun JsonMessageAction.toAction(): Action {
+    return actionMappers[this.type]?.invoke(this) ?: throw IllegalArgumentException("Unknown Action Type")
+}
+
+private fun String.failIfEmpty() = this.ifEmpty { throw IllegalStateException("Empty argument") }
+
+private fun String.asPlaceholder(): Placeholder = Placeholder.from(this)

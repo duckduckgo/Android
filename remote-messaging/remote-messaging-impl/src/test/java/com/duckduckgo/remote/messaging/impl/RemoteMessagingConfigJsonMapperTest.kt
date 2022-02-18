@@ -23,7 +23,6 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
@@ -50,7 +49,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -120,7 +118,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -146,7 +143,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -160,7 +156,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config_unsupported_items.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -180,7 +175,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -204,7 +198,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
@@ -222,7 +215,6 @@ class RemoteMessagingConfigJsonMapperTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(
-            jsonRemoteMessageMapper = JsonRemoteMessageMapper(),
             jsonRulesMapper = JsonRulesMapper()
         )
 
