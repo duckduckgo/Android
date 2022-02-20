@@ -22,8 +22,8 @@ sealed class EvaluationResult {
     object NextMessage : EvaluationResult()
 }
 
-fun String.defaultValue() = this.isEmpty()
-fun Int.defaultValue() = this == -1
+fun String.isDefaultValue() = this.isEmpty()
+fun Int.isDefaultValue() = this == -1
 
 fun Boolean?.toResult(): EvaluationResult {
     return when (this) {

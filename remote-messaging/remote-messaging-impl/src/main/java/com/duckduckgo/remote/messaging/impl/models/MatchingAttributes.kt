@@ -17,7 +17,7 @@
 package com.duckduckgo.remote.messaging.impl.models
 
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
-import com.duckduckgo.remote.messaging.impl.matchers.defaultValue
+import com.duckduckgo.remote.messaging.impl.matchers.isDefaultValue
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import timber.log.Timber
 import java.util.*
@@ -186,8 +186,8 @@ fun IntMatchingAttribute.matches(value: Int): EvaluationResult {
 }
 
 fun RangeIntMatchingAttribute.matches(value: Int): EvaluationResult {
-    if ((this.min.defaultValue() || value >= this.min) &&
-        (this.max.defaultValue() || value <= this.max)
+    if ((this.min.isDefaultValue() || value >= this.min) &&
+        (this.max.isDefaultValue() || value <= this.max)
     ) {
         return true.toResult()
     }
@@ -196,7 +196,7 @@ fun RangeIntMatchingAttribute.matches(value: Int): EvaluationResult {
 }
 
 fun DateMatchingAttribute.matches(value: Int): EvaluationResult {
-    if ((this.value.defaultValue() || value == this.value)) {
+    if ((this.value.isDefaultValue() || value == this.value)) {
         return true.toResult()
     }
     return false.toResult()
