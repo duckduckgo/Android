@@ -20,7 +20,7 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.Result
+import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Api
@@ -336,14 +336,14 @@ class RemoteMessagingConfigMatcherTest {
     private suspend fun givenDeviceMatches(
         vararg matchingAttributes: MatchingAttribute
     ) {
-        whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
-        whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
-        whenever(userAttributeMatcher.evaluate(any())).thenReturn(Result.Fail)
+        whenever(deviceAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
+        whenever(androidAppAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
+        whenever(userAttributeMatcher.evaluate(any())).thenReturn(EvaluationResult.Fail)
 
         matchingAttributes.forEach {
-            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
-            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
-            whenever(userAttributeMatcher.evaluate(it)).thenReturn(Result.Match)
+            whenever(deviceAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
+            whenever(androidAppAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
+            whenever(userAttributeMatcher.evaluate(it)).thenReturn(EvaluationResult.Match)
         }
     }
 

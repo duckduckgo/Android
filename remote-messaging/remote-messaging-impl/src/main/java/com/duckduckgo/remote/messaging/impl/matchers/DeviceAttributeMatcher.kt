@@ -32,10 +32,10 @@ class DeviceAttributeMatcher(
     val appBuildConfig: AppBuildConfig,
     val appProperties: AppProperties
 ) {
-    fun evaluate(matchingAttribute: MatchingAttribute): Result {
+    fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> {
-                if (matchingAttribute == MatchingAttribute.Api()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.Api()) return EvaluationResult.Fail
 
                 if (matchingAttribute.value != MATCHING_ATTR_INT_DEFAULT_VALUE) {
                     return (matchingAttribute as IntMatchingAttribute).matches(appBuildConfig.sdkInt)
@@ -43,11 +43,11 @@ class DeviceAttributeMatcher(
                 return (matchingAttribute as RangeIntMatchingAttribute).matches(appBuildConfig.sdkInt)
             }
             is MatchingAttribute.Locale -> {
-                if (matchingAttribute == MatchingAttribute.Locale()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.Locale()) return EvaluationResult.Fail
                 return matchingAttribute.matches(appBuildConfig.deviceLocale.asJsonFormat())
             }
             is MatchingAttribute.WebView -> {
-                if (matchingAttribute == MatchingAttribute.WebView()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.WebView()) return EvaluationResult.Fail
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
                     return (matchingAttribute as StringMatchingAttribute).matches(appProperties.webView())
                 }

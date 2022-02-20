@@ -23,7 +23,7 @@ import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import com.duckduckgo.remote.messaging.impl.matchers.Result
+import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
@@ -40,55 +40,55 @@ class RemoteMessagingConfigMatcher(
             val matchingResult = matchingRules.evaluateMatchingRules(rules)
             val excludeResult = message.exclusionRules.evaluateExclusionRules(rules)
 
-            if (matchingResult == Result.Match && excludeResult == Result.Fail) return message
+            if (matchingResult == EvaluationResult.Match && excludeResult == EvaluationResult.Fail) return message
         }
 
         return null
     }
 
-    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): Result {
-        var result: Result = Result.Match
+    private suspend fun Iterable<Int>.evaluateMatchingRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
+        var result: EvaluationResult = EvaluationResult.Match
 
         for (rule in this) {
-            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.NextMessage
-            result = Result.Match
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return EvaluationResult.NextMessage
+            result = EvaluationResult.Match
 
             for (attr in attributes) {
                 result = evaluateAttribute(attr)
-                if (result == Result.Fail || result == Result.NextMessage) {
+                if (result == EvaluationResult.Fail || result == EvaluationResult.NextMessage) {
                     Timber.i("RMF: first failed attribute $attr")
                     break
                 }
             }
 
-            if (result == Result.NextMessage || result == Result.Match) return result
+            if (result == EvaluationResult.NextMessage || result == EvaluationResult.Match) return result
         }
 
         return result
     }
 
-    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute>>): Result {
-        var result: Result = Result.Fail
+    private suspend fun Iterable<Int>.evaluateExclusionRules(rules: Map<Int, List<MatchingAttribute>>): EvaluationResult {
+        var result: EvaluationResult = EvaluationResult.Fail
 
         for (rule in this) {
-            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return Result.NextMessage
-            result = Result.Fail
+            val attributes = rules[rule].takeUnless { it.isNullOrEmpty() } ?: return EvaluationResult.NextMessage
+            result = EvaluationResult.Fail
 
             for (attr in attributes) {
                 result = evaluateAttribute(attr)
-                if (result == Result.Fail || result == Result.NextMessage) {
+                if (result == EvaluationResult.Fail || result == EvaluationResult.NextMessage) {
                     Timber.i("RMF: first failed attribute $attr")
                     break
                 }
             }
 
-            if (result == Result.NextMessage || result == Result.Match) return result
+            if (result == EvaluationResult.NextMessage || result == EvaluationResult.Match) return result
         }
 
         return result
     }
 
-    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): Result {
+    private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): EvaluationResult {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> return deviceAttributeMatcher.evaluate(matchingAttribute)
             is MatchingAttribute.AppAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)

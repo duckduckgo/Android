@@ -41,7 +41,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.Flavor(value = listOf("internal"))
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -52,7 +52,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.Flavor(value = listOf("play"))
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -63,7 +63,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -74,7 +74,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -85,7 +85,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(max = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -96,7 +96,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(max = "5.99.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -107,7 +107,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(min = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -118,7 +118,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(min = "5.100.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -129,7 +129,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(min = "5.99.0", max = "5.200.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -140,7 +140,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(min = "5.100.0", max = "5.200.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -151,7 +151,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(value = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -162,7 +162,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppVersion(value = "5.100.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -173,7 +173,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.Atb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -184,7 +184,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.Atb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -195,7 +195,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppAtb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -206,7 +206,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.AppAtb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -217,7 +217,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.SearchAtb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -228,7 +228,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.SearchAtb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -239,7 +239,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.ExpVariant(value = "zo")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -250,7 +250,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.ExpVariant(value = "zz")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -261,7 +261,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.InstalledGPlay(value = true)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -272,7 +272,7 @@ class AndroidAppAttributeMatcherTest {
             MatchingAttribute.InstalledGPlay(value = true)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     private fun givenDeviceProperties(

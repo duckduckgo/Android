@@ -42,7 +42,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.AppTheme(value = "system_default")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -53,7 +53,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.AppTheme(value = "light")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -64,7 +64,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(value = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -75,7 +75,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(value = 15)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -86,7 +86,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(max = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -97,7 +97,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(max = 10)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -108,7 +108,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(min = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -119,7 +119,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(min = 9)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -130,7 +130,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(min = 9, max = 15)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -141,7 +141,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.Bookmarks(min = 3, max = 6)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // Favorites
@@ -153,7 +153,7 @@ class UserAttributeMatcherTest {
             Favorites(value = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -164,7 +164,7 @@ class UserAttributeMatcherTest {
             Favorites(value = 15)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -175,7 +175,7 @@ class UserAttributeMatcherTest {
             Favorites(max = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -186,7 +186,7 @@ class UserAttributeMatcherTest {
             Favorites(max = 5)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -197,7 +197,7 @@ class UserAttributeMatcherTest {
             Favorites(min = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -208,7 +208,7 @@ class UserAttributeMatcherTest {
             Favorites(min = 10)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -219,7 +219,7 @@ class UserAttributeMatcherTest {
             Favorites(min = 9, max = 15)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -230,7 +230,7 @@ class UserAttributeMatcherTest {
             Favorites(min = 3, max = 6)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // DaysSinceInstalled
@@ -242,7 +242,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(max = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -253,7 +253,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(max = 5)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -264,7 +264,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(min = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -275,7 +275,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(min = 10)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -286,7 +286,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(min = 9, max = 15)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -297,7 +297,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysSinceInstalled(min = 3, max = 6)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // DaysUsedSince
@@ -309,7 +309,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysUsedSince(since = Date(), value = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -320,7 +320,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DaysUsedSince(since = Date(), value = 8)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // DefaultBrowser
@@ -332,7 +332,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DefaultBrowser(value = true)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -343,7 +343,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.DefaultBrowser(value = true)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // EmailEnabled
@@ -355,7 +355,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.EmailEnabled(value = true)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -366,7 +366,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.EmailEnabled(value = true)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // SearchCount
@@ -378,7 +378,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(value = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -389,7 +389,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(value = 15)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -400,7 +400,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(max = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -411,7 +411,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(max = 5)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -422,7 +422,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(min = 10)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -433,7 +433,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(min = 10)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -444,7 +444,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(min = 10, max = 15)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -455,7 +455,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.SearchCount(min = 3, max = 6)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     // WidgetAdded
@@ -467,7 +467,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.WidgetAdded(value = true)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -478,7 +478,7 @@ class UserAttributeMatcherTest {
             MatchingAttribute.WidgetAdded(value = true)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     private suspend fun givenBrowserProperties(

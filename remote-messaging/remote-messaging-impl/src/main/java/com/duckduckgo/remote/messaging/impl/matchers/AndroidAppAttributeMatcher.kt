@@ -28,17 +28,17 @@ class AndroidAppAttributeMatcher(
     val appProperties: AppProperties,
     val appBuildConfig: AppBuildConfig
 ) {
-    fun evaluate(matchingAttribute: MatchingAttribute): Result {
+    fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
-                if (matchingAttribute == MatchingAttribute.Flavor()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.Flavor()) return EvaluationResult.Fail
                 return matchingAttribute.matches(appBuildConfig.flavor.toString())
             }
             is MatchingAttribute.AppId -> {
                 return matchingAttribute.matches(appBuildConfig.applicationId)
             }
             is MatchingAttribute.AppVersion -> {
-                if (matchingAttribute == MatchingAttribute.AppVersion()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.AppVersion()) return EvaluationResult.Fail
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
                     return (matchingAttribute as StringMatchingAttribute).matches(appBuildConfig.versionName)
                 }

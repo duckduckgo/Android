@@ -16,19 +16,19 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
-sealed class Result {
-    object Match : Result()
-    object Fail : Result()
-    object NextMessage : Result()
+sealed class EvaluationResult {
+    object Match : EvaluationResult()
+    object Fail : EvaluationResult()
+    object NextMessage : EvaluationResult()
 }
 
 fun String.defaultValue() = this.isEmpty()
 fun Int.defaultValue() = this == -1
 
-fun Boolean?.toResult(): Result {
+fun Boolean?.toResult(): EvaluationResult {
     return when (this) {
-        true -> Result.Match
-        false -> Result.Fail
-        null -> Result.NextMessage
+        true -> EvaluationResult.Match
+        false -> EvaluationResult.Fail
+        null -> EvaluationResult.NextMessage
     }
 }

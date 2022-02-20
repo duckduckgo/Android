@@ -41,7 +41,7 @@ class DeviceAttributeMatcherTest {
             MatchingAttribute.Locale(value = listOf("en-US"))
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -52,7 +52,7 @@ class DeviceAttributeMatcherTest {
             MatchingAttribute.Locale(value = listOf("fr-FR", "fr-CA", "en-US"))
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -63,7 +63,7 @@ class DeviceAttributeMatcherTest {
             MatchingAttribute.Locale(value = listOf("en_US"))
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -74,7 +74,7 @@ class DeviceAttributeMatcherTest {
             MatchingAttribute.Locale(value = listOf(""))
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -83,7 +83,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(value = 21))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -92,7 +92,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(value = 19))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -101,7 +101,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(min = 19))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -110,7 +110,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(min = 19, max = 23))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -119,7 +119,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(min = 19, max = 21))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -128,7 +128,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api(max = 19))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -137,7 +137,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.Api())
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -146,7 +146,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.104"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -155,7 +155,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(value = "96.0.4664.105"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -164,7 +164,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4665.101"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -173,7 +173,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4664.101"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -182,7 +182,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "96.0.4664.101"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -191,7 +191,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "96.1.4664.104"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -200,7 +200,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(max = "96.0.4664.104"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -209,7 +209,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "96.0.4664.104"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -218,7 +218,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(max = "96"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -227,7 +227,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "96"))
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
@@ -236,7 +236,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(max = "95"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -245,7 +245,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "97"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -254,7 +254,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "97"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -263,7 +263,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -272,7 +272,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -281,7 +281,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView(min = "91"))
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
@@ -290,7 +290,7 @@ class DeviceAttributeMatcherTest {
 
         val result = testee.evaluate(MatchingAttribute.WebView())
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     private fun givenDeviceProperties(
