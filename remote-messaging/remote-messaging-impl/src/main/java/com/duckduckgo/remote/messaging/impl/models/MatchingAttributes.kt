@@ -17,7 +17,6 @@
 package com.duckduckgo.remote.messaging.impl.models
 
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
-import com.duckduckgo.remote.messaging.impl.matchers.isDefaultValue
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import timber.log.Timber
 import java.util.*
@@ -233,6 +232,9 @@ private fun List<Int>.compareTo(other: List<Int>): Int {
 
     return 0
 }
+
+private fun String.isDefaultValue() = this.isEmpty()
+private fun Int.isDefaultValue() = this == -1
 
 @Suppress("UNCHECKED_CAST")
 internal fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()

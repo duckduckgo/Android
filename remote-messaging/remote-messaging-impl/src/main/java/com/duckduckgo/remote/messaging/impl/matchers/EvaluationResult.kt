@@ -22,10 +22,7 @@ sealed class EvaluationResult {
     object NextMessage : EvaluationResult()
 }
 
-fun String.isDefaultValue() = this.isEmpty()
-fun Int.isDefaultValue() = this == -1
-
-fun Boolean?.toResult(): EvaluationResult {
+internal fun Boolean?.toResult(): EvaluationResult {
     return when (this) {
         true -> EvaluationResult.Match
         false -> EvaluationResult.Fail
