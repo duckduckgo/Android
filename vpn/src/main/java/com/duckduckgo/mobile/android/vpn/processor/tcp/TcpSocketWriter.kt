@@ -36,6 +36,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
+import java.nio.channels.SocketChannel
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -113,7 +114,7 @@ class RealTcpSocketWriter @Inject constructor(
             val socket = writeData.socket
             val connectionParams = writeData.connectionParams
 
-            val bytesWritten = socket.write(payloadBuffer)
+            val bytesWritten = socket.safeWrite(payloadBuffer)
 
             if (payloadBuffer.remaining() == 0) {
                 Timber.v("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
@@ -128,6 +129,15 @@ class RealTcpSocketWriter @Inject constructor(
 
         selector.wakeup()
         tcb.channel.register(selector, OP_READ, tcb)
+    }
+
+    private fun SocketChannel.safeWrite(src: ByteBuffer): Int {
+        return kotlin.runCatching {
+            this.write(src)
+        }.getOrElse {
+            ByteBufferPool.release(src)
+            throw it
+        }
     }
 
     private fun partiallyWritten(
