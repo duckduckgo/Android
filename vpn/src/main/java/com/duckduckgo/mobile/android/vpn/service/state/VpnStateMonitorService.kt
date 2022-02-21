@@ -77,11 +77,6 @@ class VpnStateMonitorService : Service() {
         if (lastStateStats.state == VpnServiceState.ENABLED) {
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
         }
-
-        // create method in dao that returns last service state
-        // create interface in vpn-api Flow<VpnRunningState> (isRunning yes no and vpnstopreason)
-        // impl interface in vpn as a Repository
-        // use that repository from PrivacyReportViewModel
     }
 
     @WorkerThread
