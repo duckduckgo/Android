@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.impl
 
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonMessage
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.bigSingleActionJsonContent
@@ -35,8 +34,6 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,13 +43,9 @@ import java.util.*
 @RunWith(Parameterized::class)
 class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
 
-    private val deviceProperties: DeviceProperties = mock<DeviceProperties>().apply {
-        whenever(this.deviceLocale()).thenReturn(Locale.FRANCE)
-    }
-
     @Test
     fun whenJsonMessageThenReturnMessage() {
-        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage()
+        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage(Locale.FRANCE)
 
         assertEquals(testCase.expectedMessages, remoteMessages)
     }

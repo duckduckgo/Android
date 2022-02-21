@@ -117,8 +117,10 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigJsonMapper(): RemoteMessagingConfigJsonMapper {
-        return RemoteMessagingConfigJsonMapper()
+    fun providesRemoteMessagingConfigJsonMapper(
+        appBuildConfig: AppBuildConfig
+    ): RemoteMessagingConfigJsonMapper {
+        return RemoteMessagingConfigJsonMapper(appBuildConfig)
     }
 
     @Provides

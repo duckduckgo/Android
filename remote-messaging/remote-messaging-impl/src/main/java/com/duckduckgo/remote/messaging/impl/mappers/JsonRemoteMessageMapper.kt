@@ -16,7 +16,6 @@
 
 package com.duckduckgo.remote.messaging.impl.mappers
 
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.remote.messaging.api.Action
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.Content.BigSingleAction
@@ -39,6 +38,7 @@ import com.duckduckgo.remote.messaging.impl.models.JsonMessageType.SMALL
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import timber.log.Timber
+import java.util.*
 
 private val smallMapper: (JsonContent) -> Content = { jsonContent ->
     Small(
@@ -107,9 +107,9 @@ private val actionMappers = mapOf(
     Pair(DEFAULT_BROWSER.jsonValue, defaultBrowserActionMapper)
 )
 
-fun List<JsonRemoteMessage>.mapToRemoteMessage(): List<RemoteMessage> = this.mapNotNull { it.map() }
+fun List<JsonRemoteMessage>.mapToRemoteMessage(locale: Locale): List<RemoteMessage> = this.mapNotNull { it.map(locale) }
 
-private fun JsonRemoteMessage.map(): RemoteMessage? {
+private fun JsonRemoteMessage.map(locale: Locale): RemoteMessage? {
     return runCatching {
         val remoteMessage = RemoteMessage(
             id = this.id.failIfEmpty(),
@@ -117,16 +117,15 @@ private fun JsonRemoteMessage.map(): RemoteMessage? {
             matchingRules = this.matchingRules.orEmpty(),
             exclusionRules = this.exclusionRules.orEmpty()
         )
-        remoteMessage.localizeMessage(this.translations)
+        remoteMessage.localizeMessage(this.translations, locale)
     }.onFailure {
         Timber.e("RMF: error $it")
     }.getOrNull()
 }
 
-private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, deviceProperties: DeviceProperties): RemoteMessage {
+private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
     if (translations == null) return this
 
-    val locale = deviceProperties.deviceLocale()
     return translations[locale.asJsonFormat()]?.let {
         this.copy(content = this.content.localize(it))
     } ?: translations[locale.language]?.let {
