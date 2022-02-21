@@ -17,8 +17,15 @@
 package com.duckduckgo.mobile.android.vpn.service.state
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.state.VpnStateRepository
-import com.duckduckgo.mobile.android.vpn.state.VpnStateRepository.VpnState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.ERROR
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStoppingReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
@@ -26,11 +33,23 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealVpnStateRepository @Inject constructor(val database: VpnDatabase) : VpnStateRepository {
+class RealVpnStateRepository @Inject constructor(val database: VpnDatabase) : VpnStateMonitor {
 
     override fun getState(): Flow<VpnState> {
-        return database.vpnServiceStateDao().getLastStateStats().map {
-            VpnState(it.state, it.stopReason)
+        return database.vpnServiceStateDao().getStateStats().map {
+            val stoppingReason = when (it.stopReason) {
+                SELF_STOP -> VpnStoppingReason.SELF_STOP
+                REVOKED -> VpnStoppingReason.REVOKED
+                ERROR -> VpnStoppingReason.ERROR
+                else -> VpnStoppingReason.UNKNOWN
+            }
+            val runningState = when (it.state) {
+                ENABLED -> VpnRunningState.ENABLED
+                DISABLED -> VpnRunningState.DISABLED
+                else -> VpnRunningState.INVALID
+            }
+            VpnState(runningState, stoppingReason)
         }
     }
+
 }

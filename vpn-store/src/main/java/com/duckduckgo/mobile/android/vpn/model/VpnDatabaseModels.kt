@@ -68,6 +68,13 @@ enum class VpnServiceState {
     INVALID
 }
 
+enum class VpnStopReason {
+    SELF_STOP,
+    ERROR,
+    REVOKED,
+    UNKNOWN
+}
+
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
@@ -75,12 +82,6 @@ data class VpnServiceStateStats(
     val state: VpnServiceState,
     val stopReason: VpnStopReason? = null
 )
-
-enum class VpnStopReason {
-    SELF_STOP,
-    ERROR,
-    REVOKED
-}
 
 data class BucketizedVpnServiceStateStats(
     val day: String,

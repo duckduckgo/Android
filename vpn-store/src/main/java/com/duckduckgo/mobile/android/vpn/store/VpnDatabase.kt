@@ -286,7 +286,7 @@ object VpnTypeConverters {
         return try {
             VpnStopReason.valueOf(stopReason)
         } catch (t: Throwable) {
-            VpnStopReason.INVALID
+            VpnStopReason.UNKNOWN
         }
     }
 

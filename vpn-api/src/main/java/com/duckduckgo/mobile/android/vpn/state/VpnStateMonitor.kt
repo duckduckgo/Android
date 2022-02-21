@@ -15,16 +15,26 @@
  */
 
 package com.duckduckgo.mobile.android.vpn.state
-
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
 import kotlinx.coroutines.flow.Flow
 
-interface VpnStateRepository {
+interface VpnStateMonitor {
     fun getState(): Flow<VpnState>
 
     data class VpnState(
-        val state: VpnServiceState,
-        val stopReason: VpnStopReason? = null
+        val state: VpnRunningState,
+        val stopReason: VpnStoppingReason? = null
     )
+
+    enum class VpnRunningState {
+        ENABLED,
+        DISABLED,
+        INVALID
+    }
+
+    enum class VpnStoppingReason {
+        SELF_STOP,
+        ERROR,
+        REVOKED,
+        UNKNOWN
+    }
 }

@@ -22,8 +22,8 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.state.VpnStateRepository
-import com.duckduckgo.mobile.android.vpn.state.VpnStateRepository.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -36,7 +36,7 @@ import javax.inject.Provider
 class PrivacyReportViewModel(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
-    private val vpnStateRepository: VpnStateRepository
+    private val vpnStateRepository: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
     val viewStateFlow = vpnStateRepository.getState().combine(getReport()) { vpnState, trackersBlocked ->

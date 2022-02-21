@@ -22,7 +22,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
