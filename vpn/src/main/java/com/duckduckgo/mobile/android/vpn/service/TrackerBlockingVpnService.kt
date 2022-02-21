@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
+import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
 import android.content.ComponentName
@@ -26,12 +27,14 @@ import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
+import android.os.Build.VERSION_CODES
 import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
@@ -54,6 +57,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import java.net.StandardSocketOptions
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import java.util.concurrent.ExecutorService
@@ -105,6 +109,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject
     lateinit var tunPacketWriterFactory: TunPacketWriter.Factory
     private var vpnStateServiceReference: IBinder? = null
+
+    @Inject lateinit var appBuildConfig: AppBuildConfig
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -488,8 +494,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
+    @SuppressLint("NewApi") // because we use the appBuildConfig.sdkInt IDE doesn't detect it
     override fun createSocketChannel(): SocketChannel {
         return SocketChannel.open().also { channel ->
+            if (appBuildConfig.sdkInt >= VERSION_CODES.N) {
+                channel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
+            }
             channel.configureBlocking(false)
             protect(channel.socket())
         }
