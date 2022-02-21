@@ -24,6 +24,7 @@ import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
+import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
@@ -31,6 +32,8 @@ class RemoteMessagingConfigMatcher(
     val androidAppAttributeMatcher: AndroidAppAttributeMatcher,
     val userAttributeMatcher: UserAttributeMatcher
 ) {
+    private val matchers = listOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
+
     suspend fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules
 
@@ -89,30 +92,15 @@ class RemoteMessagingConfigMatcher(
     }
 
     private suspend fun evaluateAttribute(matchingAttribute: MatchingAttribute): EvaluationResult {
-        when (matchingAttribute) {
-            is MatchingAttribute.Api -> return deviceAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.AppAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.AppId -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.AppTheme -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.AppVersion -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Atb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Bookmarks -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.DaysSinceInstalled -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.DaysUsedSince -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.DefaultBrowser -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.EmailEnabled -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.ExpVariant -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Favorites -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Flavor -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.InstalledGPlay -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Locale -> return deviceAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.SearchAtb -> return androidAppAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.SearchCount -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.WebView -> return deviceAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.WidgetAdded -> return userAttributeMatcher.evaluate(matchingAttribute)
-            is MatchingAttribute.Unknown -> {
-                return matchingAttribute.fallback.toResult()
+        if (matchingAttribute is Unknown) {
+            return matchingAttribute.fallback.toResult()
+        } else {
+            matchers.forEach {
+                val result = it.evaluate(matchingAttribute)
+                if (result != null) return result
             }
         }
+
+        return EvaluationResult.NextMessage
     }
 }

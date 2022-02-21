@@ -25,8 +25,8 @@ import com.duckduckgo.remote.messaging.impl.models.matches
 
 class UserAttributeMatcher(
     val userBrowserProperties: UserBrowserProperties
-) {
-    suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult {
+) : AttributeMatcher {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {
             is MatchingAttribute.AppTheme -> {
                 return matchingAttribute.matches(userBrowserProperties.appTheme().toString())
@@ -73,7 +73,7 @@ class UserAttributeMatcher(
             is MatchingAttribute.WidgetAdded -> {
                 return matchingAttribute.matches(userBrowserProperties.widgetAdded())
             }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
+            else -> return null
         }
     }
 }

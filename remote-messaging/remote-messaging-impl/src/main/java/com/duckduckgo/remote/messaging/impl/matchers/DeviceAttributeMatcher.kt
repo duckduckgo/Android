@@ -31,8 +31,8 @@ import com.duckduckgo.remote.messaging.impl.models.matches
 class DeviceAttributeMatcher(
     val appBuildConfig: AppBuildConfig,
     val appProperties: AppProperties
-) {
-    fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult {
+) : AttributeMatcher {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {
             is MatchingAttribute.Api -> {
                 if (matchingAttribute == MatchingAttribute.Api()) return EvaluationResult.Fail
@@ -53,7 +53,7 @@ class DeviceAttributeMatcher(
                 }
                 return (matchingAttribute as RangeStringMatchingAttribute).matches(appProperties.webView())
             }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
+            else -> return null
         }
     }
 }

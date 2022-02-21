@@ -23,9 +23,12 @@ import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AndroidAppAttributeMatcherTest {
 
     private val appProperties: AppProperties = mock()
@@ -34,7 +37,7 @@ class AndroidAppAttributeMatcherTest {
     private val testee = AndroidAppAttributeMatcher(appProperties, appBuildConfig)
 
     @Test
-    fun whenFlavorMatchesThenReturnMatch() {
+    fun whenFlavorMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
@@ -45,7 +48,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenFlavorDoesNotMatchThenReturnFail() {
+    fun whenFlavorDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
@@ -56,7 +59,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppIdMatchesThenReturnMatch() {
+    fun whenAppIdMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
@@ -67,7 +70,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppIdDoesNotMatchThenReturnFail() {
+    fun whenAppIdDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
@@ -78,7 +81,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionEqualOrLowerThanMaxThenReturnMatch() {
+    fun whenAppVersionEqualOrLowerThanMaxThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
@@ -89,7 +92,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionGreaterThanMaxThenReturnFail() {
+    fun whenAppVersionGreaterThanMaxThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
@@ -100,7 +103,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionEqualOrGreaterThanMinThenReturnMatch() {
+    fun whenAppVersionEqualOrGreaterThanMinThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
@@ -111,7 +114,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionLowerThanMinThenReturnFail() {
+    fun whenAppVersionLowerThanMinThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
@@ -122,7 +125,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionInRangeThenReturnMatch() {
+    fun whenAppVersionInRangeThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.150.0")
 
         val result = testee.evaluate(
@@ -133,7 +136,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionNotInRangeThenReturnMatch() {
+    fun whenAppVersionNotInRangeThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.000.0")
 
         val result = testee.evaluate(
@@ -144,7 +147,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionSameAsDeviceThenReturnMatch() {
+    fun whenAppVersionSameAsDeviceThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
@@ -155,7 +158,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppVersionDifferentToDeviceThenReturnFail() {
+    fun whenAppVersionDifferentToDeviceThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
@@ -166,7 +169,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAtbMatchesThenReturnMatch() {
+    fun whenAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
@@ -177,7 +180,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAtbDoesNotMatchThenReturnFail() {
+    fun whenAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
@@ -188,7 +191,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppAtbMatchesThenReturnMatch() {
+    fun whenAppAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
@@ -199,7 +202,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenAppAtbDoesNotMatchThenReturnFail() {
+    fun whenAppAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
@@ -210,7 +213,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenSearchAtbMatchesThenReturnMatch() {
+    fun whenSearchAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
@@ -221,7 +224,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenSearchAtbDoesNotMatchThenReturnFail() {
+    fun whenSearchAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
@@ -232,7 +235,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenExpVariantMatchesThenReturnMatch() {
+    fun whenExpVariantMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
@@ -243,7 +246,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenExpVariantDoesNotMatchThenReturnFail() {
+    fun whenExpVariantDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
@@ -254,7 +257,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenInstalledGPlayMatchesThenReturnMatch() {
+    fun whenInstalledGPlayMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(installedGPlay = true)
 
         val result = testee.evaluate(
@@ -265,7 +268,7 @@ class AndroidAppAttributeMatcherTest {
     }
 
     @Test
-    fun whenInstalledGPlayDoesNotMatchThenReturnFail() {
+    fun whenInstalledGPlayDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(installedGPlay = false)
 
         val result = testee.evaluate(

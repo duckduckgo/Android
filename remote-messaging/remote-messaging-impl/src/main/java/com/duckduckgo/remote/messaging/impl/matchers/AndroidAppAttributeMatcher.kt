@@ -27,8 +27,8 @@ import com.duckduckgo.remote.messaging.impl.models.matches
 class AndroidAppAttributeMatcher(
     val appProperties: AppProperties,
     val appBuildConfig: AppBuildConfig
-) {
-    fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult {
+) : AttributeMatcher {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
                 if (matchingAttribute == MatchingAttribute.Flavor()) return EvaluationResult.Fail
@@ -59,7 +59,7 @@ class AndroidAppAttributeMatcher(
             is MatchingAttribute.InstalledGPlay -> {
                 return matchingAttribute.matches(appProperties.installedGPlay())
             }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
+            else -> return null
         }
     }
 }
