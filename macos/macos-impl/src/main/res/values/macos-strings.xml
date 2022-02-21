@@ -36,7 +36,7 @@
 
     <string name="macos_waitlist_code_title">You\'re invited!</string>
     <string name="macos_waitlist_code_invite">Invite Code</string>
-    <string name="macos_waitlist_code_description">Ready to start browsing privately\non your Mac?\n\n<b>Step 1</b>\nOn your Mac, go to:\n<b><annotation type="beta_link">duckduckgo.com/macbeta</annotation></b>\n\n<b>Step 2</b>\nOpen and install the downloaded file. When prompted, enter your invite code\nto unlock.</string>
+    <string name="macos_waitlist_code_description">Ready to start browsing privately\non your Mac?\n\n<b>Step 1</b>\nOn your Mac, go to:\n<b><annotation type="beta_link">duckduckgo.com/macbeta</annotation></b>\n\n<b>Step 2</b>\nOpen and install the downloaded file. When prompted, enter your invite code to unlock.</string>
     <string name="macos_waitlist_code_share_text"><![CDATA[Ready to start browsing privately on your Mac?<br/><br/><b>Step 1</b><br/>On your Mac, go to:<br/><a href="https://duckduckgo.com/macbeta"><b>https://duckduckgo.com/macbeta</b></a><br/><br/><b>Step 2</b><br/>Open and install the downloaded file. When prompted, enter your invite code to unlock.<br/><br/>Invite Code: %s]]></string>
 
     <string name="macos_waitlist_clipboard_invite_copied">Invite copied to clipboard</string>
