@@ -19,11 +19,11 @@ package com.duckduckgo.remote.messaging.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.app.global.AppUrl
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
-import com.duckduckgo.browser.api.DeviceProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRulesMapper
+import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
@@ -117,25 +117,8 @@ class DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesRemoteMessagingConfigJsonMapper(
-        jsonRemoteMessageMapper: JsonRemoteMessageMapper,
-        jsonRulesMapper: JsonRulesMapper
-    ): RemoteMessagingConfigJsonMapper {
-        return RemoteMessagingConfigJsonMapper(jsonRemoteMessageMapper, jsonRulesMapper)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesJsonRemoteMessageMapper(
-        deviceProperties: DeviceProperties
-    ): JsonRemoteMessageMapper {
-        return JsonRemoteMessageMapper(deviceProperties)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesJsonRulesMapper(): JsonRulesMapper {
-        return JsonRulesMapper()
+    fun providesRemoteMessagingConfigJsonMapper(): RemoteMessagingConfigJsonMapper {
+        return RemoteMessagingConfigJsonMapper()
     }
 
     @Provides
@@ -152,17 +135,19 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesAndroidAppAttributeMatcher(
-        appProperties: AppProperties
+        appProperties: AppProperties,
+        appBuildConfig: AppBuildConfig
     ): AndroidAppAttributeMatcher {
-        return AndroidAppAttributeMatcher(appProperties)
+        return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesDeviceAttributeMatcher(
-        deviceProperties: DeviceProperties
+        appBuildConfig: AppBuildConfig,
+        appProperties: AppProperties
     ): DeviceAttributeMatcher {
-        return DeviceAttributeMatcher(deviceProperties)
+        return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
 
     @Provides

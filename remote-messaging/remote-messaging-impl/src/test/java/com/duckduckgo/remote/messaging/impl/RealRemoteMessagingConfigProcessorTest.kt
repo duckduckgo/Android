@@ -27,10 +27,14 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
 
+@ExperimentalCoroutinesApi
 class RealRemoteMessagingConfigProcessorTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -57,8 +61,12 @@ class RealRemoteMessagingConfigProcessorTest {
 
     @Test
     fun whenSameVersionThenDoNothing() = runTest {
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
-            aRemoteMessagingConfig(version = 1L)
+            aRemoteMessagingConfig(
+                version = 1L,
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now())
+            )
         )
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
@@ -68,10 +76,14 @@ class RealRemoteMessagingConfigProcessorTest {
 
     @Test
     fun whenSameVersionButExpiredThenEvaluate() = runTest {
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
-            aRemoteMessagingConfig(version = 0L)
+            aRemoteMessagingConfig(
+                version = 0L,
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now().minusDays(2L))
+            )
         )
-        whenever(remoteMessagingConfigRepository.expired()).thenReturn(true)
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
@@ -81,9 +93,11 @@ class RealRemoteMessagingConfigProcessorTest {
     @Test
     fun whenSameVersionButInvalidatedThenEvaluate() = runTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
-            aRemoteMessagingConfig(version = 0L)
+            aRemoteMessagingConfig(
+                version = 0L,
+                invalidate = true
+            )
         )
-        whenever(remoteMessagingConfigRepository.invalidated()).thenReturn(true)
 
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 

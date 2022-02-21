@@ -68,6 +68,11 @@ class TwoLineListItem : LinearLayout {
 
     /** Sets the item image resource */
     fun setImageResource(idRes: Int) {
+        binding.image.setImageResource(idRes)
+    }
+
+    /** Sets the item image drawable */
+    fun setImageDrawable(idRes: Int) {
         val drawable = VectorDrawableCompat.create(resources, idRes, null)
         binding.image.setImageDrawable(drawable)
     }

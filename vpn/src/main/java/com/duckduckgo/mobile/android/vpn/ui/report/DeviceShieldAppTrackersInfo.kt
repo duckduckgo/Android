@@ -31,7 +31,7 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        setupToolbar(binding.includeToolbar.defaultToolbar)
+        setupToolbar(binding.includeToolbar.toolbar)
     }
 
     override fun onSupportNavigateUp(): Boolean {

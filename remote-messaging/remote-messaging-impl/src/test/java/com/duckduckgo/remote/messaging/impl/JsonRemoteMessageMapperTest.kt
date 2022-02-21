@@ -28,11 +28,11 @@ import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigSingleAction
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aBigTwoActionsMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
+import com.duckduckgo.remote.messaging.impl.mappers.mapToRemoteMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigSingleActionContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.bigTwoActionsContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.mediumContent
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.smallContent
-import com.duckduckgo.remote.messaging.impl.mappers.JsonRemoteMessageMapper
 import com.duckduckgo.remote.messaging.impl.models.JsonContentTranslations
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessage
 import com.nhaarman.mockitokotlin2.mock
@@ -49,11 +49,10 @@ class JsonRemoteMessageMapperTest(private val testCase: TestCase) {
     private val deviceProperties: DeviceProperties = mock<DeviceProperties>().apply {
         whenever(this.deviceLocale()).thenReturn(Locale.FRANCE)
     }
-    private val testee = JsonRemoteMessageMapper(deviceProperties)
 
     @Test
     fun whenJsonMessageThenReturnMessage() {
-        val remoteMessages = testee.map(testCase.jsonRemoteMessages)
+        val remoteMessages = testCase.jsonRemoteMessages.mapToRemoteMessage()
 
         assertEquals(testCase.expectedMessages, remoteMessages)
     }

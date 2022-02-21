@@ -16,31 +16,19 @@
 
 package com.duckduckgo.app.global.store
 
-import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.BuildConfig.APPLICATION_ID
-import com.duckduckgo.app.browser.BuildConfig.FLAVOR
+import android.content.Context
+import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
 
 class AndroidAppProperties(
+    private val appContext: Context,
     private val variantManager: VariantManager,
     private val playStoreUtils: PlayStoreUtils,
     private val statisticsStore: StatisticsDataStore
 ) : AppProperties {
-
-    override fun flavor(): String {
-        return FLAVOR
-    }
-
-    override fun appId(): String {
-        return APPLICATION_ID
-    }
-
-    override fun appVersion(): String {
-        return BuildConfig.VERSION_NAME
-    }
 
     override fun atb(): String {
         return statisticsStore.atb?.version.orEmpty()
@@ -60,5 +48,13 @@ class AndroidAppProperties(
 
     override fun installedGPlay(): Boolean {
         return playStoreUtils.installedFromPlayStore()
+    }
+
+    override fun webView(): String {
+        return WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
+    }
+
+    companion object {
+        const val WEBVIEW_UNKNOWN_VERSION = "unknown"
     }
 }

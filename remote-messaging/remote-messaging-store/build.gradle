@@ -22,13 +22,25 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+}
+
 dependencies {
     implementation AndroidX.room.ktx
     kapt AndroidX.room.compiler
     implementation "com.jakewharton.threetenabp:threetenabp:_"
 
-    androidTestImplementation project(path: ':common-test')
-    androidTestImplementation AndroidX.archCore.testing
-    androidTestImplementation AndroidX.test.runner
-    androidTestImplementation AndroidX.test.rules
+    testImplementation project(path: ':common-test')
+    testImplementation "org.threeten:threetenbp:_"
+    testImplementation Testing.junit4
 }

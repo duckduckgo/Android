@@ -55,4 +55,6 @@
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
 
+    <color name="black18">#2E000000</color>
+    <color name="black36">#5C000000</color>
 </resources>

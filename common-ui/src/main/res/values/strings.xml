@@ -40,4 +40,9 @@
     <string name="checkbox_label_title">Checkbox</string>
     <string name="snackbar_label_title">Snackbar</string>
 
+    <!-- Defaults Searchbar -->
+    <string name="searchbar_cleartextaction_content_description_default">Collapse</string>
+    <string name="searchbar_searchhint_default">Search</string>
+    <string name="searhbar_upaction_content_description_default">Navigate up</string>
+
 </resources>
