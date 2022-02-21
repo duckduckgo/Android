@@ -126,11 +126,13 @@ private fun JsonRemoteMessage.map(locale: Locale): RemoteMessage? {
 private fun RemoteMessage.localizeMessage(translations: Map<String, JsonContentTranslations>?, locale: Locale): RemoteMessage {
     if (translations == null) return this
 
-    return translations[locale.asJsonFormat()]?.let {
-        this.copy(content = this.content.localize(it))
-    } ?: translations[locale.language]?.let {
-        this.copy(content = this.content.localize(it))
-    } ?: this
+    val deviceTranslations = translations[locale.asJsonFormat()] ?: translations[locale.language]
+
+    return if (deviceTranslations != null) {
+        this.copy(content = this.content.localize(deviceTranslations))
+    } else {
+        this
+    }
 }
 
 private fun JsonContent.mapToContent(messageType: String): Content {
