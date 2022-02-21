@@ -30,7 +30,8 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -59,8 +60,8 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         when (vpnStopReason) {
-            is VpnStopReason.SelfStop -> onVPNManuallyStopped()
-            is VpnStopReason.Revoked -> onVPNRevoked()
+            VpnStateMonitor.VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+            VpnStateMonitor.VpnStopReason.REVOKED -> onVPNRevoked()
             else -> onVPNUndesiredStop()
         }
     }

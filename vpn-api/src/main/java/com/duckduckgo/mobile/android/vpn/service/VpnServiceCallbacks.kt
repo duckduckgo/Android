@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import kotlinx.coroutines.CoroutineScope
 
 interface VpnServiceCallbacks {

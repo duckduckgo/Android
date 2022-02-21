@@ -22,7 +22,7 @@ interface VpnStateMonitor {
 
     data class VpnState(
         val state: VpnRunningState,
-        val stopReason: VpnStoppingReason? = null
+        val stopReason: VpnStopReason? = null
     )
 
     enum class VpnRunningState {
@@ -31,7 +31,7 @@ interface VpnStateMonitor {
         INVALID
     }
 
-    enum class VpnStoppingReason {
+    enum class VpnStopReason {
         SELF_STOP,
         ERROR,
         REVOKED,

@@ -282,17 +282,17 @@ object VpnTypeConverters {
 
     @TypeConverter
     @JvmStatic
-    fun toVpnStopReason(stopReason: String): VpnStopReason {
+    fun toVpnStopReason(stopReason: String): VpnStoppingReason {
         return try {
-            VpnStopReason.valueOf(stopReason)
+            VpnStoppingReason.valueOf(stopReason)
         } catch (t: Throwable) {
-            VpnStopReason.UNKNOWN
+            VpnStoppingReason.UNKNOWN
         }
     }
 
     @TypeConverter
     @JvmStatic
-    fun fromVpnStopReason(vpnStopReason: VpnStopReason): String {
+    fun fromVpnStopReason(vpnStopReason: VpnStoppingReason): String {
         return vpnStopReason.name
     }
 }

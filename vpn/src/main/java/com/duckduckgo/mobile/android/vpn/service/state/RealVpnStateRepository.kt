@@ -19,13 +19,13 @@ package com.duckduckgo.mobile.android.vpn.service.state
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.ERROR
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStoppingReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.flow.Flow
@@ -38,10 +38,10 @@ class RealVpnStateRepository @Inject constructor(val database: VpnDatabase) : Vp
     override fun getState(): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map {
             val stoppingReason = when (it.stopReason) {
-                SELF_STOP -> VpnStoppingReason.SELF_STOP
-                REVOKED -> VpnStoppingReason.REVOKED
-                ERROR -> VpnStoppingReason.ERROR
-                else -> VpnStoppingReason.UNKNOWN
+                SELF_STOP -> VpnStopReason.SELF_STOP
+                REVOKED -> VpnStopReason.REVOKED
+                ERROR -> VpnStopReason.ERROR
+                else -> VpnStopReason.UNKNOWN
             }
             val runningState = when (it.state) {
                 ENABLED -> VpnRunningState.ENABLED

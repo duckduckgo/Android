@@ -68,7 +68,7 @@ enum class VpnServiceState {
     INVALID
 }
 
-enum class VpnStopReason {
+enum class VpnStoppingReason {
     SELF_STOP,
     ERROR,
     REVOKED,
@@ -80,7 +80,7 @@ data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
     val state: VpnServiceState,
-    val stopReason: VpnStopReason? = null
+    val stopReason: VpnStoppingReason? = null
 )
 
 data class BucketizedVpnServiceStateStats(

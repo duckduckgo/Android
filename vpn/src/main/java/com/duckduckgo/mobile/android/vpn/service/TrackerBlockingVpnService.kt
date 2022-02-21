@@ -33,16 +33,14 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.ERROR
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.model.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
@@ -184,7 +182,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch { stopVpn(SELF_STOP) }
+                launch { stopVpn(VpnStateMonitor.VpnStopReason.SELF_STOP) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -273,7 +271,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(ERROR)
+            stopVpn(VpnStateMonitor.VpnStopReason.ERROR)
         }
     }
 
@@ -298,7 +296,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
+    private suspend fun stopVpn(reason: VpnStateMonitor.VpnStopReason) = withContext(Dispatchers.IO) {
         Timber.i("VPN log: Stopping VPN.")
 
         queues.clearAll()
@@ -323,12 +321,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         stopSelf()
     }
 
-    private fun sendStopPixels(reason: VpnStopReason) {
+    private fun sendStopPixels(reason: VpnStateMonitor.VpnStopReason) {
         when (reason) {
-            SELF_STOP -> { /* noop */
+            VpnStateMonitor.VpnStopReason.SELF_STOP -> { /* noop */
             }
-            ERROR -> deviceShieldPixels.startError()
-            REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
+            VpnStateMonitor.VpnStopReason.ERROR -> deviceShieldPixels.startError()
+            VpnStateMonitor.VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
     }
 
@@ -340,7 +338,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        launch { stopVpn(REVOKED) }
+        launch { stopVpn(VpnStateMonitor.VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
