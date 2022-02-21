@@ -134,7 +134,7 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun renderStateRevoked() {
-        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
+        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
     }
 

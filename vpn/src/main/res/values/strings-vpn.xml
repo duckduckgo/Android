@@ -125,6 +125,7 @@
     <!-- New Tab Integration -->
     <string name="atp_NewTabSuffix">"\u0020(past hour)."</string>
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
+    <string name="atp_NewTabRevoked"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
