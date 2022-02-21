@@ -33,13 +33,13 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Provider
 
-class PrivacyReportViewModel(
+class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
-    private val vpnStateRepository: VpnStateMonitor
+    private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
-    val viewStateFlow = vpnStateRepository.getState().combine(getReport()) { vpnState, trackersBlocked ->
+    val viewStateFlow = vpnStateMonitor.getState().combine(getReport()) { vpnState, trackersBlocked ->
         PrivacyReportView.ViewState(vpnState, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
     }
 
