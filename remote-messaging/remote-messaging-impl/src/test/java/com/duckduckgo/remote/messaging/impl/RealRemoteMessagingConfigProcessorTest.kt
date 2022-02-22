@@ -94,7 +94,7 @@ class RealRemoteMessagingConfigProcessorTest {
     fun whenSameVersionButInvalidatedThenEvaluate() = runTest {
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(
-                version = 0L,
+                version = 1L,
                 invalidate = true
             )
         )

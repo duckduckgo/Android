@@ -49,7 +49,7 @@ class RealRemoteMessagingConfigProcessor(
             val config = remoteMessagingConfigJsonMapper.map(jsonRemoteMessagingConfig)
             val message = remoteMessagingConfigMatcher.evaluate(config)
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
-            message?.let { remoteMessagingRepository.add(message) }
+            remoteMessagingRepository.activeMessage(message)
         } else {
             Timber.v("RMF: skip")
         }
