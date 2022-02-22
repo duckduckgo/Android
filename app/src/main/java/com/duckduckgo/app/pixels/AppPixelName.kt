@@ -255,5 +255,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BOOKMARK_EXPORT_ERROR("m_be_e"),
 
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
-    ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e")
+    ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e"),
+
+    WEBVIEW_FEATURE_SUPPORTED("m_webview_feature_supported")
 }
