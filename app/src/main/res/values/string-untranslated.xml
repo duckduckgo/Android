@@ -28,4 +28,9 @@
     <string name="macos_settings_description_list">You\'re on the list!</string>
     <string name="macos_settings_description_ready">Available for download on Mac</string>
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+
+    <!-- Voice Search  -->
+    <string name="voiceSearchIconContentDescription">Voice search</string>
+    <string name="voiceSearchListening">Listening…</string>
+    <string name="voiceSearchTitle">Voice search</string>
 </resources>

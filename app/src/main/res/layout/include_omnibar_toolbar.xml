@@ -136,6 +136,7 @@
                             android:id="@+id/voiceSearchButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:contentDescription="@string/voiceSearchIconContentDescription"
                             android:padding="@dimen/keyline_2"
                             android:visibility="gone"
                             app:layout_constraintBottom_toBottomOf="parent"

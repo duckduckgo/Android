@@ -384,6 +384,11 @@
             android:label="@string/folderLocationTitle"
             android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
 
+        <activity
+            android:name="com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity"
+            android:label="@string/voiceSearchTitle"
+            android:parentActivityName=".BrowserActivity" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
