@@ -33,4 +33,7 @@
     <string name="voiceSearchIconContentDescription">Voice search</string>
     <string name="voiceSearchListening">Listening…</string>
     <string name="voiceSearchTitle">Voice search</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Settings</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Microphone Access Required</string>
 </resources>

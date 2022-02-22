@@ -176,6 +176,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.voice.VoiceSearchAvailabilityUtil
+import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
@@ -298,6 +299,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
 
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -397,6 +401,12 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
+        voiceSearchLauncher.registerResultsCallback(this) {
+            if (it.isNotEmpty()) {
+                omnibar.omnibarTextInput.setText(it)
+                userEnteredQuery(it)
+            }
+        }
     }
 
     override fun onCreateView(
@@ -1297,6 +1307,9 @@ class BrowserTabFragment :
         context?.let {
             if (VoiceSearchAvailabilityUtil.shouldShowVoiceSearchEntry(it)) {
                 voiceSearchButton.visibility = VISIBLE
+                voiceSearchButton.setOnClickListener {
+                    voiceSearchLauncher.launch()
+                }
             } else {
                 voiceSearchButton.visibility = GONE
             }
