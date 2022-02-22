@@ -39,6 +39,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -229,7 +231,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runBlocking {
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runTest {
         viewModel.commands().test {
             val permissionIntent = Intent()
             viewModel.onVPNPermissionNeeded(permissionIntent)
@@ -242,7 +244,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasHigherThanNeededThenVpnIsStopped() = runBlocking {
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasHigherThanNeededThenVpnIsStopped() = runTest {
         viewModel.commands().test {
             val permissionIntent = Intent()
             viewModel.onVPNPermissionNeeded(permissionIntent)
@@ -250,7 +252,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
             delay(2000)
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_CANCELED)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }

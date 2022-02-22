@@ -34,7 +34,7 @@ interface VpnServiceStateStatsDao {
     fun getLastStateStats(): VpnServiceStateStats
 
     @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
-    fun getStateStats(): Flow<VpnServiceStateStats>
+    fun getStateStats(): Flow<VpnServiceStateStats?>
 
     @Query("SELECT COUNT(*) FROM vpn_service_state_stats WHERE state is 'ENABLED'")
     fun getEnableCount(): Int

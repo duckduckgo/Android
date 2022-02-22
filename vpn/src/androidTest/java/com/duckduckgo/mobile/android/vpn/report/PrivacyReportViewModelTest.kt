@@ -62,7 +62,7 @@ class PrivacyReportViewModelTest {
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val appBuildConfig: AppBuildConfig = mock()
     private val onboardingStore = mock<DeviceShieldOnboardingStore>()
-    private val stateRepository = mock<VpnStateMonitor>()
+    private val vpnStateMonitor = mock<VpnStateMonitor>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -80,7 +80,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context, appBuildConfig)
 
-        testee = PrivacyReportViewModel(repository, onboardingStore, stateRepository)
+        testee = PrivacyReportViewModel(repository, onboardingStore, vpnStateMonitor)
     }
 
     private fun prepareDb() {

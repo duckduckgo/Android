@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 20,
-    "identityHash": "dc6e3395763a09e6953c47ec53d5566e",
+    "identityHash": "d683be5ff8d34422f26e050b3522918d",
     "entities": [
       {
         "tableName": "vpn_state",

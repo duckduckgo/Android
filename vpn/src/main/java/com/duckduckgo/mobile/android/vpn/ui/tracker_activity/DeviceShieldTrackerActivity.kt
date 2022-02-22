@@ -69,10 +69,11 @@ class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
-    AppTPVPNConflictDialog.Listener {
+    AppTPVpnConflictDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
 
@@ -229,6 +230,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> launchVPNConflictDialog()
         }
     }
 
@@ -243,7 +245,7 @@ class DeviceShieldTrackerActivity :
     private fun launchDisableConfirmationDialog() {
         deviceShieldSwitch.quietlySetIsChecked(true, enableAppTPSwitchListener)
         deviceShieldPixels.didShowDisableTrackingProtectionDialog()
-        val dialog = AppTPDisableConfirmationDialog.instance()
+        val dialog = AppTPDisableConfirmationDialog.instance(this)
         dialog.show(
             supportFragmentManager,
             AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
@@ -251,12 +253,12 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchVPNConflictDialog() {
-        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        quietlyToggleAppTpSwitch(false)
         deviceShieldPixels.didShowVpnConflictDialog()
-        val dialog = AppTPVPNConflictDialog.instance()
+        val dialog = AppTPVpnConflictDialog.instance(this)
         dialog.show(
             supportFragmentManager,
-            AppTPVPNConflictDialog.TAG_VPN_CONFLICT_DIALOG
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
         )
     }
 
@@ -266,7 +268,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onTurnAppTrackingProtectionOff() {
-        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        quietlyToggleAppTpSwitch(false)
         deviceShieldPixels.didChooseToDisableTrackingProtectionFromDialog()
         viewModel.onAppTpManuallyDisabled()
     }
@@ -325,19 +327,23 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun startVPN() {
-        deviceShieldSwitch.quietlySetIsChecked(true, enableAppTPSwitchListener)
+        quietlyToggleAppTpSwitch(true)
         TrackerBlockingVpnService.startService(this)
     }
 
     private fun stopDeviceShield() {
-        deviceShieldSwitch.quietlySetIsChecked(false, enableAppTPSwitchListener)
+        quietlyToggleAppTpSwitch(false)
         TrackerBlockingVpnService.stopService(this)
+    }
+
+    private fun quietlyToggleAppTpSwitch(state: Boolean){
+        deviceShieldSwitch.quietlySetIsChecked(state, enableAppTPSwitchListener)
     }
 
     private fun renderViewState(state: DeviceShieldTrackerActivityViewModel.TrackerActivityViewState) {
         // is there a better way to do this?
         if (::deviceShieldSwitch.isInitialized) {
-            deviceShieldSwitch.quietlySetIsChecked(state.runningState.isRunning, enableAppTPSwitchListener)
+            quietlyToggleAppTpSwitch(state.runningState.isRunning)
         } else {
             Timber.v("switch view reference not yet initialized; cache value until menu populated")
             deviceShieldCachedState = state.runningState.isRunning
@@ -495,5 +501,4 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
-
 }

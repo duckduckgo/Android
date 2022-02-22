@@ -33,17 +33,17 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealVpnStateRepository @Inject constructor(val database: VpnDatabase) : VpnStateMonitor {
+class RealVpnStateMonitor @Inject constructor(val database: VpnDatabase) : VpnStateMonitor {
 
     override fun getState(): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map {
-            val stoppingReason = when (it.stopReason) {
+            val stoppingReason = when (it?.stopReason) {
                 SELF_STOP -> VpnStopReason.SELF_STOP
                 REVOKED -> VpnStopReason.REVOKED
                 ERROR -> VpnStopReason.ERROR
                 else -> VpnStopReason.UNKNOWN
             }
-            val runningState = when (it.state) {
+            val runningState = when (it?.state) {
                 ENABLED -> VpnRunningState.ENABLED
                 DISABLED -> VpnRunningState.DISABLED
                 else -> VpnRunningState.INVALID
@@ -51,5 +51,4 @@ class RealVpnStateRepository @Inject constructor(val database: VpnDatabase) : Vp
             VpnState(runningState, stoppingReason)
         }
     }
-
 }

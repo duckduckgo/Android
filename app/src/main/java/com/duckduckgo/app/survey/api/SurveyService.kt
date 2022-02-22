@@ -26,5 +26,4 @@ interface SurveyService {
 
     @GET("https://staticcdn.duckduckgo.com/survey/apptp/survey-mobile.json")
     fun surveyAppTp(): Call<SurveyGroup?>
-
 }

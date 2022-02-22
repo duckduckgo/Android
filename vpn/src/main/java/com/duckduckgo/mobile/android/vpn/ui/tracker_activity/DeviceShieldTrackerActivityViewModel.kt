@@ -113,7 +113,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 if (System.currentTimeMillis() - lastVpnRequestTime < 1000) {
                     sendCommand(Command.ShowVpnConflictDialog)
                 } else {
-                    sendCommand(Command.StopVPN)
+                    sendCommand(Command.VPNPermissionNotGranted)
                 }
                 lastVpnRequestTime = -1
             }
@@ -175,6 +175,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object StopVPN : Command()
         object LaunchVPN : Command()
         object CheckVPNPermission : Command()
+        object VPNPermissionNotGranted : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
         data class LaunchExcludedApps(val shouldListBeEnabled: Boolean) : Command()
         object LaunchDeviceShieldFAQ : Command()

@@ -22,6 +22,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -30,11 +31,12 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealVpnDetector @Inject constructor(
-    private val context: Context
+    private val context: Context,
+    private val appBuildConfig: AppBuildConfig
 ) : VpnDetector {
 
     override fun isVpnDetected(): Boolean {
-        return if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        return if (appBuildConfig.sdkInt <= Build.VERSION_CODES.LOLLIPOP_MR1) {
             detectVpnLollipop()
         } else {
             detectVpn()
@@ -51,7 +53,7 @@ class RealVpnDetector @Inject constructor(
     @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     private fun detectVpnLollipop(): Boolean {
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetworkInfo?.type == ConnectivityManager.TYPE_VPN ?: false
+        return connectivityManager.activeNetworkInfo?.type == ConnectivityManager.TYPE_VPN
     }
 
 }

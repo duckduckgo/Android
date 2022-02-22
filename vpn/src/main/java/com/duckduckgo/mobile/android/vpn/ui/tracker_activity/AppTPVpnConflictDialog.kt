@@ -23,21 +23,12 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class AppTPVPNConflictDialog : DialogFragment() {
+class AppTPVpnConflictDialog private constructor(private val listener: Listener): DialogFragment() {
 
     interface Listener {
         fun onDismissConflictDialog()
         fun onOpenSettings()
     }
-
-    val listener: Listener
-        get() {
-            return if (parentFragment is Listener) {
-                parentFragment as Listener
-            } else {
-                activity as Listener
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,8 +73,8 @@ class AppTPVPNConflictDialog : DialogFragment() {
 
         const val TAG_VPN_CONFLICT_DIALOG = "AppTPVpnConflictDialog"
 
-        fun instance(): AppTPVPNConflictDialog {
-            return AppTPVPNConflictDialog()
+        fun instance(listener: Listener): AppTPVpnConflictDialog {
+            return AppTPVpnConflictDialog(listener)
         }
     }
 }
