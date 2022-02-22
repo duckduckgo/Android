@@ -72,6 +72,8 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
@@ -116,6 +118,7 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkInfo
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -152,6 +155,7 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val remoteMessagingModel: RemoteMessagingModel,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -178,6 +182,7 @@ class BrowserTabViewModel(
 
     data class CtaViewState(
         val cta: Cta? = null,
+        val message: RemoteMessage? = null,
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
     )
 
@@ -350,7 +355,10 @@ class BrowserTabViewModel(
             val icon: Bitmap? = null
         ) : Command()
 
+        class SubmitUrl(val url: String) : Command()
+        class LaunchPlayStore(val appPackage: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
+        object LaunchDefaultBrowser : Command()
         object LaunchAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(
@@ -436,6 +444,7 @@ class BrowserTabViewModel(
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
+    private var ctaChangedTicker = MutableStateFlow("")
 
     val url: String?
         get() = site?.url
@@ -571,6 +580,26 @@ class BrowserTabViewModel(
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
+
+        remoteMessagingModel.activeMessages
+            .combine(ctaChangedTicker.asStateFlow(), ::Pair)
+            .onEach { (activeMessage, ticker) ->
+                Timber.v("RMF: $ticker-$activeMessage")
+
+                if (ticker.isEmpty()) return@onEach
+                if (currentBrowserViewState().browserShowing) return@onEach
+
+                val cta = currentCtaViewState().cta?.takeUnless { it ->
+                    activeMessage != null && it is HomePanelCta
+                }
+
+                withContext(dispatchers.main()) {
+                    ctaViewState.value = currentCtaViewState().copy(
+                        cta = cta,
+                        message = if (cta == null) activeMessage else null
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -2106,6 +2135,7 @@ class BrowserTabViewModel(
                 )
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }
         return null
@@ -2136,6 +2166,39 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
+        }
+    }
+
+    fun onMessageShown() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageShown(message)
+        }
+    }
+
+    fun onMessageCloseButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageDismissed(message)
+            refreshCta()
+        }
+    }
+
+    fun onMessagePrimaryButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
+        }
+    }
+
+    fun onMessageSecondaryButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
         }
     }
 
@@ -2535,6 +2598,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val specialUrlDetector: Provider<SpecialUrlDetector>,
     private val faviconManager: Provider<FaviconManager>,
     private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
+    private val remoteMessagingModel: Provider<RemoteMessagingModel>,
     private val ctaViewModel: Provider<CtaViewModel>,
     private val searchCountDao: Provider<SearchCountDao>,
     private val pixel: Provider<Pixel>,
@@ -2575,6 +2639,7 @@ class BrowserTabViewModelFactory @Inject constructor(
                     specialUrlDetector.get(),
                     faviconManager.get(),
                     addToHomeCapabilityDetector.get(),
+                    remoteMessagingModel.get(),
                     ctaViewModel.get(),
                     searchCountDao.get(),
                     pixel.get(),
