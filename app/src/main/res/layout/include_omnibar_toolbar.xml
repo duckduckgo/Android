@@ -127,10 +127,21 @@
                             android:textSize="16sp"
                             android:textStyle="normal"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                            app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                             app:layout_constraintStart_toEndOf="@id/omnibarIconContainer"
                             app:layout_constraintTop_toTopOf="parent"
                             tools:text="https://duckduckgo.com/?q=areallylongexampleexample" />
+
+                        <com.duckduckgo.mobile.android.ui.view.IconButton
+                            android:id="@+id/voiceSearchButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/keyline_2"
+                            android:visibility="gone"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:srcCompat="@drawable/ic_microphone_24"/>
 
                         <ImageView
                             android:id="@+id/clearTextButton"
