@@ -336,7 +336,7 @@ class DeviceShieldTrackerActivity :
         TrackerBlockingVpnService.stopService(this)
     }
 
-    private fun quietlyToggleAppTpSwitch(state: Boolean){
+    private fun quietlyToggleAppTpSwitch(state: Boolean) {
         deviceShieldSwitch.quietlySetIsChecked(state, enableAppTPSwitchListener)
     }
 

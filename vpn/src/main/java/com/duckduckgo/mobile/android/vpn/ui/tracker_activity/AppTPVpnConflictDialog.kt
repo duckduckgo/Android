@@ -23,7 +23,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class AppTPVpnConflictDialog private constructor(private val listener: Listener): DialogFragment() {
+class AppTPVpnConflictDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
         fun onDismissConflictDialog()

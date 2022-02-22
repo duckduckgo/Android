@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.service.VpnStopReason.SelfStop
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
