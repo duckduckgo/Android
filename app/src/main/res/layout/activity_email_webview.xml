@@ -25,7 +25,7 @@
 
     <include
         android:id="@+id/includeToolbar"
-        layout="@layout/include_toolbar" />
+        layout="@layout/include_default_toolbar" />
 
     <WebView
         android:id="@+id/simpleWebview"

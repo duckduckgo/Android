@@ -91,8 +91,8 @@ object JsonRemoteMessageOM {
     fun aJsonMessage(
         id: String = "id",
         content: JsonContent? = emptyJsonContent(),
-        exclusionRules: List<Int>? = emptyList(),
-        matchingRules: List<Int>? = emptyList(),
+        exclusionRules: List<Int> = emptyList(),
+        matchingRules: List<Int> = emptyList(),
         translations: Map<String, JsonContentTranslations> = emptyMap()
     ) = JsonRemoteMessage(
         id = id,

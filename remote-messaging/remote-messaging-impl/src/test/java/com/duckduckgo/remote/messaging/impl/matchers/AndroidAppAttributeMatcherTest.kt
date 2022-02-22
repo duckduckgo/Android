@@ -16,262 +16,270 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AndroidAppAttributeMatcherTest {
 
     private val appProperties: AppProperties = mock()
-    private val testee = AndroidAppAttributeMatcher(appProperties)
+    private val appBuildConfig: AppBuildConfig = mock()
+
+    private val testee = AndroidAppAttributeMatcher(appProperties, appBuildConfig)
 
     @Test
-    fun whenFlavorMatchesThenReturnMatch() {
-        givenDeviceProperties(flavor = "Internal")
+    fun whenFlavorMatchesThenReturnMatch() = runTest {
+        givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
             MatchingAttribute.Flavor(value = listOf("internal"))
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenFlavorDoesNotMatchThenReturnFail() {
-        givenDeviceProperties(flavor = "Internal")
+    fun whenFlavorDoesNotMatchThenReturnFail() = runTest {
+        givenDeviceProperties(flavor = INTERNAL)
 
         val result = testee.evaluate(
             MatchingAttribute.Flavor(value = listOf("play"))
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppIdMatchesThenReturnMatch() {
+    fun whenAppIdMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
             MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppIdDoesNotMatchThenReturnFail() {
+    fun whenAppIdDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(appId = "com.duckduckgo.mobile.android")
 
         val result = testee.evaluate(
             MatchingAttribute.AppId(value = "com.duckduckgo.mobile.android.debug")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppVersionEqualOrLowerThanMaxThenReturnMatch() {
+    fun whenAppVersionEqualOrLowerThanMaxThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(max = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppVersionGreaterThanMaxThenReturnFail() {
+    fun whenAppVersionGreaterThanMaxThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(max = "5.99.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppVersionEqualOrGreaterThanMinThenReturnMatch() {
+    fun whenAppVersionEqualOrGreaterThanMinThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(min = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppVersionLowerThanMinThenReturnFail() {
+    fun whenAppVersionLowerThanMinThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(min = "5.100.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppVersionInRangeThenReturnMatch() {
+    fun whenAppVersionInRangeThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.150.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(min = "5.99.0", max = "5.200.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppVersionNotInRangeThenReturnMatch() {
+    fun whenAppVersionNotInRangeThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.000.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(min = "5.100.0", max = "5.200.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppVersionSameAsDeviceThenReturnMatch() {
+    fun whenAppVersionSameAsDeviceThenReturnMatch() = runTest {
         givenDeviceProperties(appVersion = "5.100.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(value = "5.100.0")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppVersionDifferentToDeviceThenReturnFail() {
+    fun whenAppVersionDifferentToDeviceThenReturnFail() = runTest {
         givenDeviceProperties(appVersion = "5.99.0")
 
         val result = testee.evaluate(
             MatchingAttribute.AppVersion(value = "5.100.0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAtbMatchesThenReturnMatch() {
+    fun whenAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.Atb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAtbDoesNotMatchThenReturnFail() {
+    fun whenAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(atb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.Atb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenAppAtbMatchesThenReturnMatch() {
+    fun whenAppAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.AppAtb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenAppAtbDoesNotMatchThenReturnFail() {
+    fun whenAppAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(appAtb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.AppAtb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenSearchAtbMatchesThenReturnMatch() {
+    fun whenSearchAtbMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.SearchAtb(value = "v105-2")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenSearchAtbDoesNotMatchThenReturnFail() {
+    fun whenSearchAtbDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(searchAtb = "v105-2")
 
         val result = testee.evaluate(
             MatchingAttribute.SearchAtb(value = "v105-0")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenExpVariantMatchesThenReturnMatch() {
+    fun whenExpVariantMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
             MatchingAttribute.ExpVariant(value = "zo")
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenExpVariantDoesNotMatchThenReturnFail() {
+    fun whenExpVariantDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(expVariant = "zo")
 
         val result = testee.evaluate(
             MatchingAttribute.ExpVariant(value = "zz")
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     @Test
-    fun whenInstalledGPlayMatchesThenReturnMatch() {
+    fun whenInstalledGPlayMatchesThenReturnMatch() = runTest {
         givenDeviceProperties(installedGPlay = true)
 
         val result = testee.evaluate(
             MatchingAttribute.InstalledGPlay(value = true)
         )
 
-        assertEquals(Result.Match, result)
+        assertEquals(EvaluationResult.Match, result)
     }
 
     @Test
-    fun whenInstalledGPlayDoesNotMatchThenReturnFail() {
+    fun whenInstalledGPlayDoesNotMatchThenReturnFail() = runTest {
         givenDeviceProperties(installedGPlay = false)
 
         val result = testee.evaluate(
             MatchingAttribute.InstalledGPlay(value = true)
         )
 
-        assertEquals(Result.Fail, result)
+        assertEquals(EvaluationResult.Fail, result)
     }
 
     private fun givenDeviceProperties(
-        flavor: String = "play",
+        flavor: BuildFlavor = BuildFlavor.PLAY,
         appId: String = "com.duckduckgo.mobile.android.debug",
         appVersion: String = "5.106.0",
         atb: String = "v105-2",
@@ -280,9 +288,9 @@ class AndroidAppAttributeMatcherTest {
         expVariant: String = "zo",
         installedGPlay: Boolean = true
     ) {
-        whenever(appProperties.flavor()).thenReturn(flavor)
-        whenever(appProperties.appId()).thenReturn(appId)
-        whenever(appProperties.appVersion()).thenReturn(appVersion)
+        whenever(appBuildConfig.flavor).thenReturn(flavor)
+        whenever(appBuildConfig.applicationId).thenReturn(appId)
+        whenever(appBuildConfig.versionName).thenReturn(appVersion)
         whenever(appProperties.atb()).thenReturn(atb)
         whenever(appProperties.appAtb()).thenReturn(appAtb)
         whenever(appProperties.searchAtb()).thenReturn(searchAtb)

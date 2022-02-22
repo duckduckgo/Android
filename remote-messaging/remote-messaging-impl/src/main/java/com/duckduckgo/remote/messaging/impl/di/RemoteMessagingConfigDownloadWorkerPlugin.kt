@@ -19,21 +19,22 @@ package com.duckduckgo.remote.messaging.impl.di
 import androidx.work.ListenableWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
-import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloadWorker
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloadWorker
+import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import javax.inject.Provider
 
 @ContributesMultibinding(AppScope::class)
 class RemoteMessagingConfigDownloadWorkerPlugin @Inject constructor(
-    private val downloader: RemoteMessagingConfigDownloader,
-    private val dispatcherProvider: DispatcherProvider
+    private val downloader: Provider<RemoteMessagingConfigDownloader>,
+    private val dispatcherProvider: Provider<DispatcherProvider>
 ) : WorkerInjectorPlugin {
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is RemoteMessagingConfigDownloadWorker) {
-            worker.downloader = downloader
-            worker.dispatcherProvider = dispatcherProvider
+            worker.downloader = downloader.get()
+            worker.dispatcherProvider = dispatcherProvider.get()
             return true
         }
         return false

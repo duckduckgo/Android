@@ -24,7 +24,9 @@
     android:orientation="vertical"
     tools:context="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity">
 
-    <include layout="@layout/include_default_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/activity_list"

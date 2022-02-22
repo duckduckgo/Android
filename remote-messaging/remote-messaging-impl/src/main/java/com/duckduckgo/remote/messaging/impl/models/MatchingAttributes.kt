@@ -16,8 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.models
 
-import com.duckduckgo.remote.messaging.impl.matchers.Result
-import com.duckduckgo.remote.messaging.impl.matchers.defaultValue
+import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import timber.log.Timber
 import java.util.*
@@ -172,22 +171,22 @@ interface DateMatchingAttribute {
     val value: Int
 }
 
-fun StringArrayMatchingAttribute.matches(value: String): Result {
+fun StringArrayMatchingAttribute.matches(value: String): EvaluationResult {
     this.value.find { it.equals(value, true) } ?: return false.toResult()
     return true.toResult()
 }
 
-fun BooleanMatchingAttribute.matches(value: Boolean): Result {
+fun BooleanMatchingAttribute.matches(value: Boolean): EvaluationResult {
     return (this.value == value).toResult()
 }
 
-fun IntMatchingAttribute.matches(value: Int): Result {
+fun IntMatchingAttribute.matches(value: Int): EvaluationResult {
     return (this.value == value).toResult()
 }
 
-fun RangeIntMatchingAttribute.matches(value: Int): Result {
-    if ((this.min.defaultValue() || value >= this.min) &&
-        (this.max.defaultValue() || value <= this.max)
+fun RangeIntMatchingAttribute.matches(value: Int): EvaluationResult {
+    if ((this.min.isDefaultValue() || value >= this.min) &&
+        (this.max.isDefaultValue() || value <= this.max)
     ) {
         return true.toResult()
     }
@@ -195,18 +194,18 @@ fun RangeIntMatchingAttribute.matches(value: Int): Result {
     return false.toResult()
 }
 
-fun DateMatchingAttribute.matches(value: Int): Result {
-    if ((this.value.defaultValue() || value == this.value)) {
+fun DateMatchingAttribute.matches(value: Int): EvaluationResult {
+    if ((this.value.isDefaultValue() || value == this.value)) {
         return true.toResult()
     }
     return false.toResult()
 }
 
-fun StringMatchingAttribute.matches(value: String): Result {
+fun StringMatchingAttribute.matches(value: String): EvaluationResult {
     return this.value.equals(value, ignoreCase = true).toResult()
 }
 
-fun RangeStringMatchingAttribute.matches(value: String): Result {
+fun RangeStringMatchingAttribute.matches(value: String): EvaluationResult {
     Timber.i("RMF: device value: $value")
     if (!value.matches(Regex("[0-9]+(\\.[0-9]+)*"))) return false.toResult()
 
@@ -234,17 +233,20 @@ private fun List<Int>.compareTo(other: List<Int>): Int {
     return 0
 }
 
-@Suppress("UNCHECKED_CAST")
-fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
+private fun String.isDefaultValue() = this.isEmpty()
+private fun Int.isDefaultValue() = this == -1
 
-fun Any?.toIntOrDefault(default: Int): Int = when {
+@Suppress("UNCHECKED_CAST")
+internal fun Any?.toStringList(): List<String> = this?.let { it as List<String> } ?: emptyList()
+
+internal fun Any?.toIntOrDefault(default: Int): Int = when {
     this == null -> default
     this is Double -> this.toInt()
     this is Long -> this.toInt()
     else -> this as Int
 }
 
-fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
+internal fun Any?.toStringOrDefault(default: String): String = this?.let { it as String } ?: default
 
 internal fun Locale.asJsonFormat() = "$language-$country"
 

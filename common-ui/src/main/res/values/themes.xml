@@ -131,6 +131,7 @@
         <item name="textInputOutlinedBoxColor">@color/grayish</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
         <item name="splitterColor">@color/gray85</item>
+        <item name="secondaryButtonPressedColor">@color/black36</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
@@ -243,6 +244,7 @@
         <item name="textInputOutlinedBoxColor">@color/grayishThree</item>
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
         <item name="splitterColor">@color/gray25</item>
+        <item name="secondaryButtonPressedColor">@color/black18</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>

@@ -20,15 +20,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldAllTracerActivityBinding
 
 class DeviceShieldMostRecentActivity : DuckDuckGoActivity() {
+
+    private val binding: ActivityDeviceShieldAllTracerActivityBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_device_shield_all_tracer_activity)
-        setupToolbar(findViewById(R.id.default_toolbar))
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
     }
 
     override fun onBackPressed() {

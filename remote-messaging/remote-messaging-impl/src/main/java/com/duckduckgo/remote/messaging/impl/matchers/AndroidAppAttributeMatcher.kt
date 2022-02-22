@@ -16,6 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.matchers
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.remote.messaging.impl.models.MATCHING_ATTR_STRING_DEFAULT_VALUE
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
@@ -24,23 +25,24 @@ import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.matches
 
 class AndroidAppAttributeMatcher(
-    val appProperties: AppProperties
-) {
-    fun evaluate(matchingAttribute: MatchingAttribute): Result {
+    val appProperties: AppProperties,
+    val appBuildConfig: AppBuildConfig
+) : AttributeMatcher {
+    override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {
             is MatchingAttribute.Flavor -> {
-                if (matchingAttribute == MatchingAttribute.Flavor()) return Result.Fail
-                return matchingAttribute.matches(appProperties.flavor())
+                if (matchingAttribute == MatchingAttribute.Flavor()) return EvaluationResult.Fail
+                return matchingAttribute.matches(appBuildConfig.flavor.toString())
             }
             is MatchingAttribute.AppId -> {
-                return matchingAttribute.matches(appProperties.appId())
+                return matchingAttribute.matches(appBuildConfig.applicationId)
             }
             is MatchingAttribute.AppVersion -> {
-                if (matchingAttribute == MatchingAttribute.AppVersion()) return Result.Fail
+                if (matchingAttribute == MatchingAttribute.AppVersion()) return EvaluationResult.Fail
                 if (matchingAttribute.value != MATCHING_ATTR_STRING_DEFAULT_VALUE) {
-                    return (matchingAttribute as StringMatchingAttribute).matches(appProperties.appVersion())
+                    return (matchingAttribute as StringMatchingAttribute).matches(appBuildConfig.versionName)
                 }
-                return (matchingAttribute as RangeStringMatchingAttribute).matches(appProperties.appVersion())
+                return (matchingAttribute as RangeStringMatchingAttribute).matches(appBuildConfig.versionName)
             }
             is MatchingAttribute.Atb -> {
                 return matchingAttribute.matches(appProperties.atb())
@@ -57,7 +59,7 @@ class AndroidAppAttributeMatcher(
             is MatchingAttribute.InstalledGPlay -> {
                 return matchingAttribute.matches(appProperties.installedGPlay())
             }
-            else -> throw IllegalArgumentException("Invalid matcher for $matchingAttribute")
+            else -> return null
         }
     }
 }
