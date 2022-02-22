@@ -68,6 +68,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -81,6 +82,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -122,6 +124,9 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import org.mockito.kotlin.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
@@ -292,6 +297,11 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
 
+    @Mock
+    private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
+
+    private lateinit var remoteMessagingModel: RemoteMessagingModel
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -332,6 +342,8 @@ class BrowserTabViewModelTest {
 
     private val bookmarksListFlow = Channel<List<Bookmark>>()
 
+    private val remoteMessageFlow = Channel<RemoteMessage>()
+
     private val favoriteListFlow = Channel<List<Favorite>>()
 
     @Before
@@ -351,6 +363,9 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
         whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
+        whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
+
+        remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -423,7 +438,8 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager,
-            trackingLinkDetector = mockTrackingLinkDetector
+            trackingLinkDetector = mockTrackingLinkDetector,
+            remoteMessagingModel = remoteMessagingModel
         )
 
         testee.loadData("abc", null, false, false)
@@ -439,6 +455,7 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.close()
         bookmarksListFlow.close()
         favoriteListFlow.close()
+        remoteMessageFlow.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -3840,6 +3857,55 @@ class BrowserTabViewModelTest {
         assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
     }
 
+    @Test
+    fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageShown()
+
+        verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageCloseButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessagePrimaryButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageSecondaryButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -3966,12 +4032,22 @@ class BrowserTabViewModelTest {
         testee.loadData("TAB_ID", domain, false, false)
     }
 
+    private fun givenRemoteMessagingModel(
+        remoteMessagingRepository: RemoteMessagingRepository,
+        pixel: Pixel,
+        dispatchers: DispatcherProvider
+    ) = RemoteMessagingModel(remoteMessagingRepository, pixel, dispatchers)
+
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
     private fun setCta(cta: Cta) {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+    }
+
+    private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
+        remoteMessageFlow.send(remoteMessage)
     }
 
     private fun loadUrl(
