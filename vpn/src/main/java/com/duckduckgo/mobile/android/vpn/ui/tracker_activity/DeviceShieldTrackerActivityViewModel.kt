@@ -28,15 +28,16 @@ import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -49,6 +50,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnDetector: VpnDetector,
+    private val vpnStateMonitor: VpnStateMonitor,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -58,9 +60,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private var lastVpnRequestTime = -1L
 
-    internal val vpnRunningState = MutableStateFlow(
-        RunningState(isRunning = true)
-    )
+    internal suspend fun getRunningState(): Flow<RunningState> = withContext(dispatcherProvider.io()){
+        return@withContext vpnStateMonitor.getState()
+            .map { RunningState(it.state, it.stopReason) }
+    }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
         return@withContext appTrackerBlockingStatsRepository.getTrackingAppsCountBetween({ dateOfLastWeek() })
@@ -70,18 +73,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal suspend fun getBlockedTrackersCount(): Flow<TrackerCount> = withContext(dispatcherProvider.io()) {
         return@withContext appTrackerBlockingStatsRepository.getBlockedTrackersCountBetween({ dateOfLastWeek() })
             .map { TrackerCount(it) }
-            .onStart { pollDeviceShieldState() }
-    }
-
-    private fun pollDeviceShieldState() {
-        job += viewModelScope.launch {
-            while (isActive) {
-                val isRunning = TrackerBlockingVpnService.isServiceRunning(applicationContext)
-                vpnRunningState.emit(RunningState(isRunning))
-
-                delay(1_000)
-            }
-        }
     }
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
@@ -147,7 +138,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
-        val runningState: RunningState
+        val runningState: VpnState
     )
 
     internal data class TrackerCountInfo(
@@ -204,6 +195,9 @@ class PastWeekTrackerActivityViewModelFactory @Inject constructor(
     }
 }
 
-internal data class RunningState(val isRunning: Boolean)
+internal data class RunningState(
+    val isRunning: VpnRunningState,
+    val stopReason: VpnStopReason?
+)
 internal inline class TrackerCount(val value: Int)
 internal inline class TrackingAppCount(val value: Int)

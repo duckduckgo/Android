@@ -46,6 +46,7 @@
     <string name="atp_OnNotificationPrefix">Tracking attempts blocked</string>
     <string name="atp_OnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
     <string name="atp_DisabledNotification">App Tracking Protection disabled. Tap to continue blocking tracking attempts.</string>
+    <string name="atp_RevokedNotification">A VPN app on your device disabled App Tracking Protection. Tap to re-enable.</string>
 
     <!-- App Tracking Protection Daily Notification -->
     <string name="atp_DailyTrackersNotificationPrefix">App Tracking Protection blocked</string>
@@ -125,7 +126,7 @@
     <!-- New Tab Integration -->
     <string name="atp_NewTabSuffix">"\u0020(past hour)."</string>
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
-    <string name="atp_NewTabRevoked"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
+    <string name="atp_NewTabRevoked"><b>A VPN app on your device disabled App Tracking Protection.</b>\nTap to re-enable.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
@@ -343,9 +344,9 @@
     <string name="atp_DisableConfirmationCancel">Cancel</string>
 
     <!--  App Tracking Protection VPN Conflict Dialog -->
-    <string name="atp_VpnConflictDialogTitle">Disconnect your VPN to enable App Tracking Protection</string>
-    <string name="atp_VpnConflictDialogMessage">Android only permits one active VPN connection at a time. Go to Network Settings > VPN. Find the VPN that\'s "Always ON" and disconnect it to continue</string>
-    <string name="atp_VpnConflictDialogGotIt">Got it</string>
-    <string name="atp_VpnConflictDialogLearnMore">Learn more</string>
+    <string name="atp_VpnConflictDialogTitle">A VPN app on your device may be set to “always-on”</string>
+    <string name="atp_VpnConflictDialogMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
+    <string name="atp_VpnConflictDialogCancel">Cancel</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Open Settings</string>
 
 </resources>

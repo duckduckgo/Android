@@ -40,7 +40,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_vpn_conflict, null)
 
         val openSettings = rootView.findViewById<Button>(R.id.vpnConflictDialogOpenSettings)
-        val dismiss = rootView.findViewById<Button>(R.id.vpnConflictDialogDismiss)
+        val cancel = rootView.findViewById<Button>(R.id.vpnConflictDialogCancel)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
@@ -50,20 +50,20 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
         isCancelable = false
 
-        configureListeners(openSettings, dismiss)
+        configureListeners(openSettings, cancel)
 
         return alertDialog.create()
     }
 
     private fun configureListeners(
         openSettings: Button,
-        dismiss: Button
+        cancel: Button
     ) {
         openSettings.setOnClickListener {
             dismiss()
             listener.onOpenSettings()
         }
-        dismiss.setOnClickListener {
+        cancel.setOnClickListener {
             dismiss()
             listener.onDismissConflictDialog()
         }

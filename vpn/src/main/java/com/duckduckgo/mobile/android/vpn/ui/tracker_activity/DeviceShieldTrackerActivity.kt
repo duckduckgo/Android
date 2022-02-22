@@ -264,7 +264,7 @@ class DeviceShieldTrackerActivity :
 
     override fun onOpenAppProtection() {
         deviceShieldPixels.didChooseToDisableOneAppFromDialog()
-        launchExcludedApps(viewModel.vpnRunningState.value.isRunning)
+        launchExcludedApps(viewModel.vpnRunningState)
     }
 
     override fun onTurnAppTrackingProtectionOff() {

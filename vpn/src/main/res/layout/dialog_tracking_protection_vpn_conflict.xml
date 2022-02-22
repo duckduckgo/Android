@@ -54,18 +54,20 @@
         android:gravity="end">
 
         <Button
+            android:id="@+id/vpnConflictDialogCancel"
+            style="@style/Widget.DuckDuckGo.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dialogButtonHeight"
+            android:text="@string/atp_VpnConflictDialogCancel"/>
+
+        <Button
             android:id="@+id/vpnConflictDialogOpenSettings"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
-            android:text="@string/atp_VpnConflictDialogLearnMore"/>
-        <Button
-            android:id="@+id/vpnConflictDialogDismiss"
-            style="@style/Widget.DuckDuckGo.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/dialogButtonHeight"
-            android:text="@string/atp_VpnConflictDialogGotIt"/>
+            android:text="@string/atp_VpnConflictDialogOpenSettings"/>
+
 
     </LinearLayout>
 
