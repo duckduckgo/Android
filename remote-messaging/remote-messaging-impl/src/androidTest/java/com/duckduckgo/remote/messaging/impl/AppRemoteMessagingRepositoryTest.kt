@@ -72,7 +72,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenAddMediumMessageThenMessageStored() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = Medium(
@@ -107,7 +107,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenAddSmallMessageThenMessageStored() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = Small(
@@ -140,7 +140,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenAddBigSingleActionMessageThenMessageStored() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = BigSingleAction(
@@ -179,7 +179,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenAddBigTwoActionMessageThenMessageStored() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = BigTwoActions(
@@ -222,7 +222,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenDismissMessageThenUpdateState() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = BigTwoActions(
@@ -251,7 +251,7 @@ class AppRemoteMessagingRepositoryTest {
 
     @Test
     fun whenGetDismisedMessagesThenReturnDismissedMessageIds() = runTest {
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id",
                 content = BigTwoActions(
@@ -284,7 +284,7 @@ class AppRemoteMessagingRepositoryTest {
             )
         )
 
-        testee.add(
+        testee.activeMessage(
             RemoteMessage(
                 id = "id2",
                 content = BigTwoActions(
