@@ -80,10 +80,11 @@ class AppTPHealthMonitor @Inject constructor(
         // how far back to look when obtaining health metrics
         const val SLIDING_WINDOW_DURATION_MS: Long = 60_000
 
-        private const val MONITORING_FREQUENCY_MS: Long = 30_000
+        private const val MONITORING_FREQUENCY_MS: Long = 3_000
         private const val OLD_METRIC_CLEANUP_FREQUENCY_MS: Long = 60_000
 
         private val TUN_READ_ALERT_SAMPLES: Int = (4.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
+        private val DEFAULT_ALERT_SAMPLES: Int = (2.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
     }
 
     private val now: Long
@@ -343,7 +344,7 @@ class AppTPHealthMonitor @Inject constructor(
 
     private abstract class HealthRule(
         open val name: String,
-        open var samplesToWaitBeforeAlerting: Int = 4
+        open var samplesToWaitBeforeAlerting: Int = DEFAULT_ALERT_SAMPLES
     ) {
         var badHealthSampleCount: Int = 0
 
