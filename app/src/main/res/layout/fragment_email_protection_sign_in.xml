@@ -102,7 +102,7 @@
 
         <TextView
             android:id="@+id/footerDescription"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
+            style="@style/TextAppearance.DuckDuckGo.Caption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="24dp"

@@ -120,7 +120,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
             getText(R.string.macos_waitlist_code_description),
             listOf(Pair("beta_link", macOsSpan))
         )
-
+        binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.notifyMeButton.gone()
@@ -131,6 +131,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
+        binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
         binding.codeFrame.gone()
@@ -149,6 +150,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.ic_privacy_simplified)
         binding.waitListButton.show()
+        binding.waitlistWindows.show()
         binding.footerDescription.show()
         binding.notifyMeButton.gone()
         binding.codeFrame.gone()

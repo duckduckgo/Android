@@ -35,10 +35,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/pill"
             app:layout_constrainedWidth="true"
+            android:paddingEnd="6dp"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintWidth_default="wrap"
-            tools:text="Title goes here" />
+            tools:text="Title goes here"
+            tools:ignore="RtlSymmetry" />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/pill"

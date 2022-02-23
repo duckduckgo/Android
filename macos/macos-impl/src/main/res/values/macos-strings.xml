@@ -16,15 +16,17 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="macos_app">DuckDuckGo Desktop App</string>
     <string name="macos_waitlist_title">Try DuckDuckGo for Mac!</string>
-    <string name="macos_waitlist_description">DuckDuckGo Privacy Browser for Mac has the speed you need, the browsing features you expect, and comes packed with our best-in-class privacy essentials.</string>
+    <string name="macos_waitlist_windows">Windows coming soon!</string>
+    <string name="macos_waitlist_description">The DuckDuckGo Privacy Browser for Mac has the speed you need, the browsing features you expect, and comes packed with our best-in-class privacy essentials.</string>
     <string name="macos_join_waitlist">Join the Private Waitlist</string>
     <string name="macos_join_waitlist_error">An error happened while joining the Waitlist, please try again later</string>
     <string name="macos_waitlist_footer">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
 
     <string name="macos_waitlist_on_the_list_title">You\'re on the list!</string>
     <string name="macos_waitlist_on_the_list_no_notification">Your invite to try DuckDuckGo for Mac will arrive here. Check back soon, or we can send you a notification when it\'s your turn.</string>
-    <string name="macos_waitlist_on_the_list_notification">We\'ll send you a notification when your copy of DuckDuckGo for Mac is ready for download. </string>
+    <string name="macos_waitlist_on_the_list_notification">We\'ll send you a notification when your copy of DuckDuckGo for Mac is ready for download.</string>
     <string name="macos_waitlist_on_the_list_no_notification_button" tools:ignore="ExtraTranslation">Notify Me</string>
 
     <string name="notification_channel_macos_waitlist">macOS waitlist</string>
@@ -35,15 +37,12 @@
     <string name="macos_notification_dialog_notify_me" tools:ignore="ExtraTranslation">Notify Me</string>
 
     <string name="macos_waitlist_code_title">You\'re invited!</string>
-    <string name="macos_waitlist_code_invite">Invite Code</string>
-    <string name="macos_waitlist_code_description">Ready to start browsing privately\non your Mac?\n\n<b>Step 1</b>\nOn your Mac, go to:\n<b><annotation type="beta_link">duckduckgo.com/macbeta</annotation></b>\n\n<b>Step 2</b>\nOpen and install the downloaded file. When prompted, enter your invite code to unlock.</string>
-    <string name="macos_waitlist_code_share_text"><![CDATA[Ready to start browsing privately on your Mac?<br/><br/><b>Step 1</b><br/>On your Mac, go to:<br/><a href="https://duckduckgo.com/macbeta"><b>https://duckduckgo.com/macbeta</b></a><br/><br/><b>Step 2</b><br/>Open and install the downloaded file. When prompted, enter your invite code to unlock.<br/><br/>Invite Code: %s]]></string>
+    <string name="macos_waitlist_code_invite">Invite Code</string>`
+    <string name="macos_waitlist_code_description">Ready to use DuckDuckGo on Mac?\n\n<b>Step 1</b>\nVisit this URL on your Mac to download:\n<b><annotation type="beta_link">duckduckgo.com/mac</annotation></b>\n\n<b>Step 2</b>\nOpen the file to install, then enter your invite code to unlock.</string>
+    <string name="macos_waitlist_code_share_text"><![CDATA[Ready to use DuckDuckGo on Mac?<br/><br/><b>Step 1</b><br/>Visit this URL on your Mac to download:<br/><a href="https://duckduckgo.com/mac"><b>https://duckduckgo.com/mac</b></a><br/><br/><b>Step 2</b><br/>Open the file to install, then enter your invite code to unlock.<br/><br/>Invite Code: %s]]></string>
 
     <string name="macos_waitlist_clipboard_invite_copied">Invite copied to clipboard</string>
     <string name="macos_waitlist_clipboard_code_copied">Code copied to clipboard</string>
 
     <string name="macos_waitlist_share_invite">Share your invite</string>
-    <!-- Settings -->
-    <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 </resources>

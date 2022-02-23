@@ -35,6 +35,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.macos_api.MacOsWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
@@ -98,6 +100,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var mockMacOsWaitlist: MacOsWaitlist
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -117,7 +122,8 @@ class SettingsViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
-            mockAppBuildConfig
+            mockAppBuildConfig,
+            mockMacOsWaitlist
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -126,6 +132,7 @@ class SettingsViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+        whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)

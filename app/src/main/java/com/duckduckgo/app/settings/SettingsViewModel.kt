@@ -37,6 +37,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.macos_api.MacOsWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -72,7 +74,8 @@ class SettingsViewModel(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
+    private val macOsWaitlist: MacOsWaitlist
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -90,7 +93,8 @@ class SettingsViewModel(
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
-        val appTrackingProtectionEnabled: Boolean = false
+        val appTrackingProtectionEnabled: Boolean = false,
+        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue
     )
 
     data class AutomaticallyClearData(
@@ -153,7 +157,8 @@ class SettingsViewModel(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = atpRepository.getState()
+                    appTrackingProtectionWaitlistState = atpRepository.getState(),
+                    macOsWaitlistState = macOsWaitlist.getWaitlistState()
                 )
             )
         }
@@ -456,6 +461,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val atpRepository: Provider<AtpWaitlistStateRepository>,
     private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
     private val appBuildConfig: Provider<AppBuildConfig>,
+    private val macOsWaitlist: Provider<MacOsWaitlist>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -473,7 +479,8 @@ class SettingsViewModelFactory @Inject constructor(
                         gpc.get(),
                         featureToggle.get(),
                         pixel.get(),
-                        appBuildConfig.get()
+                        appBuildConfig.get(),
+                        macOsWaitlist.get(),
                     ) as T
                     )
                 else -> null

@@ -112,4 +112,10 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%s widget added to home screen</string>
     <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Browse privately with our app for Mac</string>
+    <string name="macos_settings_description_list">You\'re on the list!</string>
+    <string name="macos_settings_description_ready">Available for download on Mac</string>
+    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 </resources>

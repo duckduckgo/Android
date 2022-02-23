@@ -75,6 +75,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/waitlistDescription" />
 
+            <TextView
+                android:id="@+id/waitlistWindows"
+                style="@style/TextAppearance.DuckDuckGo.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
+                android:text="@string/macos_waitlist_windows"
+                android:textAlignment="center"
+                android:textColor="?attr/settingsMinorTextColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/waitListButton" />
+
             <Button
                 android:id="@+id/notifyMeButton"
                 style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
@@ -143,7 +158,7 @@
 
             <TextView
                 android:id="@+id/footerDescription"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
+                style="@style/TextAppearance.DuckDuckGo.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"

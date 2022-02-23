@@ -57,6 +57,10 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.macos_api.MacWaitlistState
+import com.duckduckgo.macos_api.MacWaitlistState.InBeta
+import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -206,6 +210,7 @@ class SettingsActivity :
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateMacOsSettings(it.macOsWaitlistState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -324,6 +329,16 @@ class SettingsActivity :
                 } else {
                     deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
                 }
+            }
+        }
+    }
+
+    private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
+        with(viewsMore) {
+            when (waitlistState) {
+                InBeta -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_ready))
+                JoinedWaitlist -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_list))
+                NotJoinedQueue -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description))
             }
         }
     }
