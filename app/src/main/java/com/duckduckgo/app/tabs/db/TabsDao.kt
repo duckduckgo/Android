@@ -43,9 +43,6 @@ abstract class TabsDao {
     @Query("select * from tabs where deletable is 0 order by position")
     abstract fun flowTabs(): Flow<List<TabEntity>>
 
-    @Query("select * from tabs where deletable is 0 order by position")
-    abstract fun liveTabs(): LiveData<List<TabEntity>>
-
     @Query("select * from tabs where deletable is 1 order by position")
     abstract fun flowDeletableTabs(): Flow<List<TabEntity>>
 

@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2021 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+    id 'kotlin-kapt'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    implementation project(path: ':di')
+    implementation project(path: ':common')
+    implementation project(path: ':remote-messaging-api')
+    api project(path: ':remote-messaging-store')
+    api project(path: ':browser-api')
+    implementation project(path: ':appbuildconfig-api')
+
+    implementation KotlinX.coroutines.core
+    androidTestImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    implementation JakeWharton.timber
+    implementation AndroidX.work.runtimeKtx
+    implementation Square.retrofit2.retrofit
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.moshi
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation Google.dagger
+    implementation AndroidX.room.ktx
+    kapt AndroidX.room.compiler
+
+    testImplementation project(path: ':common-test')
+    testImplementation "org.threeten:threetenbp:_"
+    testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation CashApp.turbine
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+}
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}

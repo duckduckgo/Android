@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.DuckDuckGo.MessageCta">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/close"
+        android:layout_width="@dimen/messageCtaCloseButtonSize"
+        android:layout_height="@dimen/messageCtaCloseButtonSize"
+        android:padding="@dimen/keyline_2"
+        android:background="?selectableItemBackground"
+        android:src="@drawable/ic_close_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?normalTextColor" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/illustration"
+        android:layout_width="@dimen/messageCtaIllustrationSize"
+        android:layout_height="@dimen/messageCtaIllustrationSize"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:scaleType="center"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/messageTitle"
+        style="@style/MessageCta.Title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/illustration"
+        app:layout_goneMarginTop="20dp"
+        tools:text="Placeholder Title" />
+
+    <TextView
+        android:id="@+id/messageSubtitle"
+        style="@style/MessageCta.Description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="6dp"
+        app:layout_constraintBottom_toTopOf="@id/primaryActionButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/messageTitle"
+        app:layout_goneMarginBottom="18dp"
+        tools:text="Body text goes here. This component can be used with one or two buttons." />
+
+    <Button
+        android:id="@+id/primaryActionButton"
+        style="@style/MessageCta.Button.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_4"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/secondaryActionButton"
+        app:layout_constraintTop_toBottomOf="@id/messageSubtitle"
+        app:layout_goneMarginStart="0dp"
+        tools:text="button" />
+
+    <Button
+        android:id="@+id/secondaryActionButton"
+        style="@style/MessageCta.Button.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/primaryActionButton"
+        app:layout_constraintEnd_toStartOf="@id/primaryActionButton"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/primaryActionButton"
+        tools:text="button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
