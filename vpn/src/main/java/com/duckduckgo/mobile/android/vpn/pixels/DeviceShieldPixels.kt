@@ -272,6 +272,8 @@ interface DeviceShieldPixels {
 
     fun didChooseToOpenSettingsFromVpnConflicDialog()
 
+    fun didChooseToContinueFromVpnConflicDialog()
+
     /**
      * Will fire when the waitlist dialog is showed to the user
      */
@@ -605,6 +607,10 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didChooseToOpenSettingsFromVpnConflicDialog() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+    }
+
+    override fun didChooseToContinueFromVpnConflicDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
     }
 

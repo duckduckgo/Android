@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,6 +29,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
     interface Listener {
         fun onDismissConflictDialog()
         fun onOpenSettings()
+        fun onContinue()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,8 +41,10 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_vpn_conflict, null)
 
-        val openSettings = rootView.findViewById<Button>(R.id.vpnConflictDialogOpenSettings)
-        val cancel = rootView.findViewById<Button>(R.id.vpnConflictDialogCancel)
+        val endCta = rootView.findViewById<Button>(R.id.vpnConflictDialogEndCta)
+        val startCta = rootView.findViewById<Button>(R.id.vpnConflictDialogStartCta)
+        val titleView = rootView.findViewById<TextView>(R.id.vpnConflictDialogTitle)
+        val messageView = rootView.findViewById<TextView>(R.id.vpnConflictDialogMessage)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
@@ -50,20 +54,88 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
         isCancelable = false
 
-        configureListeners(openSettings, cancel)
+        configureViews(titleView, messageView, startCta, endCta)
 
         return alertDialog.create()
     }
 
-    private fun configureListeners(
-        openSettings: Button,
-        cancel: Button
+    private fun configureViews(
+        titleView: TextView,
+        messageView: TextView,
+        startCta: Button,
+        endCta: Button
     ) {
-        openSettings.setOnClickListener {
+        arguments?.let { args ->
+            val isAlwaysOn = args.getBoolean(KEY_ALWAYS_ON_CONFLICT)
+            if (isAlwaysOn){
+                configureAlwaysOnDialogViews(titleView, messageView, startCta, endCta)
+            } else {
+                configureVpnConflictViews(titleView, messageView, startCta, endCta)
+            }
+        }
+    }
+
+    private fun configureVpnConflictViews(
+        titleView: TextView,
+        messageView: TextView,
+        startCta: Button,
+        endCta: Button
+    ) {
+        configureVpnConflictText(titleView, messageView)
+        configureVpnConflictListeners(startCta, endCta)
+    }
+
+    private fun configureVpnConflictText(
+        titleView: TextView,
+        messageView: TextView
+    ) {
+        titleView.setText(getText(R.string.atp_VpnConflictDialogTitle))
+        messageView.setText(getText(R.string.atp_VpnConflictDialogMessage))
+    }
+
+    private fun configureVpnConflictListeners(
+        startCta: Button,
+        endCta: Button
+    ) {
+        endCta.setText(R.string.atp_VpnConflictDialogGotIt)
+        endCta.setOnClickListener {
+            dismiss()
+            listener.onContinue()
+        }
+        startCta.setOnClickListener {
+            dismiss()
+            listener.onDismissConflictDialog()
+        }
+    }
+
+    private fun configureAlwaysOnDialogViews(
+        titleView: TextView,
+        messageView: TextView,
+        startCta: Button,
+        endCta: Button
+    ) {
+        configureAlwaysOnText(titleView, messageView)
+        configureAlwaysOnListeners(startCta, endCta)
+    }
+
+    private fun configureAlwaysOnText(
+        titleView: TextView,
+        messageView: TextView
+    ) {
+        titleView.setText(getText(R.string.atp_VpnConflictAlwaysOnDialogTitle))
+        messageView.setText(getText(R.string.atp_VpnConflictDialogAlwaysOnMessage))
+    }
+
+    private fun configureAlwaysOnListeners(
+        startCta: Button,
+        endCta: Button
+    ) {
+        endCta.setText(R.string.atp_VpnConflictDialogOpenSettings)
+        endCta.setOnClickListener {
             dismiss()
             listener.onOpenSettings()
         }
-        cancel.setOnClickListener {
+        startCta.setOnClickListener {
             dismiss()
             listener.onDismissConflictDialog()
         }
@@ -72,9 +144,14 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
     companion object {
 
         const val TAG_VPN_CONFLICT_DIALOG = "AppTPVpnConflictDialog"
+        private const val KEY_ALWAYS_ON_CONFLICT = "KEY_ALWAYS_ON_CONFLICT"
 
-        fun instance(listener: Listener): AppTPVpnConflictDialog {
-            return AppTPVpnConflictDialog(listener)
+        fun instance(listener: Listener, alwaysOn: Boolean = false): AppTPVpnConflictDialog {
+            return AppTPVpnConflictDialog(listener).also {  fragment ->
+                val bundle = Bundle()
+                bundle.putBoolean(KEY_ALWAYS_ON_CONFLICT, alwaysOn)
+                fragment.arguments = bundle
+            }
         }
     }
 }

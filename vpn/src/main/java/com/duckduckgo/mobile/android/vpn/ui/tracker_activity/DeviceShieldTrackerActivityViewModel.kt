@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dummy.ui.VpnPreferences
@@ -60,9 +59,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private var lastVpnRequestTime = -1L
 
-    internal suspend fun getRunningState(): Flow<RunningState> = withContext(dispatcherProvider.io()){
-        return@withContext vpnStateMonitor.getState()
-            .map { RunningState(it.state, it.stopReason) }
+    internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
+        return@withContext vpnStateMonitor.getStateFlow()
     }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
@@ -102,13 +100,18 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             }
             else -> {
                 if (System.currentTimeMillis() - lastVpnRequestTime < 1000) {
-                    sendCommand(Command.ShowVpnConflictDialog)
+                    sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
                 } else {
                     sendCommand(Command.VPNPermissionNotGranted)
                 }
                 lastVpnRequestTime = -1
             }
         }
+    }
+
+    internal fun launchExcludedApps() {
+        deviceShieldPixels.didChooseToDisableOneAppFromDialog()
+        sendCommand(Command.LaunchExcludedApps(vpnStateMonitor.getState().state == VpnRunningState.ENABLED))
     }
 
     internal fun onAppTpManuallyDisabled() {
@@ -127,7 +130,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 }
                 ViewEvent.LaunchBetaInstructions -> command.send(Command.LaunchBetaInstructions)
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
-                ViewEvent.LaunchExcludedApps -> command.send(Command.LaunchExcludedApps(vpnRunningState.value.isRunning))
+                ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
             }
         }
@@ -175,8 +178,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchMostRecentActivity : Command()
         object ShowDisableConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
+        object ShowVpnAlwaysOnConflictDialog : Command()
     }
-
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -195,9 +198,5 @@ class PastWeekTrackerActivityViewModelFactory @Inject constructor(
     }
 }
 
-internal data class RunningState(
-    val isRunning: VpnRunningState,
-    val stopReason: VpnStopReason?
-)
 internal inline class TrackerCount(val value: Int)
 internal inline class TrackingAppCount(val value: Int)

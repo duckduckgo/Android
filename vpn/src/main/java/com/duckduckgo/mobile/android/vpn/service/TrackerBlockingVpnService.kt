@@ -303,7 +303,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     }
 
     private suspend fun stopVpn(reason: VpnStateMonitor.VpnStopReason) = withContext(Dispatchers.IO) {
-        Timber.i("VPN log: Stopping VPN.")
+        Timber.i("VPN log: Stopping VPN. $reason")
 
         queues.clearAll()
         executorService?.shutdownNow()

@@ -160,5 +160,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_SHOW_VPN_CONFLICT_DIALOG("m_atp_imp_vpn_conflict_dialog_c"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_dismiss_c"),
     ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_open_settings_c"),
+    ATP_DID_CHOOSE_CONTINUIE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
     ;
 }

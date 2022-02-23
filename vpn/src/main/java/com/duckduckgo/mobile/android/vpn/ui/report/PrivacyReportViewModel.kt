@@ -39,7 +39,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
-    val viewStateFlow = vpnStateMonitor.getState().combine(getReport()) { vpnState, trackersBlocked ->
+    val viewStateFlow = vpnStateMonitor.getStateFlow().combine(getReport()) { vpnState, trackersBlocked ->
         PrivacyReportView.ViewState(vpnState, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
     }
 

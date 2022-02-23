@@ -18,7 +18,8 @@ package com.duckduckgo.mobile.android.vpn.state
 import kotlinx.coroutines.flow.Flow
 
 interface VpnStateMonitor {
-    fun getState(): Flow<VpnState>
+    fun getStateFlow(): Flow<VpnState>
+    fun getState(): VpnState
 
     data class VpnState(
         val state: VpnRunningState,

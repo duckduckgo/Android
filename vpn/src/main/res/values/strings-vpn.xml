@@ -228,6 +228,7 @@
     </plurals>
     <string name="atp_ActivityEnabledLabel">This feature is in beta. Notice a problem with an app? <annotation type="report_issues_link">Please report an issue</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -344,9 +345,12 @@
     <string name="atp_DisableConfirmationCancel">Cancel</string>
 
     <!--  App Tracking Protection VPN Conflict Dialog -->
-    <string name="atp_VpnConflictDialogTitle">A VPN app on your device may be set to “always-on”</string>
-    <string name="atp_VpnConflictDialogMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
+    <string name="atp_VpnConflictDialogTitle">Any active VPN may be disconnected</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">A VPN app on your device may be set to “always-on”</string>
+    <string name="atp_VpnConflictDialogMessage">Android only allows one active VPN connection at a time. Enabling App Tracking Protection may disconnect any active VPN on your device.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
     <string name="atp_VpnConflictDialogCancel">Cancel</string>
     <string name="atp_VpnConflictDialogOpenSettings">Open Settings</string>
+    <string name="atp_VpnConflictDialogGotIt">Got it</string>
 
 </resources>

@@ -47,21 +47,21 @@
             android:text="@string/atp_VpnConflictDialogMessage"/>
 
     <LinearLayout
-        android:layout_marginTop="@dimen/keyline_3"
+        android:layout_marginTop="@dimen/keyline_5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end">
 
         <Button
-            android:id="@+id/vpnConflictDialogCancel"
+            android:id="@+id/vpnConflictDialogStartCta"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:text="@string/atp_VpnConflictDialogCancel"/>
 
         <Button
-            android:id="@+id/vpnConflictDialogOpenSettings"
+            android:id="@+id/vpnConflictDialogEndCta"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
