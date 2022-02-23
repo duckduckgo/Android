@@ -16,9 +16,7 @@
 
 package com.duckduckgo.app.tabs.ui
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
@@ -27,6 +25,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -35,14 +36,31 @@ class TabSwitcherViewModel(
     private val webViewSessionStorage: WebViewSessionStorage
 ) : ViewModel() {
 
-    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
-    var deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
-        context = viewModelScope.coroutineContext
+    data class ViewState(
+        val tabs: List<TabEntity> = emptyList(),
+        val deletableTabs: List<TabEntity> = emptyList()
     )
+
+    private val viewState = MutableStateFlow(ViewState())
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     sealed class Command {
         object Close : Command()
+    }
+
+    fun start() {
+        viewModelScope.launch {
+            tabRepository.flowTabs.collect {
+                viewState.emit(currentViewState().copy(tabs = it))
+            }
+            tabRepository.flowDeletableTabs.collect {
+                viewState.emit(currentViewState().copy(deletableTabs = it))
+            }
+        }
+    }
+
+    fun viewState(): StateFlow<ViewState> {
+        return viewState
     }
 
     suspend fun onNewTabRequested() {
@@ -70,6 +88,10 @@ class TabSwitcherViewModel(
 
     suspend fun purgeDeletableTabs() {
         tabRepository.purgeDeletableTabs()
+    }
+
+    private fun currentViewState(): ViewState {
+        return viewState.value
     }
 }
 

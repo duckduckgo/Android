@@ -257,5 +257,11 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
     ENCRYPTED_GENERAL_EXCEPTION("m_e_g_e"),
 
+    REMOTE_MESSAGE_DISMISSED("m_remote_message_dismissed"),
+    REMOTE_MESSAGE_SHOWN("m_remote_message_shown"),
+    REMOTE_MESSAGE_SHOWN_UNIQUE("m_remote_message_shown_unique"),
+    REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
+    REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
+
     WEBVIEW_FEATURE_SUPPORTED("m_webview_feature_supported")
 }

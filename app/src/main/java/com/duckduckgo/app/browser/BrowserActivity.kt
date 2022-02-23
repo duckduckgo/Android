@@ -27,7 +27,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.Observer
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -63,6 +66,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -125,6 +129,8 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
+
+    private val tabsJob = ConflatedJob()
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -312,19 +318,20 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 if (it != null) selectTab(it)
             }
         )
-        viewModel.tabs.observe(
-            this,
-            Observer {
-                clearStaleTabs(it)
-                launch { viewModel.onTabsUpdated(it) }
-            }
-        )
+
+        tabsJob += lifecycleScope.launch {
+            viewModel.tabs
+                .flowWithLifecycle(lifecycle, STARTED).collect {
+                    clearStaleTabs(it)
+                    launch { viewModel.onTabsUpdated(it) }
+                }
+        }
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
-        viewModel.tabs.removeObservers(this)
+        tabsJob.cancel()
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
