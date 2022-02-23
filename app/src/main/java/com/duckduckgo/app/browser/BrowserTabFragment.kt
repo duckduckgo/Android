@@ -175,12 +175,13 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
-import kotlinx.android.synthetic.main.include_cta.*
+import kotlinx.coroutines.flow.cancellable
 
 class BrowserTabFragment :
     Fragment(),
@@ -324,6 +325,8 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
+
+    private val tabsJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -597,14 +600,11 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(
-            viewLifecycleOwner,
-            Observer<List<TabEntity>> {
-                it?.let {
-                    decorator.renderTabIcon(it)
-                }
+        tabsJob += lifecycleScope.launch {
+            viewModel.tabs.cancellable().collect {
+                decorator.renderTabIcon(it)
             }
-        )
+        }
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -951,7 +951,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        viewModel.tabs.removeObservers(this)
+        tabsJob.cancel()
         decorator.incrementTabs()
     }
 

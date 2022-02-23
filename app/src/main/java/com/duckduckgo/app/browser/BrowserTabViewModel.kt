@@ -440,7 +440,7 @@ class BrowserTabViewModel(
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
