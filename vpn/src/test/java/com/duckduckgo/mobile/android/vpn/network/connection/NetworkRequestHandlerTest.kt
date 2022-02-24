@@ -25,12 +25,9 @@ import android.net.NetworkCapabilities.TRANSPORT_VPN
 import android.net.NetworkCapabilities.TRANSPORT_WIFI
 import android.os.Build.VERSION_CODES.M
 import android.os.Build.VERSION_CODES.P
-import android.os.Handler
-import android.os.Message
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.mobile.android.vpn.network.connection.Messages.MSG_ADD_ALL_NETWORKS
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -64,15 +61,12 @@ class NetworkRequestHandlerTest {
 
         whenever(appBuildConfig.sdkInt).thenReturn(24)
 
-        networkRequestHandler = NetworkRequestHandler(connectivityManager, appBuildConfig, Handler().looper, listener)
+        networkRequestHandler = NetworkRequestHandler(connectivityManager, appBuildConfig, listener)
     }
 
     @Test
     fun whenNoNetworksThenCallOnNetworkDisconnected() {
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.sendMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertTrue(listener.networks.isEmpty())
     }
@@ -81,10 +75,7 @@ class NetworkRequestHandlerTest {
     fun whenActiveNetworkNoInternetThenCallOnNetworkDisconnected() {
         shadowOf(networkCapabilities).addTransportType(TRANSPORT_WIFI)
 
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.sendMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertTrue(listener.networks.isEmpty())
     }
@@ -94,10 +85,7 @@ class NetworkRequestHandlerTest {
         shadowOf(networkCapabilities).addTransportType(TRANSPORT_WIFI)
         shadowOf(networkCapabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.handleMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertEquals(1, listener.networks.size)
         assertEquals(connectivityManager.activeNetwork, listener.networks.toTypedArray()[0])
@@ -111,10 +99,7 @@ class NetworkRequestHandlerTest {
 
         shadowOf(networkCapabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.handleMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertEquals(2, listener.networks.size)
         assertEquals(connectivityManager.activeNetwork, listener.networks.toTypedArray()[0])
@@ -127,10 +112,7 @@ class NetworkRequestHandlerTest {
 
         shadowOf(networkCapabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.handleMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertEquals(1, listener.networks.size)
         assertEquals(connectivityManager.activeNetwork, listener.networks.toTypedArray()[0])
@@ -142,10 +124,7 @@ class NetworkRequestHandlerTest {
 
         shadowOf(networkCapabilities).addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 
-        val message = Message.obtain().apply {
-            what = MSG_ADD_ALL_NETWORKS.ordinal
-        }
-        networkRequestHandler.handleMessage(message)
+        networkRequestHandler.updateAllNetworks()
 
         assertTrue(listener.networks.isEmpty())
     }

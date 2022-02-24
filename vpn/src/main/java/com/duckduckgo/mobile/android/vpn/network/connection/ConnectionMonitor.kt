@@ -21,26 +21,30 @@ import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import android.os.HandlerThread
-import android.os.Message
-import com.duckduckgo.mobile.android.vpn.network.connection.Messages.MSG_ADD_ALL_NETWORKS
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.Executors
 
 class ConnectionMonitor @AssistedInject constructor(
     private val connectivityManager: ConnectivityManager?,
     private val networkRequestHandlerFactory: NetworkRequestHandler.Factory,
+    @Assisted private val coroutineScope: CoroutineScope,
     @Assisted private val networkConnectionListener: NetworkConnectionListener,
 ) : NetworkCallback() {
 
     @AssistedFactory
     interface Factory {
-        fun create(networkConnectionListener: NetworkConnectionListener): ConnectionMonitor
+        fun create(coroutineScope: CoroutineScope, networkConnectionListener: NetworkConnectionListener): ConnectionMonitor
     }
 
-    private var handlerThread: HandlerThread? = null
+    // single thread dispatcher because we want all operations to be sync'ed and in-order
+    private val handlerDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
     private var networkHandler: NetworkRequestHandler? = null
 
     private val networkRequest: NetworkRequest = NetworkRequest.Builder()
@@ -63,9 +67,7 @@ class ConnectionMonitor @AssistedInject constructor(
         // just in case it is called twice without calling onStopMonitoring()
         tearDownNetworkHandler()
 
-        val handler = HandlerThread(NetworkRequestHandler::class.java.simpleName).apply { start() }
-        handlerThread = handler
-        networkHandler = networkRequestHandlerFactory.create(handler.looper, networkConnectionListener)
+        networkHandler = networkRequestHandlerFactory.create(networkConnectionListener)
     }
 
     fun onSopMonitoring() {
@@ -75,23 +77,11 @@ class ConnectionMonitor @AssistedInject constructor(
     }
 
     private fun tearDownNetworkHandler() {
-        handlerThread?.quitSafely()
-        handlerThread = null
-        networkHandler?.removeCallbacksAndMessages(null)
         networkHandler = null
     }
 
     private fun handleNetworkChange() {
-        buildMessage(MSG_ADD_ALL_NETWORKS).run {
-            networkHandler?.removeMessages(this.what, null)
-            networkHandler?.sendMessage(this)
-        }
-    }
-
-    private fun buildMessage(what: Messages): Message {
-        val message = Message.obtain()
-        message.what = what.ordinal
-        return message
+        coroutineScope.launch(handlerDispatcher) { networkHandler?.updateAllNetworks() }
     }
 
     private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {

@@ -237,7 +237,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         connectionMonitor?.onSopMonitoring()
-        connectionMonitor = connectionMonitorFactory.create(this@TrackerBlockingVpnService).apply { onStartMonitoring() }
+        connectionMonitor = connectionMonitorFactory.create(this@TrackerBlockingVpnService, this@TrackerBlockingVpnService)
+            .apply { onStartMonitoring() }
     }
 
     private suspend fun establishVpnInterface() {

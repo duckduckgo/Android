@@ -21,9 +21,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Build.VERSION_CODES
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import androidx.annotation.WorkerThread
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -33,29 +31,19 @@ import timber.log.Timber
 class NetworkRequestHandler @AssistedInject constructor(
     private val connectivityManager: ConnectivityManager?,
     private val appBuildConfig: AppBuildConfig,
-    @Assisted looper: Looper,
-    @Assisted private val networkConnectionListener: NetworkConnectionListener
-) : Handler(looper) {
+    @Assisted private val networkConnectionListener: NetworkConnectionListener,
+) {
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            looper: Looper,
-            networkConnectionListener: NetworkConnectionListener
-        ): NetworkRequestHandler
+        fun create(networkConnectionListener: NetworkConnectionListener): NetworkRequestHandler
     }
 
     var currentNetworks: LinkedHashSet<Network> = linkedSetOf()
 
-    override fun handleMessage(msg: Message) {
-        when (msg.what) {
-            Messages.MSG_ADD_ALL_NETWORKS.ordinal -> updateAllNetworks()
-            else -> {}
-        }
-    }
-
     @SuppressLint("NewApi")
-    private fun updateAllNetworks() {
+    @WorkerThread
+    internal fun updateAllNetworks() {
         val newActiveNetwork = if (appBuildConfig.sdkInt >= VERSION_CODES.M) {
             connectivityManager?.activeNetwork
         } else {
@@ -104,9 +92,4 @@ class NetworkRequestHandler @AssistedInject constructor(
             NetworkCapabilities.TRANSPORT_VPN
         ) ?: false
     }
-}
-
-enum class Messages {
-    // add all available networks as underlying vpn networks
-    MSG_ADD_ALL_NETWORKS,
 }
