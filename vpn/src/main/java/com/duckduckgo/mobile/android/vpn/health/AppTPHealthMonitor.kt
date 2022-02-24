@@ -32,6 +32,8 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV4_PACKET
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV6_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
@@ -107,8 +109,12 @@ class AppTPHealthMonitor @Inject constructor(
     private val socketConnectExceptionAlerts = object : HealthRule("socketConnectExceptionAlerts") {}.also { healthRules.add(it) }
     private val tunWriteExceptionAlerts = object : HealthRule("tunWriteIOExceptions") {}.also { healthRules.add(it) }
     private val tunWriteIOMemoryExceptionsAlerts = object : HealthRule("tunWriteIOMemoryExceptions") {}.also { healthRules.add(it) }
+
+    // these alerts below will never trigger and are informational
     private val bufferAllocationsAlerts =
         object : HealthRule("bufferAllocationAlerts", samplesToWaitBeforeAlerting = Int.MAX_VALUE) {}.also { healthRules.add(it) }
+    private val ipPacketCounts =
+        object : HealthRule("ipPacketCounts", samplesToWaitBeforeAlerting = Int.MAX_VALUE) {}.also { healthRules.add(it) }
 
     private suspend fun checkCurrentHealth() {
         val timeWindow = now - SLIDING_WINDOW_DURATION_MS
@@ -121,6 +127,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleTunWriteExceptions(timeWindow, tunWriteExceptionAlerts)
         healthStates += sampleTunWriteNoMemoryExceptions(timeWindow, tunWriteIOMemoryExceptionsAlerts)
         healthStates += sampleBufferAllocations(timeWindow, bufferAllocationsAlerts)
+        healthStates += sampleIpPackets(timeWindow, ipPacketCounts)
 
         /*
          * useful for testing notifications; can trigger good or bad health from diagnostics screen
@@ -232,6 +239,17 @@ class AppTPHealthMonitor @Inject constructor(
     ): HealthState {
         val allocations = ByteBufferPool.allocations.get()
         val state = healthClassifier.determineHealthBufferAllocations(allocations)
+        healthAlerts.updateAlert(state)
+        return state
+    }
+
+    private fun sampleIpPackets(
+        timeWindow: Long,
+        healthAlerts: HealthRule
+    ): HealthState {
+        val ipv4PacketCount = healthMetricCounter.getStat(TUN_READ_IPV4_PACKET(), timeWindow)
+        val ipv6PacketCount = healthMetricCounter.getStat(TUN_READ_IPV6_PACKET(), timeWindow)
+        val state = healthClassifier.determineHealthIpPackets(ipv4PacketCount, ipv6PacketCount)
         healthAlerts.updateAlert(state)
         return state
     }

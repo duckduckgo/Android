@@ -156,5 +156,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_PRESS_WAITLIST_DIALOG_DISMISS("m_atp_ev_waitlist_dialog_dismiss_c"),
 
     ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL("m_atp_ev_unknown_packet_%d_c"),
+    ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL_DAILY("m_atp_ev_unknown_packet_%d_d"),
     ;
 }
