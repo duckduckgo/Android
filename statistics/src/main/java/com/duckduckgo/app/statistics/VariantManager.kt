@@ -61,8 +61,7 @@ interface VariantManager {
             Variant(key = "zh", weight = 1.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
 
             // Tracking parameter removal - initial rollout
-            Variant(key = "ms", weight = 0.75, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "my", weight = 0.25, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { isEnglishLocale() })
+            Variant(key = "my", weight = 1.0, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { isEnglishLocale() })
         )
 
         val REFERRER_VARIANTS = listOf(

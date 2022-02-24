@@ -336,7 +336,7 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsTrackingParameterLinkAndVariantIsNotTrackingParameterRemovalThenReturnWebType() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "ms" })
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         val expected = Web::class
         val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
         assertEquals(expected, actual::class)
