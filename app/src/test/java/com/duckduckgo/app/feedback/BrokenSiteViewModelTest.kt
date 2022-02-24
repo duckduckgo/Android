@@ -26,6 +26,8 @@ import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkInfo
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.junit.After
@@ -36,6 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteViewModelTest {
@@ -54,6 +57,8 @@ class BrokenSiteViewModelTest {
 
     private val mockCommandObserver: Observer<Command> = mock()
 
+    private val mockTrackingLinkDetector: TrackingLinkDetector = mock()
+
     private lateinit var testee: BrokenSiteViewModel
 
     private val viewState: BrokenSiteViewModel.ViewState
@@ -62,7 +67,7 @@ class BrokenSiteViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender)
+        testee = BrokenSiteViewModel(mockPixel, mockBrokenSiteSender, mockTrackingLinkDetector)
         testee.command.observeForever(mockCommandObserver)
     }
 
@@ -161,11 +166,57 @@ class BrokenSiteViewModelTest {
     }
 
     @Test
+    fun whenCanSubmitBrokenSiteAndLastTrackingLinkIsNullAndSubmitPressedThenReportUrlAndPixelSubmitted() {
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(null)
+
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = url,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
+    fun whenCanSubmitBrokenSiteAndUrlHasAssociatedTrackingLinkAndSubmitPressedThenTrackingLinkReportedAndPixelSubmitted() {
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(TrackingLinkInfo(trackingUrl, url))
+
+        testee.setInitialBrokenSite(url, "", "", false)
+        selectAndAcceptCategory()
+        testee.onSubmitPressed("webViewVersion")
+
+        val brokenSiteExpected = BrokenSite(
+            category = testee.categories[0].key,
+            siteUrl = trackingUrl,
+            upgradeHttps = false,
+            blockedTrackers = "",
+            surrogates = "",
+            webViewVersion = "webViewVersion",
+            siteType = BrokenSiteViewModel.DESKTOP_SITE
+        )
+
+        verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
+        verify(mockBrokenSiteSender).submitBrokenSiteFeedback(brokenSiteExpected)
+        verify(mockCommandObserver).onChanged(Command.ConfirmAndFinish)
+    }
+
+    @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(BrokenSiteViewModel.DESKTOP_SITE, brokenSiteExpected.siteType)
     }
 
@@ -175,7 +226,7 @@ class BrokenSiteViewModelTest {
         testee.setInitialBrokenSite(url, "", "", false)
         selectAndAcceptCategory()
 
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(BrokenSiteViewModel.MOBILE_SITE, brokenSiteExpected.siteType)
     }
 
@@ -187,7 +238,7 @@ class BrokenSiteViewModelTest {
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
-        val brokenSiteExpected = testee.getBrokenSite("")
+        val brokenSiteExpected = testee.getBrokenSite(url, "")
         assertEquals(categoryExpected, brokenSiteExpected.category)
     }
 
@@ -217,5 +268,6 @@ class BrokenSiteViewModelTest {
 
     companion object Constants {
         private const val url = "http://example.com"
+        private const val trackingUrl = "https://foo.com"
     }
 }

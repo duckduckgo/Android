@@ -107,7 +107,7 @@
 
                         </FrameLayout>
 
-                        <com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+                        <com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
                             android:id="@+id/omnibarTextInput"
                             style="@style/Base.V7.Widget.AppCompat.EditText"
                             android:layout_width="0dp"

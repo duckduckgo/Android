@@ -45,6 +45,9 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailInjector
@@ -74,6 +77,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -113,7 +117,8 @@ class BrowserModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
-        accessibilityManager: AccessibilityManager
+        accessibilityManager: AccessibilityManager,
+        trackingLinkDetector: TrackingLinkDetector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -131,7 +136,33 @@ class BrowserModule {
             appCoroutineScope,
             dispatcherProvider,
             emailInjector,
-            accessibilityManager
+            accessibilityManager,
+            trackingLinkDetector
+        )
+    }
+
+    @Provides
+    fun urlExtractingWebViewClient(
+        webViewHttpAuthStore: WebViewHttpAuthStore,
+        trustedCertificateStore: TrustedCertificateStore,
+        requestInterceptor: RequestInterceptor,
+        cookieManager: CookieManager,
+        gpc: Gpc,
+        thirdPartyCookieManager: ThirdPartyCookieManager,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        urlExtractor: DOMUrlExtractor
+    ): UrlExtractingWebViewClient {
+        return UrlExtractingWebViewClient(
+            webViewHttpAuthStore,
+            trustedCertificateStore,
+            requestInterceptor,
+            cookieManager,
+            gpc,
+            thirdPartyCookieManager,
+            appCoroutineScope,
+            dispatcherProvider,
+            urlExtractor
         )
     }
 
@@ -188,7 +219,10 @@ class BrowserModule {
     }
 
     @Provides
-    fun specialUrlDetector(packageManager: PackageManager): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager)
+    fun specialUrlDetector(
+        packageManager: PackageManager,
+        trackingLinkDetector: TrackingLinkDetector
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -299,6 +333,11 @@ class BrowserModule {
     @Provides
     fun domLoginDetector(settingsDataStore: SettingsDataStore): DOMLoginDetector {
         return JsLoginDetector(settingsDataStore)
+    }
+
+    @Provides
+    fun domUrlExtractor(): DOMUrlExtractor {
+        return JsUrlExtractor()
     }
 
     @Provides

@@ -47,6 +47,7 @@ import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
@@ -67,6 +68,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -80,6 +82,7 @@ import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -115,14 +118,15 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.duckduckgo.privacy.config.api.GpcException
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.remote.messaging.api.Content
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import org.mockito.kotlin.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
@@ -290,6 +294,14 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
 
+    @Mock
+    private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+
+    @Mock
+    private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
+
+    private lateinit var remoteMessagingModel: RemoteMessagingModel
+
     private val lazyFaviconManager = Lazy { mockFaviconManager }
 
     private lateinit var mockAutoCompleteApi: AutoCompleteApi
@@ -330,6 +342,8 @@ class BrowserTabViewModelTest {
 
     private val bookmarksListFlow = Channel<List<Bookmark>>()
 
+    private val remoteMessageFlow = Channel<RemoteMessage>()
+
     private val favoriteListFlow = Channel<List<Favorite>>()
 
     @Before
@@ -349,6 +363,9 @@ class BrowserTabViewModelTest {
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
         whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
+        whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
+
+        remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -420,7 +437,9 @@ class BrowserTabViewModelTest {
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-            variantManager = mockVariantManager
+            variantManager = mockVariantManager,
+            trackingLinkDetector = mockTrackingLinkDetector,
+            remoteMessagingModel = remoteMessagingModel
         )
 
         testee.loadData("abc", null, false, false)
@@ -436,6 +455,7 @@ class BrowserTabViewModelTest {
         dismissedCtaDaoChannel.close()
         bookmarksListFlow.close()
         favoriteListFlow.close()
+        remoteMessageFlow.close()
         testee.onCleared()
         db.close()
         testee.command.removeObserver(mockCommandObserver)
@@ -923,6 +943,22 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenVisualProgressEqualsFixedProgress() {
+        setBrowserShowing(true)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertEquals(50, loadingViewState().progress)
+    }
+
+    @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenPrivacyGradeShouldAnimateIsTrue() {
+        setBrowserShowing(true)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().shouldAnimate)
+    }
+
+    @Test
     fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
         setBrowserShowing(true)
         testee.progressChanged(50)
@@ -945,6 +981,15 @@ class BrowserTabViewModelTest {
         testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
         testee.progressChanged(100)
         assertFalse(privacyGradeState().showEmptyGrade)
+    }
+
+    @Test
+    fun whenProgressChangesAndIsProcessingTrackingLinkThenShowLoadingGradeIsTrue() {
+        setBrowserShowing(true)
+        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
+        testee.startProcessingTrackingLink()
+        testee.progressChanged(100)
+        assertTrue(privacyGradeState().showEmptyGrade)
     }
 
     @Test
@@ -1535,8 +1580,8 @@ class BrowserTabViewModelTest {
         testee.titleReceived(newTitle = title)
         testee.onBookmarkMenuClicked()
         val command = captureCommands().value as Command.ShowSavedSiteAddedConfirmation
-        assertEquals(url, command.savedSite.url)
-        assertEquals(title, command.savedSite.title)
+        assertEquals(url, command.savedSiteChangedViewState.savedSite.url)
+        assertEquals(title, command.savedSiteChangedViewState.savedSite.title)
     }
 
     @Test
@@ -3561,8 +3606,8 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertTrue(commandCaptor.lastValue is Command.ShowEditSavedSiteDialog)
         val command = commandCaptor.lastValue as Command.ShowEditSavedSiteDialog
-        assertEquals("www.example.com", command.savedSite.url)
-        assertEquals("title", command.savedSite.title)
+        assertEquals("www.example.com", command.savedSiteChangedViewState.savedSite.url)
+        assertEquals("title", command.savedSiteChangedViewState.savedSite.title)
     }
 
     @Test
@@ -3727,6 +3772,140 @@ class BrowserTabViewModelTest {
         )
     }
 
+    @Test
+    fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
+        testee.handleCloakedTrackingLink(initialUrl = "example.com")
+        assertCommandIssued<Command.ExtractUrlFromCloakedTrackingLink>()
+    }
+
+    @Test
+    fun whenPageChangedThenUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("http://twitter.com/explore", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoHasDestinationUrlThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = TrackingLinkInfo("https://foo.com", "https://bar.com")
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
+        assertEquals("https://bar.com", trackingLinkInfo.destinationUrl)
+    }
+
+    @Test
+    fun whenPageChangedAndTrackingLinkInfoIsNullThenDontUpdateTrackingLinkInfo() {
+        val trackingLinkInfo = null
+        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        assertNull(trackingLinkInfo)
+    }
+
+    @Test
+    fun whenUpdateLastTrackingLinkThenUpdateTrackingLinkInfo() {
+        testee.updateLastTrackingLink("https://foo.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo("https://foo.com")
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsCloakedTrackingLinkThenHandleCloakedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromCloakedTrackingLink }
+        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromCloakedTrackingLink).initialUrl)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsExtractedTrackingLinkThenNavigateToExtractedTrackingLink() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
+    fun whenUrlExtractionErrorThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtractionError("http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
+        testee.onUrlExtracted("http://foo.com", "http://example.com")
+        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = "http://foo.com")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenUrlExtractedAndIsNullThenIssueLoadExtractedUrlCommandWithInitialUrl() {
+        testee.onUrlExtracted("http://foo.com", null)
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
+        assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenRemoteMessageShownThenFirePixelAndMarkAsShown() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageShown()
+
+        verify(mockRemoteMessagingRepository).markAsShown(remoteMessage)
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN_UNIQUE, mapOf("cta" to "id1"))
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SHOWN, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageCloseButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageCloseButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_DISMISSED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessagePrimaryButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessagePrimaryButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenRemoteMessageSecondaryButtonClickedThenFirePixelAndDismiss() = runTest {
+        val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
+        givenRemoteMessage(remoteMessage)
+        testee.onViewVisible()
+
+        testee.onMessageSecondaryButtonClicked()
+
+        verify(mockRemoteMessagingRepository).dismissMessage("id1")
+        verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -3853,12 +4032,22 @@ class BrowserTabViewModelTest {
         testee.loadData("TAB_ID", domain, false, false)
     }
 
+    private fun givenRemoteMessagingModel(
+        remoteMessagingRepository: RemoteMessagingRepository,
+        pixel: Pixel,
+        dispatchers: DispatcherProvider
+    ) = RemoteMessagingModel(remoteMessagingRepository, pixel, dispatchers)
+
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
     }
 
     private fun setCta(cta: Cta) {
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
+    }
+
+    private suspend fun givenRemoteMessage(remoteMessage: RemoteMessage) {
+        remoteMessageFlow.send(remoteMessage)
     }
 
     private fun loadUrl(

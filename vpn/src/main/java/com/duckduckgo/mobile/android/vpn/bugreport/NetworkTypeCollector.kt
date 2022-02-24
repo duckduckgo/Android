@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
@@ -43,6 +44,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -79,7 +81,7 @@ class NetworkTypeCollector @Inject constructor(
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(null)
+            updateNetworkInfo(NetworkType.NO_NETWORK)
         }
     }
 
@@ -89,7 +91,7 @@ class NetworkTypeCollector @Inject constructor(
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(null)
+            updateNetworkInfo(NetworkType.NO_NETWORK)
         }
     }
 
@@ -111,21 +113,35 @@ class NetworkTypeCollector @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
-            it.unregisterNetworkCallback(wifiNetworkCallback)
-            it.unregisterNetworkCallback(cellularNetworkCallback)
+            it.safeUnregisterNetworkCallback(wifiNetworkCallback)
+            it.safeUnregisterNetworkCallback(cellularNetworkCallback)
         }
     }
 
-    private fun updateNetworkInfo(networkType: NetworkType?) {
+    private fun updateNetworkInfo(networkType: NetworkType) {
         coroutineScope.launch(databaseDispatcher) {
             try {
-                val previousNetwork: String? = currentNetworkInfo?.let { adapter.fromJson(it)?.currentNetwork }
+                val previousNetworkInfo: NetworkInfo? = currentNetworkInfo?.let { adapter.fromJson(it) }
+
+                // Calculate timestamp for when the network type last switched
+                val previousNetworkType = previousNetworkInfo?.let { NetworkType.valueOf(it.currentNetwork) }
+                val didSwitch = previousNetworkType != networkType
+                val lastSwitchTimestampMillis = if (didSwitch) {
+                    SystemClock.elapsedRealtime()
+                } else {
+                    previousNetworkInfo?.lastSwitchTimestampMillis ?: SystemClock.elapsedRealtime()
+                }
+
+                // Calculate how long ago the network type last switched
+                val previousNetwork: String? = previousNetworkInfo?.currentNetwork
+                val secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - lastSwitchTimestampMillis)
                 val jsonInfo =
                     adapter.toJson(
                         NetworkInfo(
                             currentNetwork = networkType.toString(),
                             previousNetwork = previousNetwork,
-                            secondsSinceLastSwitch = SystemClock.elapsedRealtime()
+                            lastSwitchTimestampMillis = lastSwitchTimestampMillis,
+                            secondsSinceLastSwitch = secondsSinceLastSwitch
                         )
                     )
                 currentNetworkInfo = jsonInfo
@@ -136,26 +152,49 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
+    private fun updateSecondsSinceLastSwitch() {
+        val networkInfo: NetworkInfo = currentNetworkInfo?.let { adapter.fromJson(it) } ?: return
+        networkInfo.copy(
+            secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - networkInfo.lastSwitchTimestampMillis)
+        ).run {
+            currentNetworkInfo = adapter.toJson(this)
+        }
+    }
+
     private fun getNetworkInfoJsonObject(): JSONObject {
-        val info = currentNetworkInfo ?: return JSONObject()
+        updateSecondsSinceLastSwitch()
+        // redact the lastSwitchTimestampMillis from the report
+        val info = currentNetworkInfo?.let { adapter.toJson(adapter.fromJson(it)?.copy(lastSwitchTimestampMillis = -999)) } ?: return JSONObject()
 
         return JSONObject(info)
+    }
+
+    private fun ConnectivityManager.safeUnregisterNetworkCallback(networkCallback: NetworkCallback) {
+        kotlin.runCatching {
+            unregisterNetworkCallback(networkCallback)
+        }.onFailure {
+            Timber.e(it, "Error unregistering the network callback")
+        }
     }
 
     internal data class NetworkInfo(
         val currentNetwork: String,
         val previousNetwork: String? = null,
+        val lastSwitchTimestampMillis: Long,
         val secondsSinceLastSwitch: Long
     )
 
     internal enum class NetworkType {
         WIFI,
-        CELLULAR
+        CELLULAR,
+        NO_NETWORK,
     }
 
     companion object {
         private const val FILENAME = "network.type.collector.file"
-        private const val NETWORK_INFO_KEY = "NETWORK_INFO_KEY"
+        private const val NETWORK_INFO_KEY = "network.info.key"
+
+        private const val UNKNOWN = -1L
     }
 }
 

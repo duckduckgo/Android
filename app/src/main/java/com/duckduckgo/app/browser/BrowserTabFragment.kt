@@ -79,6 +79,7 @@ import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -87,7 +88,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.omnibar.KeyboardAwareEditText
+import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -154,6 +155,9 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import android.content.pm.ApplicationInfo
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
@@ -166,11 +170,18 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import kotlinx.android.synthetic.main.include_cta.*
+import javax.inject.Provider
+import kotlinx.coroutines.flow.cancellable
 
 class BrowserTabFragment :
     Fragment(),
@@ -265,6 +276,9 @@ class BrowserTabFragment :
     lateinit var accessibilitySettingsDataStore: AccessibilitySettingsDataStore
 
     @Inject
+    lateinit var playStoreUtils: PlayStoreUtils
+
+    @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
@@ -273,6 +287,17 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
+
+    @Inject
+    lateinit var urlExtractor: Provider<DOMUrlExtractor>
+
+    @Inject
+    lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+
+    private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
 
@@ -300,6 +325,8 @@ class BrowserTabFragment :
 
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
+
+    private val tabsJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -573,14 +600,11 @@ class BrowserTabFragment :
     }
 
     private fun addTabsObserver() {
-        viewModel.tabs.observe(
-            viewLifecycleOwner,
-            Observer<List<TabEntity>> {
-                it?.let {
-                    decorator.renderTabIcon(it)
-                }
+        tabsJob += lifecycleScope.launch {
+            viewModel.tabs.cancellable().collect {
+                decorator.renderTabIcon(it)
             }
-        )
+        }
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -646,8 +670,8 @@ class BrowserTabFragment :
                 openInNewBackgroundTab()
             }
             is Command.LaunchNewTab -> browserActivity?.launchNewTab()
-            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSite)
-            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSite)
+            is Command.ShowSavedSiteAddedConfirmation -> savedSiteAdded(it.savedSiteChangedViewState)
+            is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
@@ -725,8 +749,18 @@ class BrowserTabFragment :
                     headers = it.headers
                 )
             }
+            is Command.ExtractUrlFromCloakedTrackingLink -> {
+                extractUrlFromTrackingLink(it.initialUrl)
+            }
+            is Command.LoadExtractedUrl -> {
+                webView?.loadUrl(it.extractedUrl)
+                destroyUrlExtractingWebView()
+            }
             is Command.LaunchSurvey -> launchSurvey(it.survey)
+            is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
+            is Command.SubmitUrl -> submitQuery(it.url)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
+            is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.RequiresAuthentication -> showAuthenticationDialog(it.request)
             is Command.SaveCredentials -> saveBasicAuthCredentials(it.request, it.credentials)
             is Command.GenerateWebViewPreviewImage -> generateWebViewPreviewImage()
@@ -755,6 +789,26 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
         }
+    }
+
+    private fun extractUrlFromTrackingLink(initialUrl: String) {
+        context?.let {
+            val client = urlExtractingWebViewClient.get()
+            client.urlExtractionListener = viewModel
+
+            Timber.d("Tracking link detection: Creating WebView for URL extraction")
+            urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
+
+            urlExtractingWebView?.urlExtractionListener = viewModel
+
+            Timber.d("Tracking link detection: Loading tracking URL for extraction")
+            urlExtractingWebView?.loadUrl(initialUrl)
+        }
+    }
+
+    private fun destroyUrlExtractingWebView() {
+        urlExtractingWebView?.destroyWebView()
+        urlExtractingWebView = null
     }
 
     private fun injectEmailAddress(alias: String) {
@@ -897,7 +951,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        viewModel.tabs.removeObservers(this)
+        tabsJob.cancel()
         decorator.incrementTabs()
     }
 
@@ -956,6 +1010,7 @@ class BrowserTabFragment :
 
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
+            appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(appLink.appIntent)
         } else if (appLink.excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
@@ -977,6 +1032,7 @@ class BrowserTabFragment :
         excludedComponents: List<ComponentName>
     ): Intent {
         val urlIntent = Intent.parseUri(url, Intent.URI_ANDROID_APP_SCHEME)
+        urlIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val chooserIntent = Intent.createChooser(urlIntent, title)
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, excludedComponents.toTypedArray())
         return chooserIntent
@@ -1194,7 +1250,7 @@ class BrowserTabFragment :
             QuickAccessDragTouchItemListener(
                 apapter,
                 object : QuickAccessDragTouchItemListener.DragDropListener {
-                    override fun onListChanged(listElements: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+                    override fun onListChanged(listElements: List<QuickAccessFavorite>) {
                         viewModel.onQuickAccessListChanged(listElements)
                         recyclerView.disableAnimation()
                     }
@@ -1457,20 +1513,24 @@ class BrowserTabFragment :
         return super.onContextItemSelected(item)
     }
 
-    private fun savedSiteAdded(savedSite: SavedSite) {
-        val snackbarMessage = when (savedSite) {
+    private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        val snackbarMessage = when (savedSiteChangedViewState.savedSite) {
             is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
             is SavedSite.Favorite -> R.string.favoriteAddedMessage
         }
         browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {
-                editSavedSite(savedSite)
+                editSavedSite(savedSiteChangedViewState)
             }
             .show()
     }
 
-    private fun editSavedSite(savedSite: SavedSite) {
-        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(savedSite)
+    private fun editSavedSite(savedSiteChangedViewState: SavedSiteChangedViewState) {
+        val addBookmarkDialog = EditSavedSiteDialogFragment.instance(
+            savedSiteChangedViewState.savedSite,
+            savedSiteChangedViewState.bookmarkFolder?.id ?: 0,
+            savedSiteChangedViewState.bookmarkFolder?.name
+        )
         addBookmarkDialog.show(childFragmentManager, ADD_SAVED_SITE_FRAGMENT_TAG)
         addBookmarkDialog.listener = viewModel
     }
@@ -1758,6 +1818,16 @@ class BrowserTabFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun launchPlayStore(appPackage: String) {
+        playStoreUtils.launchPlayStore(appPackage)
+    }
+
+    private fun launchDefaultBrowser() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            requireActivity().launchDefaultAppActivity()
         }
     }
 
@@ -2331,21 +2401,55 @@ class BrowserTabFragment :
             }
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
+                val newMessage = (viewState.message?.id != lastSeenCtaViewState?.message?.id)
                 lastSeenCtaViewState = viewState
                 removeNewTabLayoutClickListener()
-                if (viewState.cta != null) {
-                    showCta(viewState.cta, viewState.favorites)
-                } else {
-                    hideHomeCta()
-                    hideDaxCta()
-                    showHomeBackground(viewState.favorites)
+                Timber.v("RMF: render $newMessage, $viewState")
+                when {
+                    viewState.cta != null -> {
+                        showCta(viewState.cta, viewState.favorites)
+                    }
+                    viewState.message != null -> {
+                        showRemoteMessage(viewState.message, newMessage)
+                        showHomeBackground(viewState.favorites, hideLogo = true)
+                        hideHomeCta()
+                    }
+                    else -> {
+                        hideHomeCta()
+                        hideDaxCta()
+                        messageCta.gone()
+                        showHomeBackground(viewState.favorites)
+                    }
+                }
+            }
+        }
+
+        private fun showRemoteMessage(
+            message: RemoteMessage,
+            newMessage: Boolean
+        ) {
+            val shouldRender = newMessage || messageCta.isGone
+
+            if (shouldRender) {
+                Timber.i("RMF: render $message")
+                messageCta.show()
+                viewModel.onMessageShown()
+                messageCta.setMessage(message.asMessage())
+                messageCta.onCloseButtonClicked {
+                    viewModel.onMessageCloseButtonClicked()
+                }
+                messageCta.onPrimaryActionClicked {
+                    viewModel.onMessagePrimaryButtonClicked()
+                }
+                messageCta.onSecondaryActionClicked {
+                    viewModel.onMessageSecondaryButtonClicked()
                 }
             }
         }
 
         private fun showCta(
             configuration: Cta,
-            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>
         ) {
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
@@ -2353,6 +2457,7 @@ class BrowserTabFragment :
                 is BubbleCta -> showBubleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
+            messageCta.gone()
         }
 
         private fun showDaxDialogCta(configuration: DialogCta) {
@@ -2399,7 +2504,7 @@ class BrowserTabFragment :
 
         private fun showHomeCta(
             configuration: HomePanelCta,
-            favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>
+            favorites: List<QuickAccessFavorite>
         ) {
             hideDaxCta()
             if (ctaContainer.isEmpty()) {
@@ -2411,9 +2516,9 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite>) {
+        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
             if (favorites.isEmpty()) {
-                homeBackgroundLogo.showLogo()
+                if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
             } else {
                 homeBackgroundLogo.hideLogo()

@@ -19,11 +19,11 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.content.res.Resources
 import android.text.SpannableStringBuilder
 import androidx.annotation.VisibleForTesting
+import com.duckduckgo.app.global.formatters.time.model.dateOfLastDay
+import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastDay
-import com.duckduckgo.mobile.android.vpn.model.dateOfLastWeek
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber

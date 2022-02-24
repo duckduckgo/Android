@@ -40,6 +40,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
+import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -51,7 +52,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState.Inva
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
-import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
@@ -72,8 +72,11 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment.HttpAuthenticationListener
+import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
@@ -113,6 +116,9 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.TrackingLinkInfo
+import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.jakewharton.rxrelay2.PublishRelay
 import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -149,6 +155,7 @@ class BrowserTabViewModel(
     private val specialUrlDetector: SpecialUrlDetector,
     private val faviconManager: FaviconManager,
     private val addToHomeCapabilityDetector: AddToHomeCapabilityDetector,
+    private val remoteMessagingModel: RemoteMessagingModel,
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
@@ -161,9 +168,10 @@ class BrowserTabViewModel(
     private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
-    private val variantManager: VariantManager
+    private val variantManager: VariantManager,
+    private val trackingLinkDetector: TrackingLinkDetector
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, ViewModel() {
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -174,7 +182,13 @@ class BrowserTabViewModel(
 
     data class CtaViewState(
         val cta: Cta? = null,
+        val message: RemoteMessage? = null,
         val favorites: List<FavoritesQuickAccessAdapter.QuickAccessFavorite> = emptyList()
+    )
+
+    data class SavedSiteChangedViewState(
+        val savedSite: SavedSite,
+        val bookmarkFolder: BookmarkFolder?
     )
 
     data class BrowserViewState(
@@ -310,8 +324,8 @@ class BrowserTabViewModel(
             val requestUserConfirmation: Boolean
         ) : Command()
 
-        class ShowSavedSiteAddedConfirmation(val savedSite: SavedSite) : Command()
-        class ShowEditSavedSiteDialog(val savedSite: SavedSite) : Command()
+        class ShowSavedSiteAddedConfirmation(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
+        class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
@@ -333,13 +347,18 @@ class BrowserTabViewModel(
 
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
+        class ExtractUrlFromCloakedTrackingLink(val initialUrl: String) : Command()
+        class LoadExtractedUrl(val extractedUrl: String) : Command()
         class AddHomeShortcut(
             val title: String,
             val url: String,
             val icon: Bitmap? = null
         ) : Command()
 
+        class SubmitUrl(val url: String) : Command()
+        class LaunchPlayStore(val appPackage: String) : Command()
         class LaunchSurvey(val survey: Survey) : Command()
+        object LaunchDefaultBrowser : Command()
         object LaunchAddWidget : Command()
         class RequiresAuthentication(val request: BasicAuthenticationRequest) : Command()
         class SaveCredentials(
@@ -421,10 +440,11 @@ class BrowserTabViewModel(
     val privacyGradeViewState: MutableLiveData<PrivacyGradeViewState> = MutableLiveData()
 
     var skipHome = false
-    val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
+    val tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
     val survey: LiveData<Survey> = ctaViewModel.surveyLiveData
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     private var refreshOnViewVisible = MutableStateFlow(true)
+    private var ctaChangedTicker = MutableStateFlow("")
 
     val url: String?
         get() = site?.url
@@ -465,6 +485,7 @@ class BrowserTabViewModel(
     private var faviconPrefetchJob: Job? = null
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
+    private var isProcessingTrackingLink = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -559,6 +580,26 @@ class BrowserTabViewModel(
             val bookmark = bookmarks.firstOrNull { it.url == url }
             browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark)
         }.launchIn(viewModelScope)
+
+        remoteMessagingModel.activeMessages
+            .combine(ctaChangedTicker.asStateFlow(), ::Pair)
+            .onEach { (activeMessage, ticker) ->
+                Timber.v("RMF: $ticker-$activeMessage")
+
+                if (ticker.isEmpty()) return@onEach
+                if (currentBrowserViewState().browserShowing) return@onEach
+
+                val cta = currentCtaViewState().cta?.takeUnless { it ->
+                    activeMessage != null && it is HomePanelCta
+                }
+
+                withContext(dispatchers.main()) {
+                    ctaViewState.value = currentCtaViewState().copy(
+                        cta = cta,
+                        message = if (cta == null) activeMessage else null
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -740,25 +781,37 @@ class BrowserTabViewModel(
         }
 
         val verticalParameter = extractVerticalParameter(url)
-        val urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+        var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
-        val type = specialUrlDetector.determineType(trimmedInput)
-        if (type is NonHttpAppLink) {
-            nonHttpAppLinkClicked(type)
-        } else {
-            if (shouldClearHistoryOnNewQuery()) {
-                command.value = ResetHistory
+        when (val type = specialUrlDetector.determineType(trimmedInput)) {
+            is NonHttpAppLink -> {
+                nonHttpAppLinkClicked(type)
             }
-
-            fireQueryChangedPixel(trimmedInput)
-
-            if (!appSettingsPreferencesStore.showAppLinksPrompt) {
-                appLinksHandler.updatePreviousUrl(urlToNavigate)
-                appLinksHandler.setUserQueryState(true)
-            } else {
-                clearPreviousUrl()
+            is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
+                handleCloakedTrackingLink(type.trackingUrl)
             }
-            command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+            else -> {
+
+                if (type is SpecialUrlDetector.UrlType.ExtractedTrackingLink) {
+                    Timber.d("Tracking link detection: Using extracted URL: ${type.extractedUrl}")
+                    urlToNavigate = type.extractedUrl
+                }
+
+                if (shouldClearHistoryOnNewQuery()) {
+                    command.value = ResetHistory
+                }
+
+                fireQueryChangedPixel(trimmedInput)
+
+                if (!appSettingsPreferencesStore.showAppLinksPrompt) {
+                    appLinksHandler.updatePreviousUrl(urlToNavigate)
+                    appLinksHandler.setUserQueryState(true)
+                } else {
+                    clearPreviousUrl()
+                }
+
+                command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+            }
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
@@ -1078,6 +1131,13 @@ class BrowserTabViewModel(
 
         appLinksHandler.setUserQueryState(false)
         appLinksHandler.updatePreviousUrl(url)
+
+        trackingLinkDetector.lastTrackingLinkInfo?.let { lastTrackingInfo ->
+            if (lastTrackingInfo.destinationUrl == null) {
+                lastTrackingInfo.destinationUrl = url
+            }
+        }
+        isProcessingTrackingLink = false
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1121,13 +1181,23 @@ class BrowserTabViewModel(
         val bookmark = getBookmark(url)
         val favorite = getFavorite(url)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(bookmark = bookmark, favorite = favorite)
+            browserViewState.value = currentBrowserViewState().copy(
+                bookmark = bookmark,
+                favorite = favorite
+            )
         }
     }
 
     private suspend fun getBookmark(url: String): SavedSite.Bookmark? {
         return withContext(dispatchers.io()) {
             bookmarksRepository.getBookmark(url)
+        }
+    }
+
+    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+        if (bookmark == null) return null
+        return withContext(dispatchers.io()) {
+            bookmarksRepository.getBookmarkFolderByParentId(bookmark.parentId)
         }
     }
 
@@ -1217,10 +1287,10 @@ class BrowserTabViewModel(
         Timber.v("Loading in progress $newProgress")
         if (!currentBrowserViewState().browserShowing) return
 
-        val isLoading = newProgress < 100
+        val isLoading = newProgress < 100 || isProcessingTrackingLink
         val progress = currentLoadingViewState()
         if (progress.progress == newProgress) return
-        val visualProgress = if (newProgress < FIXED_PROGRESS) {
+        val visualProgress = if (newProgress < FIXED_PROGRESS || isProcessingTrackingLink) {
             FIXED_PROGRESS
         } else {
             newProgress
@@ -1229,7 +1299,10 @@ class BrowserTabViewModel(
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
         val showLoadingGrade = progress.privacyOn || isLoading
-        privacyGradeViewState.value = currentPrivacyGradeState().copy(shouldAnimate = isLoading, showEmptyGrade = showLoadingGrade)
+        privacyGradeViewState.value = currentPrivacyGradeState().copy(
+            shouldAnimate = isLoading,
+            showEmptyGrade = showLoadingGrade
+        )
 
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
@@ -1605,8 +1678,9 @@ class BrowserTabViewModel(
             }
             bookmarksRepository.insert(title, url)
         }
+        val bookmarkFolder = getBookmarkFolder(savedBookmark)
         withContext(dispatchers.main()) {
-            command.value = ShowSavedSiteAddedConfirmation(savedBookmark)
+            command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(savedBookmark, bookmarkFolder))
         }
     }
 
@@ -1650,7 +1724,7 @@ class BrowserTabViewModel(
             }
             favorite?.let {
                 withContext(dispatchers.main()) {
-                    command.value = ShowSavedSiteAddedConfirmation(it)
+                    command.value = ShowSavedSiteAddedConfirmation(SavedSiteChangedViewState(it, null))
                 }
             }
         }
@@ -1731,7 +1805,20 @@ class BrowserTabViewModel(
     }
 
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
-        command.value = ShowEditSavedSiteDialog(savedSite)
+        viewModelScope.launch(dispatchers.io()) {
+            val bookmarkFolder =
+                if (savedSite is SavedSite.Bookmark) getBookmarkFolder(savedSite)
+                else null
+
+            withContext(dispatchers.main()) {
+                command.value = ShowEditSavedSiteDialog(
+                    SavedSiteChangedViewState(
+                        savedSite,
+                        bookmarkFolder
+                    )
+                )
+            }
+        }
     }
 
     fun onDeleteQuickAccessItemRequested(savedSite: SavedSite) {
@@ -2048,6 +2135,7 @@ class BrowserTabViewModel(
                 )
             }
             ctaViewState.value = currentCtaViewState().copy(cta = cta)
+            ctaChangedTicker.emit(System.currentTimeMillis().toString())
             return cta
         }
         return null
@@ -2078,6 +2166,39 @@ class BrowserTabViewModel(
         viewModelScope.launch {
             val cta = currentCtaViewState().cta ?: return@launch
             ctaViewModel.onUserDismissedCta(cta)
+        }
+    }
+
+    fun onMessageShown() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageShown(message)
+        }
+    }
+
+    fun onMessageCloseButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            remoteMessagingModel.onMessageDismissed(message)
+            refreshCta()
+        }
+    }
+
+    fun onMessagePrimaryButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onPrimaryActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
+        }
+    }
+
+    fun onMessageSecondaryButtonClicked() {
+        val message = currentCtaViewState().message ?: return
+        viewModelScope.launch {
+            val action = remoteMessagingModel.onSecondaryActionClicked(message) ?: return@launch
+            command.value = action.asBrowserTabCommand() ?: return@launch
+            refreshCta()
         }
     }
 
@@ -2414,6 +2535,35 @@ class BrowserTabViewModel(
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
     }
 
+    override fun handleCloakedTrackingLink(initialUrl: String) {
+        isProcessingTrackingLink = true
+        command.value = ExtractUrlFromCloakedTrackingLink(initialUrl)
+    }
+
+    override fun startProcessingTrackingLink() {
+        isProcessingTrackingLink = true
+    }
+
+    fun updateLastTrackingLink(url: String) {
+        trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url)
+    }
+
+    override fun onUrlExtractionError(initialUrl: String) {
+        command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
+    }
+
+    override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
+        val destinationUrl: String = if (extractedUrl != null) {
+            trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = initialUrl)
+            Timber.d("Tracking link detection: Success! Loading extracted URL: $extractedUrl")
+            extractedUrl
+        } else {
+            Timber.d("Tracking link detection: Failed! Loading initial URL: $initialUrl")
+            initialUrl
+        }
+        command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 
@@ -2448,6 +2598,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val specialUrlDetector: Provider<SpecialUrlDetector>,
     private val faviconManager: Provider<FaviconManager>,
     private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
+    private val remoteMessagingModel: Provider<RemoteMessagingModel>,
     private val ctaViewModel: Provider<CtaViewModel>,
     private val searchCountDao: Provider<SearchCountDao>,
     private val pixel: Provider<Pixel>,
@@ -2460,7 +2611,8 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val accessibilitySettingsDataStore: Provider<AccessibilitySettingsDataStore>,
     private val appCoroutineScope: Provider<CoroutineScope>,
     private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
-    private val variantManager: Provider<VariantManager>
+    private val variantManager: Provider<VariantManager>,
+    private val trackingLinkDetector: Provider<TrackingLinkDetector>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -2487,6 +2639,7 @@ class BrowserTabViewModelFactory @Inject constructor(
                     specialUrlDetector.get(),
                     faviconManager.get(),
                     addToHomeCapabilityDetector.get(),
+                    remoteMessagingModel.get(),
                     ctaViewModel.get(),
                     searchCountDao.get(),
                     pixel.get(),
@@ -2499,7 +2652,8 @@ class BrowserTabViewModelFactory @Inject constructor(
                     accessibilitySettingsDataStore.get(),
                     appCoroutineScope.get(),
                     appLinksHandler.get(),
-                    variantManager.get()
+                    variantManager.get(),
+                    trackingLinkDetector.get()
                 ) as T
                 else -> null
             }

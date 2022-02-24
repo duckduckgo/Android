@@ -19,26 +19,16 @@ package com.duckduckgo.app.browser.downloader
 import androidx.test.filters.SdkSuppress
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.whenever
 
 class UriUtilsFilenameExtractorTest {
 
     private val mockedPixel: Pixel = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
-    private val testee: FilenameExtractor = FilenameExtractor(mockAppBuildConfig, mockedPixel)
-
-    @Before
-    fun setup() {
-        whenever(mockAppBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-    }
+    private val testee: FilenameExtractor = FilenameExtractor(mockedPixel)
 
     @Test
     fun whenUrlEndsWithFilenameAsJpgNoMimeOrContentDispositionThenFilenameShouldBeExtracted() {

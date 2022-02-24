@@ -17,7 +17,10 @@
 package com.duckduckgo.app.bookmarks.model
 
 import androidx.annotation.VisibleForTesting
-import com.duckduckgo.app.bookmarks.db.*
+import com.duckduckgo.app.bookmarks.db.BookmarkEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFolderEntity
+import com.duckduckgo.app.bookmarks.db.BookmarkFoldersDao
+import com.duckduckgo.app.bookmarks.db.BookmarksDao
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +42,7 @@ interface BookmarksRepository {
     suspend fun delete(bookmark: Bookmark)
     fun getBookmarkFoldersByParentId(parentId: Long): List<BookmarkFolder>
     fun getBookmarksByParentId(parentId: Long): List<BookmarkEntity>
+    suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder?
     suspend fun deleteFolderBranch(bookmarkFolder: BookmarkFolder): BookmarkFolderBranch
     suspend fun insertFolderBranch(branchToInsert: BookmarkFolderBranch)
     suspend fun getFlatFolderStructure(
@@ -51,6 +55,7 @@ interface BookmarksRepository {
     fun bookmarks(): Flow<List<Bookmark>>
     fun getBookmark(url: String): Bookmark?
     suspend fun hasBookmarks(): Boolean
+    suspend fun bookmarksCount(): Long
 }
 
 class BookmarksDataRepository(
@@ -96,6 +101,10 @@ class BookmarksDataRepository(
         return bookmarksDao.getBookmarksByParentIdSync(parentId)
     }
 
+    override suspend fun getBookmarkFolderByParentId(parentId: Long): BookmarkFolder? {
+        return bookmarkFoldersDao.getBookmarkFolderByParentId(parentId)
+    }
+
     override fun bookmarks(): Flow<List<Bookmark>> {
         return bookmarksDao.getBookmarks().distinctUntilChanged().map { bookmarks -> bookmarks.mapToSavedSites() }
     }
@@ -106,6 +115,10 @@ class BookmarksDataRepository(
 
     override suspend fun hasBookmarks(): Boolean {
         return bookmarksDao.hasBookmarks()
+    }
+
+    override suspend fun bookmarksCount(): Long {
+        return bookmarksDao.bookmarksCount()
     }
 
     @VisibleForTesting

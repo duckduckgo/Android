@@ -21,6 +21,6 @@ import com.duckduckgo.mobile.android.themepreview.ui.component.ComponentFragment
 
 class ComponentInteractiveElementsFragment : ComponentFragment() {
     override fun getComponents(): List<Component> {
-        return listOf(Component.BUTTON, Component.TOP_APP_BAR, Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX)
+        return listOf(Component.BUTTON, Component.TOP_APP_BAR, Component.SWITCH, Component.RADIO_BUTTON, Component.CHECKBOX, Component.SEARCH_BAR)
     }
 }

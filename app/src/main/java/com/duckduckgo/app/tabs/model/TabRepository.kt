@@ -24,11 +24,6 @@ import kotlinx.coroutines.flow.SharedFlow
 
 interface TabRepository {
 
-    /**
-     * @return the tabs that are NOT marked as deletable in the DB
-     */
-    val liveTabs: LiveData<List<TabEntity>>
-
     val flowTabs: Flow<List<TabEntity>>
 
     val childClosedTabs: SharedFlow<String>

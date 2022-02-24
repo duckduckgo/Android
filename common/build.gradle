@@ -46,4 +46,12 @@ dependencies {
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     kapt AndroidX.room.compiler
+
+    // ThreeTenABP
+    implementation "com.jakewharton.threetenabp:threetenabp:_"
+    testImplementation "org.threeten:threetenbp:_"
+
+    // Testing dependencies
+    testImplementation Testing.junit4
+    testImplementation project(path: ':common-test')
 }

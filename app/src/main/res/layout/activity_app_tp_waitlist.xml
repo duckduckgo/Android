@@ -24,7 +24,7 @@
 
     <include
             android:id="@+id/includeToolbar"
-            layout="@layout/include_toolbar" app:layout_constraintTop_toTopOf="parent"
+            layout="@layout/include_default_toolbar" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.appcompat.widget.AppCompatImageView
@@ -67,7 +67,7 @@
 
     <Button
             android:id="@+id/waitListButton"
-            style="@style/DeviceShield.Button.Blue.Lowercase"
+            style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistJoin" app:layout_constraintTop_toBottomOf="@+id/appTPDescription"
@@ -77,7 +77,7 @@
 
     <Button
             android:id="@+id/getStartedButton"
-            style="@style/DeviceShield.Button.Blue.Lowercase"
+            style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistGetStartedCta" app:layout_constraintTop_toBottomOf="@+id/waitListButton"
@@ -86,7 +86,7 @@
 
     <Button
             android:id="@+id/inviteCodeButton"
-            style="@style/DeviceShield.Button.Border"
+            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta" app:layout_constraintTop_toBottomOf="@+id/getStartedButton"
@@ -95,7 +95,7 @@
 
     <Button
             android:id="@+id/footerInviteCodeButton"
-            style="@style/DeviceShield.Button.Border"
+            style="@style/Widget.DuckDuckGo.Button.Secondary"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:text="@string/atp_WaitlistCodeCta"
