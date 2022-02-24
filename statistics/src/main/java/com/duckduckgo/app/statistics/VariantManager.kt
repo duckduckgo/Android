@@ -34,6 +34,8 @@ interface VariantManager {
 
         object ReturningUsersContinueWithoutPrivacyTips : VariantFeature()
         object ReturningUsersSkipTutorial : VariantFeature()
+
+        object TrackingParameterRemoval : VariantFeature()
     }
 
     companion object {
@@ -57,6 +59,10 @@ interface VariantManager {
             Variant(key = "zd", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "zg", weight = 1.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
             Variant(key = "zh", weight = 1.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
+
+            // Tracking parameter removal - initial rollout
+            Variant(key = "ms", weight = 0.75, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "my", weight = 0.25, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { isEnglishLocale() })
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -190,6 +196,8 @@ fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature
 
 fun VariantManager.returningUsersContinueWithoutPrivacyTips() = this.getVariant().hasFeature(ReturningUsersContinueWithoutPrivacyTips)
 fun VariantManager.returningUsersSkipTutorial() = this.getVariant().hasFeature(ReturningUsersSkipTutorial)
+
+fun VariantManager.isTrackingParameterRemovalEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.TrackingParameterRemoval)
 
 /**
  * A variant which can be used for experimentation.

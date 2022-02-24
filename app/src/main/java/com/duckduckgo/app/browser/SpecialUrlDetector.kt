@@ -24,6 +24,8 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isTrackingParameterRemovalEnabled
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -64,7 +66,8 @@ interface SpecialUrlDetector {
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val trackingLinkDetector: TrackingLinkDetector,
-    private val trackingParameters: TrackingParameters
+    private val trackingParameters: TrackingParameters,
+    private val variantManager: VariantManager
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
@@ -96,8 +99,10 @@ class SpecialUrlDetectorImpl(
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
     override fun processUrl(uriString: String): UrlType {
-        trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
-            return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
+        if (variantManager.isTrackingParameterRemovalEnabled()) {
+            trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
+                return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

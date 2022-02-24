@@ -221,8 +221,9 @@ class BrowserModule {
     fun specialUrlDetector(
         packageManager: PackageManager,
         trackingLinkDetector: TrackingLinkDetector,
-        trackingParameters: TrackingParameters
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector, trackingParameters)
+        trackingParameters: TrackingParameters,
+        variantManager: VariantManager
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector, trackingParameters, variantManager)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

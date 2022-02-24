@@ -104,4 +104,20 @@ class VariantManagerTest {
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(ReturningUsersSkipTutorial))
     }
+
+    // TRACKING PARAMETERS - INITIAL ROLLOUT
+    @Test
+    fun trackingParameterRemovalControlVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "ms" }
+        assertEqualsDouble(0.75, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun trackingParameterRemovalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "my" }
+        assertEqualsDouble(0.25, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(TrackingParameterRemoval))
+    }
 }
