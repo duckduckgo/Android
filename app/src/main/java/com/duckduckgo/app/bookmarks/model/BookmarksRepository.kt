@@ -55,6 +55,7 @@ interface BookmarksRepository {
     fun bookmarks(): Flow<List<Bookmark>>
     fun getBookmark(url: String): Bookmark?
     suspend fun hasBookmarks(): Boolean
+    suspend fun bookmarksCount(): Long
 }
 
 class BookmarksDataRepository(
@@ -114,6 +115,10 @@ class BookmarksDataRepository(
 
     override suspend fun hasBookmarks(): Boolean {
         return bookmarksDao.hasBookmarks()
+    }
+
+    override suspend fun bookmarksCount(): Long {
+        return bookmarksDao.bookmarksCount()
     }
 
     @VisibleForTesting

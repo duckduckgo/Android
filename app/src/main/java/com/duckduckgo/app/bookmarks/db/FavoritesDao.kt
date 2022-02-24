@@ -39,6 +39,9 @@ interface FavoritesDao {
     @Query("select count(*) from favorites WHERE url LIKE :domain")
     fun favoritesCountByUrl(domain: String): Int
 
+    @Query("select count(*) from favorites")
+    fun favoritesCount(): Long
+
     @Delete
     fun delete(favorite: FavoriteEntity)
 

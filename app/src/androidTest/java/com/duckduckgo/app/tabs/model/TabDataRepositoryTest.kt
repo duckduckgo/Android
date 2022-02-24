@@ -36,7 +36,6 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -234,7 +233,13 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
+        val job = launch {
+            testee.flowTabs.collect {
+                assertEquals(1, it.size)
+            }
+        }
+        job.cancel()
+        db.close()
     }
 
     @Test
@@ -245,7 +250,13 @@ class TabDataRepositoryTest {
 
         testee.addDefaultTab()
 
-        assertTrue(testee.liveTabs.blockingObserve()?.size == 1)
+        val job = launch {
+            testee.flowTabs.collect {
+                assertEquals(1, it.size)
+            }
+        }
+        job.cancel()
+        db.close()
     }
 
     @Test
