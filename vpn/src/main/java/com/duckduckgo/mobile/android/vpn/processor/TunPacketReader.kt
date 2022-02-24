@@ -102,6 +102,7 @@ class TunPacketReader @AssistedInject constructor(
         } else {
             healthMetricCounter.onTunUnknownPacketReceived()
             deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
+            ByteBufferPool.release(bufferToNetwork)
         }
     }
 
