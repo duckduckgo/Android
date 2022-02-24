@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -60,6 +61,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -226,9 +228,10 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun userAgentProvider(
         @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
-        deviceInfo: DeviceInfo
+        deviceInfo: DeviceInfo,
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo)
+        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint)
     }
 
     @Provides
