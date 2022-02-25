@@ -54,7 +54,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
-    private val job = ConflatedJob()
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private var lastVpnRequestTime = -1L
