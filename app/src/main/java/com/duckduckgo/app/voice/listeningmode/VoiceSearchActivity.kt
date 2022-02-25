@@ -16,25 +16,30 @@
 
 package com.duckduckgo.app.voice.listeningmode
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityVoiceSearchBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.voice.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
-import com.duckduckgo.app.voice.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
+import com.duckduckgo.app.voice.listeningmode.VoiceSearchViewModel.Command
+import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import java.util.Locale
 
 class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
     }
 
-    @Inject
-    lateinit var speechRecognizer: OnDeviceSpeechRecognizer
-
+    private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -42,29 +47,62 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        speechRecognizer.start {
-            when (it) {
-                is PartialResultReceived -> updateText(it.partialResult)
-                is RecognitionSuccess -> handleSuccess(it.result)
-            }
-        }
+        observeViewModel()
+        viewModel.start()
     }
 
     override fun onStop() {
         super.onStop()
-        speechRecognizer.stop()
+        viewModel.stop()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.indicator.destroy()
+    }
+
+    private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+            .onEach {
+                if (it.result.isNotEmpty()) updateText(it.result)
+            }.launchIn(lifecycleScope)
+
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach {
+                when (it) {
+                    is Command.UpdateVoiceIndicator -> handleVolume(it.volume)
+                    is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun handleVolume(normalizedVolume: Float) {
+        if (normalizedVolume != 0f) binding.indicator.bind(Model(normalizedVolume))
     }
 
     private fun handleSuccess(result: String) {
         updateText(result)
         Intent().apply {
-            putExtra(EXTRA_VOICE_RESULT, result)
+            putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
             setResult(Activity.RESULT_OK, this)
         }
         finish()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateText(result: String) {
-        binding.speechResults.text = result
+        binding.speechResults.text = "\"${result.capitalizeFirstLetter()}\""
+    }
+
+    private fun String.capitalizeFirstLetter() = this.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
     }
 }
