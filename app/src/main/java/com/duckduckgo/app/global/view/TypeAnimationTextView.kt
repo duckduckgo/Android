@@ -21,6 +21,8 @@ import android.text.Spanned
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatTextView
 import kotlinx.coroutines.*
+import java.text.BreakIterator
+import java.text.StringCharacterIterator
 import kotlin.coroutines.CoroutineContext
 
 class TypeAnimationTextView @JvmOverloads constructor(
@@ -34,6 +36,8 @@ class TypeAnimationTextView @JvmOverloads constructor(
 
     private var typingAnimationJob: Job? = null
     private var delayAfterAnimationInMs: Long = 300
+    private val breakIterator = BreakIterator.getCharacterInstance()
+
     var typingDelayInMs: Long = 20
     var textInDialog: Spanned? = null
 
@@ -53,9 +57,14 @@ class TypeAnimationTextView @JvmOverloads constructor(
         }
 
         typingAnimationJob = launch {
-            textInDialog?.let {
-                it.mapIndexed { index, _ ->
-                    text = it.subSequence(0, index + 1)
+            textInDialog?.let { spanned ->
+
+                breakIterator.text = StringCharacterIterator(spanned.toString())
+
+                var nextIndex = breakIterator.next()
+                while (nextIndex != BreakIterator.DONE) {
+                    text = spanned.subSequence(0, nextIndex)
+                    nextIndex = breakIterator.next()
                     delay(typingDelayInMs)
                 }
                 delay(delayAfterAnimationInMs)

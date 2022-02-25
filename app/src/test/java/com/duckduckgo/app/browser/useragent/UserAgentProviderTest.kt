@@ -18,12 +18,13 @@ package com.duckduckgo.app.browser.useragent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.device.DeviceInfo
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import com.duckduckgo.app.global.plugins.PluginPoint
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class UserAgentProviderTest {
@@ -39,100 +40,108 @@ class UserAgentProviderTest {
 
     @Test
     fun whenUaRetrievedWithNoParamsThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent()
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenMobileUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenDesktopUaRetrievedThenDeviceStrippedAndApplicationComponentAddedBeforeSafari() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(isDesktop = true)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
     }
 
     @Test
     fun whenMissingAppleWebKitComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
-        testee = UserAgentProvider({ Agent.NO_WEBKIT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.NO_WEBKIT, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected regex", ValidationRegex.missingWebKit.matches(actual))
     }
 
     @Test
     fun whenMissingSafariComponentThenUaContainsMozillaAndVersionAndApplicationComponents() {
-        testee = UserAgentProvider({ Agent.NO_SAFARI }, deviceInfo)
+        testee = getUserAgentProvider(Agent.NO_SAFARI, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.missingSafari.matches(actual))
     }
 
     @Test
     fun whenMissingVersionComponentThenUaContainsMozillaAndApplicationAndSafariComponents() {
-        testee = UserAgentProvider({ Agent.NO_VERSION }, deviceInfo)
+        testee = getUserAgentProvider(Agent.NO_VERSION, deviceInfo)
         val actual = testee.userAgent(isDesktop = false)
         assertTrue("$actual does not match expected result", ValidationRegex.noVersion.matches(actual))
     }
 
     @Test
     fun whenDomainDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(NO_APPLICATION_DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
     }
 
     @Test
     fun whenSubdomsinDoesNotSupportApplicationThenUaOmitsApplicationComponent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(NO_APPLICATION_SUBDOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noApplication.matches(actual))
     }
 
     @Test
     fun whenDomainSupportsApplicationThenUaAddsApplicationComponentBeforeSafari() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenDomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(NO_VERSION_DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
     }
 
     @Test
     fun whenSubdomainDoesNotSupportVersionThenUaOmitsVersionComponent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(NO_VERSION_SUBDOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.noVersion.matches(actual))
     }
 
     @Test
     fun whenDomainSupportsVersionThenUaIncludesVersionComponentInUsualLocation() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DOMAIN)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
     @Test
     fun whenUserAgentIsForASiteThatShouldUseDesktopAgentThenReturnDesktopUserAgent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DESKTOP_ONLY_SITE)
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop.matches(actual))
     }
 
     @Test
     fun whenUserAgentIsForASiteThatShouldUseDesktopAgentButContainsAnExclusionThenDoNotReturnConvertedUserAgent() {
-        testee = UserAgentProvider({ Agent.DEFAULT }, deviceInfo)
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
         val actual = testee.userAgent(DESKTOP_ONLY_SITE_EXCEPTION)
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
+    }
+
+    private fun getUserAgentProvider(
+        defaultUserAgent: String,
+        device: DeviceInfo,
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentFakePluginPoint()
+    ): UserAgentProvider {
+        return UserAgentProvider({ defaultUserAgent }, device, userAgentInterceptorPluginPoint)
     }
 
     companion object {
