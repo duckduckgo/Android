@@ -259,5 +259,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
-    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error")
+    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error"),
+
+    VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED("m_voice_search_privacy_dialog_accepted"),
+    VOICE_SEARCH_PRIVACY_DIALOG_REJECTED("m_voice_search_privacy_dialog_rejected"),
+    VOICE_SEARCH_STARTED("m_voice_search_started"),
+    VOICE_SEARCH_DONE("m_voice_search_done")
 }

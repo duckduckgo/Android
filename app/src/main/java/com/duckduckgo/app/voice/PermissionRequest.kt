@@ -26,6 +26,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -40,7 +42,9 @@ interface PermissionRequest {
 }
 
 @ContributesBinding(AppScope::class)
-class MicrophonePermissionRequest @Inject constructor() : PermissionRequest {
+class MicrophonePermissionRequest @Inject constructor(
+    private val pixel: Pixel
+) : PermissionRequest {
     companion object {
         private const val SCHEME_PACKAGE = "package"
     }
@@ -54,8 +58,10 @@ class MicrophonePermissionRequest @Inject constructor() : PermissionRequest {
         permissionLauncher = fragment.registerForActivityResult(RequestPermission()) { result ->
             fragment.context?.let {
                 if (result) {
+                    pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
                     onPermissionsGranted()
                 } else {
+                    pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
                     showNoMicAccessDialog(it)
                 }
             }
