@@ -19,6 +19,8 @@ package com.duckduckgo.app.email
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.email.db.EmailDataStore
 import com.duckduckgo.app.global.DispatcherProvider
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi.Builder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +43,7 @@ interface EmailManager {
 
     fun signOut()
     fun getEmailAddress(): String?
+    fun getUserData(): String?
     fun waitlistState(): AppEmailManager.WaitlistState
     fun joinWaitlist(
         timestamp: Int,
@@ -98,6 +101,19 @@ class AppEmailManager(
         return emailDataStore.emailUsername?.let {
             "$it$DUCK_EMAIL_DOMAIN"
         }
+    }
+
+    data class UserData(val token: String?, val userName: String?, val nextAlias: String?)
+    var moshi = Builder().build()
+    var jsonAdapter: JsonAdapter<UserData> = moshi.adapter(UserData::class.java)
+
+    override fun getUserData(): String? {
+        var userData = UserData(
+            emailDataStore.emailToken,
+            emailDataStore.emailUsername,
+            emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""),
+        )
+        return jsonAdapter.toJson(userData)
     }
 
     override fun waitlistState(): WaitlistState {

@@ -47,6 +47,15 @@ class EmailJavascriptInterface(
     }
 
     @JavascriptInterface
+    fun getUserData(): String? {
+        return if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.getUserData()
+        } else {
+            ""
+        }
+    }
+
+    @JavascriptInterface
     fun storeCredentials(
         token: String,
         username: String,
