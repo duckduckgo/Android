@@ -22,6 +22,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.duckduckgo.privacy.config.store.features.autofill.AutofillDao
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingDao
 import com.duckduckgo.privacy.config.store.features.drm.DrmDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcExceptionsDao
@@ -35,7 +36,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 6,
+    exportSchema = true, version = 7,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -47,7 +48,8 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         PrivacyConfig::class,
         AmpLinkFormatEntity::class,
         AmpKeywordEntity::class,
-        TrackingLinkExceptionEntity::class
+        TrackingLinkExceptionEntity::class,
+        AutofillExceptionEntity::class
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -60,6 +62,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun privacyConfigDao(): PrivacyConfigDao
     abstract fun drmDao(): DrmDao
     abstract fun trackingLinkDetectionDao(): TrackingLinkDetectionDao
+    abstract fun autofillDao(): AutofillDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

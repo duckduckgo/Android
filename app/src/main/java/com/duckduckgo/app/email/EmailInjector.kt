@@ -23,6 +23,9 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import java.io.BufferedReader
 
 interface EmailInjector {
@@ -45,7 +48,9 @@ interface EmailInjector {
 class EmailInjectorJs(
     private val emailManager: EmailManager,
     private val urlDetector: DuckDuckGoUrlDetector,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val featureToggle: FeatureToggle,
+    private val autofill: Autofill,
 ) : EmailInjector {
     private val javaScriptInjector = JavaScriptInjector()
 
@@ -53,10 +58,12 @@ class EmailInjectorJs(
         webView: WebView,
         onTooltipShown: () -> Unit
     ) {
-        webView.addJavascriptInterface(
-            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown),
-            JAVASCRIPT_INTERFACE_NAME
-        )
+        if (isFeatureEnabled()) {
+            webView.addJavascriptInterface(
+                EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown),
+                JAVASCRIPT_INTERFACE_NAME
+            )
+        }
     }
 
     @UiThread
@@ -64,8 +71,12 @@ class EmailInjectorJs(
         webView: WebView,
         url: String?
     ) {
-        if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
-            webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
+        url?.let {
+            if (isFeatureEnabled() && !autofill.isAnException(url)) {
+                if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
+                    webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
+                }
+            }
         }
     }
 
@@ -74,8 +85,12 @@ class EmailInjectorJs(
         webView: WebView,
         alias: String?
     ) {
-        webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+        if (isFeatureEnabled()) {
+            webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+        }
     }
+
+    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName(), defaultValue = true) ?: false
 
     private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
 
