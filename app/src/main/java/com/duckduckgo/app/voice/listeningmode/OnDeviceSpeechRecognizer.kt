@@ -24,27 +24,34 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.app.voice.listeningmode.OnDeviceSpeechRecognizer.Event
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
 
 interface OnDeviceSpeechRecognizer {
+    companion object {
+        const val MAX_VOLUME = 10f
+        const val MIN_VOLUME = 0f
+    }
+
     fun start(eventHandler: (Event) -> Unit)
     fun stop()
 
     sealed class Event {
         data class PartialResultReceived(val partialResult: String) : Event()
         data class RecognitionSuccess(val result: String) : Event()
+        data class VolumeUpdateReceived(val normalizedVolume: Float) : Event()
     }
 }
 
 @RequiresApi(VERSION_CODES.S)
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class DefaultOnDeviceSpeechRecognizer @Inject constructor(
-    context: Context
+    private val context: Context
 ) : OnDeviceSpeechRecognizer {
-    private val speechRecognizer: SpeechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+
+    private var speechRecognizer: SpeechRecognizer? = null
 
     private val speechRecognizerIntent: Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).run {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -61,12 +68,12 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
         }
 
         override fun onRmsChanged(rmsdB: Float) {
-            // Do nothing.
+            _eventHandler(
+                Event.VolumeUpdateReceived(rmsdB.clean())
+            )
         }
 
-        override fun onBufferReceived(buffer: ByteArray?) {
-            // Do nothing.
-        }
+        override fun onBufferReceived(buffer: ByteArray?) {}
 
         override fun onEndOfSpeech() {
             // Do nothing. User has finished speaking.
@@ -74,9 +81,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
         override fun onError(error: Int) {
             when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH -> speechRecognizer.restartListening()
-                SpeechRecognizer.ERROR_CLIENT -> Timber.e("SpeechRecognizer internal client error")
-                SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> Timber.e("SpeechRecognizer is currently busy")
+                SpeechRecognizer.ERROR_NO_MATCH -> speechRecognizer?.restartListening()
                 else -> Timber.e("SpeechRecognizer error: $error")
             }
         }
@@ -101,23 +106,21 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
             eventType: Int,
             params: Bundle?
         ) {
-            // Do nothing.
         }
     }
 
     private var _eventHandler: (Event) -> Unit = {}
 
-    init {
-        speechRecognizer.setRecognitionListener(recognitionListener)
-    }
-
     override fun start(eventHandler: (Event) -> Unit) {
         _eventHandler = eventHandler
-        speechRecognizer.startListening(speechRecognizerIntent)
+        speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
+        speechRecognizer?.setRecognitionListener(recognitionListener)
+        speechRecognizer?.startListening(speechRecognizerIntent)
     }
 
     override fun stop() {
-        speechRecognizer.destroy()
+        speechRecognizer?.stopListening()
+        speechRecognizer?.destroy()
     }
 
     private fun SpeechRecognizer.restartListening() {
@@ -127,7 +130,15 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
     private fun Bundle.extractResult(): String {
         val result = getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.toList()
-        if (result.isNullOrEmpty()) return ""
-        return result[0]
+        return if (result.isNullOrEmpty()) "" else result[0]
+    }
+
+    private fun Float.clean(): Float {
+        // We disregard any negative value since they tend to be emitted even if the user is not speaking
+        return when {
+            this <= OnDeviceSpeechRecognizer.MIN_VOLUME -> OnDeviceSpeechRecognizer.MIN_VOLUME
+            this > OnDeviceSpeechRecognizer.MAX_VOLUME -> OnDeviceSpeechRecognizer.MAX_VOLUME
+            else -> this
+        }
     }
 }
