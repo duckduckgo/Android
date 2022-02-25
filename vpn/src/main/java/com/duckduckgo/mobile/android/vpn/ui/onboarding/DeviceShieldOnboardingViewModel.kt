@@ -20,7 +20,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -28,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -83,8 +81,8 @@ class DeviceShieldOnboardingViewModel @Inject constructor(
         deviceShieldOnboardingStore.onboardingDidNotShow()
     }
 
-    fun onTurnAppTpOffOn(){
-        if (vpnDetector.isVpnDetected()){
+    fun onTurnAppTpOffOn() {
+        if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
             sendCommand(Command.CheckVPNPermission)
@@ -141,7 +139,8 @@ class DeviceShieldOnboardingViewModelFactory @Inject constructor(
         with(modelClass) {
             return when {
                 isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (
-                    (viewModelProvider.get()
+                    (
+                        viewModelProvider.get()
                         ) as T
                     )
                 else -> null

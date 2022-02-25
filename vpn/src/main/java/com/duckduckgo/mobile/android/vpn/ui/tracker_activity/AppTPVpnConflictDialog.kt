@@ -67,7 +67,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
     ) {
         arguments?.let { args ->
             val isAlwaysOn = args.getBoolean(KEY_ALWAYS_ON_CONFLICT)
-            if (isAlwaysOn){
+            if (isAlwaysOn) {
                 configureAlwaysOnDialogViews(titleView, messageView, startCta, endCta)
             } else {
                 configureVpnConflictViews(titleView, messageView, startCta, endCta)
@@ -147,7 +147,7 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         private const val KEY_ALWAYS_ON_CONFLICT = "KEY_ALWAYS_ON_CONFLICT"
 
         fun instance(listener: Listener, alwaysOn: Boolean = false): AppTPVpnConflictDialog {
-            return AppTPVpnConflictDialog(listener).also {  fragment ->
+            return AppTPVpnConflictDialog(listener).also { fragment ->
                 val bundle = Bundle()
                 bundle.putBoolean(KEY_ALWAYS_ON_CONFLICT, alwaysOn)
                 fragment.arguments = bundle

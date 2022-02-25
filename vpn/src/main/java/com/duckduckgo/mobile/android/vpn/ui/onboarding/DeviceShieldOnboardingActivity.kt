@@ -43,15 +43,12 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermiss
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity.Companion
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import javax.inject.Inject
 
-class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding), AppTPVpnConflictDialog.Listener  {
+class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding), AppTPVpnConflictDialog.Listener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -181,12 +178,11 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-
     private fun processCommand(command: Command) {
-        when (command){
+        when (command) {
             is LaunchVPN -> startVpn()
-            is ShowVpnConflictDialog ->  launchVPNConflictDialog(false)
-            is ShowVpnAlwaysOnConflictDialog ->  launchVPNConflictDialog(true)
+            is ShowVpnConflictDialog -> launchVPNConflictDialog(false)
+            is ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is CheckVPNPermission -> checkVPNPermission()
             is RequestVPNPermission -> obtainVpnRequestPermission(command.vpnIntent)
         }
@@ -270,6 +266,5 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
             return Intent(context, DeviceShieldOnboardingActivity::class.java)
         }
     }
-
 
 }
