@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -69,6 +70,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
+    private val vpnStateMonitor = mock<VpnStateMonitor>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -98,6 +100,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             vpnPreferences,
             appTrackerBlockingStatsRepository,
             vpnDetector,
+            vpnStateMonitor,
             CoroutineTestRule().testDispatcherProvider
         )
     }

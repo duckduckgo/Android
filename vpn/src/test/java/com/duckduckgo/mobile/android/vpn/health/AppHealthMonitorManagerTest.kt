@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.health
 
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason.SelfStop
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +48,7 @@ class AppHealthMonitorManagerTest {
 
     @Test
     fun whenOnVpnStoppedThenStopMonitoring() {
-        appHealthMonitorManager.onVpnStopped(TestCoroutineScope(), SelfStop)
+        appHealthMonitorManager.onVpnStopped(TestCoroutineScope(), SELF_STOP)
 
         verify(appHealthMonitor).stopMonitoring()
         verifyNoMoreInteractions(appHealthMonitor)
