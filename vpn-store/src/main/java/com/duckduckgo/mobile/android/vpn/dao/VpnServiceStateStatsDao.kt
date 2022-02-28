@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VpnServiceStateStatsDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(stat: VpnServiceStateStats)
 
     @Query("SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")

@@ -32,6 +32,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -45,6 +46,7 @@ class VpnServiceStateLogger @Inject constructor(
 ) : VpnServiceCallbacks {
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcherProvider.io()) {
+            Timber.d("VpnServiceStateLogge, new state ENABLED")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
         }
     }
@@ -54,6 +56,7 @@ class VpnServiceStateLogger @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         coroutineScope.launch(dispatcherProvider.io()) {
+            Timber.d("VpnServiceStateLogge, new state DISABLED, reason $vpnStopReason")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = mapStopReason(vpnStopReason)))
         }
     }
