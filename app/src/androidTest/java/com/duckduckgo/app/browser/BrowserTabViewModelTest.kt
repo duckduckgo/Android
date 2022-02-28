@@ -117,7 +117,6 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
@@ -301,9 +300,6 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
-    @Mock
-    private lateinit var mockAppBuildConfig: AppBuildConfig
-
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -443,8 +439,7 @@ class BrowserTabViewModelTest {
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager,
             trackingLinkDetector = mockTrackingLinkDetector,
-            remoteMessagingModel = remoteMessagingModel,
-            appBuildConfig = mockAppBuildConfig
+            remoteMessagingModel = remoteMessagingModel
         )
 
         testee.loadData("abc", null, false, false)

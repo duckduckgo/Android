@@ -32,7 +32,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.PendingPixelDao
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
@@ -97,7 +96,6 @@ class StatisticsModule {
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
         pixelSender: PixelSender,
-        appBuildConfig: AppBuildConfig,
         offlinePixels: DaggerSet<OfflinePixel>
     ): OfflinePixelSender = OfflinePixelSender(offlinePixelCountDataStore, uncaughtExceptionRepository, pixelSender, appBuildConfig, offlinePixels)
 

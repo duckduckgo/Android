@@ -28,8 +28,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -46,7 +44,6 @@ import javax.inject.Inject
 class FileDownloadBroadcastReceiver @Inject constructor(
     private val context: Context,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig,
     private val dispatcher: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
@@ -69,17 +66,11 @@ class FileDownloadBroadcastReceiver @Inject constructor(
                 when (cursor.getInt(index)) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         Timber.d("Download completed with success.")
-                        pixel.fire(
-                            AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED,
-                            parameters = mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
-                        )
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
                     }
                     DownloadManager.STATUS_FAILED -> {
                         Timber.d("Download completed, but failed.")
-                        pixel.fire(
-                            AppPixelName.DOWNLOAD_REQUEST_FAILED,
-                            parameters = mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
-                        )
+                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
                     }
                 }
             }
