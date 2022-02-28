@@ -26,7 +26,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.DaggerSet
 import io.reactivex.Completable
 import io.reactivex.Completable.*
@@ -42,7 +41,6 @@ class OfflinePixelSender constructor(
     private val offlineCountCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val pixelSender: PixelSender,
-    private val appBuildConfig: AppBuildConfig,
     private val offlinePixels: DaggerSet<OfflinePixel>,
 ) {
 
