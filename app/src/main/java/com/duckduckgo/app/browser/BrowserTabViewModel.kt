@@ -2552,10 +2552,7 @@ class BrowserTabViewModel(
         command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
     }
 
-    override fun onUrlExtracted(
-        initialUrl: String,
-        extractedUrl: String?
-    ) {
+    override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
         val destinationUrl: String = if (extractedUrl != null) {
             trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = initialUrl)
             Timber.d("Tracking link detection: Success! Loading extracted URL: $extractedUrl")
