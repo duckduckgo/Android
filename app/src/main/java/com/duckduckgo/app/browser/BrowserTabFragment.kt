@@ -175,6 +175,7 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
+import com.duckduckgo.app.voice.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.app.voice.VoiceSearchAvailabilityUtil
 import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -302,6 +303,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
+    @Inject
+    lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -403,7 +407,7 @@ class BrowserTabFragment :
         decorator = BrowserTabFragmentDecorator()
         voiceSearchLauncher.registerResultsCallback(this) {
             if (it.isNotEmpty()) {
-                omnibar.omnibarTextInput.setText(it)
+                omnibarTextInput.setText(it)
                 userEnteredQuery(it)
             }
         }
@@ -1306,6 +1310,7 @@ class BrowserTabFragment :
     private fun configureVoiceSearch() {
         context?.let {
             if (VoiceSearchAvailabilityUtil.shouldShowVoiceSearchEntry(it)) {
+                voiceSearchPixelLogger.log()
                 voiceSearchButton.visibility = VISIBLE
                 voiceSearchButton.setOnClickListener {
                     voiceSearchLauncher.launch()
