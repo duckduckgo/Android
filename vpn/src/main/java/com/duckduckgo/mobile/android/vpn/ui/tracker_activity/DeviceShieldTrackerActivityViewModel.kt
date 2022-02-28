@@ -108,8 +108,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     internal fun launchExcludedApps() {
-        deviceShieldPixels.didChooseToDisableOneAppFromDialog()
-        sendCommand(Command.LaunchExcludedApps(vpnStateMonitor.getState().state == VpnRunningState.ENABLED))
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val vpnState = vpnStateMonitor.getState().state
+            sendCommand(Command.LaunchExcludedApps(vpnState == VpnRunningState.ENABLED))
+            deviceShieldPixels.didChooseToDisableOneAppFromDialog()
+        }
     }
 
     internal fun onAppTpManuallyDisabled() {

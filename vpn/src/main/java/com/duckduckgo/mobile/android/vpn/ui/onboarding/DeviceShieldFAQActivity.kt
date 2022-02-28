@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldFaqBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import javax.inject.Inject
