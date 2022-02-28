@@ -31,6 +31,9 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -40,7 +43,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -173,6 +175,7 @@ class DeviceShieldTrackerActivityViewModelTest {
 
     @Test
     fun whenLaunchExcludedAppsViewEventThenCommandIsLaunchExcludedApps() = runBlocking {
+        whenever(vpnStateMonitor.getState()).thenReturn(VpnState(ENABLED, UNKNOWN))
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
@@ -233,20 +236,20 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
-    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runTest {
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runBlocking {
         viewModel.commands().test {
             val permissionIntent = Intent()
             viewModel.onVPNPermissionNeeded(permissionIntent)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission(permissionIntent), awaitItem())
 
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_CANCELED)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
 
     @Test
-    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasHigherThanNeededThenVpnIsStopped() = runTest {
+    fun whenVpnPermissionResultIsDeniedAndRequestTimeWasHigherThanNeededThenVpnIsStopped() = runBlocking {
         viewModel.commands().test {
             val permissionIntent = Intent()
             viewModel.onVPNPermissionNeeded(permissionIntent)
