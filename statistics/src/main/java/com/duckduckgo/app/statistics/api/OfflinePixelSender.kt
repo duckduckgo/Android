@@ -118,7 +118,7 @@ class OfflinePixelSender constructor(
                     )
 
                 val pixel =
-                    pixelSender.sendPixel(pixelName, params, emptyMap()).doOnComplete {
+                    pixelSender.sendPixel(pixelName, params, determinePixelParameters(pixelName)).doOnComplete {
                         Timber.d(
                             "Sent pixel with params: $params containing exception; deleting exception with id=${exception.id}"
                         )
@@ -148,6 +148,10 @@ class OfflinePixelSender constructor(
             RECEIVED_PAGE_TITLE -> APPLICATION_CRASH_WEBVIEW_RECEIVED_PAGE_TITLE
             SHOW_FILE_CHOOSER -> APPLICATION_CRASH_WEBVIEW_SHOW_FILE_CHOOSER
         }.pixelName
+    }
+
+    private fun determinePixelParameters(pixelName: String): Map<String, String> {
+        return emptyMap()
     }
 
     private fun sendPixelCount(
