@@ -187,7 +187,6 @@ class BrowserWebViewClient(
                                 webView.loadUrl(urlType.cleanedUrl)
                                 return listener.handleAppLink(parameterStrippedType, isForMainFrame)
                             }
-                            return false
                         } else {
                             webView.loadUrl(urlType.cleanedUrl)
                             return true
