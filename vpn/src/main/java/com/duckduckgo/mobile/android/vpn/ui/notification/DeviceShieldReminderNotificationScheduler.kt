@@ -66,12 +66,14 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
+        Timber.d("VPN Manually stopped, showing disabled notification")
         showImmediateReminderNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
     }
 
     private fun onVPNRevoked() {
+        Timber.d("VPN Revoked, showing revoke notification")
         showImmediateRevokedNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()

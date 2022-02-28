@@ -20,7 +20,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldFaqBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import javax.inject.Inject
 
@@ -29,11 +31,13 @@ class DeviceShieldFAQActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
+    private val binding: ActivityDeviceShieldFaqBinding by viewBinding()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_device_shield_faq)
-        setupToolbar(findViewById(com.duckduckgo.mobile.android.R.id.toolbar))
+        setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
 
         deviceShieldPixels.privacyReportOnboardingFAQDisplayed()
     }
