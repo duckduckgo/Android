@@ -20,12 +20,14 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionEntity
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.COUNT
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.pixels.Pixel.StatisticsPixelName.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.DaggerSet
 import io.reactivex.Completable
 import io.reactivex.Completable.*
@@ -41,6 +43,7 @@ class OfflinePixelSender constructor(
     private val offlineCountCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val pixelSender: PixelSender,
+    private val appBuildConfig: AppBuildConfig,
     private val offlinePixels: DaggerSet<OfflinePixel>,
 ) {
 
@@ -151,7 +154,11 @@ class OfflinePixelSender constructor(
     }
 
     private fun determinePixelParameters(pixelName: String): Map<String, String> {
-        return emptyMap()
+        return when {
+            pixelName.equals(APPLICATION_CRASH.pixelName) -> mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
+            pixelName.equals(APPLICATION_CRASH_GLOBAL.pixelName) -> mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
+            else -> emptyMap()
+        }
     }
 
     private fun sendPixelCount(

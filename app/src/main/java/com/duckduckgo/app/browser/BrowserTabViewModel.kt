@@ -113,6 +113,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
@@ -169,7 +170,8 @@ class BrowserTabViewModel(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
     private val variantManager: VariantManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val trackingLinkDetector: TrackingLinkDetector,
+    private val appBuildConfig: AppBuildConfig
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
@@ -2454,7 +2456,7 @@ class BrowserTabViewModel(
 
     fun download(pendingFileDownload: FileDownloader.PendingFileDownload) {
         viewModelScope.launch(dispatchers.io()) {
-            pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
+            pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED, parameters = mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString()))
             fileDownloader.download(
                 pendingFileDownload,
                 object : FileDownloader.FileDownloadListener {
@@ -2483,7 +2485,9 @@ class BrowserTabViewModel(
                         mimeType: String?
                     ) {
                         Timber.i("downloadFinished data uri")
-                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+                        pixel.fire(
+                            AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED, parameters = mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
+                        )
                         command.postValue(DownloadCommand.ScanMediaFiles(file))
                         command.postValue(DownloadCommand.ShowDownloadFinishedNotification(file, mimeType))
                     }
@@ -2494,7 +2498,10 @@ class BrowserTabViewModel(
                     ) {
                         // TODO [Improve downloads] This used only when DownloadManager is not involved.
                         Timber.w("Failed to download file [$message]")
-                        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+                        pixel.fire(
+                            AppPixelName.DOWNLOAD_REQUEST_FAILED,
+                            parameters = mapOf(PixelParameter.OS_VERSION to appBuildConfig.sdkInt.toString())
+                        )
                         command.postValue(DownloadCommand.ShowDownloadFailedNotification(message, downloadFailReason))
                     }
 
@@ -2552,7 +2559,10 @@ class BrowserTabViewModel(
         command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
     }
 
-    override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
+    override fun onUrlExtracted(
+        initialUrl: String,
+        extractedUrl: String?
+    ) {
         val destinationUrl: String = if (extractedUrl != null) {
             trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = initialUrl)
             Timber.d("Tracking link detection: Success! Loading extracted URL: $extractedUrl")
@@ -2612,7 +2622,8 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val appCoroutineScope: Provider<CoroutineScope>,
     private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
     private val variantManager: Provider<VariantManager>,
-    private val trackingLinkDetector: Provider<TrackingLinkDetector>
+    private val trackingLinkDetector: Provider<TrackingLinkDetector>,
+    private val appBuildConfig: Provider<AppBuildConfig>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -2653,7 +2664,8 @@ class BrowserTabViewModelFactory @Inject constructor(
                     appCoroutineScope.get(),
                     appLinksHandler.get(),
                     variantManager.get(),
-                    trackingLinkDetector.get()
+                    trackingLinkDetector.get(),
+                    appBuildConfig.get()
                 ) as T
                 else -> null
             }
