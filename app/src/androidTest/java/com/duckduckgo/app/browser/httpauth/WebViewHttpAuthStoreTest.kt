@@ -31,8 +31,10 @@ import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Provider
 
 @ExperimentalCoroutinesApi
 class WebViewHttpAuthStoreTest {
@@ -41,13 +43,19 @@ class WebViewHttpAuthStoreTest {
     val coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val webViewDatabaseProvider: Provider<WebViewDatabase> = mock()
     private val webViewDatabase: WebViewDatabase = mock()
     private val mockDatabaseCleaner: DatabaseCleaner = mock()
     private val webView: WebView = mock()
     private val databaseLocator = AuthDatabaseLocator(context)
 
     private val webViewHttpAuthStore =
-        RealWebViewHttpAuthStore(webViewDatabase, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestScope())
+        RealWebViewHttpAuthStore(webViewDatabaseProvider, mockDatabaseCleaner, databaseLocator, coroutineRule.testDispatcherProvider, TestScope())
+
+    @Before
+    fun before() {
+        whenever(webViewDatabaseProvider.get()).thenReturn(webViewDatabase)
+    }
 
     @Test
     @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.O)

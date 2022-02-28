@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 import dagger.SingleInstanceIn
+import javax.inject.Provider
 
 data class WebViewHttpAuthCredentials(
     val username: String,
@@ -75,7 +76,7 @@ interface WebViewHttpAuthStore {
 )
 @SingleInstanceIn(AppScope::class)
 class RealWebViewHttpAuthStore @Inject constructor(
-    private val webViewDatabase: WebViewDatabase,
+    private val webViewDatabase: Provider<WebViewDatabase>,
     private val databaseCleaner: DatabaseCleaner,
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
     private val dispatcherProvider: DispatcherProvider,
@@ -101,7 +102,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         password: String
     ) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
+            webViewDatabase.get().setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
             webView.setHttpAuthUsernamePassword(host, realm, username, password)
         }
@@ -113,7 +114,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         realm: String
     ): WebViewHttpAuthCredentials? {
         val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+            webViewDatabase.get().getHttpAuthUsernamePassword(host, realm)
         } else {
             @Suppress("DEPRECATION")
             webView.getHttpAuthUsernamePassword(host, realm)
@@ -123,7 +124,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
     }
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
-        webViewDatabase.clearHttpAuthUsernamePassword()
+        webViewDatabase.get().clearHttpAuthUsernamePassword()
     }
 
     override suspend fun cleanHttpAuthDatabase() {
