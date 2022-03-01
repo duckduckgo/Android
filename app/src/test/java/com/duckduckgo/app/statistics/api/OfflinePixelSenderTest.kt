@@ -26,7 +26,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_APP_V
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_MESSAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.EXCEPTION_TIMESTAMP
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.*
 import io.reactivex.Completable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,11 +38,10 @@ class OfflinePixelSenderTest {
 
     private var mockOfflinePixelCountDataStore: OfflinePixelCountDataStore = mock()
     private var mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
-    private var mockAppBuildConfig: AppBuildConfig = mock()
     private var mockPixel: PixelSender = mock()
 
     private var testee: OfflinePixelSender =
-        OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel, mockAppBuildConfig, setOf())
+        OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel, setOf())
 
     @get:Rule
     val schedulers = InstantSchedulersRule()
