@@ -23,17 +23,22 @@ import com.duckduckgo.app.global.domain
 import com.duckduckgo.app.global.replaceQueryParameters
 import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
+import dagger.WrongScope
 import timber.log.Timber
 import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 
+@WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealTrackingParameters @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val featureToggle: FeatureToggle,
