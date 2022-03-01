@@ -19,7 +19,12 @@ package com.duckduckgo.app.voice.listeningmode
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND
+import android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -42,7 +47,20 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        addBackgroundBlur()
         setContentView(binding.root)
+    }
+
+    private fun addBackgroundBlur() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // It is important to set FLAG_DIM_BEHIND and dimAmount since without it there will be a lag on the blur effect
+            window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window.addFlags(FLAG_BLUR_BEHIND)
+            window.addFlags(FLAG_DIM_BEHIND)
+            window.attributes.blurBehindRadius = 70
+            window.attributes.dimAmount = 0.001f
+            setTranslucent(true)
+        }
     }
 
     override fun onStart() {

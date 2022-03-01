@@ -18,7 +18,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimaryDark">
+    android:background="@android:color/transparent">
+
+    <FrameLayout
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.8"
+        android:background="?attr/colorPrimary" />
 
     <TextView
         android:id="@+id/speechResults"
@@ -55,7 +62,7 @@
         android:layout_marginBottom="54dp"
         android:gravity="center"
         android:text="@string/voiceSearchListeningFooter"
-        android:textColor="?attr/secondaryTextColor"
+        android:textColor="@color/gray70"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
