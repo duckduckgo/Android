@@ -124,7 +124,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCanSubmitBrokenSiteAndUrlNotNullAndSubmitPressedThenReportAndPixelSubmitted() {
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -135,7 +135,8 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
+            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            urlParametersRemoved = false
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -146,7 +147,7 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenCanSubmitBrokenSiteAndUrlIsEmptyAndSubmitPressedThenDoNotSubmit() {
         val nullUrl = ""
-        testee.setInitialBrokenSite(nullUrl, "", "", false)
+        testee.setInitialBrokenSite(nullUrl, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -157,7 +158,8 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
+            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            urlParametersRemoved = false
         )
 
         verify(mockPixel, never()).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to nullUrl))
@@ -169,7 +171,7 @@ class BrokenSiteViewModelTest {
     fun whenCanSubmitBrokenSiteAndLastTrackingLinkIsNullAndSubmitPressedThenReportUrlAndPixelSubmitted() {
         whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(null)
 
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -180,7 +182,8 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
+            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            urlParametersRemoved = false
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to url))
@@ -192,7 +195,7 @@ class BrokenSiteViewModelTest {
     fun whenCanSubmitBrokenSiteAndUrlHasAssociatedTrackingLinkAndSubmitPressedThenTrackingLinkReportedAndPixelSubmitted() {
         whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(TrackingLinkInfo(trackingUrl, url))
 
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
         testee.onSubmitPressed("webViewVersion")
 
@@ -203,7 +206,8 @@ class BrokenSiteViewModelTest {
             blockedTrackers = "",
             surrogates = "",
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
+            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            urlParametersRemoved = false
         )
 
         verify(mockPixel).fire(AppPixelName.BROKEN_SITE_REPORTED, mapOf("url" to trackingUrl))
@@ -213,7 +217,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenUrlIsDesktopThenSendDesktopParameter() {
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -223,7 +227,7 @@ class BrokenSiteViewModelTest {
     @Test
     fun whenUrlIsMobileThenSendMobileParameter() {
         val url = "http://m.example.com"
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory()
 
         val brokenSiteExpected = testee.getBrokenSite(url, "")
@@ -234,7 +238,7 @@ class BrokenSiteViewModelTest {
     fun whenGetBrokenSiteThenReturnCorrectCategory() {
         val url = "http://m.example.com"
         val categoryIndex = 0
-        testee.setInitialBrokenSite(url, "", "", false)
+        testee.setInitialBrokenSite(url, "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory(categoryIndex)
 
         val categoryExpected = testee.categories[categoryIndex].key
@@ -244,7 +248,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCancelSelectionThenAssignOldIndexValue() {
-        testee.setInitialBrokenSite("", "", "", false)
+        testee.setInitialBrokenSite("", "", "", upgradedHttps = false, urlParametersRemoved = false)
         selectAndAcceptCategory(0)
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
@@ -254,7 +258,7 @@ class BrokenSiteViewModelTest {
 
     @Test
     fun whenCancelSelectionAndNoPreviousValueThenAssignMinusOne() {
-        testee.setInitialBrokenSite("", "", "", false)
+        testee.setInitialBrokenSite("", "", "", upgradedHttps = false, urlParametersRemoved = false)
         testee.onCategoryIndexChanged(1)
         testee.onCategorySelectionCancelled()
 

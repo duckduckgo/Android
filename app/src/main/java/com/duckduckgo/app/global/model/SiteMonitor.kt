@@ -122,6 +122,8 @@ class SiteMonitor(
         return SiteGrades(privacyGradeOriginal, privacyGradeImproved)
     }
 
+    override var urlParametersRemoved: Boolean = false
+
     private fun privacyGrade(scores: Grade.Scores): PrivacyGrade {
         return when (scores) {
             Grade.Scores.ScoresUnavailable -> PrivacyGrade.UNKNOWN

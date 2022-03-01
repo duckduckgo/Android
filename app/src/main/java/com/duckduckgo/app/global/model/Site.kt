@@ -64,6 +64,8 @@ interface Site {
         val grade: PrivacyGrade,
         val improvedGrade: PrivacyGrade
     )
+
+    var urlParametersRemoved: Boolean
 }
 
 fun Site.orderedTrackingEntities(): List<Entity> = trackingEvents

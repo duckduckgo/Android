@@ -19,6 +19,7 @@ package com.duckduckgo.app.privacy.db
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class UserWhitelistDao {
@@ -39,6 +40,9 @@ abstract class UserWhitelistDao {
 
     @Query("select * from user_whitelist")
     abstract fun all(): LiveData<List<UserWhitelistedDomain>>
+
+    @Query("select * from user_whitelist")
+    abstract fun allFlow(): Flow<List<UserWhitelistedDomain>>
 
     @Query("select count(1) > 0 from user_whitelist where domain = :domain")
     abstract fun contains(domain: String): Boolean

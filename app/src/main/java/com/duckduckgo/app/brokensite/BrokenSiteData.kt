@@ -24,7 +24,8 @@ data class BrokenSiteData(
     val url: String,
     val blockedTrackers: String,
     val surrogates: String,
-    val upgradedToHttps: Boolean
+    val upgradedToHttps: Boolean,
+    val urlParametersRemoved: Boolean
 ) {
 
     companion object {
@@ -34,7 +35,8 @@ data class BrokenSiteData(
             val upgradedHttps = site?.upgradedHttps ?: false
             val surrogates = site?.surrogates?.map { Uri.parse(it.name).baseHost }.orEmpty().distinct().joinToString(",")
             val url = site?.url.orEmpty()
-            return BrokenSiteData(url, blockedTrackers, surrogates, upgradedHttps)
+            val urlParametersRemoved = site?.urlParametersRemoved ?: false
+            return BrokenSiteData(url, blockedTrackers, surrogates, upgradedHttps, urlParametersRemoved)
         }
     }
 }
