@@ -1145,8 +1145,7 @@ class BrowserTabViewModel(
 
         trackingParameters.lastCleanedUrl?.let {
             trackingParameters.lastCleanedUrl = null
-            site?.urlParametersRemoved = true
-            onSiteChanged()
+            enableUrlParametersRemovedFlag()
         }
 
         isProcessingTrackingLink = false
@@ -1551,6 +1550,11 @@ class BrowserTabViewModel(
             site?.hasHttpResources = true
             onSiteChanged()
         }
+    }
+
+    private fun enableUrlParametersRemovedFlag() {
+        site?.urlParametersRemoved = true
+        onSiteChanged()
     }
 
     private fun onSiteChanged() {
