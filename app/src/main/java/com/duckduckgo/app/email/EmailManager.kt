@@ -104,9 +104,9 @@ class AppEmailManager(
 
     override fun getUserData(): String {
         return JSONObject().apply {
-            put("token", emailDataStore.emailToken)
-            put("userName", emailDataStore.emailUsername)
-            put("nextAlias", emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
+            put(TOKEN, emailDataStore.emailToken)
+            put(USERNAME, emailDataStore.emailUsername)
+            put(NEXT_ALIAS, emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
         }.toString()
     }
 
@@ -224,6 +224,9 @@ class AppEmailManager(
     companion object {
         const val DUCK_EMAIL_DOMAIN = "@duck.com"
         const val UNKNOWN_COHORT = "unknown"
+        const val TOKEN = "token"
+        const val USERNAME = "userName"
+        const val NEXT_ALIAS = "nextAlias"
     }
 
     private fun EmailDataStore.clearEmailData() {
