@@ -70,6 +70,7 @@ class BrokenSiteViewModel(
     private var url: String = ""
     private var upgradedHttps: Boolean = false
     private val viewValue: ViewState get() = viewState.value!!
+    private var urlParametersRemoved: Boolean = false
 
     init {
         viewState.value = ViewState()
@@ -79,12 +80,14 @@ class BrokenSiteViewModel(
         url: String,
         blockedTrackers: String,
         surrogates: String,
-        upgradedHttps: Boolean
+        upgradedHttps: Boolean,
+        urlParametersRemoved: Boolean
     ) {
         this.url = url
         this.blockedTrackers = blockedTrackers
         this.upgradedHttps = upgradedHttps
         this.surrogates = surrogates
+        this.urlParametersRemoved = urlParametersRemoved
     }
 
     fun onCategoryIndexChanged(newIndex: Int) {
@@ -133,7 +136,8 @@ class BrokenSiteViewModel(
             blockedTrackers = blockedTrackers,
             surrogates = surrogates,
             webViewVersion = webViewVersion,
-            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE
+            siteType = if (Uri.parse(url).isMobileSite) MOBILE_SITE else DESKTOP_SITE,
+            urlParametersRemoved = urlParametersRemoved
         )
     }
 

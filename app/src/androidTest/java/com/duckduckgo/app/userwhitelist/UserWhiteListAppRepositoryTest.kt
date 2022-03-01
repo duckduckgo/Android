@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +14,47 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.db
+package com.duckduckgo.app.userwhitelist
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestScope
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.MockitoAnnotations
 
-class UserWhitelistDaoTest {
+class UserWhiteListAppRepositoryTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     @get:Rule
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var coroutinesTestRule = CoroutineTestRule()
-
     private lateinit var db: AppDatabase
     private lateinit var dao: UserWhitelistDao
+    private lateinit var repository: UserWhiteListAppRepository
 
+    @ExperimentalCoroutinesApi
     @Before
     fun before() {
+        MockitoAnnotations.openMocks(this)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
         dao = db.userWhitelistDao()
+        repository = UserWhiteListAppRepository(db, TestScope(), coroutineRule.testDispatcherProvider)
     }
 
     @After
@@ -58,41 +63,10 @@ class UserWhitelistDaoTest {
     }
 
     @Test
-    fun whenInitializedThenListIsEmpty() {
-        assertTrue(dao.all().blockingObserve()!!.isEmpty())
-    }
-
-    @Test
-    fun whenElementAddedThenListSizeIsOne() {
-        dao.insert(DOMAIN)
-        assertEquals(1, dao.all().blockingObserve()!!.size)
-    }
-
-    @Test
-    fun whenElementAddedThenFlowListSizeIsOne() = runBlocking {
-        dao.insert(DOMAIN)
-        assertEquals(1, dao.allFlow().first().size)
-    }
-
-    @Test
-    fun whenElementAddedThenContainsIsTrue() {
-        dao.insert(DOMAIN)
-        assertTrue(dao.contains(DOMAIN))
-    }
-
-    @Test
-    fun wheElementDeletedThenContainsIsFalse() {
-        dao.insert(DOMAIN)
-        dao.delete(DOMAIN)
-        assertFalse(dao.contains(DOMAIN))
-    }
-
-    @Test
-    fun whenElementDoesNotExistThenContainsIsFalse() {
-        assertFalse(dao.contains(DOMAIN))
-    }
-
-    companion object {
-        const val DOMAIN = "www.example.com"
+    fun whenDbContainsUserWhiteListedDomainsThenUpdateUserWhiteList() {
+        assertEquals(0, repository.userWhiteList.size)
+        dao.insert("www.example.com")
+        assertEquals(1, repository.userWhiteList.size)
+        assertEquals("www.example.com", repository.userWhiteList.first())
     }
 }

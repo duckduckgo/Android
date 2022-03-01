@@ -298,6 +298,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
 
     @Mock
+    private lateinit var mockTrackingParameters: TrackingParameters
+
+    @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
@@ -439,7 +442,8 @@ class BrowserTabViewModelTest {
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager,
             trackingLinkDetector = mockTrackingLinkDetector,
-            remoteMessagingModel = remoteMessagingModel
+            remoteMessagingModel = remoteMessagingModel,
+            trackingParameters = mockTrackingParameters
         )
 
         testee.loadData("abc", null, false, false)
@@ -3833,6 +3837,17 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryIsTrackingParameterLinkThenNavigateToCleanedUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
     fun whenUrlExtractionErrorThenIssueLoadExtractedUrlCommandWithInitialUrl() {
         testee.onUrlExtractionError("http://foo.com")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3855,6 +3870,22 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenPageChangedThenClearLastCleanedUrlAndUpdateSite() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn("https://foo.com")
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters).lastCleanedUrl = null
+        assertTrue(testee.siteLiveData.value?.urlParametersRemoved!!)
+    }
+
+    @Test
+    fun whenPageChangedAndLastCleanedUrlIsNullThenDoNothing() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn(null)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters, times(0)).lastCleanedUrl = null
+        assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
     }
 
     @Test
