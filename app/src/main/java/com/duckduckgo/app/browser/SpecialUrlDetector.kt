@@ -24,14 +24,18 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isTrackingParameterRemovalEnabled
 import com.duckduckgo.privacy.config.api.TrackingLinkDetector
 import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import timber.log.Timber
 import java.net.URISyntaxException
 
 interface SpecialUrlDetector {
     fun determineType(uri: Uri): UrlType
     fun determineType(uriString: String?): UrlType
+    fun processUrl(uriString: String): UrlType
 
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
@@ -55,12 +59,15 @@ interface SpecialUrlDetector {
         class Unknown(val uriString: String) : UrlType()
         class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
         class CloakedTrackingLink(val trackingUrl: String) : UrlType()
+        class TrackingParameterLink(val cleanedUrl: String) : UrlType()
     }
 }
 
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val trackingLinkDetector: TrackingLinkDetector,
+    private val trackingParameters: TrackingParameters,
+    private val variantManager: VariantManager
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
@@ -91,7 +98,13 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    private fun processUrl(uriString: String): UrlType {
+    override fun processUrl(uriString: String): UrlType {
+        if (variantManager.isTrackingParameterRemovalEnabled()) {
+            trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
+                return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
+            }
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 val activities = queryActivities(uriString)

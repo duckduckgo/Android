@@ -91,4 +91,7 @@
     <attr name="splitterColor" format="color" />
     <attr name="secondaryButtonPressedColor" format="color" />
 
+    <attr name="dialogPrimaryButtonColor" format="color" />
+    <attr name="dialogSecondaryButtonColor" format="color" />
+
 </resources>

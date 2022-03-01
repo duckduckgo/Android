@@ -175,6 +175,25 @@ class BrowserWebViewClient(
                     }
                     false
                 }
+                is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.startProcessingTrackingLink()
+                        Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+
+                        val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)
+
+                        if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
+                            webViewClientListener?.let { listener ->
+                                webView.loadUrl(urlType.cleanedUrl)
+                                return listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                            }
+                        } else {
+                            webView.loadUrl(urlType.cleanedUrl)
+                            return true
+                        }
+                    }
+                    false
+                }
             }
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {

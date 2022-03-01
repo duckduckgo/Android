@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.anr
 
+import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import com.duckduckgo.app.anrs.store.AnrsDatabase
@@ -36,7 +37,7 @@ class AnrSupervisor @Inject constructor(
 
     override fun onOpen(isFreshLaunch: Boolean) {
         synchronized(anrSupervisorRunnable) {
-            if (anrSupervisorRunnable.isStopped) {
+            if (!Debug.isDebuggerConnected() && anrSupervisorRunnable.isStopped) {
                 executor.execute(anrSupervisorRunnable)
             }
         }
@@ -81,7 +82,7 @@ class AnrSupervisorRunnable @Inject constructor(
                     callback.wait(ANR_THRESHOLD_MILLIS)
 
                     if (callback.isCalled) {
-                        Timber.d("UI Thread responded withint ${ANR_THRESHOLD_MILLIS}ms")
+                        Timber.d("UI Thread responded within ${ANR_THRESHOLD_MILLIS}ms")
                     } else {
                         val e = AnrException(handler.looper.thread)
                         Timber.e("ANR Detected: ${e.threadStateMap}")
