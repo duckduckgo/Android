@@ -82,7 +82,7 @@ class AppTPHealthMonitor @Inject constructor(
         // how far back to look when obtaining health metrics
         const val SLIDING_WINDOW_DURATION_MS: Long = 60_000
 
-        private const val MONITORING_FREQUENCY_MS: Long = 3_000
+        private const val MONITORING_FREQUENCY_MS: Long = 30_000
         private const val OLD_METRIC_CLEANUP_FREQUENCY_MS: Long = 60_000
 
         private val TUN_READ_ALERT_SAMPLES: Int = (4.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
