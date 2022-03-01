@@ -56,12 +56,15 @@ interface VariantManager {
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
             // Returning users - second experiment
-            Variant(key = "zd", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zg", weight = 1.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
-            Variant(key = "zh", weight = 1.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
+            Variant(key = "zd", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
+            Variant(key = "zg", weight = 0.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
+            Variant(key = "zh", weight = 0.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
 
-            // Tracking parameter removal - initial rollout
-            Variant(key = "my", weight = 1.0, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { isEnglishLocale() })
+            // Tracking parameter removal - initial rollout to 25%
+            Variant(key = "my", weight = 1.0, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { isEnglishLocale() }),
+            Variant(key = "mc", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "me", weight = 1.0, features = emptyList(), filterBy = { noFilter() }),
+            Variant(key = "mg", weight = 1.0, features = emptyList(), filterBy = { noFilter() })
         )
 
         val REFERRER_VARIANTS = listOf(

@@ -85,14 +85,14 @@ class VariantManagerTest {
     @Test
     fun returningUsersControlVariantHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "zd" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(0, variant.features.size)
     }
 
     @Test
     fun returningUsersExperimentalFirstVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(ReturningUsersContinueWithoutPrivacyTips))
     }
@@ -100,17 +100,41 @@ class VariantManagerTest {
     @Test
     fun returningUsersExperimentalSecondVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(ReturningUsersSkipTutorial))
     }
 
-    // TRACKING PARAMETERS - INITIAL ROLLOUT
+    // TRACKING PARAMETERS - INITIAL ROLLOUT TO 25%
     @Test
     fun trackingParameterRemovalVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "my" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(TrackingParameterRemoval))
+    }
+
+    @Test
+    fun trackingParameterRemovalEmptyVariant1HasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "mc" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertFalse(variant.hasFeature(TrackingParameterRemoval))
+    }
+
+    @Test
+    fun trackingParameterRemovalEmptyVariant2HasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "me" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertFalse(variant.hasFeature(TrackingParameterRemoval))
+    }
+
+    @Test
+    fun trackingParameterRemovalEmptyVariant3HasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "mg" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+        assertFalse(variant.hasFeature(TrackingParameterRemoval))
     }
 }
