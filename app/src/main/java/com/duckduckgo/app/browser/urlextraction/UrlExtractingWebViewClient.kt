@@ -57,7 +57,7 @@ class UrlExtractingWebViewClient(
             }
         }
         injectGpcToDom(webView, url)
-        Timber.d("Tracking link detection: Injecting JS for URL extraction")
+        Timber.d("AMP link detection: Injecting JS for URL extraction")
         urlExtractor.injectUrlExtractionJS(webView)
     }
 

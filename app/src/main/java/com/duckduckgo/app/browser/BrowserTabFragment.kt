@@ -749,8 +749,8 @@ class BrowserTabFragment :
                     headers = it.headers
                 )
             }
-            is Command.ExtractUrlFromCloakedTrackingLink -> {
-                extractUrlFromTrackingLink(it.initialUrl)
+            is Command.ExtractUrlFromCloakedAmpLink -> {
+                extractUrlFromAmpLink(it.initialUrl)
             }
             is Command.LoadExtractedUrl -> {
                 webView?.loadUrl(it.extractedUrl)
@@ -791,17 +791,17 @@ class BrowserTabFragment :
         }
     }
 
-    private fun extractUrlFromTrackingLink(initialUrl: String) {
+    private fun extractUrlFromAmpLink(initialUrl: String) {
         context?.let {
             val client = urlExtractingWebViewClient.get()
             client.urlExtractionListener = viewModel
 
-            Timber.d("Tracking link detection: Creating WebView for URL extraction")
+            Timber.d("AMP link detection: Creating WebView for URL extraction")
             urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 
-            Timber.d("Tracking link detection: Loading tracking URL for extraction")
+            Timber.d("AMP link detection: Loading AMP URL for extraction")
             urlExtractingWebView?.loadUrl(initialUrl)
         }
     }
