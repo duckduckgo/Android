@@ -226,7 +226,7 @@ abstract class VpnDatabase : RoomDatabase() {
 
         private val MIGRATION_20_TO_21: Migration = object : Migration(20, 21) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE `vpn_service_state_stats` ADD COLUMN `stopReason` TEXT NOT NULL")
+                database.execSQL("ALTER TABLE `vpn_service_state_stats` ADD COLUMN `stopReason` TEXT NOT NULL DEFAULT 'UNKNOWN' ")
             }
         }
 
