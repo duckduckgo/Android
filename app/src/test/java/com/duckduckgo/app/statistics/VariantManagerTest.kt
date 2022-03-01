@@ -109,31 +109,15 @@ class VariantManagerTest {
     @Test
     fun trackingParameterRemovalVariantHasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "my" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.25, variant.weight)
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(TrackingParameterRemoval))
     }
 
     @Test
-    fun trackingParameterRemovalEmptyVariant1HasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mc" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-        assertFalse(variant.hasFeature(TrackingParameterRemoval))
-    }
-
-    @Test
     fun trackingParameterRemovalEmptyVariant2HasExpectedWeightAndFeatures() {
         val variant = variants.first { it.key == "me" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-        assertFalse(variant.hasFeature(TrackingParameterRemoval))
-    }
-
-    @Test
-    fun trackingParameterRemovalEmptyVariant3HasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mg" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.75, variant.weight)
         assertEquals(0, variant.features.size)
         assertFalse(variant.hasFeature(TrackingParameterRemoval))
     }
