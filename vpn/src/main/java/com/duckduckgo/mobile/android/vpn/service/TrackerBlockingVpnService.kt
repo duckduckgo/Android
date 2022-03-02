@@ -553,7 +553,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         "com.netflix.Speedtest",
         "eu.vspeed.android",
         "net.fireprobe.android",
-        "com.philips.lighting.hue2"
+        "com.philips.lighting.hue2",
+        "com.duckduckgo.mobile.android.debug"
     )
 }
 
