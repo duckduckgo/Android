@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.service
+package com.duckduckgo.mobile.android.vpn.state
+import kotlinx.coroutines.flow.Flow
 
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import kotlinx.coroutines.CoroutineScope
+interface VpnStateMonitor {
+    fun getStateFlow(): Flow<VpnState>
+    fun getState(): VpnState
 
-interface VpnServiceCallbacks {
-    fun onVpnStarted(coroutineScope: CoroutineScope)
-
-    fun onVpnStopped(
-        coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
+    data class VpnState(
+        val state: VpnRunningState,
+        val stopReason: VpnStopReason? = null
     )
+
+    enum class VpnRunningState {
+        ENABLED,
+        DISABLED,
+        INVALID
+    }
+
+    enum class VpnStopReason {
+        SELF_STOP,
+        ERROR,
+        REVOKED,
+        UNKNOWN
+    }
 }

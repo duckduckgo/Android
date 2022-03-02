@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.service
+package com.duckduckgo.mobile.android.vpn.network
 
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import kotlinx.coroutines.CoroutineScope
+interface VpnDetector {
 
-interface VpnServiceCallbacks {
-    fun onVpnStarted(coroutineScope: CoroutineScope)
+    /**
+     * Detects if the current network connection is using a VPN
+     *
+     * @return returns a boolean that identifies the connection being routed through a VPN
+     */
+    fun isVpnDetected(): Boolean
 
-    fun onVpnStopped(
-        coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
-    )
 }

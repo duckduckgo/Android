@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -59,13 +59,22 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         when (vpnStopReason) {
-            is VpnStopReason.SelfStop -> onVPNManuallyStopped()
+            VpnStopReason.SELF_STOP -> onVPNManuallyStopped()
+            VpnStopReason.REVOKED -> onVPNRevoked()
             else -> onVPNUndesiredStop()
         }
     }
 
     private fun onVPNManuallyStopped() {
+        Timber.d("VPN Manually stopped, showing disabled notification")
         showImmediateReminderNotification()
+        cancelUndesiredStopReminderAlarm()
+        scheduleReminderForTomorrow()
+    }
+
+    private fun onVPNRevoked() {
+        Timber.d("VPN Revoked, showing revoke notification")
+        showImmediateRevokedNotification()
         cancelUndesiredStopReminderAlarm()
         scheduleReminderForTomorrow()
     }
@@ -101,12 +110,17 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun showImmediateReminderNotification() {
-        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, false)
+        val notification = deviceShieldAlertNotificationBuilder.buildReminderNotification(context, true)
+        notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
+    }
+
+    private fun showImmediateRevokedNotification() {
+        val notification = deviceShieldAlertNotificationBuilder.buildRevokedNotification(context)
         notificationManager.notify(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID, notification)
     }
 
     private fun scheduleReminderForTomorrow() {
-        Timber.v("Scheduling the VpnReminderNotification worker a week from now")
+        Timber.v("Scheduling the VpnReminderNotification worker for tomorrow")
         val request = OneTimeWorkRequestBuilder<VpnReminderNotificationWorker>()
             .setInitialDelay(24, TimeUnit.HOURS)
             .addTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
@@ -115,7 +129,6 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
         workManager.enqueueUniqueWork(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG, ExistingWorkPolicy.KEEP, request)
     }
 
-    //
     private fun enableReminderReceiver() {
         val receiver = ComponentName(context, VpnReminderReceiver::class.java)
 

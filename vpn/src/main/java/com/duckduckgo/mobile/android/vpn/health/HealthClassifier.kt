@@ -101,6 +101,20 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
+    fun determineHealthIpPackets(
+        ipv4PacketCount: Long,
+        ipv6PacketCount: Long
+    ): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("ipPacket-types", rawMetrics, informational = true)
+
+        // never trigger an alert for this. We just one the info
+        rawMetrics["ipv4"] = Metric(ipv4PacketCount.toString(), badHealthIf { false })
+        rawMetrics["ipv6"] = Metric(ipv6PacketCount.toString(), badHealthIf { false })
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
     fun determineHealthMemory(): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("memory", rawMetrics, redacted = true)
