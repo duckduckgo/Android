@@ -342,7 +342,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     private fun sendStopPixels(reason: VpnStateMonitor.VpnStopReason) {
         when (reason) {
-            VpnStateMonitor.VpnStopReason.SELF_STOP -> { /* noop */
+            VpnStateMonitor.VpnStopReason.SELF_STOP, VpnStopReason.UNKNOWN -> { /* noop */
             }
             VpnStateMonitor.VpnStopReason.ERROR -> deviceShieldPixels.startError()
             VpnStateMonitor.VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()

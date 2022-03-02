@@ -31,7 +31,7 @@ interface VpnServiceStateStatsDao {
     fun getServiceStateStatsSince(startTime: String): List<BucketizedVpnServiceStateStats>
 
     @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
-    fun getLastStateStats(): VpnServiceStateStats
+    fun getLastStateStats(): VpnServiceStateStats?
 
     @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
     fun getStateStats(): Flow<VpnServiceStateStats?>
