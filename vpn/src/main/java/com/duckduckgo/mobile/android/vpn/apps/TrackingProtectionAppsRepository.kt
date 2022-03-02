@@ -20,6 +20,8 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
@@ -56,6 +58,7 @@ interface TrackingProtectionAppsRepository {
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
+    private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider
 ) : TrackingProtectionAppsRepository {
 
@@ -121,14 +124,17 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
-            return isSystemAppAndNotOverriden(appInfo) ||
-                isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
-        } else {
-            return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-                isSystemAppAndNotOverriden(appInfo) ||
-                isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
+        if (inTransparencyModeForAndroid12(appInfo)) {
+            Timber.d("DDG App in transparency mode for Android 12")
+            return false
         }
+        return VpnExclusionList.isDdgApp(appInfo.packageName) ||
+            isSystemAppAndNotOverriden(appInfo) ||
+            isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
+    }
+
+    private fun inTransparencyModeForAndroid12(appInfo: ApplicationInfo): Boolean {
+        return appBuildConfig.sdkInt > Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(appInfo.packageName) && appBuildConfig.flavor == INTERNAL
     }
 
     private fun isManuallyExcluded(
