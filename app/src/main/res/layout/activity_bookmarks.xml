@@ -29,6 +29,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?toolbarBgColor"
         android:theme="@style/ToolbarTheme">
 
         <FrameLayout
@@ -47,10 +48,10 @@
                 android:id="@+id/searchBar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="gone"
                 android:layout_margin="@dimen/keyline_2"
-                app:searchHint="@string/search"
-                app:clearActionContentDescription="@string/clearButtonContentDescription"/>
+                android:visibility="gone"
+                app:clearActionContentDescription="@string/clearButtonContentDescription"
+                app:searchHint="@string/search" />
         </FrameLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
