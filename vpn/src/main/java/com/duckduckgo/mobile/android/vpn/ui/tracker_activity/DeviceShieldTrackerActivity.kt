@@ -22,19 +22,11 @@ import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.provider.Settings
-import android.text.Annotation
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.SpannedString
-import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
-import android.text.style.UnderlineSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -53,7 +45,6 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivit
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
@@ -61,7 +52,6 @@ import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
-import kotlinx.android.synthetic.main.activity_vpn_diagnostics.*
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -372,70 +362,35 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun updateRunningState(runningState: VpnState) {
-        val infoPanelTextResource = if (runningState.state == VpnRunningState.ENABLED) {
+        if (runningState.state == VpnRunningState.ENABLED) {
             Timber.d("updateRunningState enabled")
             deviceShieldDisabledLabel.gone()
-            deviceShieldEnabledLabel.show()
-            R.string.atp_ActivityEnabledLabel
+
+            deviceShieldEnabledLabel.apply {
+                setClickableLink(
+                    REPORT_ISSUES_ANNOTATION,
+                    getText(R.string.atp_ActivityEnabledLabel)
+                ) { launchFeedback() }
+                show()
+            }
         } else {
             deviceShieldEnabledLabel.gone()
-            deviceShieldDisabledLabel.show()
 
-            if (runningState.stopReason == REVOKED) {
+            val disabledLabel = if (runningState.stopReason == REVOKED) {
                 Timber.d("updateRunningState revoked")
                 R.string.atp_ActivityRevokedLabel
             } else {
                 Timber.d("updateRunningState disabled")
                 R.string.atp_ActivityDisabledLabel
             }
-        }
-        deviceShieldDisabledLabel.apply {
-            setClickableLink(
-                REPORT_ISSUES_ANNOTATION,
-                getText(infoPanelTextResource)
-            ) { launchFeedback() }
-        }
-    }
-
-    private fun addClickableLink(
-        annotation: String,
-        text: CharSequence,
-        onClick: () -> Unit
-    ): SpannableString {
-        val fullText = text as SpannedString
-        val spannableString = SpannableString(fullText)
-        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-        val clickableSpan = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                onClick()
+            deviceShieldDisabledLabel.apply {
+                setClickableLink(
+                    REPORT_ISSUES_ANNOTATION,
+                    getText(disabledLabel)
+                ) { launchFeedback() }
+                show()
             }
         }
-
-        annotations?.find { it.value == annotation }?.let {
-            spannableString.apply {
-                setSpan(
-                    clickableSpan,
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                setSpan(
-                    UnderlineSpan(),
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                setSpan(
-                    ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.almostBlackDark)
-                    ),
-                    fullText.getSpanStart(it),
-                    fullText.getSpanEnd(it),
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-        }
-        return spannableString
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
