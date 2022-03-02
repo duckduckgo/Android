@@ -46,6 +46,7 @@
     <string name="atp_OnNotificationPrefix">Tracking attempts blocked</string>
     <string name="atp_OnNoTrackersNotificationMessageTimeSuffix">(past hour).</string>
     <string name="atp_DisabledNotification">App Tracking Protection disabled. Tap to continue blocking tracking attempts.</string>
+    <string name="atp_RevokedNotification">A VPN app on your device disabled App Tracking Protection. Tap to re-enable.</string>
 
     <!-- App Tracking Protection Daily Notification -->
     <string name="atp_DailyTrackersNotificationPrefix">App Tracking Protection blocked</string>
@@ -125,6 +126,7 @@
     <!-- New Tab Integration -->
     <string name="atp_NewTabSuffix">"\u0020(past hour)."</string>
     <string name="atp_NewTabDisabled"><b>App Tracking Protection disabled.</b>\nTap to continue blocking tracking attempts across your apps.</string>
+    <string name="atp_NewTabRevoked"><b>A VPN app on your device disabled App Tracking Protection.</b>\nTap to re-enable.</string>
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
@@ -226,6 +228,7 @@
     </plurals>
     <string name="atp_ActivityEnabledLabel">This feature is in beta. Notice a problem with an app? <annotation type="report_issues_link">Please report an issue</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -235,10 +238,12 @@
     <string name="atp_FAQSecondText"><b>Protection may be automatically disabled for certain apps, like those that load websites, so that content appears normally</b>. For apps with known issues, this is mostly temporary as we work to improve App Tracking Protection. You can manage this protection for each app on your device in the settings.\n\nIn addition, some trackers may not be blocked because we haven\'t yet detected and added them to our blocklist. We are continually working to identify and protect against new trackers, so you can rest easy knowing you\'re getting the most up-to-date protection.\n\nYou can expect updates to our tracker list every few months. These updates will get applied on your device automatically</string>
     <string name="atp_FAQThirdHeader">Why does App Tracking Protection use a VPN connection?</string>
     <string name="atp_FAQThirdText">You’ll be asked to set up a virtual private network (VPN) connection, <b>but you don\'t need to install a VPN app for App Tracking Protection to work.</b>\n\nThis permission allows App Tracking Protection, which works locally on your device, to monitor network traffic <b>so that it can block known trackers.</b></string>
-    <string name="atp_FAQFourthHeader">How is App Tracking Protection different from a VPN?</string>
-    <string name="atp_FAQFourthText">A VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. However, this allows the VPN company to see your network traffic.\n\n<b>App Tracking Protection is different.</b> Instead of sending your data to a VPN server, <b>App Tracking Protection works locally on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever App Tracking Protection recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
-    <string name="atp_FAQFifthHeader">Is my data private?</string>
-    <string name="atp_FAQFifthText">App Tracking Protection works on your device and doesn’t send your personal data off your device to DuckDuckGo.</string>
+    <string name="atp_FAQFourthHeader">Will App Tracking Protection work if I also use a VPN app?</string>
+    <string name="atp_FAQFourthText"><b>Android only allows one active VPN connection at a time.</b> That means you can\’t use App Tracking Protection while a VPN app on your device is running or set to “Always on.”\n\n<b>We recommend that you enable App Tracking Protection when you are not using a VPN app</b><![CDATA[ Just make sure your VPN app isn’t set to "always-on". Go to Android Network settings > VPN. Then, check the gear icon for any listed VPN apps and disable"always-on." Some VPN apps may also have an auto-connect setting which must be disabled.]]></string>
+    <string name="atp_FAQFifthHeader">How is App Tracking Protection different from a VPN?</string>
+    <string name="atp_FAQFifthText">A VPN sends your data from the device to its own server, where it secures and anonymizes your data from prying eyes. However, this allows the VPN company to see your network traffic.\n\n<b>App Tracking Protection is different.</b> Instead of sending your data to a VPN server, <b>App Tracking Protection works locally on your device</b>, sitting between your apps and the servers they talk to.\n\nWhenever App Tracking Protection recognizes a known tracker, <b>it blocks the tracker from sending personal information (such as your IP address, activity, and device details) off your device.</b> All other traffic reaches its destination, so your apps work normally.</string>
+    <string name="atp_FAQSixthHeader">Is my data private?</string>
+    <string name="atp_FAQSixthText">App Tracking Protection works on your device and doesn’t send your personal data off your device to DuckDuckGo.</string>
 
     <!--  App Tracking Protection Waitlist -->
     <string name="atp_WaitlistActivityTitle">App Tracking Protection</string>
@@ -340,5 +345,14 @@
     <string name="atp_DisableConfirmationDisableApp">Disable for one app</string>
     <string name="atp_DisableConfirmationDisableAllApps">Disable for all apps</string>
     <string name="atp_DisableConfirmationCancel">Cancel</string>
+
+    <!--  App Tracking Protection VPN Conflict Dialog -->
+    <string name="atp_VpnConflictDialogTitle">Your VPN app may be disconnected</string>
+    <string name="atp_VpnConflictAlwaysOnDialogTitle">Your VPN app is blocking App Tracking Protection</string>
+    <string name="atp_VpnConflictDialogMessage">Android only allows one active VPN connection at a time. Enabling App Tracking Protection may disconnect any active VPN on your device.</string>
+    <string name="atp_VpnConflictDialogAlwaysOnMessage">Android only allows one active VPN connection at a time. Open Network settings > VPN. Find the VPN app that’s “always-on” and disable it to continue.</string>
+    <string name="atp_VpnConflictDialogCancel">Cancel</string>
+    <string name="atp_VpnConflictDialogOpenSettings">Open Settings</string>
+    <string name="atp_VpnConflictDialogGotIt">Got it</string>
 
 </resources>

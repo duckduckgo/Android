@@ -264,6 +264,17 @@ interface DeviceShieldPixels {
     fun didChooseToCancelTrackingProtectionDialog()
 
     /**
+     * Will fire when the user is already connected to a VPN and wants to enable AppTP
+     */
+    fun didShowVpnConflictDialog()
+
+    fun didChooseToDismissVpnConflicDialog()
+
+    fun didChooseToOpenSettingsFromVpnConflicDialog()
+
+    fun didChooseToContinueFromVpnConflicDialog()
+
+    /**
      * Will fire when the waitlist dialog is showed to the user
      */
     fun didShowWaitlistDialog()
@@ -585,6 +596,26 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didChooseToCancelTrackingProtectionDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_APP_PROTECTION_DIALOG)
+    }
+
+    override fun didShowVpnConflictDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_VPN_CONFLICT_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_VPN_CONFLICT_DIALOG)
+    }
+
+    override fun didChooseToDismissVpnConflicDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
+    }
+
+    override fun didChooseToOpenSettingsFromVpnConflicDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+    }
+
+    override fun didChooseToContinueFromVpnConflicDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
     }
 
     override fun didShowWaitlistDialog() {

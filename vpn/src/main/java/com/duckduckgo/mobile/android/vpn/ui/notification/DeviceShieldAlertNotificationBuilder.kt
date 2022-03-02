@@ -53,6 +53,10 @@ interface DeviceShieldAlertNotificationBuilder {
         silent: Boolean
     ): Notification
 
+    fun buildRevokedNotification(
+        context: Context
+    ): Notification
+
     fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
@@ -108,6 +112,45 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .setCustomContentView(notificationLayout)
             .setPriority(NotificationCompat.DEFAULT_ALL)
             .setSilent(silent)
+            .addAction(
+                NotificationCompat.Action(
+                    R.drawable.ic_vpn_notification_24,
+                    context.getString(R.string.atp_EnableCTA),
+                    restartVpnIntent
+                )
+            )
+            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+            .setChannelId(VPN_ALERTS_CHANNEL_ID)
+            .build()
+    }
+
+    override fun buildRevokedNotification(context: Context): Notification {
+        registerAlertChannel(context)
+
+        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_revoked)
+
+        val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(
+                Intent(
+                    context,
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
+                )
+            )
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
+            intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
+            PendingIntent.getBroadcast(context, 0, intent, 0)
+        }
+
+        return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setContentIntent(onNotificationTapPendingIntent)
+            .setCustomContentView(notificationLayout)
+            .setPriority(NotificationCompat.DEFAULT_ALL)
+            .setSilent(true)
             .addAction(
                 NotificationCompat.Action(
                     R.drawable.ic_vpn_notification_24,
