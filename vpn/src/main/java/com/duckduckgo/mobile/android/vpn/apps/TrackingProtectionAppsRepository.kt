@@ -124,7 +124,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
-        if (inTransparencyModeForAndroid12(appInfo)) {
+        if (transparencyModeBugFixForAndroid12(appInfo)) {
             Timber.d("DDG App in transparency mode for Android 12")
             return false
         }
@@ -133,7 +133,9 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 
-    private fun inTransparencyModeForAndroid12(appInfo: ApplicationInfo): Boolean {
+    // https://issuetracker.google.com/issues/217570500
+    // https://app.asana.com/0/1174433894299346/1201657419006650
+    private fun transparencyModeBugFixForAndroid12(appInfo: ApplicationInfo): Boolean {
         return appBuildConfig.sdkInt > Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(appInfo.packageName) && appBuildConfig.flavor == INTERNAL
     }
 
