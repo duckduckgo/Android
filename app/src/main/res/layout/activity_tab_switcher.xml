@@ -21,7 +21,7 @@
     android:background="?attr/colorPrimaryDark"
     tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
 
-    <include layout="@layout/include_toolbar" />
+    <include layout="@layout/include_default_toolbar" />
 
     <include layout="@layout/content_tab_switcher" />
 

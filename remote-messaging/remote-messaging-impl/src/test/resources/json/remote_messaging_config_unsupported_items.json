@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "messages": [
+    {
+      "id": "26780792-49fe-4e25-ae27-aa6a2e6f013b",
+      "content": {
+        "messageType": "unknown",
+        "titleText": "Here goes a title",
+        "descriptionText": "description"
+      },
+      "matchingRules": [
+        5,
+        6
+      ],
+      "exclusionRules": [
+        7,
+        8,
+        9
+      ]
+    },
+    {
+      "id": "8274589c-8aeb-4322-a737-3852911569e3",
+      "content": {
+        "messageType": "big_single_action",
+        "titleText": "title",
+        "descriptionText": "description",
+        "placeholder": "WARNING",
+        "primaryActionText": "Ok",
+        "primaryAction": {
+          "type": "unknown",
+          "value": "https://duckduckgo.com"
+        }
+      }
+    },
+    {
+      "id": "c3549d64-b388-41d8-9649-33e6e2674e8e",
+      "content": {
+        "messageType": "medium",
+        "titleText": "Here goes a title",
+        "descriptionText": "description",
+        "placeholder": "UNKNOWN"
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": 6,
+      "attributes": {
+        "unknown": {
+          "value": [
+            "en-GB"
+          ],
+          "fallback": true
+        }
+      }
+    },
+    {
+      "id": 7,
+      "attributes": {
+        "defaultBrowser": {
+          "value": true
+        }
+      }
+    }
+  ]
+}

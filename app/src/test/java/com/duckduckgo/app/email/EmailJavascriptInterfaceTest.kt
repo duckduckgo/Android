@@ -85,6 +85,24 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
+    fun whenGetUserDataAndUrlIsDuckDuckGoEmailThenGetUserDataCalled() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager).getUserData()
+    }
+
+    @Test
+    fun whenGetUserDataAndUrlIsNotDuckDuckGoEmailThenGetUserDataIsNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager, never()).getUserData()
+    }
+
+    @Test
     fun whenShowTooltipThenLambdaCalled() {
         testee.showTooltip()
 

@@ -35,7 +35,7 @@ import java.util.*
 import java.util.concurrent.Executors
 
 @Database(
-    exportSchema = true, version = 20,
+    exportSchema = true, version = 21,
     entities = [
         VpnState::class,
         VpnTracker::class,
@@ -224,10 +224,17 @@ abstract class VpnDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_20_TO_21: Migration = object : Migration(20, 21) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `vpn_service_state_stats` ADD COLUMN `stopReason` TEXT NOT NULL DEFAULT 'UNKNOWN' ")
+            }
+        }
+
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_18_TO_19,
-                MIGRATION_19_TO_20
+                MIGRATION_19_TO_20,
+                MIGRATION_20_TO_21
             )
     }
 }
@@ -278,6 +285,22 @@ object VpnTypeConverters {
     @JvmStatic
     fun fromVpnServiceState(vpnServiceState: VpnServiceState): String {
         return vpnServiceState.name
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toVpnStopReason(stopReason: String): VpnStoppingReason {
+        return try {
+            VpnStoppingReason.valueOf(stopReason)
+        } catch (t: Throwable) {
+            VpnStoppingReason.UNKNOWN
+        }
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromVpnStopReason(vpnStopReason: VpnStoppingReason): String {
+        return vpnStopReason.name
     }
 }
 

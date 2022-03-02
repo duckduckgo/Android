@@ -28,6 +28,7 @@ import java.io.Serializable
 
 interface FavoritesRepository {
     fun favoritesCountByDomain(domain: String): Int
+    fun favoritesCount(): Long
     fun favoritesObservable(): Single<List<SavedSite.Favorite>>
     fun favoritesSync(): List<SavedSite.Favorite>
     fun insert(
@@ -70,6 +71,10 @@ class FavoritesDataRepository(
 ) : FavoritesRepository {
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
+    }
+
+    override fun favoritesCount(): Long {
+        return favoritesDao.favoritesCount()
     }
 
     override fun favoritesObservable() =

@@ -143,6 +143,9 @@ dependencies {
     implementation project(path: ':anrs-api')
     implementation project(path: ':anrs-impl')
 
+    implementation project(path: ':remote-messaging-api')
+    implementation project(path: ':remote-messaging-impl')
+
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
 
@@ -251,7 +254,6 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
     androidTestImplementation "androidx.test.espresso:espresso-web:_"
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4

@@ -21,6 +21,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.webkit.WebViewFeature
 import androidx.work.*
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
@@ -68,6 +69,10 @@ class EnqueuedPixelWorker @Inject constructor(
                 pixel = AppPixelName.APP_LAUNCH,
                 parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
             )
+
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
+                pixel.get().fire(AppPixelName.WEBVIEW_FEATURE_SUPPORTED)
+            }
         }
     }
 

@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -41,6 +42,7 @@ interface EmailManager {
 
     fun signOut()
     fun getEmailAddress(): String?
+    fun getUserData(): String
     fun waitlistState(): AppEmailManager.WaitlistState
     fun joinWaitlist(
         timestamp: Int,
@@ -98,6 +100,14 @@ class AppEmailManager(
         return emailDataStore.emailUsername?.let {
             "$it$DUCK_EMAIL_DOMAIN"
         }
+    }
+
+    override fun getUserData(): String {
+        return JSONObject().apply {
+            put(TOKEN, emailDataStore.emailToken)
+            put(USERNAME, emailDataStore.emailUsername)
+            put(NEXT_ALIAS, emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
+        }.toString()
     }
 
     override fun waitlistState(): WaitlistState {
@@ -214,6 +224,9 @@ class AppEmailManager(
     companion object {
         const val DUCK_EMAIL_DOMAIN = "@duck.com"
         const val UNKNOWN_COHORT = "unknown"
+        const val TOKEN = "token"
+        const val USERNAME = "userName"
+        const val NEXT_ALIAS = "nextAlias"
     }
 
     private fun EmailDataStore.clearEmailData() {

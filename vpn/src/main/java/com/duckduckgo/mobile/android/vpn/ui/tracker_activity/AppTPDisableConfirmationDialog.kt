@@ -23,22 +23,13 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class AppTPDisableConfirmationDialog : DialogFragment() {
+class AppTPDisableConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
 
-    interface AppTPDisableConfirmationDialogListener {
+    interface Listener {
         fun onOpenAppProtection()
         fun onTurnAppTrackingProtectionOff()
         fun onDisableDialogCancelled()
     }
-
-    val listener: AppTPDisableConfirmationDialogListener
-        get() {
-            return if (parentFragment is AppTPDisableConfirmationDialogListener) {
-                parentFragment as AppTPDisableConfirmationDialogListener
-            } else {
-                activity as AppTPDisableConfirmationDialogListener
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,8 +80,8 @@ class AppTPDisableConfirmationDialog : DialogFragment() {
 
         const val TAG_APPTP_DISABLE_DIALOG = "AppTPDisableConfirmationDialog"
 
-        fun instance(): AppTPDisableConfirmationDialog {
-            return AppTPDisableConfirmationDialog()
+        fun instance(listener: Listener): AppTPDisableConfirmationDialog {
+            return AppTPDisableConfirmationDialog(listener)
         }
     }
 }

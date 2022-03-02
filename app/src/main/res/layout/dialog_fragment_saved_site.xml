@@ -23,7 +23,7 @@
 
     <include
         android:id="@+id/savedSiteAppBar"
-        layout="@layout/include_toolbar"
+        layout="@layout/include_default_toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"

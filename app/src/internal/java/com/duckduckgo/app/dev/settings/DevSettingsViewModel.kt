@@ -18,6 +18,8 @@ package com.duckduckgo.app.dev.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.dev.settings.db.UAOverride
+import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.traces.api.StartupTraces
@@ -25,7 +27,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,15 +39,19 @@ import javax.inject.Provider
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
+    private val userAgentProvider: UserAgentProvider
 ) : ViewModel() {
 
     data class ViewState(
         val nextTdsEnabled: Boolean = false,
         val startupTraceEnabled: Boolean = false,
+        val overrideUA: Boolean = false,
+        val userAgent: String = ""
     )
 
     sealed class Command {
         object SendTdsIntent : Command()
+        object OpenUASelector : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -53,7 +62,9 @@ class DevSettingsViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     nextTdsEnabled = devSettingsDataStore.nextTdsEnabled,
-                    startupTraceEnabled = startupTraces.isTraceEnabled
+                    startupTraceEnabled = startupTraces.isTraceEnabled,
+                    overrideUA = devSettingsDataStore.overrideUA,
+                    userAgent = userAgentProvider.userAgent("", false)
                 )
             )
         }
@@ -84,21 +95,40 @@ class DevSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onOverrideUAToggled(enabled: Boolean) {
+        devSettingsDataStore.overrideUA = enabled
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(overrideUA = enabled))
+        }
+    }
+
     private fun currentViewState(): ViewState {
         return viewState.value
+    }
+
+    fun onUserAgentSelectorClicked() {
+        viewModelScope.launch { command.send(Command.OpenUASelector) }
+    }
+
+    fun onUserAgentSelected(userAgent: UAOverride) {
+        devSettingsDataStore.selectedUA = userAgent
+        viewModelScope.launch {
+            viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
+        }
     }
 }
 
 @ContributesMultibinding(AppScope::class)
 class SettingsViewModelFactory @Inject constructor(
     private val devSettingsDataStore: Provider<DevSettingsDataStore>,
+    private val userAgentProvider: Provider<UserAgentProvider>,
     private val startupTraces: Provider<StartupTraces>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(DevSettingsViewModel::class.java) ->
-                    DevSettingsViewModel(devSettingsDataStore.get(), startupTraces.get()) as T
+                    DevSettingsViewModel(devSettingsDataStore.get(), startupTraces.get(), userAgentProvider.get()) as T
                 else -> null
             }
         }

@@ -247,4 +247,16 @@
         </item>
     </style>
 
+    <!-- MessageCta -->
+    <style name="Widget.DuckDuckGo.MessageCta">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_message_cta</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:layout_marginTop">@dimen/keyline_4</item>
+        <item name="android:layout_marginStart">@dimen/keyline_4</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_1</item>
+    </style>
+
 </resources>

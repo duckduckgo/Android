@@ -46,18 +46,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <ImageView
-                android:id="@+id/ddgLogo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|center"
-                android:maxHeight="180dp"
-                android:maxWidth="180dp"
-                android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-                android:alpha="0"
-                android:visibility="gone"
-                android:contentDescription="@string/duckDuckGoLogoDescription"
-                android:src="@drawable/logo_full" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/ddgLogo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|center"
+                    android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+                    android:alpha="0"
+                    android:contentDescription="@string/duckDuckGoLogoDescription"
+                    android:maxWidth="180dp"
+                    android:maxHeight="180dp"
+                    android:src="@drawable/logo_full"
+                    android:visibility="gone" />
+
+                <com.duckduckgo.mobile.android.ui.view.MessageCta
+                    android:id="@+id/messageCta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </FrameLayout>
 
             <include layout="@layout/include_quick_access_items" />
 

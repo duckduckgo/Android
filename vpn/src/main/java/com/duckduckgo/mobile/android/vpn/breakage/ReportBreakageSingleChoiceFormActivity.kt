@@ -52,7 +52,7 @@ class ReportBreakageSingleChoiceFormActivity : DuckDuckGoActivity() {
     })
 
     private val toolbar
-        get() = binding.includeToolbar.defaultToolbar
+        get() = binding.includeToolbar.toolbar
 
     private var brokenApp: BrokenApp? = null
 
