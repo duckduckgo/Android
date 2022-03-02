@@ -300,7 +300,7 @@ class AppBadHealthStateHandler @Inject constructor(
         private const val FILENAME = "com.duckduckgo.mobile.vpn.bad.health.config.store"
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         private const val INITIAL_BACKOFF: Long = 0
-        private const val INITIAL_BACKOFF_INCREMENT_SECONDS: Long = 1
+        private const val INITIAL_BACKOFF_INCREMENT_SECONDS: Long = 30
         private const val RESTART_BAKE_TIME_SECONDS = 45
 
         private const val MANUFACTURER_KEY = "manufacturer"

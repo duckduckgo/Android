@@ -55,6 +55,8 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV4_PACKET
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV6_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
@@ -247,7 +249,9 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 """
                     device-to-network queue writes: %d
                       tun reads: %d (rate %s)
-                        unknown packets: %d (rate %s)
+                        IPv4 packets: %d (rate %s)
+                            unknown packets: %d (rate %s)
+                        IPv6 packets: %d (rate %s)
                       queue reads: %s (rate %s)
                         queue TCP reads: %s (rate %s)
                         queue UDP reads: %s (rate %s)
@@ -258,9 +262,19 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                     healthMetricsInfo.writtenToDeviceToNetworkQueue,
                     healthMetricsInfo.tunPacketReceived,
                 ),
+                healthMetricsInfo.tunIpv4PacketReceived,
+                calculatePercentage(
+                    healthMetricsInfo.tunIpv4PacketReceived,
+                    healthMetricsInfo.tunPacketReceived,
+                ),
                 healthMetricsInfo.tunUnknownPacketReceived,
                 calculatePercentage(
                     healthMetricsInfo.tunUnknownPacketReceived,
+                    healthMetricsInfo.tunPacketReceived,
+                ),
+                healthMetricsInfo.tunIpv6PacketReceived,
+                calculatePercentage(
+                    healthMetricsInfo.tunIpv6PacketReceived,
                     healthMetricsInfo.tunPacketReceived,
                 ),
                 healthMetricsInfo.removeFromDeviceToNetworkQueue,
@@ -332,6 +346,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         val timeWindow = System.currentTimeMillis() - SLIDING_WINDOW_DURATION_MS
 
         val tunPacketReceived = healthMetricCounter.getStat(TUN_READ(), timeWindow)
+        val tunIpv4PacketReceived = healthMetricCounter.getStat(TUN_READ_IPV4_PACKET(), timeWindow)
+        val tunIpv6PacketReceived = healthMetricCounter.getStat(TUN_READ_IPV6_PACKET(), timeWindow)
         val tunUnknownPacketReceived = healthMetricCounter.getStat(TUN_READ_UNKNOWN_PACKET(), timeWindow)
         val removeFromDeviceToNetworkQueue =
             healthMetricCounter.getStat(REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE(), timeWindow)
@@ -357,6 +373,8 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
 
         return HealthMetricsInfo(
             tunPacketReceived = tunPacketReceived,
+            tunIpv4PacketReceived = tunIpv4PacketReceived,
+            tunIpv6PacketReceived = tunIpv6PacketReceived,
             tunUnknownPacketReceived = tunUnknownPacketReceived,
             writtenToDeviceToNetworkQueue = writtenToDeviceToNetworkQueue,
             writtenToTCPDeviceToNetworkQueue = writtenToTCPDeviceToNetworkQueue,
@@ -642,6 +660,8 @@ data class AppExitHistory(val history: List<String> = emptyList()) {
 
 data class HealthMetricsInfo(
     val tunPacketReceived: Long,
+    val tunIpv4PacketReceived: Long,
+    val tunIpv6PacketReceived: Long,
     val tunUnknownPacketReceived: Long,
     val writtenToDeviceToNetworkQueue: Long,
     val writtenToTCPDeviceToNetworkQueue: Long,

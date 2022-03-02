@@ -610,6 +610,7 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun sendUnknownPacketProtocol(protocol: Int) {
+        tryToFireDailyPixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL_DAILY.pixelName, protocol))
         firePixel(String.format(Locale.US, DeviceShieldPixelNames.ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL.pixelName, protocol))
     }
 
