@@ -26,6 +26,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.ERROR
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -73,7 +74,7 @@ class VpnServiceHeartbeat @Inject constructor(
         Timber.v("onVpnStopped called")
         when (vpnStopReason) {
             ERROR -> Timber.v("HB monitor: sudden vpn stopped $vpnStopReason")
-            SELF_STOP, REVOKED -> {
+            SELF_STOP, REVOKED, UNKNOWN -> {
                 Timber.v("HB monitor: self stopped or revoked: $vpnStopReason")
                 coroutineScope.launch { storeHeartbeat(VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_STOPPED) }
             }
