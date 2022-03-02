@@ -181,7 +181,7 @@ class DeviceShieldNotificationScheduler(
 
             if (!deviceShieldNotification.hidden) {
                 val notification =
-                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(context, deviceShieldNotification, notificationPressedHandler)
+                    deviceShieldAlertNotificationBuilder.buildStatusNotification(context, deviceShieldNotification, notificationPressedHandler)
                 deviceShieldPixels.didShowDailyNotification(deviceShieldNotification.notificationVariant)
                 notificationManager.notify(VPN_DAILY_NOTIFICATION_ID, notification)
                 Timber.v("Vpn Daily notification is now shown")
@@ -210,7 +210,7 @@ class DeviceShieldNotificationScheduler(
 
             if (!deviceShieldNotification.hidden) {
                 Timber.v("Vpn Daily notification won't be shown because there is no data to show")
-                val notification = deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                val notification = deviceShieldAlertNotificationBuilder.buildStatusNotification(
                     context, deviceShieldNotification, notificationPressedHandler
                 )
                 deviceShieldPixels.didShowWeeklyNotification(deviceShieldNotification.notificationVariant)

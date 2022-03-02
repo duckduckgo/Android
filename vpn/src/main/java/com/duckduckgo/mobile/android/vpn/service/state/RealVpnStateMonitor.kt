@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.service.state
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.ENABLED
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
