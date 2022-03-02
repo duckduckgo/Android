@@ -130,7 +130,7 @@
       },
       {
         "tableName": "vpn_service_state_stats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL, `stopReason` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` TEXT NOT NULL, `state` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -149,12 +149,6 @@
             "columnName": "state",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "stopReason",
-            "columnName": "stopReason",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
