@@ -37,30 +37,23 @@ class RealVpnStateMonitor @Inject constructor(val database: VpnDatabase) : VpnSt
 
     override fun getStateFlow(): Flow<VpnState> {
         return database.vpnServiceStateDao().getStateStats().map {
-            val stoppingReason = when (it?.stopReason) {
-                SELF_STOP -> VpnStopReason.SELF_STOP
-                REVOKED -> VpnStopReason.REVOKED
-                ERROR -> VpnStopReason.ERROR
-                else -> VpnStopReason.UNKNOWN
-            }
-            val runningState = when (it?.state) {
-                ENABLED -> VpnRunningState.ENABLED
-                DISABLED -> VpnRunningState.DISABLED
-                else -> VpnRunningState.INVALID
-            }
-            VpnState(runningState, stoppingReason)
+            mapState(it)
         }
     }
 
     override fun getState(): VpnState {
         val lastState = database.vpnServiceStateDao().getLastStateStats()
-        val stoppingReason = when (lastState.stopReason) {
+        return mapState(lastState)
+    }
+
+    private fun mapState(lastState: VpnServiceStateStats?): VpnState {
+        val stoppingReason = when (lastState?.stopReason) {
             SELF_STOP -> VpnStopReason.SELF_STOP
             REVOKED -> VpnStopReason.REVOKED
             ERROR -> VpnStopReason.ERROR
             else -> VpnStopReason.UNKNOWN
         }
-        val runningState = when (lastState.state) {
+        val runningState = when (lastState?.state) {
             ENABLED -> VpnRunningState.ENABLED
             DISABLED -> VpnRunningState.DISABLED
             else -> VpnRunningState.INVALID
