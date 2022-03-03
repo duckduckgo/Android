@@ -31,8 +31,10 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @ContributesMultibinding(
@@ -44,8 +46,11 @@ class VpnServiceStateLogger @Inject constructor(
     private val dispatcherProvider: VpnDispatcherProvider,
     private val vpnDatabase: VpnDatabase
 ) : VpnServiceCallbacks {
+
+    private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch(dispatcher) {
             Timber.d("VpnServiceStateLogge, new state ENABLED")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
         }
@@ -55,7 +60,7 @@ class VpnServiceStateLogger @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason
     ) {
-        coroutineScope.launch(dispatcherProvider.io()) {
+        coroutineScope.launch(dispatcher) {
             Timber.d("VpnServiceStateLogge, new state DISABLED, reason $vpnStopReason")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = mapStopReason(vpnStopReason)))
         }
