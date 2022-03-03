@@ -21,6 +21,7 @@ import android.webkit.WebViewDatabase
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.fire.AuthDatabaseLocator
 import com.duckduckgo.app.fire.DatabaseCleaner
@@ -34,7 +35,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import javax.inject.Provider
 
 @ExperimentalCoroutinesApi
 class WebViewHttpAuthStoreTest {
@@ -43,7 +43,7 @@ class WebViewHttpAuthStoreTest {
     val coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val webViewDatabaseProvider: Provider<WebViewDatabase> = mock()
+    private val webViewDatabaseProvider: WebViewDatabaseProvider = mock()
     private val webViewDatabase: WebViewDatabase = mock()
     private val mockDatabaseCleaner: DatabaseCleaner = mock()
     private val webView: WebView = mock()
