@@ -42,10 +42,7 @@ import javax.inject.Inject
     boundType = VpnServiceCallbacks::class
 )
 @SingleInstanceIn(VpnScope::class)
-class VpnServiceStateLogger @Inject constructor(
-    private val dispatcherProvider: VpnDispatcherProvider,
-    private val vpnDatabase: VpnDatabase
-) : VpnServiceCallbacks {
+class VpnServiceStateLogger @Inject constructor(private val vpnDatabase: VpnDatabase) : VpnServiceCallbacks {
 
     private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
