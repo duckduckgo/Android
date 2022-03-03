@@ -19,9 +19,13 @@ package com.duckduckgo.app.browser
 import android.content.Context
 import android.webkit.WebViewDatabase
 
-class WebViewDatabaseProvider(val context: Context) {
+interface WebViewDatabaseProvider {
+    fun get(): WebViewDatabase
+}
 
-    fun get(): WebViewDatabase {
+class DefaultWebViewDatabaseProvider(val context: Context) : WebViewDatabaseProvider {
+
+    override fun get(): WebViewDatabase {
         return WebViewDatabase.getInstance(context)
     }
 }
