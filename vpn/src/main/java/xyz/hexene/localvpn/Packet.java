@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 // TODO: Reduce public mutability
 public class Packet {
 
-    static final int IP4_HEADER_SIZE = 20;
+    //    static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
     public static final int UDP_HEADER_SIZE = 8;
     static final int TCP_OPTION_TYPE_MSS = 0x02;
@@ -128,13 +128,13 @@ public class Packet {
         backingBuffer = buffer;
 
         tcpHeader.flags = flags;
-        backingBuffer.put(IP4_HEADER_SIZE + 13, flags);
+        backingBuffer.put(getIpHeader().getDefaultHeaderSize() + 13, flags);
 
         tcpHeader.sequenceNumber = sequenceNum;
-        backingBuffer.putInt(IP4_HEADER_SIZE + 4, (int) sequenceNum);
+        backingBuffer.putInt(getIpHeader().getDefaultHeaderSize() + 4, (int) sequenceNum);
 
         tcpHeader.acknowledgementNumber = ackNum;
-        backingBuffer.putInt(IP4_HEADER_SIZE + 8, (int) ackNum);
+        backingBuffer.putInt(getIpHeader().getDefaultHeaderSize() + 8, (int) ackNum);
 
         // Reset header size, since we don't need options
         byte dataOffset = (byte) (TCP_HEADER_SIZE << 2);
@@ -150,15 +150,15 @@ public class Packet {
         }
         tcpHeader.headerLength = headerLength;
         tcpHeader.dataOffsetAndReserved = dataOffset;
-        backingBuffer.put(IP4_HEADER_SIZE + 12, dataOffset);
+        backingBuffer.put(getIpHeader().getDefaultHeaderSize() + 12, dataOffset);
 
         updateTCPChecksum(payloadSize);
 
-        int ip4TotalLength = IP4_HEADER_SIZE + headerLength + payloadSize;
+        int ip4TotalLength = getIpHeader().getDefaultHeaderSize() + headerLength + payloadSize;
         backingBuffer.putShort(2, (short) ip4TotalLength);
         getIpHeader().setTotalLength(ip4TotalLength);
 
-        updateIP4Checksum();
+        updateIPChecksum();
     }
 
     public void updateUdpBuffer(ByteBuffer buffer, int payloadSize) {
@@ -167,21 +167,21 @@ public class Packet {
         backingBuffer = buffer;
 
         int udpTotalLength = UDP_HEADER_SIZE + payloadSize;
-        backingBuffer.putShort(IP4_HEADER_SIZE + 4, (short) udpTotalLength);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 4, (short) udpTotalLength);
         udpHeader.length = udpTotalLength;
 
         // Disable UDP checksum validation
-        backingBuffer.putShort(IP4_HEADER_SIZE + 6, (short) 0);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 6, (short) 0);
         udpHeader.checksum = 0;
 
-        int ip4TotalLength = IP4_HEADER_SIZE + udpTotalLength;
+        int ip4TotalLength = getIpHeader().getDefaultHeaderSize() + udpTotalLength;
         backingBuffer.putShort(2, (short) ip4TotalLength);
         getIpHeader().setTotalLength(ip4TotalLength);
 
-        updateIP4Checksum();
+        updateIPChecksum();
     }
 
-    private void updateIP4Checksum() {
+    private void updateIPChecksum() {
         // IPv6 has no checksum
         if (getIpHeader().getVersion() == 6) {
             return;
@@ -209,10 +209,10 @@ public class Packet {
 
         buffer = backingBuffer.duplicate();
         // Clear previous checksum
-        buffer.putShort(IP4_HEADER_SIZE + 16, (short) 0);
+        buffer.putShort(getIpHeader().getDefaultHeaderSize() + 16, (short) 0);
 
         // Calculate TCP segment checksum
-        buffer.position(IP4_HEADER_SIZE);
+        buffer.position(getIpHeader().getDefaultHeaderSize());
         while (tcpLength > 1) {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             tcpLength -= 2;
@@ -223,7 +223,7 @@ public class Packet {
 
         sum = ~sum;
         tcpHeader.checksum = sum;
-        backingBuffer.putShort(IP4_HEADER_SIZE + 16, (short) sum);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 16, (short) sum);
     }
 
     private void fillHeader(ByteBuffer buffer) {

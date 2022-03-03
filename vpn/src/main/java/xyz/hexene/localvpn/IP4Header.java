@@ -21,9 +21,9 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 public class IP4Header implements IPHeader {
-    private byte version;
+    private final byte version;
     public byte IHL;
-    private int headerLength;
+    private final int headerLength;
     public short typeOfService;
     private int totalLength;
 
@@ -62,6 +62,11 @@ public class IP4Header implements IPHeader {
     @Override
     public TransportProtocol getProtocol() {
         return protocol;
+    }
+
+    @Override
+    public int getDefaultHeaderSize() {
+        return 20;
     }
 
     @Override

@@ -85,6 +85,11 @@ public class IP6Header implements IPHeader {
     }
 
     @Override
+    public int getDefaultHeaderSize() {
+        return getHeaderLength();
+    }
+
+    @Override
     public int getHeaderLength() {
         return HEADER_SIZE_BYTES;
     }
@@ -96,7 +101,7 @@ public class IP6Header implements IPHeader {
 
     @Override
     public void setTotalLength(int length) {
-        this.payloadLength = (short) length;
+        this.payloadLength = (short) (length - HEADER_SIZE_BYTES);
     }
 
     @Override

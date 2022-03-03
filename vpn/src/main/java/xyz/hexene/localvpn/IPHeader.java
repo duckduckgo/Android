@@ -30,6 +30,8 @@ public interface IPHeader {
 
     TransportProtocol getProtocol();
 
+    int getDefaultHeaderSize();
+
     int getHeaderLength();
 
     int getTotalLength();
