@@ -116,8 +116,8 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.jakewharton.rxrelay2.PublishRelay
@@ -170,7 +170,7 @@ class BrowserTabViewModel(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
     private val variantManager: VariantManager,
-    private val trackingLinkDetector: TrackingLinkDetector,
+    private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
@@ -349,7 +349,7 @@ class BrowserTabViewModel(
 
         class ShowAppLinkPrompt(val appLink: AppLink) : Command()
         class OpenAppLink(val appLink: AppLink) : Command()
-        class ExtractUrlFromCloakedTrackingLink(val initialUrl: String) : Command()
+        class ExtractUrlFromCloakedAmpLink(val initialUrl: String) : Command()
         class LoadExtractedUrl(val extractedUrl: String) : Command()
         class AddHomeShortcut(
             val title: String,
@@ -789,13 +789,13 @@ class BrowserTabViewModel(
             is NonHttpAppLink -> {
                 nonHttpAppLinkClicked(type)
             }
-            is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                handleCloakedTrackingLink(type.trackingUrl)
+            is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
+                handleCloakedAmpLink(type.ampUrl)
             }
             else -> {
 
-                if (type is SpecialUrlDetector.UrlType.ExtractedTrackingLink) {
-                    Timber.d("Tracking link detection: Using extracted URL: ${type.extractedUrl}")
+                if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
+                    Timber.d("AMP link detection: Using extracted URL: ${type.extractedUrl}")
                     urlToNavigate = type.extractedUrl
                 } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
                     Timber.d("Loading parameter cleaned URL: ${type.cleanedUrl}")
@@ -1137,9 +1137,9 @@ class BrowserTabViewModel(
         appLinksHandler.setUserQueryState(false)
         appLinksHandler.updatePreviousUrl(url)
 
-        trackingLinkDetector.lastTrackingLinkInfo?.let { lastTrackingInfo ->
-            if (lastTrackingInfo.destinationUrl == null) {
-                lastTrackingInfo.destinationUrl = url
+        ampLinks.lastAmpLinkInfo?.let { lastAmpLinkInfo ->
+            if (lastAmpLinkInfo.destinationUrl == null) {
+                lastAmpLinkInfo.destinationUrl = url
             }
         }
 
@@ -2551,17 +2551,17 @@ class BrowserTabViewModel(
         accessibilityViewState.value = currentAccessibilityViewState().copy(refreshWebView = false)
     }
 
-    override fun handleCloakedTrackingLink(initialUrl: String) {
+    override fun handleCloakedAmpLink(initialUrl: String) {
         isProcessingTrackingLink = true
-        command.value = ExtractUrlFromCloakedTrackingLink(initialUrl)
+        command.value = ExtractUrlFromCloakedAmpLink(initialUrl)
     }
 
     override fun startProcessingTrackingLink() {
         isProcessingTrackingLink = true
     }
 
-    fun updateLastTrackingLink(url: String) {
-        trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url)
+    fun updateLastAmpLink(url: String) {
+        ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = url)
     }
 
     override fun onUrlExtractionError(initialUrl: String) {
@@ -2570,11 +2570,11 @@ class BrowserTabViewModel(
 
     override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
         val destinationUrl: String = if (extractedUrl != null) {
-            trackingLinkDetector.lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = initialUrl)
-            Timber.d("Tracking link detection: Success! Loading extracted URL: $extractedUrl")
+            ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
+            Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")
             extractedUrl
         } else {
-            Timber.d("Tracking link detection: Failed! Loading initial URL: $initialUrl")
+            Timber.d("AMP link detection: Failed! Loading initial URL: $initialUrl")
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
@@ -2628,7 +2628,7 @@ class BrowserTabViewModelFactory @Inject constructor(
     private val appCoroutineScope: Provider<CoroutineScope>,
     private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
     private val variantManager: Provider<VariantManager>,
-    private val trackingLinkDetector: Provider<TrackingLinkDetector>,
+    private val ampLinks: Provider<AmpLinks>,
     private val trackingParameters: Provider<TrackingParameters>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
@@ -2670,7 +2670,7 @@ class BrowserTabViewModelFactory @Inject constructor(
                     appCoroutineScope.get(),
                     appLinksHandler.get(),
                     variantManager.get(),
-                    trackingLinkDetector.get(),
+                    ampLinks.get(),
                     trackingParameters.get()
                 ) as T
                 else -> null

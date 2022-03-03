@@ -28,7 +28,7 @@ class UrlExtractionJavascriptInterface(private val onUrlExtracted: (extractedUrl
 
     @JavascriptInterface
     fun log(message: String?) {
-        Timber.d("Tracking link detection: $message")
+        Timber.d("AMP link detection: $message")
     }
 
     companion object {

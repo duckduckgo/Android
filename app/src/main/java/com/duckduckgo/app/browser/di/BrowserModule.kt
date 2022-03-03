@@ -77,7 +77,7 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import dagger.Module
 import dagger.Provides
@@ -119,7 +119,7 @@ class BrowserModule {
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
-        trackingLinkDetector: TrackingLinkDetector
+        ampLinks: AmpLinks
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -138,7 +138,7 @@ class BrowserModule {
             dispatcherProvider,
             emailInjector,
             accessibilityManager,
-            trackingLinkDetector
+            ampLinks
         )
     }
 
@@ -222,10 +222,10 @@ class BrowserModule {
     @Provides
     fun specialUrlDetector(
         packageManager: PackageManager,
-        trackingLinkDetector: TrackingLinkDetector,
+        ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
         variantManager: VariantManager
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector, trackingParameters, variantManager)
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, variantManager)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

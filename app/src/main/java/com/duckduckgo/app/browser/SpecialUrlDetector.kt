@@ -26,8 +26,8 @@ import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isTrackingParameterRemovalEnabled
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import timber.log.Timber
 import java.net.URISyntaxException
@@ -57,15 +57,15 @@ interface SpecialUrlDetector {
 
         class SearchQuery(val query: String) : UrlType()
         class Unknown(val uriString: String) : UrlType()
-        class ExtractedTrackingLink(val extractedUrl: String) : UrlType()
-        class CloakedTrackingLink(val trackingUrl: String) : UrlType()
+        class ExtractedAmpLink(val extractedUrl: String) : UrlType()
+        class CloakedAmpLink(val ampUrl: String) : UrlType()
         class TrackingParameterLink(val cleanedUrl: String) : UrlType()
     }
 }
 
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
-    private val trackingLinkDetector: TrackingLinkDetector,
+    private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val variantManager: VariantManager
 ) : SpecialUrlDetector {
@@ -123,11 +123,11 @@ class SpecialUrlDetectorImpl(
             }
         }
 
-        trackingLinkDetector.extractCanonicalFromTrackingLink(uriString)?.let { trackingLinkType ->
-            if (trackingLinkType is TrackingLinkType.ExtractedTrackingLink) {
-                return UrlType.ExtractedTrackingLink(extractedUrl = trackingLinkType.extractedUrl)
-            } else if (trackingLinkType is TrackingLinkType.CloakedTrackingLink) {
-                return UrlType.CloakedTrackingLink(trackingUrl = trackingLinkType.trackingUrl)
+        ampLinks.extractCanonicalFromAmpLink(uriString)?.let { ampLinkType ->
+            if (ampLinkType is AmpLinkType.ExtractedAmpLink) {
+                return UrlType.ExtractedAmpLink(extractedUrl = ampLinkType.extractedUrl)
+            } else if (ampLinkType is AmpLinkType.CloakedAmpLink) {
+                return UrlType.CloakedAmpLink(ampUrl = ampLinkType.ampUrl)
             }
         }
         return UrlType.Web(uriString)
