@@ -25,7 +25,11 @@ interface WebViewDatabaseProvider {
 
 class DefaultWebViewDatabaseProvider(val context: Context) : WebViewDatabaseProvider {
 
-    override fun get(): WebViewDatabase {
-        return WebViewDatabase.getInstance(context)
-    }
+    @Volatile
+    private var instance: WebViewDatabase? = null
+
+    override fun get(): WebViewDatabase =
+        instance ?: synchronized(this) {
+            instance ?: WebViewDatabase.getInstance(context).also { instance = it }
+        }
 }
