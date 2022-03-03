@@ -28,7 +28,7 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcExceptionsDao
 import com.duckduckgo.privacy.config.store.features.gpc.GpcHeadersDao
 import com.duckduckgo.privacy.config.store.features.https.HttpsDao
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistDao
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionDao
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
 
@@ -48,7 +48,7 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         PrivacyConfig::class,
         AmpLinkFormatEntity::class,
         AmpKeywordEntity::class,
-        TrackingLinkExceptionEntity::class,
+        AmpLinkExceptionEntity::class,
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class
     ]
@@ -62,7 +62,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun contentBlockingDao(): ContentBlockingDao
     abstract fun privacyConfigDao(): PrivacyConfigDao
     abstract fun drmDao(): DrmDao
-    abstract fun trackingLinkDetectionDao(): TrackingLinkDetectionDao
+    abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
 }
 

@@ -48,8 +48,8 @@ import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
 import com.duckduckgo.privacy.config.store.features.https.RealHttpsRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.RealTrackerAllowlistRepository
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllowlistRepository
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.RealTrackingLinkDetectionRepository
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.RealAmpLinksRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.duckduckgo.privacy.config.store.features.trackingparameters.RealTrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.RealUnprotectedTemporaryRepository
@@ -199,12 +199,12 @@ class DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideTrackingLinkDetectionRepository(
+    fun provideAmpLinksRepository(
         database: PrivacyConfigDatabase,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider
-    ): TrackingLinkDetectionRepository {
-        return RealTrackingLinkDetectionRepository(database, coroutineScope, dispatcherProvider)
+    ): AmpLinksRepository {
+        return RealAmpLinksRepository(database, coroutineScope, dispatcherProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

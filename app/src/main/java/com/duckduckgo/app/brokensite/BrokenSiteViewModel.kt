@@ -30,7 +30,7 @@ import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.AmpLinks
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
@@ -38,7 +38,7 @@ import javax.inject.Provider
 class BrokenSiteViewModel(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val ampLinks: AmpLinks
 ) : ViewModel() {
 
     data class ViewState(
@@ -109,10 +109,10 @@ class BrokenSiteViewModel(
     fun onSubmitPressed(webViewVersion: String) {
         if (url.isNotEmpty()) {
 
-            val lastTrackingInfo = trackingLinkDetector.lastTrackingLinkInfo
+            val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
 
-            val brokenSite = if (lastTrackingInfo?.destinationUrl == url) {
-                getBrokenSite(lastTrackingInfo.trackingLink, webViewVersion)
+            val brokenSite = if (lastAmpLinkInfo?.destinationUrl == url) {
+                getBrokenSite(lastAmpLinkInfo.ampLink, webViewVersion)
             } else {
                 getBrokenSite(url, webViewVersion)
             }
@@ -154,7 +154,7 @@ class BrokenSiteViewModel(
 class BrokenSiteViewModelFactory @Inject constructor(
     private val pixel: Provider<Pixel>,
     private val brokenSiteSender: Provider<BrokenSiteSender>,
-    private val trackingLinkDetector: Provider<TrackingLinkDetector>
+    private val ampLinks: Provider<AmpLinks>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -163,7 +163,7 @@ class BrokenSiteViewModelFactory @Inject constructor(
                     BrokenSiteViewModel(
                         pixel.get(),
                         brokenSiteSender.get(),
-                        trackingLinkDetector.get()
+                        ampLinks.get()
                     ) as T
                     )
                 else -> null

@@ -24,7 +24,7 @@ import com.duckduckgo.privacy.config.api.DrmException
 import com.duckduckgo.privacy.config.api.GpcException
 import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
-import com.duckduckgo.privacy.config.api.TrackingLinkException
+import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.TrackingParameterException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -123,7 +123,7 @@ data class AmpKeywordEntity(
 )
 
 @Entity(tableName = "amp_exceptions")
-data class TrackingLinkExceptionEntity(
+data class AmpLinkExceptionEntity(
     @PrimaryKey val domain: String,
     val reason: String
 )
@@ -139,8 +139,8 @@ data class TrackingParameterExceptionEntity(
     val reason: String
 )
 
-fun TrackingLinkExceptionEntity.toTrackingLinkException(): TrackingLinkException {
-    return TrackingLinkException(domain = this.domain, reason = this.reason)
+fun AmpLinkExceptionEntity.toAmpLinkException(): AmpLinkException {
+    return AmpLinkException(domain = this.domain, reason = this.reason)
 }
 
 fun TrackingParameterExceptionEntity.toTrackingParameterException(): TrackingParameterException {

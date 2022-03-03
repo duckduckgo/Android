@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.store.features.amplinks
 
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.*
@@ -30,20 +30,20 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class RealTrackingLinkDetectionRepositoryTest {
+class RealAmpLinksRepositoryTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    lateinit var testee: RealTrackingLinkDetectionRepository
+    lateinit var testee: RealAmpLinksRepository
 
     private val mockDatabase: PrivacyConfigDatabase = mock()
-    private val mockTrackingLinkDetectionDao: TrackingLinkDetectionDao = mock()
+    private val mockAmpLinksDao: AmpLinksDao = mock()
 
     @Before
     fun before() {
-        whenever(mockDatabase.trackingLinkDetectionDao()).thenReturn(mockTrackingLinkDetectionDao)
-        testee = RealTrackingLinkDetectionRepository(
+        whenever(mockDatabase.ampLinksDao()).thenReturn(mockAmpLinksDao)
+        testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider
@@ -52,22 +52,22 @@ class RealTrackingLinkDetectionRepositoryTest {
 
     @Test
     fun whenRepositoryIsCreatedThenValuesLoadedIntoMemory() {
-        givenTrackingLinkDetectionDaoContainsEntities()
+        givenAmpLinksDaoContainsEntities()
 
-        testee = RealTrackingLinkDetectionRepository(
+        testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider
         )
 
-        assertEquals(trackingLinkExceptionEntity.toTrackingLinkException(), testee.exceptions.first())
+        assertEquals(ampLinkExceptionEntity.toAmpLinkException(), testee.exceptions.first())
         assertEquals(ampLinkFormatEntity.format, testee.ampLinkFormats.first().toString())
         assertEquals(ampKeywordEntity.keyword, testee.ampKeywords.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() = runTest {
-        testee = RealTrackingLinkDetectionRepository(
+        testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider
@@ -75,14 +75,14 @@ class RealTrackingLinkDetectionRepositoryTest {
 
         testee.updateAll(listOf(), listOf(), listOf())
 
-        verify(mockTrackingLinkDetectionDao).updateAll(anyList(), anyList(), anyList())
+        verify(mockAmpLinksDao).updateAll(anyList(), anyList(), anyList())
     }
 
     @Test
     fun whenUpdateAllThenPreviousValuesAreCleared() = runTest {
-        givenTrackingLinkDetectionDaoContainsEntities()
+        givenAmpLinksDaoContainsEntities()
 
-        testee = RealTrackingLinkDetectionRepository(
+        testee = RealAmpLinksRepository(
             mockDatabase,
             TestScope(),
             coroutineRule.testDispatcherProvider
@@ -91,7 +91,7 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertEquals(1, testee.ampLinkFormats.size)
         assertEquals(1, testee.ampKeywords.size)
 
-        reset(mockTrackingLinkDetectionDao)
+        reset(mockAmpLinksDao)
 
         testee.updateAll(listOf(), listOf(), listOf())
 
@@ -100,14 +100,14 @@ class RealTrackingLinkDetectionRepositoryTest {
         assertEquals(0, testee.ampKeywords.size)
     }
 
-    private fun givenTrackingLinkDetectionDaoContainsEntities() {
-        whenever(mockTrackingLinkDetectionDao.getAllExceptions()).thenReturn(listOf(trackingLinkExceptionEntity))
-        whenever(mockTrackingLinkDetectionDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
-        whenever(mockTrackingLinkDetectionDao.getAllAmpKeywords()).thenReturn(listOf(ampKeywordEntity))
+    private fun givenAmpLinksDaoContainsEntities() {
+        whenever(mockAmpLinksDao.getAllExceptions()).thenReturn(listOf(ampLinkExceptionEntity))
+        whenever(mockAmpLinksDao.getAllAmpLinkFormats()).thenReturn(listOf(ampLinkFormatEntity))
+        whenever(mockAmpLinksDao.getAllAmpKeywords()).thenReturn(listOf(ampKeywordEntity))
     }
 
     companion object {
-        val trackingLinkExceptionEntity = TrackingLinkExceptionEntity(
+        val ampLinkExceptionEntity = AmpLinkExceptionEntity(
             domain = "https://www.example.com",
             reason = "reason"
         )

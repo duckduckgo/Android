@@ -28,8 +28,8 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertNull
@@ -53,7 +53,7 @@ class SpecialUrlDetectorImplTest {
     lateinit var mockPackageManager: PackageManager
 
     @Mock
-    lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+    lateinit var mockAmpLinks: AmpLinks
 
     @Mock
     lateinit var mockTrackingParameters: TrackingParameters
@@ -66,7 +66,7 @@ class SpecialUrlDetectorImplTest {
         MockitoAnnotations.openMocks(this)
         testee = SpecialUrlDetectorImpl(
             packageManager = mockPackageManager,
-            trackingLinkDetector = mockTrackingLinkDetector,
+            ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
             variantManager = mockVariantManager
         )
@@ -306,23 +306,23 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsTrackingLinkThenExtractedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
-            .thenReturn(TrackingLinkType.ExtractedTrackingLink(extractedUrl = "https://www.example.com"))
-        val expected = ExtractedTrackingLink::class
+    fun whenUrlIsAmpLinkThenExtractedAmpLinkTypeDetected() {
+        whenever(mockAmpLinks.extractCanonicalFromAmpLink(anyString()))
+            .thenReturn(AmpLinkType.ExtractedAmpLink(extractedUrl = "https://www.example.com"))
+        val expected = ExtractedAmpLink::class
         val actual = testee.determineType("https://www.google.com/amp/s/www.example.com")
         assertEquals(expected, actual::class)
-        assertEquals("https://www.example.com", (actual as ExtractedTrackingLink).extractedUrl)
+        assertEquals("https://www.example.com", (actual as ExtractedAmpLink).extractedUrl)
     }
 
     @Test
-    fun whenUrlIsCloakedTrackingLinkThenCloakedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
-            .thenReturn(TrackingLinkType.CloakedTrackingLink(trackingUrl = "https://www.example.com/amp"))
-        val expected = CloakedTrackingLink::class
+    fun whenUrlIsCloakedAmpLinkThenCloakedAmpLinkTypeDetected() {
+        whenever(mockAmpLinks.extractCanonicalFromAmpLink(anyString()))
+            .thenReturn(AmpLinkType.CloakedAmpLink(ampUrl = "https://www.example.com/amp"))
+        val expected = CloakedAmpLink::class
         val actual = testee.determineType("https://www.example.com/amp")
         assertEquals(expected, actual::class)
-        assertEquals("https://www.example.com/amp", (actual as CloakedTrackingLink).trackingUrl)
+        assertEquals("https://www.example.com/amp", (actual as CloakedAmpLink).ampUrl)
     }
 
     @Test

@@ -29,7 +29,7 @@ sealed class PrivacyFeatureName(override val value: String) : FeatureName {
         PrivacyFeatureName(value)
 
     data class DrmFeatureName(override val value: String = "eme") : PrivacyFeatureName(value)
-    data class TrackingLinkDetectionFeatureName(override val value: String = "ampLinks") :
+    data class AmpLinksFeatureName(override val value: String = "ampLinks") :
         PrivacyFeatureName(value)
 
     data class TrackingParametersFeatureName(override val value: String = "trackingParameters") :
