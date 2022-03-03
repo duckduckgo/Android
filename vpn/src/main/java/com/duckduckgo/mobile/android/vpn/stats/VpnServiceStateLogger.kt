@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.di.VpnDispatcherProvider
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
