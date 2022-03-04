@@ -60,6 +60,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import java.net.InetAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import java.util.concurrent.ExecutorService
@@ -266,6 +267,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             if (vpnPreferences.isCustomDnsServerSet()) {
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
+            vpnPreferences.privateDns?.let { privateDnsName ->
+                if (appBuildConfig.flavor == INTERNAL) {
+                    Timber.v("Setting private DNS: $privateDnsName")
+                    InetAddress.getAllByName(privateDnsName).forEach { addr -> addDnsServer(addr) }
+                }
+            }
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
@@ -397,7 +404,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     companion object {
 
-        const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
         const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
 
         const val VPN_REMINDER_NOTIFICATION_ID = 999
