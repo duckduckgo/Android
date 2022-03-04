@@ -21,11 +21,20 @@
     android:background="@android:color/transparent">
 
     <FrameLayout
-        android:id="@+id/bg"
+        android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0.8"
         android:background="?attr/colorPrimary" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
     <TextView
         android:id="@+id/speechResults"

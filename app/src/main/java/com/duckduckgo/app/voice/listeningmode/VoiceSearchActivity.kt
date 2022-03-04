@@ -49,6 +49,12 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         addBackgroundBlur()
         setContentView(binding.root)
+        configureToolbar()
+    }
+
+    private fun configureToolbar() {
+        setupToolbar(binding.toolbar)
+        supportActionBar?.title = ""
     }
 
     private fun addBackgroundBlur() {
