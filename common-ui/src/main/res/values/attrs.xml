@@ -94,4 +94,5 @@
     <attr name="dialogPrimaryButtonColor" format="color" />
     <attr name="dialogSecondaryButtonColor" format="color" />
 
+    <attr name="menuItemViewIconColor" format="color" />
 </resources>

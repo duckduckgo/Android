@@ -176,6 +176,17 @@
     </style>
 
     <!-- Styles for App Components -->
+
+    <style name="Widget.DuckDuckGo.MenuItemView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingStart">@dimen/keyline_5</item>
+        <item name="android:paddingEnd">@dimen/keyline_5</item>
+        <item name="android:paddingTop">@dimen/keyline_3</item>
+        <item name="android:paddingBottom">@dimen/keyline_3</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+
     <!-- Section Header -->
     <style name="Widget.DuckDuckGo.SectionHeader">
         <item name="android:paddingTop">32dp</item>
