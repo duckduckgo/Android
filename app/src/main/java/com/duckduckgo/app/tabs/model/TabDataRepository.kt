@@ -51,7 +51,9 @@ class TabDataRepository @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : TabRepository {
 
-    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs().distinctUntilChanged()
+    override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs()
+
+    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs()
 
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
