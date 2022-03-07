@@ -65,7 +65,7 @@ class MicrophonePermissionRequest @Inject constructor(
                     onPermissionsGranted()
                 } else {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)) {
-                        preferences.setPermissionDeclinedForever(true)
+                        preferences.declinePermissionForever(true)
                     }
                 }
             }
@@ -77,7 +77,11 @@ class MicrophonePermissionRequest @Inject constructor(
         if (preferences.hasPermissionDeclinedForever()) {
             showNoMicAccessDialog(activity)
         } else {
-            showPermissionRationale(activity)
+            if (preferences.hasAcceptedRationaleDialog()) {
+                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            } else {
+                showPermissionRationale(activity)
+            }
         }
     }
 
@@ -97,11 +101,10 @@ class MicrophonePermissionRequest @Inject constructor(
             .setTitle(R.string.voiceSearchPermissionRationaleTitle)
             .setMessage(R.string.voiceSearchPermissionRationaleDescription)
             .setPositiveButton(R.string.voiceSearchPermissionRationalePositiveAction) { _, _ ->
-                pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
-                permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                handleRationaleAccepted()
             }
             .setNegativeButton(R.string.cancel) { _, _ ->
-                pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
+                handleRationaleCancelled()
             }
             .show()
     }
@@ -111,5 +114,15 @@ class MicrophonePermissionRequest @Inject constructor(
             data = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
         }
         startActivity(intent)
+    }
+
+    private fun handleRationaleAccepted() {
+        pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
+        preferences.acceptRationaleDialog(true)
+        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+    }
+
+    private fun handleRationaleCancelled() {
+        pixel.fire(AppPixelName.VOICE_SEARCH_PRIVACY_DIALOG_REJECTED)
     }
 }

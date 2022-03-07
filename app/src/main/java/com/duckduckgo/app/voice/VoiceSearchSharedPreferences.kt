@@ -27,6 +27,7 @@ class VoiceSearchSharedPreferences @Inject constructor(
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
         const val KEY_DECLINED_PERMISSION_FOREVER = "KEY_DECLINED_PERMISSION_FOREVER"
+        const val KEY_RATIONALE_DIALOG_ACCEPTED = "KEY_RATIONALE_DIALOG_ACCEPTED"
     }
 
     private val preferences: SharedPreferences
@@ -34,7 +35,13 @@ class VoiceSearchSharedPreferences @Inject constructor(
 
     fun hasPermissionDeclinedForever(): Boolean = preferences.getBoolean(KEY_DECLINED_PERMISSION_FOREVER, false)
 
-    fun setPermissionDeclinedForever(declined: Boolean) = preferences.edit(true) {
+    fun declinePermissionForever(declined: Boolean) = preferences.edit(true) {
         putBoolean(KEY_DECLINED_PERMISSION_FOREVER, declined)
+    }
+
+    fun hasAcceptedRationaleDialog(): Boolean = preferences.getBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, false)
+
+    fun acceptRationaleDialog(accept: Boolean) = preferences.edit(true) {
+        putBoolean(KEY_RATIONALE_DIALOG_ACCEPTED, accept)
     }
 }
