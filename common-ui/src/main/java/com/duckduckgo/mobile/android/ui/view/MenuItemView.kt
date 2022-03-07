@@ -58,7 +58,7 @@ class MenuItemView : LinearLayout {
         binding.label.text = attributes.getString(R.styleable.MenuItemView_labelText) ?: ""
         binding.icon.setImageResource(
             attributes.getResourceId(
-                R.styleable.InfoPanel_panelDrawable,
+                R.styleable.MenuItemView_iconDrawable,
                 R.drawable.ic_globe_gray_16dp
             )
         )
