@@ -119,7 +119,6 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     }
 
     override fun stop() {
-        speechRecognizer?.stopListening()
         speechRecognizer?.destroy()
     }
 
