@@ -24,8 +24,9 @@
         android:id="@+id/icon"
         android:layout_width="@dimen/keyline_4"
         android:layout_height="@dimen/keyline_4"
+        tools:background="@drawable/ic_globe_gray_16dp"
         app:tint="?attr/menuItemViewIconColor"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/label"
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_3"
         android:layout_gravity="center"
+        android:gravity="start|center_vertical"
         tools:text="Text label"
         android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"/>
 </LinearLayout>
