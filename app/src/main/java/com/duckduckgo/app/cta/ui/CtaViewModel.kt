@@ -402,7 +402,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs
+    private fun forceStopFireButtonPulseAnimationFlow() = tabRepository.flowTabs.distinctUntilChanged()
         .map { tabs ->
             if (tabs.size >= MAX_TABS_OPEN_FIRE_EDUCATION) return@map true
             return@map false

@@ -48,7 +48,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -94,7 +93,7 @@ class BrowserViewModel(
     private val currentViewState: ViewState
         get() = viewState.value!!
 
-    var tabs: Flow<List<TabEntity>> = tabRepository.flowTabs
+    var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     var selectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
