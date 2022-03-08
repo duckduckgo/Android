@@ -98,13 +98,12 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     override suspend fun getExclusionAppsList(): List<String> = withContext(dispatcherProvider.io()) {
         val exclusionList = appTrackerRepository.getAppExclusionList()
         val manualExclusionList = appTrackerRepository.getManualAppExclusionList()
-        val exclusionAppsList = packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
+        return@withContext packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .asSequence()
             .filter { shouldBeExcluded(it, exclusionList, manualExclusionList) }
             .sortedBy { it.name }
             .map { it.packageName }
             .toList()
-        return@withContext exclusionAppsList
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
