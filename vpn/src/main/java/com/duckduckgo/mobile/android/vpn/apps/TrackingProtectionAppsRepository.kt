@@ -135,7 +135,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     // https://issuetracker.google.com/issues/217570500
     // https://app.asana.com/0/1174433894299346/1201657419006650
     private fun transparencyModeBugFixForAndroid12(appInfo: ApplicationInfo): Boolean {
-        return appBuildConfig.sdkInt > Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(appInfo.packageName) && appBuildConfig.flavor == INTERNAL
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(appInfo.packageName) && appBuildConfig.flavor == INTERNAL
     }
 
     private fun isManuallyExcluded(
