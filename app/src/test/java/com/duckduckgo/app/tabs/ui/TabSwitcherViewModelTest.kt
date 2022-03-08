@@ -20,7 +20,6 @@ package com.duckduckgo.app.tabs.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -29,8 +28,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -72,7 +70,8 @@ class TabSwitcherViewModelTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
         runBlocking {
-            whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.receiveAsFlow())
+            whenever(mockTabRepository.flowDeletableTabs)
+                .thenReturn(repoDeletableTabs.consumeAsFlow())
             whenever(mockTabRepository.add()).thenReturn("TAB_ID")
             testee = TabSwitcherViewModel(mockTabRepository, WebViewSessionInMemoryStorage())
             testee.command.observeForever(mockCommandObserver)
@@ -131,30 +130,28 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun whenRepositoryDeletableTabsUpdatesThenViewStateEmitsDeletableTabs() = runTest {
-        val deletableTabs = listOf(TabEntity("ID", position = 0))
+    fun whenRepositoryDeletableTabsUpdatesThenDeletableTabsEmits() = runTest {
+        val tab = TabEntity("ID", position = 0)
 
-        whenever(mockTabRepository.flowDeletableTabs).thenReturn(flowOf(deletableTabs))
-        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(deletableTabs, awaitItem().deletableTabs)
+        val expectedTabs = listOf(listOf(), listOf(tab))
+        var index = 0
+        testee.deletableTabs.observeForever {
+            assertEquals(expectedTabs[index++], it)
         }
+
+        repoDeletableTabs.send(listOf())
+        repoDeletableTabs.send(listOf(tab))
     }
 
     @Test
-    fun whenRepositoryTabsUpdatesThenViewStateEmitsTabs() = runTest {
-        val tabs = listOf(TabEntity("ID", position = 0))
+    fun whenRepositoryDeletableTabsEmitsSameValueThenDeletableTabsEmitsAll() = runTest {
+        val tab = TabEntity("ID", position = 0)
 
-        whenever(mockTabRepository.flowTabs).thenReturn(flowOf(tabs))
-        whenever(mockTabRepository.flowDeletableTabs).thenReturn(flowOf(emptyList()))
-
-        testee.start()
-
-        testee.viewState().test {
-            assertEquals(tabs, awaitItem().tabs)
+        testee.deletableTabs.observeForever {
+            assertEquals(listOf(tab), it)
         }
+
+        repoDeletableTabs.send(listOf(tab))
+        repoDeletableTabs.send(listOf(tab))
     }
 }

@@ -42,7 +42,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.AmpLinks
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -85,7 +85,7 @@ class BrowserWebViewClientTest {
     private val thirdPartyCookieManager: ThirdPartyCookieManager = mock()
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
-    private val trackingLinkDetector: TrackingLinkDetector = mock()
+    private val ampLinks: AmpLinks = mock()
 
     @UiThreadTest
     @Before
@@ -108,7 +108,7 @@ class BrowserWebViewClientTest {
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
             accessibilitySettings,
-            trackingLinkDetector
+            ampLinks
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -418,8 +418,8 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
+    fun whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
@@ -428,8 +428,8 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(EXAMPLE_URL))
+    fun whenAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         val mockWebView = mock<WebView>()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
@@ -438,19 +438,19 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenCloakedTrackingLinkDetectedAndIsForMainFrameThenHandleCloakedTrackingLink() = runTest {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+    fun whenCloakedAmpLinkDetectedAndIsForMainFrameThenHandleCloakedAmpLink() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener).handleCloakedTrackingLink(EXAMPLE_URL)
+        verify(listener).handleCloakedAmpLink(EXAMPLE_URL)
     }
 
     @Test
-    fun whenCloakedTrackingLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
-        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(EXAMPLE_URL))
+    fun whenCloakedAmpLinkDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
         assertFalse(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(listener, never()).handleCloakedTrackingLink(any())
+        verify(listener, never()).handleCloakedAmpLink(any())
     }
 
     @Test

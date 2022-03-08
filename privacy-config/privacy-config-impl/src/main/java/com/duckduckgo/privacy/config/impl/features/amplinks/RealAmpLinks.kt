@@ -14,43 +14,43 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkInfo
-import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkInfo
+import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealTrackingLinkDetector @Inject constructor(
-    private val trackingLinkDetectionRepository: TrackingLinkDetectionRepository,
+class RealAmpLinks @Inject constructor(
+    private val ampLinksRepository: AmpLinksRepository,
     private val featureToggle: FeatureToggle,
     private val unprotectedTemporary: UnprotectedTemporary
-) : TrackingLinkDetector {
+) : AmpLinks {
 
     private var lastExtractedUrl: String? = null
 
-    override var lastTrackingLinkInfo: TrackingLinkInfo? = null
+    override var lastAmpLinkInfo: AmpLinkInfo? = null
 
     override fun isAnException(url: String): Boolean {
         return matches(url) || unprotectedTemporary.isAnException(url)
     }
 
     private fun matches(url: String): Boolean {
-        return trackingLinkDetectionRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
+        return ampLinksRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
-    override fun extractCanonicalFromTrackingLink(url: String): TrackingLinkType? {
-        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName()) == false) return null
+    override fun extractCanonicalFromAmpLink(url: String): AmpLinkType? {
+        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName()) == false) return null
         if (url == lastExtractedUrl) return null
 
         val extractedUrl = extractCanonical(url)
@@ -61,23 +61,23 @@ class RealTrackingLinkDetector @Inject constructor(
             return if (isAnException(extractedUrl)) {
                 null
             } else {
-                lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = url)
-                TrackingLinkType.ExtractedTrackingLink(extractedUrl = extractedUrl)
+                lastAmpLinkInfo = AmpLinkInfo(ampLink = url)
+                AmpLinkType.ExtractedAmpLink(extractedUrl = extractedUrl)
             }
         }
 
-        if (urlContainsTrackingKeyword(url)) {
+        if (urlContainsAmpKeyword(url)) {
             return if (isAnException(url)) {
                 null
             } else {
-                TrackingLinkType.CloakedTrackingLink(trackingUrl = url)
+                AmpLinkType.CloakedAmpLink(ampUrl = url)
             }
         }
         return null
     }
 
-    private fun urlContainsTrackingKeyword(url: String): Boolean {
-        val ampKeywords = trackingLinkDetectionRepository.ampKeywords
+    private fun urlContainsAmpKeyword(url: String): Boolean {
+        val ampKeywords = ampLinksRepository.ampKeywords
 
         ampKeywords.forEach { keyword ->
             if (url.contains(keyword)) {
@@ -103,7 +103,7 @@ class RealTrackingLinkDetector @Inject constructor(
     }
 
     private fun urlIsExtractableAmpLink(url: String): Regex? {
-        val ampLinkFormats = trackingLinkDetectionRepository.ampLinkFormats
+        val ampLinkFormats = ampLinksRepository.ampLinkFormats
 
         ampLinkFormats.forEach { format ->
             if (url.matches(format)) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.store.features.amplinks
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -23,13 +23,13 @@ import androidx.room.Query
 import androidx.room.Transaction
 import com.duckduckgo.privacy.config.store.AmpKeywordEntity
 import com.duckduckgo.privacy.config.store.AmpLinkFormatEntity
-import com.duckduckgo.privacy.config.store.TrackingLinkExceptionEntity
+import com.duckduckgo.privacy.config.store.AmpLinkExceptionEntity
 
 @Dao
-abstract class TrackingLinkDetectionDao {
+abstract class AmpLinksDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertAllExceptions(domains: List<TrackingLinkExceptionEntity>)
+    abstract fun insertAllExceptions(domains: List<AmpLinkExceptionEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertAllAmpLinkFormats(ampLinkFormats: List<AmpLinkFormatEntity>)
@@ -38,7 +38,7 @@ abstract class TrackingLinkDetectionDao {
     abstract fun insertAllAmpKeywords(ampKeywords: List<AmpKeywordEntity>)
 
     @Transaction
-    open fun updateAll(domains: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>) {
+    open fun updateAll(domains: List<AmpLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>) {
         deleteAllExceptions()
         insertAllExceptions(domains)
 
@@ -50,7 +50,7 @@ abstract class TrackingLinkDetectionDao {
     }
 
     @Query("select * from amp_exceptions")
-    abstract fun getAllExceptions(): List<TrackingLinkExceptionEntity>
+    abstract fun getAllExceptions(): List<AmpLinkExceptionEntity>
 
     @Query("select * from amp_link_formats")
     abstract fun getAllAmpLinkFormats(): List<AmpLinkFormatEntity>

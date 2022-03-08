@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.store.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.store.features.amplinks
 
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.privacy.config.api.TrackingLinkException
+import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.store.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-interface TrackingLinkDetectionRepository {
-    fun updateAll(exceptions: List<TrackingLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)
-    val exceptions: List<TrackingLinkException>
+interface AmpLinksRepository {
+    fun updateAll(exceptions: List<AmpLinkExceptionEntity>, ampLinkFormats: List<AmpLinkFormatEntity>, ampKeywords: List<AmpKeywordEntity>)
+    val exceptions: List<AmpLinkException>
     val ampLinkFormats: List<Regex>
     val ampKeywords: List<String>
 }
 
-class RealTrackingLinkDetectionRepository(
+class RealAmpLinksRepository(
     val database: PrivacyConfigDatabase,
     coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider
-) : TrackingLinkDetectionRepository {
+) : AmpLinksRepository {
 
-    private val trackingLinkDetectionDao: TrackingLinkDetectionDao = database.trackingLinkDetectionDao()
+    private val ampLinksDao: AmpLinksDao = database.ampLinksDao()
 
-    override val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
+    override val exceptions = CopyOnWriteArrayList<AmpLinkException>()
     override val ampLinkFormats = CopyOnWriteArrayList<Regex>()
     override val ampKeywords = CopyOnWriteArrayList<String>()
 
@@ -49,27 +49,27 @@ class RealTrackingLinkDetectionRepository(
     }
 
     override fun updateAll(
-        exceptions: List<TrackingLinkExceptionEntity>,
+        exceptions: List<AmpLinkExceptionEntity>,
         ampLinkFormats: List<AmpLinkFormatEntity>,
         ampKeywords: List<AmpKeywordEntity>
     ) {
-        trackingLinkDetectionDao.updateAll(exceptions, ampLinkFormats, ampKeywords)
+        ampLinksDao.updateAll(exceptions, ampLinkFormats, ampKeywords)
         loadToMemory()
     }
 
     private fun loadToMemory() {
         exceptions.clear()
-        trackingLinkDetectionDao.getAllExceptions().map {
-            exceptions.add(it.toTrackingLinkException())
+        ampLinksDao.getAllExceptions().map {
+            exceptions.add(it.toAmpLinkException())
         }
 
         ampLinkFormats.clear()
-        trackingLinkDetectionDao.getAllAmpLinkFormats().map {
+        ampLinksDao.getAllAmpLinkFormats().map {
             ampLinkFormats.add(it.format.toRegex(RegexOption.IGNORE_CASE))
         }
 
         ampKeywords.clear()
-        trackingLinkDetectionDao.getAllAmpKeywords().map {
+        ampLinksDao.getAllAmpKeywords().map {
             ampKeywords.add(it.keyword)
         }
     }

@@ -30,10 +30,10 @@ interface VpnServiceStateStatsDao {
     @Query("SELECT strftime('%Y-%m-%d', timestamp) day, * FROM vpn_service_state_stats WHERE timestamp >= :startTime order by timestamp DESC")
     fun getServiceStateStatsSince(startTime: String): List<BucketizedVpnServiceStateStats>
 
-    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY id DESC limit 1")
     fun getLastStateStats(): VpnServiceStateStats?
 
-    @Query("SELECT * FROM vpn_service_state_stats ORDER BY timestamp DESC limit 1")
+    @Query("SELECT * FROM vpn_service_state_stats ORDER BY id DESC limit 1")
     fun getStateStats(): Flow<VpnServiceStateStats?>
 
     @Query("SELECT COUNT(*) FROM vpn_service_state_stats WHERE state is 'ENABLED'")

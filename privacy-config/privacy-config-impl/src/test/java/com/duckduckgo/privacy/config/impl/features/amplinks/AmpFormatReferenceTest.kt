@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkException
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkException
+import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
+import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import junit.framework.TestCase.*
+import junit.framework.TestCase.assertEquals
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
@@ -37,20 +38,20 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class AmpKeywordReferenceTest(private val testCase: TestCase) {
+class AmpFormatReferenceTest(private val testCase: TestCase) {
 
-    lateinit var testee: TrackingLinkDetector
+    lateinit var testee: AmpLinks
 
-    private val mockRepository: TrackingLinkDetectionRepository = mock()
+    private val mockRepository: AmpLinksRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
 
     @Before
     fun setup() {
         mockAmpLinks()
-        testee = RealTrackingLinkDetector(mockRepository, mockFeatureToggle, mockUnprotectedTemporary)
+        testee = RealAmpLinks(mockRepository, mockFeatureToggle, mockUnprotectedTemporary)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName(), true)).thenReturn(true)
     }
 
     companion object {
@@ -62,51 +63,51 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         fun testData(): List<TestCase> {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
-                    AmpKeywordReferenceTest::class.java.classLoader!!,
-                    "reference_tests/tracking_link_detection_matching_tests.json"
+                    AmpFormatReferenceTest::class.java.classLoader!!,
+                    "reference_tests/amplinks/amp_links_matching_tests.json"
                 )
             )
-            return test?.ampKeywords?.tests ?: emptyList()
+            return test?.ampFormats?.tests ?: emptyList()
         }
     }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() {
-        val extractedUrl = testee.extractCanonicalFromTrackingLink(testCase.ampURL)
+        testCase.exceptPlatforms
+        val extractedUrl = testee.extractCanonicalFromAmpLink(testCase.ampURL)
         if (extractedUrl != null) {
-            assertTrue(testCase.expectAmpDetected)
+            assertEquals(testCase.expectURL, (extractedUrl as AmpLinkType.ExtractedAmpLink).extractedUrl)
         } else {
-            assertFalse(testCase.expectAmpDetected)
+            assertEquals(testCase.expectURL, "")
         }
     }
 
     private fun mockAmpLinks() {
-        val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> = moshi.adapter(TrackingLinkDetectionFeature::class.java)
-        val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
-        val ampLinkKeywords = CopyOnWriteArrayList<String>()
+        val jsonAdapter: JsonAdapter<AmpLinksFeature> = moshi.adapter(AmpLinksFeature::class.java)
+        val exceptions = CopyOnWriteArrayList<AmpLinkException>()
+        val ampLinkFormats = CopyOnWriteArrayList<Regex>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
-            AmpKeywordReferenceTest::class.java.classLoader!!,
-            "reference_tests/tracking_link_detection_reference.json"
+            AmpFormatReferenceTest::class.java.classLoader!!,
+            "reference_tests/amplinks/amp_links_reference.json"
         )
 
-        jsonObject.keys().forEach {
-            val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonObject.get(it).toString())
-            exceptions.addAll(trackingLinkDetectionFeature!!.exceptions)
-            ampLinkKeywords.addAll(trackingLinkDetectionFeature.settings.keywords)
+        jsonObject.keys().forEach { key ->
+            val ampLinksFeature: AmpLinksFeature? = jsonAdapter.fromJson(jsonObject.get(key).toString())
+            exceptions.addAll(ampLinksFeature!!.exceptions)
+            ampLinkFormats.addAll(ampLinksFeature.settings.linkFormats.map { it.toRegex(RegexOption.IGNORE_CASE) })
         }
         whenever(mockRepository.exceptions).thenReturn(exceptions)
-        whenever(mockRepository.ampLinkFormats).thenReturn(CopyOnWriteArrayList())
-        whenever(mockRepository.ampKeywords).thenReturn(ampLinkKeywords)
+        whenever(mockRepository.ampLinkFormats).thenReturn(ampLinkFormats)
     }
 
     data class TestCase(
         val name: String,
         val ampURL: String,
-        val expectAmpDetected: Boolean,
+        val expectURL: String,
         val exceptPlatforms: List<String>
     )
 
-    data class AmpKeywordTest(
+    data class AmpFormatTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
@@ -114,6 +115,6 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
     )
 
     data class ReferenceTest(
-        val ampKeywords: AmpKeywordTest
+        val ampFormats: AmpFormatTest
     )
 }
