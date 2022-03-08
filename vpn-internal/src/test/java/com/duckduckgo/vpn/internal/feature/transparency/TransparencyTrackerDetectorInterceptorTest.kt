@@ -53,7 +53,7 @@ class TransparencyTrackerDetectorInterceptorTest {
 
     @Test
     fun returnNotTrackersNullWhenDDGAppAndAndroid12() {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(32)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
 
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
         assertEquals(trackerType, RequestTrackerType.NotTracker(HOSTNAME))
@@ -61,7 +61,7 @@ class TransparencyTrackerDetectorInterceptorTest {
 
     @Test
     fun returnNullWhenDDGAppAndAndroid11() {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
+        whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
 
         val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
         assertNull(trackerType)
