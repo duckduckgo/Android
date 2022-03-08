@@ -32,10 +32,8 @@ import javax.inject.Inject
 
 interface MacOsWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
-    fun notifyOnJoinedWaitlist()
     fun joinWaitlist(timestamp: Int, token: String)
     fun getState(): MacOsWaitlistState
-    fun isNotificationEnabled(): Boolean
     fun getInviteCode(): String?
 }
 
@@ -69,17 +67,11 @@ class RealMacOsWaitlistManager @Inject constructor(
         }
     }
 
-    override fun notifyOnJoinedWaitlist() {
-        repository.notifyOnJoinedWaitlist()
-    }
-
     override fun joinWaitlist(timestamp: Int, token: String) {
         repository.joinWaitlist(timestamp, token)
     }
 
     override fun getState(): MacOsWaitlistState = repository.getState()
-
-    override fun isNotificationEnabled(): Boolean = repository.isNotificationEnabled()
 
     override fun getInviteCode(): String? = repository.getInviteCode()
 }

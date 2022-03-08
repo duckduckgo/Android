@@ -24,7 +24,6 @@ interface MacOsWaitlistDataStore {
     var inviteCode: String?
     var waitlistTimestamp: Int
     var waitlistToken: String?
-    var sendNotification: Boolean
 }
 
 class MacOsWaitlistDataStoreSharedPreferences constructor(private val context: Context) :
@@ -59,19 +58,10 @@ class MacOsWaitlistDataStoreSharedPreferences constructor(private val context: C
             }
         }
 
-    override var sendNotification: Boolean
-        get() = preferences.getBoolean(KEY_SEND_NOTIFICATION, false) ?: false
-        set(value) {
-            preferences.edit(commit = true) {
-                putBoolean(KEY_SEND_NOTIFICATION, value)
-            }
-        }
-
     companion object {
         const val FILENAME = "com.duckduckgo.macos.store.waitlist"
         const val KEY_WAITLIST_TIMESTAMP = "KEY_WAITLIST_TIMESTAMP"
         const val KEY_WAITLIST_TOKEN = "KEY_WAITLIST_TOKEN"
         const val KEY_INVITE_CODE = "KEY_INVITE_CODE"
-        const val KEY_SEND_NOTIFICATION = "KEY_SEND_NOTIFICATION"
     }
 }

@@ -22,16 +22,12 @@ import androidx.work.WorkManager
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_DISMISS
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_NOTIFY_ME
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_SHOWN
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistService
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.macos_store.MacOsWaitlistState
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
@@ -60,7 +56,6 @@ class MacOsWaitlistViewModel(
 
     sealed class Command {
         object ShowErrorMessage : Command()
-        object ShowNotificationDialog : Command()
         data class ShareInviteCode(val inviteCode: String) : Command()
         data class CopyInviteToClipboard(val inviteCode: String, val onlyCode: Boolean) : Command()
     }
@@ -90,8 +85,8 @@ class MacOsWaitlistViewModel(
         token: String
     ) {
         waitlistManager.joinWaitlist(timestamp, token)
-        commandChannel.send(ShowNotificationDialog)
         workManager.enqueue(workRequestBuilder.waitlistRequestWork(withBigDelay = false))
+        viewStateFlow.emit(ViewState(waitlistManager.getState()))
     }
 
     fun onShareClicked() {
@@ -101,21 +96,6 @@ class MacOsWaitlistViewModel(
                 pixel.fire(MACOS_WAITLIST_SHARE_PRESSED)
             }
         }
-    }
-
-    fun onNotifyMeClicked() {
-        viewModelScope.launch {
-            waitlistManager.notifyOnJoinedWaitlist()
-            pixel.fire(MACOS_WAITLIST_DIALOG_NOTIFY_ME)
-        }
-    }
-
-    fun onNoThanksClicked() {
-        pixel.fire(MACOS_WAITLIST_DIALOG_DISMISS)
-    }
-
-    fun onDialogCreated() {
-        pixel.fire(MACOS_WAITLIST_DIALOG_SHOWN)
     }
 
     fun onDialogDismissed() {

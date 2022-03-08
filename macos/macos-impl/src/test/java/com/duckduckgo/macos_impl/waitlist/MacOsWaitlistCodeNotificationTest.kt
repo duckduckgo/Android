@@ -31,33 +31,23 @@ import org.mockito.kotlin.whenever
 class MacOsWaitlistCodeNotificationTest {
     private val mockContext: Context = mock()
     private val mockNotificationRepository: NotificationRepository = mock()
-    private val mockMacOsWaitlistManager: MacOsWaitlistManager = mock()
 
     private lateinit var testee: MacOsWaitlistCodeNotification
 
     @Before
     fun before() {
-        testee = MacOsWaitlistCodeNotification(mockContext, mockNotificationRepository, mockMacOsWaitlistManager)
+        testee = MacOsWaitlistCodeNotification(mockContext, mockNotificationRepository)
     }
 
     @Test
-    fun whenNotificationNotSeenAndSendNotificationIsTrueThenReturnTrue() = runTest {
+    fun whenNotificationNotSeenThenReturnTrue() = runTest {
         whenever(mockNotificationRepository.exists(any())).thenReturn(false)
-        whenever(mockMacOsWaitlistManager.isNotificationEnabled()).thenReturn(true)
         assertTrue(testee.canShow())
-    }
-
-    @Test
-    fun whenNotificationNotSeenAndSendNotificationIsFalseThenReturnFalse() = runTest {
-        whenever(mockNotificationRepository.exists(any())).thenReturn(false)
-        whenever(mockMacOsWaitlistManager.isNotificationEnabled()).thenReturn(false)
-        assertFalse(testee.canShow())
     }
 
     @Test
     fun whenNotificationSeenThenReturnFalse() = runTest {
         whenever(mockNotificationRepository.exists(any())).thenReturn(true)
-        whenever(mockMacOsWaitlistManager.isNotificationEnabled()).thenReturn(true)
         assertFalse(testee.canShow())
     }
 }

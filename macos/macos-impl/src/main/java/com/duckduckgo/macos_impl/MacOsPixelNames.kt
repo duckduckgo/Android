@@ -22,9 +22,6 @@ enum class MacOsPixelNames(override val pixelName: String) : Pixel.PixelName {
     MACOS_WAITLIST_NOTIFICATION_LAUNCHED("m_notification_launch_mac_waitlist"),
     MACOS_WAITLIST_NOTIFICATION_CANCELLED("m_notification_cancel_mac_waitlist"),
     MACOS_WAITLIST_NOTIFICATION_SHOWN("m_notification_shown_mac_waitlist"),
-    MACOS_WAITLIST_DIALOG_SHOWN("m_macos_waitlist_did_show_waitlist_dialog"),
-    MACOS_WAITLIST_DIALOG_DISMISS("m_macos_waitlist_did_press_waitlist_dialog_dismiss"),
-    MACOS_WAITLIST_DIALOG_NOTIFY_ME("m_macos_waitlist_did_press_waitlist_dialog_notify_me"),
     MACOS_WAITLIST_SHARE_PRESSED("m_macos_waitlist_did_press_share_button"),
     MACOS_WAITLIST_SHARE_SHARED("m_macos_waitlist_did_press_share_button_shared"),
 }

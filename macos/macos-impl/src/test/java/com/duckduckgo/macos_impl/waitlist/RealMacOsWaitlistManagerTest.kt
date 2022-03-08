@@ -116,12 +116,6 @@ class RealMacOsWaitlistManagerTest {
     }
 
     @Test
-    fun whenNotifyOnJoinedWaitlistThenCallRepository() {
-        testee.notifyOnJoinedWaitlist()
-        verify(mockMacOsWaitlistRepository).notifyOnJoinedWaitlist()
-    }
-
-    @Test
     fun whenJoinWaitlistThenCallRepository() {
         testee.joinWaitlist(1234, "token")
         verify(mockMacOsWaitlistRepository).joinWaitlist(1234, "token")
@@ -134,12 +128,6 @@ class RealMacOsWaitlistManagerTest {
     }
 
     @Test
-    fun whenIsNotificationEnabledThenCallRepository() {
-        testee.isNotificationEnabled()
-        verify(mockMacOsWaitlistRepository).isNotificationEnabled()
-    }
-
-    @Test
     fun whenGetInviteCodeThenCallRepository() {
         testee.getInviteCode()
         verify(mockMacOsWaitlistRepository).getInviteCode()
@@ -148,7 +136,7 @@ class RealMacOsWaitlistManagerTest {
     private fun givenUserIsInWaitlist() {
         whenever(mockMacOsWaitlistRepository.getToken()).thenReturn("token")
         whenever(mockMacOsWaitlistRepository.getTimestamp()).thenReturn(1234)
-        whenever(mockMacOsWaitlistRepository.getState()).thenReturn(MacOsWaitlistState.JoinedWaitlist())
+        whenever(mockMacOsWaitlistRepository.getState()).thenReturn(MacOsWaitlistState.JoinedWaitlist)
     }
 
     private fun givenUserIsTopOfTheQueue() = runTest {

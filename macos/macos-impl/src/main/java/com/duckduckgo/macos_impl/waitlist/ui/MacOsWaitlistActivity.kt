@@ -42,7 +42,6 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.ViewState
 import com.duckduckgo.macos_store.MacOsWaitlistState.InBeta
 import com.duckduckgo.macos_store.MacOsWaitlistState.JoinedWaitlist
@@ -92,14 +91,13 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
             it.isEnabled = false
             viewModel.joinTheWaitlist()
         }
-        binding.notifyMeButton.setOnClickListener { showNotificationDialog() }
         binding.shareImage.setOnClickListener { viewModel.onShareClicked() }
     }
 
     private fun render(viewState: ViewState) {
         when (val state = viewState.waitlist) {
             is NotJoinedQueue -> renderNotJoinedQueue()
-            is JoinedWaitlist -> renderJoinedQueue(state.notify)
+            is JoinedWaitlist -> renderJoinedQueue()
             is InBeta -> renderInBeta(state.inviteCode)
         }
     }
@@ -107,7 +105,6 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     private fun executeCommand(command: Command) {
         when (command) {
             is ShowErrorMessage -> renderErrorMessage()
-            is ShowNotificationDialog -> showNotificationDialog()
             is ShareInviteCode -> launchSharePageChooser(command.inviteCode)
             is CopyInviteToClipboard -> copyToClipboard(command.inviteCode, command.onlyCode)
         }
@@ -123,14 +120,13 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
-        binding.notifyMeButton.gone()
         binding.codeFrame.show()
         binding.shareImage.show()
         binding.inviteCode.text = inviteCode
         binding.inviteCode.setOnClickListener { viewModel.onCopyToClipboard(onlyCode = true) }
     }
 
-    private fun renderJoinedQueue(notify: Boolean) {
+    private fun renderJoinedQueue() {
         binding.waitlistWindows.gone()
         binding.waitListButton.gone()
         binding.footerDescription.gone()
@@ -138,13 +134,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.shareImage.gone()
         binding.headerImage.setImageResource(R.drawable.ic_list)
         binding.statusTitle.text = getString(R.string.macos_waitlist_on_the_list_title)
-        if (notify) {
-            binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_notification)
-            binding.notifyMeButton.gone()
-        } else {
-            binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_no_notification)
-            binding.notifyMeButton.show()
-        }
+        binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_notification)
     }
 
     private fun renderNotJoinedQueue() {
@@ -152,7 +142,6 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.waitListButton.show()
         binding.waitlistWindows.show()
         binding.footerDescription.show()
-        binding.notifyMeButton.gone()
         binding.codeFrame.gone()
         binding.shareImage.gone()
         binding.waitlistDescription.text = getText(R.string.macos_waitlist_description)
@@ -161,18 +150,6 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     private fun renderErrorMessage() {
         binding.waitListButton.isEnabled = true
         Toast.makeText(this, R.string.macos_join_waitlist_error, Toast.LENGTH_LONG).show()
-    }
-
-    private fun showNotificationDialog() {
-        supportFragmentManager.let {
-            val dialog = MacOsWaitlistNotificationDialog.create().apply {
-                onNotifyClicked = { viewModel.onNotifyMeClicked() }
-                onNoThanksClicked = { viewModel.onNoThanksClicked() }
-                onDialogDismissed = { viewModel.onDialogDismissed() }
-                onDialogCreated = { viewModel.onDialogCreated() }
-            }
-            dialog.show(it, NOTIFICATION_DIALOG_TAG)
-        }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -219,7 +196,6 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val NOTIFICATION_DIALOG_TAG = "NOTIFICATION_DIALOG_FRAGMENT"
         const val CLIPBOARD_LABEL = "INVITE_CODE"
 
         fun intent(context: Context): Intent {

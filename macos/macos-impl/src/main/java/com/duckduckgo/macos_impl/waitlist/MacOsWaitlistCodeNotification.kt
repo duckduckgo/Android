@@ -40,8 +40,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class MacOsWaitlistCodeNotification @Inject constructor(
     private val context: Context,
-    private val notificationRepository: NotificationRepository,
-    private val manager: MacOsWaitlistManager
+    private val notificationRepository: NotificationRepository
 ) : SchedulableNotification {
 
     override val id = "com.duckduckgo.macos.waitlist"
@@ -50,7 +49,7 @@ class MacOsWaitlistCodeNotification @Inject constructor(
 
     override suspend fun canShow(): Boolean {
 
-        if (notificationRepository.exists(id) || !manager.isNotificationEnabled()) {
+        if (notificationRepository.exists(id)) {
             Timber.v("Notification already seen")
             return false
         }

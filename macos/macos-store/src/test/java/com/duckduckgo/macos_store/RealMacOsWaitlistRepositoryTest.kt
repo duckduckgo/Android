@@ -57,13 +57,6 @@ class RealMacOsWaitlistRepositoryTest {
     }
 
     @Test
-    fun whenNotifyOnJoinedWaitlistThenSendNotificationSetToTrue() {
-        fakeDataStore.sendNotification = false
-        testee.notifyOnJoinedWaitlist()
-        assertTrue(fakeDataStore.sendNotification)
-    }
-
-    @Test
     fun whenGetTokenThenWaitlistTokenReturned() {
         fakeDataStore.waitlistToken = "token"
         assertEquals("token", testee.getToken())
@@ -88,25 +81,10 @@ class RealMacOsWaitlistRepositoryTest {
     }
 
     @Test
-    fun whenIsNotificationEnabledThenSendNotificationReturned() {
-        fakeDataStore.sendNotification = true
-        assertTrue(testee.isNotificationEnabled())
-    }
-
-    @Test
-    fun whenGetStateIfUserIsInWaitlistCodeDoesNotExistAndSendNotificationIsTrueThenReturnJoinedQueueWithTrue() {
+    fun whenGetStateIfUserIsInWaitlistCodeDoesNotExistThenReturnJoinedQueue() {
         givenUserIsInWaitlist()
-        fakeDataStore.sendNotification = true
 
-        assertEquals(JoinedWaitlist(true), testee.getState())
-    }
-
-    @Test
-    fun whenGetStateIfUserIsInWaitlistAndCodeDoesNotExistAndSendNotificationIsFalseThenReturnJoinedQueueWithFalse() {
-        givenUserIsInWaitlist()
-        fakeDataStore.sendNotification = false
-
-        assertEquals(JoinedWaitlist(false), testee.getState())
+        assertEquals(JoinedWaitlist, testee.getState())
     }
 
     @Test
@@ -136,5 +114,4 @@ class FakeMacOsWaitlistDataStore : MacOsWaitlistDataStore {
     override var inviteCode: String? = null
     override var waitlistTimestamp: Int = -1
     override var waitlistToken: String? = null
-    override var sendNotification: Boolean = false
 }

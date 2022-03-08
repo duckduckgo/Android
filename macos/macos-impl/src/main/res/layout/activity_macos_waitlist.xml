@@ -90,20 +90,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/waitListButton" />
 
-            <Button
-                android:id="@+id/notifyMeButton"
-                style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginEnd="24dp"
-                android:text="@string/macos_waitlist_on_the_list_no_notification_button"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/waitlistDescription" />
-
             <TextView
                 android:id="@+id/waitlistDescription"
                 style="@style/TextAppearance.DuckDuckGo.Body1"

@@ -143,17 +143,17 @@ class MacOsWaitlistCodeFetcherTest {
     }
 
     private fun givenUserIsInTheQueueAndCodeAlreadyExists() = runTest {
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
         whenever(mockMacOsWaitlistManager.fetchInviteCode()).thenReturn(CodeExisted)
     }
 
     private fun givenUserIsInTheQueueAndCodeReturned() = runTest {
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
         whenever(mockMacOsWaitlistManager.fetchInviteCode()).thenReturn(Code)
     }
 
     private fun givenUserIsInTheQueueAndNoCodeReturned() = runTest {
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
         whenever(mockMacOsWaitlistManager.fetchInviteCode()).thenReturn(NoCode)
     }
 

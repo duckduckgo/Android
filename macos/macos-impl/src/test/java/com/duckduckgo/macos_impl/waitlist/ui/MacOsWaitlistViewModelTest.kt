@@ -28,9 +28,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_DISMISS
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_NOTIFY_ME
-import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_DIALOG_SHOWN
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.duckduckgo.macos_impl.waitlist.api.MacOsInviteCodeResponse
@@ -40,7 +37,6 @@ import com.duckduckgo.macos_impl.waitlist.api.MacOsWaitlistStatusResponse
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.CopyInviteToClipboard
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
-import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.macos_store.MacOsWaitlistState.JoinedWaitlist
 import com.duckduckgo.macos_store.MacOsWaitlistState.NotJoinedQueue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,7 +83,7 @@ class MacOsWaitlistViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTimestampIsNullThenEmitShowErrorMessageCommand() = runTest {
         whenever(mockMacOsWaitlistService.joinWaitlist()).thenReturn(MacOsWaitlistResponse("token", null))
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -98,7 +94,7 @@ class MacOsWaitlistViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTokenIsNullThenEmitShowErrorMessageCommand() = runTest {
         whenever(mockMacOsWaitlistService.joinWaitlist()).thenReturn(MacOsWaitlistResponse(null, 12345))
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -109,7 +105,7 @@ class MacOsWaitlistViewModelTest {
     @Test
     fun whenJoinTheWaitlistAndCallTokenIsEmptyThenEmitShowErrorMessageCommand() = runTest {
         whenever(mockMacOsWaitlistService.joinWaitlist()).thenReturn(MacOsWaitlistResponse("", 12345))
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
 
         testee.commands.test {
             testee.joinTheWaitlist()
@@ -127,13 +123,13 @@ class MacOsWaitlistViewModelTest {
     }
 
     @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitShowNotificationDialogCommand() = runTest {
+    fun whenJoinTheWaitlistAndCallIsSuccessfulThenViewStateIsJoinedWaitlist() = runTest {
         givenJoinWaitlistSuccessful()
 
-        testee.commands.test {
+        testee.viewState.test {
+            assert(awaitItem().waitlist is NotJoinedQueue)
             testee.joinTheWaitlist()
-
-            assertEquals(ShowNotificationDialog, awaitItem())
+            assert(awaitItem().waitlist is JoinedWaitlist)
         }
     }
 
@@ -154,40 +150,6 @@ class MacOsWaitlistViewModelTest {
             testee.joinTheWaitlist()
             assertEquals(ShowErrorMessage, awaitItem())
         }
-    }
-
-    @Test
-    fun whenOnNotifyMeClickedThenNotifyOnJoinedWaitlistCalled() = runTest {
-        testee.onNotifyMeClicked()
-
-        verify(mockMacOsWaitlistManager).notifyOnJoinedWaitlist()
-    }
-
-    @Test
-    fun whenOnNotifyMeClickedThenPixelFired() = runTest {
-        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
-
-        testee.onNotifyMeClicked()
-
-        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_NOTIFY_ME)
-    }
-
-    @Test
-    fun whenOnNoThanksClickedThenPixelFired() = runTest {
-        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
-
-        testee.onNoThanksClicked()
-
-        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_DISMISS)
-    }
-
-    @Test
-    fun whenOnDialogCreatedAThenPixelFired() = runTest {
-        whenever(mockMacOsWaitlistManager.getInviteCode()).thenReturn(null)
-
-        testee.onDialogCreated()
-
-        verify(mockPixel).fire(MACOS_WAITLIST_DIALOG_SHOWN)
     }
 
     @Test
@@ -259,7 +221,7 @@ class MacOsWaitlistViewModelTest {
 
     private fun givenJoinWaitlistSuccessful() = runTest {
         whenever(mockMacOsWaitlistService.joinWaitlist()).thenReturn(MacOsWaitlistResponse("token", 12345))
-        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist())
+        whenever(mockMacOsWaitlistManager.getState()).thenReturn(JoinedWaitlist)
     }
 
     private fun getScheduledWorkers(): List<WorkInfo> {
