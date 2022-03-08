@@ -41,6 +41,6 @@
         android:clickable="false"
         android:focusable="false"
         android:padding="16dp"
-        android:src="@drawable/ic_microphone_light"
+        android:src="@drawable/ic_microphone_dark"
         tools:ignore="ContentDescription" />
 </merge>
