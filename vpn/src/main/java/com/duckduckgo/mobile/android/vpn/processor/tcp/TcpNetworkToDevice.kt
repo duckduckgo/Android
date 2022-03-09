@@ -17,6 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.processor.packet.isIP4
+import com.duckduckgo.mobile.android.vpn.processor.packet.totalHeaderSize
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.logPacketDetails
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.sendFinToClient
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Companion.updateState
@@ -108,12 +110,12 @@ class TcpNetworkToDevice(
     private fun processRead(key: SelectionKey) {
         Timber.v("Got next network-to-device packet [isReadable]")
         val receiveBuffer = ByteBufferPool.acquire()
-        receiveBuffer.position(HEADER_SIZE)
 
         val tcb = key.attachment() as TCB
 
         synchronized(tcb) {
             val packet = tcb.referencePacket
+            receiveBuffer.position(packet.totalHeaderSize())
 
             val channel = key.channel() as SocketChannel
             try {
@@ -159,7 +161,7 @@ class TcpNetworkToDevice(
         )
 
         tcb.sequenceNumberToClient += readBytes
-        receiveBuffer.position(HEADER_SIZE + readBytes)
+        receiveBuffer.position(tcb.referencePacket.totalHeaderSize() + readBytes)
 
         offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
     }
@@ -252,7 +254,11 @@ class TcpNetworkToDevice(
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
 
             tcbCloser.closeConnection(tcb)
-            healthMetricCounter.onSocketChannelConnectError()
+            // ignore ipv6 connection errors
+            // a lot of them can happen specially when in WIFI and traffic should go through IPv4 anyway
+            if (packet.isIP4()) {
+                healthMetricCounter.onSocketChannelConnectError()
+            }
         }
     }
 
@@ -274,7 +280,7 @@ class TcpNetworkToDevice(
             tcb.ipAndPort,
             tcb.tcbState,
             logPacketDetails(packet, packet.tcpHeader.sequenceNumber, packet.tcpHeader.acknowledgementNumber),
-            packet.ip4Header.totalLength,
+            packet.ipHeader.totalLength,
             packet.tcpPayloadSize(false)
         )
     }
@@ -282,7 +288,6 @@ class TcpNetworkToDevice(
     private fun endOfStream(readBytes: Int) = readBytes == -1
 
     companion object {
-        private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.TCP_HEADER_SIZE
         private const val OP_NONE = 0
     }
 }
