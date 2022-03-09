@@ -51,7 +51,7 @@ jobs:
     name: Android CI checks
     strategy:
       matrix:
-        api-level: [22, 30]
+        api-level: [23, 30]
 
     steps:
       - name: Cancel previous
