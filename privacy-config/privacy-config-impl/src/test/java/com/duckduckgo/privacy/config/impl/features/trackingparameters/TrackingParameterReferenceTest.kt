@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.app.userwhitelist.api.UserWhiteListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkException
+import com.duckduckgo.privacy.config.api.TrackingParameterException
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
-import com.duckduckgo.privacy.config.store.features.trackinglinkdetection.TrackingLinkDetectionRepository
+import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.*
@@ -37,20 +38,21 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import java.util.concurrent.CopyOnWriteArrayList
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class AmpKeywordReferenceTest(private val testCase: TestCase) {
+class TrackingParameterReferenceTest(private val testCase: TestCase) {
 
-    lateinit var testee: TrackingLinkDetector
+    lateinit var testee: TrackingParameters
 
-    private val mockRepository: TrackingLinkDetectionRepository = mock()
+    private val mockRepository: TrackingParametersRepository = mock()
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockUserWhiteListRepository: UserWhiteListRepository = mock()
 
     @Before
     fun setup() {
-        mockAmpLinks()
-        testee = RealTrackingLinkDetector(mockRepository, mockFeatureToggle, mockUnprotectedTemporary)
+        mockTrackingParameters()
+        testee = RealTrackingParameters(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingLinkDetectionFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName(), true)).thenReturn(true)
     }
 
     companion object {
@@ -62,51 +64,50 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
         fun testData(): List<TestCase> {
             val test = adapter.fromJson(
                 FileUtilities.loadText(
-                    AmpKeywordReferenceTest::class.java.classLoader!!,
-                    "reference_tests/tracking_link_detection_matching_tests.json"
+                    TrackingParameterReferenceTest::class.java.classLoader!!,
+                    "reference_tests/trackingparameters/tracking_parameters_matching_tests.json"
                 )
             )
-            return test?.ampKeywords?.tests ?: emptyList()
+            return test?.trackingParameters?.tests ?: emptyList()
         }
     }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() {
-        val extractedUrl = testee.extractCanonicalFromTrackingLink(testCase.ampURL)
-        if (extractedUrl != null) {
-            assertTrue(testCase.expectAmpDetected)
+        val cleanedUrl = testee.cleanTrackingParameters(testCase.testURL)
+        if (cleanedUrl != null) {
+            assertEquals(testCase.expectURL, cleanedUrl)
         } else {
-            assertFalse(testCase.expectAmpDetected)
+            assertEquals(testCase.expectURL, testCase.testURL)
         }
     }
 
-    private fun mockAmpLinks() {
-        val jsonAdapter: JsonAdapter<TrackingLinkDetectionFeature> = moshi.adapter(TrackingLinkDetectionFeature::class.java)
-        val exceptions = CopyOnWriteArrayList<TrackingLinkException>()
-        val ampLinkKeywords = CopyOnWriteArrayList<String>()
+    private fun mockTrackingParameters() {
+        val jsonAdapter: JsonAdapter<TrackingParametersFeature> = moshi.adapter(TrackingParametersFeature::class.java)
+        val exceptions = CopyOnWriteArrayList<TrackingParameterException>()
+        val trackingParameters = CopyOnWriteArrayList<Regex>()
         val jsonObject: JSONObject = FileUtilities.getJsonObjectFromFile(
-            AmpKeywordReferenceTest::class.java.classLoader!!,
-            "reference_tests/tracking_link_detection_reference.json"
+            TrackingParameterReferenceTest::class.java.classLoader!!,
+            "reference_tests/trackingparameters/tracking_parameters_reference.json"
         )
 
-        jsonObject.keys().forEach {
-            val trackingLinkDetectionFeature: TrackingLinkDetectionFeature? = jsonAdapter.fromJson(jsonObject.get(it).toString())
-            exceptions.addAll(trackingLinkDetectionFeature!!.exceptions)
-            ampLinkKeywords.addAll(trackingLinkDetectionFeature.settings.keywords)
+        jsonObject.keys().forEach { key ->
+            val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(jsonObject.get(key).toString())
+            exceptions.addAll(trackingParametersFeature!!.exceptions)
+            trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it.toRegex(RegexOption.IGNORE_CASE) })
         }
         whenever(mockRepository.exceptions).thenReturn(exceptions)
-        whenever(mockRepository.ampLinkFormats).thenReturn(CopyOnWriteArrayList())
-        whenever(mockRepository.ampKeywords).thenReturn(ampLinkKeywords)
+        whenever(mockRepository.parameters).thenReturn(trackingParameters)
     }
 
     data class TestCase(
         val name: String,
-        val ampURL: String,
-        val expectAmpDetected: Boolean,
+        val testURL: String,
+        val expectURL: String,
         val exceptPlatforms: List<String>
     )
 
-    data class AmpKeywordTest(
+    data class TrackingParameterTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
@@ -114,6 +115,6 @@ class AmpKeywordReferenceTest(private val testCase: TestCase) {
     )
 
     data class ReferenceTest(
-        val ampKeywords: AmpKeywordTest
+        val trackingParameters: TrackingParameterTest
     )
 }

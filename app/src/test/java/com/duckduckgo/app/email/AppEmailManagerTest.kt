@@ -17,6 +17,7 @@
 package com.duckduckgo.app.email
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.AppEmailManager.Companion.DUCK_EMAIL_DOMAIN
 import com.duckduckgo.app.email.AppEmailManager.Companion.UNKNOWN_COHORT
@@ -39,6 +40,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -46,9 +48,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
 @FlowPreview
 @ExperimentalCoroutinesApi
+@RunWith(AndroidJUnit4::class)
 class AppEmailManagerTest {
 
     @get:Rule
@@ -385,6 +389,21 @@ class AppEmailManagerTest {
         assertFalse(testee.isEmailFeatureSupported())
     }
 
+    @Test
+    fun whenGetUserDataThenDataReceivedCorrectly() {
+        val expected = JSONObject().apply {
+            put(AppEmailManager.TOKEN, "token")
+            put(AppEmailManager.USERNAME, "user")
+            put(AppEmailManager.NEXT_ALIAS, "nextAlias")
+        }.toString()
+
+        mockEmailDataStore.emailToken = "token"
+        mockEmailDataStore.emailUsername = "user"
+        mockEmailDataStore.nextAlias = "nextAlias@duck.com"
+
+        assertEquals(expected, testee.getUserData())
+    }
+
     private fun givenUserIsInWaitlist() {
         mockEmailDataStore.waitlistTimestamp = 1234
         mockEmailDataStore.waitlistToken = "token"
@@ -396,7 +415,6 @@ class AppEmailManagerTest {
     }
 
     private fun givenNextAliasExists() {
-//        cachedAlias.set("alias")
         mockEmailDataStore.nextAlias = "alias"
     }
 

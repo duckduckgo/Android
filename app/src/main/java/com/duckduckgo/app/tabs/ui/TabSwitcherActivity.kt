@@ -23,10 +23,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.Observer
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -109,8 +106,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
-
-        viewModel.start()
     }
 
     private fun extractIntentExtras() {
@@ -145,17 +140,20 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        lifecycleScope.launch {
-            viewModel.viewState()
-                .flowWithLifecycle(lifecycle, STARTED)
-                .collect {
-                    render(it.tabs)
-                    if (it.deletableTabs.isNotEmpty()) {
-                        onDeletableTab(it.deletableTabs.last())
-                    }
+        viewModel.tabs.observe(
+            this,
+            Observer<List<TabEntity>> {
+                render(it)
+            }
+        )
+        viewModel.deletableTabs.observe(
+            this,
+            {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
                 }
-        }
-
+            }
+        )
         viewModel.command.observe(
             this,
             Observer {
@@ -215,6 +213,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested() {
+        clearObserversEarlyToStopViewUpdates()
         launch { viewModel.onNewTabRequested() }
     }
 
@@ -261,7 +260,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun closeAllTabs() {
         launch {
-            viewModel.viewState().value.tabs.forEach {
+            viewModel.tabs.value?.forEach {
                 viewModel.onTabDeleted(it)
             }
         }
@@ -272,16 +271,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun finish() {
+        clearObserversEarlyToStopViewUpdates()
         super.finish()
         overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.deletableTabs.removeObservers(this)
         // we don't want to purge during device rotation
         if (isFinishing) {
             launch { viewModel.purgeDeletableTabs() }
         }
+    }
+
+    private fun clearObserversEarlyToStopViewUpdates() {
+        viewModel.tabs.removeObservers(this)
+        viewModel.deletableTabs.removeObservers(this)
     }
 
     companion object {

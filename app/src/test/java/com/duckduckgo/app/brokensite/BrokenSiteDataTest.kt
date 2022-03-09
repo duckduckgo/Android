@@ -59,6 +59,21 @@ class BrokenSiteDataTest {
     }
 
     @Test
+    fun whenUrlParametersRemovedThenUrlParametersRemovedIsTrue() {
+        val site = buildSite(SITE_URL)
+        site.urlParametersRemoved = true
+        val data = BrokenSiteData.fromSite(site)
+        assertTrue(data.urlParametersRemoved)
+    }
+
+    @Test
+    fun whenUrlParametersNotRemovedThenUrlParametersRemovedIsFalse() {
+        val site = buildSite(SITE_URL)
+        val data = BrokenSiteData.fromSite(site)
+        assertFalse(data.urlParametersRemoved)
+    }
+
+    @Test
     fun whenSiteHasNoTrackersThenBlockedTrackersIsEmpty() {
         val site = buildSite(SITE_URL)
         val data = BrokenSiteData.fromSite(site)

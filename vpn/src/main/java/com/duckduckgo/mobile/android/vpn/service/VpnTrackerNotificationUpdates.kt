@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
@@ -44,6 +45,7 @@ class VpnTrackerNotificationUpdates @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val ongoingNotificationPressedHandler: OngoingNotificationPressedHandler
 ) : VpnServiceCallbacks {
+
     private var notificationTickerChannel = MutableStateFlow(System.currentTimeMillis())
     private val notificationTickerJob = ConflatedJob()
     private val newTrackerObserverJob = ConflatedJob()

@@ -20,26 +20,41 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.CheckVPNPermission
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.LaunchVPN
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermission
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnAlwaysOnConflictDialog
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.ShowVpnConflictDialog
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
 import dagger.android.AndroidInjection
-import timber.log.Timber
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding) {
+class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding), AppTPVpnConflictDialog.Listener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private lateinit var viewPager: ViewPager2
 
@@ -61,6 +76,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
         bindViews()
         configureUI()
+        observeViewModel()
     }
 
     private fun bindViews() {
@@ -96,8 +112,15 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         }
 
         enableDeviceShieldToggle.setOnClickListener {
-            startVpnIfAllowed()
+            viewModel.onTurnAppTpOffOn()
         }
+    }
+
+    private fun observeViewModel() {
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun showOnboardingPage(position: Int) {
@@ -150,21 +173,38 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         data: Intent?
     ) {
         if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
-            when (resultCode) {
-                RESULT_OK -> {
-                    startVpn()
-                    return
-                }
-                else -> Timber.d("Permission not granted")
-            }
+            viewModel.onVPNPermissionResult(resultCode)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun startVpnIfAllowed() {
-        when (val permissionStatus = checkVpnPermission()) {
-            is VpnPermissionStatus.Granted -> startVpn()
-            is VpnPermissionStatus.Denied -> obtainVpnRequestPermission(permissionStatus.intent)
+    private fun processCommand(command: Command) {
+        when (command) {
+            is LaunchVPN -> startVpn()
+            is ShowVpnConflictDialog -> launchVPNConflictDialog(false)
+            is ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
+            is CheckVPNPermission -> checkVPNPermission()
+            is RequestVPNPermission -> obtainVpnRequestPermission(command.vpnIntent)
+        }
+    }
+
+    private fun checkVPNPermission() {
+        when (val permissionStatus = checkVpnPermissionStatus()) {
+            is VpnPermissionStatus.Granted -> {
+                startVpn()
+            }
+            is VpnPermissionStatus.Denied -> {
+                viewModel.onVPNPermissionNeeded(permissionStatus.intent)
+            }
+        }
+    }
+
+    private fun checkVpnPermissionStatus(): VpnPermissionStatus {
+        val intent = VpnService.prepare(applicationContext)
+        return if (intent == null) {
+            VpnPermissionStatus.Granted
+        } else {
+            VpnPermissionStatus.Denied(intent)
         }
     }
 
@@ -184,11 +224,36 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private fun startVpn() {
         TrackerBlockingVpnService.startService(this)
-        viewModel.onDeviceShieldEnabled()
+        viewModel.onAppTpEnabled()
         startActivity(DeviceShieldEnabledActivity.intent(this))
         finish()
     }
 
+    private fun launchVPNConflictDialog(isAlwaysOn: Boolean) {
+        deviceShieldPixels.didShowVpnConflictDialog()
+        val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
+        dialog.show(
+            supportFragmentManager,
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+        )
+    }
+
+    override fun onDismissConflictDialog() {
+        deviceShieldPixels.didChooseToDismissVpnConflicDialog()
+    }
+
+    override fun onOpenSettings() {
+        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflicDialog()
+
+        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
+    override fun onContinue() {
+        deviceShieldPixels.didChooseToContinueFromVpnConflicDialog()
+        checkVPNPermission()
+    }
     private sealed class VpnPermissionStatus {
         object Granted : VpnPermissionStatus()
         data class Denied(val intent: Intent) : VpnPermissionStatus()
@@ -201,4 +266,5 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
             return Intent(context, DeviceShieldOnboardingActivity::class.java)
         }
     }
+
 }

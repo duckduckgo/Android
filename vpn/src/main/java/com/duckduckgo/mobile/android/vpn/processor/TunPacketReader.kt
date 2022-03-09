@@ -93,15 +93,22 @@ class TunPacketReader @AssistedInject constructor(
 
         bufferToNetwork.flip()
         val packet = Packet(bufferToNetwork)
-        if (packet.isUDP) {
-            queues.udpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
-        } else if (packet.isTCP) {
-            queues.tcpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+        if (packet.ip4Header.version.toInt() == 4) {
+            healthMetricCounter.onTunIpv4PacketReceived()
+
+            if (packet.isUDP) {
+                queues.udpDeviceToNetwork.offer(packet)
+                healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
+            } else if (packet.isTCP) {
+                queues.tcpDeviceToNetwork.offer(packet)
+                healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+            } else {
+                healthMetricCounter.onTunUnknownPacketReceived()
+                deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
+                ByteBufferPool.release(bufferToNetwork)
+            }
         } else {
-            healthMetricCounter.onTunUnknownPacketReceived()
-            deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
+            healthMetricCounter.onTunIpv6PacketReceived()
             ByteBufferPool.release(bufferToNetwork)
         }
     }

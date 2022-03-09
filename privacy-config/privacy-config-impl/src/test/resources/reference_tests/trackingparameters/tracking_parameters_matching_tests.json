@@ -1,0 +1,57 @@
+{
+    "trackingParameters": {
+        "name": "Tracking parameters are able to be removed from a URL",
+        "desc": "Those tests use config_reference.json",
+        "referenceConfig": "config_reference.json",
+        "tests": [
+            {
+                "name": "Remove utm tracking parameters from URL",
+                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&utm_campaign=test&utm_term=test&utm_content=test",
+                "expectURL": "http://www.example.com/test.html",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Remove fbclid parameter and retain other parameters",
+                "testURL": "http://www.example.com/test.html?fbclid=test&q=test&id=5",
+                "expectURL": "http://www.example.com/test.html?q=test&id=5",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Retain all non tracking parameters",
+                "testURL": "http://www.example.com/test.html?q=test&id=5",
+                "expectURL": "http://www.example.com/test.html?q=test&id=5",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Don't remove parameters because domain is in exceptions list",
+                "testURL": "http://example2.com/test.html?gclid=test&fbclid=test",
+                "expectURL": "http://example2.com/test.html?gclid=test&fbclid=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Remove 2 tracking parameters and retain other parameters",
+                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&q=test&id=5",
+                "expectURL": "http://www.example.com/test.html?q=test&id=5",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Param is in URL path",
+                "testURL": "http://gclid.example.com/fbclid=123",
+                "expectURL": "http://gclid.example.com/fbclid=123",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Param has no value",
+                "testURL": "http://www.example.com/test.html?fbclid&gclid",
+                "expectURL": "http://www.example.com/test.html",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Param ALMOST matches",
+                "testURL": "http://www.example.com/test.html?fbclid1=test",
+                "expectURL": "http://www.example.com/test.html?fbclid1=test",
+                "exceptPlatforms": []
+            }
+        ]
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.features.trackinglinkdetection
+package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
-import com.duckduckgo.privacy.config.api.TrackingLinkException
+import com.duckduckgo.privacy.config.api.TrackingParameterException
 
-data class TrackingLinkDetectionFeature(
+data class TrackingParametersFeature(
     val state: String,
-    val settings: TrackingLinkDetectionSettings,
-    val exceptions: List<TrackingLinkException>
+    val settings: TrackingParametersSettings,
+    val exceptions: List<TrackingParameterException>
 )
 
-data class TrackingLinkDetectionSettings(
-    val linkFormats: List<String>,
-    val keywords: List<String>
+data class TrackingParametersSettings(
+    val parameters: List<String>
 )
