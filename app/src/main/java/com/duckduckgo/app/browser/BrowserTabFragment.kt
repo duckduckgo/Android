@@ -813,7 +813,7 @@ class BrowserTabFragment :
 
     private fun injectEmailAddress(alias: String) {
         webView?.let {
-            emailInjector.injectAddressInEmailField(it, alias)
+            emailInjector.injectAddressInEmailField(it, alias, it.url)
         }
     }
 

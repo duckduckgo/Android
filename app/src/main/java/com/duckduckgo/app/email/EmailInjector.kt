@@ -41,7 +41,8 @@ interface EmailInjector {
 
     fun injectAddressInEmailField(
         webView: WebView,
-        alias: String?
+        alias: String?,
+        url: String?
     )
 }
 
@@ -58,12 +59,11 @@ class EmailInjectorJs(
         webView: WebView,
         onTooltipShown: () -> Unit
     ) {
-        if (isFeatureEnabled()) {
-            webView.addJavascriptInterface(
-                EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown),
-                JAVASCRIPT_INTERFACE_NAME
-            )
-        }
+        // We always add the interface irrespectively if the feature is enabled or not
+        webView.addJavascriptInterface(
+            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, featureToggle, autofill, onTooltipShown),
+            JAVASCRIPT_INTERFACE_NAME
+        )
     }
 
     @UiThread
@@ -72,10 +72,8 @@ class EmailInjectorJs(
         url: String?
     ) {
         url?.let {
-            if (isFeatureEnabled() && !autofill.isAnException(url)) {
-                if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
-                    webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
-                }
+            if (isDuckDuckGoUrl(url) || (isFeatureEnabled() && !autofill.isAnException(url) && emailManager.isSignedIn())) {
+                webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
             }
         }
     }
@@ -83,10 +81,13 @@ class EmailInjectorJs(
     @UiThread
     override fun injectAddressInEmailField(
         webView: WebView,
-        alias: String?
+        alias: String?,
+        url: String?
     ) {
-        if (isFeatureEnabled()) {
-            webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+        url?.let {
+            if (isFeatureEnabled() && !autofill.isAnException(url)) {
+                webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+            }
         }
     }
 
