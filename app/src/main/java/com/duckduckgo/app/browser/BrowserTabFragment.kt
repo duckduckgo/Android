@@ -2052,7 +2052,8 @@ class BrowserTabFragment :
                     browserActivity?.launchSettings()
                 }
                 onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
-                    viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                    // TODO: recheck which value we should send to viewmodel
+                    // viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
@@ -2342,7 +2343,8 @@ class BrowserTabFragment :
                     }
                 }
                 fireproofWebsiteMenuItem?.isEnabled = viewState.canFireproofSite
-                fireproofWebsiteMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
+                // TODO: set icon based on state
+                // fireproofWebsiteMenuItem?.setIcon(viewState.canFireproofSite && viewState.isFireproofWebsite)
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistMenuItem?.isEnabled = viewState.canWhitelist
                 whitelistMenuItem?.label {
@@ -2350,7 +2352,8 @@ class BrowserTabFragment :
                 }
                 brokenSiteMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
-                requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
+                // TODO: set icon based on state
+                // requestDesktopSiteCheckMenuItem?.setIcon(viewState.isDesktopBrowsingMode)
 
                 newEmailAliasMenuItem?.let {
                     it.visibility = if (viewState.isEmailSignedIn) VISIBLE else GONE

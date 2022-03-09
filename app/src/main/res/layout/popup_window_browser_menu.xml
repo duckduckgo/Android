@@ -103,17 +103,17 @@
 
             <View style="@style/OverflowMenuDivider" />
 
-            <androidx.appcompat.widget.AppCompatCheckBox
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/fireproofWebsiteMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
-                android:theme="@style/PopUpMenuSwitchTheme"
-                android:text="@string/fireproofWebsiteMenuTitleAdd" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/fireproofWebsiteMenuTitleAdd" />
 
-            <androidx.appcompat.widget.AppCompatCheckBox
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
-                android:theme="@style/PopUpMenuSwitchTheme"
-                android:text="@string/requestDesktopSiteMenuTitle" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/requestDesktopSiteMenuTitle" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/findInPageMenuItem"
