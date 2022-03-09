@@ -2011,43 +2011,43 @@ class BrowserTabFragment :
             popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) {
+                onMenuItemClicked(view.forwardMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
-                onMenuItemClicked(view.backPopupMenuItem) {
+                onMenuItemClicked(view.backMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
-                onMenuItemClicked(view.refreshPopupMenuItem) {
+                onMenuItemClicked(view.refreshMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.newTabPopupMenuItem) {
+                onMenuItemClicked(view.newTabMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.bookmarksPopupMenuItem) {
+                onMenuItemClicked(view.bookmarksMenuItem) {
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) {
+                onMenuItemClicked(view.fireproofWebsiteMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
+                onMenuItemClicked(view.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
-                onMenuItemClicked(view.addFavoritePopupMenuItem) {
+                onMenuItemClicked(view.addFavoriteMenuItem) {
                     viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) {
+                onMenuItemClicked(view.whitelistMenuItem) { viewModel.onWhitelistSelected() }
+                onMenuItemClicked(view.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
-                onMenuItemClicked(view.settingsPopupMenuItem) {
+                onMenuItemClicked(view.settingsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
@@ -2325,30 +2325,30 @@ class BrowserTabFragment :
             viewState: BrowserViewState
         ) {
             popupMenu.contentView.apply {
-                backPopupMenuItem.isEnabled = viewState.canGoBack
-                forwardPopupMenuItem.isEnabled = viewState.canGoForward
-                refreshPopupMenuItem.isEnabled = browserShowing
-                newTabPopupMenuItem.isEnabled = browserShowing
-                addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
-                addBookmarksPopupMenuItem?.label {
+                backMenuItem.isEnabled = viewState.canGoBack
+                forwardMenuItem.isEnabled = viewState.canGoForward
+                refreshMenuItem.isEnabled = browserShowing
+                newTabMenuItem.isEnabled = browserShowing
+                addBookmarksMenuItem?.isEnabled = viewState.canAddBookmarks
+                addBookmarksMenuItem?.label {
                     getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
                 }
-                addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
-                addFavoritePopupMenuItem.label {
+                addFavoriteMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
+                addFavoriteMenuItem.label {
                     when {
                         viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
                         viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
                         else -> getString(R.string.addFavoriteMenuTitle)
                     }
                 }
-                fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
-                fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
+                fireproofWebsiteMenuItem?.isEnabled = viewState.canFireproofSite
+                fireproofWebsiteMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
-                whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
-                whitelistPopupMenuItem?.label {
+                whitelistMenuItem?.isEnabled = viewState.canWhitelist
+                whitelistMenuItem?.label {
                     getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
                 }
-                brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
+                brokenSiteMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
 
