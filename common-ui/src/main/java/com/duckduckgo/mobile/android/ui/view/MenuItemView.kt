@@ -79,4 +79,10 @@ class MenuItemView : LinearLayout {
         val drawable = VectorDrawableCompat.create(resources, iconResId, null)
         binding.icon.setImageDrawable(drawable)
     }
+
+    fun setOnClickListener(onClick: () -> Unit) {
+        binding.root.setOnClickListener {
+            onClick()
+        }
+    }
 }
