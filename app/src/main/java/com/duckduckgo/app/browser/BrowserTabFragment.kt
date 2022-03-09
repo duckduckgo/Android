@@ -2330,20 +2330,24 @@ class BrowserTabFragment :
                 refreshPopupMenuItem.isEnabled = browserShowing
                 newTabPopupMenuItem.isEnabled = browserShowing
                 addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
-                addBookmarksPopupMenuItem?.text =
+                addBookmarksPopupMenuItem?.label {
                     getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
+                }
                 addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
-                addFavoritePopupMenuItem.text = when {
-                    viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
-                    viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
-                    else -> getString(R.string.addFavoriteMenuTitle)
+                addFavoritePopupMenuItem.label {
+                    when {
+                        viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
+                        viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
+                        else -> getString(R.string.addFavoriteMenuTitle)
+                    }
                 }
                 fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
                 fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
                 sharePageMenuItem?.isEnabled = viewState.canSharePage
                 whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
-                whitelistPopupMenuItem?.text =
-                    getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection)
+                whitelistPopupMenuItem?.label {
+                    getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
+                }
                 brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
                 requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
                 requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode

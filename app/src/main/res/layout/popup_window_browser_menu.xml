@@ -69,25 +69,36 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/newTabPopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/newTabMenuItem" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/newTabMenuItem" />
 
-            <TextView
-                android:id="@+id/bookmarksPopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/bookmarksMenuTitle" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/sharePageMenuItem"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/shareMenuTitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addBookmarksPopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/addBookmarkMenuTitle" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/addBookmarkMenuTitle" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addFavoritePopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/addFavoriteMenuTitle" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/addFavoriteMenuTitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/bookmarksPopupMenuItem"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/bookmarksMenuTitle" />
 
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/fireproofWebsitePopupMenuItem"
@@ -95,53 +106,60 @@
                 android:theme="@style/PopUpMenuSwitchTheme"
                 android:text="@string/fireproofWebsiteMenuTitleAdd" />
 
-            <TextView
-                android:id="@+id/sharePageMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/shareMenuTitle" />
-
-            <TextView
-                android:id="@+id/newEmailAliasMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/newEmailAliasMenuTitle" />
-
-            <TextView
-                android:id="@+id/findInPageMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/findInPageMenuTitle" />
-
-            <TextView
-                android:id="@+id/openInAppMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:visibility="gone"
-                android:text="@string/appLinkMenuItemTitle" />
-
-            <TextView
-                android:id="@+id/addToHome"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/addToHome" />
-
             <androidx.appcompat.widget.AppCompatCheckBox
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox"
                 android:theme="@style/PopUpMenuSwitchTheme"
                 android:text="@string/requestDesktopSiteMenuTitle" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/findInPageMenuItem"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/findInPageMenuTitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/openInAppMenuItem"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                app:labelText="@string/appLinkMenuItemTitle" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/addToHome"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/addToHome" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/whitelistPopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/enablePrivacyProtection" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/enablePrivacyProtection" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/brokenSitePopupMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/brokenSiteReportBrokenSiteMenuItem" />
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/brokenSiteReportBrokenSiteMenuItem" />
+
+            <!-- TODO// see if we can get rid off background -->
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/settingsPopupMenuItem"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:labelText="@string/settingsMenuItemTitle"
+                android:background="@drawable/ripple_bottom_rounded" />
+
+
+
+
+
 
             <TextView
-                android:id="@+id/settingsPopupMenuItem"
+                android:id="@+id/newEmailAliasMenuItem"
                 style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/settingsMenuItemTitle"
-                android:background="@drawable/ripple_bottom_rounded" />
+                android:text="@string/newEmailAliasMenuTitle" />
 
         </LinearLayout>
 
