@@ -35,9 +35,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:labelText="This is a Test"
-        app:iconDrawable="@drawable/ic_close"
+        app:iconDrawable="@drawable/ic_globe_gray_16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label" />
+        app:layout_constraintTop_toBottomOf="@id/label"
+        android:clickable="true"
+        android:focusable="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
