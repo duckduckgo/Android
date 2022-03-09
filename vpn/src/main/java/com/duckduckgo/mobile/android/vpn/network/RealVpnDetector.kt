@@ -16,13 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.network
 
-import android.annotation.TargetApi
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -32,28 +28,11 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealVpnDetector @Inject constructor(
     private val context: Context,
-    private val appBuildConfig: AppBuildConfig
 ) : VpnDetector {
 
     override fun isVpnDetected(): Boolean {
-        return if (appBuildConfig.sdkInt <= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            detectVpnLollipop()
-        } else {
-            detectVpn()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun detectVpn(): Boolean {
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork
         return connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
     }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
-    private fun detectVpnLollipop(): Boolean {
-        val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetworkInfo?.type == ConnectivityManager.TYPE_VPN
-    }
-
 }
