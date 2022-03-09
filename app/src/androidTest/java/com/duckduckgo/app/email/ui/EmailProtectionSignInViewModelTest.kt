@@ -40,7 +40,6 @@ import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.ShowNo
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.ADDRESS_BLOG_POST
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.GET_STARTED_URL
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.LOGIN_URL
-import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.PRIVACY_GUARANTEE
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.SIGN_UP_URL
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
@@ -125,14 +124,6 @@ class EmailProtectionSignInViewModelTest {
         testee.commands.test {
             testee.readBlogPost()
             assertEquals(OpenUrl(url = ADDRESS_BLOG_POST), awaitItem())
-        }
-    }
-
-    @Test
-    fun whenReadPrivacyGuaranteeThenEmitCommandOpenUrlWithCorrectUrl() = runTest {
-        testee.commands.test {
-            testee.readPrivacyGuarantees()
-            assertEquals(OpenUrl(url = PRIVACY_GUARANTEE), awaitItem())
         }
     }
 

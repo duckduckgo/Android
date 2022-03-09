@@ -198,6 +198,7 @@ class SettingsActivity :
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateEmailSubtitle(it.emailAddress)
                 }
             }.launchIn(lifecycleScope)
 
@@ -205,6 +206,11 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateEmailSubtitle(emailAddress: String?) {
+        val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
+        viewsPrivacy.emailSetting.setSubtitle(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {

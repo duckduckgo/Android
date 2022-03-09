@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -98,6 +99,9 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -117,7 +121,8 @@ class SettingsViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
-            mockAppBuildConfig
+            mockAppBuildConfig,
+            mockEmailManager
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -206,6 +211,19 @@ class SettingsViewModelTest {
             val value = expectMostRecentItem()
             val expectedStartString = "name (1)"
             assertTrue(value.version.startsWith(expectedStartString))
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledThenEmailAddressSetCorrectly() = runTest {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("email")
+        testee.start()
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+            val expectedEmail = "email"
+            assertEquals(expectedEmail, value.emailAddress)
 
             cancelAndConsumeRemainingEvents()
         }
