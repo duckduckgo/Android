@@ -95,4 +95,5 @@
     <attr name="dialogSecondaryButtonColor" format="color" />
 
     <attr name="menuItemViewIconColor" format="color" />
+    <attr name="overflowMenuDividerColor" format="color" />
 </resources>
