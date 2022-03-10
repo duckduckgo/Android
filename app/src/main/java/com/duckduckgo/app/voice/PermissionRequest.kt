@@ -23,10 +23,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -36,7 +36,8 @@ import javax.inject.Inject
 
 interface PermissionRequest {
     fun registerResultsCallback(
-        fragment: Fragment,
+        caller: ActivityResultCaller,
+        activity: Activity,
         onPermissionsGranted: () -> Unit
     )
 
@@ -53,34 +54,33 @@ class MicrophonePermissionRequest @Inject constructor(
     }
 
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
-    private lateinit var activity: Activity
+    private lateinit var _activity: Activity
 
     override fun registerResultsCallback(
-        fragment: Fragment,
+        caller: ActivityResultCaller,
+        activity: Activity,
         onPermissionsGranted: () -> Unit
     ) {
-        permissionLauncher = fragment.registerForActivityResult(RequestPermission()) { result ->
-            fragment.context?.let {
-                if (result) {
-                    onPermissionsGranted()
-                } else {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)) {
-                        preferences.declinePermissionForever(true)
-                    }
+        _activity = activity
+        permissionLauncher = caller.registerForActivityResult(RequestPermission()) { result ->
+            if (result) {
+                onPermissionsGranted()
+            } else {
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)) {
+                    preferences.declinePermissionForever(true)
                 }
             }
         }
-        activity = fragment.requireActivity()
     }
 
     override fun launch() {
         if (preferences.hasPermissionDeclinedForever()) {
-            showNoMicAccessDialog(activity)
+            showNoMicAccessDialog(_activity)
         } else {
             if (preferences.hasAcceptedRationaleDialog()) {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             } else {
-                showPermissionRationale(activity)
+                showPermissionRationale(_activity)
             }
         }
     }
@@ -113,7 +113,7 @@ class MicrophonePermissionRequest @Inject constructor(
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
         }
-        startActivity(intent)
+        _activity.startActivity(intent)
     }
 
     private fun handleRationaleAccepted() {

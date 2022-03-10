@@ -19,9 +19,9 @@ package com.duckduckgo.app.voice
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.fragment.app.Fragment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity
@@ -35,10 +35,11 @@ class VoiceSearchActivityLauncher @Inject constructor(
     private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
 
     override fun registerResultsCallback(
-        fragment: Fragment,
+        caller: ActivityResultCaller,
+        activity: Activity,
         onSpeechResult: (String) -> Unit
     ) {
-        voiceSearchActivityLaucher = fragment.registerForActivityResult(StartActivityForResult()) { result ->
+        voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) { result ->
             result?.let {
                 if (it.resultCode == Activity.RESULT_OK) {
                     it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT)?.let { data ->

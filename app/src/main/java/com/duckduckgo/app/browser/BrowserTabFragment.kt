@@ -405,7 +405,7 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
-        voiceSearchLauncher.registerResultsCallback(this) {
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity()) {
             if (it.isNotEmpty()) {
                 omnibarTextInput.setText(it)
                 userEnteredQuery(it)
