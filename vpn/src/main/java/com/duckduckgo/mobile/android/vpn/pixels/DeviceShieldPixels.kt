@@ -328,7 +328,7 @@ interface DeviceShieldPixels {
     /**
      * Will fire when the FAQ Activity is closed, sending the amount of time spent actively on the screen
      */
-     fun didSpendTimeOnFAQActivity(timeSpent: Long)
+    fun didSpendTimeOnFAQActivity(timeSpent: Long)
 
     /**
      * Will fire when the Onboarding Activity is closed, sending the amount of time spent actively on the screen

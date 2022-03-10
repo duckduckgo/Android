@@ -47,7 +47,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDia
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import javax.inject.Inject
 
 class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding), AppTPVpnConflictDialog.Listener {
@@ -86,7 +85,6 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     override fun onResume() {
         startTime = SystemClock.elapsedRealtime()
-        Timber.d("Started Onboarding screen at $startTime")
         super.onResume()
     }
 
@@ -97,7 +95,6 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     override fun onDestroy() {
         deviceShieldPixels.didSpendTimeOnOnboardingActivity(timeElapsed)
-        Timber.d("Spent $timeElapsed ms in the Onboarding screen")
         super.onDestroy()
     }
 

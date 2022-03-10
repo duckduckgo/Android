@@ -322,7 +322,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchMostRecentActivity() {
-        deviceShieldPixels. didShowDetailedTrackerActivity()
+        deviceShieldPixels.didShowDetailedTrackerActivity()
         startActivity(DeviceShieldMostRecentActivity.intent(this))
     }
 

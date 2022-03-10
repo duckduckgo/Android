@@ -24,7 +24,6 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityAppTrackersInfoBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import timber.log.Timber
 import javax.inject.Inject
 
 class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
@@ -39,13 +38,11 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
 
     override fun onResume() {
         startTime = SystemClock.elapsedRealtime()
-        Timber.d("Started Trackers Info screen at $startTime")
         super.onResume()
     }
 
     override fun onPause() {
         timeElapsed = SystemClock.elapsedRealtime() - startTime
-        Timber.d("Spent $timeElapsed ms in the Trackers Info screen")
         super.onPause()
     }
 
