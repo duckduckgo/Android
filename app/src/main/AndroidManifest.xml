@@ -430,6 +430,12 @@
                 android:resource="@xml/search_favorites_widget_info" />
         </receiver>
 
+        <receiver android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdater">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
