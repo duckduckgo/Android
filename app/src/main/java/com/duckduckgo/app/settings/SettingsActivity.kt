@@ -106,6 +106,9 @@ class SettingsActivity :
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
 
+    private val viewsMore
+        get() = binding.includeSettings.contentSettingsMore
+
     private val viewsOther
         get() = binding.includeSettings.contentSettingsOther
 
@@ -144,9 +147,7 @@ class SettingsActivity :
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             whitelist.setOnClickListener { viewModel.onManageWhitelistSelected() }
-            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
-            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
 
         with(viewsOther) {
@@ -161,6 +162,11 @@ class SettingsActivity :
                     )
                 )
             }
+        }
+
+        with(viewsMore) {
+            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
+            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
     }
 
@@ -210,7 +216,7 @@ class SettingsActivity :
 
     private fun updateEmailSubtitle(emailAddress: String?) {
         val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
-        viewsPrivacy.emailSetting.setSubtitle(subtitle)
+        viewsMore.emailSetting.setSubtitle(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -312,7 +318,7 @@ class SettingsActivity :
         appTPEnabled: Boolean,
         waitlistState: WaitlistState
     ) {
-        with(viewsPrivacy) {
+        with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
                 deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
