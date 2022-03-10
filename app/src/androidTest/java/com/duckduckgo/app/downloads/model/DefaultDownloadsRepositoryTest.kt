@@ -152,6 +152,18 @@ class DefaultDownloadsRepositoryTest {
     }
 
     @Test
+    fun whenDeleteListOfDownloadItemsThenRemoveFromDB() = runTest {
+        val firstItem = oneItem()
+        val secondItem = otherItem()
+        repository.insert(firstItem)
+        repository.insert(secondItem)
+
+        repository.delete(listOf(firstItem.downloadId, secondItem.downloadId))
+
+        assertTrue(downloadsDao.getDownloads().isEmpty())
+    }
+
+    @Test
     fun whenDeleteAllDownloadItemsThenRemoveFromDB() = runTest {
         val firstItem = oneItem()
         val secondItem = otherItem()

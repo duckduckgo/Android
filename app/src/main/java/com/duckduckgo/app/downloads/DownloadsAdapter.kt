@@ -111,11 +111,17 @@ class DownloadsAdapter @Inject constructor(
             val twoListItem = binding.root
             twoListItem.setContentDescription(context.getString(R.string.downloadsMoreOptionsContentDescription, item.downloadItem.fileName))
             twoListItem.setTitle(item.downloadItem.fileName)
-            twoListItem.setSubtitle(formatter.format(item.downloadItem.contentLength))
+            val subtitle = when {
+                item.downloadItem.contentLength > 0 -> formatter.format(item.downloadItem.contentLength)
+                else -> context.getString(R.string.downloadsStateInProgress)
+            }
+            twoListItem.setSubtitle(subtitle)
             twoListItem.setImageResource(R.drawable.ic_file)
 
             twoListItem.setClickListener {
-                listener.onItemClicked(item.downloadItem)
+                if (item.downloadItem.contentLength > 0) {
+                    listener.onItemClicked(item.downloadItem)
+                }
             }
 
             twoListItem.setOverflowClickListener { view ->
