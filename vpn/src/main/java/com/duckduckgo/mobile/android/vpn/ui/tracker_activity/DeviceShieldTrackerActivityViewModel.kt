@@ -73,7 +73,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
-            vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+            enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
         }

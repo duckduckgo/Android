@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page
+package com.duckduckgo.mobile.android.vpn.apps
 
-import android.content.Intent
+class VpnExclusionList {
 
-object WelcomePageView {
-    sealed class Event {
-        object OnPrimaryCtaClicked : Event()
-        object OnDefaultBrowserSet : Event()
-        object OnDefaultBrowserNotSet : Event()
-    }
+    companion object {
+        fun isDdgApp(packageName: String): Boolean {
+            return packageName.startsWith(DDG_PACKAGE_PREFIX)
+        }
 
-    sealed class State {
-        object Idle : State()
-        data class ShowDefaultBrowserDialog(val intent: Intent) : State()
-        object Finish : State()
+        private const val DDG_PACKAGE_PREFIX = "com.duckduckgo.mobile"
     }
 }

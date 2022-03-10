@@ -22,6 +22,7 @@ import android.os.SystemClock
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
+import com.duckduckgo.mobile.android.vpn.processor.packet.totalHeaderSize
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
@@ -133,7 +134,7 @@ class UdpPacketProcessor @AssistedInject constructor(
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue(isUdp = true)
 
-        val destinationAddress = packet.ip4Header.destinationAddress
+        val destinationAddress = packet.ipHeader.destinationAddress
         val destinationPort = packet.udpHeader.destinationPort
         val cacheKey = generateCacheKey(packet)
         val connectionInfo = packet.connectionInfo()
@@ -229,14 +230,14 @@ class UdpPacketProcessor @AssistedInject constructor(
 
                     val receiveBuffer = ByteBufferPool.acquire()
                     receiveBufferRef = receiveBuffer
-                    receiveBuffer.position(Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE)
+                    val referencePacket = key.attachment() as Packet
+                    receiveBuffer.position(referencePacket.totalHeaderSize())
 
                     val inputChannel = (key.channel() as DatagramChannel)
                     val readBytes = inputChannel.read(receiveBuffer)
                     packetPersister.persistDataReceived(readBytes, PACKET_TYPE_UDP)
-                    val referencePacket = key.attachment() as Packet
                     referencePacket.updateUdpBuffer(receiveBuffer, readBytes)
-                    receiveBuffer.position(HEADER_SIZE + readBytes)
+                    receiveBuffer.position(referencePacket.totalHeaderSize() + readBytes)
 
                     queues.networkToDevice.offer(receiveBuffer)
                 }
@@ -249,15 +250,11 @@ class UdpPacketProcessor @AssistedInject constructor(
     }
 
     private fun generateCacheKey(packet: Packet): String {
-        return "${packet.ip4Header.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
+        return "${packet.ipHeader.destinationAddress}:${packet.udpHeader.destinationPort}:${packet.udpHeader.sourcePort}"
     }
 
     data class ChannelDetails(
         val datagramChannel: DatagramChannel,
         val originatingApp: OriginatingApp
     )
-
-    companion object {
-        private const val HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.UDP_HEADER_SIZE
-    }
 }
