@@ -111,7 +111,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val vpnState = vpnStateMonitor.getState().state
             sendCommand(Command.LaunchExcludedApps(vpnState == VpnRunningState.ENABLED))
-            deviceShieldPixels.didChooseToDisableOneAppFromDialog()
         }
     }
 

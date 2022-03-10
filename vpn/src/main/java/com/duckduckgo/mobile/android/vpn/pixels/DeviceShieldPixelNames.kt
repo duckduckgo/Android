@@ -161,6 +161,14 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_SHOW_VPN_CONFLICT_DIALOG("m_atp_imp_vpn_conflict_dialog_c"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_dismiss_c"),
     ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_open_settings_c"),
-    ATP_DID_CHOOSE_CONTINUIE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
+    ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
+
+    ATP_ONBOARDING_SCREEN_TIME("m_atp_ev_onboarding_screen_time_c"),
+    ATP_ONBOARDING_PAGE_ONE_SCREEN_TIME("m_atp_ev_onboarding_page_one_time_c"),
+    ATP_ONBOARDING_PAGE_TWO_SCREEN_TIME("m_atp_ev_onboarding_page_two_time_c"),
+    ATP_ONBOARDING_PAGE_THREE_SCREEN_TIME("m_atp_ev_onboarding_page_three_time_c"),
+
+    ATP_FAQ_SCREEN_TIME("m_atp_ev_faq_screen_time_c"),
+    ATP_TRACKERS_INFO_SCREEN_TIME("m_atp_ev_trackers_info_screen_time_c"),
     ;
 }

@@ -258,6 +258,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onOpenAppProtection() {
+        deviceShieldPixels.didChooseToDisableOneAppFromDialog()
         viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
     }
 
@@ -321,7 +322,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchMostRecentActivity() {
-        deviceShieldPixels.didShowDetailedTrackerActivity()
+        deviceShieldPixels. didShowDetailedTrackerActivity()
         startActivity(DeviceShieldMostRecentActivity.intent(this))
     }
 

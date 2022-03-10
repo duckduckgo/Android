@@ -21,6 +21,7 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
@@ -323,6 +324,21 @@ interface DeviceShieldPixels {
      * Will fire when the VPN Process is restarted as a result of bad health mitigation
      */
     fun didRestartVpnProcessOnBadHealth()
+
+    /**
+     * Will fire when the FAQ Activity is closed, sending the amount of time spent actively on the screen
+     */
+     fun didSpendTimeOnFAQActivity(timeSpent: Long)
+
+    /**
+     * Will fire when the Onboarding Activity is closed, sending the amount of time spent actively on the screen
+     */
+    fun didSpendTimeOnOnboardingActivity(timeSpent: Long)
+
+    /**
+     * Will fire when the What Are App Trackers is closed, sending the amount of time spent actively on the screen
+     */
+    fun didSpendTimeOnTrackersInfoActivity(timeSpent: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -614,8 +630,8 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didChooseToContinueFromVpnConflicDialog() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
-        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
     }
 
     override fun didShowWaitlistDialog() {
@@ -663,6 +679,18 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didRestartVpnProcessOnBadHealth() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
+    }
+
+    override fun didSpendTimeOnFAQActivity(timeSpent: Long) {
+        firePixel(DeviceShieldPixelNames.ATP_FAQ_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
+    }
+
+    override fun didSpendTimeOnOnboardingActivity(timeSpent: Long) {
+        firePixel(DeviceShieldPixelNames.ATP_ONBOARDING_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
+    }
+
+    override fun didSpendTimeOnTrackersInfoActivity(timeSpent: Long) {
+        firePixel(DeviceShieldPixelNames.ATP_TRACKERS_INFO_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
     }
 
     private fun suddenKill() {
