@@ -38,3 +38,6 @@ sealed class DownloadCommand(@StringRes val messageId: Int, val showNotification
         val showEnableDownloadManagerAction: Boolean
     ) : DownloadCommand(messageId, showNotification)
 }
+
+const val DOWNLOAD_SNACKBAR_LENGTH = 750
+const val DOWNLOAD_SNACKBAR_DELAY = 1500L
