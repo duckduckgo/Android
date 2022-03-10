@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
 import javax.inject.Inject
@@ -59,6 +60,9 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     @Inject
     lateinit var gridCalculator: SearchAndFavoritesGridCalculator
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
@@ -120,6 +124,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
         remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+
+        configureVoiceSearch(context, remoteViews, true)
         configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
         configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
 

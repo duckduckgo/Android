@@ -31,6 +31,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
@@ -46,6 +47,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     @Inject
     lateinit var widgetCapabilities: AppWidgetCapabilities
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     override fun onReceive(
         context: Context,
@@ -106,6 +110,8 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         val views = RemoteViews(context.packageName, layoutId)
         views.setViewVisibility(R.id.searchInputBox, if (shouldShowHint) View.VISIBLE else View.INVISIBLE)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
+
+        configureVoiceSearch(context, views, false)
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
