@@ -80,8 +80,7 @@ class SpecialUrlDetectorImpl(
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
             HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(uriString)
-            ABOUT_SCHEME -> UrlType.Unknown(uriString)
-            JAVASCRIPT_SCHEME, FILE_SCHEME -> UrlType.SearchQuery(uriString)
+            JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME -> UrlType.SearchQuery(uriString)
             null -> UrlType.SearchQuery(uriString)
             else -> checkForIntent(scheme, uriString)
         }
