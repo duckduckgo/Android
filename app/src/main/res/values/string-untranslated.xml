@@ -38,7 +38,6 @@
     <string name="downloadsDownloadStartedMessage">Download started for %s</string>
     <string name="downloadsDownloadFinishedMessage">Download complete for %s</string>
     <string name="downloadsDownloadFinishedActionName">Open</string>
-    <string name="downloadsDownloadErrorMessage">Failed to download. Check internet connection.</string>
     <string name="downloadsDownloadGenericErrorMessage">Failed to download.</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
     <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
@@ -49,6 +48,7 @@
     <string name="downloadsAllFilesDeletedMessage">All files deleted</string>
     <string name="downloadsMoreOptionsContentDescription">More options for %s</string>
     <string name="downloadsUndoActionName">Undo</string>
+    <string name="downloadsStateInProgress">In Progress…</string>
 
     <!-- Tabs -->
     <string name="downloadsMenuItemTitle">Downloads</string>

@@ -28,11 +28,11 @@ class DataUriSuffixParser @Inject constructor() {
 
     fun parseSuffix(mimeType: String, url: String, data: String): String {
 
-        // MimeTypeMap returns the wrong value for "jpeg" types on Lollipop
+        // MimeTypeMap returns the wrong value for "jpeg" types on some OS versions.
         if (mimeType == "image/jpeg") return "jpg"
 
         if (mimeType == "text/plain" && url.contains("base64", ignoreCase = true)) {
-            val dataPart = data.take(if (data.length > 20) 20 else data.length)
+            val dataPart = data.take(if (data.length > MAX_LENGTH_FOR_MIME_TYPE_DETECTION) MAX_LENGTH_FOR_MIME_TYPE_DETECTION else data.length)
             val suffix = determineSuffixFromUrlPart(dataPart)
             if (suffix != null) {
                 return suffix
@@ -54,5 +54,9 @@ class DataUriSuffixParser @Inject constructor() {
             decodedDataPart.startsWith("BM") -> "bmp"
             else -> null
         }
+    }
+
+    companion object {
+        const val MAX_LENGTH_FOR_MIME_TYPE_DETECTION = 20
     }
 }

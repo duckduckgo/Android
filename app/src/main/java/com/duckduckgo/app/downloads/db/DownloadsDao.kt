@@ -43,6 +43,9 @@ interface DownloadsDao {
     @Query("delete from downloads where id = :id")
     suspend fun delete(id: Long)
 
+    @Query("delete from downloads where downloadId in (:downloadIdList)")
+    suspend fun delete(downloadIdList: List<Long>)
+
     @Query("delete from downloads")
     suspend fun delete()
 

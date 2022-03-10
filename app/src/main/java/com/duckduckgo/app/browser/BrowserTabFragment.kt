@@ -639,31 +639,31 @@ class BrowserTabFragment :
         if (command.showNotification) {
             fileDownloadNotificationManager.showDownloadInProgressNotification()
         }
-        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)?.show()
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), 750)?.show()
     }
 
     private fun downloadFailed(command: FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage) {
         if (command.showNotification) {
             fileDownloadNotificationManager.showDownloadFailedNotification()
         }
-        if (command.showEnableDownloadManagerAction) {
-            view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-                ?.apply {
-                    this.setAction(R.string.enable) {
-                        showDownloadManagerAppSettings()
+        val downloadFailedSnackbar = when {
+            command.showEnableDownloadManagerAction ->
+                view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+                    ?.apply {
+                        this.setAction(R.string.enable) {
+                            showDownloadManagerAppSettings()
+                        }
                     }
-                }
-                ?.show()
-        } else {
-            view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)?.show()
+            else -> view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
         }
+        view?.postDelayed({ downloadFailedSnackbar ?.show() }, 1500L)
     }
 
     private fun downloadSucceeded(command: FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage) {
         if (command.showNotification) {
             fileDownloadNotificationManager.showDownloadFinishedNotification(command.fileName, command.filePath.toUri(), command.mimeType)
         }
-        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
+        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
                     val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
@@ -672,7 +672,7 @@ class BrowserTabFragment :
                     }
                 }
             }
-            ?.show()
+        view?.postDelayed({ downloadSucceededSnackbar?.show() }, 1500L)
     }
 
     private fun addTabsObserver() {

@@ -45,6 +45,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.threeten.bp.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class DownloadsViewModelTest {
@@ -72,7 +73,20 @@ class DownloadsViewModelTest {
         MockitoAnnotations.openMocks(this)
     }
 
-    @Test fun whenDownloadsCalledThenViewStateEmitted() = runTest {
+    @Test fun whenDownloadsCalledAndNoDownloadsThenViewStateEmittedWithEmptyViewItem() = runTest {
+        val list = emptyList<DownloadItem>()
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
+
+        testee.downloads()
+
+        testee.viewState().test {
+            val items = awaitItem().downloadItems
+            assertEquals(1, items.size)
+            assertTrue(items[0] is Empty)
+        }
+    }
+
+    @Test fun whenDownloadsCalledAndOneDownloadThenViewStateEmittedWithOneItem() = runTest {
         val list = listOf(oneItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
 
@@ -84,6 +98,63 @@ class DownloadsViewModelTest {
             assertTrue(items[0] is Header)
             assertTrue(items[1] is Item)
             assertEquals(list[0].fileName, (items[1] as Item).downloadItem.fileName)
+        }
+    }
+
+    @Test fun whenDownloadsCalledAndMultipleDownloadsThenViewStateEmittedWithMultipleItemsAndHeaders() = runTest {
+        val today = LocalDateTime.now()
+        val yesterday = today.minusDays(1)
+        val sometimeDuringPastWeek = today.minusDays(6)
+        val sometimeDuringPastMonth = today.minusDays(20)
+        val sometimeBeforePastMonth = today.minusDays(40)
+        val sometimeInThePreviousYear = today.minusDays(370)
+
+        val downloadList = listOf(
+            oneItem().copy(id = 1L, createdAt = today.toString()),
+            oneItem().copy(id = 2L, createdAt = yesterday.toString()),
+            oneItem().copy(id = 3L, createdAt = sometimeDuringPastWeek.toString()),
+            oneItem().copy(id = 4L, createdAt = sometimeDuringPastMonth.toString()),
+            oneItem().copy(id = 5L, createdAt = sometimeBeforePastMonth.toString()),
+            oneItem().copy(id = 6L, createdAt = sometimeInThePreviousYear.toString())
+        )
+
+        whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
+
+        testee.downloads()
+
+        testee.viewState().test {
+            val items = awaitItem().downloadItems
+            assertEquals(12, items.size)
+
+            assertTrue(items[0] is Header)
+            assertTrue((items[0] as Header).text == "Today")
+            assertTrue(items[1] is Item)
+            assertEquals(downloadList[0].id, (items[1] as Item).downloadItem.id)
+
+            assertTrue(items[2] is Header)
+            assertTrue((items[2] as Header).text == "Yesterday")
+            assertTrue(items[3] is Item)
+            assertEquals(downloadList[1].id, (items[3] as Item).downloadItem.id)
+
+            assertTrue(items[4] is Header)
+            assertTrue((items[4] as Header).text == "Past Week")
+            assertTrue(items[5] is Item)
+            assertEquals(downloadList[2].id, (items[5] as Item).downloadItem.id)
+
+            assertTrue(items[6] is Header)
+            assertTrue((items[6] as Header).text == "Past Month")
+            assertTrue(items[7] is Item)
+            assertEquals(downloadList[3].id, (items[7] as Item).downloadItem.id)
+
+            assertTrue(items[8] is Header)
+            assertTrue((items[8] as Header).text.lowercase() == sometimeBeforePastMonth.month.name.lowercase())
+            assertTrue(items[9] is Item)
+            assertEquals(downloadList[4].id, (items[9] as Item).downloadItem.id)
+
+            assertTrue(items[10] is Header)
+            assertTrue((items[10] as Header).text == sometimeInThePreviousYear.year.toString())
+            assertTrue(items[11] is Item)
+            assertEquals(downloadList[5].id, (items[11] as Item).downloadItem.id)
         }
     }
 

@@ -28,6 +28,7 @@ interface DownloadsRepository {
     suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long)
     suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
     suspend fun delete(id: Long)
+    suspend fun delete(downloadIdList: List<Long>)
     suspend fun deleteAll()
     suspend fun getDownloads(): List<DownloadItem>
     suspend fun getDownloadItem(downloadId: Long): DownloadItem
@@ -54,6 +55,10 @@ class DefaultDownloadsRepository(private val downloadsDao: DownloadsDao) : Downl
 
     override suspend fun delete(id: Long) {
         downloadsDao.delete(id)
+    }
+
+    override suspend fun delete(downloadIdList: List<Long>) {
+        downloadsDao.delete(downloadIdList)
     }
 
     override suspend fun deleteAll() {

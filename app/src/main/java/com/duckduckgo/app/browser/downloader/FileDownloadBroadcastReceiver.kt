@@ -56,30 +56,32 @@ class FileDownloadBroadcastReceiver @Inject constructor(
             Timber.d("Download completed.")
             val downloadManager = context?.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
 
+            val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            if (downloadId == null || downloadId <= 0) {
+                return@launch
+            }
+
             val query = DownloadManager.Query()
-            query.setFilterByStatus(DownloadManager.STATUS_FAILED or DownloadManager.STATUS_SUCCESSFUL)
+            query.setFilterByStatus(DownloadManager.STATUS_FAILED or DownloadManager.STATUS_SUCCESSFUL).setFilterById(downloadId)
 
             val cursor = downloadManager?.query(query)
             if (cursor?.moveToFirst() == true) {
                 val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
-                val downloadId = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-
                 when (cursor.getInt(index)) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         Timber.d("Download completed with success.")
-                        if (downloadId != null && downloadId > 0) {
-                            val totalSizeIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
-                            val size = if (totalSizeIndex > 0) cursor.getLong(totalSizeIndex) else 0
-                            callback.onSuccess(downloadId = downloadId, contentLength = size)
-                        }
+                        val totalSizeIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+                        val size = if (totalSizeIndex > 0) cursor.getLong(totalSizeIndex) else 0
+                        callback.onSuccess(downloadId = downloadId, contentLength = size)
                     }
                     DownloadManager.STATUS_FAILED -> {
                         Timber.d("Download completed, but failed.")
-                        if (downloadId != null && downloadId > 0) {
-                            callback.onFailure(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
-                        }
+                        callback.onFailure(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
                     }
                 }
+            } else {
+                Timber.d("Download cancelled.")
+                callback.onCancel(downloadId)
             }
         }
     }

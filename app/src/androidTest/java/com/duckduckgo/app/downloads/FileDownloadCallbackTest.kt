@@ -135,6 +135,18 @@ class FileDownloadCallbackTest {
     }
 
     @Test
+    fun whenOnCancelCalledForDownloadIdThenPixelFiredAndItemDeleted() = runTest {
+        val downloadId = 1L
+
+        callback.onCancel(downloadId = downloadId)
+
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        verify(mockDownloadsRepository).delete(
+            downloadIdList = listOf(downloadId)
+        )
+    }
+
+    @Test
     fun whenOnFailureCalledForDownloadIdAndUnsupportedUrlThenPixelFiredAndDownloadFailedCommandSent() = runTest {
         val downloadId = 1L
         val failReason = DownloadFailReason.UnsupportedUrlType
@@ -163,7 +175,7 @@ class FileDownloadCallbackTest {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
             assertFalse(actualItem.showNotification)
-            assertEquals(R.string.downloadsDownloadErrorMessage, actualItem.messageId)
+            assertEquals(R.string.downloadsErrorMessage, actualItem.messageId)
             assertFalse((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
         }
     }
