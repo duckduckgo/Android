@@ -29,8 +29,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
-import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
-import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
@@ -50,12 +48,6 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
-
-    private val getNotificationSpan = object : DuckDuckGoClickableSpan() {
-        override fun onClick(widget: View) {
-            showNotificationDialog()
-        }
-    }
 
     private val readBlogSpan = object : DuckDuckGoClickableSpan() {
         override fun onClick(widget: View) {
@@ -91,9 +83,9 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun render(viewState: AppTPWaitlistViewModel.ViewState) {
-        when (val state = viewState.waitlist) {
+        when (viewState.waitlist) {
             is WaitlistState.NotJoinedQueue -> renderNotJoinedQueue()
-            is WaitlistState.JoinedWaitlist -> renderJoinedQueue(state.notify)
+            is WaitlistState.JoinedWaitlist -> renderJoinedQueue()
             is WaitlistState.InBeta -> renderInBeta()
             is WaitlistState.CodeRedeemed -> renderCodeRedeemed()
         }
@@ -103,7 +95,6 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         when (command) {
             is AppTPWaitlistViewModel.Command.LaunchBetaInstructions -> openWebsite()
             is AppTPWaitlistViewModel.Command.ShowErrorMessage -> renderErrorMessage()
-            is AppTPWaitlistViewModel.Command.ShowNotificationDialog -> showNotificationDialog()
             is AppTPWaitlistViewModel.Command.ShowOnboarding -> showOnboarding()
             is AppTPWaitlistViewModel.Command.EnterInviteCode -> openRedeemCode()
         }
@@ -122,7 +113,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun renderJoinedQueue(notify: Boolean) {
+    private fun renderJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.we_hatched)
         binding.waitListButton.gone()
         binding.inviteCodeButton.gone()
@@ -130,17 +121,10 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.footerDescription.gone()
         binding.footerInviteCodeButton.show()
         binding.statusTitle.text = getString(R.string.atp_WaitlistStatusJoined)
-        if (notify) {
-            binding.appTPDescription.addClickableSpan(
-                getText(R.string.atp_WaitlistJoinedWithNotification),
-                listOf(Pair("beta_link", readBlogSpan))
-            )
-        } else {
-            binding.appTPDescription.addClickableSpan(
-                getText(R.string.atp_WaitlistJoinedWithoutNotification),
-                listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan))
-            )
-        }
+        binding.appTPDescription.addClickableSpan(
+            getText(R.string.atp_WaitlistJoinedWithNotification),
+            listOf(Pair("beta_link", readBlogSpan))
+        )
     }
 
     private fun renderNotJoinedQueue() {
@@ -170,17 +154,6 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     private fun renderErrorMessage() {
         binding.waitListButton.isEnabled = true
         Toast.makeText(this, R.string.atp_WaitlistErrorJoining, Toast.LENGTH_LONG).show()
-    }
-
-    private fun showNotificationDialog() {
-        supportFragmentManager.let {
-            val dialog = WaitlistNotificationDialog.create().apply {
-                onNotifyClicked = { viewModel.onNotifyMeClicked() }
-                onNoThanksClicked = { viewModel.onNoThanksClicked() }
-                onDialogDismissed = { viewModel.onDialogDismissed() }
-            }
-            dialog.show(it, EmailProtectionSignInFragment.NOTIFICATION_DIALOG_TAG)
-        }
     }
 
     private fun openRedeemCode() {

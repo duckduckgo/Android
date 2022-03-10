@@ -32,7 +32,6 @@ import javax.inject.Inject
 
 interface AppTPWaitlistManager {
     suspend fun fetchInviteCode(): FetchCodeResult
-    fun notifyOnJoinedWaitlist()
     fun joinWaitlist(
         timestamp: Int,
         token: String
@@ -72,10 +71,6 @@ class AndroidAppTPWaitlistManager @Inject constructor(
         }
     }
 
-    override fun notifyOnJoinedWaitlist() {
-        dataStore.sendNotification = true
-    }
-
     override fun joinWaitlist(
         timestamp: Int,
         token: String
@@ -86,6 +81,7 @@ class AndroidAppTPWaitlistManager @Inject constructor(
         if (dataStore.waitlistToken == null) {
             dataStore.waitlistToken = token
         }
+        dataStore.sendNotification = true
     }
 
     override suspend fun redeemCode(inviteCode: String): RedeemCodeResult {

@@ -58,7 +58,6 @@ class AppTPWaitlistViewModel(
         object LaunchBetaInstructions : Command()
         object EnterInviteCode : Command()
         object ShowErrorMessage : Command()
-        object ShowNotificationDialog : Command()
         object ShowOnboarding : Command()
     }
 
@@ -101,7 +100,6 @@ class AppTPWaitlistViewModel(
         deviceShieldPixels.didShowWaitlistDialog()
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)
-            commandChannel.send(Command.ShowNotificationDialog)
             workManager.enqueue(workRequestBuilder.waitlistRequestWork(withBigDelay = false))
         }
     }
@@ -109,25 +107,6 @@ class AppTPWaitlistViewModel(
     fun learnMore() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchBetaInstructions)
-        }
-    }
-
-    fun onNotifyMeClicked() {
-        viewModelScope.launch {
-            deviceShieldPixels.didPressWaitlistDialogNotifyMe()
-            waitlistManager.notifyOnJoinedWaitlist()
-        }
-    }
-
-    fun onNoThanksClicked() {
-        viewModelScope.launch {
-            deviceShieldPixels.didPressWaitlistDialogDismiss()
-        }
-    }
-
-    fun onDialogDismissed() {
-        viewModelScope.launch {
-            viewStateFlow.emit(ViewState(atpWaitlistStateRepository.getState()))
         }
     }
 
