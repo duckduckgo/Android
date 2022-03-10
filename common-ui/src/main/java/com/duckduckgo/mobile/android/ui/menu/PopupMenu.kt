@@ -26,8 +26,10 @@ import com.duckduckgo.mobile.android.ui.view.MenuItemView
 class PopupMenu(
     layoutInflater: LayoutInflater,
     resourceId: Int,
-    view: View = inflate(layoutInflater, resourceId)
-) : PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
+    view: View = inflate(layoutInflater, resourceId),
+    width: Int = WRAP_CONTENT,
+    height: Int = WRAP_CONTENT
+) : PopupWindow(view, width, height, true) {
 
     init {
         elevation = ELEVATION

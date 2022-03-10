@@ -2008,7 +2008,11 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
+            popupMenu = PopupMenu(
+                layoutInflater = layoutInflater,
+                resourceId = R.layout.popup_window_browser_menu,
+                width = resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
+            )
             val view = popupMenu.contentView
             popupMenu.apply {
                 onMenuItemClicked(view.forwardMenuItem) {
