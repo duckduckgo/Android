@@ -271,6 +271,32 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsAboutSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("about:blank")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsAboutSchemeThenFullQueryRetained() {
+        val type = testee.determineType("about:blank") as SearchQuery
+        assertEquals("about:blank", type.query)
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("file:///sdcard/")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenFullQueryRetained() {
+        val type = testee.determineType("file:///sdcard/") as SearchQuery
+        assertEquals("file:///sdcard/", type.query)
+    }
+
+    @Test
     fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
         val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("sms:$longSms") as Sms
