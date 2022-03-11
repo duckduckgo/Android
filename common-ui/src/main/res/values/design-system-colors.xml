@@ -16,6 +16,8 @@
 
 <resources>
 
+    <color name="disabledColor">#59000000</color>
+
     <color name="red50">#DE5833</color>
 
     <color name="purple50">#5132A9</color>

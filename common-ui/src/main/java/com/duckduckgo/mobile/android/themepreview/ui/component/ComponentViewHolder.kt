@@ -59,6 +59,16 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
 
+    class SingleLineItemComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_single_line_item))
+
+    class TwoLineItemComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)){
+
+    }
+
     @SuppressLint("ShowToast")
     class SnackbarComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
@@ -90,6 +100,8 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
                 Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
+                Component.SINGLE_LINE_LIST_ITEM -> SingleLineItemComponentViewHolder(parent)
+                Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }
