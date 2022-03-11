@@ -73,7 +73,8 @@
                 android:id="@+id/newTabMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/newTabMenuItem" />
+                app:labelText="@string/newTabMenuItem"
+                app:iconDrawable="@drawable/ic_add_16" />
 
             <View style="@style/OverflowMenuDivider" />
 
@@ -81,25 +82,29 @@
                 android:id="@+id/sharePageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/shareMenuTitle" />
+                app:labelText="@string/shareMenuTitle"
+                app:iconDrawable="@drawable/ic_share_16_1" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/addBookmarkMenuTitle" />
+                app:labelText="@string/addBookmarkMenuTitle"
+                app:iconDrawable="@drawable/ic_bookmark_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addFavoriteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/addFavoriteMenuTitle" />
+                app:labelText="@string/addFavoriteMenuTitle"
+                app:iconDrawable="@drawable/ic_favorite_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/bookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/bookmarksMenuTitle" />
+                app:labelText="@string/bookmarksMenuTitle"
+                app:iconDrawable="@drawable/ic_library_16" />
 
             <View style="@style/OverflowMenuDivider" />
 
@@ -107,44 +112,65 @@
                 android:id="@+id/fireproofWebsiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/fireproofWebsiteMenuTitleAdd" />
+                app:labelText="@string/fireproofWebsiteMenuTitleAdd"
+                app:iconDrawable="@drawable/ic_fire_16" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/createAliasMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelText="Create a Duck Address"
+                app:iconDrawable="@drawable/ic_email_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/requestDesktopSiteCheckMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/requestDesktopSiteMenuTitle" />
+                app:labelText="@string/requestDesktopSiteMenuTitle"
+                app:iconDrawable="@drawable/ic_device_desktop_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/findInPageMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/findInPageMenuTitle" />
+                app:labelText="@string/findInPageMenuTitle"
+                app:iconDrawable="@drawable/ic_find_search_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:labelText="@string/appLinkMenuItemTitle" />
+                app:labelText="@string/appLinkMenuItemTitle"
+                app:iconDrawable="@drawable/ic_open_in_16_1" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addToHome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/addToHome" />
+                app:labelText="@string/addToHome"
+                app:iconDrawable="@drawable/ic_add_to_home_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/whitelistMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/enablePrivacyProtection" />
+                app:labelText="@string/enablePrivacyProtection"
+                app:iconDrawable="@drawable/ic_protections_blocked_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/brokenSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:labelText="@string/brokenSiteReportBrokenSiteMenuItem" />
+                app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
+                app:iconDrawable="@drawable/ic_feedback_16" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                android:id="@+id/downloadsMenuItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:labelText="Downloads"
+                app:iconDrawable="@drawable/ic_downloads_16" />
 
             <!-- TODO// see if we can get rid off background -->
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -152,8 +178,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/ripple_bottom_rounded"
-                app:labelText="@string/settingsMenuItemTitle" />
-
+                app:labelText="@string/settingsMenuItemTitle"
+                app:iconDrawable="@drawable/ic_settings_16" />
 
             <TextView
                 android:id="@+id/newEmailAliasMenuItem"
