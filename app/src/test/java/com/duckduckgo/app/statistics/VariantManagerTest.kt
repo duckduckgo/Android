@@ -81,27 +81,20 @@ class VariantManagerTest {
         assertTrue(variant.hasFeature(FireproofExperiment))
     }
 
-    // RETURNING USERS - SECOND EXPERIMENT
+    // TRACKING PARAMETERS - INITIAL ROLLOUT TO 25%
     @Test
-    fun returningUsersControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zd" }
-        assertEqualsDouble(1.0, variant.weight)
+    fun trackingParameterRemovalVariantHasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "my" }
+        assertEqualsDouble(0.25, variant.weight)
+        assertEquals(1, variant.features.size)
+        assertTrue(variant.hasFeature(TrackingParameterRemoval))
+    }
+
+    @Test
+    fun trackingParameterRemovalEmptyVariant2HasExpectedWeightAndFeatures() {
+        val variant = variants.first { it.key == "me" }
+        assertEqualsDouble(0.75, variant.weight)
         assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun returningUsersExperimentalFirstVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(ReturningUsersContinueWithoutPrivacyTips))
-    }
-
-    @Test
-    fun returningUsersExperimentalSecondVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(ReturningUsersSkipTutorial))
+        assertFalse(variant.hasFeature(TrackingParameterRemoval))
     }
 }

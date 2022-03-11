@@ -20,6 +20,7 @@ package com.duckduckgo.mobile.android.vpn.model
 
 import androidx.room.*
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 
 @Entity(
@@ -68,11 +69,19 @@ enum class VpnServiceState {
     INVALID
 }
 
+enum class VpnStoppingReason {
+    SELF_STOP,
+    ERROR,
+    REVOKED,
+    UNKNOWN
+}
+
 @Entity(tableName = "vpn_service_state_stats")
 data class VpnServiceStateStats(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: String = DatabaseDateFormatter.timestamp(),
-    val state: VpnServiceState
+    val state: VpnServiceState,
+    val stopReason: VpnStoppingReason = UNKNOWN
 )
 
 data class BucketizedVpnServiceStateStats(

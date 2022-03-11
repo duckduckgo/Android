@@ -30,6 +30,8 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV4_PACKET
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV6_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
@@ -60,6 +62,18 @@ class HealthMetricCounter @Inject constructor(
     fun clearAllMetrics() {
         coroutineScope.launch(databaseDispatcher) {
             db.clearAllTables()
+        }
+    }
+
+    fun onTunIpv4PacketReceived() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_READ_IPV4_PACKET())
+        }
+    }
+
+    fun onTunIpv6PacketReceived() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_READ_IPV6_PACKET())
         }
     }
 

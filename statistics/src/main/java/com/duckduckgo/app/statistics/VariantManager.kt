@@ -19,8 +19,6 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersContinueWithoutPrivacyTips
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersSkipTutorial
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import timber.log.Timber
 import java.util.*
@@ -32,8 +30,7 @@ interface VariantManager {
     sealed class VariantFeature {
         object FireproofExperiment : VariantFeature()
 
-        object ReturningUsersContinueWithoutPrivacyTips : VariantFeature()
-        object ReturningUsersSkipTutorial : VariantFeature()
+        object TrackingParameterRemoval : VariantFeature()
     }
 
     companion object {
@@ -53,10 +50,9 @@ interface VariantManager {
             Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
-            // Returning users - second experiment
-            Variant(key = "zd", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zg", weight = 1.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
-            Variant(key = "zh", weight = 1.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
+            // Tracking parameter removal - initial rollout to 25%
+            Variant(key = "my", weight = 0.25, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { noFilter() }),
+            Variant(key = "me", weight = 0.75, features = emptyList(), filterBy = { noFilter() })
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -188,8 +184,7 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
-fun VariantManager.returningUsersContinueWithoutPrivacyTips() = this.getVariant().hasFeature(ReturningUsersContinueWithoutPrivacyTips)
-fun VariantManager.returningUsersSkipTutorial() = this.getVariant().hasFeature(ReturningUsersSkipTutorial)
+fun VariantManager.isTrackingParameterRemovalEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.TrackingParameterRemoval)
 
 /**
  * A variant which can be used for experimentation.

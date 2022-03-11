@@ -125,7 +125,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
             blockedTrackers = testCase.blockedTrackers.joinToString(","),
             surrogates = testCase.surrogates.joinToString(","),
             webViewVersion = "webViewVersion",
-            siteType = BrokenSiteViewModel.DESKTOP_SITE
+            siteType = BrokenSiteViewModel.DESKTOP_SITE,
+            urlParametersRemoved = testCase.urlParameterRemoved
         )
 
         testee.submitBrokenSiteFeedback(brokenSite)
@@ -168,7 +169,8 @@ class BrokenSitesReferenceTest(private val testCase: TestCase) {
         val gpcEnabled: Boolean = false,
         val expectReportURLPrefix: String,
         val expectReportURLParams: List<UrlParam>,
-        val exceptPlatforms: List<String>
+        val exceptPlatforms: List<String>,
+        val urlParameterRemoved: Boolean
     )
 
     data class UrlParam(

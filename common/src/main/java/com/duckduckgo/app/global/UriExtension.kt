@@ -120,3 +120,11 @@ data class ValidUrl(
     val host: String,
     val path: String?
 )
+
+fun Uri.replaceQueryParameters(queryParameters: List<String>): Uri {
+    val newUri = buildUpon().clearQuery()
+    for (parameter in queryParameters) {
+        newUri.appendQueryParameter(parameter, getQueryParameter(parameter))
+    }
+    return newUri.build()
+}

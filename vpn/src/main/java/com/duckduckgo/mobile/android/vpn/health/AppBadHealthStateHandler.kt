@@ -297,7 +297,7 @@ class AppBadHealthStateHandler @Inject constructor(
     }
 
     companion object {
-        private const val FILENAME = "com.duckduckgo.mobile.android.vpn.app.health.state"
+        private const val FILENAME = "com.duckduckgo.mobile.vpn.bad.health.config.store"
         private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         private const val INITIAL_BACKOFF: Long = 0
         private const val INITIAL_BACKOFF_INCREMENT_SECONDS: Long = 30

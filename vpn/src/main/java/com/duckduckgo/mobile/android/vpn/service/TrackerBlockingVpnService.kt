@@ -28,7 +28,6 @@ import android.net.Network
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
-import android.os.Build.VERSION_CODES
 import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
@@ -46,6 +45,8 @@ import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
@@ -59,7 +60,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
-import java.net.StandardSocketOptions
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import java.util.concurrent.ExecutorService
@@ -193,7 +193,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch { stopVpn(VpnStopReason.SelfStop) }
+                launch { stopVpn(VpnStateMonitor.VpnStopReason.SELF_STOP) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -286,7 +286,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.Error)
+            stopVpn(VpnStateMonitor.VpnStopReason.ERROR)
         }
     }
 
@@ -311,8 +311,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
-        Timber.i("VPN log: Stopping VPN.")
+    private suspend fun stopVpn(reason: VpnStateMonitor.VpnStopReason) = withContext(Dispatchers.IO) {
+        Timber.i("VPN log: Stopping VPN. $reason")
 
         queues.clearAll()
         executorService?.shutdownNow()
@@ -324,6 +324,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         tunInterface = null
 
         sendStopPixels(reason)
+
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: stopping ${it.javaClass} callback")
             it.onVpnStopped(this, reason)
@@ -337,12 +338,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         stopSelf()
     }
 
-    private fun sendStopPixels(reason: VpnStopReason) {
+    private fun sendStopPixels(reason: VpnStateMonitor.VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */
+            VpnStateMonitor.VpnStopReason.SELF_STOP, VpnStopReason.UNKNOWN -> { /* noop */
             }
-            VpnStopReason.Error -> deviceShieldPixels.startError()
-            VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
+            VpnStateMonitor.VpnStopReason.ERROR -> deviceShieldPixels.startError()
+            VpnStateMonitor.VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
     }
 
@@ -354,7 +355,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        launch { stopVpn(VpnStopReason.Revoked) }
+        launch { stopVpn(VpnStateMonitor.VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
@@ -534,12 +535,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    @SuppressLint("NewApi") // because we use the appBuildConfig.sdkInt IDE doesn't detect it
     override fun createSocketChannel(): SocketChannel {
         return SocketChannel.open().also { channel ->
-            if (appBuildConfig.sdkInt >= VERSION_CODES.N) {
-                channel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-            }
             channel.configureBlocking(false)
             protect(channel.socket())
         }
@@ -553,7 +550,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         "com.netflix.Speedtest",
         "eu.vspeed.android",
         "net.fireprobe.android",
-        "com.philips.lighting.hue2"
+        "com.philips.lighting.hue2",
+        "com.duckduckgo.mobile.android.debug"
     )
 }
 
