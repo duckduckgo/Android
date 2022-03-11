@@ -98,11 +98,11 @@ class AppTPWaitlistViewModel(
         timestamp: Int,
         token: String
     ) {
-        deviceShieldPixels.didShowWaitlistDialog()
         viewModelScope.launch {
             waitlistManager.joinWaitlist(timestamp, token)
-            commandChannel.send(Command.ShowNotificationDialog)
+            waitlistManager.notifyOnJoinedWaitlist()
             workManager.enqueue(workRequestBuilder.waitlistRequestWork(withBigDelay = false))
+            viewStateFlow.emit(ViewState(atpWaitlistStateRepository.getState()))
         }
     }
 
