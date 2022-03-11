@@ -24,16 +24,24 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/popupMenuItemHeight"
+        android:layout_height="@dimen/popupMenuNavigationItemHeight"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
 
         <ImageButton
             android:id="@+id/backMenuItem"
             style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="@drawable/ripple_top_left_rounded"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_back_24"
+            android:src="@drawable/ic_arrow_left_24"
+            app:tint="?attr/primaryIconColor"
+            android:layout_marginStart="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -41,8 +49,11 @@
         <ImageButton
             android:id="@+id/forwardMenuItem"
             style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:contentDescription="@string/forward"
-            android:src="@drawable/ic_forward"
+            android:src="@drawable/ic_arrow_right_24"
+            app:tint="?attr/primaryIconColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
             app:layout_constraintStart_toEndOf="@+id/backMenuItem"
@@ -51,14 +62,20 @@
         <ImageButton
             android:id="@+id/refreshMenuItem"
             style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="@drawable/ripple_top_right_rounded"
             android:contentDescription="@string/refresh"
-            android:src="@drawable/ic_refresh"
+            android:src="@drawable/ic_reload_24"
+            app:tint="?attr/primaryIconColor"
+            android:layout_marginEnd="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View style="@style/OverflowMenuFullDivider" />
 
     <ScrollView
         android:layout_width="match_parent"
