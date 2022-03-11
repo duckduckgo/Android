@@ -43,6 +43,7 @@
         app:layout_constraintTop_toBottomOf="@id/label"/>
 
     <com.duckduckgo.mobile.android.ui.view.SingleLineListItem
+        android:id="@+id/singleLineListItemWIthoutImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:singleLineItemTitle="This is a List Item without Image"
