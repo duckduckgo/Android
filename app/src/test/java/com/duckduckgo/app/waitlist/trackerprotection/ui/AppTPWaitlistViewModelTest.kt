@@ -35,7 +35,6 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,15 +77,11 @@ class AppTPWaitlistViewModelTest {
         val expectedWorkRequest = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>().build()
         whenever(waitlistBuilder.waitlistRequestWork(false)).thenReturn(expectedWorkRequest)
 
-        viewModel.commands.test {
-            viewModel.joinTheWaitlist()
+        viewModel.joinTheWaitlist()
 
-            verify(manager).joinWaitlist(any(), any())
-            verify(workManager).enqueue(expectedWorkRequest)
-            verify(deviceShieldPixels).didShowWaitlistDialog()
-
-            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
-        }
+        verify(manager).joinWaitlist(any(), any())
+        verify(workManager).enqueue(expectedWorkRequest)
+        verify(deviceShieldPixels).didShowWaitlistDialog()
     }
 
     @Test
@@ -145,38 +140,11 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserWantsToBeNotifiedThenWaitlistManagerStoresIt() = runTest {
-        viewModel.onNotifyMeClicked()
-
-        verify(manager).notifyOnJoinedWaitlist()
-        verify(deviceShieldPixels).didPressWaitlistDialogNotifyMe()
-    }
-
-    @Test
     fun whenUserWantsToGetStartedThenShowOnboardingCommandSent() = runTest {
         viewModel.commands.test {
             viewModel.getStarted()
             assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowOnboarding)
         }
-    }
-
-    @Test
-    fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
-        val waitlistState = WaitlistState.JoinedWaitlist(false)
-        whenever(repository.getState()).thenReturn(waitlistState)
-        viewModel.viewState.test {
-            assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(WaitlistState.NotJoinedQueue)), awaitEvent())
-            viewModel.onDialogDismissed()
-
-            verify(deviceShieldPixels, never()).didPressWaitlistDialogDismiss()
-            assertEquals(Event.Item(AppTPWaitlistViewModel.ViewState(waitlistState)), awaitEvent())
-        }
-    }
-
-    @Test
-    fun whenUserDismissedDialogThenWaitlistStateIsJoinedQueue() = runTest {
-        viewModel.onNoThanksClicked()
-        verify(deviceShieldPixels).didPressWaitlistDialogDismiss()
     }
 
     @Test
