@@ -33,7 +33,7 @@
     <string name="voiceSearchIconContentDescription">Voice search</string>
     <string name="voiceSearchListening">Listening…</string>
     <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. All speech data processing for Private Voice Search happens on your device.</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. Audio is processed on-device. It isn’t stored or shared with anyone.</string>
     <string name="voiceSearchPermissionRationaleTitle">Microphone Access Required for Private Voice Search</string>
     <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
     <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
