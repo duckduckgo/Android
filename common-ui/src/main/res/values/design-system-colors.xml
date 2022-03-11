@@ -16,27 +16,11 @@
 
 <resources>
 
-    <!-- Day / Light theme colors -->
-    <color name="primaryTextColor">@color/gray90</color>
-    <color name="secondaryTextColor">@color/gray70</color>
-    <color name="accentTextColor">@color/gray70</color>
-    <color name="disabledColor">#59000000</color>
-    <color name="splitterBg">@color/gray25</color>
-
-    <color name="primaryIconColor">@color/gray40</color>
-    <color name="accentIconColor">@color/gray30</color>
-
-    <color name="primaryButtonDefaultTextColor">@color/white</color>
-    <color name="primaryButtonHoverTextColor">@color/white</color>
-    <color name="primaryButtonPressedTextColor">@color/white</color>
-    <color name="primaryButtonDisabledTextColor">@color/disabledColor</color>
-
     <color name="red50">#DE5833</color>
 
     <color name="purple50">#5132A9</color>
 
     <color name="yellow50">#FFCC33</color>
-
 
     <color name="green50">#4CBA3C</color>
 
