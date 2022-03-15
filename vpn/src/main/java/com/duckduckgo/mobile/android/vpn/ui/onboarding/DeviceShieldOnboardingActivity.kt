@@ -89,7 +89,8 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     }
 
     override fun onPause() {
-        timeElapsed = SystemClock.elapsedRealtime() - startTime
+        val onScreenTime = SystemClock.elapsedRealtime() - startTime
+        timeElapsed += onScreenTime
         super.onPause()
     }
 
