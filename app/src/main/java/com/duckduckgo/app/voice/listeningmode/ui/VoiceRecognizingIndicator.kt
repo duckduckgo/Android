@@ -25,16 +25,23 @@ import android.widget.FrameLayout
 import com.duckduckgo.app.browser.databinding.ViewVoiceRecognizingIndicatorBinding
 import com.duckduckgo.app.voice.listeningmode.OnDeviceSpeechRecognizer.Companion.MAX_VOLUME
 import com.duckduckgo.app.voice.listeningmode.OnDeviceSpeechRecognizer.Companion.MIN_VOLUME
+import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Action
+import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface VoiceRecognizingIndicator {
     fun bind(model: Model)
+    fun onAction(actionHandler: (Action) -> Unit)
     fun destroy()
 
     data class Model(
         val volume: Float
     )
+
+    enum class Action {
+        INDICATOR_CLICKED
+    }
 }
 
 class VoiceRecognizingIndicatorView @JvmOverloads constructor(
@@ -96,6 +103,10 @@ class VoiceRecognizingIndicatorView @JvmOverloads constructor(
             reversePulseAnimator
         )
         animatorSet.start()
+    }
+
+    override fun onAction(actionHandler: (Action) -> Unit) {
+        binding.microphone.setOnClickListener { actionHandler.invoke(INDICATOR_CLICKED) }
     }
 
     override fun destroy() {

@@ -31,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.databinding.ActivityVoiceSearchBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchViewModel.Command
+import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
@@ -50,6 +51,15 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         addBackgroundBlur()
         setContentView(binding.root)
         configureToolbar()
+        configureViews()
+    }
+
+    private fun configureViews() {
+        binding.indicator.onAction {
+            if (it == INDICATOR_CLICKED) {
+                viewModel.userInitiatesSearchComplete()
+            }
+        }
     }
 
     private fun configureToolbar() {
@@ -113,10 +123,12 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun handleSuccess(result: String) {
-        updateText(result)
-        Intent().apply {
-            putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
-            setResult(Activity.RESULT_OK, this)
+        if (result.isNotEmpty()) {
+            updateText(result)
+            Intent().apply {
+                putExtra(EXTRA_VOICE_RESULT, result.capitalizeFirstLetter())
+                setResult(Activity.RESULT_OK, this)
+            }
         }
         finish()
     }

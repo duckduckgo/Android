@@ -162,4 +162,19 @@ class VoiceSearchViewModelTest {
         }
 
     }
+
+    @Test
+    fun whenUserInitiatesSearchCompleteThenEmitHandleSpeechRecognitionSuccessCommand() = runTest {
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.start()
+        verify(speechRecognizer).start(captor.capture())
+        captor.firstValue.invoke(Event.PartialResultReceived("Test"))
+
+        testee.userInitiatesSearchComplete()
+
+        testee.commands().test {
+            assertEquals(Command.HandleSpeechRecognitionSuccess("Test"), expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }

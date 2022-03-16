@@ -116,6 +116,17 @@ class VoiceSearchViewModel constructor(
             result
         }
     }
+
+    fun userInitiatesSearchComplete() {
+        sendCommand(
+            HandleSpeechRecognitionSuccess(
+                getFullResult(
+                    viewState.value.result,
+                    viewState.value.unsentResult
+                )
+            )
+        )
+    }
 }
 
 @ContributesMultibinding(AppScope::class)

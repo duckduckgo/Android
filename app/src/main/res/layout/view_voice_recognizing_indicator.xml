@@ -32,7 +32,7 @@
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
-    <ImageView
+    <ImageButton
         android:id="@+id/microphone"
         android:layout_width="56dp"
         android:layout_height="56dp"
