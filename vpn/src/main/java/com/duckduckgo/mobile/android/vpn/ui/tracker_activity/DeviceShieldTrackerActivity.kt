@@ -230,6 +230,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchExcludedApps(shouldListBeEnabled: Boolean) {
+        deviceShieldPixels.didOpenExclusionListActivity()
         startActivity(TrackingProtectionExclusionListActivity.intent(this, shouldListBeEnabled))
     }
 

@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.SystemClock
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldFaqBinding
@@ -32,24 +31,6 @@ class DeviceShieldFAQActivity : DuckDuckGoActivity() {
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private val binding: ActivityDeviceShieldFaqBinding by viewBinding()
-
-    private var timeElapsed: Long = -1
-    private var startTime: Long = -1
-
-    override fun onResume() {
-        startTime = SystemClock.elapsedRealtime()
-        super.onResume()
-    }
-
-    override fun onPause() {
-        timeElapsed = SystemClock.elapsedRealtime() - startTime
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        deviceShieldPixels.didSpendTimeOnFAQActivity(timeElapsed)
-        super.onDestroy()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

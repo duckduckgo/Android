@@ -21,7 +21,6 @@ import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
@@ -325,20 +324,20 @@ interface DeviceShieldPixels {
      */
     fun didRestartVpnProcessOnBadHealth()
 
-    /**
-     * Will fire when the FAQ Activity is closed, sending the amount of time spent actively on the screen
-     */
-    fun didSpendTimeOnFAQActivity(timeSpent: Long)
+    /** Will fire when Beta instructions CTA is pressed */
+    fun didOpenBetaInstructions()
 
     /**
-     * Will fire when the Onboarding Activity is closed, sending the amount of time spent actively on the screen
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
      */
-    fun didSpendTimeOnOnboardingActivity(timeSpent: Long)
+    fun didShowExclusionListActivity()
 
     /**
-     * Will fire when the What Are App Trackers is closed, sending the amount of time spent actively on the screen
+     * Will fire when the user wants to open the Exclusion List Activity
      */
-    fun didSpendTimeOnTrackersInfoActivity(timeSpent: Long)
+    fun didOpenExclusionListActivity()
 }
 
 @ContributesBinding(AppScope::class)
@@ -518,10 +517,12 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun privacyReportArticleDisplayed() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE_DAILY)
     }
 
     override fun privacyReportOnboardingFAQDisplayed() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ_DAILY)
     }
 
     override fun vpnEstablishTunInterfaceError() {
@@ -681,16 +682,19 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
     }
 
-    override fun didSpendTimeOnFAQActivity(timeSpent: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_FAQ_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
+    override fun didOpenBetaInstructions() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
     }
 
-    override fun didSpendTimeOnOnboardingActivity(timeSpent: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_ONBOARDING_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
+    override fun didShowExclusionListActivity() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY)
     }
 
-    override fun didSpendTimeOnTrackersInfoActivity(timeSpent: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_TRACKERS_INFO_SCREEN_TIME, mapOf(PixelParameter.SCREEN_TIME to timeSpent.toString()))
+    override fun didOpenExclusionListActivity() {
+        TODO("Not yet implemented")
     }
 
     private fun suddenKill() {

@@ -36,6 +36,7 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityTrackingProtectionExclusionListBinding
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
@@ -56,6 +57,9 @@ class TrackingProtectionExclusionListActivity :
     @Inject
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
@@ -80,6 +84,8 @@ class TrackingProtectionExclusionListActivity :
 
         bindViews()
         observeViewModel()
+
+        deviceShieldPixels.didShowExclusionListActivity()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
-import android.os.SystemClock
 import android.provider.Settings
 import android.view.View
 import android.widget.Button
@@ -69,9 +68,6 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
 
     private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
 
-    private var timeElapsed: Long = -1
-    private var startTime: Long = -1
-
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,22 +77,6 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
         bindViews()
         configureUI()
         observeViewModel()
-    }
-
-    override fun onResume() {
-        startTime = SystemClock.elapsedRealtime()
-        super.onResume()
-    }
-
-    override fun onPause() {
-        val onScreenTime = SystemClock.elapsedRealtime() - startTime
-        timeElapsed += onScreenTime
-        super.onPause()
-    }
-
-    override fun onDestroy() {
-        deviceShieldPixels.didSpendTimeOnOnboardingActivity(timeElapsed)
-        super.onDestroy()
     }
 
     private fun bindViews() {
