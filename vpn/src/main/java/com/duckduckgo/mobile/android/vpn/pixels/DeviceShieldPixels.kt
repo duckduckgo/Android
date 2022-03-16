@@ -335,9 +335,15 @@ interface DeviceShieldPixels {
     fun didShowExclusionListActivity()
 
     /**
-     * Will fire when the user wants to open the Exclusion List Activity
+     * Will fire when the user wants to open the Exclusion List Activity from the Trackers Screen
      */
-    fun didOpenExclusionListActivity()
+    fun didOpenExclusionListActivityFromTrackersScreen()
+
+    /**
+     * Will fire when the user opens the Company Trackers Screen
+     */
+    fun didOpenCompanyTrackersScreen()
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -693,8 +699,19 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY)
     }
 
-    override fun didOpenExclusionListActivity() {
-        TODO("Not yet implemented")
+    override fun didOpenExclusionListActivityFromTrackersScreen() {
+        tryToFireUniquePixel(
+            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS,
+            tag = FIRST_OPEN_ENTRY_POINT_TAG
+        )
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
+    }
+
+    override fun didOpenCompanyTrackersScreen() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
     }
 
     private fun suddenKill() {
@@ -759,6 +776,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     companion object {
         private const val FIRST_ENABLE_ENTRY_POINT_TAG = "FIRST_ENABLE_ENTRY_POINT_TAG"
+        private const val FIRST_OPEN_ENTRY_POINT_TAG = "FIRST_OPEN_ENTRY_POINT_TAG"
 
         @VisibleForTesting
         const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
