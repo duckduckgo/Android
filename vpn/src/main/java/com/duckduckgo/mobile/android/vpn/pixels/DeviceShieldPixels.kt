@@ -689,8 +689,8 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didOpenBetaInstructions() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS)
     }
 
     override fun didShowExclusionListActivity() {
