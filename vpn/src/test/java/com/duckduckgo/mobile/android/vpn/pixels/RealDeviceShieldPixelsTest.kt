@@ -295,6 +295,7 @@ class RealDeviceShieldPixelsTest {
         deviceShieldPixels.privacyReportArticleDisplayed()
 
         verify(pixel, times(2)).fire(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE.pixelName)
+        verify(pixel, times(1)).fire(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE_DAILY.pixelName)
         verifyNoMoreInteractions(pixel)
     }
 
