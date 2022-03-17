@@ -40,6 +40,13 @@ interface DownloadCallback {
     suspend fun onSuccess(file: File, mimeType: String?)
 
     /**
+     * Called when a download done using the DownloadManager is cancelled by the user from the notification. The DownloadManager considers
+     * this as a successful download. However, the downloadId gets removed from the internal DB maintained by the DownloadManager.
+     * Takes as parameter the [downloadId] provided by the DownloadManager when the download is enqueued.
+     */
+    suspend fun onCancel(downloadId: Long)
+
+    /**
      * Called when the download fails. Takes as optional parameters the [downloadId] provided by the DownloadManager if that was used
      * and the [url] which started the download. Takes as mandatory parameter the [reason] describing why the download has failed.
      */

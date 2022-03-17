@@ -65,7 +65,7 @@ class DefaultDownloadsRepository @Inject constructor(
     }
 
     override suspend fun delete(downloadIdList: List<Long>) {
-        downloadsDao.delete(downloadIdList)
+        downloadsDatabase.downloadsDao().delete(downloadIdList)
     }
 
     override suspend fun deleteAll() {

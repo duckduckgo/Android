@@ -39,15 +39,6 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-interface DownloadCallback {
-    fun onStart(downloadItem: DownloadItem)
-    fun onSuccess(downloadId: Long, contentLength: Long)
-    fun onSuccess(file: File, mimeType: String?)
-    fun onCancel(downloadId: Long)
-    fun onFailure(downloadId: Long? = null, url: String? = null, reason: DownloadFailReason)
-    fun commands(): Flow<FileDownloadCallback.DownloadCommand>
-}
-
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
