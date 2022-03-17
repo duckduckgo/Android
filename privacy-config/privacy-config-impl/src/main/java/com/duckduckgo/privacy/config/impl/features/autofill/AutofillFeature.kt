@@ -14,29 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component
+package com.duckduckgo.privacy.config.impl.features.autofill
 
-enum class Component {
-    BUTTON,
-    FAB,
-    CARD,
-    TOP_APP_BAR,
-    CHIP,
-    DRAWER,
-    TEXT_FIELD,
-    BOTTOM_NAVIGATION,
-    SWITCH,
-    RADIO_BUTTON,
-    CHECKBOX,
-    BOTTOM_APP_BAR,
-    TABS,
-    SNACKBAR,
-    INFO_PANEL,
-    DIALOG,
-    BOTTOM_SHEET,
-    IMAGE,
-    SEARCH_BAR,
-    MENU_ITEM,
-    SINGLE_LINE_LIST_ITEM,
-    TWO_LINE_LIST_ITEM
-}
+import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
+
+data class AutofillFeature(
+    val state: String,
+    val exceptions: List<AutofillExceptionEntity>
+)

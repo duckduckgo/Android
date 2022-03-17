@@ -16,15 +16,21 @@
 
 package xyz.hexene.localvpn;
 
+import androidx.annotation.Nullable;
 import java.nio.ByteBuffer;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
+import kotlin.jvm.Synchronized;
+import timber.log.Timber;
 
 public class ByteBufferPool {
     static final int BUFFER_SIZE = 16384; // XXX: Is this ideal?
     private static final ConcurrentLinkedQueue<ByteBuffer> pool = new ConcurrentLinkedQueue<>();
+    private static final HashSet<Integer> poolKeys = new HashSet<>();
     public static final AtomicLong allocations = new AtomicLong();
 
+    @Synchronized
     public static ByteBuffer acquire() {
 
         ByteBuffer buffer = pool.poll();
@@ -33,17 +39,28 @@ public class ByteBufferPool {
             allocations.incrementAndGet();
         }
         buffer.clear();
+        poolKeys.remove(System.identityHashCode(buffer));
         return buffer;
     }
 
-    public static void release(ByteBuffer buffer) {
+    @Synchronized
+    public static int release(@Nullable ByteBuffer buffer) {
+        if (buffer == null) {
+            Timber.d("Trying to release a null buffer...skip");
+            return ENULL;
+        }
+
+        int key = System.identityHashCode(buffer);
+        if (poolKeys.contains(key)) {
+            Timber.d("Trying to release a buffer that is already in the pool...skip");
+            return EEXIST;
+        }
         buffer.clear();
         pool.offer(buffer);
+        poolKeys.add(key);
         atomicUpdateAndGet(allocations, value -> value > 0 ? value - 1 : 0);
-    }
 
-    public static void clear() {
-        pool.clear();
+        return 0;
     }
 
     private static void atomicUpdateAndGet(AtomicLong atomicLong, UpdateAllocation updateFunction) {
@@ -57,4 +74,7 @@ public class ByteBufferPool {
     private interface UpdateAllocation {
         long applyUpdate(long operand);
     }
+
+    static final int ENULL = 1;
+    static final int EEXIST = 2;
 }

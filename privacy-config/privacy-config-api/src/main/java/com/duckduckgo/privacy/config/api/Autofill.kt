@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.themepreview.ui.component
+package com.duckduckgo.privacy.config.api
 
-enum class Component {
-    BUTTON,
-    FAB,
-    CARD,
-    TOP_APP_BAR,
-    CHIP,
-    DRAWER,
-    TEXT_FIELD,
-    BOTTOM_NAVIGATION,
-    SWITCH,
-    RADIO_BUTTON,
-    CHECKBOX,
-    BOTTOM_APP_BAR,
-    TABS,
-    SNACKBAR,
-    INFO_PANEL,
-    DIALOG,
-    BOTTOM_SHEET,
-    IMAGE,
-    SEARCH_BAR,
-    MENU_ITEM,
-    SINGLE_LINE_LIST_ITEM,
-    TWO_LINE_LIST_ITEM
+/** Public interface for the Autofill feature */
+interface Autofill {
+    /**
+     * This method takes a [url] and returns `true` or `false` depending if the [url] is in the
+     * autofill exceptions list
+     * @return a `true` if the given [url] if the url is in the autofill exceptions list and `false`
+     * otherwise.
+     */
+    fun isAnException(url: String): Boolean
 }
+
+/** Public data class for Autofill Exceptions */
+data class AutofillException(
+    val domain: String,
+    val reason: String
+)

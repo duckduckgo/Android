@@ -18,6 +18,7 @@ package dummy.ui
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -29,20 +30,33 @@ class VpnPreferences @Inject constructor(
 ) {
 
     fun updateDebugLoggingPreference(enabled: Boolean) {
-        prefs().edit { putBoolean(PREFS_KEY_DEBUG_LOGGING, enabled) }
+        preferences.edit { putBoolean(PREFS_KEY_DEBUG_LOGGING, enabled) }
     }
 
-    fun getDebugLoggingPreference(): Boolean = prefs().getBoolean(PREFS_KEY_DEBUG_LOGGING, appBuildConfig.isDebug)
+    fun getDebugLoggingPreference(): Boolean = preferences.getBoolean(PREFS_KEY_DEBUG_LOGGING, appBuildConfig.isDebug)
 
     fun useCustomDnsServer(dnsServer: Boolean) {
-        prefs().edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
+        preferences.edit { putBoolean(PREFS_KEY_DNS_SERVER, dnsServer) }
     }
 
-    fun isCustomDnsServerSet(): Boolean = prefs().getBoolean(PREFS_KEY_DNS_SERVER, false)
+    fun isCustomDnsServerSet(): Boolean = preferences.getBoolean(PREFS_KEY_DNS_SERVER, false)
 
-    private fun prefs(): SharedPreferences {
-        return applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
+    var privateDns: String?
+        get() = preferences.getString("private_dns", null)
+        set(value) = preferences.edit { putString("private_dns", value) }
+
+    fun isPrivateDnsKey(key: String) = key == "private_dns"
+
+    fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+        preferences.registerOnSharedPreferenceChangeListener(listener)
     }
+
+    fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+        preferences.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
+    private val preferences: SharedPreferences
+        get() = applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
 
     companion object {
 
