@@ -116,6 +116,8 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
+import com.duckduckgo.app.voice.VoiceSearchAvailability
+import com.duckduckgo.app.voice.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.*
@@ -303,6 +305,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
+    @Mock
+    private lateinit var voiceSearchAvailability: VoiceSearchAvailability
+
+    @Mock
+    private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -443,7 +451,9 @@ class BrowserTabViewModelTest {
             variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
-            trackingParameters = mockTrackingParameters
+            trackingParameters = mockTrackingParameters,
+            voiceSearchAvailability = voiceSearchAvailability,
+            voiceSearchPixelLogger = voiceSearchPixelLogger
         )
 
         testee.loadData("abc", null, false, false)
@@ -3935,6 +3945,49 @@ class BrowserTabViewModelTest {
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserSubmittedQueryThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserNavigatesHomeThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserLoadedUrlThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        loadUrl("https://test.com")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndOmnibarInputStateChangedThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenInitializedAndVoiceSearchNotSupportedThenDontLogVoiceSearch() {
+        verify(voiceSearchPixelLogger, never()).log()
     }
 
     private fun givenUrlCanUseGpc() {

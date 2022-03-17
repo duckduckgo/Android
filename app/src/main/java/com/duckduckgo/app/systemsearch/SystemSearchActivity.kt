@@ -53,7 +53,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
-import com.duckduckgo.app.voice.VoiceSearchAvailabilityUtil
+import com.duckduckgo.app.voice.VoiceSearchAvailability
 import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -80,6 +80,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
@@ -252,7 +255,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun configureVoiceSearch() {
-        if (VoiceSearchAvailabilityUtil.shouldShowVoiceSearchEntry(this)) {
+        if (voiceSearchAvailability.isVoiceSearchSupported) {
             voiceSearch.visibility = View.VISIBLE
             voiceSearchLauncher.registerResultsCallback(this, this) {
                 if (it.isNotEmpty()) {

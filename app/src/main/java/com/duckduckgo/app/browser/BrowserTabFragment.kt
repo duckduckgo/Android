@@ -175,8 +175,6 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
-import com.duckduckgo.app.voice.VoiceSearchAvailabilityPixelLogger
-import com.duckduckgo.app.voice.VoiceSearchAvailabilityUtil
 import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -303,9 +301,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
-    @Inject
-    lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
-
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -431,7 +426,6 @@ class BrowserTabFragment :
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureFindInPage()
-        configureVoiceSearch()
         configureAutoComplete()
         configureOmnibarQuickAccessGrid()
         configureHomeTabQuickAccessGrid()
@@ -1304,20 +1298,6 @@ class BrowserTabFragment :
     private fun configurePrivacyGrade() {
         toolbar.privacyGradeButton.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
-        }
-    }
-
-    private fun configureVoiceSearch() {
-        context?.let {
-            if (VoiceSearchAvailabilityUtil.shouldShowVoiceSearchEntry(it)) {
-                voiceSearchPixelLogger.log()
-                voiceSearchButton.visibility = VISIBLE
-                voiceSearchButton.setOnClickListener {
-                    voiceSearchLauncher.launch()
-                }
-            } else {
-                voiceSearchButton.visibility = GONE
-            }
         }
     }
 
@@ -2228,6 +2208,19 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
                 }
+
+                renderVoiceSearch(viewState)
+            }
+        }
+
+        private fun renderVoiceSearch(viewState: OmnibarViewState) {
+            if (viewState.showVoiceSearch) {
+                voiceSearchButton.visibility = VISIBLE
+                voiceSearchButton.setOnClickListener {
+                    voiceSearchLauncher.launch()
+                }
+            } else {
+                voiceSearchButton.visibility = GONE
             }
         }
 
@@ -2547,7 +2540,10 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
+        private fun showHomeBackground(
+            favorites: List<QuickAccessFavorite>,
+            hideLogo: Boolean = false
+        ) {
             if (favorites.isEmpty()) {
                 if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()

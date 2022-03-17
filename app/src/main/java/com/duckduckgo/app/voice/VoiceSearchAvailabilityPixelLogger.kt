@@ -21,12 +21,19 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-class VoiceSearchAvailabilityPixelLogger @Inject constructor(
+interface VoiceSearchAvailabilityPixelLogger {
+    fun log()
+}
+
+@ContributesBinding(AppScope::class)
+class DefaultVoiceSearchAvailabilityPixelLogger @Inject constructor(
     val context: Context,
     private val pixel: Pixel
-) {
+) : VoiceSearchAvailabilityPixelLogger {
     companion object {
         const val FILENAME = "com.duckduckgo.app.voice"
         const val KEY_VOICE_SEARCH_AVAILABILITY_LOGGED = "KEY_VOICE_SEARCH_AVAILABILITY_LOGGED"
@@ -35,7 +42,7 @@ class VoiceSearchAvailabilityPixelLogger @Inject constructor(
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
-    fun log() {
+    override fun log() {
         if (!hasLoggedPixel()) {
             pixel.fire(AppPixelName.VOICE_SEARCH_AVAILABLE)
             savePixelAlreadyLogged()
