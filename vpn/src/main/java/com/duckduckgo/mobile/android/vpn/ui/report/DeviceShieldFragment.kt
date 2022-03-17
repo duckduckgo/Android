@@ -32,8 +32,11 @@ import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
+import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
@@ -103,25 +106,36 @@ class DeviceShieldFragment : Fragment() {
             }.launchIn(lifecycleScope)
     }
 
-    private fun renderViewState(
-        state: PrivacyReportViewModel.PrivacyReportView.ViewState
-    ) {
-        if (state.onboardingComplete) {
+    private fun renderViewState(viewState: ViewState) {
+        if (viewState.onboardingComplete) {
             this.view?.show()
         } else {
             this.view?.gone()
         }
-        if (state.isRunning) {
-            if (state.trackersBlocked.trackers > 0) {
-                renderTrackersBlockedWhenEnabled(state.trackersBlocked)
-            } else {
-                deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
-                deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
-            }
-        } else {
-            deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
-            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+        when {
+            viewState.vpnState.state == ENABLED -> renderStateEnabled(viewState)
+            viewState.vpnState.stopReason == REVOKED -> renderStateRevoked()
+            else -> renderStateDisabled()
         }
+    }
+
+    private fun renderStateEnabled(viewState: ViewState) {
+        if (viewState.trackersBlocked.trackers > 0) {
+            renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
+        } else {
+            deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
+            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
+        }
+    }
+
+    private fun renderStateDisabled() {
+        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+    }
+
+    private fun renderStateRevoked() {
+        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
+        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {

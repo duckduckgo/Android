@@ -41,7 +41,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
@@ -63,7 +63,7 @@ class BrowserWebViewClient(
     private val dispatcherProvider: DispatcherProvider,
     private val emailInjector: EmailInjector,
     private val accessibilityManager: AccessibilityManager,
-    private val trackingLinkDetector: TrackingLinkDetector
+    private val ampLinks: AmpLinks
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -156,20 +156,39 @@ class BrowserWebViewClient(
                     }
                     false
                 }
-                is SpecialUrlDetector.UrlType.ExtractedTrackingLink -> {
+                is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                     if (isForMainFrame) {
                         webViewClientListener?.startProcessingTrackingLink()
-                        Timber.d("Tracking link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                        Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
                         webView.loadUrl(urlType.extractedUrl)
                         return true
                     }
                     false
                 }
-                is SpecialUrlDetector.UrlType.CloakedTrackingLink -> {
-                    val lastTrackingLinkInfo = trackingLinkDetector.lastTrackingLinkInfo
-                    if (isForMainFrame && (lastTrackingLinkInfo == null || lastPageStarted != lastTrackingLinkInfo.destinationUrl)) {
+                is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
+                    val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
+                    if (isForMainFrame && (lastAmpLinkInfo == null || lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
                         webViewClientListener?.let { listener ->
-                            listener.handleCloakedTrackingLink(urlType.trackingUrl)
+                            listener.handleCloakedAmpLink(urlType.ampUrl)
+                            return true
+                        }
+                    }
+                    false
+                }
+                is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.startProcessingTrackingLink()
+                        Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+
+                        val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)
+
+                        if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
+                            webViewClientListener?.let { listener ->
+                                webView.loadUrl(urlType.cleanedUrl)
+                                return listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                            }
+                        } else {
+                            webView.loadUrl(urlType.cleanedUrl)
                             return true
                         }
                     }

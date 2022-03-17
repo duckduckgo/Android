@@ -35,5 +35,8 @@ enum class Component {
     DIALOG,
     BOTTOM_SHEET,
     IMAGE,
-    SEARCH_BAR
+    SEARCH_BAR,
+    MENU_ITEM,
+    SINGLE_LINE_LIST_ITEM,
+    TWO_LINE_LIST_ITEM
 }

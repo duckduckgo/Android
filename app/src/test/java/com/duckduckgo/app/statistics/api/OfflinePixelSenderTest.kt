@@ -40,7 +40,8 @@ class OfflinePixelSenderTest {
     private var mockUncaughtExceptionRepository: UncaughtExceptionRepository = mock()
     private var mockPixel: PixelSender = mock()
 
-    private var testee: OfflinePixelSender = OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel, setOf())
+    private var testee: OfflinePixelSender =
+        OfflinePixelSender(mockOfflinePixelCountDataStore, mockUncaughtExceptionRepository, mockPixel, setOf())
 
     @get:Rule
     val schedulers = InstantSchedulersRule()

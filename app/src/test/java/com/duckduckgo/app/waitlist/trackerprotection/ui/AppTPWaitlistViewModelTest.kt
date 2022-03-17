@@ -78,15 +78,11 @@ class AppTPWaitlistViewModelTest {
         val expectedWorkRequest = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>().build()
         whenever(waitlistBuilder.waitlistRequestWork(false)).thenReturn(expectedWorkRequest)
 
-        viewModel.commands.test {
-            viewModel.joinTheWaitlist()
+        viewModel.joinTheWaitlist()
 
-            verify(manager).joinWaitlist(any(), any())
-            verify(workManager).enqueue(expectedWorkRequest)
-            verify(deviceShieldPixels).didShowWaitlistDialog()
-
-            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
-        }
+        verify(manager).joinWaitlist(any(), any())
+        verify(manager).notifyOnJoinedWaitlist()
+        verify(workManager).enqueue(expectedWorkRequest)
     }
 
     @Test

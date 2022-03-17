@@ -27,8 +27,10 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
-import com.duckduckgo.privacy.config.api.TrackingLinkType
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.AmpLinkType
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -51,13 +53,25 @@ class SpecialUrlDetectorImplTest {
     lateinit var mockPackageManager: PackageManager
 
     @Mock
-    lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+    lateinit var mockAmpLinks: AmpLinks
+
+    @Mock
+    lateinit var mockTrackingParameters: TrackingParameters
+
+    @Mock
+    lateinit var mockVariantManager: VariantManager
 
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-        testee = SpecialUrlDetectorImpl(packageManager = mockPackageManager, trackingLinkDetector = mockTrackingLinkDetector)
+        testee = SpecialUrlDetectorImpl(
+            packageManager = mockPackageManager,
+            ampLinks = mockAmpLinks,
+            trackingParameters = mockTrackingParameters,
+            variantManager = mockVariantManager
+        )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "my" })
     }
 
     @Test
@@ -257,6 +271,32 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsAboutSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("about:blank")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsAboutSchemeThenFullQueryRetained() {
+        val type = testee.determineType("about:blank") as SearchQuery
+        assertEquals("about:blank", type.query)
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("file:///sdcard/")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsFileSchemeThenFullQueryRetained() {
+        val type = testee.determineType("file:///sdcard/") as SearchQuery
+        assertEquals("file:///sdcard/", type.query)
+    }
+
+    @Test
     fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
         val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("sms:$longSms") as Sms
@@ -292,23 +332,40 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsTrackingLinkThenExtractedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
-            .thenReturn(TrackingLinkType.ExtractedTrackingLink(extractedUrl = "https://www.example.com"))
-        val expected = ExtractedTrackingLink::class
+    fun whenUrlIsAmpLinkThenExtractedAmpLinkTypeDetected() {
+        whenever(mockAmpLinks.extractCanonicalFromAmpLink(anyString()))
+            .thenReturn(AmpLinkType.ExtractedAmpLink(extractedUrl = "https://www.example.com"))
+        val expected = ExtractedAmpLink::class
         val actual = testee.determineType("https://www.google.com/amp/s/www.example.com")
         assertEquals(expected, actual::class)
-        assertEquals("https://www.example.com", (actual as ExtractedTrackingLink).extractedUrl)
+        assertEquals("https://www.example.com", (actual as ExtractedAmpLink).extractedUrl)
     }
 
     @Test
-    fun whenUrlIsCloakedTrackingLinkThenCloakedTrackingLinkTypeDetected() {
-        whenever(mockTrackingLinkDetector.extractCanonicalFromTrackingLink(anyString()))
-            .thenReturn(TrackingLinkType.CloakedTrackingLink(trackingUrl = "https://www.example.com/amp"))
-        val expected = CloakedTrackingLink::class
+    fun whenUrlIsCloakedAmpLinkThenCloakedAmpLinkTypeDetected() {
+        whenever(mockAmpLinks.extractCanonicalFromAmpLink(anyString()))
+            .thenReturn(AmpLinkType.CloakedAmpLink(ampUrl = "https://www.example.com/amp"))
+        val expected = CloakedAmpLink::class
         val actual = testee.determineType("https://www.example.com/amp")
         assertEquals(expected, actual::class)
-        assertEquals("https://www.example.com/amp", (actual as CloakedTrackingLink).trackingUrl)
+        assertEquals("https://www.example.com/amp", (actual as CloakedAmpLink).ampUrl)
+    }
+
+    @Test
+    fun whenUrlIsTrackingParameterLinkThenTrackingParameterLinkTypeDetected() {
+        whenever(mockTrackingParameters.cleanTrackingParameters(anyString())).thenReturn("https://www.example.com/query.html")
+        val expected = TrackingParameterLink::class
+        val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
+        assertEquals(expected, actual::class)
+        assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
+    }
+
+    @Test
+    fun whenUrlIsTrackingParameterLinkAndVariantIsNotTrackingParameterRemovalThenReturnWebType() {
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        val expected = Web::class
+        val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
+        assertEquals(expected, actual::class)
     }
 
     private fun randomString(length: Int): String {

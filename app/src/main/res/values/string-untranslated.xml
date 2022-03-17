@@ -30,13 +30,6 @@
     <string name="favoritesWidgetLabel">Favorites</string>
     <string name="searchWidgetLabel">Search</string>
 
-    <!-- Treat returning users differently Experiment -->
-    <string name="returningUsersLetsDoItButtonLabel">Let\'s Do It</string>
-    <string name="returningUsersContinuesWithoutPrivacyTipsButtonLabel">Continue Without Privacy Tips</string>
-    <string name="returningUsersSkipTutorialButtonLabel">Skip Tutorial</string>
-    <string name="returningUsersWidgetPromptTitle">Add the DuckDuckGo widget to your home screen</string>
-    <string name="returningUsersWidgetDismissButtonLabel">No Thanks</string>
-
     <!-- Email -->
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>

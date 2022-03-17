@@ -18,8 +18,12 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.processor.packet.isIP4
+import com.duckduckgo.mobile.android.vpn.processor.packet.isIP6
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -36,6 +40,7 @@ class TunPacketReader @AssistedInject constructor(
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val appBuildConfig: AppBuildConfig,
 ) : Runnable {
 
     private var running = false
@@ -93,17 +98,34 @@ class TunPacketReader @AssistedInject constructor(
 
         bufferToNetwork.flip()
         val packet = Packet(bufferToNetwork)
-        if (packet.isUDP) {
-            queues.udpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
-        } else if (packet.isTCP) {
-            queues.tcpDeviceToNetwork.offer(packet)
-            healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+        if (packet.isIP4() || isIP6AndInternalBuild(packet)) {
+            if (packet.isIP4()) {
+                healthMetricCounter.onTunIpv4PacketReceived()
+            }
+            if (packet.isIP6()) {
+                healthMetricCounter.onTunIpv6PacketReceived()
+            }
+
+            if (packet.isUDP) {
+                queues.udpDeviceToNetwork.offer(packet)
+                healthMetricCounter.onWrittenToDeviceToNetworkQueue(isUdp = true)
+            } else if (packet.isTCP) {
+                queues.tcpDeviceToNetwork.offer(packet)
+                healthMetricCounter.onWrittenToDeviceToNetworkQueue()
+            } else {
+                healthMetricCounter.onTunUnknownPacketReceived()
+                deviceShieldPixels.sendUnknownPacketProtocol(packet.ipHeader.protocol.number)
+                ByteBufferPool.release(bufferToNetwork)
+            }
         } else {
-            healthMetricCounter.onTunUnknownPacketReceived()
-            deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
+            // this is temporary until we remove the isIP6AndInternalBuild() to make IP6 available in production builds
+            if (packet.isIP6()) healthMetricCounter.onTunIpv6PacketReceived()
             ByteBufferPool.release(bufferToNetwork)
         }
+    }
+
+    private fun isIP6AndInternalBuild(packet: Packet): Boolean {
+        return packet.isIP6() && appBuildConfig.flavor == BuildFlavor.INTERNAL
     }
 
     private fun byteBuffer(): ByteBuffer {

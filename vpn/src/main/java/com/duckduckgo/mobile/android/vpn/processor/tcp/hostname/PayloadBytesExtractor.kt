@@ -32,8 +32,8 @@ class ConcretePayloadBytesExtractor : PayloadBytesExtractor {
         packet: Packet,
         payloadBuffer: ByteBuffer
     ): ByteArray {
-        val headerLength = packet.ip4Header.headerLength + packet.tcpHeader.headerLength
-        val payloadSize = packet.ip4Header.totalLength - headerLength
+        val headerLength = packet.ipHeader.headerLength + packet.tcpHeader.headerLength
+        val payloadSize = packet.ipHeader.totalLength - headerLength
         val newArray = ByteArray(payloadSize)
 
         if (payloadBuffer.hasArray()) {

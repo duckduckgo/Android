@@ -16,26 +16,41 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.di.AppCoroutineScope
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
 
-class DeviceShieldOnboardingViewModel(
+class DeviceShieldOnboardingViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
+    private val vpnDetector: VpnDetector,
+    private val vpnStateMonitor: VpnStateMonitor,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
+
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    private var lastVpnRequestTime = -1L
 
     data class OnboardingPage(
         val imageHeader: Int,
@@ -66,31 +81,67 @@ class DeviceShieldOnboardingViewModel(
         deviceShieldOnboardingStore.onboardingDidNotShow()
     }
 
-    fun onDeviceShieldEnabled() {
+    fun onTurnAppTpOffOn() {
+        if (vpnDetector.isVpnDetected()) {
+            sendCommand(Command.ShowVpnConflictDialog)
+        } else {
+            sendCommand(Command.CheckVPNPermission)
+        }
+    }
+
+    fun onAppTpEnabled() {
         Timber.i("App Tracking Protection, is now enabled")
         appCoroutineScope.launch(dispatcherProvider.io()) {
             deviceShieldPixels.enableFromOnboarding()
         }
     }
+
+    fun onVPNPermissionNeeded(permissionIntent: Intent) {
+        lastVpnRequestTime = System.currentTimeMillis()
+        sendCommand(Command.RequestVPNPermission(permissionIntent))
+    }
+
+    fun onVPNPermissionResult(resultCode: Int) {
+        when (resultCode) {
+            AppCompatActivity.RESULT_OK -> {
+                sendCommand(Command.LaunchVPN)
+                return
+            }
+            else -> {
+                if (System.currentTimeMillis() - lastVpnRequestTime < 1000) {
+                    sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
+                }
+                lastVpnRequestTime = -1
+            }
+        }
+    }
+
+    private fun sendCommand(newCommand: Command) {
+        viewModelScope.launch {
+            command.send(newCommand)
+        }
+    }
+}
+
+sealed class Command {
+    object LaunchVPN : Command()
+    object CheckVPNPermission : Command()
+    object ShowVpnConflictDialog : Command()
+    object ShowVpnAlwaysOnConflictDialog : Command()
+    data class RequestVPNPermission(val vpnIntent: Intent) : Command()
 }
 
 @ContributesMultibinding(AppScope::class)
 class DeviceShieldOnboardingViewModelFactory @Inject constructor(
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
-    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
-    @AppCoroutineScope private val appCoroutineScope: Provider<CoroutineScope>,
-    private val dispatcherProvider: Provider<DispatcherProvider>,
+    private val viewModelProvider: Provider<DeviceShieldOnboardingViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
                 isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (
-                    DeviceShieldOnboardingViewModel(
-                        deviceShieldPixels.get(),
-                        deviceShieldOnboardingStore.get(),
-                        appCoroutineScope.get(),
-                        dispatcherProvider.get(),
-                    ) as T
+                    (
+                        viewModelProvider.get()
+                        ) as T
                     )
                 else -> null
             }

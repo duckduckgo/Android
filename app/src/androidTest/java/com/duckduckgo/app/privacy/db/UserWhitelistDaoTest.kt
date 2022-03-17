@@ -23,6 +23,8 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.blockingObserve
 import com.duckduckgo.app.global.db.AppDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -64,6 +66,12 @@ class UserWhitelistDaoTest {
     fun whenElementAddedThenListSizeIsOne() {
         dao.insert(DOMAIN)
         assertEquals(1, dao.all().blockingObserve()!!.size)
+    }
+
+    @Test
+    fun whenElementAddedThenFlowListSizeIsOne() = runBlocking {
+        dao.insert(DOMAIN)
+        assertEquals(1, dao.allFlow().first().size)
     }
 
     @Test

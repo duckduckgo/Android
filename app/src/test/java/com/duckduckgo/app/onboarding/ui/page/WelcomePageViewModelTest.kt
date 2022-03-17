@@ -22,9 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -42,7 +40,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
@@ -68,12 +65,6 @@ class WelcomePageViewModelTest {
     @Mock
     private lateinit var defaultRoleBrowserDialog: DefaultRoleBrowserDialog
 
-    @Mock
-    private lateinit var mockOnboardingStore: OnboardingStore
-
-    @Mock
-    private lateinit var mockVariantManager: VariantManager
-
     private val events = ConflatedBroadcastChannel<WelcomePageView.Event>()
 
     lateinit var viewModel: WelcomePageViewModel
@@ -83,16 +74,11 @@ class WelcomePageViewModelTest {
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
-
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-
         viewModel = WelcomePageViewModel(
             appInstallStore = appInstallStore,
             context = mock(),
             pixel = pixel,
-            defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-            onboardingStore = mockOnboardingStore,
-            variantManager = mockVariantManager
+            defaultRoleBrowserDialog = defaultRoleBrowserDialog
         )
 
         viewEvents = events.asFlow().flatMapLatest { viewModel.reduce(it) }
@@ -111,7 +97,6 @@ class WelcomePageViewModelTest {
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
         }
     }
 
@@ -125,7 +110,6 @@ class WelcomePageViewModelTest {
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
         }
     }
 
@@ -138,7 +122,6 @@ class WelcomePageViewModelTest {
 
         viewEvents.test {
             assertTrue(awaitItem() == WelcomePageView.State.Finish)
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_PRIMARY_CTA_PRESSED)
             verify(pixel).fire(AppPixelName.DEFAULT_BROWSER_DIALOG_NOT_SHOWN)
         }
     }
@@ -168,100 +151,6 @@ class WelcomePageViewModelTest {
                 AppPixelName.DEFAULT_BROWSER_NOT_SET,
                 mapOf(Pixel.PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString())
             )
-        }
-    }
-
-    @Test
-    fun whenReturningUsersContinueWithoutPrivacyTipsShowExpectedState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
-
-        viewModel.screenContent.test {
-            val viewState = awaitItem()
-            assertTrue(viewState is WelcomePageViewModel.ViewState.ContinueWithoutPrivacyTipsState)
-        }
-    }
-
-    @Test
-    fun whenReturningUsersSkipTutorialEnabledShowExpectedState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
-
-        viewModel.screenContent.test {
-            val viewState = awaitItem()
-            assertTrue(viewState is WelcomePageViewModel.ViewState.SkipTutorialState)
-        }
-    }
-
-    @Test
-    fun whenControlEnabledShowDefaultOnboardingState() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zd" })
-
-        viewModel.screenContent.test {
-            val viewState = awaitItem()
-            assertTrue(viewState is WelcomePageViewModel.ViewState.DefaultOnboardingState)
-        }
-    }
-
-    @Test
-    fun whenOnPrimaryCtaClickedAndReturningUsersContinueWithoutPrivacyTipsEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
-
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
-        }
-    }
-
-    @Test
-    fun whenOnPrimaryCtaClickedAndReturningUsersSkipTutorialEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
-
-        events.send(WelcomePageView.Event.OnPrimaryCtaClicked)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            verify(mockOnboardingStore, never()).userMarkedAsReturningUser = true
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_NEW_USER_CTA_PRESSED)
-        }
-    }
-
-    @Test
-    fun whenOnReturningUserClickedAndReturningUsersContinueWithoutPrivacyTipsEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zg" })
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
-
-        events.send(WelcomePageView.Event.OnReturningUserClicked)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            verify(mockOnboardingStore).userMarkedAsReturningUser = true
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
-        }
-    }
-
-    @Test
-    fun whenOnReturningUserClickedAndReturningUsersSkipTutorialEnabledThenEmitShowDialog() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "zh" })
-        whenever(defaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
-        val intent = Intent()
-        whenever(defaultRoleBrowserDialog.createIntent(any())).thenReturn(intent)
-
-        events.send(WelcomePageView.Event.OnReturningUserClicked)
-
-        viewEvents.test {
-            assertTrue(awaitItem() == WelcomePageView.State.ShowDefaultBrowserDialog(intent))
-            verify(mockOnboardingStore).userMarkedAsReturningUser = true
-            verify(pixel).fire(AppPixelName.ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED)
         }
     }
 }

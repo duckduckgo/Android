@@ -25,6 +25,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceState.DISABLED
+import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import dagger.android.AndroidInjection
@@ -62,9 +65,19 @@ class VpnStateMonitorService : Service() {
     override fun onDestroy() {
         Timber.d("onDestroy")
         coroutineScope.launch(dispatcherProvider.io()) {
+            maybeUpdateVPNState()
             vpnBringUpIfSuddenKill()
         }
         super.onDestroy()
+    }
+
+    // check last state, if it was enabled then we store disabled state reason unknown
+    private fun maybeUpdateVPNState() {
+        val lastStateStats = vpnDatabase.vpnServiceStateDao().getLastStateStats()
+        if (lastStateStats?.state != VpnServiceState.DISABLED) {
+            Timber.d("VpnStateMonitorService destroyed but VPN state stored as ${lastStateStats?.state}, inserting DISABLED")
+            vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
+        }
     }
 
     @WorkerThread
