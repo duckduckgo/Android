@@ -34,4 +34,5 @@ sealed class PrivacyFeatureName(override val value: String) : FeatureName {
 
     data class TrackingParametersFeatureName(override val value: String = "trackingParameters") :
         PrivacyFeatureName(value)
+    data class AutofillFeatureName(override val value: String = "autofill") : PrivacyFeatureName(value)
 }

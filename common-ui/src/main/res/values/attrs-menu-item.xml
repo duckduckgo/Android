@@ -17,12 +17,10 @@
 
 <resources>
 
-    <!-- Night / Dark theme colors -->
-    <color name="primaryTextColor">@color/white</color>
-    <color name="secondaryTextColor">@color/gray20</color>
-    <color name="splitterBg">@color/gray85</color>
+    <!--Menu item view-->
+    <declare-styleable name="MenuItemView">
+        <attr name="iconDrawable" format="reference" />
+        <attr name="labelText" format="string" />
+    </declare-styleable>
 
-    <color name="primaryIconColor">@color/gray85</color>
-    <color name="accentIconColor">@color/gray80</color>
-    <color name="accentTextColor">@color/gray30</color>
 </resources>
