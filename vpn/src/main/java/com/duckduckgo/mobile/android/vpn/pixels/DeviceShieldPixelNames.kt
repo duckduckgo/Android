@@ -178,6 +178,6 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE("m_atp_imp_company_trackers_activity_u"),
     ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY("m_atp_imp_company_trackers_activity_d"),
-    ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY("m_atp_imp_exclusion_list_activity_c"),
+    ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY("m_atp_imp_company_trackers_activity_c"),
     ;
 }
