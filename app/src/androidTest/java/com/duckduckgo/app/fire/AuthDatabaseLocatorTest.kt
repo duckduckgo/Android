@@ -16,17 +16,25 @@
 
 package com.duckduckgo.app.fire
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
 class AuthDatabaseLocatorTest {
 
+    val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Before
+    fun before() {
+        DefaultWebViewDatabaseProvider(context).get()
+    }
+
     @Test
     fun whenGetDatabasePathOnDeviceThenPathNotEmpty() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
         val authDatabaseLocator = AuthDatabaseLocator(context)
-
         val databasePath = authDatabaseLocator.getDatabasePath()
 
         // If this test fails, it means the Auth Database path has changed its location

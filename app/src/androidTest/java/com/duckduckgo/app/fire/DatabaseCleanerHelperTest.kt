@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -38,6 +39,7 @@ class DatabaseCleanerHelperTest {
 
     @Before
     fun before() {
+        DefaultWebViewDatabaseProvider(context).get()
         testee = DatabaseCleanerHelper(coroutineRule.testDispatcherProvider)
     }
 
