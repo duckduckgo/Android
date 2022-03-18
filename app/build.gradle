@@ -23,6 +23,7 @@ android {
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunnerArguments clearPackageData: 'true'
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
 
@@ -104,9 +105,9 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
-        if (USE_ORCHESTRATOR) {
-            execution 'ANDROID_TEST_ORCHESTRATOR'
-        }
+//        if (USE_ORCHESTRATOR) {
+//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+//        }
     }
 
     def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
@@ -121,6 +122,34 @@ android {
     } else {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
+    }
+}
+
+fulladleModuleConfig {
+    variant.set("playDebug")
+    maxTestShards.set(2)
+}
+
+fladle {
+    configs {
+        privacyTests {
+            async.set(false)
+            variant.set("playDebug")
+            flankVersion.set("21.+")
+            useOrchestrator.set(true)
+            environmentVariables.set([
+                    "clearPackageData": "true"
+            ])
+            testTargets.set([
+                    "annotation com.duckduckgo.espresso.PrivacyTest"
+            ])
+            devices.set([
+                    ["model": "Pixel3", "version": "30"]
+            ])
+            localResultsDir.set("foo")
+            flakyTestAttempts.set(3)
+            testShards.set(1)
+        }
     }
 }
 
@@ -241,7 +270,7 @@ dependencies {
     internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
+    androidTestUtil 'androidx.test:orchestrator:1.4.1-rc01'
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
@@ -289,4 +318,8 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }

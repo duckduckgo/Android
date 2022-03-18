@@ -130,3 +130,11 @@ dependencies {
     testImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':common-test')
 }
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}

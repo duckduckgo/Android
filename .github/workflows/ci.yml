@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - feature/marcos/flank
     paths-ignore:
       - '**.md'
   pull_request:
@@ -54,11 +55,8 @@ jobs:
           path: jvm-checks-report.zip
 
   android_tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     name: Android CI checks
-    strategy:
-      matrix:
-        api-level: [23, 30]
 
     steps:
       - name: Cancel previous
@@ -80,55 +78,13 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Gradle cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
+      - name: Decode secret
+        env:
+          FIREBASE_CONFIG: ${{ secrets.FLANK_TEST }}
+          run: echo FLANK_TEST > flank/flank.json
 
-      - name: AVD cache
-        uses: actions/cache@v2
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-emul-${{ matrix.api-level }}
+      - name: Build
+        run: ./gradlew androidTestsBuild
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          ndk: 21.0.6113669
-          arch: x86_64
-          profile: Nexus 5
-          force-avd-creation: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
-      - name: Android checks
-        uses: reactiveCircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          ndk: 21.0.6113669
-          arch: x86_64
-          profile: Nexus 5
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: ./gradlew android_checks -Pandroid.testInstrumentationRunnerArguments.notAnnotation=com.duckduckgo.espresso.PrivacyTest
-
-      - name: Bundle the Android CI checks report
-        if: always()
-        run: find . -type d -name 'reports' | zip -@ -r android-checks-report.zip
-
-      - name: Upload the Android CI checks report
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: android-checks-report
-          path: android-checks-report.zip
+      - name: Firebase tests
+        run: ./gradlew runFlankAndroidTests
