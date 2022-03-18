@@ -16,10 +16,12 @@
 
 package com.duckduckgo.app.fire
 
+import android.webkit.WebViewDatabase
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -33,23 +35,32 @@ class DatabaseCleanerHelperTest {
     private val coroutineRule = CoroutineTestRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private lateinit var webViewDatabase: WebViewDatabase
 
     private lateinit var testee: DatabaseCleanerHelper
     private val databaseLocator = AuthDatabaseLocator(context)
 
     @Before
     fun before() {
-        DefaultWebViewDatabaseProvider(context).get()
+        webViewDatabase = DefaultWebViewDatabaseProvider(context).get()
         testee = DatabaseCleanerHelper(coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenCleanDatabaseThenReturnTrue() = runTest {
+        awaitInitialization()
         assertTrue(testee.cleanDatabase(databaseLocator.getDatabasePath()))
     }
 
     @Test
     fun whenChangeJournalModeToDeleteThenReturnTrue() = runTest {
+        awaitInitialization()
         assertTrue(testee.changeJournalModeToDelete(databaseLocator.getDatabasePath()))
+    }
+
+    private suspend fun awaitInitialization() {
+        while(!this::webViewDatabase.isInitialized) {
+            delay(100)
+        }
     }
 }
