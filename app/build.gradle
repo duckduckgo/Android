@@ -127,7 +127,6 @@ android {
 
 fulladleModuleConfig {
     variant.set("playDebug")
-    maxTestShards.set(2)
 }
 
 fladle {

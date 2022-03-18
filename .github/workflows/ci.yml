@@ -34,9 +34,6 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Spotless
         run: ./gradlew spotlessCheck --stacktrace
 
@@ -77,6 +74,14 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+
+      - name: Gradle cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
 
       - name: Decode secret
         env:
