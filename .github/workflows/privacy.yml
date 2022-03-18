@@ -32,7 +32,7 @@ jobs:
 
       - name: Decode secret
         env:
-          FLANK_TEST: ${{ secrets.FLANK_TEST }}
+          $FLANK_TEST: ${{ secrets.FLANK_TEST }}
         run: echo FLANK_TEST > flank/flank.json
 
       - name: Build
