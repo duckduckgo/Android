@@ -41,7 +41,7 @@ jobs:
         run: echo $FLANK_TEST > flank.json
 
       - name: Build
-        run: ./gradlew :app:assemblePlayDebug :app:assemblePlayDebugAndroidTest
+        run: ./gradlew androidTestsBuild
 
       - name: Firebase tests
         run: ./gradlew runFlankPrivacyTests
