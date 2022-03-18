@@ -20,12 +20,14 @@ import android.content.Context
 import android.webkit.WebViewDatabase
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AuthDatabaseLocatorTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -37,7 +39,7 @@ class AuthDatabaseLocatorTest {
     }
 
     @Test
-    fun whenGetDatabasePathOnDeviceThenPathNotEmpty() = runBlocking {
+    fun whenGetDatabasePathOnDeviceThenPathNotEmpty() = runTest {
         awaitInitialization()
         val authDatabaseLocator = AuthDatabaseLocator(context)
         val databasePath = authDatabaseLocator.getDatabasePath()
