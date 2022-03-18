@@ -18,10 +18,11 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import android.os.Process
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.vpn.feature.isIpv6SupportEnabled
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.packet.isIP4
 import com.duckduckgo.mobile.android.vpn.processor.packet.isIP6
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -40,7 +41,7 @@ class TunPacketReader @AssistedInject constructor(
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val appBuildConfig: AppBuildConfig,
+    private val featureToggle: FeatureToggle,
 ) : Runnable {
 
     private var running = false
@@ -119,13 +120,16 @@ class TunPacketReader @AssistedInject constructor(
             }
         } else {
             // this is temporary until we remove the isIP6AndInternalBuild() to make IP6 available in production builds
-            if (packet.isIP6()) healthMetricCounter.onTunIpv6PacketReceived()
+            if (packet.isIP6()) {
+                Timber.d("Dropping ipv6 packet to ${packet.connectionInfo()}")
+                healthMetricCounter.onTunIpv6PacketReceived()
+            }
             ByteBufferPool.release(bufferToNetwork)
         }
     }
 
     private fun isIP6AndInternalBuild(packet: Packet): Boolean {
-        return packet.isIP6() && appBuildConfig.flavor == BuildFlavor.INTERNAL
+        return packet.isIP6() && featureToggle.isIpv6SupportEnabled()
     }
 
     private fun byteBuffer(): ByteBuffer {

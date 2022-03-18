@@ -54,6 +54,52 @@
             android:orientation="vertical"
         >
 
+            <!-- Section Config -->
+            <TextView
+                android:id="@+id/sectionConfigTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Config"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/ipv6SupportToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="IPv6 Support"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/privateDnsToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Private DNS support"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/vpnUnderlyingNetworksToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Network Switching handling"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <!-- Section Trackers -->
+            <View style="@style/SettingsGroupDivider" />
+            <TextView
+                android:id="@+id/sectionTrackersTitle"
+                style="@style/SettingsSectionTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Trackers"
+            />
+
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/transparencyModeToggle"
                 style="@style/SettingsSwitch"
@@ -71,6 +117,25 @@
                 android:text="App/Tracker exception rules"
             />
 
+            <TextView
+                    android:id="@+id/delete_tracking_history"
+                    style="@style/SettingsItemClickable"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:text="Delete Tracking History"
+            />
+
+            <!-- Section Logging -->
+            <View style="@style/SettingsGroupDivider" />
+
+            <TextView
+                    android:id="@+id/sectionTrackersLogging"
+                    style="@style/SettingsSectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Logging"
+            />
+
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/debug_logging_toggle"
                 style="@style/SettingsSwitch"
@@ -80,20 +145,22 @@
                 android:theme="@style/SettingsSwitchTheme"
             />
 
+            <!-- Section Diagnostics -->
+            <View style="@style/SettingsGroupDivider" />
+
+            <TextView
+                    android:id="@+id/sectionDiagnosticsTitle"
+                    style="@style/SettingsSectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Diagnostics"
+            />
+
             <com.duckduckgo.vpn.internal.feature.ui.SettingsToggleOptionWithLoadingState
                 android:id="@+id/apptp_bugreport"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="Generate AppTP bugreport"
-            />
-
-
-            <TextView
-                android:id="@+id/delete_tracking_history"
-                style="@style/SettingsItemClickable"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="Delete Tracking History"
             />
 
             <TextView
@@ -102,6 +169,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:text="View Diagnostics Data"/>
+
+
+            <!-- Section Health -->
+            <View style="@style/SettingsGroupDivider" />
+
+            <TextView
+                    android:id="@+id/sectionHealthTitle"
+                    style="@style/SettingsSectionTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Health"
+            />
 
             <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/badHealthMonitorToggle"

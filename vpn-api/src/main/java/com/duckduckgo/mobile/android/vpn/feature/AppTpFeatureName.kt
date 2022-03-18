@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.mobile.android.vpn.feature
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.feature.toggles.api.FeatureName
 
-dependencies {
-    implementation project(path: ':feature-toggles-api')
-
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-
+sealed class AppTpFeatureName(override val value: String) : FeatureName {
+    data class Ipv6Support(override val value: String = "ipv6Support") : AppTpFeatureName(value)
+    data class PrivateDnsSupport(override val value: String = "privateDnsSupport") : AppTpFeatureName(value)
+    data class NetworkSwitchingHandling(override val value: String = "networkSwitchingHandling") : AppTpFeatureName(value)
 }
