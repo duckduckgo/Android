@@ -80,8 +80,8 @@ jobs:
 
       - name: Decode secret
         env:
-          FIREBASE_CONFIG: ${{ secrets.FLANK_TEST }}
-          run: echo FLANK_TEST > flank/flank.json
+          FLANK_TEST: ${{ secrets.FLANK_TEST }}
+        run: echo FLANK_TEST > flank/flank.json
 
       - name: Build
         run: ./gradlew androidTestsBuild
