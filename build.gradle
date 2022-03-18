@@ -49,7 +49,7 @@ task clean(type: Delete) {
 
 fladle {
     configs {
-        serviceAccountCredentials.set(project.layout.projectDirectory.file("flank/flank.json"))
+        serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
         androidTests {
             async.set(false)
             flankVersion.set("21.+")
