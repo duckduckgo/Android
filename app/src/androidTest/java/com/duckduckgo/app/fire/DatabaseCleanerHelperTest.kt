@@ -59,7 +59,7 @@ class DatabaseCleanerHelperTest {
     }
 
     private suspend fun awaitInitialization() {
-        while(!this::webViewDatabase.isInitialized) {
+        while (!this::webViewDatabase.isInitialized) {
             delay(100)
         }
     }
