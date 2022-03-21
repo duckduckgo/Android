@@ -36,7 +36,6 @@ import com.duckduckgo.app.email.api.WaitlistStatusResponse
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.OpenUrl
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.OpenUrlInBrowserTab
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.ShowErrorMessage
-import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Command.ShowNotificationDialog
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.ADDRESS_BLOG_POST
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.GET_STARTED_URL
 import com.duckduckgo.app.email.ui.EmailProtectionSignInViewModel.Companion.LOGIN_URL
@@ -167,16 +166,17 @@ class EmailProtectionSignInViewModelTest {
         testee.joinTheWaitlist()
 
         verify(mockEmailManager).joinWaitlist(12345, "token")
+        verify(mockEmailManager).notifyOnJoinedWaitlist()
     }
 
     @Test
-    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitShowNotificationDialogCommand() = runTest {
+    fun whenJoinTheWaitlistAndCallIsSuccessfulThenEmitWaitlistState() = runTest {
         givenJoinWaitlistSuccessful()
 
-        testee.commands.test {
+        testee.viewState.test {
+            assertEquals(NotJoinedQueue, awaitItem().waitlistState)
             testee.joinTheWaitlist()
-
-            assertEquals(ShowNotificationDialog, awaitItem())
+            assertEquals(JoinedQueue(), awaitItem().waitlistState)
         }
     }
 
