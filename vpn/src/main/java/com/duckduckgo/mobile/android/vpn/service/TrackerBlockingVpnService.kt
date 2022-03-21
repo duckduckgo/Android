@@ -274,7 +274,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             vpnPreferences.privateDns?.let { privateDnsName ->
                 if (featureToggle.isPrivateDnsSupportEnabled()) {
                     Timber.v("Setting private DNS: $privateDnsName")
-                    InetAddress.getAllByName(privateDnsName).forEach { addr -> addDnsServer(addr) }
+                    runCatching { InetAddress.getAllByName(privateDnsName) }.getOrNull()?.forEach { addr -> addDnsServer(addr) }
                 }
             }
 
