@@ -26,14 +26,15 @@ import java.nio.ByteBuffer;
 // TODO: Reduce public mutability
 public class Packet {
 
-    public static final int IP4_HEADER_SIZE = 20;
+    //    static final int IP4_HEADER_SIZE = 20;
     public static final int TCP_HEADER_SIZE = 20;
     public static final int UDP_HEADER_SIZE = 8;
-    public static final int TCP_OPTION_TYPE_MSS = 0x02;
-    public static final int TCP_OPTION_MSS_SIZE = 0x04;
-    public static final int TCP_MAX_SEGMENT_SIZE = BUFFER_SIZE - 40;
+    static final int TCP_OPTION_TYPE_MSS = 0x02;
+    static final int TCP_OPTION_MSS_SIZE = 0x04;
+    static final int TCP_MAX_SEGMENT_SIZE = BUFFER_SIZE - 40;
 
-    public IP4Header ip4Header;
+    private IP4Header ip4Header;
+    private final IP6Header ip6Header;
     public TCPHeader tcpHeader;
     public UDPHeader udpHeader;
     public ByteBuffer backingBuffer;
@@ -42,15 +43,37 @@ public class Packet {
     private boolean isUDP;
 
     public Packet(ByteBuffer buffer) throws UnknownHostException {
+        buffer.mark();
+
         this.ip4Header = new IP4Header(buffer);
-        if (this.ip4Header.protocol == IP4Header.TransportProtocol.TCP) {
+        TransportProtocol protocol;
+        if (ip4Header.getVersion() == 4) {
+            this.ip6Header = null;
+            protocol = ip4Header.getProtocol();
+        } else if (this.ip4Header.getVersion() == 6) {
+            this.ip4Header = null;
+            buffer.reset();
+            this.ip6Header = new IP6Header(buffer);
+            protocol = ip6Header.getProtocol();
+        } else {
+            // There's no proper net exception
+            throw new UnknownHostException("Wrong IP version");
+        }
+
+        if (protocol == TransportProtocol.TCP) {
             this.tcpHeader = new TCPHeader(buffer);
             this.isTCP = true;
-        } else if (ip4Header.protocol == IP4Header.TransportProtocol.UDP) {
+        } else if (protocol == TransportProtocol.UDP) {
             this.udpHeader = new UDPHeader(buffer);
             this.isUDP = true;
         }
         this.backingBuffer = buffer;
+    }
+
+    public IPHeader getIpHeader() {
+        if (this.ip4Header == null) return this.ip6Header;
+
+        return this.ip4Header;
     }
 
     @Override
@@ -73,9 +96,9 @@ public class Packet {
     }
 
     public void swapSourceAndDestination() {
-        InetAddress newSourceAddress = ip4Header.destinationAddress;
-        ip4Header.destinationAddress = ip4Header.sourceAddress;
-        ip4Header.sourceAddress = newSourceAddress;
+        InetAddress newSourceAddress = getIpHeader().getDestinationAddress();
+        getIpHeader().setDestinationAddress(getIpHeader().getSourceAddress());
+        getIpHeader().setSourceAddress(newSourceAddress);
 
         if (isUDP) {
             int newSourcePort = udpHeader.destinationPort;
@@ -91,9 +114,9 @@ public class Packet {
     public int tcpPayloadSize(boolean containsIpHeader) {
         if (isUDP) return 0;
 
-        int totalLength = ip4Header.totalLength;
+        int totalLength = getIpHeader().getTotalLength();
         int tcpHeaderLength = tcpHeader.headerLength;
-        int ipHeaderLength = containsIpHeader ? ip4Header.headerLength : 0;
+        int ipHeaderLength = containsIpHeader ? getIpHeader().getHeaderLength() : 0;
 
         return totalLength - (tcpHeaderLength + ipHeaderLength);
     }
@@ -105,13 +128,13 @@ public class Packet {
         backingBuffer = buffer;
 
         tcpHeader.flags = flags;
-        backingBuffer.put(IP4_HEADER_SIZE + 13, flags);
+        backingBuffer.put(getIpHeader().getDefaultHeaderSize() + 13, flags);
 
         tcpHeader.sequenceNumber = sequenceNum;
-        backingBuffer.putInt(IP4_HEADER_SIZE + 4, (int) sequenceNum);
+        backingBuffer.putInt(getIpHeader().getDefaultHeaderSize() + 4, (int) sequenceNum);
 
         tcpHeader.acknowledgementNumber = ackNum;
-        backingBuffer.putInt(IP4_HEADER_SIZE + 8, (int) ackNum);
+        backingBuffer.putInt(getIpHeader().getDefaultHeaderSize() + 8, (int) ackNum);
 
         // Reset header size, since we don't need options
         byte dataOffset = (byte) (TCP_HEADER_SIZE << 2);
@@ -127,15 +150,15 @@ public class Packet {
         }
         tcpHeader.headerLength = headerLength;
         tcpHeader.dataOffsetAndReserved = dataOffset;
-        backingBuffer.put(IP4_HEADER_SIZE + 12, dataOffset);
+        backingBuffer.put(getIpHeader().getDefaultHeaderSize() + 12, dataOffset);
 
         updateTCPChecksum(payloadSize);
 
-        int ip4TotalLength = IP4_HEADER_SIZE + headerLength + payloadSize;
+        int ip4TotalLength = getIpHeader().getDefaultHeaderSize() + headerLength + payloadSize;
         backingBuffer.putShort(2, (short) ip4TotalLength);
-        ip4Header.totalLength = ip4TotalLength;
+        getIpHeader().setTotalLength(ip4TotalLength);
 
-        updateIP4Checksum();
+        updateIPChecksum();
     }
 
     public void updateUdpBuffer(ByteBuffer buffer, int payloadSize) {
@@ -144,38 +167,26 @@ public class Packet {
         backingBuffer = buffer;
 
         int udpTotalLength = UDP_HEADER_SIZE + payloadSize;
-        backingBuffer.putShort(IP4_HEADER_SIZE + 4, (short) udpTotalLength);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 4, (short) udpTotalLength);
         udpHeader.length = udpTotalLength;
 
         // Disable UDP checksum validation
-        backingBuffer.putShort(IP4_HEADER_SIZE + 6, (short) 0);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 6, (short) 0);
         udpHeader.checksum = 0;
 
-        int ip4TotalLength = IP4_HEADER_SIZE + udpTotalLength;
+        int ip4TotalLength = getIpHeader().getDefaultHeaderSize() + udpTotalLength;
         backingBuffer.putShort(2, (short) ip4TotalLength);
-        ip4Header.totalLength = ip4TotalLength;
+        getIpHeader().setTotalLength(ip4TotalLength);
 
-        updateIP4Checksum();
+        updateIPChecksum();
     }
 
-    private void updateIP4Checksum() {
-        ByteBuffer buffer = backingBuffer.duplicate();
-        buffer.position(0);
-
-        // Clear previous checksum
-        buffer.putShort(10, (short) 0);
-
-        int ipLength = ip4Header.headerLength;
-        int sum = 0;
-        while (ipLength > 0) {
-            sum += BitUtils.getUnsignedShort(buffer.getShort());
-            ipLength -= 2;
+    private void updateIPChecksum() {
+        // IPv6 has no checksum
+        if (getIpHeader().getVersion() == 6) {
+            return;
         }
-        while (sum >> 16 > 0) sum = (sum & 0xFFFF) + (sum >> 16);
-
-        sum = ~sum;
-        ip4Header.headerChecksum = sum;
-        backingBuffer.putShort(10, (short) sum);
+        IPHeader.computeChecksum(backingBuffer, 10, getIpHeader().getHeaderLength(), true);
     }
 
     private void updateTCPChecksum(int payloadSize) {
@@ -184,24 +195,24 @@ public class Packet {
         int tcpLength = TCP_HEADER_SIZE + optionsSize + payloadSize;
 
         // Calculate pseudo-header checksum
-        ByteBuffer buffer = ByteBuffer.wrap(ip4Header.sourceAddress.getAddress());
+        ByteBuffer buffer = ByteBuffer.wrap(getIpHeader().getSourceAddress().getAddress());
         sum =
                 BitUtils.getUnsignedShort(buffer.getShort())
                         + BitUtils.getUnsignedShort(buffer.getShort());
 
-        buffer = ByteBuffer.wrap(ip4Header.destinationAddress.getAddress());
+        buffer = ByteBuffer.wrap(getIpHeader().getDestinationAddress().getAddress());
         sum +=
                 BitUtils.getUnsignedShort(buffer.getShort())
                         + BitUtils.getUnsignedShort(buffer.getShort());
 
-        sum += IP4Header.TransportProtocol.TCP.getNumber() + tcpLength;
+        sum += TransportProtocol.TCP.getNumber() + tcpLength;
 
         buffer = backingBuffer.duplicate();
         // Clear previous checksum
-        buffer.putShort(IP4_HEADER_SIZE + 16, (short) 0);
+        buffer.putShort(getIpHeader().getDefaultHeaderSize() + 16, (short) 0);
 
         // Calculate TCP segment checksum
-        buffer.position(IP4_HEADER_SIZE);
+        buffer.position(getIpHeader().getDefaultHeaderSize());
         while (tcpLength > 1) {
             sum += BitUtils.getUnsignedShort(buffer.getShort());
             tcpLength -= 2;
@@ -212,114 +223,13 @@ public class Packet {
 
         sum = ~sum;
         tcpHeader.checksum = sum;
-        backingBuffer.putShort(IP4_HEADER_SIZE + 16, (short) sum);
+        backingBuffer.putShort(getIpHeader().getDefaultHeaderSize() + 16, (short) sum);
     }
 
     private void fillHeader(ByteBuffer buffer) {
-        ip4Header.fillHeader(buffer);
+        getIpHeader().fillHeader(buffer);
         if (isUDP) udpHeader.fillHeader(buffer);
         else if (isTCP) tcpHeader.fillHeader(buffer);
-    }
-
-    public static class IP4Header {
-        public byte version;
-        public byte IHL;
-        public int headerLength;
-        public short typeOfService;
-        public int totalLength;
-
-        public int identificationAndFlagsAndFragmentOffset;
-
-        public short TTL;
-        public final short protocolNum;
-        public TransportProtocol protocol;
-        public int headerChecksum;
-
-        public InetAddress sourceAddress;
-        public InetAddress destinationAddress;
-
-        public int optionsAndPadding;
-
-        public enum TransportProtocol {
-            TCP(6),
-            UDP(17),
-            Other(0xFF);
-
-            private int protocolNumber;
-
-            TransportProtocol(int protocolNumber) {
-                this.protocolNumber = protocolNumber;
-            }
-
-            private static TransportProtocol numberToEnum(int protocolNumber) {
-                if (protocolNumber == 6) return TCP;
-                else if (protocolNumber == 17) return UDP;
-                else return Other;
-            }
-
-            public int getNumber() {
-                return this.protocolNumber;
-            }
-        }
-
-        private IP4Header(ByteBuffer buffer) throws UnknownHostException {
-            byte versionAndIHL = buffer.get();
-            this.version = (byte) (versionAndIHL >> 4);
-            this.IHL = (byte) (versionAndIHL & 0x0F);
-            this.headerLength = this.IHL << 2;
-
-            this.typeOfService = BitUtils.getUnsignedByte(buffer.get());
-            this.totalLength = BitUtils.getUnsignedShort(buffer.getShort());
-
-            this.identificationAndFlagsAndFragmentOffset = buffer.getInt();
-
-            this.TTL = BitUtils.getUnsignedByte(buffer.get());
-            this.protocolNum = BitUtils.getUnsignedByte(buffer.get());
-            this.protocol = TransportProtocol.numberToEnum(protocolNum);
-            this.headerChecksum = BitUtils.getUnsignedShort(buffer.getShort());
-
-            byte[] addressBytes = new byte[4];
-            buffer.get(addressBytes, 0, 4);
-            this.sourceAddress = InetAddress.getByAddress(addressBytes);
-
-            buffer.get(addressBytes, 0, 4);
-            this.destinationAddress = InetAddress.getByAddress(addressBytes);
-
-            // this.optionsAndPadding = buffer.getInt();
-        }
-
-        public void fillHeader(ByteBuffer buffer) {
-            buffer.put((byte) (this.version << 4 | this.IHL));
-            buffer.put((byte) this.typeOfService);
-            buffer.putShort((short) this.totalLength);
-
-            buffer.putInt(this.identificationAndFlagsAndFragmentOffset);
-
-            buffer.put((byte) this.TTL);
-            buffer.put((byte) this.protocol.getNumber());
-            buffer.putShort((short) this.headerChecksum);
-
-            buffer.put(this.sourceAddress.getAddress());
-            buffer.put(this.destinationAddress.getAddress());
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder sb = new StringBuilder("IP4Header{");
-            sb.append("version=").append(version);
-            sb.append(", IHL=").append(IHL);
-            sb.append(", typeOfService=").append(typeOfService);
-            sb.append(", totalLength=").append(totalLength);
-            sb.append(", identificationAndFlagsAndFragmentOffset=")
-                    .append(identificationAndFlagsAndFragmentOffset);
-            sb.append(", TTL=").append(TTL);
-            sb.append(", protocol=").append(protocolNum).append(":").append(protocol);
-            sb.append(", headerChecksum=").append(headerChecksum);
-            sb.append(", sourceAddress=").append(sourceAddress.getHostAddress());
-            sb.append(", destinationAddress=").append(destinationAddress.getHostAddress());
-            sb.append('}');
-            return sb.toString();
-        }
     }
 
     public static class TCPHeader {
@@ -464,16 +374,16 @@ public class Packet {
         }
     }
 
-    private static class BitUtils {
-        private static short getUnsignedByte(byte value) {
+    static class BitUtils {
+        static short getUnsignedByte(byte value) {
             return (short) (value & 0xFF);
         }
 
-        private static int getUnsignedShort(short value) {
+        static int getUnsignedShort(short value) {
             return value & 0xFFFF;
         }
 
-        private static long getUnsignedInt(int value) {
+        static long getUnsignedInt(int value) {
             return value & 0xFFFFFFFFL;
         }
     }

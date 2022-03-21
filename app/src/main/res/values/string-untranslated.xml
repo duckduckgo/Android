@@ -16,13 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <!-- Treat returning users differently Experiment -->
-    <string name="returningUsersLetsDoItButtonLabel">Let\'s Do It</string>
-    <string name="returningUsersContinuesWithoutPrivacyTipsButtonLabel">Continue Without Privacy Tips</string>
-    <string name="returningUsersSkipTutorialButtonLabel">Skip Tutorial</string>
-    <string name="returningUsersWidgetPromptTitle">Add the DuckDuckGo widget to your home screen</string>
-    <string name="returningUsersWidgetDismissButtonLabel">No Thanks</string>
-
     <!-- Fireproof CTA Experiment -->
     <string name="daxFireproofCtaText"><![CDATA[Your data is toast!<br/><br/>Want me to \"Fireproof\" sites when you sign in? That way, you won\'t be signed out when you burn your data.<br/><br/>You can always change this later in settings.]]></string>
     <string name="daxFireproofKeepMeSignedInButton">Keep Me Signed In To Sites</string>

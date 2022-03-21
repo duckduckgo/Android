@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.apps
+package com.duckduckgo.mobile.android.vpn.feature
 
-internal class VpnExclusionList {
+import com.duckduckgo.feature.toggles.api.FeatureName
 
-    companion object {
-        fun isDdgApp(packageName: String): Boolean {
-            return packageName.startsWith(DDG_PACKAGE_PREFIX)
-        }
-
-        private const val DDG_PACKAGE_PREFIX = "com.duckduckgo.mobile"
-    }
+sealed class AppTpFeatureName(override val value: String) : FeatureName {
+    data class Ipv6Support(override val value: String = "ipv6Support") : AppTpFeatureName(value)
+    data class PrivateDnsSupport(override val value: String = "privateDnsSupport") : AppTpFeatureName(value)
+    data class NetworkSwitchingHandling(override val value: String = "networkSwitchingHandling") : AppTpFeatureName(value)
 }

@@ -23,16 +23,11 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import android.view.WindowManager
-import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
@@ -72,7 +67,6 @@ class WelcomePage : OnboardingPageFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         configureDaxCta()
-        buildScreenContent()
         scheduleWelcomeAnimation()
         setSkipAnimationListener()
 
@@ -86,38 +80,6 @@ class WelcomePage : OnboardingPageFragment() {
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
-    }
-
-    private fun buildScreenContent() {
-        lifecycleScope.launch {
-            welcomePageViewModel.screenContent.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    when (it) {
-                        is WelcomePageViewModel.ViewState.ContinueWithoutPrivacyTipsState ->
-                            renderNewOrReturningUsers(R.string.returningUsersContinuesWithoutPrivacyTipsButtonLabel)
-                        is WelcomePageViewModel.ViewState.SkipTutorialState ->
-                            renderNewOrReturningUsers(R.string.returningUsersSkipTutorialButtonLabel)
-                        is WelcomePageViewModel.ViewState.DefaultOnboardingState ->
-                            renterDefaultOnboarding()
-                    }
-                }
-        }
-    }
-
-    private fun renderNewOrReturningUsers(@StringRes returningUserButtonRes: Int) {
-        returningUserCta.visibility = VISIBLE
-        returningUserCta.text = getString(returningUserButtonRes)
-        returningUserCta.setOnClickListener { event(WelcomePageView.Event.OnReturningUserClicked) }
-        ctaText = getString(R.string.onboardingDaxText)
-        hiddenTextCta.text = ctaText.html(requireContext())
-        primaryCta.text = getString(R.string.returningUsersLetsDoItButtonLabel)
-    }
-
-    private fun renterDefaultOnboarding() {
-        returningUserCta.visibility = GONE
-        ctaText = getString(R.string.onboardingDaxText)
-        hiddenTextCta.text = ctaText.html(requireContext())
-        primaryCta.text = getString(R.string.onboardingLetsDoItButton)
     }
 
     private fun render(state: WelcomePageView.State) {
