@@ -37,8 +37,8 @@ jobs:
 
       - name: Decode secret
         env:
-          FLANK_TEST: ${{ secrets.FLANK_TEST }}
-        run: echo $FLANK_TEST > flank.json
+          FLANK: ${{ secrets.FLANK }}
+        run: echo $FLANK > flank.json
 
       - name: Build
         run: ./gradlew androidTestsBuild
