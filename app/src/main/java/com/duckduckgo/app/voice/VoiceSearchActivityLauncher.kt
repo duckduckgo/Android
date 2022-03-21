@@ -19,26 +19,33 @@ package com.duckduckgo.app.voice
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Build.VERSION_CODES
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.annotation.RequiresApi
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity
+import com.duckduckgo.app.voice.listeningmode.ui.addBlur
+import com.duckduckgo.app.voice.listeningmode.ui.removeBlur
 import javax.inject.Inject
 
+@RequiresApi(VERSION_CODES.S)
 class VoiceSearchActivityLauncher @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
 ) : VoiceSearchLauncher {
 
     private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
+    private var _activity: Activity? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
         onSpeechResult: (String) -> Unit
     ) {
+        _activity = activity
         voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) { result ->
             result?.let {
                 if (it.resultCode == Activity.RESULT_OK) {
@@ -48,6 +55,7 @@ class VoiceSearchActivityLauncher @Inject constructor(
                     }
                 }
             }
+            _activity?.window?.decorView?.rootView?.removeBlur()
         }
     }
 
@@ -56,6 +64,7 @@ class VoiceSearchActivityLauncher @Inject constructor(
     }
 
     private fun launchVoiceSearch(context: Context) {
+        _activity?.window?.decorView?.rootView?.addBlur()
         pixel.fire(AppPixelName.VOICE_SEARCH_STARTED)
         voiceSearchActivityLaucher.launch(Intent(context, VoiceSearchActivity::class.java))
     }

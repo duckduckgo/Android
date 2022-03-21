@@ -23,8 +23,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND
-import android.view.WindowManager.LayoutParams.FLAG_DIM_BEHIND
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,22 +31,27 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.app.voice.listeningmode.ui.VoiceRecognizingIndicator.Model
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.util.Locale
+import javax.inject.Inject
 
 class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
     }
 
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        addBackgroundBlur()
+        makeBackgroundTransparent()
         setContentView(binding.root)
         configureToolbar()
         configureViews()
@@ -67,14 +70,10 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         supportActionBar?.title = ""
     }
 
-    private fun addBackgroundBlur() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // It is important to set FLAG_DIM_BEHIND and dimAmount since without it there will be a lag on the blur effect
+    @SuppressLint("NewApi")
+    private fun makeBackgroundTransparent() {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            window.addFlags(FLAG_BLUR_BEHIND)
-            window.addFlags(FLAG_DIM_BEHIND)
-            window.attributes.blurBehindRadius = 70
-            window.attributes.dimAmount = 0.001f
             setTranslucent(true)
         }
     }
