@@ -71,7 +71,6 @@ class SpecialUrlDetectorImplTest {
             variantManager = mockVariantManager
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "my" })
     }
 
     @Test
