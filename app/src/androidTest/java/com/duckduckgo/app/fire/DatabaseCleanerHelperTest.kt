@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -57,8 +58,10 @@ class DatabaseCleanerHelperTest {
     }
 
     private suspend fun awaitPathCreation() {
-        while (databaseLocator.getDatabasePath().isEmpty()) {
-            delay(100)
+        withTimeout(2000) {
+            while (databaseLocator.getDatabasePath().isEmpty()) {
+                delay(100)
+            }
         }
     }
 }
