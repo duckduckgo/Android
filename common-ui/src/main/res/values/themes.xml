@@ -55,6 +55,7 @@
         <item name="secondaryTextColor">@color/gray50</item>
         <item name="accentTextColor">@color/gray30</item>
         <item name="primaryIconColor">@color/gray20</item>
+        <item name="primaryDisabledIconColor">@color/gray60</item>
         <item name="secondaryIconColor">@color/gray70</item>
         <item name="accentIconColor">@color/gray80</item>
         <item name="chipBackgroundColor">@color/gray90</item>
@@ -174,6 +175,7 @@
         <item name="secondaryTextColor">@color/warmerGray</item>
         <item name="accentTextColor">@color/gray70</item>
         <item name="primaryIconColor">@color/gray95</item>
+        <item name="primaryDisabledIconColor">@color/gray50</item>
         <item name="secondaryIconColor">@color/gray40</item>
         <item name="accentIconColor">@color/gray30</item>
         <item name="chipBackgroundColor">@color/gray20</item>
