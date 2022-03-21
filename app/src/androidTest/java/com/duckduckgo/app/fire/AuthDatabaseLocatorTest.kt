@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -29,22 +30,26 @@ import org.junit.Test
 class AuthDatabaseLocatorTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val authDatabaseLocator = AuthDatabaseLocator(context)
 
     @Before
     fun before() {
         DefaultWebViewDatabaseProvider(context).get()
-
-        // Wait for the database path to be created
-        Thread.sleep(1000)
     }
 
     @Test
     fun whenGetDatabasePathOnDeviceThenPathNotEmpty() = runTest {
-        val authDatabaseLocator = AuthDatabaseLocator(context)
+        awaitPathCreation()
         val databasePath = authDatabaseLocator.getDatabasePath()
 
         // If this test fails, it means the Auth Database path has changed its location
         // If so, add a new database location to knownLocations list
         assertTrue(databasePath.isNotEmpty())
+    }
+
+    private suspend fun awaitPathCreation() {
+        while (authDatabaseLocator.getDatabasePath().isEmpty()) {
+            delay(100)
+        }
     }
 }

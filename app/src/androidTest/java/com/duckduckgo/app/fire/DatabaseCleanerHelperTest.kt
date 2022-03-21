@@ -20,6 +20,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -40,20 +41,24 @@ class DatabaseCleanerHelperTest {
     @Before
     fun before() {
         DefaultWebViewDatabaseProvider(context).get()
-
-        // Wait for the database path to be created
-        Thread.sleep(1000)
-
         testee = DatabaseCleanerHelper(coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenCleanDatabaseThenReturnTrue() = runTest {
+        awaitPathCreation()
         assertTrue(testee.cleanDatabase(databaseLocator.getDatabasePath()))
     }
 
     @Test
     fun whenChangeJournalModeToDeleteThenReturnTrue() = runTest {
+        awaitPathCreation()
         assertTrue(testee.changeJournalModeToDelete(databaseLocator.getDatabasePath()))
+    }
+
+    private suspend fun awaitPathCreation() {
+        while (databaseLocator.getDatabasePath().isEmpty()) {
+            delay(100)
+        }
     }
 }
