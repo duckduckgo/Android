@@ -143,9 +143,9 @@ fladle {
                     "annotation com.duckduckgo.espresso.PrivacyTest"
             ])
             devices.set([
-                    ["model": "Pixel3", "version": "30"]
+                    ["model": "redfin", "version": "30"]
             ])
-            localResultsDir.set("foo")
+            localResultsDir.set("fladleResults")
             flakyTestAttempts.set(2)
             testShards.set(1)
         }

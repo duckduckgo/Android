@@ -61,7 +61,8 @@ fladle {
                     "notAnnotation com.duckduckgo.espresso.UserJourney",
             ])
             devices.set([
-                    ["model": "Pixel3", "version": "30"]
+                    ["model": "Pixel3", "version": "30"],
+                    ["model": "Nexus6", "version": "23"]
             ])
             localResultsDir.set("fladleResults")
         }
