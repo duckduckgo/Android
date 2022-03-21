@@ -104,4 +104,9 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%s widget added to home screen</string>
     <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
+
+
+    <!-- New overflow Menu -->
+    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
+    <string name="requestMobileSiteMenuTitle">Mobile Site</string>
 </resources>

@@ -177,6 +177,7 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.R.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
@@ -2055,15 +2056,14 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
-                    // TODO: recheck which value we should send to viewmodel
-                    // viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                onMenuItemClicked(view.requestDesktopSiteMenuItem) {
+                    viewModel.onDesktopSiteModeToggled()
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
-                onMenuItemClicked(view.addToHome) {
+                onMenuItemClicked(view.addToHomeMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
@@ -2333,44 +2333,66 @@ class BrowserTabFragment :
                 backMenuItem.isEnabled = viewState.canGoBack
                 forwardMenuItem.isEnabled = viewState.canGoForward
                 refreshMenuItem.isEnabled = browserShowing
-                newTabMenuItem.isEnabled = browserShowing
-                addBookmarksMenuItem?.isEnabled = viewState.canAddBookmarks
+
+                newTabMenuItem.isVisible = browserShowing
+                sharePageMenuItem?.isVisible = viewState.canSharePage
+                addBookmarksMenuItem?.isVisible = viewState.canAddBookmarks
+                val isBookmark = viewState.bookmark != null
                 addBookmarksMenuItem?.label {
-                    getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
+                    getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
                 }
-                addFavoriteMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
+                addBookmarksMenuItem?.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
+
+                val isFavorite = viewState.favorite != null
+                addFavoriteMenuItem?.isVisible = viewState.addFavorite.isEnabled()
                 addFavoriteMenuItem.label {
                     when {
                         viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
-                        viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
+                        isFavorite -> getString(R.string.removeFavoriteMenuTitle)
                         else -> getString(R.string.addFavoriteMenuTitle)
                     }
                 }
-                fireproofWebsiteMenuItem?.isEnabled = viewState.canFireproofSite
-                // TODO: set icon based on state
-                // fireproofWebsiteMenuItem?.setIcon(viewState.canFireproofSite && viewState.isFireproofWebsite)
-                sharePageMenuItem?.isEnabled = viewState.canSharePage
-                whitelistMenuItem?.isEnabled = viewState.canWhitelist
+                addFavoriteMenuItem.setIcon(if (isFavorite) drawable.ic_favorite_solid_16 else drawable.ic_favorite_16)
+
+                fireproofWebsiteMenuItem?.isVisible = viewState.canFireproofSite
+                fireproofWebsiteMenuItem?.label {
+                    getString(
+                        if (viewState.isFireproofWebsite) {
+                            R.string.fireproofWebsiteMenuTitleRemove
+                        } else {
+                            R.string.fireproofWebsiteMenuTitleAdd
+                        }
+                    )
+                }
+                fireproofWebsiteMenuItem?.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fireproofed_16 else drawable.ic_fire_16)
+
+                createAliasMenuItem?.isVisible = viewState.isEmailSignedIn
+
+                requestDesktopSiteMenuItem?.isVisible = viewState.canChangeBrowsingMode
+                requestDesktopSiteMenuItem.label {
+                    getString(
+                        if (viewState.isDesktopBrowsingMode) {
+                            R.string.requestMobileSiteMenuTitle
+                        } else {
+                            R.string.requestDesktopSiteMenuTitle
+                        }
+                    )
+                }
+                requestDesktopSiteMenuItem?.setIcon(
+                    if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16
+                )
+
+                openInAppMenuItem.isVisible = viewState.previousAppLink != null
+
+                addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
+                whitelistMenuItem?.isVisible = viewState.canWhitelist
                 whitelistMenuItem?.label {
                     getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
                 }
-                brokenSiteMenuItem?.isEnabled = viewState.canReportSite
-                requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
-                // TODO: set icon based on state
-                // requestDesktopSiteCheckMenuItem?.setIcon(viewState.isDesktopBrowsingMode)
-
-                createAliasMenuItem?.let {
-                    it.visibility = if (viewState.isEmailSignedIn) VISIBLE else GONE
-                }
-
-                addToHome?.let {
-                    it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
-                    it.isEnabled = viewState.addToHomeEnabled
-                }
-
-                openInAppMenuItem?.let {
-                    it.visibility = if (viewState.previousAppLink != null) VISIBLE else GONE
-                }
+                whitelistMenuItem?.setIcon(
+                    if (viewState.isWhitelisted) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
+                )
+                brokenSiteMenuItem?.isVisible = viewState.canReportSite
             }
         }
 
@@ -2403,7 +2425,7 @@ class BrowserTabFragment :
                 hideFindInPage()
             }
 
-            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
+            popupMenu.contentView.findInPageMenuItem?.isVisible = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {

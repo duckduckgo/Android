@@ -197,7 +197,7 @@ class BrowserTabViewModel(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
-        val canChangeBrowsingMode: Boolean = true,
+        val canChangeBrowsingMode: Boolean = false,
         val showPrivacyGrade: Boolean = false,
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
@@ -1091,6 +1091,7 @@ class BrowserTabViewModel(
         val domain = site?.domain
         val canWhitelist = domain != null
         val canFireproofSite = domain != null
+        val canChangeBrowsingMode = domain != null
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
             HighlightableButton.Visible(enabled = true)
         } else {
@@ -1111,6 +1112,7 @@ class BrowserTabViewModel(
             isWhitelisted = false,
             showSearchIcon = false,
             showClearButton = false,
+            canChangeBrowsingMode = canChangeBrowsingMode,
             canFireproofSite = canFireproofSite,
             isFireproofWebsite = isFireproofWebsite(),
             showDaxIcon = shouldShowDaxIcon(url, true)
@@ -1281,6 +1283,7 @@ class BrowserTabViewModel(
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
+            canChangeBrowsingMode = false,
             canFireproofSite = false,
             showDaxIcon = false
         )
@@ -1979,8 +1982,9 @@ class BrowserTabViewModel(
         globalLayoutState.value = Browser(isNewTabState = false)
     }
 
-    fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
+    fun onDesktopSiteModeToggled() {
         val currentBrowserViewState = currentBrowserViewState()
+        val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
         command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 

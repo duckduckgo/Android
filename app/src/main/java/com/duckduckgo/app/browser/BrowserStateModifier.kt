@@ -31,6 +31,7 @@ class BrowserStateModifier {
             canReportSite = true,
             canSharePage = true,
             canAddBookmarks = true,
+            canChangeBrowsingMode = true,
             addFavorite = HighlightableButton.Visible(),
             addToHomeEnabled = true
         )
@@ -46,6 +47,7 @@ class BrowserStateModifier {
             canSharePage = false,
             canAddBookmarks = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
+            canChangeBrowsingMode = false,
             addToHomeEnabled = false,
             canGoBack = false
         )

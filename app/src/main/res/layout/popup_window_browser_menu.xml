@@ -140,7 +140,7 @@
                 app:iconDrawable="@drawable/ic_email_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/requestDesktopSiteCheckMenuItem"
+                android:id="@+id/requestDesktopSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="@string/requestDesktopSiteMenuTitle"
@@ -162,7 +162,7 @@
                 app:iconDrawable="@drawable/ic_open_in_16_1" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/addToHome"
+                android:id="@+id/addToHomeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="@string/addToHome"
