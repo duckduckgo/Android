@@ -93,7 +93,9 @@
                 app:labelText="@string/newTabMenuItem"
                 app:iconDrawable="@drawable/ic_add_16" />
 
-            <View style="@style/OverflowMenuDivider" />
+            <View
+                android:id="@+id/firstDivider"
+                style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/sharePageMenuItem"
@@ -123,7 +125,9 @@
                 app:labelText="@string/bookmarksMenuTitle"
                 app:iconDrawable="@drawable/ic_library_16" />
 
-            <View style="@style/OverflowMenuDivider" />
+            <View
+                android:id="@+id/secondDivider"
+                style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/fireproofWebsiteMenuItem"

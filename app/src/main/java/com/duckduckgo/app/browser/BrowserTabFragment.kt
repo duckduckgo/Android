@@ -2393,6 +2393,9 @@ class BrowserTabFragment :
                     if (viewState.isWhitelisted) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
                 )
                 brokenSiteMenuItem?.isVisible = viewState.canReportSite
+
+                firstDivider.isVisible = viewState.browserShowing
+                secondDivider.isVisible = viewState.browserShowing
             }
         }
 
