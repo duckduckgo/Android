@@ -146,7 +146,7 @@ fladle {
                     ["model": "Pixel3", "version": "30"]
             ])
             localResultsDir.set("foo")
-            flakyTestAttempts.set(3)
+            flakyTestAttempts.set(2)
             testShards.set(1)
         }
     }

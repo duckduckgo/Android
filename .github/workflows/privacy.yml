@@ -45,3 +45,14 @@ jobs:
 
       - name: Firebase tests
         run: ./gradlew runFlankPrivacyTests
+
+      - name: Bundle the Android CI checks report
+        if: always()
+        run: find . -type d -name 'fladleResults' | zip -@ -r android-checks-report.zip
+
+      - name: Upload the Android CI checks report
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-checks-report
+          path: android-checks-report.zip

@@ -63,7 +63,7 @@ fladle {
             devices.set([
                     ["model": "Pixel3", "version": "30"]
             ])
-            localResultsDir.set("foo")
+            localResultsDir.set("fladleResults")
         }
     }
 }
