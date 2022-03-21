@@ -40,7 +40,7 @@
             android:background="@drawable/ripple_top_left_rounded"
             android:contentDescription="@string/back"
             android:src="@drawable/ic_arrow_left_24"
-            app:tint="?attr/primaryIconColor"
+            app:tint="@color/primary_icon_color_selector"
             android:layout_marginStart="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,7 +53,7 @@
             android:layout_height="24dp"
             android:contentDescription="@string/forward"
             android:src="@drawable/ic_arrow_right_24"
-            app:tint="?attr/primaryIconColor"
+            app:tint="@color/primary_icon_color_selector"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/refreshMenuItem"
             app:layout_constraintStart_toEndOf="@+id/backMenuItem"
@@ -67,7 +67,7 @@
             android:background="@drawable/ripple_top_right_rounded"
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_reload_24"
-            app:tint="?attr/primaryIconColor"
+            app:tint="@color/primary_icon_color_selector"
             android:layout_marginEnd="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -197,12 +197,6 @@
                 android:background="@drawable/ripple_bottom_rounded"
                 app:labelText="@string/settingsMenuItemTitle"
                 app:iconDrawable="@drawable/ic_settings_16" />
-
-            <TextView
-                android:id="@+id/newEmailAliasMenuItem"
-                style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Text"
-                android:text="@string/newEmailAliasMenuTitle"
-                android:visibility="gone" />
 
         </LinearLayout>
 

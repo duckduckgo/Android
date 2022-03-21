@@ -2067,7 +2067,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(view.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
@@ -2359,7 +2359,7 @@ class BrowserTabFragment :
                 // TODO: set icon based on state
                 // requestDesktopSiteCheckMenuItem?.setIcon(viewState.isDesktopBrowsingMode)
 
-                newEmailAliasMenuItem?.let {
+                createAliasMenuItem?.let {
                     it.visibility = if (viewState.isEmailSignedIn) VISIBLE else GONE
                 }
 
