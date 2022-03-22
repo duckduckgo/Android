@@ -38,6 +38,7 @@ android {
 dependencies {
 
     implementation project(path: ':common')
+    implementation project(path: ':vpn-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx

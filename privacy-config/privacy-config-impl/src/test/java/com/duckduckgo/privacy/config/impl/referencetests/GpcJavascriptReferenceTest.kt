@@ -104,7 +104,7 @@ class GpcJavascriptReferenceTest(private val testCase: TestCase) {
         val isEnabled = gpcFeature?.state == "enabled"
         val exceptionsUnprotectedTemporary = CopyOnWriteArrayList(config?.unprotectedTemporary ?: emptyList())
 
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), isEnabled)).thenReturn(isEnabled)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, isEnabled)).thenReturn(isEnabled)
         whenever(mockGpcRepository.exceptions).thenReturn(CopyOnWriteArrayList(gpcExceptions))
         whenever(mockUnprotectedTemporaryRepository.exceptions).thenReturn(exceptionsUnprotectedTemporary)
     }

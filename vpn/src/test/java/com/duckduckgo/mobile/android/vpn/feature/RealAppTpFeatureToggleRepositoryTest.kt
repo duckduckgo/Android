@@ -51,50 +51,45 @@ class RealAppTpFeatureToggleRepositoryTest {
 
     @Test
     fun whenInsertThenDelegate() {
-        repository.insert(VpnFeatureToggles("feature", false))
+        repository.insert(VpnFeatureToggles(FEATURE, false))
 
-        verify(vpnFeatureToggleStore).insert(VpnFeatureToggles("feature", false))
+        verify(vpnFeatureToggleStore).insert(VpnFeatureToggles(FEATURE, false))
     }
 
     @Test
-    fun whenGetFeatureAndPlayBuildThenReturnFalseOrNull() {
+    fun whenGetFeatureAndPlayBuildThenReturnFalse() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(null)
-        assertNull(repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
+        assertEquals(false, repository.get(FEATURE, false))
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(true)
-        assertEquals(false, repository.get("feature", false))
-
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(false)
-        assertEquals(false, repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
+        assertEquals(false, repository.get(FEATURE, false))
     }
 
     @Test
-    fun whenGetFeatureAndFdroidBuildThenReturnFalseOrNull() {
+    fun whenGetFeatureAndFdroidBuildThenReturnFalse() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.FDROID)
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(null)
-        assertNull(repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
+        assertEquals(false, repository.get(FEATURE, false))
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(true)
-        assertEquals(false, repository.get("feature", false))
-
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(false)
-        assertEquals(false, repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
+        assertEquals(false, repository.get(FEATURE, false))
     }
 
     @Test
     fun whenGetFeatureAndInternalBuildThenReturnFalseOrValue() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(null)
-        assertNull(repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
+        assertEquals(true, repository.get(FEATURE, false))
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(true)
-        assertEquals(true, repository.get("feature", false))
+        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
+        assertEquals(false, repository.get(FEATURE, false))
+    }
 
-        whenever(vpnFeatureToggleStore.get("feature", false)).thenReturn(false)
-        assertEquals(false, repository.get("feature", false))
+    companion object {
+        private val FEATURE = AppTpFeatureName.Ipv6Support
     }
 }

@@ -36,14 +36,11 @@ class AppTpFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledCalledOnAppTpFeatureNameThenReturnRepositoryValue() {
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(null)
-        assertNull(plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
+        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support, false)).thenReturn(true)
+        assertEquals(true, plugin.isEnabled(AppTpFeatureName.Ipv6Support, false))
 
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(true)
-        assertEquals(true, plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
-
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(false)
-        assertEquals(false, plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
+        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support, false)).thenReturn(false)
+        assertEquals(false, plugin.isEnabled(AppTpFeatureName.Ipv6Support, false))
     }
 
     @Test

@@ -50,7 +50,7 @@ class RealAmpLinks @Inject constructor(
     }
 
     override fun extractCanonicalFromAmpLink(url: String): AmpLinkType? {
-        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName()) == false) return null
+        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName) == false) return null
         if (url == lastExtractedUrl) return null
 
         val extractedUrl = extractCanonical(url)

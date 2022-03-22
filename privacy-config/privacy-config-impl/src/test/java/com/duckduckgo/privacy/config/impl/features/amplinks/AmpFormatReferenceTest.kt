@@ -51,7 +51,7 @@ class AmpFormatReferenceTest(private val testCase: TestCase) {
         mockAmpLinks()
         testee = RealAmpLinks(mockRepository, mockFeatureToggle, mockUnprotectedTemporary)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.AmpLinksFeatureName, true)).thenReturn(true)
     }
 
     companion object {

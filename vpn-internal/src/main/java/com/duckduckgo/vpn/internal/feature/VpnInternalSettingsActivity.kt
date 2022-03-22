@@ -174,20 +174,20 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupConfigSection() {
-        binding.ipv6SupportToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.Ipv6Support().value, false) ?: false
+        binding.ipv6SupportToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.Ipv6Support, false) ?: false
         binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
-            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.Ipv6Support().value, isChecked))
+            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.Ipv6Support, isChecked))
         }
 
-        binding.privateDnsToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.PrivateDnsSupport().value, false) ?: false
+        binding.privateDnsToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.PrivateDnsSupport, false) ?: false
         binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
-            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.PrivateDnsSupport().value, isChecked))
+            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.PrivateDnsSupport, isChecked))
         }
 
-        binding.vpnUnderlyingNetworksToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.NetworkSwitchingHandling().value, false)
+        binding.vpnUnderlyingNetworksToggle.isChecked = vpnFeatureToggleStore.get(AppTpFeatureName.NetworkSwitchingHandling, false)
             ?: false
         binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
-            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.NetworkSwitchingHandling().value, isChecked))
+            vpnFeatureToggleStore.insert(VpnFeatureToggles(AppTpFeatureName.NetworkSwitchingHandling, isChecked))
         }
     }
 

@@ -35,8 +35,8 @@ class RealAppTpFeatureToggleRepository constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : AppTpFeatureToggleRepository, VpnFeatureToggleStore by vpnFeatureToggleStore {
 
-    override fun get(featureName: String, defaultValue: Boolean): Boolean? {
-        val delegateValue = vpnFeatureToggleStore.get(featureName, defaultValue) ?: return null
+    override fun get(featureName: AppTpFeatureName, defaultValue: Boolean): Boolean {
+        val delegateValue = vpnFeatureToggleStore.get(featureName, defaultValue)
 
         // Ensure production builds have all these feature disabled for now
         return (appBuildConfig.flavor == BuildFlavor.INTERNAL) && delegateValue

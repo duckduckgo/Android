@@ -28,7 +28,7 @@ class AppTpFeatureTogglesPlugin @Inject constructor(
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
         return if (featureName is AppTpFeatureName) {
-            return appTpFeatureToggleRepository.get(featureName.value, defaultValue)
+            return appTpFeatureToggleRepository.get(featureName, defaultValue)
         } else {
             null
         }
