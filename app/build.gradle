@@ -265,7 +265,7 @@ dependencies {
     internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
-    androidTestUtil 'androidx.test:orchestrator:1.4.1-rc01'
+    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules

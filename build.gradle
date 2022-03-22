@@ -9,6 +9,7 @@ buildscript {
         min_sdk = 23
         target_sdk = 30
         compile_sdk = 31
+        fladle_version = "fladle-0.17.4-SNAPSHOT"
     }
 
     repositories {
@@ -24,7 +25,7 @@ buildscript {
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.osacky.fulladle:fladle-0.17.4-SNAPSHOT"
+        classpath "com.osacky.fulladle:$fladle_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
