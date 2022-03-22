@@ -20,8 +20,11 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build.VERSION_CODES
 import androidx.activity.result.ActivityResultCaller
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import com.duckduckgo.app.voice.VoiceSearchLauncher.Event
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,13 +33,19 @@ interface VoiceSearchLauncher {
     fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
-        onSpeechResult: (String) -> Unit
+        onEvent: (Event) -> Unit
     )
 
     fun launch()
+
+    sealed class Event {
+        class VoiceRecognitionSuccess(val result: String) : Event()
+        object SearchCancelled : Event()
+    }
 }
 
 @ContributesBinding(AppScope::class)
+@RequiresApi(VERSION_CODES.S)
 class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val context: Context,
     private val permissionRequest: PermissionRequest,
@@ -46,13 +55,13 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
-        onSpeechResult: (String) -> Unit
+        onEvent: (Event) -> Unit
     ) {
         permissionRequest.registerResultsCallback(caller, activity) {
             voiceSearchActivityLauncher.launch()
         }
         voiceSearchActivityLauncher.registerResultsCallback(caller, activity) {
-            onSpeechResult(it)
+            onEvent(it)
         }
     }
 

@@ -401,10 +401,20 @@ class BrowserTabFragment :
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
         voiceSearchLauncher.registerResultsCallback(this, requireActivity()) {
-            if (it.isNotEmpty()) {
-                omnibarTextInput.setText(it)
-                userEnteredQuery(it)
+            when (it) {
+                is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
+                    omnibarTextInput.setText(it.result)
+                    userEnteredQuery(it.result)
+                    resumeWebView()
+                }
+                else -> resumeWebView()
             }
+        }
+    }
+
+    private fun resumeWebView() {
+        webView?.let {
+            if (it.isShown) it.onResume()
         }
     }
 
@@ -499,6 +509,7 @@ class BrowserTabFragment :
         }
 
         addTextChangedListeners()
+        resumeWebView()
     }
 
     override fun onPause() {
@@ -2217,6 +2228,7 @@ class BrowserTabFragment :
             if (viewState.showVoiceSearch) {
                 voiceSearchButton.visibility = VISIBLE
                 voiceSearchButton.setOnClickListener {
+                    webView?.onPause()
                     voiceSearchLauncher.launch()
                 }
             } else {

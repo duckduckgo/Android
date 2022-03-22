@@ -27,6 +27,7 @@ import androidx.annotation.RequiresApi
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity
+import com.duckduckgo.app.voice.VoiceSearchLauncher.Event
 import com.duckduckgo.app.voice.listeningmode.ui.addBlur
 import com.duckduckgo.app.voice.listeningmode.ui.removeBlur
 import javax.inject.Inject
@@ -43,16 +44,22 @@ class VoiceSearchActivityLauncher @Inject constructor(
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
-        onSpeechResult: (String) -> Unit
+        onEvent: (Event) -> Unit
     ) {
         _activity = activity
         voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) { result ->
             result?.let {
                 if (it.resultCode == Activity.RESULT_OK) {
                     it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT)?.let { data ->
-                        pixel.fire(AppPixelName.VOICE_SEARCH_DONE)
-                        onSpeechResult(data)
+                        if (data.isNotEmpty()) {
+                            pixel.fire(AppPixelName.VOICE_SEARCH_DONE)
+                            onEvent(Event.VoiceRecognitionSuccess(data))
+                        } else {
+                            onEvent(Event.SearchCancelled)
+                        }
                     }
+                } else {
+                    onEvent(Event.SearchCancelled)
                 }
             }
             _activity?.window?.decorView?.rootView?.removeBlur()

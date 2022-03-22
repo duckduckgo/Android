@@ -258,8 +258,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         if (voiceSearchAvailability.isVoiceSearchSupported) {
             voiceSearch.visibility = View.VISIBLE
             voiceSearchLauncher.registerResultsCallback(this, this) {
-                if (it.isNotEmpty()) {
-                    viewModel.onUserSelectedToEditQuery(it)
+                if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
+                    viewModel.onUserSelectedToEditQuery(it.result)
                 }
             }
             voiceSearch.setOnClickListener {
