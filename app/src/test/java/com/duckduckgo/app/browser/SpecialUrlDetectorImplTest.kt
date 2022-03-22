@@ -27,7 +27,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -58,20 +57,15 @@ class SpecialUrlDetectorImplTest {
     @Mock
     lateinit var mockTrackingParameters: TrackingParameters
 
-    @Mock
-    lateinit var mockVariantManager: VariantManager
-
     @Before
     fun setup() {
         MockitoAnnotations.openMocks(this)
         testee = SpecialUrlDetectorImpl(
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
-            trackingParameters = mockTrackingParameters,
-            variantManager = mockVariantManager
+            trackingParameters = mockTrackingParameters
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "my" })
     }
 
     @Test
@@ -358,14 +352,6 @@ class SpecialUrlDetectorImplTest {
         val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
         assertEquals(expected, actual::class)
         assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
-    }
-
-    @Test
-    fun whenUrlIsTrackingParameterLinkAndVariantIsNotTrackingParameterRemovalThenReturnWebType() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-        val expected = Web::class
-        val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
-        assertEquals(expected, actual::class)
     }
 
     private fun randomString(length: Int): String {

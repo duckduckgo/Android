@@ -35,8 +35,10 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.isNetworkSwitchingHandlingEnabled
 import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
 import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -117,6 +119,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
     private var connectionMonitor: ConnectionMonitor? = null
+
+    @Inject lateinit var featureToggle: FeatureToggle
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -268,9 +272,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
             vpnPreferences.privateDns?.let { privateDnsName ->
-                if (appBuildConfig.flavor == INTERNAL) {
+                if (featureToggle.isPrivateDnsSupportEnabled()) {
                     Timber.v("Setting private DNS: $privateDnsName")
-                    InetAddress.getAllByName(privateDnsName).forEach { addr -> addDnsServer(addr) }
+                    runCatching { InetAddress.getAllByName(privateDnsName) }.getOrNull()?.forEach { addr -> addDnsServer(addr) }
                 }
             }
 
@@ -503,30 +507,28 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkDisconnected() {
-        // for now just in internal builds to ensure it doesn't have side effects
-        if (appBuildConfig.flavor != INTERNAL) return
-
-        // TODO maybe at some point show the user?
-        Timber.w("No network")
-        if (appBuildConfig.sdkInt >= 22) {
-            setUnderlyingNetworks(null)
+        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+            // TODO maybe at some point show the user?
+            Timber.w("No network")
+            if (appBuildConfig.sdkInt >= 22) {
+                setUnderlyingNetworks(null)
+            }
         }
     }
 
     @SuppressLint("NewApi")
     override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
-        // for now just in internal builds to ensure it doesn't have side effects
-        if (appBuildConfig.flavor != INTERNAL) return
-
-        if (appBuildConfig.sdkInt >= 22) {
-            Timber.w("set underlying networks: $networks")
-            if (networks.isEmpty()) {
-                // this should never happen. If networks.isEmpty() onNetworkDisconnected() should be called instead.
-                // just safeguard
-                Timber.w("onNetworkConnected called with empty networks...setting underlying networks to default")
-                setUnderlyingNetworks(null)
-            } else {
-                setUnderlyingNetworks(networks.toTypedArray())
+        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+            if (appBuildConfig.sdkInt >= 22) {
+                Timber.w("set underlying networks: $networks")
+                if (networks.isEmpty()) {
+                    // this should never happen. If networks.isEmpty() onNetworkDisconnected() should be called instead.
+                    // just safeguard
+                    Timber.w("onNetworkConnected called with empty networks...setting underlying networks to default")
+                    setUnderlyingNetworks(null)
+                } else {
+                    setUnderlyingNetworks(networks.toTypedArray())
+                }
             }
         }
     }

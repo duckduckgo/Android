@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.exception.UncaughtExceptionSource
+import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -27,30 +30,37 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Thread.UncaughtExceptionHandler
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.NonCancellable
 
 class VpnUncaughtExceptionHandler(
-    private val context: Context,
     private val originalHandler: UncaughtExceptionHandler?,
     private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
 ) : UncaughtExceptionHandler {
 
     override fun uncaughtException(
         thread: Thread,
         throwable: Throwable
     ) {
-        if (throwable is OutOfMemoryError) {
-            Timber.e("Out of memory; triggering a VPN restart")
-
-            restartVpn()
-        } else {
-            Timber.e(throwable, "VPN uncaughtException")
-            originalHandler?.uncaughtException(thread, throwable)
-        }
+        Timber.e(throwable, "VPN uncaughtException")
+        recordExceptionAndAllowCrash(thread, throwable)
     }
 
-    private fun restartVpn() {
-        coroutineScope.launch {
-            TrackerBlockingVpnService.restartVpnService(context, forceGc = true)
+    private fun recordExceptionAndAllowCrash(
+        thread: Thread,
+        originalException: Throwable
+    ) {
+        coroutineScope.launch(dispatcherProvider.io() + NonCancellable) {
+            try {
+                uncaughtExceptionRepository.recordUncaughtException(originalException, UncaughtExceptionSource.GLOBAL)
+                offlinePixelCountDataStore.applicationCrashCount += 1
+            } catch (e: Throwable) {
+                Timber.e(e, "Failed to record exception")
+            } finally {
+                originalHandler?.uncaughtException(thread, originalException)
+            }
         }
     }
 }
@@ -62,10 +72,18 @@ class VpnExceptionModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesVpnUncaughtExceptionHandler(
-        context: Context,
-        @AppCoroutineScope vpnCoroutineScope: CoroutineScope
+        @AppCoroutineScope vpnCoroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider,
+        offlinePixelCountDataStore: OfflinePixelCountDataStore,
+        uncaughtExceptionRepository: UncaughtExceptionRepository,
     ): VpnUncaughtExceptionHandler {
         val originalHandler = Thread.getDefaultUncaughtExceptionHandler()
-        return VpnUncaughtExceptionHandler(context, originalHandler, vpnCoroutineScope)
+        return VpnUncaughtExceptionHandler(
+            originalHandler,
+            vpnCoroutineScope,
+            dispatcherProvider,
+            offlinePixelCountDataStore,
+            uncaughtExceptionRepository
+        )
     }
 }
