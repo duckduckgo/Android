@@ -16,10 +16,10 @@
 
 package com.duckduckgo.espresso.privacy
 
+import android.webkit.WebView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.espresso.web.assertion.WebViewAssertions.webMatches
 import androidx.test.espresso.web.sugar.Web.onWebView
@@ -36,7 +36,7 @@ import androidx.test.espresso.web.webdriver.DriverAtoms.getText
 import androidx.test.espresso.web.webdriver.DriverAtoms.webClick
 import androidx.test.espresso.web.webdriver.Locator.ID
 import com.duckduckgo.espresso.PrivacyTest
-import com.duckduckgo.espresso.WaitTimeIdlingResource
+import com.duckduckgo.espresso.WebViewIdlingResource
 import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
@@ -56,18 +56,27 @@ class GpcTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnableGpcSetCorrectly() {
-        val waitTime = 6000L
+        val waitTime = 16000L
         IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
         IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
 
-        onView(isRoot()).perform(waitForView(withId(R.id.pageLoadingIndicator)))
+        var webView: WebView? = null
+
+        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+
+        activityScenarioRule.scenario.onActivity {
+            webView = it.findViewById(R.id.browserWebView)
+        }
+
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onWebView()
             .withElement(findElement(ID, "start"))
             .check(webMatches(getText(), containsString("Start test")))
             .perform(webClick())
 
-        val idlingResourceForScript: IdlingResource = WaitTimeIdlingResource(waitTime)
+        val idlingResourceForScript = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
 
         val results = onWebView()
@@ -80,6 +89,7 @@ class GpcTest {
                 assertTrue("Value ${it.id} should be true", it.value.toString() == "true")
             }
         }
+        IdlingRegistry.getInstance().unregister(idlingResourceForDisableProtections, idlingResourceForScript)
     }
 
     private fun getTestJson(jsonString: String): TestJson? {

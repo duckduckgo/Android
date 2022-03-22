@@ -9,23 +9,30 @@ buildscript {
         min_sdk = 23
         target_sdk = 30
         compile_sdk = 31
+        fladle_version = "fladle-0.17.4-SNAPSHOT"
     }
 
     repositories {
         google()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
+        flatDir {
+            dirs "$rootProject.projectDir/libs"
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_plugin"
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.osacky.fulladle:$fladle_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
+
+apply plugin: 'com.osacky.fulladle'
 
 allprojects {
     repositories {
@@ -39,6 +46,28 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+fladle {
+    configs {
+        serviceAccountCredentials.set(project.layout.projectDirectory.file("flank.json"))
+        androidTests {
+            async.set(false)
+            flankVersion.set("21.+")
+            testShards.set(2)
+            useOrchestrator.set(false)
+            recordVideo.set(false)
+            testTargets.set([
+                    "notAnnotation com.duckduckgo.espresso.PrivacyTest",
+                    "notAnnotation com.duckduckgo.espresso.UserJourney",
+            ])
+            devices.set([
+                    ["model": "Pixel3", "version": "30"],
+                    ["model": "Nexus6", "version": "23"]
+            ])
+            localResultsDir.set("fladleResults")
+        }
+    }
 }
 
 apply plugin: 'android-reporting'
