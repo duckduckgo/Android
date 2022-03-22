@@ -24,7 +24,6 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -65,8 +64,7 @@ interface SpecialUrlDetector {
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
     private val ampLinks: AmpLinks,
-    private val trackingParameters: TrackingParameters,
-    private val variantManager: VariantManager
+    private val trackingParameters: TrackingParameters
 ) : SpecialUrlDetector {
 
     override fun determineType(uri: Uri): UrlType {
