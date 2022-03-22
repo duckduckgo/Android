@@ -90,7 +90,7 @@ jobs:
       - name: Build
         run: ./gradlew androidTestsBuild
 
-      - name: Firebase tests
+      - name: Run Android Tests
         run: ./gradlew runFlankAndroidTests
 
       - name: Bundle the Android CI checks report

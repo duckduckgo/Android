@@ -23,7 +23,6 @@ android {
         versionCode buildVersionCode()
         versionName buildVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-//        testInstrumentationRunnerArguments clearPackageData: 'true'
         archivesBaseName = "duckduckgo-$versionName"
         vectorDrawables.useSupportLibrary = true
 
@@ -105,9 +104,6 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
-//        if (USE_ORCHESTRATOR) {
-//        execution 'ANDROIDX_TEST_ORCHESTRATOR'
-//        }
     }
 
     def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
