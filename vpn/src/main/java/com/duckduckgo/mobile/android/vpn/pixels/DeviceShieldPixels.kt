@@ -701,10 +701,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didOpenExclusionListActivityFromTrackersScreen() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS,
+            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_UNIQUE,
             tag = FIRST_OPEN_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
     }
 
