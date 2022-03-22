@@ -45,8 +45,6 @@ dependencies {
     implementation "com.jakewharton.threetenabp:threetenabp:_"
     testImplementation "org.threeten:threetenbp:_"
 
-//    compileOnly "com.google.dagger:dagger:$dagger"
-
     implementation JakeWharton.timber
 
     implementation Square.retrofit2.converter.moshi
@@ -68,4 +66,12 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation AndroidX.archCore.testing
+}
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
 }
