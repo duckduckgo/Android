@@ -19,11 +19,11 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 
 internal fun FeatureToggle.isNetworkSwitchingHandlingEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling(), false) == true
+    return isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling, false)
 }
 internal fun FeatureToggle.isIpv6SupportEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.Ipv6Support(), false) == true
+    return isFeatureEnabled(AppTpFeatureName.Ipv6Support, false)
 }
 internal fun FeatureToggle.isPrivateDnsSupportEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport(), false) == true
+    return isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
 }

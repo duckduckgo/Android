@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
@@ -58,7 +59,9 @@ class RealPrivacyConfigPersister @Inject constructor(
                 jsonPrivacyConfig.features.forEach { feature ->
                     feature.value?.let { jsonObject ->
                         privacyFeaturePluginPoint.getPlugins().forEach { plugin ->
-                            plugin.store(feature.key, jsonObject.toString())
+                            privacyFeatureValueOf(feature.key)?.let {
+                                plugin.store(it, jsonObject.toString())
+                            }
                         }
                     }
                 }

@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class AppTpFeatureTogglesPlugin @Inject constructor(
 ) : FeatureTogglesPlugin {
     override fun isEnabled(featureName: FeatureName, defaultValue: Boolean): Boolean? {
         return if (featureName is AppTpFeatureName) {
-            return appTpFeatureToggleRepository.get(featureName.value, defaultValue)
+            return appTpFeatureToggleRepository.get(featureName, defaultValue)
         } else {
             null
         }

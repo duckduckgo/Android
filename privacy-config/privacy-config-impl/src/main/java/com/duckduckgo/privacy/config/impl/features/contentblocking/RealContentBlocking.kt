@@ -36,7 +36,7 @@ class RealContentBlocking @Inject constructor(
 ) : ContentBlocking {
 
     override fun isAnException(url: String): Boolean {
-        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true) == true) {
+        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true) == true) {
             unprotectedTemporary.isAnException(url) || matches(url)
         } else {
             false

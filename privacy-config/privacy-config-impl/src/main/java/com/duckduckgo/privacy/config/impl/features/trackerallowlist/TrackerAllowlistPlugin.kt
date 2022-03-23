@@ -35,10 +35,10 @@ class TrackerAllowlistPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        if (name == featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<TrackerAllowlistFeature> =
                 moshi.adapter(TrackerAllowlistFeature::class.java)
@@ -57,5 +57,5 @@ class TrackerAllowlistPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackerAllowlistFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.TrackerAllowlistFeatureName
 }
