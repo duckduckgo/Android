@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity
 import com.duckduckgo.app.voice.VoiceSearchLauncher.Event
+import com.duckduckgo.app.voice.VoiceSearchLauncher.Source
 import com.duckduckgo.app.voice.listeningmode.ui.addBlur
 import com.duckduckgo.app.voice.listeningmode.ui.removeBlur
 import javax.inject.Inject
@@ -38,25 +39,34 @@ class VoiceSearchActivityLauncher @Inject constructor(
     private val pixel: Pixel
 ) : VoiceSearchLauncher {
 
+    companion object {
+        private const val KEY_PARAM_SOURCE = "source"
+    }
+
     private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
+    private lateinit var _source: Source
     private var _activity: Activity? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
+        source: Source,
         onEvent: (Event) -> Unit
     ) {
         _activity = activity
+        _source = source
         voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) { result ->
             result?.let {
                 if (it.resultCode == Activity.RESULT_OK) {
-                    it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT)?.let { data ->
-                        if (data.isNotEmpty()) {
-                            pixel.fire(AppPixelName.VOICE_SEARCH_DONE)
-                            onEvent(Event.VoiceRecognitionSuccess(data))
-                        } else {
-                            onEvent(Event.SearchCancelled)
-                        }
+                    val data = it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT) ?: ""
+                    if (data.isNotEmpty()) {
+                        pixel.fire(
+                            pixel = AppPixelName.VOICE_SEARCH_DONE,
+                            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
+                        )
+                        onEvent(Event.VoiceRecognitionSuccess(data))
+                    } else {
+                        onEvent(Event.SearchCancelled)
                     }
                 } else {
                     onEvent(Event.SearchCancelled)
@@ -67,12 +77,15 @@ class VoiceSearchActivityLauncher @Inject constructor(
     }
 
     override fun launch() {
-        launchVoiceSearch(context)
+        launchVoiceSearch()
     }
 
-    private fun launchVoiceSearch(context: Context) {
+    private fun launchVoiceSearch() {
         _activity?.window?.decorView?.rootView?.addBlur()
-        pixel.fire(AppPixelName.VOICE_SEARCH_STARTED)
+        pixel.fire(
+            pixel = AppPixelName.VOICE_SEARCH_STARTED,
+            parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
+        )
         voiceSearchActivityLaucher.launch(Intent(context, VoiceSearchActivity::class.java))
     }
 }

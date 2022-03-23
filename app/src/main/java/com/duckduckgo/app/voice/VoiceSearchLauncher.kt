@@ -25,6 +25,7 @@ import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.voice.VoiceSearchLauncher.Event
+import com.duckduckgo.app.voice.VoiceSearchLauncher.Source
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -33,10 +34,16 @@ interface VoiceSearchLauncher {
     fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
+        source: Source,
         onEvent: (Event) -> Unit
     )
 
     fun launch()
+
+    enum class Source(val paramValueName: String) {
+        BROWSER("browser"),
+        WIDGET("widget")
+    }
 
     sealed class Event {
         class VoiceRecognitionSuccess(val result: String) : Event()
@@ -55,12 +62,13 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
+        source: Source,
         onEvent: (Event) -> Unit
     ) {
         permissionRequest.registerResultsCallback(caller, activity) {
             voiceSearchActivityLauncher.launch()
         }
-        voiceSearchActivityLauncher.registerResultsCallback(caller, activity) {
+        voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
             onEvent(it)
         }
     }
