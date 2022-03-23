@@ -40,7 +40,7 @@ class RealTrackerAllowlist @Inject constructor(
         documentURL: String,
         url: String
     ): Boolean {
-        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName, true) == true) {
+        return if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackerAllowlistFeatureName, true)) {
             trackerAllowlistRepository.exceptions
                 .filter { UriString.sameOrSubdomain(url, it.domain) }
                 .map { matches(url, documentURL, it) }

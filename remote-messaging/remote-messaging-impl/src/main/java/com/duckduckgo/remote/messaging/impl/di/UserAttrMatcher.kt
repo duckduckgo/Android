@@ -18,7 +18,7 @@ package com.duckduckgo.remote.messaging.impl.di
 
 import javax.inject.Qualifier
 
-/** Identifies a coroutine scope type that is scope to the app lifecycle */
+/** Marks the Android matcher implementation for remote-messaging */
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class UserAttrMatcher

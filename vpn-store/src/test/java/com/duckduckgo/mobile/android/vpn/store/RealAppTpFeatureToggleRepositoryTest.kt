@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.store
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggleStore
-import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggles
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

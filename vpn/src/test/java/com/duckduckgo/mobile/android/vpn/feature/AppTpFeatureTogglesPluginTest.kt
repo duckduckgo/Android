@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before

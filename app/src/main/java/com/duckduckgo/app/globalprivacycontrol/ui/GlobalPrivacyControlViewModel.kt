@@ -53,7 +53,7 @@ class GlobalPrivacyControlViewModel(
     init {
         _viewState.value = ViewState(
             globalPrivacyControlEnabled = gpc.isEnabled(),
-            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true) == true
+            globalPrivacyControlFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true)
         )
         pixel.fire(SETTINGS_DO_NOT_SELL_SHOWN)
     }

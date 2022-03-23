@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 

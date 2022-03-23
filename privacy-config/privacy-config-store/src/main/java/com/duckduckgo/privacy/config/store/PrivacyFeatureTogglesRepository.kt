@@ -16,18 +16,8 @@
 
 package com.duckduckgo.privacy.config.store
 
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-
 interface PrivacyFeatureTogglesRepository : PrivacyFeatureTogglesDataStore
 
 class RealPrivacyFeatureTogglesRepository(
-    private val privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
-) : PrivacyFeatureTogglesRepository, PrivacyFeatureTogglesDataStore by privacyFeatureTogglesDataStore {
-
-    override fun get(
-        featureName: PrivacyFeatureName,
-        defaultValue: Boolean
-    ): Boolean {
-        return privacyFeatureTogglesDataStore.get(featureName, defaultValue)
-    }
-}
+    privacyFeatureTogglesDataStore: PrivacyFeatureTogglesDataStore
+) : PrivacyFeatureTogglesRepository, PrivacyFeatureTogglesDataStore by privacyFeatureTogglesDataStore

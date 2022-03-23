@@ -18,30 +18,14 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import android.content.Context
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
+import com.duckduckgo.mobile.android.vpn.store.RealAppTpFeatureToggleRepository
 import com.duckduckgo.mobile.android.vpn.store.RealVpnFeatureToggleStore
-import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggleStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-
-// marker interface to use delegate pattern
-interface AppTpFeatureToggleRepository : VpnFeatureToggleStore
-
-class RealAppTpFeatureToggleRepository constructor(
-    private val vpnFeatureToggleStore: VpnFeatureToggleStore,
-    private val appBuildConfig: AppBuildConfig,
-) : AppTpFeatureToggleRepository, VpnFeatureToggleStore by vpnFeatureToggleStore {
-
-    override fun get(featureName: AppTpFeatureName, defaultValue: Boolean): Boolean {
-        val delegateValue = vpnFeatureToggleStore.get(featureName, defaultValue)
-
-        // Ensure production builds have all these feature disabled for now
-        return (appBuildConfig.flavor == BuildFlavor.INTERNAL) && delegateValue
-    }
-}
 
 @ContributesTo(AppScope::class)
 @Module
