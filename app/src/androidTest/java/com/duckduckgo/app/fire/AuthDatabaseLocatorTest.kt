@@ -51,7 +51,7 @@ class AuthDatabaseLocatorTest {
     private suspend fun awaitPathCreation() {
         withTimeout(5000) {
             while (authDatabaseLocator.getDatabasePath().isEmpty()) {
-                delay(100)
+                delay(10)
             }
         }
     }

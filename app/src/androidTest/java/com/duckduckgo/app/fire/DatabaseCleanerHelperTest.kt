@@ -60,7 +60,7 @@ class DatabaseCleanerHelperTest {
     private suspend fun awaitPathCreation() {
         withTimeout(5000) {
             while (databaseLocator.getDatabasePath().isEmpty()) {
-                delay(100)
+                delay(10)
             }
         }
     }
