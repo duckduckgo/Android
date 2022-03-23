@@ -134,7 +134,8 @@
         <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Icon">
+    <style name="Widget.DuckDuckGo.BrowserPopupMenu.NavigationalIcon">
+        <item name="android:background">@drawable/ripple_rectangle_rounded</item>
         <item name="android:tint">?attr/browserIconColorSelector</item>
         <item name="android:layout_width">@dimen/popupMenuItemHeight</item>
     </style>

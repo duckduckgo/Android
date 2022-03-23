@@ -24,33 +24,31 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/popupMenuNavigationItemHeight"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginBottom="@dimen/keyline_2"
+        android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp">
 
         <ImageButton
             android:id="@+id/backMenuItem"
-            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@drawable/ripple_top_left_rounded"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.NavigationalIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/back"
             android:src="@drawable/ic_arrow_left_24"
             app:tint="@color/primary_icon_color_selector"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="@dimen/keyline_4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/forwardMenuItem"
-            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.NavigationalIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/forward"
             android:src="@drawable/ic_arrow_right_24"
             app:tint="@color/primary_icon_color_selector"
@@ -61,14 +59,13 @@
 
         <ImageButton
             android:id="@+id/refreshMenuItem"
-            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.Icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@drawable/ripple_top_right_rounded"
+            style="@style/Widget.DuckDuckGo.BrowserPopupMenu.NavigationalIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:contentDescription="@string/refresh"
             android:src="@drawable/ic_reload_24"
             app:tint="@color/primary_icon_color_selector"
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="@dimen/keyline_4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
