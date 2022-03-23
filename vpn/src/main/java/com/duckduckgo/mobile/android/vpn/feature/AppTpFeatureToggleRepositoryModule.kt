@@ -20,8 +20,6 @@ import android.content.Context
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
-import com.duckduckgo.mobile.android.vpn.store.RealAppTpFeatureToggleRepository
-import com.duckduckgo.mobile.android.vpn.store.RealVpnFeatureToggleStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -33,7 +31,6 @@ class AppTpFeatureToggleRepositoryModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideAppTpFeatureToggleRepository(context: Context, appBuildConfig: AppBuildConfig): AppTpFeatureToggleRepository {
-        val store = RealVpnFeatureToggleStore(context)
-        return RealAppTpFeatureToggleRepository(store, appBuildConfig)
+        return AppTpFeatureToggleRepository.create(context, appBuildConfig)
     }
 }

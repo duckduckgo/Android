@@ -27,3 +27,6 @@ internal fun FeatureToggle.isIpv6SupportEnabled(): Boolean {
 internal fun FeatureToggle.isPrivateDnsSupportEnabled(): Boolean {
     return isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
 }
+internal fun FeatureToggle.isBadHealthMitigationEnabled(): Boolean {
+    return isFeatureEnabled(AppTpFeatureName.BadHealthMitigation, true)
+}

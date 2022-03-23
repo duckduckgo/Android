@@ -32,7 +32,7 @@ interface VpnFeatureToggleStore {
     fun insert(toggle: VpnFeatureToggles)
 }
 
-class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggleStore {
+internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggleStore {
     private val preferences: SharedPreferences
         get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
 
