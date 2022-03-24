@@ -109,4 +109,6 @@
     <!-- New overflow Menu -->
     <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
     <string name="requestMobileSiteMenuTitle">Mobile Site</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Print Page</string>
 </resources>
