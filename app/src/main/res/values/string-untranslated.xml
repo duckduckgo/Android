@@ -31,7 +31,7 @@
 
     <!-- Voice Search  -->
     <string name="voiceSearchIconContentDescription">Voice search</string>
-    <string name="voiceSearchListening">Listening…</string>
+    <string name="voiceSearchListening">Speak Now</string>
     <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
     <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. Audio is processed on-device. It isn’t stored or shared with anyone.</string>
     <string name="voiceSearchPermissionRationaleTitle">Microphone Access Required for Private Voice Search</string>
