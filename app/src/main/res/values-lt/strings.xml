@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@
     <string name="omnibarInputHint">Ieškoti arba įvesti URL</string>
     <string name="clearButtonContentDescription">Išvalyti paieškos įvestį</string>
     <string name="no_compatible_third_party_app_installed">Neįdiegta suderinama programa</string>
-    <string name="addBookmarkMenuTitle">Pridėti žymę</string>
+    <string name="addBookmarkMenuTitle">Pridėti žymelę</string>
     <string name="editBookmarkMenuTitle">Redaguoti žymę</string>
     <string name="addFavoriteMenuTitle">Pridėti mėgstamą</string>
     <string name="removeFavoriteMenuTitle">Šalinti mėgstamą</string>
@@ -58,7 +58,7 @@
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
-    <string name="permissionRequiredToDownload">Norint atsisiųsti, reikia leidimo išsaugoti</string>
+    <string name="permissionRequiredToDownload">Norint atsisiųsti reikia leidimo išsaugoti</string>
     <string name="downloadComplete">Atsisiuntimas baigtas</string>
     <string name="downloadFailed">Atsisiųsti nepavyko</string>
     <string name="downloadInProgress">Atsisiunčiama</string>
@@ -98,7 +98,7 @@
     <string name="faviconContentDescription">Parankinio piktograma</string>
     <string name="closeContentDescription">Uždaryti</string>
     <string name="closeAllTabsMenuItem">Uždaryti visas korteles</string>
-    <string name="closeTab">Uždaryti kortelę</string>
+    <string name="closeTab">Uždaryti kortelė</string>
     <string name="tabClosed">Skirtukas uždarytas</string>
     <string name="tabClosedUndo">Anuliuoti</string>
 
@@ -181,7 +181,18 @@
     <string name="settingsVersion">Versija</string>
     <string name="leaveFeedback">Bendrinti atsiliepimą</string>
     <string name="settingsEmailProtectionTitle">El. pašto apsauga</string>
-    <string name="settingsEmailProtectionSubtitle">Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą.</string>
+    <string name="settingsEmailProtectionSubtitle">Blokuokite el. laiškų sekimo priemones ir paslėpkite savo adresą</string>
+    <string name="settingsHeadingMore">Daugiau iš „DuckDuckGo“</string>
+    <string name="settingsLightTheme">Šviesi</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Tamsi</string>
+    <string name="settingsSystemTheme">Sistemos numatytoji</string>
+    <string name="settingsThemeDialogSave">Nustatyti temą</string>
+    <string name="settingsTitleAppLinks">Atidaryti nuorodas programėlėse</string>
+    <string name="settingsTitleAppLinksDialog">Atidaryti nuorodas programėlėse</string>
+    <string name="settingsAppLinksAskEveryTime">Klausti kiekvieną kartą</string>
+    <string name="settingsAppLinksAlways">Visada</string>
+    <string name="settingsAppLinksNever">Niekada</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -228,10 +239,10 @@
     <string name="brokenSiteCategoryOther">Kažkas kito</string>
 
     <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Žymės</string>
-    <string name="bookmarksActivityTitle">Žymės</string>
-    <string name="noBookmarks">Žymių dar nepridėta</string>
-    <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymei %1$s</string>
+    <string name="bookmarksMenuTitle">Žymelės</string>
+    <string name="bookmarksActivityTitle">Žymelės</string>
+    <string name="noBookmarks">Žymelių dar nepridėta</string>
+    <string name="bookmarkOverflowContentDescription">Daugiau parinkčių žymelei %1$s</string>
     <string name="bookmarkDeleteConfirmationMessage">Ištrinta &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="exportBookmarksMenu">Eksportuoti</string>
     <string name="exportBookmarksEmpty">Neturite žymelių, niekas nebus eksportuota</string>
@@ -258,6 +269,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Pridėti mėgstamą</string>
+    <string name="widgetConfigurationTitleText">Pasirinkti temą</string>
+    <string name="widgetConfigurationSystemThemeOption">Sistemos numatytoji</string>
+    <string name="widgetConfigurationLightThemeOption">Šviesi</string>
+    <string name="widgetConfigurationDarkThemeOption">Tamsi</string>
+    <string name="widgetConfigurationAddWidgetOption">Pridėti valdiklį</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Mėgstamų dar nepridėta</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Pridėti mėgstamą</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Akimirksniu apsilankykite savo mėgstamose svetainėse!\n\nEikite į savo mėgstamą svetainę. Bakstelėkite „⠇“ piktogramą ir pasirinkite Pridėti mėgstamą.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Akimirksniu apsilankykite savo mėgstamose svetainėse! Eikite į savo mėgstamą svetainę. Tada bakstelėkite naršyklės meniu piktogramą ir pasirinkite Pridėti mėgstamą.</string>
+    <string name="widgetConfigurationActivityTitle">Valdiklio konfigūracija</string>
+    <string name="favoritesWidgetLabel">Mėgstami</string>
+    <string name="searchWidgetLabel">Paieška</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridėti prie pradžios puslapio</string>
@@ -344,10 +370,10 @@
     <string name="missingBrowserFeaturesSubtitle">Kokią naršymo funkciją galime pridėti arba patobulinti?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Naršymas pirmyn, atgal ir (arba) atnaujinimas</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Kortelių kūrimas ir tvarkymas</string>
-    <string name="missingBrowserFeatureSubReasonAdPopups">Reklamų ir iššokančiųjų langų blokavimas</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Reklamų ir iššokančių langų blokavimas</string>
     <string name="missingBrowserFeatureSubReasonVideos">Vaizdo įrašų peržiūra</string>
     <string name="missingBrowserFeatureSubReasonImages">Paveikslėlių naudojimas</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Žymių kūrimas ir tvarkymas</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Žymelių kūrimas ir tvarkymas</string>
     <string name="missingBrowserFeatureSubReasonOther">Nei vienas iš šių</string>
 
     <string name="websiteNotLoadingTitleLong">Problemos kraunantis svetainei</string>
@@ -372,7 +398,7 @@
     <string name="needMoreCustomizationSubReasonAppLooks">Kaip atrodo programa</string>
     <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Kurie duomenys yra išvalomi</string>
     <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kada duomenys yra išvalomi</string>
-    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kaip rodomos žymės</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Kaip rodomos žymelės</string>
     <string name="needMoreCustomizationSubReasonOther">Nei vienas iš šių</string>
 
     <string name="appIsSlowOrBuggyTitleLong">Programa veikia lėtai, genda ar stringa</string>
@@ -394,7 +420,7 @@
     <string name="feedbackNegativeMainReasonPageSubtitle">Kas jums kelia didžiausią susierzinimą?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Apgailestaujame</string>
     <string name="feedbackShareDetails">Dalintis informacija</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Ar norėtumėte papasakoti išsamiau?</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Ar norėtumėte papasakoti plačiau?</string>
     <string name="whatHaveYouBeenEnjoying">Kas jums patiko?</string>
     <string name="awesomeToHear">Nuostabu tai girdėti!</string>
     <string name="shareTheLoveWithARating">Įvertinkite mus „Play Store“ parduotuvėje.</string>
@@ -437,10 +463,10 @@
     <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DuckDuckGo“!"</string>
+    <string name="onboardingWelcomeTitle">"Sveiki atvykę į „DUCKDUCKGO“"</string>
     <string name="onboardingDaxText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
-    <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklalapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Atlikta!<br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
     <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
@@ -455,7 +481,7 @@
         <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn - naršykite toliau!]]></string>
     <string name="daxMainNetworkCtaText">Būk atidus! Negaliu neleisti %1$s matyti tavo veiklos %2$s &lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
     <string name="daxMainNetworkOwnedCtaText">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
 
@@ -580,6 +606,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Atidaryti nuorodas susijusiose programose</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Išjungti, kad nuorodos automatiškai neatsidarytų kitose įdiegtose programose.</string>
     <string name="appLinkDialogTitle">Atidaryti kitoje programoje?</string>
+    <string name="appLinkSnackBarAction">Atidaryti programėlėje</string>
+    <string name="appLinkMultipleSnackBarAction">Pasirinkti programėlę</string>
+    <string name="appLinkSnackBarMessage">Galite atverti šią nuorodą %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Galite atidaryti šią nuorodą kitose programėlėse.</string>
+    <string name="appLinkIntentChooserTitle">Atidaryti</string>
+    <string name="appLinkMenuItemTitle">Atidaryti programėlėje</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Naujas adresas nukopijuotas į jūsų iškarpinę</string>
@@ -597,26 +629,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">El. pašto laukimo sąrašas</string>
-    <string name="waitlistNotificationTitle">Jūsų el. pašto apsaugos kvietimas jau čia!</string>
-    <string name="waitlistNotificationDescription">Jūs prisijungėte prie laukimo sąrašo ir paprašėte mūsų informuoti jus, kai ateis jūsų eilė išbandyti mūsų el. pašto apsaugos funkciją. Bakstelėkite norėdami peržiūrėti savo kvietimą.</string>
+    <string name="waitlistNotificationTitle">El. pašto apsauga įjungta!</string>
+    <string name="waitlistNotificationDescription">Atidaryti pakvietimą</string>
 
     <string name="waitlistNotificationDialogDescription">Ar norėtumėte, kad atsiųstume jums pranešimą, kai ateis jūsų eilė?</string>
-    <string name="waitlistNotificationDialogNoThanks">NE, DĖKOJU</string>
+    <string name="waitlistNotificationDialogNoThanks">Ne, dėkoju</string>
     <string name="waitlistNotificationDialogNotifyMe">INFORMUOTI</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">El. pašto apsauga (beta)</string>
     <string name="emailProtectionActivityTitle">El. pašto apsauga (beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Nesaugome jūsų el. laiškų. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Jums nereikia dalintis savo asmenine informacija, kad prisijungtumėte prie laukiančiųjų sąrašo. Užsitikrinsite vietą eilėje laiko žyma, kuri egzistuoja tik jūsų įrenginyje, kad galėtumėte jus įspėti, kai ateis jūsų eilė.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Prisijungiant prie laukimo sąrašo įvyko klaida, bandykite dar kartą vėliau</string>
     <string name="emailProtectionDuckAddressCta">Jau turiu „Duck“ adresą</string>
     <string name="emailProtectionInviteCodeCta">Turiu kvietimo kodą</string>
     <string name="emailProtectionWaitlistCta">Prisijungti prie privataus laukimo sąrašo</string>
     <string name="emailProtectionGetStartedCta">Pradėti</string>
+    <string name="emailNotSupported">Nepalaikomas įrenginys</string>
+    <string name="emailNotSupportedExplanation">El. pašto apsauga leidžia jums sukurti privačius el. pašto adresus, kurie pašalina el. laiškų sekimo priemones. Mums reikia užšifruoti ir saugoti šiuos adresus, kuriuos lokaliai sukuriate įrenginyje. Kadangi jūsų įrenginys nepalaiko užšifruotos talpyklos funkcijos, El. pašto apsaugos funkcija neprieinama.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
@@ -625,7 +659,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Esate pakviesti!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą<br />nekeisdami savo el. pašto teikėjo. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Asmeninis „Duck“ adresas</string>
@@ -633,4 +667,48 @@
         <![CDATA[Pašalinus el. pašto apsaugą iš šio įrenginio, bus pašalinta parinktis įrašyti savo asmeninį „Duck“ adresą arba naujai sukurtą privatų „Duck“ adresą į el. pašto laukelius, kol naršysite svetainėje.<br/><br/>Norėdami visam laikui ištrinti „Duck“ adresus arba turėdami kitų klausimų ar atsiliepimų, susisiekite su mumis el. paštu <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Pašalinti šį įrenginį</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Redaguoti žymę</string>
+    <string name="favoriteDialogTitleEdit">Redaguoti mėgstamiausią</string>
+    <string name="locationLabel">Vieta</string>
+    <string name="folderLocationTitle">Pasirinkti vietą</string>
+    <string name="addFolder">Pridėti aplanką</string>
+    <string name="editFolder">Redaguoti aplanką</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
+    <string name="bookmarkFolderEmpty">Tuščia</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s ir %3$d prekė?</item>
+        <item quantity="few">%1$s%2$s ir %3$d prekės?</item>
+        <item quantity="many">%1$s%2$s ir %3$d prekės?</item>
+        <item quantity="other">%1$s%2$s ir %3$d prekės?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d prekė</item>
+        <item quantity="few">%1$d prekės</item>
+        <item quantity="many">%1$d prekės</item>
+        <item quantity="other">%1$d prekės</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Pritaikymas neįgaliems</string>
+    <string name="accessibilityActivityTitle">Pritaikymas neįgaliems</string>
+    <string name="accessibilityFontSizeTitle">Teksto dydis</string>
+    <string name="accessibilityFontSizeHint">Slinkite slinkiklį, kol bus patogu skaityti. „DuckDuckGo“ rodomos svetainės prisitaikys pagal šį nustatymą.</string>
+    <string name="accessibilityForceZoomTitle">Įjunkite rankinį puslapio priartinimą</string>
+    <string name="accessibilityForceZoomSubtitle">Suimkite ir priartinkite bet kurioje svetainėje, net ir tose, kur neleistų</string>
+    <string name="accessibilityTextSizeOverrideTitle">Tvarkyti teksto dydį</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">„DuckDuckGo“ tekstas peržiūrimose svetainėse prisitaikys atitinkamai pagal žemiau pateiktą nustatymą</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Nepavyko atsisiųsti. Patikrinkite interneto ryšį.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
+    <string name="settingsAddHomeScreenWidget">Pagrindinio ekrano valdiklis</string>
 </resources>

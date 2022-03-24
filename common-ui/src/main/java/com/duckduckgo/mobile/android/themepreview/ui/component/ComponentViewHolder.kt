@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.view.SingleLineListItem
+import com.duckduckgo.mobile.android.ui.view.TwoLineListItem
 import com.google.android.material.snackbar.Snackbar
 
 sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
@@ -55,6 +57,40 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         parent: ViewGroup
     ) : ComponentViewHolder(inflate(parent, R.layout.component_search_bar))
 
+    class MenuItemComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_menu_item))
+
+    class SingleLineItemComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_single_line_item)) {
+        override fun bind(component: Component) {
+            val listItem = view.findViewById<SingleLineListItem>(R.id.singleLineListItemWIthImage)
+            listItem.setOverflowClickListener {
+                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+            }
+            val listItemWithoutImage = view.findViewById<SingleLineListItem>(R.id.singleLineListItemWIthoutImage)
+            listItemWithoutImage.setOverflowClickListener {
+                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    class TwoLineItemComponentViewHolder(
+        parent: ViewGroup
+    ) : ComponentViewHolder(inflate(parent, R.layout.component_two_line_item)) {
+        override fun bind(component: Component) {
+            val twoLineListItemWithImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWIthImage)
+            twoLineListItemWithImage.setOverflowClickListener {
+                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+            }
+            val twoLineListItemWithoutImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWIthoutImage)
+            twoLineListItemWithoutImage.setOverflowClickListener {
+                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     @SuppressLint("ShowToast")
     class SnackbarComponentViewHolder(parent: ViewGroup) :
         ComponentViewHolder(inflate(parent, R.layout.component_snackbar)) {
@@ -85,6 +121,9 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 Component.SNACKBAR -> SnackbarComponentViewHolder(parent)
                 Component.INFO_PANEL -> InfoPanelComponentViewHolder(parent)
                 Component.SEARCH_BAR -> SearchBarComponentViewHolder(parent)
+                Component.MENU_ITEM -> MenuItemComponentViewHolder(parent)
+                Component.SINGLE_LINE_LIST_ITEM -> SingleLineItemComponentViewHolder(parent)
+                Component.TWO_LINE_LIST_ITEM -> TwoLineItemComponentViewHolder(parent)
                 else -> {
                     TODO()
                 }

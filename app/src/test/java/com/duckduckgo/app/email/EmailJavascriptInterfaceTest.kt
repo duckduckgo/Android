@@ -20,6 +20,9 @@ import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -30,6 +33,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -40,12 +44,24 @@ class EmailJavascriptInterfaceTest {
 
     private val mockEmailManager: EmailManager = mock()
     private val mockWebView: WebView = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockAutofill: Autofill = mock()
     lateinit var testee: EmailJavascriptInterface
     private var counter = 0
 
     @Before
     fun setup() {
-        testee = EmailJavascriptInterface(mockEmailManager, mockWebView, DuckDuckGoUrlDetector(), coroutineRule.testDispatcherProvider) { counter++ }
+        testee = EmailJavascriptInterface(
+            mockEmailManager,
+            mockWebView,
+            DuckDuckGoUrlDetector(),
+            coroutineRule.testDispatcherProvider,
+            mockFeatureToggle,
+            mockAutofill
+        ) { counter++ }
+
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
+        whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
     @Test
@@ -85,10 +101,50 @@ class EmailJavascriptInterfaceTest {
     }
 
     @Test
+    fun whenGetUserDataAndUrlIsDuckDuckGoEmailThenGetUserDataCalled() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager).getUserData()
+    }
+
+    @Test
+    fun whenGetUserDataAndUrlIsNotDuckDuckGoEmailThenGetUserDataIsNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
+        testee.getUserData()
+
+        verify(mockEmailManager, never()).getUserData()
+    }
+
+    @Test
     fun whenShowTooltipThenLambdaCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
         testee.showTooltip()
 
         assertEquals(1, counter)
+    }
+
+    @Test
+    fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
+
+        testee.showTooltip()
+
+        assertEquals(0, counter)
+    }
+
+    @Test
+    fun whenShowTooltipAndUrlIsAnExceptionThenLambdaNotCalled() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+        whenever(mockAutofill.isAnException(any())).thenReturn(true)
+
+        testee.showTooltip()
+
+        assertEquals(0, counter)
     }
 
     companion object {

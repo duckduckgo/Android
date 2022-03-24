@@ -26,7 +26,8 @@ data class BrokenSite(
     val blockedTrackers: String,
     val surrogates: String,
     val webViewVersion: String,
-    val siteType: String
+    val siteType: String,
+    val urlParametersRemoved: Boolean
 )
 
 sealed class BrokenSiteCategory(

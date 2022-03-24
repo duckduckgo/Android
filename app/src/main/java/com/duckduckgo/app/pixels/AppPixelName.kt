@@ -39,10 +39,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
-    ONBOARDING_DAX_PRIMARY_CTA_PRESSED("m_onboarding_dax_primary_cta_pressed"),
-    ONBOARDING_DAX_NEW_USER_CTA_PRESSED("m_onboarding_dax_new_user_cta_pressed"),
-    ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED("m_onboarding_dax_returning_user_cta_pressed"),
-
     ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
     ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
     ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
@@ -261,5 +257,5 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SHOWN("m_remote_message_shown"),
     REMOTE_MESSAGE_SHOWN_UNIQUE("m_remote_message_shown_unique"),
     REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
-    REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
+    REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked")
 }

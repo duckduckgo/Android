@@ -24,6 +24,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -58,7 +59,7 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ DEFAULT }, mock())
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ DEFAULT }, mock(), provideUserAgentOverridePluginPoint())
 
     private var webView: WebView = mock()
 

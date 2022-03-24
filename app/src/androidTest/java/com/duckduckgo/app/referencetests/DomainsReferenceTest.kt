@@ -29,6 +29,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
+import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -91,7 +92,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ "" }, mock())
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ "" }, mock(), provideUserAgentOverridePluginPoint())
     private val mockGpc: Gpc = mock()
 
     companion object {

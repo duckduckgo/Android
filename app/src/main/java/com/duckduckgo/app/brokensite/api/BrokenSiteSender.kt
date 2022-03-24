@@ -50,7 +50,7 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) && gpc.isEnabled()).toString()
         val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -66,7 +66,8 @@ class BrokenSiteSubmitter(
                 MODEL_KEY to appBuildConfig.model,
                 WEBVIEW_VERSION_KEY to brokenSite.webViewVersion,
                 SITE_TYPE_KEY to brokenSite.siteType,
-                GPC to isGpcEnabled
+                GPC to isGpcEnabled,
+                URL_PARAMETERS_REMOVED to brokenSite.urlParametersRemoved.toString()
             )
             val encodedParams = mapOf(
                 BLOCKED_TRACKERS_KEY to brokenSite.blockedTrackers,
@@ -99,5 +100,6 @@ class BrokenSiteSubmitter(
         private const val WEBVIEW_VERSION_KEY = "wvVersion"
         private const val SITE_TYPE_KEY = "siteType"
         private const val GPC = "gpc"
+        private const val URL_PARAMETERS_REMOVED = "urlParametersRemoved"
     }
 }

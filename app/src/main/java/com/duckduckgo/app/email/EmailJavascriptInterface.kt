@@ -20,6 +20,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import kotlinx.coroutines.runBlocking
 
 class EmailJavascriptInterface(
@@ -27,20 +30,37 @@ class EmailJavascriptInterface(
     private val webView: WebView,
     private val urlDetector: DuckDuckGoUrlDetector,
     private val dispatcherProvider: DispatcherProvider,
+    private val featureToggle: FeatureToggle,
+    private val autofill: Autofill,
     private val showNativeTooltip: () -> Unit
 ) {
 
-    private fun isUrlFromDuckDuckGoEmail(): Boolean {
+    private fun getUrl(): String? {
         return runBlocking(dispatcherProvider.main()) {
-            val url = webView.url
-            (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
+            webView.url
         }
     }
+
+    private fun isUrlFromDuckDuckGoEmail(): Boolean {
+        val url = getUrl()
+        return (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
+    }
+
+    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName, defaultValue = true)
 
     @JavascriptInterface
     fun isSignedIn(): String {
         return if (isUrlFromDuckDuckGoEmail()) {
             emailManager.isSignedIn().toString()
+        } else {
+            ""
+        }
+    }
+
+    @JavascriptInterface
+    fun getUserData(): String {
+        return if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.getUserData()
         } else {
             ""
         }
@@ -59,7 +79,11 @@ class EmailJavascriptInterface(
 
     @JavascriptInterface
     fun showTooltip() {
-        showNativeTooltip()
+        getUrl()?.let {
+            if (isFeatureEnabled() && !autofill.isAnException(it)) {
+                showNativeTooltip()
+            }
+        }
     }
 
     companion object {

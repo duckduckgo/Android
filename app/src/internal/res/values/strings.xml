@@ -27,6 +27,16 @@
     <string name="devStartupTracingByline" translatable="false">Enable/disable start-up tracing</string>
     <string name="devSettingsTriggerAnr" translatable="false">Trigger ANR</string>
     <string name="devSettingsTriggerAnrSubtitle" translatable="false">Click here to trigger an ANR in the app</string>
+
+    <string name="devSettingsScreenUserAgentSection" translatable="false">USER AGENT</string>
+    <string name="devSettingsScreenUserAgentOverride" translatable="false">Override UserAgent</string>
+    <string name="devSettingsScreenUserAgentSelectorTitle" translatable="false">UserAgent</string>
+    <string name="devSettingsScreenUserAgentNoAppId" translatable="false">Omit DuckDuckGo AppId</string>
+    <string name="devSettingsScreenUserAgentNoVersion" translatable="false">Omit Webview Version</string>
+    <string name="devSettingsScreenUserAgentChrome" translatable="false">Chrome</string>
+    <string name="devSettingsScreenUserAgentFirefox" translatable="false">Firefox</string>
+    <string name="devSettingsScreenUserAgentDuckDuckGo" translatable="false">DDG Default</string>
+    <string name="devSettingsScreenUserAgentWebView" translatable="false">UA WebView</string>
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle" translatable="false">Audit Settings</string>
     <string name="auditSettingsSubtitle" translatable="false">Features useful for doing our privacy audit</string>

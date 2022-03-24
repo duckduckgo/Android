@@ -104,9 +104,6 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         animationsDisabled = true
-        if (USE_ORCHESTRATOR) {
-            execution 'ANDROID_TEST_ORCHESTRATOR'
-        }
     }
 
     def propertiesPath = "${CI_HOME_DIR}/ddg_android_build.properties"
@@ -121,6 +118,33 @@ android {
     } else {
         println "Signing properties not found at ${propertiesPath}, releases will NOT succeed"
         android.buildTypes.release.signingConfig = null
+    }
+}
+
+fulladleModuleConfig {
+    variant.set("playDebug")
+}
+
+fladle {
+    configs {
+        privacyTests {
+            async.set(false)
+            variant.set("playDebug")
+            flankVersion.set("21.+")
+            useOrchestrator.set(true)
+            environmentVariables.set([
+                    "clearPackageData": "true"
+            ])
+            testTargets.set([
+                    "annotation com.duckduckgo.espresso.PrivacyTest"
+            ])
+            devices.set([
+                    ["model": "redfin", "version": "30"]
+            ])
+            localResultsDir.set("fladleResults")
+            flakyTestAttempts.set(2)
+            testShards.set(1)
+        }
     }
 }
 
@@ -291,4 +315,8 @@ tasks.register('android_checks') {
 
 tasks.register('jvm_checks') {
     dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assemblePlayDebug', 'assemblePlayDebugAndroidTest'
 }

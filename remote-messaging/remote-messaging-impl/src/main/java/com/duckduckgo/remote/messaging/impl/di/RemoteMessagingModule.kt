@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
@@ -129,37 +130,40 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        deviceAttributeMatcher: DeviceAttributeMatcher,
-        androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+        @DeviceAttrMatcher deviceAttributeMatcher: AttributeMatcher,
+        @AndroidAppAttrMatcher androidAppAttributeMatcher: AttributeMatcher,
         remoteMessagingRepository: RemoteMessagingRepository,
-        userAttributeMatcher: UserAttributeMatcher
+        @UserAttrMatcher userAttributeMatcher: AttributeMatcher
     ): RemoteMessagingConfigMatcher {
         return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @AndroidAppAttrMatcher
     fun providesAndroidAppAttributeMatcher(
         appProperties: AppProperties,
         appBuildConfig: AppBuildConfig
-    ): AndroidAppAttributeMatcher {
+    ): AttributeMatcher {
         return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @DeviceAttrMatcher
     fun providesDeviceAttributeMatcher(
         appBuildConfig: AppBuildConfig,
         appProperties: AppProperties
-    ): DeviceAttributeMatcher {
+    ): AttributeMatcher {
         return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @UserAttrMatcher
     fun providesUserAttributeMatcher(
         userBrowserProperties: UserBrowserProperties
-    ): UserAttributeMatcher {
+    ): AttributeMatcher {
         return UserAttributeMatcher(userBrowserProperties)
     }
 

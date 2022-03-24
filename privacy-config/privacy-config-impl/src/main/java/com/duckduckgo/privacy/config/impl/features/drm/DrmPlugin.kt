@@ -35,10 +35,10 @@ class DrmPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        if (name == featureName) {
             val drmExceptions = mutableListOf<DrmExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<DrmFeature> =
@@ -56,5 +56,5 @@ class DrmPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.DrmFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.DrmFeatureName
 }

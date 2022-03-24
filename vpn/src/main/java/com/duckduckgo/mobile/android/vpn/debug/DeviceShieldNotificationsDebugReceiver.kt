@@ -93,7 +93,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     val deviceShieldNotification =
                         deviceShieldNotificationFactory.weeklyNotificationFactory.createWeeklyDeviceShieldNotification(weekly)
 
-                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                    deviceShieldAlertNotificationBuilder.buildStatusNotification(
                         context,
                         deviceShieldNotification,
                         weeklyNotificationPressedHandler
@@ -103,7 +103,7 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
                     dailyNotificationPressedHandler.notificationVariant = daily
                     val deviceShieldNotification = deviceShieldNotificationFactory.dailyNotificationFactory.createDailyDeviceShieldNotification(daily)
 
-                    deviceShieldAlertNotificationBuilder.buildDeviceShieldNotification(
+                    deviceShieldAlertNotificationBuilder.buildStatusNotification(
                         context, deviceShieldNotification, dailyNotificationPressedHandler
                     )
                 } else {

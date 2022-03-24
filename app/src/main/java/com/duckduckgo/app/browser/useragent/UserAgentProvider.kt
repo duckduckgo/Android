@@ -22,6 +22,7 @@ import android.webkit.WebSettings
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -39,7 +40,8 @@ import javax.inject.Provider
  */
 class UserAgentProvider constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
-    private val device: DeviceInfo
+    private val device: DeviceInfo,
+    private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -76,7 +78,13 @@ class UserAgentProvider constructor(
         }
 
         val application = if (!omitApplicationComponent) applicationComponent else null
-        return concatWithSpaces(prefix, application, safariComponent)
+        var userAgent = concatWithSpaces(prefix, application, safariComponent)
+
+        userAgentInterceptorPluginPoint.getPlugins().forEach {
+            userAgent = it.intercept(userAgent)
+        }
+
+        return userAgent
     }
 
     private fun containsExcludedPath(

@@ -136,6 +136,16 @@
         <item name="android:layout_height">1dp</item>
     </style>
 
+    <style name="OverflowMenuDivider">
+        <item name="android:background">?attr/overflowMenuDividerColor</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:layout_marginStart">@dimen/keyline_5</item>
+        <item name="android:layout_marginEnd">@dimen/keyline_5</item>
+    </style>
+
     <style name="BrowserIconMenuItem">
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingBottom">6dp</item>

@@ -28,7 +28,9 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
-import com.duckduckgo.mobile.android.vpn.service.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -57,6 +59,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
         initializeWorkManager()
         notificationManager = NotificationManagerCompat.from(context)
         testee = DeviceShieldReminderNotificationScheduler(context, workManager, notificationManager, notificationBuilder)
+        configureMockNotifications()
     }
 
     @After
@@ -104,61 +107,64 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsThenDailyReminderIsEnqueued() {
-        configureMockNotification()
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
-        testee.onVpnStopped(TestScope(), VpnStopReason.SelfStop)
+        testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
     }
 
     @Test
     fun whenVPNManuallyStopsAndDailyReminderWasEnqueuedThenDailyReminderIsStillEnqueued() {
-        configureMockNotification()
         enqueueDailyReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
-        testee.onVpnStopped(TestScope(), VpnStopReason.SelfStop)
+        testee.onVpnStopped(TestScope(), VpnStopReason.SELF_STOP)
 
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
     }
 
     @Test
     fun whenVPNManuallyStopsThenUndesiredReminderIsNotScheduled() {
-        configureMockNotification()
-        testee.onVpnStopped(TestScope(), VpnStopReason.SelfStop)
+        testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
     }
 
     @Test
     fun whenVPNManuallyStopsAndUndesiredReminderWasScheduledThenUndesiredReminderIsNoLongerScheduled() {
-        configureMockNotification()
         enqueueUndesiredReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
 
-        testee.onVpnStopped(TestScope(), VpnStopReason.SelfStop)
+        testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
     }
 
     @Test
     fun whenVPNIsKilledThenUndesiredReminderIsEnqueued() {
-        testee.onVpnStopped(TestScope(), VpnStopReason.Revoked)
+        testee.onVpnStopped(TestScope(), REVOKED)
 
-        assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+        assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
     }
 
     @Test
-    fun whenVPNIsKilledAndReminderWasScheduledThenUndesiredReminderIsStillEnqueued() {
+    fun whenVPNIsKilledAndReminderWasScheduledThenUndesiredReminderIsNoLongerScheduled() {
         enqueueUndesiredReminderNotificationWorker()
-        testee.onVpnStopped(TestScope(), VpnStopReason.Revoked)
-
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+
+        testee.onVpnStopped(TestScope(), REVOKED)
+
+        assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
     }
 
-    private fun configureMockNotification() {
+    private fun configureMockNotifications() {
         whenever(notificationBuilder.buildReminderNotification(any(), any())).thenReturn(
+            NotificationCompat.Builder(context, "")
+                .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+                .build()
+        )
+        whenever(notificationBuilder.buildRevokedNotification(any())).thenReturn(
             NotificationCompat.Builder(context, "")
                 .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
                 .build()

@@ -59,7 +59,8 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         val blockedTrackers = intent.getStringExtra(BLOCKED_TRACKERS_EXTRA).orEmpty()
         val upgradedHttps = intent.getBooleanExtra(UPGRADED_TO_HTTPS_EXTRA, false)
         val surrogates = intent.getStringExtra(SURROGATES_EXTRA).orEmpty()
-        viewModel.setInitialBrokenSite(url, blockedTrackers, surrogates, upgradedHttps)
+        val urlParametersRemoved = intent.getBooleanExtra(URL_PARAMETERS_REMOVED_EXTRA, false)
+        viewModel.setInitialBrokenSite(url, blockedTrackers, surrogates, upgradedHttps, urlParametersRemoved)
     }
 
     private fun configureListeners() {
@@ -128,6 +129,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
         private const val BLOCKED_TRACKERS_EXTRA = "BLOCKED_TRACKERS_EXTRA"
         private const val UPGRADED_TO_HTTPS_EXTRA = "UPGRADED_TO_HTTPS_EXTRA"
         private const val SURROGATES_EXTRA = "SURROGATES_EXTRA"
+        private const val URL_PARAMETERS_REMOVED_EXTRA = "URL_PARAMETERS_REMOVED_EXTRA"
 
         fun intent(
             context: Context,
@@ -138,6 +140,7 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
             intent.putExtra(BLOCKED_TRACKERS_EXTRA, data.blockedTrackers)
             intent.putExtra(SURROGATES_EXTRA, data.surrogates)
             intent.putExtra(UPGRADED_TO_HTTPS_EXTRA, data.upgradedToHttps)
+            intent.putExtra(URL_PARAMETERS_REMOVED_EXTRA, data.urlParametersRemoved)
             return intent
         }
     }

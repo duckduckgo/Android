@@ -295,7 +295,10 @@ class BrowserTabViewModelTest {
     private lateinit var mockUnprotectedTemporary: UnprotectedTemporary
 
     @Mock
-    private lateinit var mockTrackingLinkDetector: TrackingLinkDetector
+    private lateinit var mockAmpLinks: AmpLinks
+
+    @Mock
+    private lateinit var mockTrackingParameters: TrackingParameters
 
     @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
@@ -438,8 +441,9 @@ class BrowserTabViewModelTest {
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             variantManager = mockVariantManager,
-            trackingLinkDetector = mockTrackingLinkDetector,
-            remoteMessagingModel = remoteMessagingModel
+            ampLinks = mockAmpLinks,
+            remoteMessagingModel = remoteMessagingModel,
+            trackingParameters = mockTrackingParameters
         )
 
         testee.loadData("abc", null, false, false)
@@ -3773,59 +3777,70 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenHandleCloakedTrackingLinkThenIssueExtractUrlFromTrackingLinkCommand() {
-        testee.handleCloakedTrackingLink(initialUrl = "example.com")
-        assertCommandIssued<Command.ExtractUrlFromCloakedTrackingLink>()
+    fun whenHandleCloakedAmpLinkThenIssueExtractUrlFromCloakedAmpLinkCommand() {
+        testee.handleCloakedAmpLink(initialUrl = "example.com")
+        assertCommandIssued<Command.ExtractUrlFromCloakedAmpLink>()
     }
 
     @Test
-    fun whenPageChangedThenUpdateTrackingLinkInfo() {
-        val trackingLinkInfo = TrackingLinkInfo("https://foo.com")
-        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+    fun whenPageChangedThenUpdateAmpLinkInfo() {
+        val ampLinkInfo = AmpLinkInfo("https://foo.com")
+        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(ampLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
-        assertEquals("http://twitter.com/explore", trackingLinkInfo.destinationUrl)
+        assertEquals("https://foo.com", ampLinkInfo.ampLink)
+        assertEquals("http://twitter.com/explore", ampLinkInfo.destinationUrl)
     }
 
     @Test
-    fun whenPageChangedAndTrackingLinkInfoHasDestinationUrlThenDontUpdateTrackingLinkInfo() {
-        val trackingLinkInfo = TrackingLinkInfo("https://foo.com", "https://bar.com")
-        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+    fun whenPageChangedAndAmpLinkInfoHasDestinationUrlThenDontUpdateAmpLinkInfo() {
+        val ampLinkInfo = AmpLinkInfo("https://foo.com", "https://bar.com")
+        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(ampLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        assertEquals("https://foo.com", trackingLinkInfo.trackingLink)
-        assertEquals("https://bar.com", trackingLinkInfo.destinationUrl)
+        assertEquals("https://foo.com", ampLinkInfo.ampLink)
+        assertEquals("https://bar.com", ampLinkInfo.destinationUrl)
     }
 
     @Test
-    fun whenPageChangedAndTrackingLinkInfoIsNullThenDontUpdateTrackingLinkInfo() {
-        val trackingLinkInfo = null
-        whenever(mockTrackingLinkDetector.lastTrackingLinkInfo).thenReturn(trackingLinkInfo)
+    fun whenPageChangedAndAmpLinkInfoIsNullThenDontUpdateAmpLinkInfo() {
+        val ampLinkInfo = null
+        whenever(mockAmpLinks.lastAmpLinkInfo).thenReturn(ampLinkInfo)
         updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
-        assertNull(trackingLinkInfo)
+        assertNull(ampLinkInfo)
     }
 
     @Test
-    fun whenUpdateLastTrackingLinkThenUpdateTrackingLinkInfo() {
-        testee.updateLastTrackingLink("https://foo.com")
-        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo("https://foo.com")
+    fun whenUpdateLastAmpLinkThenUpdateAmpLinkInfo() {
+        testee.updateLastAmpLink("https://foo.com")
+        verify(mockAmpLinks).lastAmpLinkInfo = AmpLinkInfo("https://foo.com")
     }
 
     @Test
-    fun whenUserSubmittedQueryIsCloakedTrackingLinkThenHandleCloakedTrackingLink() {
+    fun whenUserSubmittedQueryIsCloakedAmpLinkThenHandleCloakedAmpLink() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.CloakedTrackingLink(trackingUrl = "http://foo.com"))
+            .thenReturn(SpecialUrlDetector.UrlType.CloakedAmpLink(ampUrl = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromCloakedTrackingLink }
-        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromCloakedTrackingLink).initialUrl)
+        val issuedCommand = commandCaptor.allValues.find { it is Command.ExtractUrlFromCloakedAmpLink }
+        assertEquals("http://foo.com", (issuedCommand as Command.ExtractUrlFromCloakedAmpLink).initialUrl)
     }
 
     @Test
-    fun whenUserSubmittedQueryIsExtractedTrackingLinkThenNavigateToExtractedTrackingLink() {
+    fun whenUserSubmittedQueryIsExtractedAmpLinkThenNavigateToExtractedAmpLink() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString()))
-            .thenReturn(SpecialUrlDetector.UrlType.ExtractedTrackingLink(extractedUrl = "http://foo.com"))
+            .thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(extractedUrl = "http://foo.com"))
+        testee.onUserSubmittedQuery("foo")
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val issuedCommand = commandCaptor.allValues.find { it is Navigate }
+        assertEquals("http://foo.com", (issuedCommand as Navigate).url)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryIsTrackingParameterLinkThenNavigateToCleanedUrl() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(mockSpecialUrlDetector.determineType(anyString()))
+            .thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(cleanedUrl = "http://foo.com"))
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is Navigate }
@@ -3843,7 +3858,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUrlExtractedAndIsNotNullThenIssueLoadExtractedUrlCommandWithExtractedUrl() {
         testee.onUrlExtracted("http://foo.com", "http://example.com")
-        verify(mockTrackingLinkDetector).lastTrackingLinkInfo = TrackingLinkInfo(trackingLink = "http://foo.com")
+        verify(mockAmpLinks).lastAmpLinkInfo = AmpLinkInfo(ampLink = "http://foo.com")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://example.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
@@ -3855,6 +3870,22 @@ class BrowserTabViewModelTest {
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val issuedCommand = commandCaptor.allValues.find { it is LoadExtractedUrl }
         assertEquals("http://foo.com", (issuedCommand as LoadExtractedUrl).extractedUrl)
+    }
+
+    @Test
+    fun whenPageChangedThenClearLastCleanedUrlAndUpdateSite() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn("https://foo.com")
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters).lastCleanedUrl = null
+        assertTrue(testee.siteLiveData.value?.urlParametersRemoved!!)
+    }
+
+    @Test
+    fun whenPageChangedAndLastCleanedUrlIsNullThenDoNothing() {
+        whenever(mockTrackingParameters.lastCleanedUrl).thenReturn(null)
+        updateUrl("http://www.example.com/", "http://twitter.com/explore", true)
+        verify(mockTrackingParameters, times(0)).lastCleanedUrl = null
+        assertFalse(testee.siteLiveData.value?.urlParametersRemoved!!)
     }
 
     @Test
@@ -3914,7 +3945,7 @@ class BrowserTabViewModelTest {
 
     private fun givenUrlCannotUseGpc(url: String) {
         val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
     }

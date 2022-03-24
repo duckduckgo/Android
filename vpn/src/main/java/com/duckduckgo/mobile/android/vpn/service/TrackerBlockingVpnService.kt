@@ -24,10 +24,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.net.Network
 import android.net.VpnService
 import android.os.Binder
 import android.os.Build
-import android.os.Build.VERSION_CODES
 import android.os.IBinder
 import android.os.Parcel
 import android.os.ParcelFileDescriptor
@@ -35,13 +35,20 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.isNetworkSwitchingHandlingEnabled
+import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
+import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.processor.udp.UdpPacketProcessor
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
@@ -55,14 +62,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
-import java.net.StandardSocketOptions
+import java.net.InetAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator, NetworkConnectionListener {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -109,6 +116,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private var vpnStateServiceReference: IBinder? = null
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
+    private var connectionMonitor: ConnectionMonitor? = null
+
+    @Inject lateinit var featureToggle: FeatureToggle
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -186,7 +198,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 returnCode = Service.START_REDELIVER_INTENT
             }
             ACTION_STOP_VPN -> {
-                launch { stopVpn(VpnStopReason.SelfStop) }
+                launch { stopVpn(VpnStateMonitor.VpnStopReason.SELF_STOP) }
             }
             else -> Timber.e("Unknown intent action: $action")
         }
@@ -228,6 +240,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
+        connectionMonitor?.onSopMonitoring()
+        connectionMonitor = connectionMonitorFactory.create(this@TrackerBlockingVpnService, this@TrackerBlockingVpnService)
+            .apply { onStartMonitoring() }
     }
 
     private suspend fun establishVpnInterface() {
@@ -255,6 +271,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             if (vpnPreferences.isCustomDnsServerSet()) {
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
+            vpnPreferences.privateDns?.let { privateDnsName ->
+                if (featureToggle.isPrivateDnsSupportEnabled()) {
+                    Timber.v("Setting private DNS: $privateDnsName")
+                    runCatching { InetAddress.getAllByName(privateDnsName) }.getOrNull()?.forEach { addr -> addDnsServer(addr) }
+                }
+            }
 
             // Can either route all apps through VPN and exclude a few (better for prod), or exclude all apps and include a few (better for dev)
             val limitingToTestApps = false
@@ -275,7 +297,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         if (tunInterface == null) {
             Timber.e("VPN log: Failed to establish VPN tunnel")
-            stopVpn(VpnStopReason.Error)
+            stopVpn(VpnStateMonitor.VpnStopReason.ERROR)
         }
     }
 
@@ -300,17 +322,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    private suspend fun stopVpn(reason: VpnStopReason) = withContext(Dispatchers.IO) {
-        Timber.i("VPN log: Stopping VPN.")
+    private suspend fun stopVpn(reason: VpnStateMonitor.VpnStopReason) = withContext(Dispatchers.IO) {
+        Timber.i("VPN log: Stopping VPN. $reason")
 
         queues.clearAll()
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
+        connectionMonitor?.onSopMonitoring()
+        connectionMonitor = null
         tunInterface?.close()
         tunInterface = null
 
         sendStopPixels(reason)
+
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             Timber.v("VPN log: stopping ${it.javaClass} callback")
             it.onVpnStopped(this, reason)
@@ -324,12 +349,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         stopSelf()
     }
 
-    private fun sendStopPixels(reason: VpnStopReason) {
+    private fun sendStopPixels(reason: VpnStateMonitor.VpnStopReason) {
         when (reason) {
-            VpnStopReason.SelfStop -> { /* noop */
+            VpnStateMonitor.VpnStopReason.SELF_STOP, VpnStopReason.UNKNOWN -> { /* noop */
             }
-            VpnStopReason.Error -> deviceShieldPixels.startError()
-            VpnStopReason.Revoked -> deviceShieldPixels.suddenKillByVpnRevoked()
+            VpnStateMonitor.VpnStopReason.ERROR -> deviceShieldPixels.startError()
+            VpnStateMonitor.VpnStopReason.REVOKED -> deviceShieldPixels.suddenKillByVpnRevoked()
         }
     }
 
@@ -341,7 +366,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     override fun onRevoke() {
         Timber.e("VPN log onRevoke called")
-        launch { stopVpn(VpnStopReason.Revoked) }
+        launch { stopVpn(VpnStateMonitor.VpnStopReason.REVOKED) }
     }
 
     override fun onLowMemory() {
@@ -383,7 +408,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     companion object {
 
-        const val ACTION_VPN_REMINDER = "com.duckduckgo.vpn.internaltesters.reminder"
         const val ACTION_VPN_REMINDER_RESTART = "com.duckduckgo.vpn.internaltesters.reminder.restart"
 
         const val VPN_REMINDER_NOTIFICATION_ID = 999
@@ -481,6 +505,34 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
 
+    @SuppressLint("NewApi")
+    override fun onNetworkDisconnected() {
+        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+            // TODO maybe at some point show the user?
+            Timber.w("No network")
+            if (appBuildConfig.sdkInt >= 22) {
+                setUnderlyingNetworks(null)
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
+        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+            if (appBuildConfig.sdkInt >= 22) {
+                Timber.w("set underlying networks: $networks")
+                if (networks.isEmpty()) {
+                    // this should never happen. If networks.isEmpty() onNetworkDisconnected() should be called instead.
+                    // just safeguard
+                    Timber.w("onNetworkConnected called with empty networks...setting underlying networks to default")
+                    setUnderlyingNetworks(null)
+                } else {
+                    setUnderlyingNetworks(networks.toTypedArray())
+                }
+            }
+        }
+    }
+
     override fun createDatagramChannel(): DatagramChannel {
         return DatagramChannel.open().also { channel ->
             channel.configureBlocking(false)
@@ -491,12 +543,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
     }
 
-    @SuppressLint("NewApi") // because we use the appBuildConfig.sdkInt IDE doesn't detect it
     override fun createSocketChannel(): SocketChannel {
         return SocketChannel.open().also { channel ->
-            if (appBuildConfig.sdkInt >= VERSION_CODES.N) {
-                channel.setOption(StandardSocketOptions.SO_REUSEADDR, true)
-            }
             channel.configureBlocking(false)
             protect(channel.socket())
         }
@@ -510,7 +558,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         "com.netflix.Speedtest",
         "eu.vspeed.android",
         "net.fireprobe.android",
-        "com.philips.lighting.hue2"
+        "com.philips.lighting.hue2",
+        "com.duckduckgo.mobile.android.debug"
     )
 }
 

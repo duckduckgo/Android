@@ -19,14 +19,32 @@ package com.duckduckgo.mobile.android.vpn.processor.packet
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.ConnectionInfo
 import xyz.hexene.localvpn.Packet
 
+fun Packet.totalHeaderSize(): Int {
+    return if (isTCP) {
+        ipHeader.headerLength + Packet.TCP_HEADER_SIZE
+    } else if (isUDP) {
+        ipHeader.headerLength + Packet.UDP_HEADER_SIZE
+    } else {
+        throw java.lang.IllegalArgumentException("Protocol not supported")
+    }
+}
+
 fun Packet.connectionInfo(): ConnectionInfo {
     return ConnectionInfo(
-        destinationAddress = ip4Header.destinationAddress,
+        destinationAddress = ipHeader.destinationAddress,
         destinationPort = extractDestinationPort(),
-        sourceAddress = ip4Header.sourceAddress,
+        sourceAddress = ipHeader.sourceAddress,
         sourcePort = extractSourcePort(),
-        protocolNumber = ip4Header.protocol.number
+        protocolNumber = ipHeader.protocol.number
     )
+}
+
+fun Packet.isIP4(): Boolean {
+    return ipHeader.version == 4
+}
+
+fun Packet.isIP6(): Boolean {
+    return ipHeader.version == 6
 }
 
 private fun Packet.extractSourcePort() =

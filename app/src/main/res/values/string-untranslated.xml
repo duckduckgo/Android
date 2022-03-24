@@ -15,86 +15,6 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <!-- Favorites widget -->
-    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
-    <string name="widgetConfigurationTitleText">Choose Theme</string>
-    <string name="widgetConfigurationSystemThemeOption">System default</string>
-    <string name="widgetConfigurationLightThemeOption">Light</string>
-    <string name="widgetConfigurationDarkThemeOption">Dark</string>
-    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
-    <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
-    <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \" &#x2807;\" icon and select Add Favorite.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Visit your favorite sites in a flash! Go to a site you love. Then tap the browser menu icon and select Add Favorite.</string>
-    <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
-    <string name="favoritesWidgetLabel">Favorites</string>
-    <string name="searchWidgetLabel">Search</string>
-
-    <!-- Treat returning users differently Experiment -->
-    <string name="returningUsersLetsDoItButtonLabel">Let\'s Do It</string>
-    <string name="returningUsersContinuesWithoutPrivacyTipsButtonLabel">Continue Without Privacy Tips</string>
-    <string name="returningUsersSkipTutorialButtonLabel">Skip Tutorial</string>
-    <string name="returningUsersWidgetPromptTitle">Add the DuckDuckGo widget to your home screen</string>
-    <string name="returningUsersWidgetDismissButtonLabel">No Thanks</string>
-
-    <!-- Email -->
-    <string name="emailNotSupported">Device not supported</string>
-    <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
-
-    <!-- Settings Activity -->
-    <string name="settingsLightTheme">Light</string>
-    <string name="settingsTheme">Theme</string>
-    <string name="settingsDarkTheme">Dark</string>
-    <string name="settingsSystemTheme">System Default</string>
-    <string name="settingsHeadingMore">More from DuckDuckGo</string>
-
-    <!-- Theme Settings -->
-    <string name="settingsThemeDialogSave">Set Theme</string>
-
-    <!-- App links -->
-    <string name="appLinkSnackBarAction">Open in app</string>
-    <string name="appLinkMultipleSnackBarAction">Choose app</string>
-    <string name="appLinkSnackBarMessage">You can open this link in %s.</string>
-    <string name="appLinkMultipleSnackBarMessage">You can open this link in other apps.</string>
-    <string name="appLinkIntentChooserTitle">Open with</string>
-    <string name="appLinkMenuItemTitle">Open in App</string>
-
-    <!-- App Links Settings -->
-    <string name="settingsTitleAppLinks">Open Links in Apps</string>
-    <string name="settingsTitleAppLinksDialog">Open links in apps</string>
-    <string name="settingsAppLinksAskEveryTime">Ask every time</string>
-    <string name="settingsAppLinksAlways">Always</string>
-    <string name="settingsAppLinksNever">Never</string>
-
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
-    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
-    <string name="locationLabel">Location</string>
-    <string name="folderLocationTitle">Select Location</string>
-    <string name="addFolder">Add Folder</string>
-    <string name="editFolder">Edit Folder</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
-    <string name="bookmarkFolderEmpty">Empty</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%s%s and %d item?</item>
-        <item quantity="other">%s%s and %d items?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%d item</item>
-        <item quantity="other">%d items</item>
-    </plurals>
-
-    <!-- Accessibility-->
-    <string name="settingsAccessibility">Accessibility</string>
-    <string name="accessibilityActivityTitle">Accessibility</string>
-    <string name="accessibilityFontSizeTitle">Text size</string>
-    <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in DuckDuckGo will adjust to it.</string>
-    <string name="accessibilityForceZoomTitle">Enforce manual page zoom</string>
-    <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
-    <string name="accessibilityTextSizeOverrideTitle">Manage text size</string>
-    <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in DuckDuckGo will adjust to match the setting below</string>
 
     <!-- Fireproof CTA Experiment -->
     <string name="daxFireproofCtaText"><![CDATA[Your data is toast!<br/><br/>Want me to \"Fireproof\" sites when you sign in? That way, you won\'t be signed out when you burn your data.<br/><br/>You can always change this later in settings.]]></string>
@@ -102,16 +22,6 @@
     <string name="daxFireproofBurnEverythingButton">Burn Everything</string>
     <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
     <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
-
-    <!-- Privacy Policy -->
-    <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
-
-    <!-- Home Screen Widget -->
-    <string name="homeScreenWidgetAdded">%s widget added to home screen</string>
-    <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>

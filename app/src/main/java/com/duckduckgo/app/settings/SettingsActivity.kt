@@ -155,12 +155,6 @@ class SettingsActivity :
             appLinksSetting.setOnClickListener { viewModel.userRequestedToChangeAppLinkSetting() }
         }
 
-        with(viewsMore) {
-            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
-            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
-            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
-        }
-
         with(viewsOther) {
             provideFeedback.setOnClickListener { viewModel.userRequestedToSendFeedback() }
             about.setOnClickListener { startActivity(AboutDuckDuckGoActivity.intent(this@SettingsActivity)) }
@@ -173,6 +167,12 @@ class SettingsActivity :
                     )
                 )
             }
+        }
+
+        with(viewsMore) {
+            emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
+            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
         }
     }
 
@@ -210,6 +210,7 @@ class SettingsActivity :
                     updateSelectedFireAnimation(it.selectedFireAnimation)
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
+                    updateEmailSubtitle(it.emailAddress)
                     updateMacOsSettings(it.macOsWaitlistState)
                 }
             }.launchIn(lifecycleScope)
@@ -218,6 +219,11 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateEmailSubtitle(emailAddress: String?) {
+        val subtitle = emailAddress ?: getString(R.string.settingsEmailProtectionSubtitle)
+        viewsMore.emailSetting.setSubtitle(subtitle)
     }
 
     private fun setGlobalPrivacyControlSetting(enabled: Boolean) {
@@ -410,6 +416,7 @@ class SettingsActivity :
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(MacOsWaitlistActivity.intent(this), options)
     }
+
     private fun launchAppTPTrackersScreen() {
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }

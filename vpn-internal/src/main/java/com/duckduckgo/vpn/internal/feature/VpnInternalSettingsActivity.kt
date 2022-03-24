@@ -22,9 +22,13 @@ import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
 import com.duckduckgo.mobile.android.vpn.health.BadHealthMitigationFeature
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
+import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggles
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
@@ -46,6 +50,12 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var badHealthMitigationFeature: BadHealthMitigationFeature
+
+    @Inject
+    lateinit var featureToggle: FeatureToggle
+
+    @Inject
+    lateinit var ppTpFeatureToggleRepository: AppTpFeatureToggleRepository
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -91,6 +101,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupDeleteTrackingHistory()
         setupViewDiagnosticsView()
         setupBadHealthMonitoring()
+        setupConfigSection()
     }
 
     override fun onDestroy() {
@@ -165,6 +176,23 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.badHealthMitigationToggle.isChecked = badHealthMitigationFeature.isEnabled
         binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
+    }
+
+    private fun setupConfigSection() {
+        binding.ipv6SupportToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.Ipv6Support, false)
+        binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
+            ppTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.Ipv6Support, isChecked))
+        }
+
+        binding.privateDnsToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
+        binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
+            ppTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.PrivateDnsSupport, isChecked))
+        }
+
+        binding.vpnUnderlyingNetworksToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling, false)
+        binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
+            ppTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.NetworkSwitchingHandling, isChecked))
+        }
     }
 
     private fun setupDebugLogging() {

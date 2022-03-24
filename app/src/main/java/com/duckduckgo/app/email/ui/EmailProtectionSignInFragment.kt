@@ -56,12 +56,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         }
     }
 
-    private val privacyGuaranteeSpan = object : DuckDuckGoClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readPrivacyGuarantees()
-        }
-    }
-
     override fun configureViewModelObservers() {
         viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
@@ -69,7 +63,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     override fun configureUi() {
         configureUiEventHandlers()
-        configureClickableLink()
     }
 
     private fun configureUiEventHandlers() {
@@ -115,21 +108,23 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     }
 
     private fun renderInBeta() {
-        binding.headerImage.setImageResource(R.drawable.contact_us)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_gift_large)
         binding.waitListButton.gone()
         binding.inviteCodeButton.gone()
         binding.getStartedButton.show()
         binding.duckAddressButton.show()
+        binding.footerDescription.gone()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleInBeta)
         setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionInBeta, listOf(readBlogSpan))
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
-        binding.headerImage.setImageResource(R.drawable.we_hatched)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
         binding.waitListButton.gone()
         binding.inviteCodeButton.show()
         binding.getStartedButton.gone()
         binding.duckAddressButton.show()
+        binding.footerDescription.gone()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoined)
         if (notify) {
             setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithNotification, listOf(readBlogSpan))
@@ -144,6 +139,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.contact_us)
+        binding.footerDescription.show()
         binding.waitListButton.show()
         binding.inviteCodeButton.show()
         binding.getStartedButton.gone()
@@ -151,10 +147,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         binding.waitListButton.isEnabled = true
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoin)
         setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, listOf(readBlogSpan))
-    }
-
-    private fun configureClickableLink() {
-        setClickableSpan(binding.footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan))
     }
 
     private fun setClickableSpan(

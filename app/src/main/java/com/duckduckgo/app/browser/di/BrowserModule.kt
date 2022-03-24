@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewPersister
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
+import com.duckduckgo.app.browser.useragent.UserAgentInterceptor
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
@@ -60,6 +61,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
@@ -75,7 +77,8 @@ import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
-import com.duckduckgo.privacy.config.api.TrackingLinkDetector
+import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.TrackingParameters
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -116,7 +119,7 @@ class BrowserModule {
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
-        trackingLinkDetector: TrackingLinkDetector
+        ampLinks: AmpLinks
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -135,7 +138,7 @@ class BrowserModule {
             dispatcherProvider,
             emailInjector,
             accessibilityManager,
-            trackingLinkDetector
+            ampLinks
         )
     }
 
@@ -219,16 +222,18 @@ class BrowserModule {
     @Provides
     fun specialUrlDetector(
         packageManager: PackageManager,
-        trackingLinkDetector: TrackingLinkDetector
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, trackingLinkDetector)
+        ampLinks: AmpLinks,
+        trackingParameters: TrackingParameters
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun userAgentProvider(
         @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
-        deviceInfo: DeviceInfo
+        deviceInfo: DeviceInfo,
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo)
+        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint)
     }
 
     @Provides

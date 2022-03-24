@@ -53,7 +53,11 @@ interface DeviceShieldAlertNotificationBuilder {
         silent: Boolean
     ): Notification
 
-    fun buildDeviceShieldNotification(
+    fun buildRevokedNotification(
+        context: Context
+    ): Notification
+
+    fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver
@@ -65,6 +69,14 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
     private fun registerAlertChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "App Tracking Protection Alerts", NotificationManager.IMPORTANCE_DEFAULT)
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun registerStatusChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(VPN_STATUS_CHANNEL_ID, "App Tracking Status Channel", NotificationManager.IMPORTANCE_MIN)
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
@@ -112,18 +124,59 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .build()
     }
 
-    override fun buildDeviceShieldNotification(
+    override fun buildRevokedNotification(context: Context): Notification {
+        registerAlertChannel(context)
+
+        val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_revoked)
+
+        val onNotificationTapPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(
+                Intent(
+                    context,
+                    Class.forName("com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity")
+                )
+            )
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val restartVpnIntent = Intent(context, VpnReminderReceiver::class.java).let { intent ->
+            intent.action = TrackerBlockingVpnService.ACTION_VPN_REMINDER_RESTART
+            PendingIntent.getBroadcast(context, 0, intent, 0)
+        }
+
+        return NotificationCompat.Builder(context, VPN_ALERTS_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setContentIntent(onNotificationTapPendingIntent)
+            .setCustomContentView(notificationLayout)
+            .setPriority(NotificationCompat.DEFAULT_ALL)
+            .setSilent(true)
+            .addAction(
+                NotificationCompat.Action(
+                    R.drawable.ic_vpn_notification_24,
+                    context.getString(R.string.atp_EnableCTA),
+                    restartVpnIntent
+                )
+            )
+            .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
+            .setChannelId(VPN_ALERTS_CHANNEL_ID)
+            .build()
+    }
+
+    override fun buildStatusNotification(
         context: Context,
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver
     ): Notification {
+        registerStatusChannel(context)
+
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
 
         val notificationImage = getNotificationImage(deviceShieldNotification)
         notificationLayout.setImageViewResource(R.id.deviceShieldNotificationStatusIcon, notificationImage)
         notificationLayout.setTextViewText(R.id.deviceShieldNotificationText, deviceShieldNotification.title)
 
-        return buildNotification(context, notificationLayout, false, onNotificationPressedCallback)
+        return buildNotification(context, notificationLayout, onNotificationPressedCallback)
     }
 
     private fun getNotificationImage(deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification): Int {
@@ -145,7 +198,6 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
     private fun buildNotification(
         context: Context,
         content: RemoteViews,
-        silent: Boolean,
         resultReceiver: ResultReceiver? = null
     ): Notification {
         registerAlertChannel(context)
@@ -160,7 +212,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .setSmallIcon(R.drawable.ic_device_shield_notification_logo)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(vpnControllerPendingIntent)
-            .setSilent(silent)
+            .setSilent(true)
             .setCustomContentView(content)
             .setAutoCancel(true)
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
@@ -171,6 +223,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
     companion object {
 
         private const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
+        private const val VPN_STATUS_CHANNEL_ID = "AppTpStatusChannel"
         private const val TRACKER_COMPANY_GOOGLE = "Google"
         private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
         private const val TRACKER_COMPANY_AMAZON = "Amazon"

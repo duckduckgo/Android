@@ -80,28 +80,4 @@ class VariantManagerTest {
         assertEquals(1, variant.features.size)
         assertTrue(variant.hasFeature(FireproofExperiment))
     }
-
-    // RETURNING USERS - SECOND EXPERIMENT
-    @Test
-    fun returningUsersControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "zd" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun returningUsersExperimentalFirstVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zg" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(ReturningUsersContinueWithoutPrivacyTips))
-    }
-
-    @Test
-    fun returningUsersExperimentalSecondVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "zh" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(ReturningUsersSkipTutorial))
-    }
 }

@@ -23,7 +23,9 @@
     android:orientation="vertical"
     tools:context=".ui.onboarding.DeviceShieldFAQActivity">
 
-    <include layout="@layout/include_default_toolbar" />
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_default_toolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -126,6 +128,25 @@
                 android:text="@string/atp_FAQFifthText"
                 android:paddingStart="35dp"
                 android:paddingEnd="35dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQHeaderStyle"
+                android:layout_marginTop="32dp"
+                android:text="@string/atp_FAQSixthHeader"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/DeviceShieldOnboardingFAQTextStyle"
+                android:layout_marginTop="24dp"
+                android:text="@string/atp_FAQSixthText"
+                android:paddingStart="35dp"
+                android:paddingEnd="35dp"/>
+
 
             <ImageView
                 android:layout_marginTop="60dp"
