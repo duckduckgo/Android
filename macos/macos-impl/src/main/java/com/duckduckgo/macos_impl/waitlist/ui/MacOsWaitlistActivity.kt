@@ -111,7 +111,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun renderInBeta(inviteCode: String) {
-        binding.headerImage.setImageResource(R.drawable.ic_gift_large)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_gift_large)
         binding.statusTitle.text = getString(R.string.macos_waitlist_code_title)
         binding.waitlistDescription.addClickableSpan(
             getText(R.string.macos_waitlist_code_description),
@@ -132,13 +132,13 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
         binding.footerDescription.gone()
         binding.codeFrame.gone()
         binding.shareImage.gone()
-        binding.headerImage.setImageResource(R.drawable.ic_list)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
         binding.statusTitle.text = getString(R.string.macos_waitlist_on_the_list_title)
         binding.waitlistDescription.text = getText(R.string.macos_waitlist_on_the_list_notification)
     }
 
     private fun renderNotJoinedQueue() {
-        binding.headerImage.setImageResource(R.drawable.ic_privacy_simplified)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_privacy_simplified)
         binding.waitListButton.show()
         binding.waitlistWindows.show()
         binding.footerDescription.show()
