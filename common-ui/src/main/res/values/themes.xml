@@ -138,6 +138,7 @@
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray80</item>
+        <item name="bottomShadowBackground">@null</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -254,6 +255,7 @@
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray30</item>
+        <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

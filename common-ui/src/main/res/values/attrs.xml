@@ -96,4 +96,5 @@
     <attr name="dialogSecondaryButtonColor" format="color" />
 
     <attr name="overflowMenuDividerColor" format="color" />
+    <attr name="bottomShadowBackground" format="reference" />
 </resources>

@@ -72,11 +72,21 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View style="@style/OverflowMenuFullDivider" />
+    <View style="@style/OverflowMenuFullDivider"
+        android:layout_marginBottom="0dp"/>
+
+    <View
+        android:id="@+id/dividerShadow"
+        android:layout_height="3dp"
+        android:layout_width="match_parent"
+        android:visibility="invisible"
+        android:background="?attr/bottomShadowBackground"/>
 
     <ScrollView
+        android:id="@+id/menuScrollableContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"

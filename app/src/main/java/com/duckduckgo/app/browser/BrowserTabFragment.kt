@@ -2090,6 +2090,9 @@ class BrowserTabFragment :
                     viewModel.openAppLink()
                 }
             }
+            view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
+                view.dividerShadow.isInvisible = !view.menuScrollableContent.canScrollVertically(-1)
+            }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
                 hideKeyboardImmediately()
