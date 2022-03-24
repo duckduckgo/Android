@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 import android.content.Context
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import com.squareup.anvil.annotations.ContributesTo
@@ -30,7 +29,7 @@ import dagger.SingleInstanceIn
 class AppTpFeatureToggleRepositoryModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideAppTpFeatureToggleRepository(context: Context, appBuildConfig: AppBuildConfig): AppTpFeatureToggleRepository {
-        return AppTpFeatureToggleRepository.create(context, appBuildConfig)
+    fun provideAppTpFeatureToggleRepository(context: Context): AppTpFeatureToggleRepository {
+        return AppTpFeatureToggleRepository.create(context)
     }
 }
