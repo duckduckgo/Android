@@ -2230,6 +2230,7 @@ class BrowserTabFragment :
                 voiceSearchButton.visibility = VISIBLE
                 voiceSearchButton.setOnClickListener {
                     webView?.onPause()
+                    hideKeyboardImmediately()
                     voiceSearchLauncher.launch()
                 }
             } else {

@@ -51,6 +51,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        overridePendingTransition(0, 0)
         makeBackgroundTransparent()
         setContentView(binding.root)
         configureToolbar()
@@ -97,6 +98,11 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     override fun onDestroy() {
         super.onDestroy()
         binding.indicator.destroy()
+    }
+
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(0, 0)
     }
 
     private fun observeViewModel() {
