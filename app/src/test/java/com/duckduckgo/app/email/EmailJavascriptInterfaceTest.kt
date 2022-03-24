@@ -60,7 +60,7 @@ class EmailJavascriptInterfaceTest {
             mockAutofill
         ) { counter++ }
 
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -130,7 +130,7 @@ class EmailJavascriptInterfaceTest {
     @Test
     fun whenShowTooltipAndFeatureDisabledThenLambdaNotCalled() {
         whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
 
         testee.showTooltip()
 

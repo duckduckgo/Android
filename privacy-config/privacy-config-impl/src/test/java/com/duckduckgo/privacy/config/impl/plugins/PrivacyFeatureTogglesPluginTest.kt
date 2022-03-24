@@ -55,7 +55,7 @@ class PrivacyFeatureTogglesPluginTest {
         runTest {
             givenPrivacyFeatureIsEnabled()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
 
             assertTrue(isEnabled!!)
         }
@@ -65,7 +65,7 @@ class PrivacyFeatureTogglesPluginTest {
         runTest {
             givenPrivacyFeatureIsDisabled()
 
-            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), true)
+            val isEnabled = testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, true)
 
             assertFalse(isEnabled!!)
         }
@@ -77,7 +77,7 @@ class PrivacyFeatureTogglesPluginTest {
             givenPrivacyFeatureReturnsDefaultValue(defaultValue)
 
             val isEnabled =
-                testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName(), defaultValue)
+                testee.isEnabled(PrivacyFeatureName.ContentBlockingFeatureName, defaultValue)
 
             assertEquals(defaultValue, isEnabled)
         }
@@ -85,7 +85,7 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureIsEnabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName().value, true
+                PrivacyFeatureName.ContentBlockingFeatureName, true
             )
         )
             .thenReturn(true)
@@ -94,7 +94,7 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureIsDisabled() {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName().value, true
+                PrivacyFeatureName.ContentBlockingFeatureName, true
             )
         )
             .thenReturn(false)
@@ -103,7 +103,7 @@ class PrivacyFeatureTogglesPluginTest {
     private fun givenPrivacyFeatureReturnsDefaultValue(defaultValue: Boolean) {
         whenever(
             mockFeatureTogglesRepository.get(
-                PrivacyFeatureName.ContentBlockingFeatureName().value, defaultValue
+                PrivacyFeatureName.ContentBlockingFeatureName, defaultValue
             )
         )
             .thenReturn(defaultValue)

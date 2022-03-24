@@ -31,13 +31,12 @@ class RealFeatureToggleImplTest {
     fun whenFeatureNameCanBeHandledByPluginThenReturnTheCorrectValue() {
         val result = testee.isFeatureEnabled(TrueFeatureName(), false)
         assertNotNull(result)
-        assertTrue(result!!)
+        assertTrue(result)
     }
 
-    @Test
-    fun whenFeatureNameCannotBeHandledByAnyPluginThenReturnNull() {
-        val result = testee.isFeatureEnabled(NullFeatureName(), false)
-        assertNull(result)
+    @Test(expected = IllegalArgumentException::class)
+    fun whenFeatureNameCannotBeHandledByAnyPluginThenThrowException() {
+        testee.isFeatureEnabled(NullFeatureName(), false)
     }
 
     class FakeTruePlugin : FeatureTogglesPlugin {

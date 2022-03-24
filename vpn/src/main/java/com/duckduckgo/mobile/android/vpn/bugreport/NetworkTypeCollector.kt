@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -56,6 +58,7 @@ import javax.inject.Inject
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val vpnPreferences: VpnPreferences,
+    private val featureToggle: FeatureToggle,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
@@ -102,17 +105,22 @@ class NetworkTypeCollector @Inject constructor(
     private val privateDnsCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
-            Timber.v(
-                "isPrivateDnsActive = %s, server = %s (%s)",
-                context.isPrivateDnsActive(),
-                context.getPrivateDnsServerName(),
-                InetAddress.getAllByName(context.getPrivateDnsServerName()).map { it.hostAddress }
-            )
 
-            vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
-                context.getPrivateDnsServerName()
+            if (featureToggle.isPrivateDnsSupportEnabled()) {
+                Timber.v(
+                    "isPrivateDnsActive = %s, server = %s (%s)",
+                    context.isPrivateDnsActive(),
+                    context.getPrivateDnsServerName(),
+                    runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
+                )
+
+                vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
+                    context.getPrivateDnsServerName()
+                } else {
+                    null
+                }
             } else {
-                null
+                Timber.d("Private DNS support is disabled...skip")
             }
         }
     }

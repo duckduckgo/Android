@@ -19,14 +19,15 @@ package com.duckduckgo.mobile.android.vpn.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
 
 interface VpnFeatureToggleStore {
     fun deleteAll()
 
     fun get(
-        featureName: String,
+        featureName: AppTpFeatureName,
         defaultValue: Boolean
-    ): Boolean?
+    ): Boolean
 
     fun insert(toggle: VpnFeatureToggles)
 }
@@ -39,16 +40,12 @@ class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggle
         preferences.edit().clear().apply()
     }
 
-    override fun get(featureName: String, defaultValue: Boolean): Boolean? {
-        return if (preferences.contains(featureName)) {
-            preferences.getBoolean(featureName, defaultValue)
-        } else {
-            null
-        }
+    override fun get(featureName: AppTpFeatureName, defaultValue: Boolean): Boolean {
+        return preferences.getBoolean(featureName.value, defaultValue)
     }
 
     override fun insert(toggle: VpnFeatureToggles) {
-        preferences.edit { putBoolean(toggle.featureName, toggle.enabled) }
+        preferences.edit { putBoolean(toggle.featureName.value, toggle.enabled) }
     }
 
     companion object {
@@ -57,6 +54,6 @@ class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggle
 }
 
 data class VpnFeatureToggles(
-    val featureName: String,
+    val featureName: AppTpFeatureName,
     val enabled: Boolean,
 )
