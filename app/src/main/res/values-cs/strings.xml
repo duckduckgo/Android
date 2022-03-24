@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -165,7 +181,18 @@
     <string name="settingsVersion">Verze</string>
     <string name="leaveFeedback">Podělte se o zpětnou vazbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
-    <string name="settingsEmailProtectionSubtitle">Blokovat sledování e-mailů a skrýt vaši adresu.</string>
+    <string name="settingsEmailProtectionSubtitle">Blokování trackerů v e-mailu a skrytí adresy</string>
+    <string name="settingsHeadingMore">Další od DuckDuckGo</string>
+    <string name="settingsLightTheme">Světlo</string>
+    <string name="settingsTheme">Barevný motiv</string>
+    <string name="settingsDarkTheme">Tmavé</string>
+    <string name="settingsSystemTheme">Výchozí nastavení systému</string>
+    <string name="settingsThemeDialogSave">Nastavení motivu</string>
+    <string name="settingsTitleAppLinks">Otevírání odkazů v aplikacích</string>
+    <string name="settingsTitleAppLinksDialog">Otevírat odkazy v aplikacích</string>
+    <string name="settingsAppLinksAskEveryTime">Vždycky se ptát</string>
+    <string name="settingsAppLinksAlways">Vždy</string>
+    <string name="settingsAppLinksNever">Nikdy</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -242,6 +269,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hledat DuckDuckGo</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Přidání oblíbených</string>
+    <string name="widgetConfigurationTitleText">Vyber motiv</string>
+    <string name="widgetConfigurationSystemThemeOption">Výchozí nastavení systému</string>
+    <string name="widgetConfigurationLightThemeOption">Světlo</string>
+    <string name="widgetConfigurationDarkThemeOption">Tmavé</string>
+    <string name="widgetConfigurationAddWidgetOption">Přidat widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Zatím nebyly přidány žádné oblíbené položky</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Přidat oblíbené</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Na svoje oblíbené stránky se dostaneš snadno.<br/><br/>Přejdi na stránku, která se ti líbí. Pak klepni na ikonu „ ⠇“ a vyber Přidat do oblíbených.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Na svoje oblíbené stránky se dostaneš snadno.&lt;br/&gt;&lt;br/&gt; Přejdi na stránku, která se ti líbí. Pak klepni na ikonu nabídky prohlížeče a vyber Přidat do oblíbených.</string>
+    <string name="widgetConfigurationActivityTitle">Konfigurace widgetu</string>
+    <string name="favoritesWidgetLabel">Oblíbené</string>
+    <string name="searchWidgetLabel">Vyhledávání</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Přidat na domovskou stránku</string>
@@ -401,7 +443,7 @@
     <string name="systemSearchDeviceAppLabel">Z tohoto zařízení</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Vyhledat nebo zadat URL</font></string>
     <string name="systemSearchAppNotFound">Aplikace nebyla nalezena</string>
-    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od tohoto okamžiku Vaše vyhledávání chráněna.</string>
+    <string name="systemSearchOnboardingText">Děkujeme, že jste si vybrali DuckDuckGo!\nPři použití našeho vyhledávání nebo aplikace jsou od teď Vaše vyhledávání chráněna.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Aplikace DuckDuckGo také:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje nebezpečná sledovací zařízení.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Vynucuje šifrování na webových stránkách.</string>
@@ -564,6 +606,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Otevřít odkazy v přidružených aplikacích</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Zakažte, chcete-li zabránit automatickému otevírání odkazů v jiných nainstalovaných aplikacích.</string>
     <string name="appLinkDialogTitle">Otevřít v jiné aplikaci?</string>
+    <string name="appLinkSnackBarAction">Otevřít v aplikaci</string>
+    <string name="appLinkMultipleSnackBarAction">Vyber aplikaci</string>
+    <string name="appLinkSnackBarMessage">Tenhle odkaz můžeš otevřít v aplikaci %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Tenhle odkaz můžeš otevřít v jiných aplikacích.</string>
+    <string name="appLinkIntentChooserTitle">Otevřít v aplikaci</string>
+    <string name="appLinkMenuItemTitle">Otevřít v aplikaci</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa zkopírovaná do vaší schránky</string>
@@ -581,26 +629,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Pořadník e-mailu</string>
-    <string name="waitlistNotificationTitle">Vaše pozvánka k ochraně e-mailů je zde!</string>
-    <string name="waitlistNotificationDescription">Připojili jste se k pořadníku a požádali nás, abychom vás upozornili, až budete na řadě, abyste vyzkoušeli naši funkci ochrany e-mailů. Klepnutím zobrazíte pozvánku.</string>
+    <string name="waitlistNotificationTitle">Ochrana e-mailu je připravená.</string>
+    <string name="waitlistNotificationDescription">Otevřít pozvánku</string>
 
     <string name="waitlistNotificationDialogDescription">Chcete, abychom vám poslali upozornění, až na vás bude řada?</string>
-    <string name="waitlistNotificationDialogNoThanks">NE, DÍKY</string>
+    <string name="waitlistNotificationDialogNoThanks">Ne, děkuji</string>
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNĚTE MĚ</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Ochrana e-mailů (beta verze)</string>
     <string name="emailProtectionActivityTitle">Ochrana e-mailů (beta verze)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Vaše e-maily neukládáme. <b><a href=\"\">Více informací</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Kvůli zařazení do pořadníku není nutné sdílet žádné osobní údaje. Tvoje místo se určuje podle časového razítka uloženého jen v tvém zařízení, abychom tě mohli upozornit, až budeš na řadě.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Při připojení k pořadníku došlo k chybě, zkuste to znovu později</string>
     <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
     <string name="emailProtectionInviteCodeCta">Mám zvací kód</string>
     <string name="emailProtectionWaitlistCta">Připojte se k soukromému pořadníku</string>
     <string name="emailProtectionGetStartedCta">Začínáme</string>
+    <string name="emailNotSupported">Zařízení není podporované</string>
+    <string name="emailNotSupportedExplanation">Ochrana e-mailu umožňuje vytvářet soukromé e-mailové adresy, pomocí kterých obejdeš trackery e-mailů. Tyhle adresy potřebujeme zašifrovat a uložit přímo v tvém zařízení. Ochrana e-mailů není k dispozici, protože tvoje zařízení nepodporuje šifrování úložiště.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailové soukromí, zjednodušené.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu, bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokování trackerů e-mailu a skrytí adresy bez změny e-mailového poskytovatele.<br/><a href=\"\"><b>Více informací</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jste na seznamu!</string>
@@ -609,7 +659,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Byli jste pozváni!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokovat sledování e-mailů a skrýt vaši adresu,<br/>bez přepínání vašeho poskytovatele e-mailů. <a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuj trackery e-mailů a skryj svou adresu<br/>bez změny e-mailového poskytovatele.<br/><a href=\"\"><b>Více informací</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobní adresa Duck</string>
@@ -617,4 +667,48 @@
         <![CDATA[Odebráním ochrany e-mailů z tohoto zařízení se při procházení webu odstraní možnost vyplnit osobní adresu Duck nebo nově vygenerovanou soukromou adresu Duck do e-mailových polí. <br/><br/>Chcete-li úplně vymazat vaše adresy Duck nebo máte-li jakékoli další dotazy nebo zpětnou vazbu, obraťte se na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Odebrat ze zařízení</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Upravit záložku</string>
+    <string name="favoriteDialogTitleEdit">Upravit oblíbené</string>
+    <string name="locationLabel">Poloha</string>
+    <string name="folderLocationTitle">Vybrat umístění</string>
+    <string name="addFolder">Přidat složku</string>
+    <string name="editFolder">Upravit složku</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Opravdu chceš smazat "</string>
+    <string name="bookmarkFolderEmpty">Prázdné</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s a %3$d položka?</item>
+        <item quantity="few">%1$s%2$s a %3$d položky?</item>
+        <item quantity="many">%1$s%2$s a %3$d položek?</item>
+        <item quantity="other">%1$s%2$s a %3$d položek?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d položka</item>
+        <item quantity="few">%1$d položky</item>
+        <item quantity="many">%1$d položek</item>
+        <item quantity="other">%1$d položek</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Usnadnění</string>
+    <string name="accessibilityActivityTitle">Usnadnění</string>
+    <string name="accessibilityFontSizeTitle">Velikost textu</string>
+    <string name="accessibilityFontSizeHint">Nastav si posuvníkem pohodlnou velikost písma. Webové stránky, které si zobrazíš v DuckDuckGo, se přizpůsobí.</string>
+    <string name="accessibilityForceZoomTitle">Vynutit ruční zvětšení stránky</string>
+    <string name="accessibilityForceZoomSubtitle">Nastavit přiblížení rozvíráním a svíráním prstů i na stránkách, které to neumožňují</string>
+    <string name="accessibilityTextSizeOverrideTitle">Správa velikosti textu</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text na webových stránkách, které si zobrazíš v DuckDuckGo, se přizpůsobí nastavení dole</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Zásady ochrany osobních údajů</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Stahování se nezdařilo. Zkontrolujte připojení k internetu.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Na plochu se přidal widget %1$s</string>
+    <string name="settingsAddHomeScreenWidget">Widget na plochu</string>
 </resources>
