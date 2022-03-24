@@ -159,6 +159,7 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import android.view.ViewGroup.LayoutParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -182,6 +183,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
 import kotlinx.android.synthetic.main.include_cta.*
+import kotlinx.android.synthetic.main.popup_window_browser_menu.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -1680,6 +1682,7 @@ class BrowserTabFragment :
         }
         configureQuickAccessGridLayout(quickAccessRecyclerView)
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
+        decorator.recreatePopupMenu()
     }
 
     fun onBackPressed(): Boolean {
@@ -1964,6 +1967,11 @@ class BrowserTabFragment :
             configureLongClickOpensNewTabListener()
         }
 
+        fun recreatePopupMenu() {
+            popupMenu.dismiss()
+            popupMenu.width = getPopupMenuWidth()
+        }
+
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
@@ -2008,11 +2016,20 @@ class BrowserTabFragment :
             tabsButton?.show()
         }
 
+        private fun getPopupMenuWidth(): Int {
+            val orientation = context?.resources?.configuration?.orientation
+            return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                LayoutParams.WRAP_CONTENT
+            } else {
+                resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
+            }
+        }
+
         private fun createPopupMenu() {
             popupMenu = PopupMenu(
                 layoutInflater = layoutInflater,
                 resourceId = R.layout.popup_window_browser_menu,
-                width = resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
+                width = getPopupMenuWidth()
             )
             val view = popupMenu.contentView
             popupMenu.apply {
