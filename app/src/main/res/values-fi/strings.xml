@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2021 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
     <string name="appDescription" translatable="false">DuckDuckGo </string>
     <string name="duckDuckGoLogoDescription">DuckDuckGo-logo</string>
     <string name="duckDuckGoPrivacySimplified">Itsestään selvää tietosuojaa</string>
-    <string name="yes">Kyllä</string>
+    <string name="yes">Joo</string>
     <string name="no">Ei</string>
     <string name="open">Avaa</string>
     <string name="cancel">Peruuta</string>
@@ -173,7 +157,18 @@
     <string name="settingsVersion">Versio</string>
     <string name="leaveFeedback">Jaa palaute</string>
     <string name="settingsEmailProtectionTitle">Sähköpostisuojaus</string>
-    <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuranta ja piilota osoitteesi.</string>
+    <string name="settingsEmailProtectionSubtitle">Estä sähköpostiseuraajat ja piilota osoitteesi</string>
+    <string name="settingsHeadingMore">Lisää DuckDuckGolta</string>
+    <string name="settingsLightTheme">Vaalea</string>
+    <string name="settingsTheme">Teema</string>
+    <string name="settingsDarkTheme">Tumma</string>
+    <string name="settingsSystemTheme">Järjestelmän oletus</string>
+    <string name="settingsThemeDialogSave">Aseta teema</string>
+    <string name="settingsTitleAppLinks">Avaa linkit sovelluksissa</string>
+    <string name="settingsTitleAppLinksDialog">Avaa linkit sovelluksissa</string>
+    <string name="settingsAppLinksAskEveryTime">Kysy joka kerta</string>
+    <string name="settingsAppLinksAlways">Aina</string>
+    <string name="settingsAppLinksNever">Ei koskaan</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -250,6 +245,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Lisää suosikki</string>
+    <string name="widgetConfigurationTitleText">Valitse teema</string>
+    <string name="widgetConfigurationSystemThemeOption">Järjestelmän oletus</string>
+    <string name="widgetConfigurationLightThemeOption">Vaalea</string>
+    <string name="widgetConfigurationDarkThemeOption">Tumma</string>
+    <string name="widgetConfigurationAddWidgetOption">Lisää widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Suosikkeja ei ole vielä lisätty</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Lisää suosikki</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Siirry suosikkisivustoillesi hetkessä!<br/><br/>Siirry suosikkisivustollesi. Napauta sitten \" ⠇\" -kuvaketta ja valitse Lisää suosikki.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Siirry suosikkisivustoillesi hetkessä! Siirry suosikkisivustollesi. Napauta sitten selaimen valikkokuvaketta ja valitse Lisää suosikki.</string>
+    <string name="widgetConfigurationActivityTitle">Widget-asetukset</string>
+    <string name="favoritesWidgetLabel">Suosikit</string>
+    <string name="searchWidgetLabel">Hae</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Lisää etusivulle</string>
@@ -409,7 +419,7 @@
     <string name="systemSearchDeviceAppLabel">Tästä laitteesta</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Hae tai kirjoita URL</font></string>
     <string name="systemSearchAppNotFound">Sovellusta ei löytynyt</string>
-    <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattuja.</string>
+    <string name="systemSearchOnboardingText">Kiitos, että valitsit DuckDuckGon!\nKun nyt käytät hakua tai sovellusta, hakusi ovat suojattu.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">DuckDuckGo-sovellus myös:</string>
     <string name="systemSearchOnboardingFeatureOneText">Estää vaaralliset seurantaohjelmat.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Pakottaa verkkosivustot käyttämään salausta.</string>
@@ -495,14 +505,14 @@
     <string name="fireproofWebsiteSnackbarAction">Kumoa</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ei palonkestäviä verkkosivustoja</string>
-    <string name="fireproofWebsiteFeatureDescription">Verkkosivustot käyttävät evästeitä, joilla pysyt kirjautuneena sisään. Kun teet sivustosta palonkestävän, evästeitä ei poisteta ja pysyt kirjautuneena sisään, vaikka käytät Liekki-painiketta. Estämme edelleen kolmannen osapuolen seurannan palonkestävillä sivustoilla.</string>
+    <string name="fireproofWebsiteFeatureDescription">Verkkosivustot käyttävät evästeitä, joilla pysyt kirjautuneena sisään. Kun teet sivustosta palovarman, evästeitä ei poisteta ja pysyt kirjautuneena sisään, vaikka käytät Liekki-painiketta. Estämme edelleen kolmannen osapuolen seurannan palovarmoilla sivustoilla.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Lisää vaihtoehtoja palonkestävälle verkkosivustolle %1$s</string>
-    <string name="fireproofWebsiteLoginDialogTitle">Haluatko tehdä sivustosta %1$s palonkestävän?</string>
-    <string name="fireproofWebsiteLoginDialogDescription">Sivuston tekeminen palonkestäväksi tarkoittaa, että pysyt kirjautuneena, vaikka käytät Liekki-painiketta.</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Tee palonkestäväksi</string>
+    <string name="fireproofWebsiteLoginDialogTitle">Haluatko tehdä sivustosta %1$s palovarman?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Sivuston tekeminen palovarmaksi tarkoittaa, että pysyt kirjautuneena, vaikka käytät Liekki-painiketta.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Tee palovarmaksi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ei nyt</string>
     <string name="fireproofWebsiteItemsSectionTitle">Verkkosivustot</string>
-    <string name="fireproofWebsiteToogleText">Kysy sisäänkirjautumisen yhteydessä</string>
+    <string name="fireproofWebsiteToogleText">Kysy kirjautuessa sisään</string>
     <string name="disableLoginDetectionDialogTitle">Poistetaanko palonkestävyyden muistutus käytöstä sivustoille kirjauduttaessa?</string>
     <string name="disableLoginDetectionDialogDescription">Voit muuttaa valintaa milloin tahansa asetuksista.</string>
     <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>
@@ -568,6 +578,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Avaa linkit liittyvissä sovelluksissa</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Ota pois käytöstä estääksesi linkkejä avautumasta automaattisesti muissa asennetuissa sovelluksissa.</string>
     <string name="appLinkDialogTitle">Avataanko toisessa sovelluksessa?</string>
+    <string name="appLinkSnackBarAction">Avaa sovelluksessa</string>
+    <string name="appLinkMultipleSnackBarAction">Valitse sovellus</string>
+    <string name="appLinkSnackBarMessage">Voit avata tämän linkin sovelluksessa %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Voit avata tämän linkin muissa sovelluksissa.</string>
+    <string name="appLinkIntentChooserTitle">Avaa sovelluksessa:</string>
+    <string name="appLinkMenuItemTitle">Avaa sovelluksessa</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uusi osoite on kopioitu leikepöydälle</string>
@@ -585,8 +601,8 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Sähköpostin odotuslista</string>
-    <string name="waitlistNotificationTitle">Kutsusi sähköpostin suojaamiseen on täällä!</string>
-    <string name="waitlistNotificationDescription">Liityit odotuslistalle ja pyysit meitä ilmoittamaan, kun on sinun vuorosi kokeilla sähköpostin suojaustoimintoa. Näytä kutsu napauttamalla.</string>
+    <string name="waitlistNotificationTitle">Sähköpostisuojaus on valmis!</string>
+    <string name="waitlistNotificationDescription">Avaa kutsusi</string>
 
     <string name="waitlistNotificationDialogDescription">Haluatko saada ilmoituksen, kun on sinun vuorosi?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei kiitos</string>
@@ -595,16 +611,18 @@
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Sähköpostisuojaus (beta)</string>
     <string name="emailProtectionActivityTitle">Sähköpostisuojaus (beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Emme tallenna sähköpostejasi. <b><a href=\"\">Lue lisää</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Sinun ei tarvitse jakaa henkilökohtaisia tietoja liittyäksesi jonotuslistalle. Varmistat paikkasi jonossa aikaleimalla, joka on olemassa vain laitteessasi. Näin voimme ilmoittaa sinulle, kun on sinun vuorosi.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Odotuslistalle liityttäessä tapahtui virhe, yritä myöhemmin uudelleen</string>
     <string name="emailProtectionDuckAddressCta">Minulla on jo Duck-osoite</string>
     <string name="emailProtectionInviteCodeCta">Minulla on kutsukoodi</string>
     <string name="emailProtectionWaitlistCta">Liity yksityiselle odotuslistalle</string>
     <string name="emailProtectionGetStartedCta">Aloita</string>
+    <string name="emailNotSupported">Laitetta ei tueta</string>
+    <string name="emailNotSupportedExplanation">Sähköpostisuojauksen avulla voit luoda yksityisiä sähköpostiosoitteita, jotka poistavat sähköpostiseuraajat. Meidän on salattava ja tallennettava nämä luomasi osoitteet paikallisesti laitteellesi. Koska laitteesi ei tue salattua tallennusta, sähköpostisuojaus ei ole käytettävissä.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>
@@ -613,7 +631,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Sinut on kutsuttu!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuranta ja piilota osoitteesi<br/>vaihtamatta sähköpostintarjoajaa. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Yksityinen Duck-osoite</string>
@@ -621,4 +639,44 @@
         <![CDATA[Sähköpostisuojauksen poistaminen tältä laitteelta poistaa mahdollisuuden kirjoittaa yksityinen Duck-osoitteesi tai juuri luotu yksityinen Duck-osoite sähköpostikenttään verkkoa selatessasi.<br/><br/>Ota yhteyttä osoitteeseen <a href=\"mailto:support@duck.com\">support@duck.com</a>, jos haluat poistaa Duck-osoitteesi kokonaan tai jos sinulla on kysymyksiä tai palautetta.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Poista laitteelta</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Muokkaa kirjanmerkkiä</string>
+    <string name="favoriteDialogTitleEdit">Muokkaa suosikkia</string>
+    <string name="locationLabel">Sijainti</string>
+    <string name="folderLocationTitle">Valitse sijainti</string>
+    <string name="addFolder">Lisää kansio</string>
+    <string name="editFolder">Muokkaa kansiota</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Haluatko varmasti poistaa "</string>
+    <string name="bookmarkFolderEmpty">Tyhjä</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s ja %3$d kohteen?</item>
+        <item quantity="other">%1$s%2$s ja %3$d kohdetta?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d kohde</item>
+        <item quantity="other">%1$d kohdetta</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Käytettävyys</string>
+    <string name="accessibilityActivityTitle">Käytettävyys</string>
+    <string name="accessibilityFontSizeTitle">Tekstin koko</string>
+    <string name="accessibilityFontSizeHint">Vedä liukusäädintä, kunnes voit lukea tämän mukavasti. DuckDuckGossa tarkastelemasi verkkosivustot mukautuvat siihen.</string>
+    <string name="accessibilityForceZoomTitle">Käytä manuaalista sivun zoomausta</string>
+    <string name="accessibilityForceZoomSubtitle">Nipistä ja zoomaa millä tahansa sivustolla, myös sellaisilla, jotka muuten estäisivät sen</string>
+    <string name="accessibilityTextSizeOverrideTitle">Hallinnoi tekstin kokoa</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGossa katsomiesi verkkosivustojen teksti mukautuu alla olevan asetuksen mukaiseksi</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Tietosuojakäytäntö</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Lataus epäonnistui. Tarkista internetyhteys.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s-widget lisätty aloitusnäyttöön</string>
+    <string name="settingsAddHomeScreenWidget">Aloitusnäytön widget</string>
 </resources>

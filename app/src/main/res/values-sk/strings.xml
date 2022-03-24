@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="duckDuckGoLogoDescription">Logo DuckDuckGo</string>
     <string name="duckDuckGoPrivacySimplified">Súkromie, zjednodušene</string>
     <string name="yes">Áno</string>
-    <string name="no">Nie</string>
+    <string name="no">žiadny</string>
     <string name="open">Otvorené</string>
     <string name="cancel">Zrušiť</string>
     <string name="search">Vyhľadávať</string>
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Možno neskôr</string>
     <string name="defaultBrowserLetsDoIt">Nastaviť ako predvolený prehliadač</string>
     <string name="defaultBrowserDescriptionNoDefault">Vždy otvor odkazy s pokojom mysle.</string>
-    <string name="defaultBrowserInstructions">Zvoľte DuckDuckGo a ťuknite na položku <font color="#678fff">Vždy</font>.</string>
+    <string name="defaultBrowserInstructions">Zvoľ DuckDuckGo a ťukni <font color="#678fff">vždy</font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Ponuka prehliadača</string>
@@ -105,7 +105,7 @@
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrana súkromia stránky</string>
     <string name="privacyProtectionEnabled">OCHRANA STRÁNKY ZAPNUTÁ</string>
-    <string name="privacyProtectionDisabled">OCHRANA STRÁNKY VYPNUTÁ</string>
+    <string name="privacyProtectionDisabled">OCHRANA STRÁNKY ZAKÁZANÁ</string>
     <string name="privacyDashboardActivityTitle">Ovládací panel ochrany súkromia</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ZDOKONALENÉ Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Stupeň ochrany súkromia</string>
@@ -127,7 +127,7 @@
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">Zablokovali sa %1$s sledovacie zariadenia</item>
+        <item quantity="one">Zablokovalo sa %1$s sledovacie zariadenie</item>
         <item quantity="few">Zablokovali sa %1$s sledovacie zariadenia</item>
         <item quantity="many">Zablokovalo sa %1$s sledovacieho zariadenia</item>
         <item quantity="other">Zablokovalo sa %1$s sledovacích zariadení</item>
@@ -181,7 +181,18 @@
     <string name="settingsVersion">Verzia</string>
     <string name="leaveFeedback">Zdieľať spätnú väzbu</string>
     <string name="settingsEmailProtectionTitle">Ochrana e-mailu</string>
-    <string name="settingsEmailProtectionSubtitle">Zablokujte si e‑mailové trackery a skryte si adresu.</string>
+    <string name="settingsEmailProtectionSubtitle">Zablokujte nástroje na sledovanie e‑mailov a skryte vašu adresu</string>
+    <string name="settingsHeadingMore">Viac od DuckDuckGo</string>
+    <string name="settingsLightTheme">Svetlá</string>
+    <string name="settingsTheme">Motív</string>
+    <string name="settingsDarkTheme">Tmavý</string>
+    <string name="settingsSystemTheme">Predvolený systém</string>
+    <string name="settingsThemeDialogSave">Nastavte si tému</string>
+    <string name="settingsTitleAppLinks">Otvárať odkazy v aplikáciách</string>
+    <string name="settingsTitleAppLinksDialog">Otvárať odkazy v aplikáciách</string>
+    <string name="settingsAppLinksAskEveryTime">Vždy sa opýtať</string>
+    <string name="settingsAppLinksAlways">Vždy</string>
+    <string name="settingsAppLinksNever">Nikdy</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -215,7 +226,7 @@
     <string name="brokenSitesCategoriesTitle">Popíšte, čo sa stalo</string>
     <string name="brokenSitesCategoriesHint">Popíšte, čo sa stalo</string>
     <string name="brokenSiteSubmitButton">Odoslať správu</string>
-    <string name="brokenSiteDescription">Odoslaním anonymného hlásenia o nefunkčnom webe nám pomôžete tieto problémy odstrániť a zlepšiť aplikáciu.</string>
+    <string name="brokenSiteDescription">Odoslaním anonymného hlásenia o nefunkčnom webe nám pomôžete tieto problémy odstrániť a vylepšiť aplikáciu.</string>
 
     <string name="brokenSiteCategoryImages">Obrázky sa nepodarilo načítať</string>
     <string name="brokenSiteCategoryPaywall">Táto stránka ma požiadala o deaktiváciu</string>
@@ -259,6 +270,21 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Pridať k obľúbeným</string>
+    <string name="widgetConfigurationTitleText">Vybrať tému</string>
+    <string name="widgetConfigurationSystemThemeOption">Predvolený systém</string>
+    <string name="widgetConfigurationLightThemeOption">Svetlá</string>
+    <string name="widgetConfigurationDarkThemeOption">Tmavý</string>
+    <string name="widgetConfigurationAddWidgetOption">Pridať miniaplikáciu</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Zatiaľ neboli pridané žiadne obľúbené položky</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Pridať do obľúbených položiek</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Navštívte svoje obľúbené stránky bleskurýchlo!Prejdite na stránku, ktorá sa vám páči. Potom klepnite na ikonu „ ⠇“a vyberte Pridať k obľúbeným.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Navštívte svoje obľúbené stránky bleskurýchlo! Prejdite na stránku, ktorá sa vám páči. Potom kliknite na ikonu ponuky a vyberte Pridať k obľúbeným.</string>
+    <string name="widgetConfigurationActivityTitle">Konfigurácia miniaplikácie</string>
+    <string name="favoritesWidgetLabel">Obľúbené položky</string>
+    <string name="searchWidgetLabel">Vyhľadávať</string>
+
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Pridať do časti Domov</string>
     <string name="shortcutAddedText">Úspech! Na vašej ploche pribudla položka %1$s.</string>
@@ -281,11 +307,11 @@
     <string name="addWidgetCtaInstructionsLaunchButton">Zobraziť</string>
     <string name="addWidgetCtaDismissButton">Odmietnuť</string>
     <string name="addWidgetInstructionsActivityTitle">Pridať miniaplikáciu</string>
-    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1Label">1.</string>
     <string name="addWidgetInstruction1">Dlhým stlačením domovskej obrazovky otvorte ponuku miniaplikácií.</string>
-    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2Label">2.</string>
     <string name="addWidgetInstruction2">Vyhľadajte miniaplikáciu DuckDuckGo.</string>
-    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3Label">3.</string>
     <string name="addWidgetInstruction3">Potiahnite miniaplikáciu na domovskú obrazovku.</string>
     <string name="addWidgetInstructionsButtonGoHome">Prejdite na domovskú obrazovku</string>
     <string name="addWidgetInstructionsButtonClose">Zatvoriť</string>
@@ -294,7 +320,7 @@
     <string name="appEnjoymentDialogTitle">Ste spokojní s DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Radi by sme spoznali váš názor.</string>
     <string name="appEnjoymentDialogPositiveButton">Páči sa mi</string>
-    <string name="appEnjoymentDialogNegativeButton">Potrebuje zlepšiť</string>
+    <string name="appEnjoymentDialogNegativeButton">Potrebuje vylepšiť</string>
 
     <string name="rateAppDialogTitle">Ohodnotiť aplikáciu</string>
     <string name="rateAppDialogMessage">Vaša spätná väzba je dôležitá. Podeľte sa o svoju spokojnosť v recenzii.</string>
@@ -341,14 +367,14 @@
     <string name="feedbackActivityTitle">Zdieľať spätnú väzbu</string>
     <string name="missingBrowserFeaturesTitleLong">Funkcie prehliadača chýbajú alebo sú mätúce</string>
     <string name="missingBrowserFeaturesTitleShort">Problémy s funkciami prehliadača</string>
-    <string name="missingBrowserFeaturesSubtitle">Ktorú funkciu prehliadania môžeme pridať alebo zlepšiť?</string>
+    <string name="missingBrowserFeaturesSubtitle">Ktorú funkciu prehliadania môžeme pridať alebo zdokonaliť?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Prejsť ďalej, späť a/alebo obnoviť</string>
     <string name="missingBrowserFeatureSubReasonTabManagement">Tvorba a správa kariet</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Blokovanie reklám a automaticky otváraných okien</string>
     <string name="missingBrowserFeatureSubReasonVideos">Pozeranie videí</string>
     <string name="missingBrowserFeatureSubReasonImages">Interakcia s obrázkami</string>
     <string name="missingBrowserFeatureSubReasonBookmarks">Tvorba a správa záložiek</string>
-    <string name="missingBrowserFeatureSubReasonOther">Nič z uvedeného</string>
+    <string name="missingBrowserFeatureSubReasonOther">Žiadne z uvedených</string>
 
     <string name="websiteNotLoadingTitleLong">Problémy s načítavaním webových stránok</string>
     <string name="websiteNotLoadingTitleShort">Problémy s načítavaním webových stránok</string>
@@ -362,7 +388,7 @@
     <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Rýchlejšie načítavanie</string>
     <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Vyhľadávanie v konkrétnom jazyku alebo geografickej oblasti</string>
     <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Lepšie automatické dopĺňanie</string>
-    <string name="searchNotGoodEnoughSubReasonOther">Nič z uvedeného</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Žiadne z uvedených</string>
 
     <string name="needMoreCustomizationTitleLong">Málo spôsobov, ako si upraviť aplikáciu</string>
     <string name="needMoreCustomizationTitleShort">Problémy s prispôsobením na mieru</string>
@@ -373,7 +399,7 @@
     <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Ktoré údaje sa vymažú</string>
     <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Kedy sa údaje vymažú</string>
     <string name="needMoreCustomizationSubReasonBookmarksDisplay">Zobrazovanie záložiek</string>
-    <string name="needMoreCustomizationSubReasonOther">Nič z uvedeného</string>
+    <string name="needMoreCustomizationSubReasonOther">Žiadne z uvedených</string>
 
     <string name="appIsSlowOrBuggyTitleLong">Aplikácia je pomalá, chybná alebo zlyháva</string>
     <string name="appIsSlowOrBuggyTitleShort">Problémy s výkonnosťou</string>
@@ -381,9 +407,9 @@
     <string name="appIsSlowOrBuggySubReasonSlowResults">Pomalé načítavanie webových stránok alebo výsledkov vyhľadávania</string>
     <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikácia zlyháva alebo mrzne</string>
     <string name="appIsSlowOrBuggySubReasonMediaPlayback">Chyby prehrávania videa alebo médií</string>
-    <string name="appIsSlowOrBuggySubReasonOther">Nič z uvedeného</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Žiadne z uvedených</string>
 
-    <string name="otherMainReasonTitleLong">Nič z uvedeného</string>
+    <string name="otherMainReasonTitleLong">Žiadne z uvedených</string>
     <string name="otherMainReasonTitleShort">Iné problémy</string>
 
     <string name="openEndedInputHint">Buďte čo najkonkrétnejší</string>
@@ -428,9 +454,9 @@
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">SKRYŤ</string>
-    <string name="daxDialogPhew">Ľutujeme!</string>
+    <string name="daxDialogPhew">Uf!</string>
     <string name="daxDialogNext">Ďalšie</string>
-    <string name="daxDialogHighFive">Ruku na to!</string>
+    <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Mám to</string>
     <string name="hideTipsTitle">Skryť zostávajúce tipy?</string>
     <string name="hideTipsText">Je ich len niekoľko, snažili sme sa, aby mali informatívny charakter.</string>
@@ -455,16 +481,16 @@
         <item quantity="many"><![CDATA[ sa vás tu pokúsilo sledovať. <br/><br/>Bolo to zablokované!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
         <item quantity="other"><![CDATA[ sa vás tu pokúsilo sledovať. <br/><br/>Bolo to zablokované!<br/><br/> ☝️Môžete skontrolovať panel s adresou a zistiť, kto sa vás snaží sledovať, keď navštívite novú webovú stránku.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Počas toho, ako budete ťukať a posúvať, zablokujem nepríjemné sledovacie zariadenia. <br/><br/>Neprestávajte – pokračujte v prehľadávaní!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Počas toho, ako budeš ťukať a posúvať, zablokujem nepríjemné sledovacie zariadenia. <br/><br/>Neprestávaj - pokračuj v prehľadávaní!]]></string>
     <string name="daxMainNetworkCtaText">Upozornenie! Nedokážem zabrániť službe %1$s v tom, aby videla vašu aktivitu na %2$s. &lt;br/&gt;&lt;br/&gt;Ak však budete prehliadať so mnou, môžem obmedziť to, čo o vás služba %3$s celkove vie, zablokovaním jej trackerov na mnohých ďalších stránkach.</string>
-    <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Keďže spoločnosť %1$s vlastní službu %2$s, nemôžem jej zabrániť v tom, aby videla vašu aktivitu.&lt;br/&gt;&lt;br/&gt;Prehliadajte so mnou a môžem obmedziť to, čo o vás %3$s celkovo vie, zablokovaním jej sledovacích zariadení na mnohých ďalších stránkach.</string>
+    <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Keďže %1$s vlastní %2$s, nemôžem im zabrániť v tom, aby videli vašu aktivitu.&lt;br/&gt;&lt;br/&gt;Prehliadajte so mnou a môžem obmedziť to, čo o vás %3$s celkovo vie, zablokovaním ich sledovacích zariadení na mnohých ďalších stránkach.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Pokračovať</string>
-    <string name="downloadConfirmationSaveFileTitle">Uložiť %1$s</string>
+    <string name="downloadConfirmationContinue">Ďalej</string>
+    <string name="downloadConfirmationSaveFileTitle">Ušetrite %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Nechať si oboje</string>
-    <string name="downloadConfirmationReplaceOldFileText">Nahradiť</string>
-    <string name="downloadConfirmationOpenFileText">Otvoriť</string>
+    <string name="downloadConfirmationReplaceOldFileText">Vymeniť</string>
+    <string name="downloadConfirmationOpenFileText">Otvorené</string>
     <string name="downloadConfirmationUnableToOpenFileText">Súbor sa nepodarilo otvoriť</string>
     <string name="downloadConfirmationUnableToDeleteFileText">Starý súbor sa nepodarilo odstrániť</string>
 
@@ -478,11 +504,11 @@
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Nezabezpečené webové stránky</string>
-    <string name="reportBrokenSite">Nahlásiť nefunkčný web</string>
+    <string name="reportBrokenSite">Nahlásiť nefunkčnú stránku</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Pridať</string>
-    <string name="dialogEditTitle">Upraviť</string>
+    <string name="dialogEditTitle">Editovať</string>
     <string name="dialogSaveAction">Uložiť</string>
 
     <!-- Whitelist -->
@@ -551,12 +577,12 @@
     <string name="preciseLocationSiteDialogAllowOnce">Iba pre túto reláciu</string>
     <string name="preciseLocationSiteDialogDenyAlways">Vždy odmietnuť</string>
     <string name="preciseLocationSiteDialogDenyOnce">Odmietnuť pre túto reláciu</string>
-    <string name="settingsPreciseLocation">Poloha</string>
+    <string name="settingsPreciseLocation">Miesto</string>
     <string name="preciseLocationFeatureDescription">Stránky, ktoré navštívite, môžu požadovať informácie o polohe vášho zariadenia. Nebudú k nim mať prístup, kým im výslovne neudelíte povolenie. Prehliadač DuckDuckGo používa vašu polohu iba anonymne na doručenie miestnych výsledkov vyhľadávania.</string>
-    <string name="preciseLocationToggleText">Stránky môžu požiadať o moju polohu</string>
+    <string name="preciseLocationToggleText">Lokality môžu požiadať o moju polohu</string>
     <string name="preciseLocationEmptyListHint">Žiadne webové stránky nemajú povolenie na prístup k polohe</string>
     <string name="preciseLocationNoSystemPermission">Ak chcete spravovať povolenia na prístup k polohe, ktoré ste udelili jednotlivým webovým stránkam, povoľte polohu pre túto aplikáciu v Nastaveniach Androidu.</string>
-    <string name="preciseLocationActivityTitle">Poloha</string>
+    <string name="preciseLocationActivityTitle">Miesto</string>
     <string name="preciseLocationDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="preciseLocationDeleteContentDescription">Ďalšie možnosti povolení polohy sú v doméne %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Povolené</string>
@@ -569,7 +595,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href="">Ďalšie informácie</a><u/>]]>
+        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href=\"\">Ďalšie informácie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
@@ -580,6 +606,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Otvárať odkazy v pridružených aplikáciách</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Zakážte a zabráňte tak automatickému otváraniu odkazov v iných nainštalovaných aplikáciách.</string>
     <string name="appLinkDialogTitle">Otvoriť v inej aplikácii?</string>
+    <string name="appLinkSnackBarAction">Otvoriť v aplikácii</string>
+    <string name="appLinkMultipleSnackBarAction">Vybrať aplikáciu</string>
+    <string name="appLinkSnackBarMessage">Tento odkaz môžete otvoriť cez %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Tento odkaz môžete otvoriť v iných aplikáciách.</string>
+    <string name="appLinkIntentChooserTitle">Otvoriť cez</string>
+    <string name="appLinkMenuItemTitle">Otvoriť v aplikácii</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nová adresa bola skopírovaná do schránky</string>
@@ -597,26 +629,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Zoznam čakateľov na ochranu e‑mailu</string>
-    <string name="waitlistNotificationTitle">Vaše pozvánka na ochranu e‑mailu je tu!</string>
-    <string name="waitlistNotificationDescription">Pridali ste sa na zoznam čakateľov a požiadali ste nás, aby sme vás upozornili, keď na vás príde rad a budete si môcť vyskúšať našu ochranu e‑mailu. Klepnutím zobrazíte pozvánku.</string>
+    <string name="waitlistNotificationTitle">Ochrana e‑mailov je pripravená!</string>
+    <string name="waitlistNotificationDescription">Otvorte svoju pozvánku</string>
 
     <string name="waitlistNotificationDialogDescription">Chcete, aby sme vám poslali upozornenie, keď na vás príde rad?</string>
-    <string name="waitlistNotificationDialogNoThanks">NIE, ĎAKUJEM</string>
+    <string name="waitlistNotificationDialogNoThanks">Nie, ďakujem</string>
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNITE MA</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Ochrana e‑mailu (beta)</string>
     <string name="emailProtectionActivityTitle">Ochrana e‑mailu (beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Vaše e‑maily neukladáme. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Na zaradenie do poradovníka nemusíte zdieľať žiadne osobné údaje. Svoje miesto si zabezpečíte časovou pečiatkou, ktorá existuje výlučne vo vašom zariadení, aby sme vás mohli upozorniť, keď budete na rade.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Počas pridávania na zoznam čakateľov došlo k chybe. Skúste to znova neskôr.</string>
     <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
     <string name="emailProtectionInviteCodeCta">Mám pozývací kód</string>
     <string name="emailProtectionWaitlistCta">Pridajte sa do súkromného zoznamu čakateľov</string>
     <string name="emailProtectionGetStartedCta">Začnite</string>
+    <string name="emailNotSupported">Nepodporované zariadenia</string>
+    <string name="emailNotSupportedExplanation">Ochrana e‑mailov vám umožňuje vytvárať súkromné e‑mailové adresy, ktoré odstraňujú nástroje na sledovanie e‑mailov. Tieto adresy, ktoré vytvárate, musíme šifrovať a ukladať lokálne vo vašom zariadení. Keďže vaše zariadenie nepodporuje šifrované úložisko, ochrana e‑mailov nie je k dispozícii.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte si e‑mailové trackery bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href=\"\">Zistite viac</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>
@@ -625,7 +659,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Dostali ste pozvánku!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte si e‑mailové trackery<br/>bez zmeny poskytovateľa e‑mailu. <b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href=\"\">Zistite viac</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobná adresa Duck</string>
@@ -633,4 +667,48 @@
         <![CDATA[Odstránením ochrany e‑mailu z tohto zariadenia stratíte možnosť vyplniť svoju osobnú adresu Duck alebo novovygenerovanú súkromnú adresu Duck do e‑mailových polí pri prehliadaní webu.<br/><br/>Ak si chcete úplne odstrániť adresy Duck alebo ak máte iné otázky či pripomienky, obráťte sa na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Odstrániť zo zariadenia</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Upraviť záložku</string>
+    <string name="favoriteDialogTitleEdit">Úprava obľúbenej položky</string>
+    <string name="locationLabel">Poloha</string>
+    <string name="folderLocationTitle">Vyberte polohu</string>
+    <string name="addFolder">Pridať priečinok</string>
+    <string name="editFolder">Úprava priečinka</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Určite chcete odstrániť "</string>
+    <string name="bookmarkFolderEmpty">Prázdne</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s a %3$d položku?</item>
+        <item quantity="few">%1$s%2$s a %3$d položky?</item>
+        <item quantity="many">%1$s%2$s a %3$d položky?</item>
+        <item quantity="other">%1$s%2$s a %3$d položiek?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d položka</item>
+        <item quantity="few">%1$d položky</item>
+        <item quantity="many">%1$d položky</item>
+        <item quantity="other">%1$d položiek</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Zjednodušenie prístupu</string>
+    <string name="accessibilityActivityTitle">Zjednodušenie prístupu</string>
+    <string name="accessibilityFontSizeTitle">Veľkosť textu</string>
+    <string name="accessibilityFontSizeHint">Potiahnite posúvač, kým sa vám to nebude čítať pohodlne. Webové stránky zobrazené v DuckDuckGo sa tomu prispôsobia.</string>
+    <string name="accessibilityForceZoomTitle">Vynútenie manuálneho priblíženia stránok</string>
+    <string name="accessibilityForceZoomSubtitle">Použite gesto stiahnutia dvoch prstov na ľubovoľnej stránke, aj na tých, ktoré by tomu inak zabránili.</string>
+    <string name="accessibilityTextSizeOverrideTitle">Úprava veľkosti textu</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text na weboch, ktoré navštevujete v aplikácii DuckDuckGo, sa prispôsobí nižšie uvedenému nastaveniu.</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Zásady o ochrane súkromia</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Sťahovanie zlyhalo. Skontrolujte internetové pripojenie.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Miniaplikácia %1$s bola pridaná na úvodnú obrazovku</string>
+    <string name="settingsAddHomeScreenWidget">Miniaplikácia úvodnej obrazovky</string>
 </resources>
