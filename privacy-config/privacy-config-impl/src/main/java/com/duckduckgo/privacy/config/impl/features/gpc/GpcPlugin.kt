@@ -36,10 +36,10 @@ class GpcPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        if (name == featureName) {
             val gpcExceptions = mutableListOf<GpcExceptionEntity>()
             val gpcHeaders = mutableListOf<GpcHeaderEnabledSiteEntity>()
             val moshi = Moshi.Builder().build()
@@ -61,5 +61,5 @@ class GpcPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.GpcFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.GpcFeatureName
 }

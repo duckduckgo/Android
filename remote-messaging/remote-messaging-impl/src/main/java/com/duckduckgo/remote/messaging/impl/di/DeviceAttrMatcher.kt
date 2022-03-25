@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2020 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.health
+package com.duckduckgo.remote.messaging.impl.di
 
-interface BadHealthMitigationFeature {
-    var isEnabled: Boolean
-}
+import javax.inject.Qualifier
+
+/** Marks the device matcher implementation for remote-messaging */
+@Qualifier
+@Retention(AnnotationRetention.RUNTIME)
+annotation class DeviceAttrMatcher

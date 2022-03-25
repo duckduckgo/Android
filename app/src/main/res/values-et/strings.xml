@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@
     <string name="removeFavoriteMenuTitle">Eemalda lemmik</string>
     <string name="favoriteAddedMessage">Lemmik lisatud</string>
     <string name="bookmarkAddedMessage">Järjehoidja lisatud</string>
-    <string name="requestDesktopSiteMenuTitle">Töölaua sait</string>
+    <string name="requestDesktopSiteMenuTitle">Arvuti sait</string>
 
     <!-- Downloading files -->
-    <string name="downloadImage">Laadi pilt alla</string>
+    <string name="downloadImage">Laadige pilt alla</string>
     <string name="permissionRequiredToDownload">Allalaadimiseks on vaja salvestusluba</string>
     <string name="downloadComplete">Allalaadimine lõpetatud</string>
     <string name="downloadFailed">Allalaadimine ebaõnnestus</string>
@@ -82,7 +82,7 @@
     <string name="settingsAutocompleteEnabled">Automaatselt täidetavad ettepanekud</string>
 
     <!-- Opening external apps -->
-    <string name="openExternalApp">Ava väline rakendus</string>
+    <string name="openExternalApp">Avage väline rakendus</string>
     <string name="launchingExternalApp">Ava teises rakenduses</string>
     <string name="confirmOpenExternalApp">Kas soovite selle sisu vaatamiseks lahkuda DuckDuckGo\'st?</string>
     <string name="unableToOpenLink">Seda tüüpi linki ei saa avada</string>
@@ -121,22 +121,22 @@
 
     <plurals name="trackersFound">
         <item quantity="one">%1$s jälitaja leitud</item>
-        <item quantity="other">%1$s jälitajad leitud</item>
+        <item quantity="other">%1$s jälitajat leitud</item>
     </plurals>
 
     <plurals name="trackerBlocked">
         <item quantity="one">%1$s jälgija on blokeeritud</item>
-        <item quantity="other">%1$s jälgijad on blokeeritud</item>
+        <item quantity="other">%1$s jälgijat on blokeeritud</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s Leitud peamine jälgimisvõrk</item>
-        <item quantity="other">%1$s Leitud peamine jälgimisvõrk</item>
+        <item quantity="one">%1$s leitud suur jälgimisvõrk</item>
+        <item quantity="other">%1$s leitud suurt jälgimisvõrku</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s Peamine jälgimisvõrk on blokeeritud</item>
-        <item quantity="other">%1$s Peamine jälgimisvõrk on blokeeritud</item>
+        <item quantity="one">%1$s suur jälgimisvõrk blokeeritud</item>
+        <item quantity="other">%1$s suurt jälgimisvõrku blokeeritud</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Privaatsusaste</string>
@@ -173,7 +173,18 @@
     <string name="settingsVersion">Versioon</string>
     <string name="leaveFeedback">Jaga tagasisidet</string>
     <string name="settingsEmailProtectionTitle">E-posti kaitse</string>
-    <string name="settingsEmailProtectionSubtitle">Blokeerige e-posti jälgijad ja peitke oma aadress.</string>
+    <string name="settingsEmailProtectionSubtitle">Blokeeri meilijälgurid ja peida oma aadress</string>
+    <string name="settingsHeadingMore">Veel DuckDuckGo\'lt</string>
+    <string name="settingsLightTheme">Hele</string>
+    <string name="settingsTheme">Teema</string>
+    <string name="settingsDarkTheme">Tume</string>
+    <string name="settingsSystemTheme">Süsteem vaikimisi</string>
+    <string name="settingsThemeDialogSave">Määra kujundus</string>
+    <string name="settingsTitleAppLinks">Ava lingid rakendustes</string>
+    <string name="settingsTitleAppLinksDialog">Ava lingid rakendustes</string>
+    <string name="settingsAppLinksAskEveryTime">Küsi iga kord</string>
+    <string name="settingsAppLinksAlways">Alati</string>
+    <string name="settingsAppLinksNever">Mitte kunagi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -243,7 +254,7 @@
     <string name="favoritesEmptyHint">Lemmikuid pole veel lisatud</string>
 
     <!-- Dialogs -->
-    <string name="dialogConfirmTitle">Kinnita</string>
+    <string name="dialogConfirmTitle">Kinnitage</string>
     <string name="dialogSave">Salvesta</string>
     <string name="delete">Kustuta</string>
     <string name="edit">Redigeeri</string>
@@ -251,8 +262,23 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Lisa lemmik</string>
+    <string name="widgetConfigurationTitleText">Vali teema</string>
+    <string name="widgetConfigurationSystemThemeOption">Süsteem vaikimisi</string>
+    <string name="widgetConfigurationLightThemeOption">Hele</string>
+    <string name="widgetConfigurationDarkThemeOption">Tume</string>
+    <string name="widgetConfigurationAddWidgetOption">Lisage vidin</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Lemmikuid pole veel lisatud</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Lisa lemmik</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Külasta oma lemmiksaite hetkega!Mine saidile, mis sulle meeldib. Puuduta ikooni „⠇“ ja vali „Lisa lemmikutesse“.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Külasta oma lemmiksaite hetkega! Mine saidile, mis sulle meeldib. Puuduta brauseri menüüikooni ja vali „Lisa lemmikutesse“.</string>
+    <string name="widgetConfigurationActivityTitle">Vidina konfiguratsioon</string>
+    <string name="favoritesWidgetLabel">Lemmikud</string>
+    <string name="searchWidgetLabel">Otsing</string>
+
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lisa avalehele</string>
+    <string name="addToHome">Lisage avalehele</string>
     <string name="shortcutAddedText">Õnnestus! %1$s lisati teie avaekraanile.</string>
 
     <!-- User Survey -->
@@ -475,11 +501,11 @@
 
     <!-- Whitelist -->
     <string name="whitelisetActivityTitle">Kaitseta saidid</string>
-    <string name="enablePrivacyProtection">Luba privaatsuse kaitse</string>
-    <string name="disablePrivacyProtection">Keela privaatsuse kaitse</string>
+    <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
+    <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
     <string name="whitelistEntryDeleteConfirmMessage">Oled kindel, et soovid eemaldada &lt;b&gt;%1$s&lt;/b&gt; kaisteta saitide hulgast?</string>
-    <string name="whitelistExplanation">Nendele saitidele ei laiene privaatsuse kaitse.</string>
+    <string name="whitelistExplanation">Nendele saitidele ei laiene Eraelu puutumatuse kaitse.</string>
     <string name="whitelistNoEntries">Privaatsuse kaitse on lubatud kõigil saitidel</string>
     <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Sisesta domeen <b>example.com</b> kujul ja proovi uuesti</string>
@@ -493,7 +519,7 @@
     <string name="fireproofWebsiteMenuTitleAdd">Tulekindel veebisait</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovid kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Tulekindlaid veebisaite ei ole</string>
     <string name="fireproofWebsiteFeatureDescription">Veebilehed kasutavad küpsiseid, et hoida sind sisse logitud. Kui teed lehe tulekindlaks, ei kustutata küpsiseid ja sa jääd sisse logituks isegi pärast tulenupu kasutamist. Me blokeerime endiselt kolmanda poole jälitajad, kelle me tulekindlatelt lehtedelt leiame.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Veel tulekindla veebisaidi võimalusi %1$s</string>
@@ -540,13 +566,13 @@
     <string name="preciseLocationSiteDialogDenyAlways">Keela alati</string>
     <string name="preciseLocationSiteDialogDenyOnce">Keela selle seansi jaoks</string>
     <string name="settingsPreciseLocation">Asukoht</string>
-    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele ligipääsu enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
+    <string name="preciseLocationFeatureDescription">Saidid, mida sa külastad, võivad küsida sinu seadme asukohta. Nad ei saa sellele juurde enne, kui oled andnud selgesõnalise loa. DuckDuckGo kasutab sinu asukohta alati anonüümselt, et edastada kohaliku otsingu tulemused.</string>
     <string name="preciseLocationToggleText">Saidid võivad küsida minu asukohta</string>
     <string name="preciseLocationEmptyListHint">Ühelegi veebisaidile ei ole antud luba asukohale juurdepääsuks</string>
     <string name="preciseLocationNoSystemPermission">Haldamaks asukohale juurdepääsu lubasid, mille sa oled üksikutele saitidele andnud, luba asukoht selle rakenduse jaoks Androidi seadetes.</string>
     <string name="preciseLocationActivityTitle">Asukoht</string>
-    <string name="preciseLocationDeleteConfirmMessage">Kas soovid kindlasti saidi kustutada &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="preciseLocationDeleteContentDescription">Rohkem võimalusi domeenis asukoha lubade jaoks %1$s</string>
+    <string name="preciseLocationDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteContentDescription">Rohkem võimalusi asukoha lubade jaoks domeenis %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Antud</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Keelatud</string>
     <string name="preciseLocationSnackbarMessage">Andsid eelnevalt %1$s loa juurdepääsuks oma seadme asukohale.</string>
@@ -568,6 +594,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Ava lingid seotud rakendustes</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Keela, et takistada linkide automaatset avanemist teistes installitud rakendustes.</string>
     <string name="appLinkDialogTitle">Avada teises rakenduses?</string>
+    <string name="appLinkSnackBarAction">Ava rakenduses</string>
+    <string name="appLinkMultipleSnackBarAction">Vali rakendus</string>
+    <string name="appLinkSnackBarMessage">Selle lingi saab avada rakenduses %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Selle lingi saab avada teistes rakendustes.</string>
+    <string name="appLinkIntentChooserTitle">Ava rakendusega</string>
+    <string name="appLinkMenuItemTitle">Ava rakenduses</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Uus aadress kopeeriti teie lõikelauale</string>
@@ -585,8 +617,8 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">E-posti järjekord</string>
-    <string name="waitlistNotificationTitle">Teie e-posti kaitse kutse on siin!</string>
-    <string name="waitlistNotificationDescription">Liitusite ootenimekirjaga ja palusite meid teavitada, kui on teie kord proovida meie e-posti kaitse funktsiooni. Kutse vaatamiseks puudutage.</string>
+    <string name="waitlistNotificationTitle">Meilikaitse on valmis.</string>
+    <string name="waitlistNotificationDescription">Ava oma kutse</string>
 
     <string name="waitlistNotificationDialogDescription">Kas soovite, et me saadame teile teavituse, kui on teie kord?</string>
     <string name="waitlistNotificationDialogNoThanks">Ei aitäh</string>
@@ -595,16 +627,18 @@
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">E-posti kaitse (beeta)</string>
     <string name="emailProtectionActivityTitle">E-posti kaitse (beeta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Me ei salvesta teie e-kirju. <b><a href=\"\">Lisateave</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Ootenimekirjaga liitumiseks ei pea isikuandmeid jagama. Sinu järjekorrakoht on kinnitatud ainult sinu seadmes oleva ajatempliga ja me teavitame sind, kui on sinu kord.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Ooteloendiga liitumisel tekkis tõrge, proovige hiljem uuesti</string>
     <string name="emailProtectionDuckAddressCta">Mul on juba Ducki aadress</string>
     <string name="emailProtectionInviteCodeCta">Mul on kutse kood</string>
     <string name="emailProtectionWaitlistCta">Liituge privaatse ootenimekirjaga</string>
     <string name="emailProtectionGetStartedCta">Alustage</string>
+    <string name="emailNotSupported">Seadet ei toetata</string>
+    <string name="emailNotSupportedExplanation">Meilikaitse võimaldab luua privaatseid ja jälguritest vabasid meiliaadresse. Me peame need aadressid krüptima ja sinu seadmesse salvestama. Meilikaitset ei saa kasutada, sest sinu seade ei toeta krüptitud salvestamist.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-posti privaatsus, lihtsustatud.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress ilma meiliteenuse pakkujat vahetamata.<br/><b><a href=\"\">Lisateave</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olete nimekirjas!</string>
@@ -613,7 +647,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Olete kutsutud!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeerige e-posti jälgijad ja peitke oma aadress<br/> ilma oma e-posti teenuse pakkujat vahetamata. <a href=\"\"><b>Lisateave</b></a> .]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress <br/>ilma meiliteenuse pakkujat vahetamata.<br/><b><a href=\"\">Lisateave</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Isiklik Ducki aadress</string>
@@ -621,4 +655,44 @@
         <![CDATA[E-posti kaitse eemaldamine sellest seadmest eemaldab veebis sirvimise ajal võimaluse sisestada oma isiklik Ducki aadress või äsja loodud isiklik Ducki aadress e-posti väljadele.<br/><br/>Oma Ducki aadresside täielikuks kustutamiseks või muude küsimuste või tagasiside saamiseks pöörduge meie poole aadressil <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Eemaldage seadmest</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Redigeeri järjehoidjat</string>
+    <string name="favoriteDialogTitleEdit">Redigeeri lemmikut</string>
+    <string name="locationLabel">Asukoht</string>
+    <string name="folderLocationTitle">Vali asukoht</string>
+    <string name="addFolder">Lisa kaust</string>
+    <string name="editFolder">Redigeeri kausta</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Kas soovid kindlasti kustutada "</string>
+    <string name="bookmarkFolderEmpty">Tühi</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s ja %3$d üksuse?</item>
+        <item quantity="other">%1$s%2$s ja %3$d üksust?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d üksus</item>
+        <item quantity="other">%1$d üksust</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Hõlpsus</string>
+    <string name="accessibilityActivityTitle">Hõlpsus</string>
+    <string name="accessibilityFontSizeTitle">Teksti suurus</string>
+    <string name="accessibilityFontSizeHint">Lohista liugurit, kuni saad seda mugavalt lugeda. DuckDuckGo\'s kuvatavad veebisaidid kohanduvad sellega.</string>
+    <string name="accessibilityForceZoomTitle">Jõusta lehe käsitsi suumimine</string>
+    <string name="accessibilityForceZoomSubtitle">Sõrmedega suumimine töötab kõigil veebisaitidel, ka neil, mis seda tavaliselt takistavad</string>
+    <string name="accessibilityTextSizeOverrideTitle">Halda teksti suurust</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">DuckDuckGo\'s kuvatavate veebisaitide teksti reguleeritakse alloleva sätte järgi</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privaatsuspoliitika</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Allalaadimine ebaõnnestus. Kontrolli internetiühendust.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Vidin %1$s lisati avakuvale</string>
+    <string name="settingsAddHomeScreenWidget">Avakuva vidin</string>
 </resources>

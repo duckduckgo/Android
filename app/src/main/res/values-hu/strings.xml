@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2021 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -47,7 +31,7 @@
 
     <string name="omnibarInputHint">Keresés vagy URL beírása</string>
     <string name="clearButtonContentDescription">Megadott keresés törlése</string>
-    <string name="no_compatible_third_party_app_installed">Nincs telepítve kompatibilis alkalmazás</string>
+    <string name="no_compatible_third_party_app_installed">Nincs kompatibilis alkalmazás telepítve</string>
     <string name="addBookmarkMenuTitle">Könyvjelző mentése</string>
     <string name="editBookmarkMenuTitle">Könyvjelző szerkesztése</string>
     <string name="addFavoriteMenuTitle">Kedvenc hozzáadása</string>
@@ -60,7 +44,7 @@
     <string name="downloadImage">Kép letöltése</string>
     <string name="permissionRequiredToDownload">A letöltéshez tárolási engedély szükséges</string>
     <string name="downloadComplete">Letöltés kész</string>
-    <string name="downloadFailed">A letöltés sikertelen</string>
+    <string name="downloadFailed">A letöltés sikertelen volt</string>
     <string name="downloadInProgress">Letöltés</string>
 
     <!-- Sharing options -->
@@ -107,7 +91,7 @@
     <string name="privacyProtectionEnabled">WEBOLDAL VÉDELME ENGEDÉLYEZVE</string>
     <string name="privacyProtectionDisabled">WEBOLDAL VÉDELME LETILTVA</string>
     <string name="privacyDashboardActivityTitle">Adatvédelmi műszerfal</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTVE ERRŐL: &lt;img src=\"%1$d\" /&gt; ERRE: &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TOVÁBBFEJLESZTETT ETTŐL: &lt;img src=\"%1$d\" /&gt; EDDIG: &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Adatvédelmi fokozat</string>
     <string name="privacyProtectionTemporarilyDisabled">Ideiglenesen letiltottuk az adatvédelmet, mert úgy tűnik, hogy kárt okoz ezen a webhelyen.</string>
 
@@ -173,7 +157,18 @@
     <string name="settingsVersion">Változat</string>
     <string name="leaveFeedback">Visszajelzés megosztása</string>
     <string name="settingsEmailProtectionTitle">E-mail védelem</string>
-    <string name="settingsEmailProtectionSubtitle">Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet.</string>
+    <string name="settingsEmailProtectionSubtitle">E-mail nyomkövetők letiltása, és a cím elrejtése</string>
+    <string name="settingsHeadingMore">Továbbiak a DuckDuckGo-tól</string>
+    <string name="settingsLightTheme">Világos</string>
+    <string name="settingsTheme">Kinézet</string>
+    <string name="settingsDarkTheme">Sötét</string>
+    <string name="settingsSystemTheme">Rendszer alapértelmezés</string>
+    <string name="settingsThemeDialogSave">Téma beállítása</string>
+    <string name="settingsTitleAppLinks">Hivatkozások megnyitása az alkalmazásokban</string>
+    <string name="settingsTitleAppLinksDialog">Hivatkozások megnyitása az alkalmazásokban</string>
+    <string name="settingsAppLinksAskEveryTime">Kérdezzen rá minden alkalommal</string>
+    <string name="settingsAppLinksAlways">Mindig</string>
+    <string name="settingsAppLinksNever">Soha</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -250,6 +245,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Kedvenc hozzáadása</string>
+    <string name="widgetConfigurationTitleText">Téma kiválasztása</string>
+    <string name="widgetConfigurationSystemThemeOption">Rendszer alapértelmezés</string>
+    <string name="widgetConfigurationLightThemeOption">Világos</string>
+    <string name="widgetConfigurationDarkThemeOption">Sötét</string>
+    <string name="widgetConfigurationAddWidgetOption">Minialkalmazás hozzáadása</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Még nincsenek hozzáadva kedvencek.</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Kedvenc hozzáadása</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Látogasd meg a kedvenc weboldalaidat egy pillanat alatt!<br/><br/>Lépj egy kedvelt weboldalra. Ezután koppints a „ ⠇” ikonra, és válaszd a Kedvenc hozzáadása elemet.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Látogasd meg a kedvenc weboldalaidat egy pillanat alatt! Lépj egy kedvelt weboldalra. Ezután koppints a böngészési menü ikonra, és válaszd a Kedvenc hozzáadása elemet.</string>
+    <string name="widgetConfigurationActivityTitle">Minialkalmazás konfigurációja</string>
+    <string name="favoritesWidgetLabel">Kedvencek</string>
+    <string name="searchWidgetLabel">Keresés</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Hozzáadás a Kezdőlaphoz</string>
@@ -389,7 +399,7 @@
     <string name="sharePositiveFeedbackWithTheTeam">Szeretnél valamit megosztani a csapattal?</string>
     <string name="whatHaveYouBeenEnjoying">Mi tetszett?</string>
     <string name="awesomeToHear">Örömmel halljuk!</string>
-    <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Áruházban.</string>
+    <string name="shareTheLoveWithARating">Ha tetszik az alkalmazás, kérjük, oszd meg véleményed a Play Store -on.</string>
     <string name="rateTheApp">ALKALMAZÁS ÉRTÉKELÉSE</string>
     <string name="declineFurtherFeedback">NEM, KÖSZÖNÖM, VÉGEZTEM.</string>
     <string name="whichBrokenSites">Hol látod ezeket a problémákat?</string>
@@ -409,30 +419,30 @@
     <string name="systemSearchDeviceAppLabel">Ebből az eszközből</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Keresés vagy URL beírása</font></string>
     <string name="systemSearchAppNotFound">Az alkalmazás nem található</string>
-    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választottad!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használod, a kereséseid védettek.</string>
+    <string name="systemSearchOnboardingText">Köszönjük, hogy a DuckDuckGo-t választotta!\nMost, amikor a mi keresésünket vagy az alkalmazásunkat használja, a keresései védettek.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">A DuckDuckGo alkalmazás is:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkolja a nem biztonságos nyomkövetőket.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Kikényszeríti a webhelyeken a titkosítást.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Egyetlen érintéssel törli az adatokat.</string>
-    <string name="systemSearchOnboardingButtonMore">Mutass többet</string>
+    <string name="systemSearchOnboardingButtonMore">Többet mutat</string>
     <string name="systemSearchOnboardingButtonLess">Elrejtés</string>
-    <string name="systemSearchOnboardingButtonOk">Értem</string>
+    <string name="systemSearchOnboardingButtonOk">Megvan</string>
 
     <!-- Dax Dialog -->
     <string name="daxDialogHideButton">ELREJTÉS</string>
-    <string name="daxDialogPhew">Hűűű!</string>
+    <string name="daxDialogPhew">Pfuj!</string>
     <string name="daxDialogNext">Következő</string>
     <string name="daxDialogHighFive">Pacsi!</string>
     <string name="daxDialogGotIt">Megvan</string>
-    <string name="hideTipsTitle">Elrejted a többi tippet?</string>
+    <string name="hideTipsTitle">Elrejti a többi tippet?</string>
     <string name="hideTipsText">Csak néhány van, és megpróbáltuk őket informatívvá tenni.</string>
     <string name="hideTipsButton">Ötletek elrejtése örökre</string>
 
     <!-- New Onboarding Experience -->
     <string name="onboardingWelcomeTitle">"Üdvözlünk a DuckDuckGo-ban!"</string>
-    <string name="onboardingDaxText"><![CDATA[Az internet néha hátborzongató.<br/><br/>Ne aggódj! A magánjellegű keresés és böngészés könnyebb, mint gondolnád.]]></string>
+    <string name="onboardingDaxText"><![CDATA[Az internet lehet hátborzongató.<br/><br/>Ne aggódjon! A magánjellegű keresés és böngészés könnyebb, mint gondolná.]]></string>
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
-    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogasd meg az egyik kedvenc webhelyed! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogassa meg az egyik kedvenc webhelyét! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Megvan, ez az!<br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, egy hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
     <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és én soha nem tárolom el a keresési előzményeket. Soha. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
@@ -443,7 +453,7 @@
         <item quantity="one"><![CDATA[ itt próbált meg követni. <br/><br/>Blokkoltam!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
         <item quantity="other"><![CDATA[ itt próbált meg követni. <br/><br/>Blokkoltam!<br/><br/> ☝️Ellenőrizheted az URL-sávot, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinted és görgeted, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menj tovább - folytasd a böngészést!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Ahogy megérinti és görgeti, én blokkolni fogom a bosszantó nyomkövetőket. <br/><br/>Menjen tovább - folytassa a böngészést!]]></string>
     <string name="daxMainNetworkCtaText">Figyelem! Nem tudom megakadályozni, hogy %1$s láthassa a tevékenységedet itt: %2$s &lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s megtudhat rólad.</string>
     <string name="daxMainNetworkOwnedCtaText">Figyelem! Mivel %1$s tulajdonában van a(z) %2$s, nem tudom megakadályozni, hogy lássák az itteni tevékenységedet.&lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s tud rólad.</string>
 
@@ -557,7 +567,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href="">További részletek</a><u/>]]>
+        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
@@ -568,6 +578,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Hivatkozások megnyitása társított alkalmazásokban</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Letiltásával megakadályozhatod, hogy a hivatkozások automatikusan megnyíljanak más telepített alkalmazásokban.</string>
     <string name="appLinkDialogTitle">Megnyitás másik alkalmazásban?</string>
+    <string name="appLinkSnackBarAction">Megnyitás az alkalmazásban</string>
+    <string name="appLinkMultipleSnackBarAction">Alkalmazás kiválasztása</string>
+    <string name="appLinkSnackBarMessage">A hivatkozás a következő alkalmazásban nyitható meg: %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">A hivatkozás más alkalmazásokban nyitható meg.</string>
+    <string name="appLinkIntentChooserTitle">Megnyitás ezzel:</string>
+    <string name="appLinkMenuItemTitle">Megnyitás az alkalmazásban</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Új cím a vágólapra másolva</string>
@@ -585,26 +601,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">E-mail várólista</string>
-    <string name="waitlistNotificationTitle">Megérkezett az e-mail védelmi meghívód!</string>
-    <string name="waitlistNotificationDescription">Feliratkoztál a várólistára, és arra kértél minket, hogy értesítsünk, amikor rád kerül a sor, hogy kipróbálhasd az e-mail védelem funkciót. Koppints a meghívó megtekintéséhez.</string>
+    <string name="waitlistNotificationTitle">Az e-mail-védelem készen áll.</string>
+    <string name="waitlistNotificationDescription">Meghívó megnyitása</string>
 
     <string name="waitlistNotificationDialogDescription">Szeretnéd, hogy értesítést küldjünk neked, amikor rád kerül a sor?</string>
-    <string name="waitlistNotificationDialogNoThanks">NEM, KÖSZÖNÖM</string>
+    <string name="waitlistNotificationDialogNoThanks">Nem, köszönöm</string>
     <string name="waitlistNotificationDialogNotifyMe">ÉRTESÍTSETEK</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">E-mail védelem (béta)</string>
     <string name="emailProtectionActivityTitle">E-mail védelem (béta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Nem mentjük az e-mailjeidet. <b><a href=\"\">További részletek</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Nem kell megosztanod a személyes adataid a várólistához való csatlakozáshoz. A sorban elfoglalt helyedet egy olyan időbélyegző igazolja, amely kizárólag az eszközödön található meg, így értesíteni tudunk, amikor sorra kerülsz.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Hiba történt a várólistához való csatlakozás közben. Kérjük, próbáld újra később.</string>
     <string name="emailProtectionDuckAddressCta">Már van Duck címem</string>
     <string name="emailProtectionInviteCodeCta">Van meghívókódom</string>
     <string name="emailProtectionWaitlistCta">Csatlakozz a privát várólistához</string>
     <string name="emailProtectionGetStartedCta">Első lépések</string>
+    <string name="emailNotSupported">Az eszköz nem támogatott</string>
+    <string name="emailNotSupportedExplanation">Az e-mail-védelem lehetővé teszi olyan privát e-mail-címek létrehozását, amelyek eltávolítják az e-mail nyomkövetőket. Ezeket a címeket helyileg az eszközödön kell titkosítanunk és tárolnunk. Mivel az eszközöd nem támogatja a titkosított tárhelyet, az e-mail-védelem nem érhető el.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=\"\"><b>További részletek</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>
@@ -613,7 +631,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Meghívót kaptál!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/> anélkül, hogy leváltanád az e-mail szolgáltatódat. <a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/>anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=\"\"><b>További részletek</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Személyes Duck cím</string>
@@ -621,4 +639,44 @@
         <![CDATA[Az e-mail védelem eltávolítása erről az eszközről megszünteti azt a lehetőséget, hogy a webes böngészés során a rendszer automatikusan beírja a személyes Duck címedet vagy egy újonnan létrehozott privát Duck címet az e-mail mezőkbe.<br/><br/>A Duck címeid teljes törléséhez, vagy bármilyen más kérdés vagy visszajelzés esetén fordulj hozzánk a <a href=\"mailto:support@duck.com\">support@duck.com</a> címen.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Eltávolítás az eszközről</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Könyvjelző szerkesztése</string>
+    <string name="favoriteDialogTitleEdit">Kedvenc szerkesztése</string>
+    <string name="locationLabel">Hely</string>
+    <string name="folderLocationTitle">Hely kiválasztása</string>
+    <string name="addFolder">Mappa hozzáadása</string>
+    <string name="editFolder">Mappa szerkesztése</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Biztosan törlöd a(z) "</string>
+    <string name="bookmarkFolderEmpty">Üres</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s és a(z) %3$d elemet?</item>
+        <item quantity="other">%1$s%2$s és a(z) %3$d elemet?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d elem</item>
+        <item quantity="other">%1$d elem</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Kisegítő lehetőségek</string>
+    <string name="accessibilityActivityTitle">Kisegítő lehetőségek</string>
+    <string name="accessibilityFontSizeTitle">Szövegméret</string>
+    <string name="accessibilityFontSizeHint">Húzd el addig a csúszkát, amíg ezt kényelmesen el nem tudod olvasni. A DuckDuckGo ennek használatával jeleníti meg a webhelyeket.</string>
+    <string name="accessibilityForceZoomTitle">Kézi oldalnagyítás kényszerítése</string>
+    <string name="accessibilityForceZoomSubtitle">Használd bármelyik webhelyen a csippentést és nagyítást, még azokon is, amelyek ezt egyébként megakadályozzák</string>
+    <string name="accessibilityTextSizeOverrideTitle">Szövegméret kezelése</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">A DuckDuckGo alkalmazásban megtekintett webhelyek szövege az alábbi beállításhoz igazodik</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Adatvédelmi szabályzat</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">A letöltés sikertelen. Ellenőrizd az internetkapcsolatot.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>
+    <string name="settingsAddHomeScreenWidget">Kezdőképernyő-minialkalmazás</string>
 </resources>

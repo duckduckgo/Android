@@ -291,6 +291,19 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
+    fun whenUrlIsSiteSchemeThenWebSearchTypeDetected() {
+        val expected = SearchQuery::class
+        val actual = testee.determineType("site:example.com")
+        assertEquals(expected, actual::class)
+    }
+
+    @Test
+    fun whenUrlIsSiteSchemeThenFullQueryRetained() {
+        val type = testee.determineType("site:example.com") as SearchQuery
+        assertEquals("site:example.com", type.query)
+    }
+
+    @Test
     fun whenSmsContentIsLongerThanMaxAllowedThenTruncateToMax() {
         val longSms = randomString(SMS_MAX_LENGTH + 1)
         val type = testee.determineType("sms:$longSms") as Sms

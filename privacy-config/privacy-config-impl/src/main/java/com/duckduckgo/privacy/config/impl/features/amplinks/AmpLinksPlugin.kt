@@ -32,8 +32,8 @@ class AmpLinksPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: String): Boolean {
-        if (name == featureName.value) {
+    override fun store(name: PrivacyFeatureName, jsonString: String): Boolean {
+        if (name == featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<AmpLinksFeature> =
                 moshi.adapter(AmpLinksFeature::class.java)
@@ -64,5 +64,5 @@ class AmpLinksPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AmpLinksFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AmpLinksFeatureName
 }

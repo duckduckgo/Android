@@ -35,10 +35,10 @@ class ContentBlockingPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        if (name == featureName) {
             val contentBlockingExceptions = mutableListOf<ContentBlockingExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<ContentBlockingFeature> =
@@ -56,5 +56,5 @@ class ContentBlockingPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.ContentBlockingFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.ContentBlockingFeatureName
 }

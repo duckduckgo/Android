@@ -168,7 +168,7 @@ class RealPrivacyConfigPersisterTest {
         var count = 0
 
         override fun store(
-            name: String,
+            name: PrivacyFeatureName,
             jsonString: String
         ): Boolean {
             count++
@@ -176,11 +176,11 @@ class RealPrivacyConfigPersisterTest {
         }
 
         override val featureName: PrivacyFeatureName =
-            PrivacyFeatureName.ContentBlockingFeatureName()
+            PrivacyFeatureName.ContentBlockingFeatureName
     }
 
     companion object {
-        private const val FEATURE_NAME = "test"
+        private const val FEATURE_NAME = "gpc"
         private const val FEATURE_JSON = "{\"state\": \"enabled\"}"
         val unprotectedTemporaryList = listOf(UnprotectedTemporaryEntity("example.com", "reason"))
     }

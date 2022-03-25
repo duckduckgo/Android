@@ -35,10 +35,10 @@ class AutofillPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        if (name == featureName) {
             val autofillExceptions = mutableListOf<AutofillExceptionEntity>()
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<AutofillFeature> =
@@ -56,5 +56,5 @@ class AutofillPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AutofillFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AutofillFeatureName
 }

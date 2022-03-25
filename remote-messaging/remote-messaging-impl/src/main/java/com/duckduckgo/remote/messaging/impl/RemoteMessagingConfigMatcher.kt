@@ -18,21 +18,21 @@ package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
-import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.di.DeviceAttrMatcher
+import com.duckduckgo.remote.messaging.impl.di.UserAttrMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
-    val deviceAttributeMatcher: DeviceAttributeMatcher,
-    val androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+    @DeviceAttrMatcher val deviceAttributeMatcher: AttributeMatcher,
+    @DeviceAttrMatcher val androidAppAttributeMatcher: AttributeMatcher,
     val remoteMessagingRepository: RemoteMessagingRepository,
-    val userAttributeMatcher: UserAttributeMatcher
+    @UserAttrMatcher val userAttributeMatcher: AttributeMatcher
 ) {
     private val matchers = listOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
 

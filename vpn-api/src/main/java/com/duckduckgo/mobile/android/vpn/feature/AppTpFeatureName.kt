@@ -18,8 +18,9 @@ package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.feature.toggles.api.FeatureName
 
-sealed class AppTpFeatureName(override val value: String) : FeatureName {
-    data class Ipv6Support(override val value: String = "ipv6Support") : AppTpFeatureName(value)
-    data class PrivateDnsSupport(override val value: String = "privateDnsSupport") : AppTpFeatureName(value)
-    data class NetworkSwitchingHandling(override val value: String = "networkSwitchingHandling") : AppTpFeatureName(value)
+enum class AppTpFeatureName(override val value: String) : FeatureName {
+    BadHealthMitigation("badHealthMitigation"),
+    Ipv6Support("ipv6Support"),
+    PrivateDnsSupport("privateDnsSupport"),
+    NetworkSwitchingHandling("networkSwitchingHandling"),
 }

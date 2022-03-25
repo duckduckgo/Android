@@ -22,7 +22,7 @@ import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 
 interface PrivacyFeaturePlugin {
     fun store(
-        name: String,
+        name: PrivacyFeatureName,
         jsonString: String
     ): Boolean
 

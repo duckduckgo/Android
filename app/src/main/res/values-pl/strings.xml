@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@
     <string name="defaultBrowserMaybeLater">Może później</string>
     <string name="defaultBrowserLetsDoIt">Ustaw jako domyślną przeglądarkę</string>
     <string name="defaultBrowserDescriptionNoDefault">Zawsze otwieraj linki ze spokojem.</string>
-    <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff">Zawsze</font>.</string>
+    <string name="defaultBrowserInstructions">Wybierz DuckDuckGo i dotknij <font color="#678fff"> Zawsze </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Menu przeglądarki</string>
@@ -54,11 +54,11 @@
     <string name="removeFavoriteMenuTitle">Usuń ulubione</string>
     <string name="favoriteAddedMessage">Dodano ulubione</string>
     <string name="bookmarkAddedMessage">Dodano zakładkę</string>
-    <string name="requestDesktopSiteMenuTitle">Witryna w wersji komputerowej</string>
+    <string name="requestDesktopSiteMenuTitle">Strona w wersji komputerowej</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Pobierz obraz</string>
-    <string name="permissionRequiredToDownload">Pobieranie wymaga pozwolenia na zapisywanie</string>
+    <string name="permissionRequiredToDownload">Pobieranie wymaga pozwolenia na zapisanie</string>
     <string name="downloadComplete">Pobieranie zakończone</string>
     <string name="downloadFailed">Pobieranie nie powiodło się</string>
     <string name="downloadInProgress">Pobieranie w toku</string>
@@ -71,8 +71,8 @@
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Znajdź na stronie</string>
-    <string name="nextSearchTermDescription">Znajdź następny element</string>
-    <string name="previousSearchTermDescription">Znajdź poprzedni element</string>
+    <string name="nextSearchTermDescription">Znajdź następny(-ą)</string>
+    <string name="previousSearchTermDescription">Znajdź poprzedni(-ą)</string>
     <string name="closeFindInPageButtonDescription">Zamknij widok wyszukiwania na stronie</string>
     <string name="findInPageHint">Znajdź na stronie</string>
     <string name="findInPageMatches" translatable="false">%d/%d</string>
@@ -95,19 +95,19 @@
     <string name="openInNewTab">Otwórz w nowej karcie</string>
     <string name="openInNewBackgroundTab">Otwórz w karcie w tle</string>
     <string name="openImageInNewTab">Otwórz obraz w karcie w tle</string>
-    <string name="faviconContentDescription">Favicon</string>
+    <string name="faviconContentDescription">Ikona skrótu</string>
     <string name="closeContentDescription">Zamknij</string>
     <string name="closeAllTabsMenuItem">Zamknij wszystkie karty</string>
-    <string name="closeTab">Zamknij kartę</string>
+    <string name="closeTab">Zamknij karta</string>
     <string name="tabClosed">Karta zamknięta</string>
     <string name="tabClosedUndo">Cofnij</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
-    <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA WITRYNY</string>
-    <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA WITRYNY</string>
+    <string name="privacyProtectionEnabled">WŁĄCZONA OCHRONA STRONY</string>
+    <string name="privacyProtectionDisabled">WYŁĄCZONA OCHRONA STRONY</string>
     <string name="privacyDashboardActivityTitle">Panel zarządzania prywatnością</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">ULEPSZONY Z &lt;img src=\"%1$d\" /&gt; NA &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">USPRAWNIONY OD &lt;img src=\"%1$d\" /&gt; DO &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Poziom prywatności</string>
     <string name="privacyProtectionTemporarilyDisabled">Tymczasowo wyłączyliśmy ochronę prywatności, ponieważ wygląda na to, że zniekształca tę witrynę.</string>
 
@@ -120,31 +120,31 @@
     <string name="networksOverview">Sieci skryptów śledzących tworzą historię wyszukiwania w formie profilu informacyjnego na Twój temat. Największe sieci skryptów śledzących są bardziej szkodliwe, ponieważ mogą śledzić i namierzać Cię na większym obszarze Internetu.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">Znaleziono %1$s skrypt śledzący</item>
-        <item quantity="few">Znaleziono %1$s skrypty śledzące</item>
-        <item quantity="many">Znaleziono %1$s skryptów śledzących</item>
-        <item quantity="other">Znaleziono %1$s skryptu śledzącego</item>
+        <item quantity="one">%1$s Znaleziono tracker</item>
+        <item quantity="few">%1$s Znaleziono trackery</item>
+        <item quantity="many">%1$s Znaleziono trackerów</item>
+        <item quantity="other">%1$s Znaleziono trackery</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">Zablokowano %1$s skrypt śledzący</item>
-        <item quantity="few">Zablokowano %1$s skrypty śledzące</item>
-        <item quantity="many">Zablokowano %1$s skryptów śledzących</item>
-        <item quantity="other">Zablokowano %1$s skryptu śledzącego</item>
+        <item quantity="one">%1$s Zablokowany tracker</item>
+        <item quantity="few">%1$s Zablokowane trackery</item>
+        <item quantity="many">%1$s Zablokowanych trackerów</item>
+        <item quantity="other">%1$s Zablokowane trackery</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">Znaleziono %1$s dużą sieć skryptów śledzących</item>
-        <item quantity="few">Znaleziono %1$s duże sieci skryptów śledzących</item>
-        <item quantity="many">Znaleziono %1$s dużych sieci skryptów śledzących</item>
-        <item quantity="other">Znaleziono %1$s dużej sieci skryptów śledzących</item>
+        <item quantity="one">%1$s Znaleziono główną sieć śledzenia</item>
+        <item quantity="few">%1$s Znaleziono główne sieci śledzenia</item>
+        <item quantity="many">%1$s Znaleziono główne sieci śledzenia</item>
+        <item quantity="other">%1$s Znaleziono główne sieci śledzenia</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">Zablokowano %1$s dużą sieć skryptów śledzących</item>
-        <item quantity="few">Zablokowano %1$s duże sieci skryptów śledzących</item>
-        <item quantity="many">Zablokowano %1$s dużych sieci skryptów śledzących</item>
-        <item quantity="other">Zablokowano %1$s dużej sieci skryptów śledzących</item>
+        <item quantity="one">%1$s Zablokowana główna sieć śledząca</item>
+        <item quantity="few">%1$s Zablokowano główne sieci śledzenia</item>
+        <item quantity="many">%1$s Zablokowano główne sieci śledzenia</item>
+        <item quantity="other">%1$s Zablokowano główne sieci śledzenia</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Poziom prywatności</string>
@@ -154,7 +154,7 @@
 
     <string name="privacyTermsActivityTitle">Polityka prywatności</string>
     <string name="practicesGood">Dobra polityka prywatności</string>
-    <string name="practicesMixed">Przeciętna polityka prywatności</string>
+    <string name="practicesMixed">Zróżnicowana polityka prywatności</string>
     <string name="practicesBad">Słaba polityka prywatności</string>
     <string name="practicesUnknown">Nieznana polityka prywatności</string>
     <string name="practicesOverview">Polityka prywatności wskazuje, jak wiele informacji osobowych udostępnianych danej stronie podlega ochronie.</string>
@@ -162,7 +162,7 @@
     <string name="practicesIconContentGood">Ikona dobrej polityki prywatności</string>
     <string name="practicesIconContentBad">Ikona złej polityki prywatności</string>
 
-    <string name="networkTrackerSummaryHeader">SIECI SKRYPTÓW ŚLEDZĄCYCH – NAJWIĘKSI SPRAWCY</string>
+    <string name="networkTrackerSummaryHeader">SIECI SKRYPTÓW ŚLEDZĄCYCH – NAJWIĘKSI ZŁOCZYŃCY</string>
     <string name="networkTrackerSummaryNotReady">Nadal gromadzimy dane, aby pokazać, jak wiele skryptów śledzących zablokowaliśmy.</string>
 
     <!-- Fire -->
@@ -181,7 +181,18 @@
     <string name="settingsVersion">Wersja</string>
     <string name="leaveFeedback">Podziel się opinią</string>
     <string name="settingsEmailProtectionTitle">Ochrona poczty e-mail</string>
-    <string name="settingsEmailProtectionSubtitle">Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres.</string>
+    <string name="settingsEmailProtectionSubtitle">Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres</string>
+    <string name="settingsHeadingMore">Więcej możliwości DuckDuckGo</string>
+    <string name="settingsLightTheme">Jasny</string>
+    <string name="settingsTheme">Motyw</string>
+    <string name="settingsDarkTheme">Ciemny</string>
+    <string name="settingsSystemTheme">Domyślne ustawienie systemowe</string>
+    <string name="settingsThemeDialogSave">Ustaw motyw</string>
+    <string name="settingsTitleAppLinks">Otwieraj łącza w aplikacjach</string>
+    <string name="settingsTitleAppLinksDialog">Otwieraj łącza w aplikacjach</string>
+    <string name="settingsAppLinksAskEveryTime">Pytaj za każdym razem</string>
+    <string name="settingsAppLinksAlways">Zawsze</string>
+    <string name="settingsAppLinksNever">Nigdy</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -209,11 +220,11 @@
     <string name="no_suggestions">Brak sugestii</string>
 
     <!-- Broken Site Activity -->
-    <string name="brokenSiteReportBrokenSiteMenuItem">Zgłoś uszkodzoną witrynę</string>
+    <string name="brokenSiteReportBrokenSiteMenuItem">Zgłoś wadliwą stronę</string>
     <string name="brokenSiteHeading">Zgłoś uszkodzoną witrynę</string>
     <string name="brokenSiteSubmitted">Dziękujemy! Informacje zostały przekazane.</string>
     <string name="brokenSitesCategoriesTitle">Opisz, co się stało</string>
-    <string name="brokenSitesCategoriesHint">Opisz, co się stało</string>
+    <string name="brokenSitesCategoriesHint">Opisz co się stało</string>
     <string name="brokenSiteSubmitButton">Wyślij raport</string>
     <string name="brokenSiteDescription">Przesłanie anonimowego raportu o uszkodzonej witrynie pomaga nam debugować te problemy i ulepszać aplikację.</string>
 
@@ -259,6 +270,21 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Dodaj do Ulubionych</string>
+    <string name="widgetConfigurationTitleText">Wybierz motyw</string>
+    <string name="widgetConfigurationSystemThemeOption">Domyślne ustawienie systemowe</string>
+    <string name="widgetConfigurationLightThemeOption">Jasny</string>
+    <string name="widgetConfigurationDarkThemeOption">Ciemny</string>
+    <string name="widgetConfigurationAddWidgetOption">Dodaj widżet</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Nie dodano jeszcze ulubionych</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Dodaj do Ulubionych</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Odwiedź swoje ulubione strony w mgnieniu oka!Przejdź do swojej ulubionej witryny. Następnie dotknij ikony „ ⠇” i wybierz Dodaj do ulubionych.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Odwiedź swoje ulubione strony w mgnieniu oka! Przejdź do swojej ulubionej witryny. Następnie dotknij ikony menu przeglądarki i wybierz Dodaj do ulubionych.</string>
+    <string name="widgetConfigurationActivityTitle">Konfiguracja widżetu</string>
+    <string name="favoritesWidgetLabel">Ulubione</string>
+    <string name="searchWidgetLabel">Szukaj</string>
+
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Dodaj do ekranu głównego</string>
     <string name="shortcutAddedText">Sukces! %1$s został dodany do Twojego ekranu głównego.</string>
@@ -272,15 +298,15 @@
     <string name="surveyTitle">ANKIETA DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Zignoruj ankietę</string>
     <string name="surveyLoadingErrorTitle">O nie!</string>
-    <string name="surveyLoadingErrorText">Nasza ankieta nie wczytuje się.\nSpróbuj ponownie później.</string>
+    <string name="surveyLoadingErrorText">Nasza ankieta nie wczytuje się.\nProsimy spróbować później.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Wypróbuj widżet naszej wyszukiwarki!</string>
-    <string name="addWidgetCtaDescription">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
-    <string name="addWidgetCtaAutoLaunchButton">Dodaj widżet</string>
+    <string name="addWidgetCtaDescription">Dodaj widget naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Dodaj widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Pokaż mi</string>
     <string name="addWidgetCtaDismissButton">Odrzuć</string>
-    <string name="addWidgetInstructionsActivityTitle">Dodaj widżet</string>
+    <string name="addWidgetInstructionsActivityTitle">Dodaj widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Przyciśnij i przytrzymaj ekran główny, a następnie otwórz menu z widżetami.</string>
     <string name="addWidgetInstruction2Label">2</string>
@@ -294,7 +320,7 @@
     <string name="appEnjoymentDialogTitle">Podoba Ci się DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Chcielibyśmy poznać Twoją opinię.</string>
     <string name="appEnjoymentDialogPositiveButton">Podoba mi się</string>
-    <string name="appEnjoymentDialogNegativeButton">Wymaga dopracowania</string>
+    <string name="appEnjoymentDialogNegativeButton">DuckDuckGo wymaga dopracowania</string>
 
     <string name="rateAppDialogTitle">Oceń aplikację</string>
     <string name="rateAppDialogMessage">Twoja opinia ma znaczenie. Podziel się swoimi wrażeniami – napisz recenzję.</string>
@@ -311,7 +337,7 @@
     <!-- Notification Channel Names -->
     <string name="notificationChannelFileDownloading">Pobieranie pliku</string>
     <string name="notificationChannelFileDownloaded">Plik został pobrany</string>
-    <string name="notificationChannelTutorials">Samouczki</string>
+    <string name="notificationChannelTutorials">Tutoriale</string>
 
     <!-- Clear Notification -->
     <string name="clearNotificationTitle">Kasowanie danych jest przełączone na tryb ręczny</string>
@@ -321,9 +347,9 @@
     <string name="privacyProtectionNotificationDefaultTitle">Chronimy Twoją prywatność</string>
     <string name="privacyProtectionNotificationReportTitle">Twój raport na temat prywatności</string>
     <string name="privacyProtectionNotificationDefaultDescription">Aplikacja DuckDuckGo chroni Twoje dane, blokując skrypty śledzące i szyfrując połączenia.</string>
-    <string name="privacyProtectionNotificationUpgadeDescription">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając niezaszyfrowane połączenia (%1$d) dzięki DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) dzięki DuckDuckGo.</string>
-    <string name="privacyProtectionNotificationBothDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując skrypty śledzące (%1$d) zabezpieczając niezaszyfrowane połączenia (%2$d) dzięki DuckDuckGo.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription">Zapewniłeś(-aś) swoim danym ochronę, zabezpieczając dzięki DuckDuckGo %1$d niezaszyfrowanych połączeń.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących.</string>
+    <string name="privacyProtectionNotificationBothDescription">Zapewniłeś(-aś) swoim danym ochronę, blokując dzięki DuckDuckGo %1$d skryptów śledzących i zabezpieczając %2$d niezaszyfrowanych połączeń.</string>
     <string name="privacyProtectionNotificationLaunchButton">Powróć do przeglądania</string>
 
     <!-- Authentication -->
@@ -343,16 +369,16 @@
     <string name="missingBrowserFeaturesTitleShort">Problemy funkcji przeglądarki</string>
     <string name="missingBrowserFeaturesSubtitle">Jaką funkcję przeglądania stron powinniśmy dodać lub usprawnić?</string>
     <string name="missingBrowserFeatureSubReasonNavigation">Przejście do przodu, wstecz i/lub odświeżenie</string>
-    <string name="missingBrowserFeatureSubReasonTabManagement">Tworzenie kart i zarządzanie nimi</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Tworzenie i zarządzanie kartami</string>
     <string name="missingBrowserFeatureSubReasonAdPopups">Blokowanie reklam i wyskakujących okienek</string>
-    <string name="missingBrowserFeatureSubReasonVideos">Oglądanie filmów</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Oglądanie filmików</string>
     <string name="missingBrowserFeatureSubReasonImages">Obsługa obrazów</string>
-    <string name="missingBrowserFeatureSubReasonBookmarks">Tworzenie zakładek i zarządzanie nimi</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Tworzenie i zarządzanie zakładkami</string>
     <string name="missingBrowserFeatureSubReasonOther">Żadne z powyższych</string>
 
     <string name="websiteNotLoadingTitleLong">Problemy z wczytywaniem stron</string>
     <string name="websiteNotLoadingTitleShort">Problemy z wczytywaniem stron</string>
-    <string name="websiteNotLoadingSubtitle">Która witryna nie działa poprawnie?</string>
+    <string name="websiteNotLoadingSubtitle">Która strona nie działa poprawnie?</string>
 
     <string name="searchNotGoodEnoughTitleLong">Funkcja wyszukiwania DuckDuckGo nie jest wystarczająco dobra</string>
     <string name="searchNotGoodEnoughTitleShort">Problemy wyszukiwania za pośrednictwem DuckDuckGo</string>
@@ -380,7 +406,7 @@
     <string name="appIsSlowOrBuggySubtitle">Jakie problemy napotkałeś(-aś)?</string>
     <string name="appIsSlowOrBuggySubReasonSlowResults">Strony lub wyniki wyszukiwania wczytują się powoli</string>
     <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikacja przestaje działać lub zawiesza się</string>
-    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Błędy podczas odtwarzania filmów i mediów</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Błędy podczas wyświetlania filmów i mediów</string>
     <string name="appIsSlowOrBuggySubReasonOther">Żadne z powyższych</string>
 
     <string name="otherMainReasonTitleLong">Żadne z powyższych</string>
@@ -399,7 +425,7 @@
     <string name="awesomeToHear">Świetnie!</string>
     <string name="shareTheLoveWithARating">Podziel się swoimi wrażeniami, oceniając nas w Play Store.</string>
     <string name="rateTheApp">OCEŃ APLIKACJĘ</string>
-    <string name="declineFurtherFeedback">NIE, DZIĘKUJĘ, SKOŃCZYŁEM(-AM)</string>
+    <string name="declineFurtherFeedback">NIE, DZIĘKUJĘ, SKOŃCZYŁEM(-AM).</string>
     <string name="whichBrokenSites">Gdzie dostrzegasz te problemy?</string>
     <string name="whichBrokenSitesHint">Z jaką stroną związane są problemy?</string>
     <string name="feedbackSpecificAsPossible">Podaj jak najdokładniejsze informacje</string>
@@ -411,36 +437,36 @@
 
     <!-- Webview Recovery -->
     <string name="crashedWebViewErrorMessage">"Nie można wyświetlić strony internetowej."</string>
-    <string name="crashedWebViewErrorAction">"Załaduj ponownie"</string>
+    <string name="crashedWebViewErrorAction">"Przeładuj"</string>
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Z tego urządzenia</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">Wyszukaj lub wpisz adres URL</font></string>
     <string name="systemSearchAppNotFound">Nie można znaleźć aplikacji</string>
     <string name="systemSearchOnboardingText">Dziękujemy za wybranie DuckDuckGo!\nTeraz, gdy korzystasz z naszej wyszukiwarki lub aplikacji, Twoje wyszukiwania są chronione.</string>
-    <string name="systemSearchOnboardingFeaturesIntroText">Ponadto aplikacja DuckDuckGo:</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikacja DuckDuckGo także:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokuje niebezpieczne skrypty śledzące.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Wymusza szyfrowanie na stronach internetowych.</string>
     <string name="systemSearchOnboardingFeatureThreeText">Usuwa dane za jednym dotknięciem.</string>
     <string name="systemSearchOnboardingButtonMore">Pokaż więcej</string>
-    <string name="systemSearchOnboardingButtonLess">Ukryj</string>
+    <string name="systemSearchOnboardingButtonLess">Ukryć</string>
     <string name="systemSearchOnboardingButtonOk">Rozumiem</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">UKRYJ</string>
+    <string name="daxDialogHideButton">UKRYĆ</string>
     <string name="daxDialogPhew">Uff!</string>
-    <string name="daxDialogNext">Dalej</string>
+    <string name="daxDialogNext">Kolejny</string>
     <string name="daxDialogHighFive">Piątka!</string>
     <string name="daxDialogGotIt">Rozumiem</string>
     <string name="hideTipsTitle">Ukryć pozostałe wskazówki?</string>
-    <string name="hideTipsText">Jest ich tylko kilka i staraliśmy się, aby były pouczające.</string>
+    <string name="hideTipsText">Jest tylko kilka i staraliśmy się, aby były one pouczające.</string>
     <string name="hideTipsButton">Ukryj wskazówki na zawsze</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Witamy w DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internet może być trochę nieprzyjemny.<br/><br/>Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze, niż myślisz.]]></string>
+    <string name="onboardingWelcomeTitle">"WITAMY W DUCKDUCKGO"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet może być trochę nieprzyjemny.<br/><br/>Bez obaw! Prywatne wyszukiwanie i przeglądanie jest łatwiejsze niż myślisz.]]></string>
     <string name="onboardingLetsDoItButton">Zróbmy to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Spróbuj teraz odwiedzić jedną z Twoich ulubionych witryn!<br/><br/>Zablokuję skrypty śledzące, aby nie mogły Cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo połączenia. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! <br/><br/>Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Udało się!<br/><br/>Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. 👍]]></string>
     <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
@@ -455,12 +481,12 @@
         <item quantity="many"><![CDATA[ próbowało Cię tu śledzić. <br/><br/>Zablokowałem to!<br/><br/> ☝️ Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
         <item quantity="other"><![CDATA[ próbowało Cię tu śledzić. <br/><br/>Zablokowałem to!<br/><br/> ☝️ Możesz sprawdzić pasek adresu URL, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.<br/><br/>Śmiało – przeglądaj dalej!]]></string>
-    <string name="daxMainNetworkCtaText">Uwaga! Nie możemy powstrzymać %1$s przed zobaczeniem Twojej aktywności na %2$s.&lt;br/&gt;&lt;br/&gt;Przeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące w wielu innych witrynach.</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Gdy korzystasz z przeglądarki, ja blokuję nieznośne moduły śledzące.<br/><br/>Śmiało – kontynuuj przeglądanie.]]></string>
+    <string name="daxMainNetworkCtaText">Uwaga! Nie możemy powstrzymać %1$s przed zobaczeniem Twojej aktywności na %2$s.\n\nPrzeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące w wielu innych witrynach.</string>
     <string name="daxMainNetworkOwnedCtaText">Uwaga! Ponieważ firma %1$s jest właścicielem %2$s, nie możemy jej powstrzymać przez zobaczeniem tutaj Twojej aktywności.&lt;br/&gt;&lt;br/&gt;Przeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące na wielu innych stronach.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Kontynuuj</string>
+    <string name="downloadConfirmationContinue">Dalej</string>
     <string name="downloadConfirmationSaveFileTitle">Zapisz %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Zatrzymaj oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Zastąp</string>
@@ -493,7 +519,7 @@
     <string name="whitelistEntryDeleteConfirmMessage">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt; z niezabezpieczonych witryn?</string>
     <string name="whitelistExplanation">Te witryny nie będą ulepszane przez ochronę prywatności.</string>
     <string name="whitelistNoEntries">Ochrona prywatności włączona dla wszystkich witryn</string>
-    <string name="whitelistDomainHint">www.domena.pl</string>
+    <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Wprowadź domenę, na przykład <b>domena.pl</b>, i spróbuj ponownie</string>
 
     <!-- Settings -->
@@ -531,15 +557,15 @@
     <string name="settingsSelectFireAnimationDialogSave">Zapisz</string>
 
     <!-- Dos Attack error-->
-    <string name="dosErrorMessage">Połączenie nie powiodło się. Ta witryna może być szkodliwa dla Twojego urządzenia.</string>
+    <string name="dosErrorMessage">Połączenie nie powiodło się. Ta strona może być szkodliwa dla Twojego urządzenia.</string>
 
     <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Wyłączono Menedżer pobierania</string>
+    <string name="downloadManagerDisabled">Wyłączono Menedżera pobierania</string>
     <string name="downloadManagerIncompatible">Menedżer pobierania nie jest dostępny na tym urządzeniu</string>
     <string name="enable">Włącz</string>
 
     <!-- Precise Location -->
-    <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce DuckDuckGo Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce prywatności DuckDuckGo?</string>
     <string name="preciseLocationSystemDialogSubtitle">%1$s prosi o dostęp do lokalizacji Twojego urządzenia. Najpierw musisz zezwolić aplikacji na wysyłanie lokalizacji urządzenia, a następnie %2$s może poprosić o pozwolenie.</string>
     <string name="preciseLocationSystemDialogAllow">Włącz</string>
     <string name="preciseLocationSystemDialogDeny">Może później</string>
@@ -557,7 +583,7 @@
     <string name="preciseLocationEmptyListHint">Żadna witryna nie może uzyskać dostępu do mojej lokalizacji</string>
     <string name="preciseLocationNoSystemPermission">Aby zarządzać uprawnieniami dostępu do lokalizacji przyznanymi poszczególnym witrynom, włącz lokalizację dla tej aplikacji w Ustawieniach systemu Android.</string>
     <string name="preciseLocationActivityTitle">Lokalizacja</string>
-    <string name="preciseLocationDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="preciseLocationDeleteConfirmMessage">Na pewno usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="preciseLocationDeleteContentDescription">Więcej opcji dotyczących uprawnień do lokalizacji w domenie %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Zgoda</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Odmowa</string>
@@ -580,6 +606,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Otwieraj łącza w powiązanych aplikacjach</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Wyłącz, aby uniemożliwić automatyczne otwieranie łączy w innych zainstalowanych aplikacjach.</string>
     <string name="appLinkDialogTitle">Otworzyć w innej aplikacji?</string>
+    <string name="appLinkSnackBarAction">Otwórz w aplikacji</string>
+    <string name="appLinkMultipleSnackBarAction">Wybierz aplikację</string>
+    <string name="appLinkSnackBarMessage">Możesz otworzyć ten link w %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Możesz otworzyć ten link w innych aplikacjach.</string>
+    <string name="appLinkIntentChooserTitle">Otwórz za pomocą</string>
+    <string name="appLinkMenuItemTitle">Otwórz w aplikacji</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nowy adres skopiowany do schowka</string>
@@ -597,26 +629,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Lista oczekujących na ochronę poczty e-mail</string>
-    <string name="waitlistNotificationTitle">Twoje zaproszenie do ochrony poczty e-mail jest gotowe!</string>
-    <string name="waitlistNotificationDescription">Jesteś już na liście oczekujących i powiadomimy Cię, gdy nadejdzie Twoja kolej na wypróbowanie funkcji ochrony poczty e-mail. Dotknij, aby wyświetlić swoje zaproszenie.</string>
+    <string name="waitlistNotificationTitle">Ochrona poczty e-mail jest gotowa!</string>
+    <string name="waitlistNotificationDescription">Otwórz zaproszenie</string>
 
     <string name="waitlistNotificationDialogDescription">Czy chcesz, abyśmy wysłali Ci powiadomienie, gdy nadejdzie Twoja kolej?</string>
-    <string name="waitlistNotificationDialogNoThanks">NIE, DZIĘKUJĘ</string>
+    <string name="waitlistNotificationDialogNoThanks">Nie, dziękuję</string>
     <string name="waitlistNotificationDialogNotifyMe">POWIADOM MNIE</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
     <string name="emailProtectionActivityTitle">Ochrona poczty e-mail (wersja beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Nie zapisujemy Twoich wiadomości e-mail. <b><a href=\"\">Dowiedz się więcej</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Nie musisz udostępniać żadnych danych osobowych, aby dołączyć do listy oczekujących. Miejsce w kolejce zostanie zarezerwowane zgodnie z sygnaturą czasową przechowywaną wyłącznie na Twoim urządzeniu, aby umożliwić nam powiadomienie, gdy nadejdzie Twoja kolej.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Wystąpił błąd podczas dołączania do listy oczekujących, spróbuj ponownie później</string>
     <string name="emailProtectionDuckAddressCta">Mam już adres Duck</string>
     <string name="emailProtectionInviteCodeCta">Mam kod zaproszenia</string>
     <string name="emailProtectionWaitlistCta">Dołącz do prywatnej listy oczekujących</string>
     <string name="emailProtectionGetStartedCta">Rozpocznij</string>
+    <string name="emailNotSupported">Urządzenie nie jest obsługiwane</string>
+    <string name="emailNotSupportedExplanation">Ochrona poczty e-mail umożliwia tworzenie prywatnych adresów e-mail, które usuwają skrypty śledzące wiadomości e-mail. Musimy szyfrować i przechowywać tworzone adresy lokalnie na Twoim urządzeniu. Ponieważ Twoje urządzenie nie obsługuje szyfrowanego przechowywania, ochrona poczty e-mail jest niedostępna.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Uproszczona prywatność poczty e-mail.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jesteś na liście!</string>
@@ -625,7 +659,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Masz już zaproszenie!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres<br/>bez zmiany dostawcy poczty e-mail. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobisty adres Duck</string>
@@ -633,4 +667,48 @@
         <![CDATA[Usunięcie ochrony poczty e-mail z tego urządzenia usuwa opcję wpisywania osobistego adresu Duck lub nowo wygenerowanego prywatnego adresu Duck w polach adresu e-mail podczas przeglądania sieci.<br/><br/>Aby całkowicie usunąć swoje adresy Duck bądź przesłać jakiekolwiek pytania lub opinie, skontaktuj się z nami pod adresem <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Usuń z urządzenia</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Edytuj zakładkę</string>
+    <string name="favoriteDialogTitleEdit">Edytuj ulubione</string>
+    <string name="locationLabel">Lokalizacja</string>
+    <string name="folderLocationTitle">Wybierz lokalizację</string>
+    <string name="addFolder">Dodaj folder</string>
+    <string name="editFolder">Edytuj folder</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Czy na pewno chcesz usunąć "</string>
+    <string name="bookmarkFolderEmpty">Pusty</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s %2$s i %3$d element?</item>
+        <item quantity="few">%1$s %2$s i %3$d elementy?</item>
+        <item quantity="many">%1$s %2$s i %3$d elementów?</item>
+        <item quantity="other">%1$s %2$s i %3$d elementu?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d element</item>
+        <item quantity="few">%1$d elementy</item>
+        <item quantity="many">%1$d elementów</item>
+        <item quantity="other">%1$d elementu</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Dostępność</string>
+    <string name="accessibilityActivityTitle">Dostępność</string>
+    <string name="accessibilityFontSizeTitle">Rozmiar tekstu</string>
+    <string name="accessibilityFontSizeHint">Przeciągnij suwak, aby przeczytać to bez problemu. Ustawienie będzie miało wpływ na witryny wyświetlane w przeglądarce DuckDuckGo.</string>
+    <string name="accessibilityForceZoomTitle">Wymuszaj ręczne powiększanie strony</string>
+    <string name="accessibilityForceZoomSubtitle">Uszczypnij i powiększ dowolną witrynę, nawet taką, która w innym przypadku by to uniemożliwiła</string>
+    <string name="accessibilityTextSizeOverrideTitle">Zarządzaj rozmiarem tekstu</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Poniższe ustawienie będzie miało wpływ na tekst witryn wyświetlanych w przeglądarce DuckDuckGo</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Polityka prywatności</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Nie udało się pobrać. Sprawdź połączenie internetowe.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Dodano widżet %1$s do ekranu głównego</string>
+    <string name="settingsAddHomeScreenWidget">Widżet ekranu głównego</string>
 </resources>
