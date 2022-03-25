@@ -679,6 +679,7 @@ class BrowserTabFragment :
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -1541,7 +1542,7 @@ class BrowserTabFragment :
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = when(savedSite) {
+        val message = when (savedSite) {
             is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
             is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
         }
@@ -1580,6 +1581,18 @@ class BrowserTabFragment :
             })
         }
         snackbar.show()
+    }
+
+    private fun removeFireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
+        rootView.makeSnackbarWithNoBottomInset(
+            getString(R.string.fireproofDeleteConfirmationMessage),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.onRemoveFireproofWebsiteSnackbarUndoClicked(entity)
+            }
+            show()
+        }
     }
 
     private fun launchSharePageChooser(url: String) {

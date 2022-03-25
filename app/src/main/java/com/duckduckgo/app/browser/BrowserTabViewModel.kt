@@ -330,6 +330,7 @@ class BrowserTabViewModel(
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
@@ -1753,7 +1754,9 @@ class BrowserTabViewModel(
         val domain = site?.domain ?: return
         viewModelScope.launch {
             if (currentBrowserViewState().isFireproofWebsite) {
-                fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity(domain))
+                val fireproofWebsiteEntity = FireproofWebsiteEntity(domain)
+                fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
+                command.value = DeleteFireproofConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
                 pixel.fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
             } else {
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
@@ -1804,6 +1807,13 @@ class BrowserTabViewModel(
     fun onFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
+            pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+        }
+    }
+
+    fun onRemoveFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofWebsiteRepository.fireproofWebsite(fireproofWebsiteEntity.domain)
             pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
         }
     }
