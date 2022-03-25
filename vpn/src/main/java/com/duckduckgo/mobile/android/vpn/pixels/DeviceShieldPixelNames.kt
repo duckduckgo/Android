@@ -97,8 +97,10 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_KILLED_VPN_REVOKED("m_atp_ev_revoke_kill_c"),
 
     ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE("m_atp_imp_article_c"),
+    ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE_DAILY("m_atp_imp_article_d"),
 
     ATP_DID_SHOW_ONBOARDING_FAQ("m_atp_imp_onboarding_faq_c"),
+    ATP_DID_SHOW_ONBOARDING_FAQ_DAILY("m_atp_imp_onboarding_faq_d"),
 
     ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_tun_error_d"),
     ATP_ESTABLISH_TUN_INTERFACE_ERROR("m_atp_ev_establish_tun_error_c"),
@@ -159,8 +161,25 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_RECEIVED_UNKNOWN_PACKET_PROTOCOL_DAILY("m_atp_ev_unknown_packet_%d_d"),
 
     ATP_DID_SHOW_VPN_CONFLICT_DIALOG("m_atp_imp_vpn_conflict_dialog_c"),
+    ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_dismiss_d"),
     ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_dismiss_c"),
+    ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_open_settings_d"),
     ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_open_settings_c"),
-    ATP_DID_CHOOSE_CONTINUIE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
+    ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG("m_atp_ev_vpn_conflict_dialog_continue_c"),
+    ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY("m_atp_ev_vpn_conflict_dialog_continue_d"),
+
+    ATP_DID_OPEN_BETA_INSTRUCTIONS("m_atp_imp_beta_instructions_c"),
+    ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY("m_atp_imp_beta_instructions_d"),
+
+    ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_UNIQUE("m_atp_imp_exclusion_list_activity_u"),
+    ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_DAILY("m_atp_imp_exclusion_list_activity_d"),
+    ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY("m_atp_imp_exclusion_list_activity_c"),
+    ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS("m_atp_ev_exclusion_list_activity_open_trackers_c"),
+    ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_DAILY("m_atp_ev_exclusion_list_activity_open_trackers_d"),
+    ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_UNIQUE("m_atp_ev_exclusion_list_activity_open_trackers_u"),
+
+    ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE("m_atp_imp_company_trackers_activity_u"),
+    ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY("m_atp_imp_company_trackers_activity_d"),
+    ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY("m_atp_imp_company_trackers_activity_c"),
     ;
 }

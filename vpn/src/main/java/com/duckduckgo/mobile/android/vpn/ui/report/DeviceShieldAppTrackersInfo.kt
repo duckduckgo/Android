@@ -22,8 +22,13 @@ import android.os.Bundle
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityAppTrackersInfoBinding
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import javax.inject.Inject
 
 class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private val binding: ActivityAppTrackersInfoBinding by viewBinding()
 
@@ -32,6 +37,8 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
+        deviceShieldPixels.privacyReportArticleDisplayed()
     }
 
     override fun onSupportNavigateUp(): Boolean {
