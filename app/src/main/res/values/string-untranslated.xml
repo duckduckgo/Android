@@ -111,4 +111,5 @@
     <string name="requestMobileSiteMenuTitle">Mobile Site</string>
     <string name="downloadsMenuTitle">Downloads</string>
     <string name="printMenuTitle">Print Page</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
 </resources>

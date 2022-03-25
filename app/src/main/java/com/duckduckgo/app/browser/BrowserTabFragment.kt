@@ -160,6 +160,8 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
 import android.view.ViewGroup.LayoutParams
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -1539,7 +1541,10 @@ class BrowserTabFragment :
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
+        val message = when(savedSite) {
+            is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
+            is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
+        }
         viewModel.deleteQuickAccessItem(savedSite)
         rootView.makeSnackbarWithNoBottomInset(
             message,
