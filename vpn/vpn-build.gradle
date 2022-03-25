@@ -43,6 +43,7 @@ dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
 
     implementation Kotlin.stdlib.jdk7
 

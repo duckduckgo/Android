@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.feature.settings
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 
-enum class AppTpFeatureName(override val value: String) : FeatureName {
-    AppTrackerProtection("appTrackerProtection"),
+/**
+ * Convenience method to get the [AppTpSetting] from its [String] value
+ */
+internal fun appTpSettingValueOf(value: String): AppTpSetting? {
+    return AppTpSetting.values().find { it.value == value }
 }

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.remote_config
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 
-enum class AppTpFeatureName(override val value: String) : FeatureName {
-    AppTrackerProtection("appTrackerProtection"),
-}
+@Entity(tableName = "vpn_config_toggles")
+data class VpnConfigToggle(
+    @PrimaryKey(autoGenerate = false) val name: String,
+    val enabled: Boolean,
+    val isManualOverride: Boolean = false,
+    val localtime: String = DatabaseDateFormatter.timestamp(),
+)
