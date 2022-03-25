@@ -283,6 +283,7 @@
     <string name="atp_CompanyDetailsTrackingShowMore">Show %d more</string>
     <string name="atp_CompanyDetailsTrackingLearnMore">Apps may include trackers from other companies for things like analytics and marketing. If we didn\'t block them, these trackers could create even more detailed digital profiles on you. <annotation type="learn_more_link">Learn more.</annotation></string>
     <string name="atp_CompanyDetailsTrackingShowLess">Show Less</string>
+    <string name="atp_CompanyDetailsAppInfoPanel"><b>App Tracking Protection is currently disabled for this app.</b>\nDid App Tracking Protection cause a problem with this app? <annotation type="report_issues_link">Report Issues</annotation></string>
 
     <!--  App Tracking Company Signals -->
     <string name="atp_TrackingSignalAAID">Android Advertising ID</string>
@@ -354,5 +355,4 @@
     <string name="atp_VpnConflictDialogCancel">Cancel</string>
     <string name="atp_VpnConflictDialogOpenSettings">Open Settings</string>
     <string name="atp_VpnConflictDialogGotIt">Got it</string>
-
 </resources>

@@ -20,7 +20,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
+import android.widget.CompoundButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +30,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -37,7 +39,6 @@ import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTracker
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -46,11 +47,16 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
 
     private val itemsAdapter = AppTPCompanyDetailsAdapter()
+    private lateinit var appEnabledSwitch: SwitchCompat
 
     private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
         if (!it.isEmpty()) {
             Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
         }
+    }
+
+    private val toggleAppSwitchListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onAppPermissionToggled(isChecked, getPackage())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,29 +89,25 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                 getPackage()
             )
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect {
+                .collect { viewState ->
                     binding.trackingAttempts.text = resources.getQuantityString(
                         R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
-                        it.totalTrackingAttempts, it.totalTrackingAttempts
+                        viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
                     )
-                    binding.includeToolbar.appTrackdAgo.text = it.lastTrackerBlockedAgo
-                    itemsAdapter.updateData(it.trackingCompanies)
+                    binding.includeToolbar.appTrackdAgo.text = viewState.lastTrackerBlockedAgo
+                    itemsAdapter.updateData(viewState.trackingCompanies)
+                    appEnabledSwitch.quietlySetIsChecked(viewState.protectionEnabled, toggleAppSwitchListener)
                 }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_company_trackers_activity, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.reportIssue -> {
-                launchFeedback(); true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
+        val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
+        appEnabledSwitch = switchMenuItem?.actionView as SwitchCompat
+        appEnabledSwitch.isEnabled = false
+        return true
     }
 
     private fun launchFeedback() {

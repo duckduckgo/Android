@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -24,12 +25,14 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
@@ -37,6 +40,7 @@ class AppTPCompanyTrackersViewModel
 @Inject
 constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
+    private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
@@ -45,16 +49,22 @@ constructor(
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
 
-    suspend fun getTrackersForAppFromDate(date: String, packageName: String): Flow<ViewState> =
+    suspend fun getTrackersForAppFromDate(
+        date: String,
+        packageName: String
+    ): Flow<ViewState> =
         withContext(dispatchers.io()) {
             return@withContext statsRepository
                 .getTrackersForAppFromDate(date, packageName)
                 .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
-                .map { aggregateDataPerApp(it) }
+                .map { aggregateDataPerApp(it, packageName) }
                 .flowOn(Dispatchers.Default)
         }
 
-    private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
+    private fun aggregateDataPerApp(
+        trackerData: List<VpnTrackerCompanySignal>,
+        packageName: String
+    ): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
         val lastTrackerBlockedAgo =
@@ -97,7 +107,7 @@ constructor(
             )
         }
 
-        return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
+        return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData, excludedAppsRepository.isAppProtectionEnabled(packageName))
     }
 
     private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
@@ -106,11 +116,28 @@ constructor(
         return randomElements.distinctBy { it.signalDisplayName }
     }
 
+    fun onAppPermissionToggled(
+        checked: Boolean,
+        packageName: String
+    ) {
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                if (checked){
+                    excludedAppsRepository.manuallyEnabledApp(packageName)
+                } else {
+                    excludedAppsRepository.manuallyExcludedApp(packageName)
+                }
+            }
+        }
+    }
+
     data class ViewState(
         val totalTrackingAttempts: Int,
         val lastTrackerBlockedAgo: String,
-        val trackingCompanies: List<CompanyTrackingDetails>
+        val trackingCompanies: List<CompanyTrackingDetails>,
+        val protectionEnabled: Boolean
     )
+
     data class CompanyTrackingDetails(
         val companyName: String,
         val companyDisplayName: String,

@@ -20,8 +20,9 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/reportIssue"
-        android:title="@string/atp_CompanyDetailsTrackingMenuReport"
-        app:showAsAction="never"/>
+        android:id="@+id/deviceShieldSwitch"
+        android:title="@string/atp_EnableCTA"
+        app:showAsAction="always"
+        app:actionLayout="@layout/menu_item_device_tracker_switch"/>
 
 </menu>

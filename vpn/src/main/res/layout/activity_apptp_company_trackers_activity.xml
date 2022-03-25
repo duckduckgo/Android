@@ -39,6 +39,15 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                android:id="@+id/app_disabled_info_panel"
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                app:panelBackground="@drawable/background_yellow_tooltip"
+                app:panelDrawable="@drawable/ic_alert_color_24"
+                app:panelText="@string/atp_CompanyDetailsAppInfoPanel"
+                android:visibility="gone"
+                android:layout_margin="16dp"/>
+
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/tracking_attempts"
                 android:paddingStart="@dimen/keyline_4"

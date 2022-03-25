@@ -51,6 +51,9 @@ interface TrackingProtectionAppsRepository {
 
     /** Restore protection to the default list */
     suspend fun restoreDefaultProtectedList()
+
+    /** Returns if an app tracking attempts are being blocked or not */
+    fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -195,6 +198,13 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             appTrackerRepository.restoreDefaultProtectedList()
         }
+    }
+
+    override fun isAppProtectionEnabled(packageName: String): Boolean {
+        val appExclusionList = appTrackerRepository.getAppExclusionList()
+        val manualAppExclusioList = appTrackerRepository.getManualAppExclusionList()
+        val installedApp = installedApps.first { it.packageName == packageName }
+        return shouldBeExcluded(installedApp, appExclusionList, manualAppExclusioList)
     }
 
     companion object {
