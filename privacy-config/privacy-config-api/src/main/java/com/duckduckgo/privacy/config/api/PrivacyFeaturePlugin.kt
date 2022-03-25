@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,23 @@ package com.duckduckgo.privacy.config.api
 
 import com.duckduckgo.feature.toggles.api.FeatureName
 
-/** List of [FeatureName] that belong to the Privacy Configuration */
-enum class PrivacyFeatureName(override val value: String) : FeatureName {
-    ContentBlockingFeatureName("contentBlocking"),
-    GpcFeatureName("gpc"),
-    HttpsFeatureName("https"),
-    TrackerAllowlistFeatureName("trackerAllowlist"),
-    DrmFeatureName("eme"),
-    AmpLinksFeatureName("ampLinks"),
-    TrackingParametersFeatureName("trackingParameters"),
-    AutofillFeatureName("autofill"),
+/**
+ * Implement this interface and contribute it as a multibinding to get called upon downloading remote privacy config
+ *
+ * Usage:
+ *
+ * ```kotlin
+ * @ContributesMultibinding(AppScope::class)
+ * class MuFeaturePlugin @Inject constructor(...) : PrivacyFeaturePlugin {
+ *
+ * }
+ * ```
+ */
+interface PrivacyFeaturePlugin {
+    fun store(
+        name: FeatureName,
+        jsonString: String
+    ): Boolean
+
+    val featureName: FeatureName
 }

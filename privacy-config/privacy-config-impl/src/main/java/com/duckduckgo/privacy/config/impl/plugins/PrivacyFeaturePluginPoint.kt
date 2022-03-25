@@ -18,16 +18,7 @@ package com.duckduckgo.privacy.config.impl.plugins
 
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-
-interface PrivacyFeaturePlugin {
-    fun store(
-        name: PrivacyFeatureName,
-        jsonString: String
-    ): Boolean
-
-    val featureName: PrivacyFeatureName
-}
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 
 class PrivacyFeaturePluginPoint(
     private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
