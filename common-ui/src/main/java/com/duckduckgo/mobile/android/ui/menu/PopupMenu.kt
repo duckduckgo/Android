@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
-import com.duckduckgo.mobile.android.ui.view.MenuItemView
 
 class PopupMenu(
     layoutInflater: LayoutInflater,
@@ -34,16 +33,6 @@ class PopupMenu(
     init {
         elevation = ELEVATION
         animationStyle = android.R.style.Animation_Dialog
-    }
-
-    fun onMenuItemClicked(
-        menuView: MenuItemView,
-        onClick: () -> Unit
-    ) {
-        menuView.setOnClickListener {
-            onClick()
-            dismiss()
-        }
     }
 
     fun onMenuItemClicked(

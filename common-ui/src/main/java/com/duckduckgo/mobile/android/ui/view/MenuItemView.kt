@@ -73,12 +73,6 @@ constructor(
         binding.icon.setImageDrawable(drawable)
     }
 
-    fun setOnClickListener(onClick: () -> Unit) {
-        binding.root.setOnClickListener {
-            onClick()
-        }
-    }
-
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
     }
