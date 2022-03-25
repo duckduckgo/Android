@@ -830,7 +830,10 @@ class BrowserTabFragment :
             val clipboard: ClipboardManager? = ContextCompat.getSystemService(it, ClipboardManager::class.java)
             val clip: ClipData = ClipData.newPlainText("Alias", alias)
             clipboard?.setPrimaryClip(clip)
-            showToast(R.string.aliasToClipboardMessage)
+            rootView.makeSnackbarWithNoBottomInset(
+                getString(R.string.aliasToClipboardMessage),
+                Snackbar.LENGTH_LONG
+            ).show()
         }
     }
 
