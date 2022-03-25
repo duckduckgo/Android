@@ -113,4 +113,7 @@
     <string name="printMenuTitle">Print Page</string>
     <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
     <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privacy Protection enabled for %s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privacy Protection disabled for %s</string>
+    <string name="undoSnackbarAction">Undo</string>
 </resources>

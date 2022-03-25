@@ -180,7 +180,7 @@
                 app:iconDrawable="@drawable/ic_add_to_home_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/whitelistMenuItem"
+                android:id="@+id/privacyProtectionMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="@string/enablePrivacyProtection"

@@ -680,6 +680,8 @@ class BrowserTabFragment :
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
+            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
             is Command.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -1595,6 +1597,30 @@ class BrowserTabFragment :
         }
     }
 
+    private fun privacyProtectionEnabledConfirmation(domain: String) {
+        rootView.makeSnackbarWithNoBottomInset(
+            HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.undoSnackbarAction) {
+                viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
+            }
+            show()
+        }
+    }
+
+    private fun privacyProtectionDisabledConfirmation(domain: String) {
+        rootView.makeSnackbarWithNoBottomInset(
+            HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.undoSnackbarAction) {
+                viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
+            }
+            show()
+        }
+    }
+
     private fun launchSharePageChooser(url: String) {
         val intent = Intent(Intent.ACTION_SEND).also {
             it.type = "text/plain"
@@ -2082,7 +2108,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(view.whitelistMenuItem) { viewModel.onWhitelistSelected() }
+                onMenuItemClicked(view.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked() }
                 onMenuItemClicked(view.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
@@ -2423,11 +2449,11 @@ class BrowserTabFragment :
                 openInAppMenuItem.isVisible = viewState.previousAppLink != null
 
                 addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
-                whitelistMenuItem?.isVisible = viewState.canWhitelist
-                whitelistMenuItem?.label {
+                privacyProtectionMenuItem?.isVisible = viewState.canWhitelist
+                privacyProtectionMenuItem?.label {
                     getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
                 }
-                whitelistMenuItem?.setIcon(
+                privacyProtectionMenuItem?.setIcon(
                     if (viewState.isWhitelisted) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
                 )
                 brokenSiteMenuItem?.isVisible = viewState.canReportSite

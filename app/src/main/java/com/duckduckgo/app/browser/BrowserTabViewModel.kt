@@ -331,6 +331,8 @@ class BrowserTabViewModel(
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        class ShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
+        class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
@@ -1870,7 +1872,7 @@ class BrowserTabViewModel(
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
     }
 
-    fun onWhitelistSelected() {
+    fun onPrivacyProtectionMenuClicked() {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
             if (isWhitelisted(domain)) {
@@ -1888,6 +1890,7 @@ class BrowserTabViewModel(
             userWhitelistDao.insert(domain)
         }
         withContext(dispatchers.main()) {
+            command.value = Command.ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
         }
     }
@@ -1898,7 +1901,28 @@ class BrowserTabViewModel(
             userWhitelistDao.delete(domain)
         }
         withContext(dispatchers.main()) {
+            command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+        }
+    }
+
+    fun onDisablePrivacyProtectionSnackbarUndoClicked(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            userWhitelistDao.insert(domain)
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+                command.value = Refresh
+            }
+        }
+    }
+
+    fun onEnablePrivacyProtectionSnackbarUndoClicked(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            userWhitelistDao.delete(domain)
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+                command.value = Refresh
+            }
         }
     }
 

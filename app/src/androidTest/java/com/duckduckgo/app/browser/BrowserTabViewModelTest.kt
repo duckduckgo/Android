@@ -1602,7 +1602,7 @@ class BrowserTabViewModelTest {
     fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
-        testee.onWhitelistSelected()
+        testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         verify(mockCommandObserver).onChanged(Command.Refresh)
@@ -1612,7 +1612,7 @@ class BrowserTabViewModelTest {
     fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
-        testee.onWhitelistSelected()
+        testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(Command.Refresh)
