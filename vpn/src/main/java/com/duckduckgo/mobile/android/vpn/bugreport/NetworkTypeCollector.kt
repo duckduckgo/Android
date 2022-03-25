@@ -94,11 +94,15 @@ class NetworkTypeCollector @Inject constructor(
 
     private val cellularNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
-            updateNetworkInfo(Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE))
+            updateNetworkInfo(
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR))
+            )
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST))
+            updateNetworkInfo(
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR))
+            )
         }
     }
 
@@ -218,14 +222,22 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
+    private fun Context.mobileNetworkCode(networkType: NetworkType): Int? {
+        return if (networkType == NetworkType.WIFI) {
+            null
+        } else {
+            return kotlin.runCatching { resources.configuration.mnc }.getOrNull()
+        }
+    }
+
     internal data class NetworkInfo(
         val currentNetwork: Connection,
         val previousNetwork: Connection? = null,
         val lastSwitchTimestampMillis: Long,
-        val secondsSinceLastSwitch: Long
+        val secondsSinceLastSwitch: Long,
     )
 
-    internal data class Connection(val netId: Long, val type: NetworkType, val state: NetworkState)
+    internal data class Connection(val netId: Long, val type: NetworkType, val state: NetworkState, val mnc: Int? = null)
 
     internal enum class NetworkType {
         WIFI,
