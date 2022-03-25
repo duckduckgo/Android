@@ -53,11 +53,11 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
-import com.duckduckgo.app.voice.VoiceSearchAvailability
-import com.duckduckgo.app.voice.VoiceSearchLauncher
-import com.duckduckgo.app.voice.VoiceSearchLauncher.Source.WIDGET
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailability
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -264,6 +264,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 }
             }
             voiceSearch.setOnClickListener {
+                omnibarTextInput.hideKeyboard()
                 voiceSearchLauncher.launch()
             }
         } else {

@@ -28,16 +28,4 @@
     <string name="macos_settings_description_list">You\'re on the list!</string>
     <string name="macos_settings_description_ready">Available for download on Mac</string>
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
-
-    <!-- Voice Search  -->
-    <string name="voiceSearchIconContentDescription">Voice search</string>
-    <string name="voiceSearchListening">Speak Now</string>
-    <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
-    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. Audio is processed on-device. It isn’t stored or shared with anyone.</string>
-    <string name="voiceSearchPermissionRationaleTitle">Microphone Access Required for Private Voice Search</string>
-    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
-    <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
-    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Settings</string>
-    <string name="voiceSearchPermissionRejectedDialogTitle">Microphone Access Required</string>
-    <string name="voiceSearchTitle">Voice search</string>
 </resources>

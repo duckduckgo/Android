@@ -175,11 +175,11 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
-import com.duckduckgo.app.voice.VoiceSearchLauncher
-import com.duckduckgo.app.voice.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider

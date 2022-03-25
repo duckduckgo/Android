@@ -22,7 +22,7 @@ import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.app.voice.VoiceSearchAvailability
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 
 class VoiceSearchWidgetConfigurator @Inject constructor(

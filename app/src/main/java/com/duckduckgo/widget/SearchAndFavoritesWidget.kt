@@ -31,7 +31,6 @@ import com.duckduckgo.app.browser.BrowserActivity.Companion.FAVORITES_ONBOARDING
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.widget.FavoritesWidgetService.Companion.THEME_EXTRAS
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,9 +59,6 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
     @Inject
     lateinit var gridCalculator: SearchAndFavoritesGridCalculator
-
-    @Inject
-    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator

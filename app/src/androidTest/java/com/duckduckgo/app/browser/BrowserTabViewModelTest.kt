@@ -116,10 +116,10 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.app.voice.VoiceSearchAvailability
-import com.duckduckgo.app.voice.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailability
+import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER

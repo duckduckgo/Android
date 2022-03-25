@@ -31,7 +31,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.app.voice.VoiceSearchLauncher
 import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
@@ -47,9 +46,6 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
 
     @Inject
     lateinit var widgetCapabilities: AppWidgetCapabilities
-
-    @Inject
-    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator

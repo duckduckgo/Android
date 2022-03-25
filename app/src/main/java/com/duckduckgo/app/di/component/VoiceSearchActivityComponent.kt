@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.di.component
 
-import com.duckduckgo.app.voice.listeningmode.VoiceSearchActivity
+import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
