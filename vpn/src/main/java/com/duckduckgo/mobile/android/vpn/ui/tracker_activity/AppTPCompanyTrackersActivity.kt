@@ -26,6 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
@@ -37,9 +38,14 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,6 +53,10 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixels: DeviceShieldPixels
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
@@ -89,6 +99,11 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         pixels.didOpenCompanyTrackersScreen()
     }
 
+    override fun onPause() {
+        viewModel.onLeavingScreen()
+        super.onPause()
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.getTrackersForAppFromDate(
@@ -105,6 +120,23 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                     itemsAdapter.updateData(viewState.trackingCompanies)
                     appEnabledSwitch.quietlySetIsChecked(viewState.protectionEnabled, toggleAppSwitchListener)
                 }
+        }
+        viewModel.commands()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            is Command.RestartVpn -> restartVpn()
+        }
+    }
+
+    private fun restartVpn() {
+        // we use the app coroutine scope to ensure this call outlives the Activity
+        appCoroutineScope.launch {
+            TrackerBlockingVpnService.restartVpnService(applicationContext)
         }
     }
 

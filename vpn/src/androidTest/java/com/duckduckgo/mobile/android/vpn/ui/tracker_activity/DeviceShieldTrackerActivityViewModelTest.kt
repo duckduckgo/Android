@@ -35,6 +35,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dummy.ui.VpnPreferences
@@ -95,7 +96,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context, appBuildConfig)
 
-        appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
+        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
         viewModel = DeviceShieldTrackerActivityViewModel(
             InstrumentationRegistry.getInstrumentation().context,
             deviceShieldPixels,

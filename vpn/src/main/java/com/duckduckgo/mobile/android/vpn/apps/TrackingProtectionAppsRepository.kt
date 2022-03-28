@@ -202,9 +202,18 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     override fun isAppProtectionEnabled(packageName: String): Boolean {
         val appExclusionList = appTrackerRepository.getAppExclusionList()
-        val manualAppExclusioList = appTrackerRepository.getManualAppExclusionList()
-        val installedApp = installedApps.first { it.packageName == packageName }
-        return shouldBeExcluded(installedApp, appExclusionList, manualAppExclusioList)
+        val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
+
+        return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
+            false
+        } else {
+            val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
+            if (userExcludedApp != null) {
+                return !userExcludedApp.isProtected
+            }
+
+            return appExclusionList.any { it.packageId == packageName }
+        }
     }
 
     companion object {

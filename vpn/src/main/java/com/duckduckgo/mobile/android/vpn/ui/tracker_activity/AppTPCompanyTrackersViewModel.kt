@@ -25,12 +25,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,8 +49,12 @@ constructor(
 ) : ViewModel() {
 
     private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
-
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
+
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    private var manualChanges: Boolean = false
 
     suspend fun getTrackersForAppFromDate(
         date: String,
@@ -120,9 +127,10 @@ constructor(
         checked: Boolean,
         packageName: String
     ) {
+        recordManualChange()
         viewModelScope.launch {
             withContext(dispatchers.io()) {
-                if (checked){
+                if (checked) {
                     excludedAppsRepository.manuallyEnabledApp(packageName)
                 } else {
                     excludedAppsRepository.manuallyExcludedApp(packageName)
@@ -131,12 +139,30 @@ constructor(
         }
     }
 
+    fun onLeavingScreen() {
+        viewModelScope.launch {
+            if (userMadeChanges()) {
+                command.send(Command.RestartVpn)
+            }
+        }
+    }
+
+    fun userMadeChanges() = manualChanges
+
+    private fun recordManualChange() {
+        manualChanges = !manualChanges
+    }
+
     data class ViewState(
         val totalTrackingAttempts: Int,
         val lastTrackerBlockedAgo: String,
         val trackingCompanies: List<CompanyTrackingDetails>,
         val protectionEnabled: Boolean
     )
+
+    internal sealed class Command {
+        object RestartVpn : Command()
+    }
 
     data class CompanyTrackingDetails(
         val companyName: String,
