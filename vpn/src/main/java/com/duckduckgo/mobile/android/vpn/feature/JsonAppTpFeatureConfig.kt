@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.plugins
+package com.duckduckgo.mobile.android.vpn.feature
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import org.json.JSONObject
 
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures.sortedBy { it.featureName.value }
-    }
-}
+data class JsonAppTpFeatureConfig(
+    val state: String,
+    val settings: Map<String, JSONObject?>,
+)

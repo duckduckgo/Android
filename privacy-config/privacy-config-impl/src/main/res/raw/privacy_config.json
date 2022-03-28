@@ -1,6 +1,27 @@
 {
   "readme": "https://github.com/duckduckgo/privacy-configuration",
   "features": {
+    "appTrackerProtection" : {
+      "state": "enabled",
+      "settings": {
+        "ipv6Support": {
+          "state": "disabled"
+        },
+        "privateDnsSupport": {
+          "state": "disabled"
+        },
+        "networkSwitchHandling": {
+          "state": "disabled",
+          "settings": {
+          }
+        },
+        "badHealthMitigation": {
+          "state": "enabled",
+          "settings": {
+          }
+        }
+      }
+    },
     "https": {
       "state": "enabled",
       "exceptions": []
@@ -358,7 +379,7 @@
       }
     }
   },
-  "version": 1634121326614,
+  "version": 1648252350000,
   "unprotectedTemporary": [
     {
       "domain": "inlandbank.com",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.plugins
+package com.duckduckgo.mobile.android.vpn.feature.settings
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.mobile.android.vpn.feature.SettingName
 
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures.sortedBy { it.featureName.value }
-    }
+enum class AppTpSetting(override val value: String) : SettingName {
+    BadHealthMitigation("badHealthMitigation"),
+    Ipv6Support("ipv6Support"),
+    PrivateDnsSupport("privateDnsSupport"),
+    NetworkSwitchHandling("networkSwitchHandling"),
 }

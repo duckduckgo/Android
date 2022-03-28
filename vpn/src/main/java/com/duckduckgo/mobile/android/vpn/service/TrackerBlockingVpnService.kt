@@ -35,10 +35,10 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.isNetworkSwitchingHandlingEnabled
+import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
 import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
 import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -120,7 +120,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
     private var connectionMonitor: ConnectionMonitor? = null
 
-    @Inject lateinit var featureToggle: FeatureToggle
+    @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -272,7 +272,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
             vpnPreferences.privateDns?.let { privateDnsName ->
-                if (featureToggle.isPrivateDnsSupportEnabled()) {
+                if (appTpFeatureConfig.get().isPrivateDnsSupportEnabled()) {
                     Timber.v("Setting private DNS: $privateDnsName")
                     runCatching { InetAddress.getAllByName(privateDnsName) }.getOrNull()?.forEach { addr -> addDnsServer(addr) }
                 }
@@ -507,7 +507,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkDisconnected() {
-        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+        if (appTpFeatureConfig.get().isNetworkSwitchingHandlingEnabled()) {
             // TODO maybe at some point show the user?
             Timber.w("No network")
             if (appBuildConfig.sdkInt >= 22) {
@@ -518,7 +518,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
-        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+        if (appTpFeatureConfig.get().isNetworkSwitchingHandlingEnabled()) {
             if (appBuildConfig.sdkInt >= 22) {
                 Timber.w("set underlying networks: $networks")
                 if (networks.isEmpty()) {

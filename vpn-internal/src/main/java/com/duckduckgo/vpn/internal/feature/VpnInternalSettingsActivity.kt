@@ -22,12 +22,9 @@ import android.os.Bundle
 import android.widget.CompoundButton
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
+import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggles
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
@@ -48,10 +45,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var appHealthMonitor: AppHealthMonitor
 
     @Inject
-    lateinit var featureToggle: FeatureToggle
-
-    @Inject
-    lateinit var appTpFeatureToggleRepository: AppTpFeatureToggleRepository
+    lateinit var appTpConfig: AppTpFeatureConfig
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -74,7 +68,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private val badHealthMitigationFeatureToggle = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.BadHealthMitigation, toggleState))
+        appTpConfig.typedGet<AppTpConfig.BadHealthMitigationConfig>()?.let { config ->
+            appTpConfig.edit { put(config.copy(isEnabled = toggleState)) }
+        }
     }
 
     private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
@@ -170,24 +166,30 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
-        binding.badHealthMitigationToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.BadHealthMitigation, true)
+        binding.badHealthMitigationToggle.isChecked = appTpConfig.get().isBadHealthMitigationEnabled()
         binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
     }
 
     private fun setupConfigSection() {
-        binding.ipv6SupportToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.Ipv6Support, false)
+        binding.ipv6SupportToggle.isChecked = appTpConfig.get().isIpv6Enabled()
         binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.Ipv6Support, isChecked))
+            appTpConfig.typedGet<AppTpConfig.Ipv6Config>()?.let { config ->
+                appTpConfig.edit { put(config.copy(isEnabled = isChecked)) }
+            }
         }
 
-        binding.privateDnsToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
+        binding.privateDnsToggle.isChecked = appTpConfig.get().isPrivateDnsSupportEnabled()
         binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.PrivateDnsSupport, isChecked))
+            appTpConfig.typedGet<AppTpConfig.PrivateDnsConfig>()?.let { config ->
+                appTpConfig.edit { put(config.copy(isEnabled = isChecked)) }
+            }
         }
 
-        binding.vpnUnderlyingNetworksToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling, false)
+        binding.vpnUnderlyingNetworksToggle.isChecked = appTpConfig.get().isNetworkSwitchingHandlingEnabled()
         binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.NetworkSwitchingHandling, isChecked))
+            appTpConfig.typedGet<AppTpConfig.NetworkSwitchHandlingConfig>()?.let { config ->
+                appTpConfig.edit { put(config.copy(isEnabled = isChecked)) }
+            }
         }
     }
 
@@ -207,6 +209,10 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
         // listener
         binding.debugLoggingToggle.setOnCheckedChangeListener(debugLoggingToggleListener)
+    }
+
+    private inline fun <reified T : AppTpConfig> AppTpFeatureConfig.typedGet(): T? {
+        return get().firstOrNull { it is T } as T?
     }
 
     companion object {

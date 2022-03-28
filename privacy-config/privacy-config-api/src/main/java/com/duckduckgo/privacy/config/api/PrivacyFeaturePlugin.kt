@@ -31,10 +31,16 @@ import com.duckduckgo.feature.toggles.api.FeatureName
  * ```
  */
 interface PrivacyFeaturePlugin {
+    /**
+     * @return `true` when the feature config was stored, otherwise `false`
+     */
     fun store(
         name: FeatureName,
         jsonString: String
     ): Boolean
 
+    /**
+     * @return the [FeatureName] of this feature
+     */
     val featureName: FeatureName
 }
