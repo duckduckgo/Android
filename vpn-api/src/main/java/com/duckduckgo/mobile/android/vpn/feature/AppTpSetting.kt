@@ -14,13 +14,38 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature.settings
+package com.duckduckgo.mobile.android.vpn.feature
 
-import com.duckduckgo.mobile.android.vpn.feature.SettingName
+import com.duckduckgo.feature.toggles.api.FeatureName
 
 enum class AppTpSetting(override val value: String) : SettingName {
     BadHealthMitigation("badHealthMitigation"),
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
     NetworkSwitchHandling("networkSwitchHandling"),
+}
+
+interface SettingName {
+    val value: String
+
+    companion object {
+        /**
+         * Utility function to create a [FeatureName] from the passed in [block] lambda
+         * instead of using the anonymous `object : FeatureName` syntax.
+         *
+         * Usage:
+         *
+         * ```kotlin
+         * val feature = FeatureName {
+         *
+         * }
+         * ```
+         */
+        inline operator fun invoke(crossinline block: () -> String): SettingName {
+            return object : SettingName {
+                override val value: String
+                    get() = block()
+            }
+        }
+    }
 }

@@ -21,53 +21,17 @@ package com.duckduckgo.mobile.android.vpn.feature
  * The configuration is set from either remote config, or the app AppTp internal settings
  */
 interface AppTpFeatureConfig {
-    fun get(): Set<AppTpConfig>
+    fun get(appTpSetting: AppTpSetting): AppTpConfig?
 
     fun edit(): Editor
 
     interface Editor {
-        fun put(config: AppTpConfig)
+        fun put(appTpSetting: AppTpSetting, config: AppTpConfig)
     }
 }
 
-fun Set<AppTpConfig>.isIpv6Enabled(): Boolean {
-    return this.firstNotNullOfOrNull { model ->
-        return if (model is AppTpConfig.Ipv6Config) {
-            model.isEnabled
-        } else {
-            false
-        }
-    } ?: false
-}
-
-fun Set<AppTpConfig>.isBadHealthMitigationEnabled(): Boolean {
-    return this.firstNotNullOfOrNull { model ->
-        return if (model is AppTpConfig.BadHealthMitigationConfig) {
-            model.isEnabled
-        } else {
-            false
-        }
-    } ?: false
-}
-
-fun Set<AppTpConfig>.isPrivateDnsSupportEnabled(): Boolean {
-    return this.firstNotNullOfOrNull { model ->
-        return if (model is AppTpConfig.PrivateDnsConfig) {
-            model.isEnabled
-        } else {
-            false
-        }
-    } ?: false
-}
-
-fun Set<AppTpConfig>.isNetworkSwitchingHandlingEnabled(): Boolean {
-    return this.firstNotNullOfOrNull { model ->
-        return if (model is AppTpConfig.NetworkSwitchHandlingConfig) {
-            model.isEnabled
-        } else {
-            false
-        }
-    } ?: false
+fun AppTpConfig?.isEnabled(): Boolean {
+    return this?.isEnabled ?: false
 }
 
 inline fun AppTpFeatureConfig.edit(

@@ -64,28 +64,3 @@ interface AppTpSettingPlugin {
 
     val settingName: SettingName
 }
-
-interface SettingName {
-    val value: String
-
-    companion object {
-        /**
-         * Utility function to create a [FeatureName] from the passed in [block] lambda
-         * instead of using the anonymous `object : FeatureName` syntax.
-         *
-         * Usage:
-         *
-         * ```kotlin
-         * val feature = FeatureName {
-         *
-         * }
-         * ```
-         */
-        inline operator fun invoke(crossinline block: () -> String): SettingName {
-            return object : SettingName {
-                override val value: String
-                    get() = block()
-            }
-        }
-    }
-}

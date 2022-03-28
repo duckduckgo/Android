@@ -38,7 +38,7 @@ class NetworkSwitchingSettingPlugin @Inject constructor(
         if (name == settingName) {
             Timber.d("Received configuration: $jsonString")
             jsonAdapter.fromJson(jsonString)?.let { config ->
-                appTpFeatureConfig.edit { put(config.toStoreModel()) }
+                appTpFeatureConfig.edit { put(name, config.toStoreModel()) }
             }
             return true
         }

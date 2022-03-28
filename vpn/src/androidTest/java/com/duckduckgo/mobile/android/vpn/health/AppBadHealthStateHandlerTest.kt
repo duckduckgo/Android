@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.feature.AppTpConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
@@ -71,7 +72,7 @@ class AppBadHealthStateHandlerTest {
             .build()
 
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-        whenever(appTpConfig.get()).thenReturn(setOf(AppTpConfig.BadHealthMitigationConfig(isEnabled = true)))
+        whenever(appTpConfig.get(AppTpSetting.BadHealthMitigation)).thenReturn(AppTpConfig.BadHealthMitigationConfig(isEnabled = true))
 
         appBadHealthStateHandler = AppBadHealthStateHandler(
             context, appBuildConfig, db, appTpConfig, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope

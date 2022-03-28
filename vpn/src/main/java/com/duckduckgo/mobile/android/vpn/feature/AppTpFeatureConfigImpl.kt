@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.feature
 
-import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -28,22 +27,29 @@ import javax.inject.Inject
     boundType = AppTpFeatureConfig::class
 )
 @SingleInstanceIn(AppScope::class)
-class AppTpFeatureConfigImpl @Inject constructor(
-    private val context: Context,
-) : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
+class AppTpFeatureConfigImpl @Inject constructor() : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
 
-    override fun get(): Set<AppTpConfig> {
+    override fun get(appTpSetting: AppTpSetting): AppTpConfig? {
         Timber.d("Get AppTpConfigs:")
-        // TODO
-        return setOf()
+        return when (appTpSetting) {
+            AppTpSetting.BadHealthMitigation -> null
+            AppTpSetting.Ipv6Support -> null
+            AppTpSetting.PrivateDnsSupport -> null
+            AppTpSetting.NetworkSwitchHandling -> null
+        }
     }
 
     override fun edit(): AppTpFeatureConfig.Editor {
         return this
     }
 
-    override fun put(config: AppTpConfig) {
-        // TODO
+    override fun put(appTpSetting: AppTpSetting, config: AppTpConfig) {
         Timber.d("Store AppTpConfigs: $config")
+        when (appTpSetting) {
+            AppTpSetting.BadHealthMitigation -> {}
+            AppTpSetting.Ipv6Support -> {}
+            AppTpSetting.PrivateDnsSupport -> {}
+            AppTpSetting.NetworkSwitchHandling -> {}
+        }
     }
 }

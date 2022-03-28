@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.settings
 
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+
 /**
  * Convenience method to get the [AppTpSetting] from its [String] value
  */
