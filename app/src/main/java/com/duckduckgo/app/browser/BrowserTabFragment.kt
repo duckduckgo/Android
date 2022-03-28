@@ -1730,6 +1730,7 @@ class BrowserTabFragment :
         configureQuickAccessGridLayout(quickAccessRecyclerView)
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
         decorator.recreatePopupMenu()
+        viewModel.onConfigurationChanged()
     }
 
     fun onBackPressed(): Boolean {
@@ -2016,7 +2017,7 @@ class BrowserTabFragment :
 
         fun recreatePopupMenu() {
             popupMenu.dismiss()
-            popupMenu.width = getPopupMenuWidth()
+            createPopupMenu()
         }
 
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {

@@ -220,7 +220,8 @@ class BrowserTabViewModel(
         val addToHomeVisible: Boolean = false,
         val showDaxIcon: Boolean = false,
         val isEmailSignedIn: Boolean = false,
-        var previousAppLink: AppLink? = null
+        var previousAppLink: AppLink? = null,
+        val forceRenderingTicker: String = ""
     )
 
     sealed class HighlightableButton {
@@ -2616,6 +2617,12 @@ class BrowserTabViewModel(
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
+    fun onConfigurationChanged() {
+        browserViewState.value = currentBrowserViewState().copy(
+            forceRenderingTicker = System.currentTimeMillis().toString()
+        )
     }
 
     companion object {
