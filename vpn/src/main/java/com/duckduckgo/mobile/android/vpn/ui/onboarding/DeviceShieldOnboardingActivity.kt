@@ -91,6 +91,7 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     private fun configureUI() {
         viewPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages)
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
             override fun onPageSelected(position: Int) {
                 showOnboardingPage(position)
                 super.onPageSelected(position)
