@@ -25,11 +25,8 @@
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>

@@ -30,6 +30,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
+import com.duckduckgo.mobile.android.ui.view.InfoPanel
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -46,6 +47,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity.Companion
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
@@ -150,7 +152,15 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             itemsAdapter.updateData(viewState.trackingCompanies)
         }
 
-        if (viewState.userChangedState){
+        binding.appDisabledInfoPanel.apply {
+            setClickableLink(
+                InfoPanel.REPORT_ISSUES_ANNOTATION,
+                getText(R.string.atp_CompanyDetailsAppInfoPanel)
+            ) { launchFeedback() }
+            show()
+        }
+
+        if (viewState.userChangedState) {
             if (viewState.manualProtectionState) {
                 binding.appDisabledInfoPanel.gone()
             } else {
@@ -166,8 +176,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun setToggleState(enabled: Boolean){
-        if (::appEnabledSwitch.isInitialized){
+    private fun setToggleState(enabled: Boolean) {
+        if (::appEnabledSwitch.isInitialized) {
             appEnabledSwitch.quietlySetIsChecked(enabled, toggleAppSwitchListener)
         }
     }

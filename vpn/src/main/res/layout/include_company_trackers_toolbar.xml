@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme.Green"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
