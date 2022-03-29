@@ -47,6 +47,9 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 private const val REMOTE_FEATURE = "remote-feature"
+private const val ON = "on"
+private const val OFF = "off"
+private const val TYPE = "type"
 
 class VpnRemoteFeatureReceiver(
     context: Context,
@@ -59,28 +62,28 @@ class VpnRemoteFeatureReceiver(
 
         fun <T : AppTpConfig> enableIntent(type: KClass<T>): Intent {
             return Intent(REMOTE_FEATURE).apply {
-                putExtra("type", type.nestedClassQualifiedName())
-                putExtra(type.qualifiedName, "on")
+                putExtra(TYPE, type.nestedClassQualifiedName())
+                putExtra(type.qualifiedName, ON)
             }
         }
 
         fun <T : AppTpConfig> disableIntent(type: KClass<T>): Intent {
             return Intent(REMOTE_FEATURE).apply {
-                putExtra("type", type.nestedClassQualifiedName())
-                putExtra(type.qualifiedName, "off")
+                putExtra(TYPE, type.nestedClassQualifiedName())
+                putExtra(type.qualifiedName, OFF)
             }
         }
 
         fun isOnIntent(intent: Intent): Boolean {
-            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == "on"
+            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == ON
         }
 
         fun isOffIntent(intent: Intent): Boolean {
-            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == "off"
+            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == OFF
         }
 
         fun <T : AppTpConfig> getType(intent: Intent): KClass<T> {
-            return Class.forName(intent.getStringExtra("type")!!).kotlin as KClass<T>
+            return Class.forName(intent.getStringExtra(TYPE)!!).kotlin as KClass<T>
         }
 
         private fun KClass<*>.nestedClassQualifiedName(): String {
