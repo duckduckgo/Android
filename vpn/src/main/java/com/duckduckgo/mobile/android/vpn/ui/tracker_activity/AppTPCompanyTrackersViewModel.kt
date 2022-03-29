@@ -158,7 +158,14 @@ constructor(
         }
     }
 
-    fun userMadeChanges() = viewStateFlow.value.manualProtectionState != viewStateFlow.value.protectionEnabled
+    fun userMadeChanges(): Boolean {
+        val currentState = viewStateFlow.value
+        if (currentState.userChangedState) {
+            return currentState.manualProtectionState != currentState.protectionEnabled
+        } else {
+            return false
+        }
+    }
 
     data class ViewState(
         val totalTrackingAttempts: Int = 0,
