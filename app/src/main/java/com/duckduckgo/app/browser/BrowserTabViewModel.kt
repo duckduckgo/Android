@@ -2321,6 +2321,10 @@ class BrowserTabViewModel(
         }
     }
 
+    fun onDonwloadsMenuItemClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+    }
+
     fun clearPreviousUrl() {
         appLinksHandler.updatePreviousUrl(null)
     }
