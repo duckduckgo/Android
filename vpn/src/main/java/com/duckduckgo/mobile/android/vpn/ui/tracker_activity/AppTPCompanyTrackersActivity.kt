@@ -31,7 +31,9 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -39,14 +41,20 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.ViewState
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import timber.log.Timber.Forest
 import javax.inject.Inject
 
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
@@ -63,6 +71,9 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     private val itemsAdapter = AppTPCompanyDetailsAdapter()
     private lateinit var appEnabledSwitch: SwitchCompat
+
+    // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
+    private var cachedState: ViewState? = null
 
     private val reportBreakage = registerForActivityResult(ReportBreakageContract()) {
         if (!it.isEmpty()) {
@@ -105,26 +116,60 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
+        viewModel.viewState()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+            .onEach { viewState ->
+                viewState.let {
+                    renderViewState(it)
+                }
+            }
+            .launchIn(lifecycleScope)
+
         lifecycleScope.launch {
-            viewModel.getTrackersForAppFromDate(
+            viewModel.loadData(
                 getDate(),
                 getPackage()
             )
-                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect { viewState ->
-                    binding.trackingAttempts.text = resources.getQuantityString(
-                        R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
-                        viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
-                    )
-                    binding.includeToolbar.appTrackdAgo.text = viewState.lastTrackerBlockedAgo
-                    itemsAdapter.updateData(viewState.trackingCompanies)
-                    appEnabledSwitch.quietlySetIsChecked(viewState.protectionEnabled, toggleAppSwitchListener)
-                }
         }
+
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun renderViewState(viewState: ViewState) {
+        cachedState = viewState
+        binding.trackingAttempts.text = resources.getQuantityString(
+            R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
+            viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
+        )
+        binding.includeToolbar.appTrackdAgo.text = viewState.lastTrackerBlockedAgo
+
+        lifecycleScope.launch {
+            itemsAdapter.updateData(viewState.trackingCompanies)
+        }
+
+        if (viewState.userChangedState){
+            if (viewState.manualProtectionState) {
+                binding.appDisabledInfoPanel.gone()
+            } else {
+                binding.appDisabledInfoPanel.show()
+            }
+        } else {
+            setToggleState(viewState.protectionEnabled)
+            if (viewState.protectionEnabled) {
+                binding.appDisabledInfoPanel.gone()
+            } else {
+                binding.appDisabledInfoPanel.show()
+            }
+        }
+    }
+
+    private fun setToggleState(enabled: Boolean){
+        if (::appEnabledSwitch.isInitialized){
+            appEnabledSwitch.quietlySetIsChecked(enabled, toggleAppSwitchListener)
+        }
     }
 
     private fun processCommand(command: Command) {
@@ -145,8 +190,17 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
         appEnabledSwitch = switchMenuItem?.actionView as SwitchCompat
-        appEnabledSwitch.isEnabled = false
+        appEnabledSwitch.setOnCheckedChangeListener(toggleAppSwitchListener)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        cachedState?.let { vpnState ->
+            appEnabledSwitch.quietlySetIsChecked(vpnState.protectionEnabled, toggleAppSwitchListener)
+            cachedState = null
+        }
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun launchFeedback() {

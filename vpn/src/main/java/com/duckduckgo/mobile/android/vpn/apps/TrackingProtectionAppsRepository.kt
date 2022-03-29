@@ -201,19 +201,20 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     override fun isAppProtectionEnabled(packageName: String): Boolean {
+        Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
 
-        return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
-            false
-        } else {
-            val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
-            if (userExcludedApp != null) {
-                return !userExcludedApp.isProtected
-            }
-
-            return appExclusionList.any { it.packageId == packageName }
+        if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
+            return true
         }
+
+        val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
+        if (userExcludedApp != null) {
+            return userExcludedApp.isProtected
+        }
+
+        return !appExclusionList.any { it.packageId == packageName }
     }
 
     companion object {

@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.stats
 
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
 import com.duckduckgo.mobile.android.vpn.model.*
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
@@ -26,6 +27,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -35,6 +37,7 @@ interface AppTrackerBlockingStatsRepository {
     fun noStartDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
     }
+
     private fun noEndDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(9999, 1, 1, 0, 0))
     }
@@ -79,7 +82,6 @@ interface AppTrackerBlockingStatsRepository {
         startTime: () -> String,
         endTime: String = noEndDate()
     ): Flow<Int>
-
 }
 
 data class DataStats(
@@ -94,7 +96,10 @@ data class DataTransfer(
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealAppTrackerBlockingStatsRepository @Inject constructor(vpnDatabase: VpnDatabase) : AppTrackerBlockingStatsRepository {
+class RealAppTrackerBlockingStatsRepository @Inject constructor(
+    val vpnDatabase: VpnDatabase,
+    val dispatcherProvider: DispatcherProvider
+) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()
     private val statsDao = vpnDatabase.vpnDataStatsDao()

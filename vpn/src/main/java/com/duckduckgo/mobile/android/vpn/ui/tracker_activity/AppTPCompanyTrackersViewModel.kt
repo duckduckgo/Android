@@ -25,7 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.apps.Command
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -48,7 +47,6 @@ constructor(
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 ) : ViewModel() {
 
-    private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -56,17 +54,25 @@ constructor(
 
     private var manualChanges: Boolean = false
 
-    suspend fun getTrackersForAppFromDate(
+    private val viewStateFlow = MutableStateFlow(ViewState())
+    fun viewState(): StateFlow<ViewState> {
+        return viewStateFlow
+    }
+
+    suspend fun loadData(
         date: String,
         packageName: String
-    ): Flow<ViewState> =
+    ) {
         withContext(dispatchers.io()) {
-            return@withContext statsRepository
+            statsRepository
                 .getTrackersForAppFromDate(date, packageName)
-                .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
                 .map { aggregateDataPerApp(it, packageName) }
                 .flowOn(Dispatchers.Default)
+                .collectLatest { state ->
+                    viewStateFlow.emit(state)
+                }
         }
+    }
 
     private fun aggregateDataPerApp(
         trackerData: List<VpnTrackerCompanySignal>,
@@ -114,7 +120,12 @@ constructor(
             )
         }
 
-        return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData, excludedAppsRepository.isAppProtectionEnabled(packageName))
+        return viewStateFlow.value.copy(
+            totalTrackingAttempts = trackerData.size,
+            lastTrackerBlockedAgo = lastTrackerBlockedAgo,
+            trackingCompanies = sourceData,
+            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName)
+        )
     }
 
     private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
@@ -127,7 +138,6 @@ constructor(
         checked: Boolean,
         packageName: String
     ) {
-        recordManualChange()
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 if (checked) {
@@ -136,6 +146,7 @@ constructor(
                     excludedAppsRepository.manuallyExcludedApp(packageName)
                 }
             }
+            viewStateFlow.emit(viewStateFlow.value.copy(userChangedState = true, manualProtectionState = checked))
         }
     }
 
@@ -147,17 +158,15 @@ constructor(
         }
     }
 
-    fun userMadeChanges() = manualChanges
-
-    private fun recordManualChange() {
-        manualChanges = !manualChanges
-    }
+    fun userMadeChanges() = viewStateFlow.value.manualProtectionState != viewStateFlow.value.protectionEnabled
 
     data class ViewState(
-        val totalTrackingAttempts: Int,
-        val lastTrackerBlockedAgo: String,
-        val trackingCompanies: List<CompanyTrackingDetails>,
-        val protectionEnabled: Boolean
+        val totalTrackingAttempts: Int = 0,
+        val lastTrackerBlockedAgo: String = "",
+        val trackingCompanies: List<CompanyTrackingDetails> = emptyList(),
+        val protectionEnabled: Boolean = false,
+        val userChangedState: Boolean = false,
+        val manualProtectionState: Boolean = false
     )
 
     internal sealed class Command {
