@@ -39,6 +39,21 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasValidConfigThenIsVoiceSearchSupportedTrue() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
+                sdkInt = 31,
+                languageTag = "en-US",
+                isOnDeviceSpeechRecognitionSupported = true
+            )
+        )
+
+        assertTrue(testee.isVoiceSearchSupported)
+    }
+
+    @Test
+    fun whenDeviceHasValidConfigWithMixedCaseModelThenIsVoiceSearchSupportedTrue() {
+        whenever(configProvider.get()).thenReturn(
+            VoiceSearchAvailabilityConfig(
+                deviceModel = "pixel 6 Pro",
                 sdkInt = 31,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -52,6 +67,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasInvalidLanguageThenIsVoiceSearchSupportedFalse() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 31,
                 languageTag = "en-UK",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -65,6 +81,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasInvalidSdkThenIsVoiceSearchSupportedFalse() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 30,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -78,6 +95,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenDeviceHasNoSupportForOnDeviceSpeechRecognitionThenIsVoiceSearchSupportedFalse() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = false
@@ -88,9 +106,24 @@ class RealVoiceSearchAvailabilityTest {
     }
 
     @Test
+    fun whenDeviceIsInvalidThenIsVoiceSearchSupportedFalse() {
+        whenever(configProvider.get()).thenReturn(
+            VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 5",
+                sdkInt = 32,
+                languageTag = "en-US",
+                isOnDeviceSpeechRecognitionSupported = true
+            )
+        )
+
+        assertFalse(testee.isVoiceSearchSupported)
+    }
+
+    @Test
     fun whenVoiceSearchNotSupportedThenShouldShowVoiceSearchFalse() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = false
@@ -109,6 +142,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndIsEditingUrlThenShouldShowVoiceSearchTrue() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -127,6 +161,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndIsEditingSERPThenShouldShowVoiceSearchTrue() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -145,6 +180,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndUrlShownInAddressBarThenShouldShowVoiceSearchFalse() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -163,6 +199,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndSERPShownThenShouldShowVoiceSearchTrue() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true
@@ -181,6 +218,7 @@ class RealVoiceSearchAvailabilityTest {
     fun whenVoiceSearchSupportedAndUrlEmptyThenShouldShowVoiceSearchTrue() {
         whenever(configProvider.get()).thenReturn(
             VoiceSearchAvailabilityConfig(
+                deviceModel = "Pixel 6",
                 sdkInt = 32,
                 languageTag = "en-US",
                 isOnDeviceSpeechRecognitionSupported = true

@@ -31,10 +31,14 @@ class RealVoiceSearchAvailability @Inject constructor(
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
     }
 
+    private val allowList = listOf("pixel 6", "pixel 6 pro")
+
     override val isVoiceSearchSupported: Boolean
         get() = configProvider.get().run {
-            hasValidVersion(sdkInt) && isOnDeviceSpeechRecognitionSupported && hasValidLocale(languageTag)
+            hasValidDevice(deviceModel.lowercase()) && hasValidVersion(sdkInt) && isOnDeviceSpeechRecognitionSupported && hasValidLocale(languageTag)
         }
+
+    private fun hasValidDevice(model: String) = allowList.contains(model)
 
     private fun hasValidVersion(sdkInt: Int) = sdkInt >= Build.VERSION_CODES.S
 
