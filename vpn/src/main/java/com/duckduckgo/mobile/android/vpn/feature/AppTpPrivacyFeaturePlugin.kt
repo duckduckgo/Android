@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.mobile.android.vpn.feature.settings.SettingName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter

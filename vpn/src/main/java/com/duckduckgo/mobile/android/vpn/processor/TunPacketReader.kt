@@ -18,8 +18,8 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import com.duckduckgo.mobile.android.vpn.feature.AppTpConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.isEnabled
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -130,7 +130,7 @@ class TunPacketReader @AssistedInject constructor(
     }
 
     private fun isIP6AndInternalBuild(packet: Packet): Boolean {
-        return packet.isIP6() && appTpFeatureConfig.get(AppTpSetting.Ipv6Support).isEnabled()
+        return packet.isIP6() && appTpFeatureConfig.get(AppTpConfig.Ipv6Config::class).isEnabled()
     }
 
     private fun byteBuffer(): ByteBuffer {

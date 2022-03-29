@@ -21,6 +21,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -29,13 +30,14 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class AppTpFeatureConfigImpl @Inject constructor() : AppTpFeatureConfig, AppTpFeatureConfig.Editor {
 
-    override fun get(appTpSetting: AppTpSetting): AppTpConfig? {
+    override fun <T : AppTpConfig> get(type: KClass<T>): T? {
         Timber.d("Get AppTpConfigs:")
-        return when (appTpSetting) {
-            AppTpSetting.BadHealthMitigation -> null
-            AppTpSetting.Ipv6Support -> null
-            AppTpSetting.PrivateDnsSupport -> null
-            AppTpSetting.NetworkSwitchHandling -> null
+        return when (type) {
+            AppTpConfig.Ipv6Config::class -> null
+            AppTpConfig.BadHealthMitigationConfig::class -> null
+            AppTpConfig.PrivateDnsConfig::class -> null
+            AppTpConfig.NetworkSwitchHandlingConfig::class -> null
+            else -> null
         }
     }
 
@@ -43,13 +45,13 @@ class AppTpFeatureConfigImpl @Inject constructor() : AppTpFeatureConfig, AppTpFe
         return this
     }
 
-    override fun put(appTpSetting: AppTpSetting, config: AppTpConfig) {
+    override fun <T : AppTpConfig> put(config: T) {
         Timber.d("Store AppTpConfigs: $config")
-        when (appTpSetting) {
-            AppTpSetting.BadHealthMitigation -> {}
-            AppTpSetting.Ipv6Support -> {}
-            AppTpSetting.PrivateDnsSupport -> {}
-            AppTpSetting.NetworkSwitchHandling -> {}
+        when (config) {
+            is AppTpConfig.Ipv6Config -> null
+            is AppTpConfig.BadHealthMitigationConfig -> null
+            is AppTpConfig.PrivateDnsConfig -> null
+            is AppTpConfig.NetworkSwitchHandlingConfig -> null
         }
     }
 }

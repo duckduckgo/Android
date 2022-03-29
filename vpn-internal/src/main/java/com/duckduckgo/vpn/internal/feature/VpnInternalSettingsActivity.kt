@@ -70,9 +70,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     private val badHealthMitigationFeatureToggle = CompoundButton.OnCheckedChangeListener { _, toggleState ->
         if (toggleState) {
-            sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(AppTpSetting.BadHealthMitigation))
+            sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(AppTpConfig.BadHealthMitigationConfig::class))
         } else {
-            sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(AppTpSetting.BadHealthMitigation))
+            sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(AppTpConfig.BadHealthMitigationConfig::class))
         }
     }
 
@@ -169,12 +169,12 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
-        binding.badHealthMitigationToggle.isChecked = appTpConfig.get(AppTpSetting.BadHealthMitigation).isEnabled()
+        binding.badHealthMitigationToggle.isChecked = appTpConfig.get(AppTpConfig.BadHealthMitigationConfig::class).isEnabled()
         binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
     }
 
     private fun setupConfigSection() {
-        with(AppTpSetting.Ipv6Support) {
+        with(AppTpConfig.Ipv6Config::class) {
             binding.ipv6SupportToggle.isChecked = appTpConfig.get(this).isEnabled()
             binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -185,7 +185,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.PrivateDnsSupport) {
+        with(AppTpConfig.PrivateDnsConfig::class) {
             binding.privateDnsToggle.isChecked = appTpConfig.get(this).isEnabled()
             binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
@@ -196,7 +196,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        with(AppTpSetting.NetworkSwitchHandling) {
+        with(AppTpConfig.NetworkSwitchHandlingConfig::class) {
             binding.vpnUnderlyingNetworksToggle.isChecked = appTpConfig.get(this).isEnabled()
             binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {

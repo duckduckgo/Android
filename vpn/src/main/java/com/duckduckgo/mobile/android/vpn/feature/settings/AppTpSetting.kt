@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.feature.settings
 
 import com.duckduckgo.feature.toggles.api.FeatureName
 

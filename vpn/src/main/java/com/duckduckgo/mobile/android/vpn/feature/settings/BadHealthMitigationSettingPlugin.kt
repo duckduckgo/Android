@@ -38,7 +38,7 @@ class BadHealthMitigationSettingPlugin @Inject constructor(
         if (name == settingName) {
             Timber.d("Received configuration: $jsonString")
             jsonAdapter.fromJson(jsonString)?.let { config ->
-                appTpFeatureConfig.edit { put(name, config.toStoreModel()) }
+                appTpFeatureConfig.edit { put(config.toStoreModel()) }
             }
             return true
         }

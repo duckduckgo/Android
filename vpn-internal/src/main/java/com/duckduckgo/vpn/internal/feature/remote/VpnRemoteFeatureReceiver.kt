@@ -44,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 private const val REMOTE_FEATURE = "remote-feature"
 
@@ -56,24 +57,36 @@ class VpnRemoteFeatureReceiver(
 
     companion object {
 
-        fun enableIntent(appTpSetting: AppTpSetting): Intent {
+        fun <T : AppTpConfig> enableIntent(type: KClass<T>): Intent {
             return Intent(REMOTE_FEATURE).apply {
-                putExtra(appTpSetting.value, "on")
+                putExtra("type", type.nestedClassQualifiedName())
+                putExtra(type.qualifiedName, "on")
             }
         }
 
-        fun disableIntent(appTpSetting: AppTpSetting): Intent {
+        fun <T : AppTpConfig> disableIntent(type: KClass<T>): Intent {
             return Intent(REMOTE_FEATURE).apply {
-                putExtra(appTpSetting.value, "off")
+                putExtra("type", type.nestedClassQualifiedName())
+                putExtra(type.qualifiedName, "off")
             }
         }
 
-        fun isOnIntent(appTpSetting: AppTpSetting, intent: Intent): Boolean {
-            return intent.getStringExtra(appTpSetting.value)?.lowercase() == "on"
+        fun isOnIntent(intent: Intent): Boolean {
+            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == "on"
         }
 
-        fun isOffIntent(appTpSetting: AppTpSetting, intent: Intent): Boolean {
-            return intent.getStringExtra(appTpSetting.value)?.lowercase() == "off"
+        fun isOffIntent(intent: Intent): Boolean {
+            return intent.getStringExtra(getType<AppTpConfig>(intent).qualifiedName)?.lowercase() == "off"
+        }
+
+        fun <T : AppTpConfig> getType(intent: Intent): KClass<T> {
+            return Class.forName(intent.getStringExtra("type")!!).kotlin as KClass<T>
+        }
+
+        private fun KClass<*>.nestedClassQualifiedName(): String {
+            val nestedClassName = qualifiedName?.substringAfterLast('.')
+            val rootClassQualifiedName = qualifiedName?.substringBeforeLast('.')
+            return "$rootClassQualifiedName$$nestedClassName"
         }
     }
 }
@@ -92,19 +105,19 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
         receiver = VpnRemoteFeatureReceiver(context) { intent ->
             Timber.v("RemoteFeatureReceiver receive $intent")
             when {
-                VpnRemoteFeatureReceiver.isOnIntent(AppTpSetting.Ipv6Support, intent) -> {
+                VpnRemoteFeatureReceiver.isOnIntent(intent) -> {
                     coroutineScope.launch {
                         appTpFeatureConfig.edit {
-                            val config = appTpFeatureConfig.get(AppTpSetting.Ipv6Support) as AppTpConfig.Ipv6Config?
-                            config?.let { put(AppTpSetting.Ipv6Support, it.copy(isEnabled = true)) }
+                            val config = appTpFeatureConfig.get(VpnRemoteFeatureReceiver.getType(intent))
+                            config?.let { put(it.copy(isEnabled = true)) }
                         }
                     }
                 }
-                VpnRemoteFeatureReceiver.isOffIntent(AppTpSetting.Ipv6Support, intent) -> {
+                VpnRemoteFeatureReceiver.isOffIntent(intent) -> {
                     coroutineScope.launch {
                         appTpFeatureConfig.edit {
-                            val config = appTpFeatureConfig.get(AppTpSetting.Ipv6Support) as AppTpConfig.Ipv6Config?
-                            config?.let { put(AppTpSetting.Ipv6Support, it.copy(isEnabled = false)) }
+                            val config = appTpFeatureConfig.get(VpnRemoteFeatureReceiver.getType(intent))
+                            config?.let { put(it.copy(isEnabled = false)) }
                         }
                     }
                 }
@@ -118,5 +131,14 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         receiver?.unregister()
+    }
+
+    private fun AppTpConfig.copy(isEnabled: Boolean): AppTpConfig {
+        return when (this) {
+            is AppTpConfig.Ipv6Config -> this.copy(isEnabled = isEnabled)
+            is AppTpConfig.BadHealthMitigationConfig -> this.copy(isEnabled = isEnabled)
+            is AppTpConfig.NetworkSwitchHandlingConfig -> this.copy(isEnabled = isEnabled)
+            is AppTpConfig.PrivateDnsConfig -> this.copy(isEnabled = isEnabled)
+        }
     }
 }

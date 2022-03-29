@@ -270,7 +270,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
             vpnPreferences.privateDns?.let { privateDnsName ->
-                if (appTpFeatureConfig.get(AppTpSetting.PrivateDnsSupport).isEnabled()) {
+                if (appTpFeatureConfig.get(AppTpConfig.PrivateDnsConfig::class).isEnabled()) {
                     Timber.v("Setting private DNS: $privateDnsName")
                     runCatching { InetAddress.getAllByName(privateDnsName) }.getOrNull()?.forEach { addr -> addDnsServer(addr) }
                 }
@@ -505,7 +505,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkDisconnected() {
-        if (appTpFeatureConfig.get(AppTpSetting.NetworkSwitchHandling).isEnabled()) {
+        if (appTpFeatureConfig.get(AppTpConfig.NetworkSwitchHandlingConfig::class).isEnabled()) {
             // TODO maybe at some point show the user?
             Timber.w("No network")
             if (appBuildConfig.sdkInt >= 22) {
@@ -516,7 +516,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
-        if (appTpFeatureConfig.get(AppTpSetting.NetworkSwitchHandling).isEnabled()) {
+        if (appTpFeatureConfig.get(AppTpConfig.NetworkSwitchHandlingConfig::class).isEnabled()) {
             if (appBuildConfig.sdkInt >= 22) {
                 Timber.w("set underlying networks: $networks")
                 if (networks.isEmpty()) {

@@ -27,8 +27,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.feature.isEnabled
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
@@ -82,7 +82,7 @@ class AppBadHealthStateHandler @Inject constructor(
         }
 
     override suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean {
-        if (!appTpConfig.get(AppTpSetting.BadHealthMitigation).isEnabled()) {
+        if (!appTpConfig.get(AppTpConfig.BadHealthMitigationConfig::class).isEnabled()) {
             Timber.d("Feature is disabled, skipping mitigation")
             return false
         }

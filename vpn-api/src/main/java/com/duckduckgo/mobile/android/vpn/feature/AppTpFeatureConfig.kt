@@ -16,24 +16,60 @@
 
 package com.duckduckgo.mobile.android.vpn.feature
 
+import kotlin.reflect.KClass
+
 /**
  * [AppTpFeatureConfig] returns the configuration of the AppTP features.
  * The configuration is set from either remote config, or the app AppTp internal settings
  */
 interface AppTpFeatureConfig {
-    fun get(appTpSetting: AppTpSetting): AppTpConfig?
+    /**
+     * @param type this is the [AppTpConfig] config type
+     * @return the config if stored or null if not found
+     *
+     * usage:
+     * ```kotlin
+     *   val config = appTpFeatureConfig.get(AppTpConfig.Ipv6Config::class)
+     * ```
+     */
+    fun <T : AppTpConfig> get(type: KClass<T>): T?
 
+    /**
+     * @return the [Editor] instance required to modify the configurations
+     */
     fun edit(): Editor
 
     interface Editor {
-        fun put(appTpSetting: AppTpSetting, config: AppTpConfig)
+        /**
+         *
+         * usage:
+         * ```kotlin
+         *   val config = appTpFeatureConfig.edit {
+         *      put(AppTpConfig.Ipv6Config(isEnabled = true))
+         *   }
+         * ```
+         */
+        fun <T : AppTpConfig> put(config: T)
     }
 }
 
+/**
+ * Convenience method
+ * @return `true` if the feature is present and enabled, else `false`
+ */
 fun AppTpConfig?.isEnabled(): Boolean {
     return this?.isEnabled ?: false
 }
 
+/**
+ * Convenience extension function to use lambda block
+ *
+ * ```kotlin
+ *   val config = appTpFeatureConfig.edit {
+ *      ...
+ *   }
+ * ```
+ */
 inline fun AppTpFeatureConfig.edit(
     action: AppTpFeatureConfig.Editor.() -> Unit
 ) {
