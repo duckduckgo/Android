@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:theme="@style/Widget.DuckDuckGo.Switch.Green"
+        android:theme="@style/Widget.DuckDuckGo.Switch.Blue"
         app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
 
     <View
