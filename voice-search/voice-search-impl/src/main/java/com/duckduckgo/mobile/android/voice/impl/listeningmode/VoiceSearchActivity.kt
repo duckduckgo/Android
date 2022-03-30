@@ -23,6 +23,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +33,7 @@ import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceRecognizin
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.voice.impl.R
 import com.duckduckgo.mobile.android.voice.impl.databinding.ActivityVoiceSearchBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -41,6 +43,7 @@ import javax.inject.Inject
 class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
+        const val DELAY_SPEAKNOW_REMINDER_MILLIS = 2000L
     }
 
     @Inject
@@ -62,6 +65,11 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         binding.indicator.onAction {
             if (it == INDICATOR_CLICKED) {
                 viewModel.userInitiatesSearchComplete()
+            }
+        }
+        binding.speechResults.let {
+            it.postDelayed(DELAY_SPEAKNOW_REMINDER_MILLIS) {
+                if (it.text.isEmpty()) it.text = getString(R.string.voiceSearchListening)
             }
         }
     }

@@ -38,7 +38,6 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="@dimen/keyline_2"
         android:gravity="center|bottom"
-        android:text="@string/voiceSearchListening"
         android:textColor="?attr/normalTextColor"
         android:maxLines="10"
         android:ellipsize="end"
