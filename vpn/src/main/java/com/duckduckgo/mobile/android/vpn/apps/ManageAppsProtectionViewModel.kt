@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
+import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -79,6 +80,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
                     protectedApps.first { protectedApp -> protectedApp.packageName == it.packageId }
                 }.take(5)
             }.map { ViewState(it) }
+            .onStart { pixel.didShowExclusionListActivity() }
             .flowOn(dispatcherProvider.io())
 
     private suspend fun aggregateDataPerApp(
@@ -205,6 +207,13 @@ class ManageAppsProtectionViewModel @Inject constructor(
         }
     }
 
+    fun launchManageAppsProtection() {
+        pixel.didOpenExclusionListActivityFromManageAppsProtectionScreen()
+        viewModelScope.launch {
+            command.send(Command.LaunchAllAppsProtection)
+        }
+    }
+
     companion object DeviceShieldPixelParameter {
         private const val PACKAGE_NAME = "packageName"
         private const val EXCLUDING_REASON = "reason"
@@ -215,6 +224,7 @@ internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
 internal sealed class Command {
     object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
+    object LaunchAllAppsProtection : Command()
     data class ShowEnableProtectionDialog(
         val excludingReason: TrackingProtectionAppInfo,
         val position: Int

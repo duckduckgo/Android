@@ -360,4 +360,5 @@
     <string name="atp_ManageRecentAppsProtectionSection">Apps by recent activity</string>
     <string name="atp_ManageRecentAppsProtectionReportIssues">Did App Tracking Protection cause a problem with on of your apps? Your feedback really helps us improve! <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Protection for Your Apps</string>
+    <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
 </resources>

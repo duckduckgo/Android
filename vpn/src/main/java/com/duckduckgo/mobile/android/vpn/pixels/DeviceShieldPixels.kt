@@ -335,9 +335,9 @@ interface DeviceShieldPixels {
     fun didShowExclusionListActivity()
 
     /**
-     * Will fire when the user wants to open the Exclusion List Activity from the Trackers Screen
+     * Will fire when the user wants to open the Exclusion List Activity from the Manage Recent Apps Protection Screen
      */
-    fun didOpenExclusionListActivityFromTrackersScreen()
+    fun didOpenExclusionListActivityFromManageAppsProtectionScreen()
 
     /**
      * Will fire when the user opens the Company Trackers Screen
@@ -702,13 +702,13 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY)
     }
 
-    override fun didOpenExclusionListActivityFromTrackersScreen() {
+    override fun didOpenExclusionListActivityFromManageAppsProtectionScreen() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_UNIQUE,
+            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_UNIQUE,
             tag = FIRST_OPEN_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION)
     }
 
     override fun didOpenCompanyTrackersScreen() {

@@ -252,7 +252,7 @@ class TrackingProtectionExclusionListActivity :
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         fun intent(
             context: Context,
-            isRunning: Boolean
+            isRunning: Boolean = true
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)

@@ -55,9 +55,6 @@ class ManageRecentAppsProtectionActivity :
     @AppCoroutineScope
     lateinit var appCoroutineScope: CoroutineScope
 
-    @Inject
-    lateinit var deviceShieldPixels: DeviceShieldPixels
-
     private val binding: ActivityManageRecentAppsProtectionBinding by viewBinding()
 
     private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
@@ -81,8 +78,6 @@ class ManageRecentAppsProtectionActivity :
 
         bindViews()
         observeViewModel()
-
-        deviceShieldPixels.didShowExclusionListActivity()
     }
 
     private fun bindViews() {
@@ -93,7 +88,9 @@ class ManageRecentAppsProtectionActivity :
         ) {
             launchFeedback()
         }
-
+        binding.manageRecentAppsShowAll.setOnClickListener {
+            viewModel.launchManageAppsProtection()
+        }
         setupRecycler()
     }
 
@@ -141,6 +138,7 @@ class ManageRecentAppsProtectionActivity :
                 command.position
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
+            is Command.LaunchAllAppsProtection ->  startActivity(TrackingProtectionExclusionListActivity.intent(this))
         }
     }
 
@@ -206,6 +204,10 @@ class ManageRecentAppsProtectionActivity :
 
     private fun launchFeedback() {
         viewModel.launchFeedback()
+    }
+
+    private fun launchManageAppsProtection() {
+        viewModel.launchManageAppsProtection()
     }
 
     override fun onDefaultProtectionRestored() {
