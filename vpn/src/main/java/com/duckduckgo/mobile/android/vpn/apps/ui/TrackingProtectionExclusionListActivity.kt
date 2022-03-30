@@ -234,13 +234,8 @@ class TrackingProtectionExclusionListActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(
-        answer: Int,
-        appName: String,
-        packageName: String,
-        skippedReport: Boolean
-    ) {
-        viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName, skippedReport = skippedReport)
+    override fun onAppProtectionDisabled(packageName: String) {
+        viewModel.onAppProtectionDisabled(packageName)
     }
 
     private fun launchFeedback() {

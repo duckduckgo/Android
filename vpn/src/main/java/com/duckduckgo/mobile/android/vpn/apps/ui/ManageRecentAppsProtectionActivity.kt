@@ -89,7 +89,7 @@ class ManageRecentAppsProtectionActivity :
             launchFeedback()
         }
         binding.manageRecentAppsShowAll.setOnClickListener {
-            viewModel.launchManageAppsProtection()
+            launchManageAppsProtection()
         }
         setupRecycler()
     }
@@ -193,13 +193,8 @@ class ManageRecentAppsProtectionActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(
-        answer: Int,
-        appName: String,
-        packageName: String,
-        skippedReport: Boolean
-    ) {
-        viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName, skippedReport = skippedReport)
+    override fun onAppProtectionDisabled(packageName: String) {
+        viewModel.onAppProtectionDisabled(packageName = packageName)
     }
 
     private fun launchFeedback() {

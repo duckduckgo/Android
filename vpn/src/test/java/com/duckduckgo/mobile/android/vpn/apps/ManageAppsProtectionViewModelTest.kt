@@ -65,49 +65,17 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenPackageNameIsExcludedThenProtectedAppsExcludesIt() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport = false)
+        viewModel.onAppProtectionDisabled(packageName)
 
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-    }
-
-    @Test
-    fun whenAppProtectionisDisabledAndReportIsSkippedThenDisablePixelIsSent() = runTest {
-        val packageName = "com.package.name"
-        val skippedReport = true
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
-
-        verify(deviceShieldPixels).didSkipManuallyDisableAppProtectionDialog()
     }
 
     @Test
     fun whenAppProtectionisSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
         val packageName = "com.package.name"
-        val skippedReport = false
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
+        viewModel.onAppProtectionDisabled(packageName)
 
         verify(deviceShieldPixels).didSubmitManuallyDisableAppProtectionDialog()
-    }
-
-    @Test
-    fun whenPackageNameIsExcludedBecauseStoppedWorkingThenProtectedAppsExcludesItAndLaunchesFeedback() = runTest {
-        viewModel.commands().test {
-            val packageName = "com.package.name"
-            val appName = "name"
-            viewModel.onAppProtectionDisabled(STOPPED_WORKING, appName, packageName, skippedReport = false)
-
-            verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
-
-            assertEquals(LaunchFeedback(IssueDescriptionForm("name", "com.package.name")), awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenPackageNameIsExcludedAndWasPreviouslyExcludedThenProtectedAppsExcludesItAndPixelIsSent() = runTest {
-        val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.DONT_USE, packageName, packageName, skippedReport = false)
-
-        verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
     @Test
@@ -141,32 +109,12 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(0, packageName, packageName, skippedReport = true)
+        viewModel.onAppProtectionDisabled(packageName)
 
         viewModel.commands().test {
             viewModel.onLeavingScreen()
             assertEquals(Command.RestartVpn, awaitItem())
             cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAppProtectionDisabledSkipDialogThenDoNotLaunchFeedback() = runTest {
-        val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = true)
-
-        viewModel.commands().test {
-            expectNoEvents()
-        }
-    }
-
-    @Test
-    fun whenOnAppProtectionDisabledSkipFalseDialogThenLaunchFeedback() = runTest {
-        val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(STOPPED_WORKING, packageName, packageName, skippedReport = false)
-
-        viewModel.commands().test {
-            assertEquals(LaunchFeedback(IssueDescriptionForm(packageName, packageName)), awaitItem())
         }
     }
 

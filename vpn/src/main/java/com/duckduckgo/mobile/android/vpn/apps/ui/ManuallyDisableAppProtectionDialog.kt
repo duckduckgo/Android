@@ -31,12 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(
-            answer: Int,
-            appName: String,
-            packageName: String,
-            skippedReport: Boolean = false
-        )
+        fun onAppProtectionDisabled(packageName: String)
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -61,7 +56,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val disableLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
         val submitCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSubmit)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
-        val radioGroup = rootView.findViewById<RadioGroup>(R.id.trackingProtectionAppRadioGroup)
 
         val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
             .setView(rootView)
@@ -71,7 +65,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
         populateAppIcon(appIcon)
         populateLabel(disableLabel)
-        configureListeners(submitCTA, skipCTA, radioGroup)
+        configureListeners(submitCTA, skipCTA)
 
         return alertDialog.create()
     }
@@ -90,35 +84,22 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         return requireArguments().getString(KEY_APP_PACKAGE_NAME)!!
     }
 
-    private fun getDialogAnswer(radioGroup: RadioGroup): Int {
-        return when (radioGroup.checkedRadioButtonId) {
-            R.id.trackingProtectionAppRadioOne -> STOPPED_WORKING
-            R.id.trackingProtectionAppRadioTwo -> TRACKING_OK
-            else -> DONT_USE
-        }
-    }
-
     private fun getAppName(): String {
         return requireArguments().getString(KEY_APP_NAME)!!
     }
 
     private fun configureListeners(
         submitCTA: Button,
-        skipCTA: Button,
-        radioGroup: RadioGroup
+        skipCTA: Button
     ) {
         submitCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName())
+            listener.onAppProtectionDisabled(getPackageName())
         }
 
         skipCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getDialogAnswer(radioGroup), getAppName(), getPackageName(), skippedReport = true)
-        }
-
-        radioGroup.setOnCheckedChangeListener { _, _ ->
-            submitCTA.isEnabled = true
+            listener.onAppProtectionDisabled(getPackageName())
         }
     }
 

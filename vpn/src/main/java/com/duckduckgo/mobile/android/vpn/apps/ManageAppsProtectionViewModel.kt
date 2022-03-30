@@ -104,22 +104,12 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionDisabled(
-        answer: Int = 0,
-        appName: String,
-        packageName: String,
-        skippedReport: Boolean
+        packageName: String
     ) {
         recordManualChange(packageName)
         viewModelScope.launch {
-            if (skippedReport) {
-                pixel.didSkipManuallyDisableAppProtectionDialog()
-            } else {
-                pixel.didSubmitManuallyDisableAppProtectionDialog()
-            }
+            pixel.didSubmitManuallyDisableAppProtectionDialog()
             excludedApps.manuallyExcludedApp(packageName)
-            if (answer == ManuallyDisableAppProtectionDialog.STOPPED_WORKING && !skippedReport) {
-                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
-            }
         }
     }
 
@@ -191,12 +181,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         if (!excludedAppInfo.isProblematic()) {
             command.send(Command.ShowDisableProtectionDialog(excludedAppInfo))
         } else {
-            onAppProtectionDisabled(
-                ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED,
-                appName = excludedAppInfo.name,
-                packageName = excludedAppInfo.packageName,
-                skippedReport = false
-            )
+            onAppProtectionDisabled(packageName = excludedAppInfo.packageName)
         }
     }
 
