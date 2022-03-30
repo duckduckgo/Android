@@ -54,7 +54,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
     }
 
     override fun isEnabled(settingName: SettingName): Boolean {
-        return togglesCache[settingName.value] ?: false
+        return togglesCache[settingName.value] ?: settingName.defaultValue
     }
 
     override fun edit(): AppTpFeatureConfig.Editor {

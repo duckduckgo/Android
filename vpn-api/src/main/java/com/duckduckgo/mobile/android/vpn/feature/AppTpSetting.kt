@@ -16,8 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.feature
 
-enum class AppTpSetting(override val value: String) : SettingName {
-    BadHealthMitigation("badHealthMitigation"),
+enum class AppTpSetting(override val value: String, override val defaultValue: Boolean = false) : SettingName {
+    BadHealthMitigation("badHealthMitigation", defaultValue = true),
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
     NetworkSwitchHandling("networkSwitchHandling"),
@@ -25,6 +25,7 @@ enum class AppTpSetting(override val value: String) : SettingName {
 
 interface SettingName {
     val value: String
+    val defaultValue: Boolean
 
     companion object {
         /**
@@ -43,6 +44,7 @@ interface SettingName {
             return object : SettingName {
                 override val value: String
                     get() = block()
+                override val defaultValue: Boolean = false
             }
         }
     }

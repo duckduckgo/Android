@@ -55,9 +55,14 @@ class AppTpFeatureConfigImplTest {
     }
 
     @Test
-    fun whenDbTablesAreEmptyThenReturnToggleIsDisabled() {
-        AppTpSetting.values().forEach {
-            assertFalse(config.isEnabled(it))
+    fun whenDbTablesAreEmptyThenReturnToggleDefaultValue() {
+        AppTpSetting.values().forEach { setting ->
+            when (setting) {
+                AppTpSetting.BadHealthMitigation -> assertTrue(config.isEnabled(setting))
+                AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.NetworkSwitchHandling -> assertFalse(config.isEnabled(setting))
+            }
         }
     }
 
