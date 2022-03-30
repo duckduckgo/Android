@@ -23,10 +23,12 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.annotation.RequiresApi
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companion
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.WrongScope
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -46,7 +48,7 @@ interface OnDeviceSpeechRecognizer {
     }
 }
 
-@RequiresApi(VERSION_CODES.S)
+@WrongScope(comment = "This can't be ActivityScoped atm since it is injected in a viewmodel.", correctScope = ActivityScope::class)
 @ContributesBinding(AppScope::class)
 class DefaultOnDeviceSpeechRecognizer @Inject constructor(
     private val context: Context
@@ -112,6 +114,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
     private var _eventHandler: (Event) -> Unit = {}
 
+    @RequiresApi(VERSION_CODES.S)
     override fun start(eventHandler: (Event) -> Unit) {
         _eventHandler = eventHandler
         speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
