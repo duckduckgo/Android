@@ -488,6 +488,7 @@ class BrowserTabViewModel(
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
+    private var isLinkOpenedInNewTab = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1149,6 +1150,7 @@ class BrowserTabViewModel(
         }
 
         isProcessingTrackingLink = false
+        isLinkOpenedInNewTab = false
     }
 
     private fun cacheAppLink(url: String?) {
@@ -2578,6 +2580,14 @@ class BrowserTabViewModel(
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
+    fun onMessageReceived() {
+        isLinkOpenedInNewTab = true
+    }
+
+    override fun linkOpenedInNewTab(): Boolean {
+        return isLinkOpenedInNewTab
     }
 
     companion object {

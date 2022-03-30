@@ -3937,6 +3937,20 @@ class BrowserTabViewModelTest {
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
     }
 
+    @Test
+    fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
+        assertFalse(testee.linkOpenedInNewTab())
+        testee.onMessageReceived()
+        assertTrue(testee.linkOpenedInNewTab())
+    }
+
+    @Test
+    fun whenPageChangedThenSetLinkOpenedInNewTabToFalse() {
+        testee.onMessageReceived()
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.linkOpenedInNewTab())
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)

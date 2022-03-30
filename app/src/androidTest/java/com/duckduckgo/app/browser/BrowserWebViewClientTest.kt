@@ -464,6 +464,12 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() = runTest {
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+        whenTrackingParametersDetectedAndIsForMainFrameThenReturnTrueAndLoadCleanedUrl()
+    }
+
+    @Test
     fun whenTrackingParametersDetectedAndIsNotForMainFrameThenReturnFalse() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(false)
@@ -488,6 +494,12 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledAndIsOpenedInNewTabThenReturnTrueAndLoadCleanedUrl() = runTest {
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+        whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsHandledThenReturnTrueAndLoadCleanedUrl()
+    }
+
+    @Test
     fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)
@@ -499,6 +511,12 @@ class BrowserWebViewClientTest {
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
         verify(listener).handleAppLink(appLink, true)
+    }
+
+    @Test
+    fun whenTrackingParamsDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledAndIsOpenedInNewTabThenReturnFalseAndLoadCleanedUrl() = runTest {
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+        whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndAppLinkIsNotHandledThenReturnFalseAndLoadCleanedUrl()
     }
 
     @Test

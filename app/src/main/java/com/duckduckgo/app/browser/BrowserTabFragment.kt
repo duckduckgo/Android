@@ -454,6 +454,8 @@ class BrowserTabFragment :
     private fun processMessage(message: Message) {
         val transport = message.obj as WebView.WebViewTransport
         transport.webView = webView
+
+        viewModel.onMessageReceived()
         message.sendToTarget()
 
         decorator.animateTabsCount()
