@@ -33,12 +33,14 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.ui.view.InfoPanel
+import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
+import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
@@ -220,7 +222,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
-            is DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps -> launchExcludedApps(it.shouldListBeEnabled)
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection -> launchManageAppsProtection()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
@@ -229,9 +231,9 @@ class DeviceShieldTrackerActivity :
         }
     }
 
-    private fun launchExcludedApps(shouldListBeEnabled: Boolean) {
-        deviceShieldPixels.didOpenExclusionListActivityFromTrackersScreen()
-        startActivity(TrackingProtectionExclusionListActivity.intent(this, shouldListBeEnabled))
+    private fun launchManageAppsProtection() {
+        deviceShieldPixels.didOpenManageRecentAppSettings()
+        startActivity(ManageRecentAppsProtectionActivity.intent(this))
     }
 
     private fun launchDeviceShieldFAQ() {
@@ -370,9 +372,9 @@ class DeviceShieldTrackerActivity :
 
             deviceShieldEnabledLabel.apply {
                 setClickableLink(
-                    REPORT_ISSUES_ANNOTATION,
+                    APPTP_SETTINGS_ANNOTATION,
                     getText(R.string.atp_ActivityEnabledLabel)
-                ) { launchFeedback() }
+                ) { launchManageAppsProtection() }
                 show()
             }
         } else {
@@ -448,6 +450,11 @@ class DeviceShieldTrackerActivity :
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
 
+    private fun launchAppSettings() {
+        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
+        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
+    }
+
     private sealed class VpnPermissionStatus {
         object Granted : VpnPermissionStatus()
         data class Denied(val intent: Intent) : VpnPermissionStatus()
@@ -459,7 +466,6 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
-        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
         fun intent(
             context: Context,

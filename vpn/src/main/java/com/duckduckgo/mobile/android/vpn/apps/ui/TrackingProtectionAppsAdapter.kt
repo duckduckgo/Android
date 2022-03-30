@@ -41,7 +41,7 @@ class TrackingProtectionAppsAdapter(val listener: AppProtectionListener) :
 
     fun update(
         newList: List<TrackingProtectionAppInfo>,
-        isListStateEnabled: Boolean
+        isListStateEnabled: Boolean = true
     ) {
         isListEnabled = isListStateEnabled
         val oldData = excludedApps

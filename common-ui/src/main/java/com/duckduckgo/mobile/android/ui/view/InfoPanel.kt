@@ -133,5 +133,6 @@ class InfoPanel : FrameLayout {
 
     companion object {
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
+        const val APPTP_SETTINGS_ANNOTATION = "app_settings_link"
     }
 }

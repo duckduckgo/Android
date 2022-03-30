@@ -34,6 +34,15 @@ import javax.inject.Inject
 
 interface AppTrackerBlockingStatsRepository {
 
+    data class TimeWindow(
+        val value: Long,
+        val unit: TimeUnit
+    ) {
+        fun asString(): String {
+            return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
+        }
+    }
+
     fun noStartDate(): String {
         return DatabaseDateFormatter.timestamp(LocalDateTime.of(2000, 1, 1, 0, 0))
     }
@@ -97,8 +106,7 @@ data class DataTransfer(
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
-    val vpnDatabase: VpnDatabase,
-    val dispatcherProvider: DispatcherProvider
+    val vpnDatabase: VpnDatabase
 ) : AppTrackerBlockingStatsRepository {
 
     private val trackerDao = vpnDatabase.vpnTrackerDao()

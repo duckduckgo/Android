@@ -24,6 +24,8 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDia
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog.Companion.STOPPED_WORKING
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen.IssueDescriptionForm
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,22 +38,27 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @ExperimentalCoroutinesApi
-class ExcludedAppsViewModelTest {
+class ManageAppsProtectionViewModelTest {
 
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
     private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
+    private val appTrackersRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
+    private val vpnStateMonitor = mock<VpnStateMonitor>()
 
-    private lateinit var viewModel: ExcludedAppsViewModel
+    private lateinit var viewModel: ManageAppsProtectionViewModel
 
     @Before
     fun setup() {
-        viewModel = ExcludedAppsViewModel(
+        viewModel = ManageAppsProtectionViewModel(
             trackingProtectionAppsRepository,
-            deviceShieldPixels
+            appTrackersRepository,
+            deviceShieldPixels,
+            vpnStateMonitor,
+            coroutineRule.testDispatcherProvider
         )
     }
 

@@ -33,6 +33,7 @@ import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import kotlin.time.ExperimentalTime
@@ -63,16 +64,18 @@ class AppTPCompanyTrackersViewModelTest {
 
     @Ignore
     @Test
-    fun whenLoadsDataReturnsTrackersForAppFromDate() = runTest {
+    fun whenLoadsDataReturnsTrackersForAppFromDate() = runBlocking {
         val date = "2020-10-21"
         val packageName = "com.duckduckgo.android"
 
         val someTrackers = someTrackers()
 
         whenever(statsRepository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
-        viewModel.getTrackersForAppFromDate(date, packageName).test {
+        viewModel.viewState().test {
             Assert.assertEquals(someTrackers, awaitItem())
         }
+
+        viewModel.loadData(date, packageName)
     }
 
     @Test

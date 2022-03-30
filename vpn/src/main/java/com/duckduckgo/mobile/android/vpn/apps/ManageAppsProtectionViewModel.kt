@@ -18,31 +18,88 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
+import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
+import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedFragment.ActivityFeedConfig
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackingCompanyInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerEmptyFeed
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.threeten.bp.LocalDateTime
+import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlin.coroutines.coroutineContext
 
-class ExcludedAppsViewModel(
+class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
-    private val pixel: DeviceShieldPixels
+    private val appTrackersRepository: AppTrackerBlockingStatsRepository,
+    private val pixel: DeviceShieldPixels,
+    private val vpnStateMonitor: VpnStateMonitor,
+    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
     private val manualChanges: MutableList<String> = mutableListOf()
 
+    private val defaultTimeWindow = TimeWindow(5, DAYS)
+
     internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
+
+    internal suspend fun getRecentApps() =
+        appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
+            .combine(excludedApps.getProtectedApps()) { recentAppsBlocked, protectedApps ->
+                recentAppsBlocked.map {
+                    protectedApps.first { protectedApp -> protectedApp.packageName == it.packageId }
+                }.take(5)
+            }.map { ViewState(it) }
+            .flowOn(dispatcherProvider.io())
+
+    private suspend fun aggregateDataPerApp(
+        trackerData: List<BucketizedVpnTracker>
+    ): List<TrackingApp> {
+        val sourceData = mutableListOf<TrackingApp>()
+        val perSessionData = trackerData.groupBy { it.bucket }
+
+        perSessionData.values.forEach { sessionTrackers ->
+            coroutineContext.ensureActive()
+
+            val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
+
+            perAppData.values.forEach { appTrackers ->
+                val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
+                sourceData.add(item.trackerCompanySignal.tracker.trackingApp)
+            }
+        }
+
+        return sourceData
+    }
 
     fun onAppProtectionDisabled(
         answer: Int = 0,
@@ -167,19 +224,13 @@ internal sealed class Command {
 }
 
 @ContributesMultibinding(AppScope::class)
-class ExcludedAppsViewModelFactory @Inject constructor(
-    private val deviceShieldExcludedApps: Provider<TrackingProtectionAppsRepository>,
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>
+class ManageAppsProtectionViewModelFactory @Inject constructor(
+    private val manageAppsProtectionViewModel: Provider<ManageAppsProtectionViewModel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
             return when {
-                isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
-                    ExcludedAppsViewModel(
-                        deviceShieldExcludedApps.get(),
-                        deviceShieldPixels.get()
-                    ) as T
-                    )
+                isAssignableFrom(ManageAppsProtectionViewModel::class.java) -> (manageAppsProtectionViewModel.get() as T)
                 else -> null
             }
         }

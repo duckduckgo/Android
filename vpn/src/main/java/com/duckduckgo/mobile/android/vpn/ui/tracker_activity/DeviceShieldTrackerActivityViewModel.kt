@@ -28,7 +28,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -47,8 +46,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-    private val vpnDetector: VpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val vpnDetector: VpnDetector,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -109,8 +108,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal fun launchExcludedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val vpnState = vpnStateMonitor.getState().state
-            sendCommand(Command.LaunchExcludedApps(vpnState == VpnRunningState.ENABLED))
+            sendCommand(Command.LaunchManageAppsProtection)
         }
     }
 
@@ -171,7 +169,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CheckVPNPermission : Command()
         object VPNPermissionNotGranted : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-        data class LaunchExcludedApps(val shouldListBeEnabled: Boolean) : Command()
+        object LaunchManageAppsProtection: Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()

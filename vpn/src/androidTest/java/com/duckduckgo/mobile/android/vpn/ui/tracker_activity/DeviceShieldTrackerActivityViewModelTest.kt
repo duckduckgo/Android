@@ -102,8 +102,8 @@ class DeviceShieldTrackerActivityViewModelTest {
             deviceShieldPixels,
             vpnPreferences,
             appTrackerBlockingStatsRepository,
-            vpnDetector,
             vpnStateMonitor,
+            vpnDetector,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -180,7 +180,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         viewModel.commands().test {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
 
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps(true), awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

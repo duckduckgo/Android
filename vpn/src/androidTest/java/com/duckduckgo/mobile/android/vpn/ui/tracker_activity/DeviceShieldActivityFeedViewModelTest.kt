@@ -24,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
@@ -36,6 +37,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.DAYS
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -132,7 +134,7 @@ class DeviceShieldActivityFeedViewModelTest {
     }
 
     companion object {
-        private val timeWindow = DeviceShieldActivityFeedViewModel.TimeWindow(1, TimeUnit.DAYS)
+        private val timeWindow = TimeWindow(1, DAYS)
     }
 }
 

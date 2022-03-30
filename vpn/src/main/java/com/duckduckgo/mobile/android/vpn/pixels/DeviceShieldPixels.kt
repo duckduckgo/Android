@@ -344,6 +344,9 @@ interface DeviceShieldPixels {
      */
     fun didOpenCompanyTrackersScreen()
 
+    /** Will fire when the user launches the Recent App Settings Screen */
+    fun didOpenManageRecentAppSettings()
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -709,6 +712,12 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didOpenCompanyTrackersScreen() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun didOpenManageRecentAppSettings() {
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
