@@ -457,7 +457,7 @@ class BrowserWebViewClientTest {
     fun whenTrackingParametersDetectedAndIsForMainFrameThenReturnTrueAndLoadCleanedUrl() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        val mockWebView = mock<WebView>()
+        val mockWebView = getImmediatelyInvokedMockWebView()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
@@ -480,7 +480,7 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.processUrl(anyString())).thenReturn(appLink)
         whenever(listener.handleAppLink(any(), any())).thenReturn(true)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        val mockWebView = mock<WebView>()
+        val mockWebView = getImmediatelyInvokedMockWebView()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
@@ -494,7 +494,7 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.processUrl(anyString())).thenReturn(appLink)
         whenever(listener.handleAppLink(any(), any())).thenReturn(false)
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        val mockWebView = mock<WebView>()
+        val mockWebView = getImmediatelyInvokedMockWebView()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
@@ -510,6 +510,15 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+    }
+
+    private fun getImmediatelyInvokedMockWebView(): WebView {
+        val mockWebView = mock<WebView>()
+        whenever(mockWebView.post(any())).thenAnswer { invocation ->
+            invocation.getArgument(0, Runnable::class.java).run()
+            null
+        }
+        return mockWebView
     }
 
     private class TestWebView(context: Context) : WebView(context)

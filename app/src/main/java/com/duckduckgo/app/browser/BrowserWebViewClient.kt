@@ -184,11 +184,15 @@ class BrowserWebViewClient(
 
                         if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
                             webViewClientListener?.let { listener ->
-                                webView.loadUrl(urlType.cleanedUrl)
+                                webView.post {
+                                    webView.loadUrl(urlType.cleanedUrl)
+                                }
                                 return listener.handleAppLink(parameterStrippedType, isForMainFrame)
                             }
                         } else {
-                            webView.loadUrl(urlType.cleanedUrl)
+                            webView.post {
+                                webView.loadUrl(urlType.cleanedUrl)
+                            }
                             return true
                         }
                     }
