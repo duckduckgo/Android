@@ -20,7 +20,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ interface VoiceSearchPermissionCheck {
     fun hasRequiredPermissionsGranted(): Boolean
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealVoiceVoiceSearchPermissionCheck @Inject constructor(
     private val context: Context
 ) : VoiceSearchPermissionCheck {

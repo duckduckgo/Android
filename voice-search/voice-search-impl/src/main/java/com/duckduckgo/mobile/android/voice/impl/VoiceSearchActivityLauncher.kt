@@ -25,7 +25,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.RequiresApi
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchActivity
@@ -45,8 +45,7 @@ interface VoiceSearchActivityLauncher {
     fun launch()
 }
 
-@RequiresApi(VERSION_CODES.S)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealVoiceSearchActivityLauncher @Inject constructor(
     private val context: Context,
     private val pixel: Pixel
@@ -60,6 +59,7 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private lateinit var _source: Source
     private var _activity: Activity? = null
 
+    @RequiresApi(VERSION_CODES.S)
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
@@ -89,10 +89,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         }
     }
 
+    @RequiresApi(VERSION_CODES.S)
     override fun launch() {
         launchVoiceSearch()
     }
 
+    @RequiresApi(VERSION_CODES.S)
     private fun launchVoiceSearch() {
         _activity?.window?.decorView?.rootView?.addBlur()
         pixel.fire(

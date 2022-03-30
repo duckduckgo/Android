@@ -18,7 +18,7 @@ package com.duckduckgo.mobile.android.voice.impl
 
 import android.app.AlertDialog
 import android.content.Context
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ interface VoiceSearchPermissionDialogsLauncher {
     )
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class RealVoiceSearchPermissionDialogsLauncher @Inject constructor() : VoiceSearchPermissionDialogsLauncher {
     override fun showNoMicAccessDialog(
         context: Context,

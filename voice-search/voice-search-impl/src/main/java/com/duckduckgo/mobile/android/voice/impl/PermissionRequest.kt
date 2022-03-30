@@ -27,7 +27,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.app.ActivityCompat
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ interface PermissionRequest {
     fun launch()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(ActivityScope::class)
 class MicrophonePermissionRequest @Inject constructor(
     private val pixel: Pixel,
     private val voiceSearchChecksStore: VoiceSearchChecksStore,

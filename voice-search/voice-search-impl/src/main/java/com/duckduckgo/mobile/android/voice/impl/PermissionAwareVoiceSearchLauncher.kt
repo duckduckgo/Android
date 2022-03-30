@@ -17,18 +17,15 @@
 package com.duckduckgo.mobile.android.voice.impl
 
 import android.app.Activity
-import android.os.Build.VERSION_CODES
 import androidx.activity.result.ActivityResultCaller
-import androidx.annotation.RequiresApi
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class)
-@RequiresApi(VERSION_CODES.S)
+@ContributesBinding(ActivityScope::class)
 class PermissionAwareVoiceSearchLauncher @Inject constructor(
     private val permissionRequest: PermissionRequest,
     private val voiceSearchActivityLauncher: VoiceSearchActivityLauncher,
