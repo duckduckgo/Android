@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -94,7 +95,8 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {
         testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
-        verify(referenceTestUtilities.privacyFeatureTogglesRepository, never()).insert(PrivacyFeatureToggles(testCase.featureName, true))
+        verify(referenceTestUtilities.privacyFeatureTogglesRepository, never())
+            .insert(PrivacyFeatureToggles(privacyFeatureValueOf(testCase.featureName)!!, true))
     }
 
     private fun prepareDb() {

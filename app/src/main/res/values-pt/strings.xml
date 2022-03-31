@@ -1,20 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright (c) 2021 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -28,7 +12,7 @@
     <string name="search">Pesquisar</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com o DuckDuckGo.</string>
+    <string name="onboardingDefaultBrowserDescription">Visite as Definições para pesquisar e navegar sempre com DuckDuckGo.</string>
     <string name="onboardingDefaultBrowserTitle">Faça do DuckDuckGo o seu predefinido</string>
 
     <!-- Default Browser -->
@@ -174,6 +158,17 @@
     <string name="leaveFeedback">Partilhar comentários</string>
     <string name="settingsEmailProtectionTitle">Proteção de e-mail</string>
     <string name="settingsEmailProtectionSubtitle">Bloqueie rastreadores de e-mail e oculte o seu endereço.</string>
+    <string name="settingsHeadingMore">Mais de DuckDuckGo</string>
+    <string name="settingsLightTheme">Claro</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Escuro</string>
+    <string name="settingsSystemTheme">Padrão do sistema</string>
+    <string name="settingsThemeDialogSave">Defina o tema</string>
+    <string name="settingsTitleAppLinks">Abra os links nas apps</string>
+    <string name="settingsTitleAppLinksDialog">Abra os links nas apps</string>
+    <string name="settingsAppLinksAskEveryTime">Pergunte todas as vezes</string>
+    <string name="settingsAppLinksAlways">Sempre</string>
+    <string name="settingsAppLinksNever">Nunca</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
@@ -250,6 +245,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Adicionar favorito</string>
+    <string name="widgetConfigurationTitleText">Escolha o tema</string>
+    <string name="widgetConfigurationSystemThemeOption">Padrão do sistema</string>
+    <string name="widgetConfigurationLightThemeOption">Claro</string>
+    <string name="widgetConfigurationDarkThemeOption">Escuro</string>
+    <string name="widgetConfigurationAddWidgetOption">Adicionar widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Ainda sem favoritos adicionados</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Adicionar favorito</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visite os seus sites favoritos num flash!<br/><br/>Vá a um site que adora. Em seguida, toque no ícone \" ⠇\" e selecione Adicione Favorito.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Visite os seus sites favoritos num flash! Vá a um site que adora. Em seguida, toque no ícone do menu do browser e selecione Adicione Favorito.</string>
+    <string name="widgetConfigurationActivityTitle">Configuração do widget</string>
+    <string name="favoritesWidgetLabel">Favoritos</string>
+    <string name="searchWidgetLabel">Pesquisar</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Adicionar à página inicial</string>
@@ -429,7 +439,7 @@
     <string name="hideTipsButton">Ocultar dicas para sempre</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Damos-lhe as boas-vindas ao DuckDuckGo!"</string>
+    <string name="onboardingWelcomeTitle">"Bem-vindo(a) ao DuckDuckGo!"</string>
     <string name="onboardingDaxText"><![CDATA[A Internet pode ser um pouco assustadora.<br/><br/>Mas não se preocupe! Pesquisar e navegar em privado é mais fácil do que pensa.]]></string>
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
     <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
@@ -481,7 +491,7 @@
     <string name="whitelistEntryDeleteConfirmMessage">Quer mesmo remover &lt;b&gt;%1$s&lt;/b&gt; da lista de sites desprotegidos?</string>
     <string name="whitelistExplanation">Estes sites não serão aprimorados pela Proteção de Privacidade.</string>
     <string name="whitelistNoEntries">Proteção de Privacidade ativa para todos os sites</string>
-    <string name="whitelistDomainHint">www.exemplo.com</string>
+    <string name="whitelistDomainHint">www.example.com</string>
     <string name="whitelistFormatError">Digite um domínio como <b>exemplo.com</b> e tente de novo</string>
 
     <!-- Settings -->
@@ -552,12 +562,12 @@
     <string name="preciseLocationSnackbarMessage">Anteriormente concedeu %1$s permissão para aceder a localização do seu dispositivo.</string>
 
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o botão de fogo para queimar tudo. Experimente agora! 👇</string>
+    <string name="daxClearDataCtaText">Os dados pessoais podem ser acumulados no seu navegador. Que nojo. Use o Botão de Fogo para queimar tudo. Tente agora! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href="">Saiba mais</a><u/>]]>
+        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>
@@ -568,6 +578,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Abrir links nas aplicações associadas</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Desative para prevenir que ligações sejam abertas automaticamente noutras aplicações instaladas.</string>
     <string name="appLinkDialogTitle">Abrir noutra aplicação?</string>
+    <string name="appLinkSnackBarAction">Abrir na app</string>
+    <string name="appLinkMultipleSnackBarAction">Escolher app</string>
+    <string name="appLinkSnackBarMessage">Pode abrir este link em %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Pode abrir este link noutras aplicações.</string>
+    <string name="appLinkIntentChooserTitle">Abrir com</string>
+    <string name="appLinkMenuItemTitle">Abrir na app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Novo endereço copiado para a área de transferência</string>
@@ -585,8 +601,8 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Lista de espera por e-mail</string>
-    <string name="waitlistNotificationTitle">O seu convite para Proteção de E-mail está aqui!</string>
-    <string name="waitlistNotificationDescription">Entrou para a a lista de espera e pediu-nos para notificá-lo quando for a sua vez de experimentar a nossa funcionalidade Proteção de E-mail. Toque para ver o seu convite.</string>
+    <string name="waitlistNotificationTitle">A proteção de e-mail está pronta!</string>
+    <string name="waitlistNotificationDescription">Abra o seu convite</string>
 
     <string name="waitlistNotificationDialogDescription">Gostaria que lhe enviássemos uma notificação quando chegar a sua vez?</string>
     <string name="waitlistNotificationDialogNoThanks">Não, obrigado</string>
@@ -595,16 +611,18 @@
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Proteção de E-mail (Beta)</string>
     <string name="emailProtectionActivityTitle">Proteção de E-mail (Beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Não guardamos os seus e-mails. <b><a href=\"\">Saiba mais</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Não precisa de partilhar nenhuma informação pessoal para aderir à lista de espera. Irá proteger o seu lugar de acordo com um selo de tempo que apenas existe no seu dispositivo para que possamos notificá-lo quando for a sua vez.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Ocorreu um erro ao entrar na Lista de Espera, tente novamente mais tarde</string>
     <string name="emailProtectionDuckAddressCta">Já tenho um endereço Duck</string>
     <string name="emailProtectionInviteCodeCta">Tenho um Código de Convite</string>
     <string name="emailProtectionWaitlistCta">Adira à Lista de Espera Privada</string>
     <string name="emailProtectionGetStartedCta">Comece</string>
+    <string name="emailNotSupported">Dispositivo não suportado</string>
+    <string name="emailNotSupportedExplanation">A Proteção do Correio Eletrónico permite-lhe criar endereços de correio eletrónico privados que removem os rastreadores de correio eletrónico. Precisamos de encriptar e armazenar estes endereços que cria localmente no seu dispositivo. Uma vez que o dispositivo não suporta armazenamento encriptado, a Proteção do Correio Eletrónico não está disponível.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">A privacidade dos e-mails, simplificada.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloqueie rastreadores de e-mail e oculte o seu endereço, sem mudar de fornecedor de e-mail. <a href=\"\"><b>Saiba mais</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço, sem mudar o fornecedor de correio eletrónico.<br/><a href=\"\"><b>Saiba mais</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Já está na lista!</string>
@@ -613,7 +631,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Está convidado!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloqueie rastreadores de e-mail e oculte o seu endereço,<br/>sem mudar de fornecedor de e-mail. <a href=\"\"><b>Saiba mais</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço,<br/>sem mudar o fornecedor de correio eletrónico.<br/><a href=\"\"><b>Saiba mais</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Endereço Duck pessoal</string>
@@ -621,4 +639,44 @@
         <![CDATA[A remoção da Proteção de E-mail deste dispositivo remove a opção de preencher o seu Endereço Duck Pessoal ou um Endereço Duck Privado recém-gerado em campos de e-mail enquanto navega na Internet. <br/><br/>Para eliminar completamente os seus Endereços Duck, ou para qualquer outra dúvida ou feedback, contacte-nos pelo e-mail <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remover do dispositivo</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Editar marcador</string>
+    <string name="favoriteDialogTitleEdit">Editar favorito</string>
+    <string name="locationLabel">Localização</string>
+    <string name="folderLocationTitle">Selecione a localização</string>
+    <string name="addFolder">Adicionar pasta</string>
+    <string name="editFolder">Editar pasta</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Tem a certeza de que quer eliminar "</string>
+    <string name="bookmarkFolderEmpty">Vazio</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s e %3$d item?</item>
+        <item quantity="other">%1$s%2$s e %3$d items?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Acessibilidade</string>
+    <string name="accessibilityActivityTitle">Acessibilidade</string>
+    <string name="accessibilityFontSizeTitle">Tamanho do texto</string>
+    <string name="accessibilityFontSizeHint">Arraste o slider até poder ler isto confortavelmente. Os websites que visualiza no DuckDuckGo ajustar-se-ão a ele.</string>
+    <string name="accessibilityForceZoomTitle">Imponha o zoom manual da página</string>
+    <string name="accessibilityForceZoomSubtitle">Aperte e faça zoom em qualquer site, mesmo aqueles que de outra forma o evitariam</string>
+    <string name="accessibilityTextSizeOverrideTitle">Gira o tamanho do texto</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Os textos nos sites que visualiza no DuckDuckGo serão ajustados para corresponder à definição abaixo</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Política de Privacidade</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Ocorreu uma falha na transferência. Verifique a ligação à Internet.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s widget adicionado ao ecrã inicial</string>
+    <string name="settingsAddHomeScreenWidget">Widget da página principal</string>
 </resources>

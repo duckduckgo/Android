@@ -26,6 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -56,6 +58,7 @@ import javax.inject.Inject
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val vpnPreferences: VpnPreferences,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
@@ -79,40 +82,49 @@ class NetworkTypeCollector @Inject constructor(
 
     private val privateDnsRequest = NetworkRequest.Builder().build()
 
-    private val wifiNetworkCallback = object : ConnectivityManager.NetworkCallback() {
+    private val wifiNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
-            updateNetworkInfo(NetworkType.WIFI)
+            updateNetworkInfo(Connection(network.networkHandle, NetworkType.WIFI, NetworkState.AVAILABLE))
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(NetworkType.NO_NETWORK)
+            updateNetworkInfo(Connection(network.networkHandle, NetworkType.WIFI, NetworkState.LOST))
         }
     }
 
-    private val cellularNetworkCallback = object : ConnectivityManager.NetworkCallback() {
+    private val cellularNetworkCallback = object : NetworkCallback() {
         override fun onAvailable(network: Network) {
-            updateNetworkInfo(NetworkType.CELLULAR)
+            updateNetworkInfo(
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.AVAILABLE, context.mobileNetworkCode(NetworkType.CELLULAR))
+            )
         }
 
         override fun onLost(network: Network) {
-            updateNetworkInfo(NetworkType.NO_NETWORK)
+            updateNetworkInfo(
+                Connection(network.networkHandle, NetworkType.CELLULAR, NetworkState.LOST, context.mobileNetworkCode(NetworkType.CELLULAR))
+            )
         }
     }
 
-    private val privateDnsCallback = object : ConnectivityManager.NetworkCallback() {
+    private val privateDnsCallback = object : NetworkCallback() {
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
-            Timber.v(
-                "isPrivateDnsActive = %s, server = %s (%s)",
-                context.isPrivateDnsActive(),
-                context.getPrivateDnsServerName(),
-                InetAddress.getAllByName(context.getPrivateDnsServerName()).map { it.hostAddress }
-            )
 
-            vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
-                context.getPrivateDnsServerName()
+            if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
+                Timber.v(
+                    "isPrivateDnsActive = %s, server = %s (%s)",
+                    context.isPrivateDnsActive(),
+                    context.getPrivateDnsServerName(),
+                    runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
+                )
+
+                vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
+                    context.getPrivateDnsServerName()
+                } else {
+                    null
+                }
             } else {
-                null
+                Timber.d("Private DNS support is disabled...skip")
             }
         }
     }
@@ -142,27 +154,36 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
-    private fun updateNetworkInfo(networkType: NetworkType) {
+    private fun updateNetworkInfo(connection: Connection) {
         coroutineScope.launch(databaseDispatcher) {
             try {
                 val previousNetworkInfo: NetworkInfo? = currentNetworkInfo?.let { adapter.fromJson(it) }
 
+                // If android notifies of a lost connection that is not the current one, just return
+                if (connection.state == NetworkState.LOST &&
+                    previousNetworkInfo?.currentNetwork?.netId != null &&
+                    connection.netId != previousNetworkInfo.currentNetwork.netId
+                ) {
+                    Timber.d("Lost of previously switched connection: $connection, current: ${previousNetworkInfo.currentNetwork}")
+                    return@launch
+                }
+
                 // Calculate timestamp for when the network type last switched
-                val previousNetworkType = previousNetworkInfo?.let { NetworkType.valueOf(it.currentNetwork) }
-                val didSwitch = previousNetworkType != networkType
-                val lastSwitchTimestampMillis = if (didSwitch) {
+                val previousNetworkType = previousNetworkInfo?.currentNetwork
+                val didChange = previousNetworkType != connection
+                val lastSwitchTimestampMillis = if (didChange) {
                     SystemClock.elapsedRealtime()
                 } else {
                     previousNetworkInfo?.lastSwitchTimestampMillis ?: SystemClock.elapsedRealtime()
                 }
 
                 // Calculate how long ago the network type last switched
-                val previousNetwork: String? = previousNetworkInfo?.currentNetwork
+                val previousNetwork = previousNetworkInfo?.currentNetwork
                 val secondsSinceLastSwitch = TimeUnit.MILLISECONDS.toSeconds(SystemClock.elapsedRealtime() - lastSwitchTimestampMillis)
                 val jsonInfo =
                     adapter.toJson(
                         NetworkInfo(
-                            currentNetwork = networkType.toString(),
+                            currentNetwork = connection,
                             previousNetwork = previousNetwork,
                             lastSwitchTimestampMillis = lastSwitchTimestampMillis,
                             secondsSinceLastSwitch = secondsSinceLastSwitch
@@ -201,21 +222,35 @@ class NetworkTypeCollector @Inject constructor(
         }
     }
 
+    private fun Context.mobileNetworkCode(networkType: NetworkType): Int? {
+        return if (networkType == NetworkType.WIFI) {
+            null
+        } else {
+            return kotlin.runCatching { resources.configuration.mnc }.getOrNull()
+        }
+    }
+
     internal data class NetworkInfo(
-        val currentNetwork: String,
-        val previousNetwork: String? = null,
+        val currentNetwork: Connection,
+        val previousNetwork: Connection? = null,
         val lastSwitchTimestampMillis: Long,
-        val secondsSinceLastSwitch: Long
+        val secondsSinceLastSwitch: Long,
     )
+
+    internal data class Connection(val netId: Long, val type: NetworkType, val state: NetworkState, val mnc: Int? = null)
 
     internal enum class NetworkType {
         WIFI,
         CELLULAR,
-        NO_NETWORK,
+    }
+
+    internal enum class NetworkState {
+        AVAILABLE,
+        LOST,
     }
 
     companion object {
-        private const val FILENAME = "network.type.collector.file"
+        private const val FILENAME = "network.type.collector.file.v1"
         private const val NETWORK_INFO_KEY = "network.info.key"
     }
 }

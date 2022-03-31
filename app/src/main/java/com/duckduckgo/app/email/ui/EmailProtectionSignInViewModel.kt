@@ -102,12 +102,6 @@ class EmailProtectionSignInViewModel(
         }
     }
 
-    fun readPrivacyGuarantees() {
-        viewModelScope.launch {
-            commandChannel.send(Command.OpenUrl(url = PRIVACY_GUARANTEE))
-        }
-    }
-
     fun onNotifyMeClicked() {
         pixel.fire(AppPixelName.EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
         viewModelScope.launch {
@@ -132,13 +126,13 @@ class EmailProtectionSignInViewModel(
         pixel.fire(AppPixelName.EMAIL_DID_SHOW_WAITLIST_DIALOG)
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
-            commandChannel.send(Command.ShowNotificationDialog)
+            emailManager.notifyOnJoinedWaitlist()
+            viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             workManager.enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork(withBigDelay = false))
         }
     }
 
     companion object {
-        const val PRIVACY_GUARANTEE = "https://duckduckgo.com/email/privacy-guarantees"
         const val ADDRESS_BLOG_POST = "https://duckduckgo.com/email/learn-more"
         const val GET_STARTED_URL = "https://duckduckgo.com/email/start?inviteCode="
         const val SIGN_UP_URL = "https://duckduckgo.com/email/signup?inviteCode="

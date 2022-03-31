@@ -19,10 +19,8 @@ package com.duckduckgo.remote.messaging.impl
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aMediumMessage
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessageOM.aSmallMessage
-import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
-import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
-import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Api
 import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Bookmarks
@@ -40,9 +38,9 @@ import org.junit.Test
 
 class RemoteMessagingConfigMatcherTest {
 
-    private val deviceAttributeMatcher: DeviceAttributeMatcher = mock()
-    private val androidAppAttributeMatcher: AndroidAppAttributeMatcher = mock()
-    private val userAttributeMatcher: UserAttributeMatcher = mock()
+    private val deviceAttributeMatcher: AttributeMatcher = mock()
+    private val androidAppAttributeMatcher: AttributeMatcher = mock()
+    private val userAttributeMatcher: AttributeMatcher = mock()
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
 
     private val testee = RemoteMessagingConfigMatcher(

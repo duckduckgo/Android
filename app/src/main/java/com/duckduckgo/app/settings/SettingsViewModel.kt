@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.*
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
@@ -72,7 +73,8 @@ class SettingsViewModel(
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
+    private val emailManager: EmailManager
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -90,7 +92,8 @@ class SettingsViewModel(
         val globalPrivacyControlEnabled: Boolean = false,
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
-        val appTrackingProtectionEnabled: Boolean = false
+        val appTrackingProtectionEnabled: Boolean = false,
+        val emailAddress: String? = null
     )
 
     data class AutomaticallyClearData(
@@ -149,10 +152,11 @@ class SettingsViewModel(
                     automaticallyClearData = AutomaticallyClearData(automaticallyClearWhat, automaticallyClearWhen, automaticallyClearWhenEnabled),
                     appIcon = settingsDataStore.appIcon,
                     selectedFireAnimation = settingsDataStore.selectedFireAnimation,
-                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true,
+                    globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) == true,
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
-                    appTrackingProtectionWaitlistState = atpRepository.getState()
+                    appTrackingProtectionWaitlistState = atpRepository.getState(),
+                    emailAddress = emailManager.getEmailAddress()
                 )
             )
         }
@@ -451,6 +455,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val atpRepository: Provider<AtpWaitlistStateRepository>,
     private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
     private val appBuildConfig: Provider<AppBuildConfig>,
+    private val emailManager: Provider<EmailManager>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -468,7 +473,8 @@ class SettingsViewModelFactory @Inject constructor(
                         gpc.get(),
                         featureToggle.get(),
                         pixel.get(),
-                        appBuildConfig.get()
+                        appBuildConfig.get(),
+                        emailManager.get()
                     ) as T
                     )
                 else -> null

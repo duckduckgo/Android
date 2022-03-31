@@ -3945,7 +3945,7 @@ class BrowserTabViewModelTest {
 
     private fun givenUrlCannotUseGpc(url: String) {
         val exceptions = CopyOnWriteArrayList<GpcException>().apply { add(GpcException(url)) }
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
         whenever(mockGpcRepository.exceptions).thenReturn(exceptions)
     }

@@ -43,7 +43,7 @@ class EmailInjectorJsTest {
     fun setup() {
         testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, mockAutofill)
 
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
@@ -102,7 +102,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenInjectEmailAutofillJsAndUrlIsFromDuckDuckGoAndFeatureIsDisabledThenInjectJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
 
         val jsToEvaluate = getJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
@@ -144,7 +144,7 @@ class EmailInjectorJsTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenInjectAddressAndFeatureIsDisabledThenJsCodeNotInjected() {
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
 
         val address = "address"
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))

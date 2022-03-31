@@ -18,6 +18,7 @@ package com.duckduckgo.app.fire
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -27,6 +28,7 @@ import org.junit.Test
 class WebViewDatabaseLocatorTest {
 
     @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.N)
     fun whenGetDatabasePathOnDeviceThenPathNotEmpty() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val webViewDatabaseLocator = WebViewDatabaseLocator(context)
@@ -39,6 +41,7 @@ class WebViewDatabaseLocatorTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = android.os.Build.VERSION_CODES.N)
     fun whenDatabasePathFoundThenReturnedAbsolutePathToFile() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val dataDir = context.applicationInfo.dataDir
