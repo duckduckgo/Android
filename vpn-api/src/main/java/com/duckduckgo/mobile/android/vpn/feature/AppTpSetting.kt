@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,37 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.feature.toggles.api
+package com.duckduckgo.mobile.android.vpn.feature
 
-/** Any feature toggles implemented in any module should implement [FeatureToggle] */
-interface FeatureToggle {
-    /**
-     * This method takes a [featureName] and optionally a default value.
-     * @return `true` if the feature is enabled, `false` if is not
-     * @throws [IllegalArgumentException] if the feature is not implemented
-     */
-    fun isFeatureEnabled(
-        featureName: FeatureName,
-        defaultValue: Boolean = true
-    ): Boolean
+enum class AppTpSetting(override val value: String, override val defaultValue: Boolean = false) : SettingName {
+    BadHealthMitigation("badHealthMitigation", defaultValue = true),
+    Ipv6Support("ipv6Support"),
+    PrivateDnsSupport("privateDnsSupport"),
+    NetworkSwitchHandling("networkSwitchHandling"),
 }
 
-/**
- * Each feature toggle created needs a [FeatureName] which can be implemented using this interface
- */
-interface FeatureName {
+interface SettingName {
     val value: String
+    val defaultValue: Boolean
 
     companion object {
         /**
-         * Utility function to create a [FeatureName] from the passed in [block] lambda
+         * Utility function to create a [SettingName] from the passed in [block] lambda
          * instead of using the anonymous `object : FeatureName` syntax.
          *
          * Usage:
          *
          * ```kotlin
-         * val feature = FeatureName {
+         * val name = SettingName {
          *
          * }
          * ```
          */
-        inline operator fun invoke(crossinline block: () -> String): FeatureName {
-            return object : FeatureName {
+        inline operator fun invoke(crossinline block: () -> String): SettingName {
+            return object : SettingName {
                 override val value: String
                     get() = block()
+                override val defaultValue: Boolean = false
             }
         }
     }

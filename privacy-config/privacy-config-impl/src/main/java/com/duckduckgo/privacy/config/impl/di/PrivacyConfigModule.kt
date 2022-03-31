@@ -26,7 +26,7 @@ import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePluginPoint
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase

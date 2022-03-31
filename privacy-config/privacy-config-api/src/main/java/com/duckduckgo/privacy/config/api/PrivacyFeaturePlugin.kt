@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.impl.plugins
+package com.duckduckgo.privacy.config.api
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
-import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.feature.toggles.api.FeatureName
 
+/**
+ * Implement this interface and contribute it as a multibinding to get called upon downloading remote privacy config
+ *
+ * Usage:
+ *
+ * ```kotlin
+ * @ContributesMultibinding(AppScope::class)
+ * class MuFeaturePlugin @Inject constructor(...) : PrivacyFeaturePlugin {
+ *
+ * }
+ * ```
+ */
 interface PrivacyFeaturePlugin {
+    /**
+     * @return `true` when the feature config was stored, otherwise `false`
+     */
     fun store(
-        name: PrivacyFeatureName,
+        name: FeatureName,
         jsonString: String
     ): Boolean
 
-    val featureName: PrivacyFeatureName
-}
-
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures
-    }
+    /**
+     * @return the [FeatureName] of this feature
+     */
+    val featureName: FeatureName
 }

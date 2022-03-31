@@ -26,8 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -58,7 +58,7 @@ import javax.inject.Inject
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val vpnPreferences: VpnPreferences,
-    private val featureToggle: FeatureToggle,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
@@ -110,7 +110,7 @@ class NetworkTypeCollector @Inject constructor(
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            if (featureToggle.isPrivateDnsSupportEnabled()) {
+            if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
                 Timber.v(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
