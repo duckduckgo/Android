@@ -91,7 +91,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/newTabMenuItem"
@@ -200,12 +201,10 @@
                 app:labelText="@string/downloadsMenuTitle"
                 app:iconDrawable="@drawable/ic_downloads_16" />
 
-            <!-- TODO// see if we can get rid off background -->
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/settingsMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ripple_bottom_rounded"
                 app:labelText="@string/settingsMenuItemTitle"
                 app:iconDrawable="@drawable/ic_settings_16" />
 
