@@ -48,6 +48,10 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.Companion.KEY_LOGIN_DETECTION_ENABLED
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -64,7 +68,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 42,
+    exportSchema = true, version = 43,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -552,6 +556,19 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
+        val fireproofLoginDetector = OldFireproofLoginDetector()
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+            fireproofLoginDetector.updateFireproofSettingType()
+
+            database.execSQL(
+                "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
+                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\""
+            )
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -618,7 +635,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_38_TO_39,
             MIGRATION_39_TO_40,
             MIGRATION_40_TO_41,
-            MIGRATION_41_TO_42
+            MIGRATION_41_TO_42,
+            MIGRATION_42_TO_43
         )
 
     @Deprecated(
@@ -640,6 +658,22 @@ class MigrationsProvider(val context: Context) {
             // First released in 5.103.0 and fully disabled in 5.114.0.
             val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
+        }
+    }
+
+    private inner class OldFireproofLoginDetector {
+
+        fun updateFireproofSettingType() {
+            val preferences = context.getSharedPreferences(SettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+            val loginDetectionEnabled = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
+            preferences.edit().remove(KEY_LOGIN_DETECTION_ENABLED).apply()
+            val newLoginDetectorSetting = migratePreferencesType(loginDetectionEnabled)
+            preferences.edit().putString(KEY_LOGIN_DETECTION_ENABLED, newLoginDetectorSetting.name).apply()
+        }
+
+        private fun migratePreferencesType(loginDetectionEnabled: Boolean): LoginDetectorSetting {
+            val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
+            return loginDetectorPrefsMapper.mapToNewLoginDetectorSetting(loginDetectionEnabled)
         }
     }
 }

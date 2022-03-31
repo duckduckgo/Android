@@ -250,4 +250,19 @@ class SettingsSharedPreferences @Inject constructor(
             else -> defValue
         }
     }
+
+    class LoginDetectorPrefsMapper {
+        enum class LoginDetectorSetting {
+            ASK_EVERY_TIME,
+            ALWAYS,
+            NEVER
+        }
+
+        fun mapToNewLoginDetectorSetting(oldLoginDetectorValue: Boolean): LoginDetectorSetting {
+            return when (oldLoginDetectorValue) {
+                false -> LoginDetectorSetting.NEVER
+                else -> LoginDetectorSetting.ASK_EVERY_TIME
+            }
+        }
+    }
 }
