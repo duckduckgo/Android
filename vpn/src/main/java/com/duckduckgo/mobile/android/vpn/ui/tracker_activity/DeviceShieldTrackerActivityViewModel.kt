@@ -111,7 +111,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val vpnState = vpnStateMonitor.getState().state
             sendCommand(Command.LaunchExcludedApps(vpnState == VpnRunningState.ENABLED))
-            deviceShieldPixels.didChooseToDisableOneAppFromDialog()
         }
     }
 
@@ -125,11 +124,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onViewEvent(viewEvent: ViewEvent) {
         viewModelScope.launch {
             when (viewEvent) {
-                ViewEvent.LaunchAppTrackersFAQ -> {
-                    deviceShieldPixels.privacyReportArticleDisplayed()
-                    command.send(Command.LaunchAppTrackersFAQ)
+                ViewEvent.LaunchAppTrackersFAQ -> command.send(Command.LaunchAppTrackersFAQ)
+                ViewEvent.LaunchBetaInstructions -> {
+                    deviceShieldPixels.didOpenBetaInstructions()
+                    command.send(Command.LaunchBetaInstructions)
                 }
-                ViewEvent.LaunchBetaInstructions -> command.send(Command.LaunchBetaInstructions)
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)

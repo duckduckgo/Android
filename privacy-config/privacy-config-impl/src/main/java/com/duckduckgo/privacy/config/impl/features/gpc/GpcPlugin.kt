@@ -17,8 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.gpc
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
@@ -36,10 +38,12 @@ class GpcPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: String,
+        name: FeatureName,
         jsonString: String
     ): Boolean {
-        if (name == featureName.value) {
+        @Suppress("NAME_SHADOWING")
+        val name = privacyFeatureValueOf(name.value)
+        if (name == featureName) {
             val gpcExceptions = mutableListOf<GpcExceptionEntity>()
             val gpcHeaders = mutableListOf<GpcHeaderEnabledSiteEntity>()
             val moshi = Moshi.Builder().build()
@@ -61,5 +65,5 @@ class GpcPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.GpcFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.GpcFeatureName
 }

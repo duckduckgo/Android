@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.health
+package com.duckduckgo.app.browser
 
-interface BadHealthMitigationFeature {
-    var isEnabled: Boolean
+import android.content.Context
+import android.webkit.WebViewDatabase
+
+interface WebViewDatabaseProvider {
+    fun get(): WebViewDatabase
+}
+
+class DefaultWebViewDatabaseProvider(val context: Context) : WebViewDatabaseProvider {
+
+    @Volatile
+    private var instance: WebViewDatabase? = null
+
+    override fun get(): WebViewDatabase =
+        instance ?: synchronized(this) {
+            instance ?: WebViewDatabase.getInstance(context).also { instance = it }
+        }
 }

@@ -58,11 +58,25 @@
             app:layout_constraintTop_toBottomOf="@id/contentSettingsPrivacy" />
 
         <include
+            android:id="@+id/contentSettingsMore"
+            layout="@layout/content_settings_more"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
+
+        <View
+            android:id="@+id/settingsSectionMoreBottomDivider"
+            style="@style/SettingsGroupDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/contentSettingsMore" />
+
+        <include
             android:id="@+id/contentSettingsOther"
             layout="@layout/content_settings_other"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/settingsSectionPrivacyBottomDivider" />
+            app:layout_constraintTop_toBottomOf="@id/settingsSectionMoreBottomDivider" />
 
         <include
             android:id="@+id/contentSettingsInternal"

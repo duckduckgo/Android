@@ -35,10 +35,8 @@ import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
-import com.duckduckgo.mobile.android.vpn.feature.isNetworkSwitchingHandlingEnabled
+import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
 import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
@@ -62,6 +60,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import java.net.Inet4Address
 import java.net.InetAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
@@ -120,7 +119,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
     private var connectionMonitor: ConnectionMonitor? = null
 
-    @Inject lateinit var featureToggle: FeatureToggle
+    @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -272,9 +271,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
             vpnPreferences.privateDns?.let { privateDnsName ->
-                if (featureToggle.isPrivateDnsSupportEnabled()) {
-                    Timber.v("Setting private DNS: $privateDnsName")
-                    InetAddress.getAllByName(privateDnsName).forEach { addr -> addDnsServer(addr) }
+                if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
+                    runCatching {
+                        InetAddress.getAllByName(privateDnsName)
+                    }.getOrNull()?.forEach { addr ->
+                        // ensure we don't set IPv6 DNS if not enabled
+                        if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || addr is Inet4Address) {
+                            Timber.v("Setting private DNS: $addr")
+                            addDnsServer(addr)
+                        }
+                    }
                 }
             }
 
@@ -507,7 +513,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkDisconnected() {
-        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
             // TODO maybe at some point show the user?
             Timber.w("No network")
             if (appBuildConfig.sdkInt >= 22) {
@@ -518,7 +524,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
     @SuppressLint("NewApi")
     override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
-        if (featureToggle.isNetworkSwitchingHandlingEnabled()) {
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
             if (appBuildConfig.sdkInt >= 22) {
                 Timber.w("set underlying networks: $networks")
                 if (networks.isEmpty()) {

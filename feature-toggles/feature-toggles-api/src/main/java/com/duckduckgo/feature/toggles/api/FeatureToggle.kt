@@ -20,13 +20,13 @@ package com.duckduckgo.feature.toggles.api
 interface FeatureToggle {
     /**
      * This method takes a [featureName] and optionally a default value.
-     * @return `true` if the feature is enabled, `false` if is not and `null` if the feature does
-     * not exist.
+     * @return `true` if the feature is enabled, `false` if is not
+     * @throws [IllegalArgumentException] if the feature is not implemented
      */
     fun isFeatureEnabled(
         featureName: FeatureName,
         defaultValue: Boolean = true
-    ): Boolean?
+    ): Boolean
 }
 
 /**
@@ -34,4 +34,25 @@ interface FeatureToggle {
  */
 interface FeatureName {
     val value: String
+
+    companion object {
+        /**
+         * Utility function to create a [FeatureName] from the passed in [block] lambda
+         * instead of using the anonymous `object : FeatureName` syntax.
+         *
+         * Usage:
+         *
+         * ```kotlin
+         * val feature = FeatureName {
+         *
+         * }
+         * ```
+         */
+        inline operator fun invoke(crossinline block: () -> String): FeatureName {
+            return object : FeatureName {
+                override val value: String
+                    get() = block()
+            }
+        }
+    }
 }

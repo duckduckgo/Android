@@ -16,21 +16,43 @@
 
 package com.duckduckgo.app.fire
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class AuthDatabaseLocatorTest {
 
-    @Test
-    fun whenGetDatabasePathOnDeviceThenPathNotEmpty() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val authDatabaseLocator = AuthDatabaseLocator(context)
+    private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val authDatabaseLocator = AuthDatabaseLocator(context)
 
+    @Before
+    fun before() {
+        DefaultWebViewDatabaseProvider(context).get()
+    }
+
+    @Test
+    fun whenGetDatabasePathOnDeviceThenPathNotEmpty() = runTest {
+        awaitPathCreation()
         val databasePath = authDatabaseLocator.getDatabasePath()
 
         // If this test fails, it means the Auth Database path has changed its location
         // If so, add a new database location to knownLocations list
         assertTrue(databasePath.isNotEmpty())
+    }
+
+    private suspend fun awaitPathCreation() {
+        withTimeout(5000) {
+            while (authDatabaseLocator.getDatabasePath().isEmpty()) {
+                delay(10)
+            }
+        }
     }
 }

@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -53,6 +54,12 @@ class VpnAppModule {
     @Provides
     fun provideAppHealthDatabase(context: Context): AppHealthDatabase {
         return AppHealthDatabase.create(context)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideVpnRemoveConfigDatabase(context: Context): VpnRemoteConfigDatabase {
+        return VpnRemoteConfigDatabase.create(context)
     }
 
     @Provides

@@ -19,20 +19,13 @@ package com.duckduckgo.privacy.config.api
 import com.duckduckgo.feature.toggles.api.FeatureName
 
 /** List of [FeatureName] that belong to the Privacy Configuration */
-sealed class PrivacyFeatureName(override val value: String) : FeatureName {
-    data class ContentBlockingFeatureName(override val value: String = "contentBlocking") :
-        PrivacyFeatureName(value)
-
-    data class GpcFeatureName(override val value: String = "gpc") : PrivacyFeatureName(value)
-    data class HttpsFeatureName(override val value: String = "https") : PrivacyFeatureName(value)
-    data class TrackerAllowlistFeatureName(override val value: String = "trackerAllowlist") :
-        PrivacyFeatureName(value)
-
-    data class DrmFeatureName(override val value: String = "eme") : PrivacyFeatureName(value)
-    data class AmpLinksFeatureName(override val value: String = "ampLinks") :
-        PrivacyFeatureName(value)
-
-    data class TrackingParametersFeatureName(override val value: String = "trackingParameters") :
-        PrivacyFeatureName(value)
-    data class AutofillFeatureName(override val value: String = "autofill") : PrivacyFeatureName(value)
+enum class PrivacyFeatureName(override val value: String) : FeatureName {
+    ContentBlockingFeatureName("contentBlocking"),
+    GpcFeatureName("gpc"),
+    HttpsFeatureName("https"),
+    TrackerAllowlistFeatureName("trackerAllowlist"),
+    DrmFeatureName("eme"),
+    AmpLinksFeatureName("ampLinks"),
+    TrackingParametersFeatureName("trackingParameters"),
+    AutofillFeatureName("autofill"),
 }

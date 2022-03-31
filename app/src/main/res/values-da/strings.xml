@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -173,7 +173,18 @@
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Del feedback</string>
     <string name="settingsEmailProtectionTitle">E-mailbeskyttelse</string>
-    <string name="settingsEmailProtectionSubtitle">Blokér e-mailtrackere og skjul din adresse.</string>
+    <string name="settingsEmailProtectionSubtitle">Bloker e-mailtrackere, og skjul din adresse</string>
+    <string name="settingsHeadingMore">Mere fra DuckDuckGo</string>
+    <string name="settingsLightTheme">Let</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Mørk</string>
+    <string name="settingsSystemTheme">System standard</string>
+    <string name="settingsThemeDialogSave">Indstil tema</string>
+    <string name="settingsTitleAppLinks">Åbn links i apps</string>
+    <string name="settingsTitleAppLinksDialog">Åbn links i apps</string>
+    <string name="settingsAppLinksAskEveryTime">Spørg hver gang</string>
+    <string name="settingsAppLinksAlways">Altid</string>
+    <string name="settingsAppLinksNever">Aldrig</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -250,6 +261,21 @@
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Tilføj favorit</string>
+    <string name="widgetConfigurationTitleText">Vælg tema</string>
+    <string name="widgetConfigurationSystemThemeOption">System standard</string>
+    <string name="widgetConfigurationLightThemeOption">Let</string>
+    <string name="widgetConfigurationDarkThemeOption">Mørk</string>
+    <string name="widgetConfigurationAddWidgetOption">Tilføj widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Ingen favoritter tilføjet endnu</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Tilføj til favorit</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Besøg dine foretrukne websteder på et splitsekund!\n\nGå til et websted, du elsker. Tryk derefter på ikonet \" ⠇\", og vælg Føj til favoritter.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Besøg dine foretrukne websteder på et splitsekund! Gå til et websted, du elsker. Tryk derefter på ikonet i browsermenuen, og vælg Tilføj favorit.</string>
+    <string name="widgetConfigurationActivityTitle">Widget-konfiguration</string>
+    <string name="favoritesWidgetLabel">Favoritter</string>
+    <string name="searchWidgetLabel">Søg</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Føj til startsiden</string>
@@ -568,6 +594,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Åbn links i tilknyttede apps</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Deaktiver for at forhindre, at links automatisk åbnes i andre installerede apps.</string>
     <string name="appLinkDialogTitle">Åbn i en anden app?</string>
+    <string name="appLinkSnackBarAction">Åbn i app</string>
+    <string name="appLinkMultipleSnackBarAction">Vælg app</string>
+    <string name="appLinkSnackBarMessage">Du kan åbne dette link i %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Du kan åbne dette link i andre apps.</string>
+    <string name="appLinkIntentChooserTitle">Åben med</string>
+    <string name="appLinkMenuItemTitle">Åbn i app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Ny adresse kopieret til din udklipsholder</string>
@@ -585,8 +617,8 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">E-mailventeliste</string>
-    <string name="waitlistNotificationTitle">Din invitation til e-mailbeskyttelse er her!</string>
-    <string name="waitlistNotificationDescription">Du sluttede dig til ventelisten og bad os om at underrette dig, når det er din tur til at prøve vores e-mailbeskyttelsesfunktion. Tryk for at se din invitation.</string>
+    <string name="waitlistNotificationTitle">E-mailbeskyttelse er klar!</string>
+    <string name="waitlistNotificationDescription">Åbn din invitation</string>
 
     <string name="waitlistNotificationDialogDescription">Vil du have os til at sende dig en meddelelse, når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nej tak.</string>
@@ -595,16 +627,18 @@
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">E-mailbeskyttelse (Beta)</string>
     <string name="emailProtectionActivityTitle">E-mailbeskyttelse (Beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Vi gemmer ikke dine e-mails. <b><a href=\"\">Få mere at vide</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Du behøver ikke at dele nogen personlige oplysninger for at komme på ventelisten. Du sikrer din plads i køen med et tidsstempel, der udelukkende findes på din enhed, så vi kan give dig besked, når det er din tur.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Der opstod en fejl, da du sluttede dig til ventelisten. Prøv igen senere</string>
     <string name="emailProtectionDuckAddressCta">Jeg har allerede en Duck-adresse</string>
     <string name="emailProtectionInviteCodeCta">Jeg har en invitationskode</string>
     <string name="emailProtectionWaitlistCta">Slut dig til den private venteliste</string>
     <string name="emailProtectionGetStartedCta">Kom igang</string>
+    <string name="emailNotSupported">Enheden understøttes ikke</string>
+    <string name="emailNotSupportedExplanation">E-mailbeskyttelse giver dig mulighed for at oprette private e-mailadresser, der fjerner e-mailtrackere. Vi skal kryptere og gemme disse adresser, som du opretter lokalt på din enhed. Fordi din enhed ikke understøtter krypteret lagring, er e-mailbeskyttelse ikke tilgængelig.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Fortrolighed af e-mail, forenklet.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokér e-mailtrackere og skjul din adresse, uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloker e-mailtrackere og skjul din adresse uden at ændre din e-mailudbyder.<a href=\"\"><b>Få mere at vide</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du er på listen!</string>
@@ -613,7 +647,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du er inviteret!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokér e-mailtrackere og skjul din adresse,<br/>uden at ændre din e-mailudbyder. <a href=\"\"><b>Få mere at vide</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloker e-mailtrackere, og skjul din adresse<br/>uden at ændre din e-mailudbyder.<br/><a href=\"\"><b>Få mere at vide</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personlig Duck-adresse</string>
@@ -621,4 +655,44 @@
         <![CDATA[Fjernelse af e-mailbeskyttelse fra denne enhed fjerner muligheden for at udfylde din personlige Duck-adresse eller en nyoprettet privat Duck-adresse i e-mailfelter, når du surfer på nettet.<br/><br/>For at slette dine Duck-adresser helt eller for andre spørgsmål eller feedback, kontakt os på <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Fjern fra enhed</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Rediger bogmærke</string>
+    <string name="favoriteDialogTitleEdit">Rediger favorit</string>
+    <string name="locationLabel">Placering</string>
+    <string name="folderLocationTitle">Vælg placering</string>
+    <string name="addFolder">Tilføj mappe</string>
+    <string name="editFolder">Rediger mappe</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Er du sikker på, at du vil slette "</string>
+    <string name="bookmarkFolderEmpty">Tom</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s og %3$d element?</item>
+        <item quantity="other">%1$s%2$s og %3$d elementer?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d element</item>
+        <item quantity="other">%1$d elementer</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Tilgængelighed</string>
+    <string name="accessibilityActivityTitle">Tilgængelighed</string>
+    <string name="accessibilityFontSizeTitle">Tekststørrelse</string>
+    <string name="accessibilityFontSizeHint">Træk skyderen, indtil du nemt kan læse dette. Websteder, som du ser i DuckDuckGo, tilpasser sig dette.</string>
+    <string name="accessibilityForceZoomTitle">Håndhæv manuel sidezoom</string>
+    <string name="accessibilityForceZoomSubtitle">Knib og zoom på ethvert websted, også dem, der ellers ville forhindre det</string>
+    <string name="accessibilityTextSizeOverrideTitle">Administrer tekststørrelse</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Tekst på websteder, du ser i DuckDuckGo, justeres, så den matcher indstillingen nedenfor</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privatlivspolitik</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Det var ikke muligt at downloade. Kontroller internetforbindelsen.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s widget tilføjet til startskærmen</string>
+    <string name="settingsAddHomeScreenWidget">Startskærmswidget</string>
 </resources>

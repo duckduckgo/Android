@@ -92,7 +92,7 @@ class RealDrmTest {
     }
 
     private fun giveFeatureIsEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.DrmFeatureName), any())).thenReturn(true)
     }
 
     private fun givenUrlIsInExceptionList() {

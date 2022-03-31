@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.gpc
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
@@ -40,7 +41,9 @@ class GpcPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchGpcThenReturnFalse() {
-        assertFalse(testee.store("test", EMPTY_JSON_STRING))
+        PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+            assertFalse(testee.store(it, EMPTY_JSON_STRING))
+        }
     }
 
     @Test
@@ -76,7 +79,7 @@ class GpcPluginTest {
     }
 
     companion object {
-        private const val FEATURE_NAME = "gpc"
+        private val FEATURE_NAME = PrivacyFeatureName.GpcFeatureName
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

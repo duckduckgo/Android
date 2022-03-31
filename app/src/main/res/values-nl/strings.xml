@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -32,20 +32,20 @@
     <string name="onboardingDefaultBrowserTitle">Stel DuckDuckGo in als standaard</string>
 
     <!-- Default Browser -->
-    <string name="cannotLaunchDefaultAppSettings">Kan het instellingenscherm voor standaard-apps niet openen</string>
+    <string name="cannotLaunchDefaultAppSettings">Kan het scherm voor standaard app-instellingen niet openen</string>
     <string name="settingsDefaultBrowserEnabled">Instellen als standaard browser</string>
     <string name="defaultBrowserMaybeLater">Later misschien</string>
     <string name="defaultBrowserLetsDoIt">Instellen als standaard browser</string>
-    <string name="defaultBrowserDescriptionNoDefault">Open links altijd met een gerust hart.</string>
-    <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff">Altijd </font>.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Elke keer links in een rustige toestand openen.</string>
+    <string name="defaultBrowserInstructions">Selecteer DuckDuckGo en tik op <font color="#678fff"> Altijd </font>.</string>
 
     <!-- Browser Activity -->
-    <string name="browserPopupMenu">Browsermenu</string>
-    <string name="refresh">Vernieuwen</string>
+    <string name="browserPopupMenu">Browser menu</string>
+    <string name="refresh">Opnieuw laden</string>
     <string name="back">Terug</string>
-    <string name="forward">Vooruit</string>
+    <string name="forward">Doorsturen</string>
 
-    <string name="omnibarInputHint">URL typen of zoeken</string>
+    <string name="omnibarInputHint">URL zoeken of typen</string>
     <string name="clearButtonContentDescription">Zoekinvoer wissen</string>
     <string name="no_compatible_third_party_app_installed">Geen compatibele app geïnstalleerd</string>
     <string name="addBookmarkMenuTitle">Bladwijzer toevoegen</string>
@@ -67,13 +67,13 @@
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
     <string name="shareMenuTitle">Delen…</string>
-    <string name="copyUrl">Adres link kopiëren</string>
+    <string name="copyUrl">Link adres kopiëren</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Zoek op pagina</string>
     <string name="nextSearchTermDescription">Volgende zoeken</string>
     <string name="previousSearchTermDescription">Vorige zoeken</string>
-    <string name="closeFindInPageButtonDescription">Scherm zoek op pagina sluiten</string>
+    <string name="closeFindInPageButtonDescription">Zoeken in paginaweergave sluiten</string>
     <string name="findInPageHint">Zoek op pagina</string>
     <string name="findInPageMatches" translatable="false">%d/%d</string>
 
@@ -108,7 +108,7 @@
     <string name="privacyProtectionDisabled">BESCHERMING VAN DE SITE UITGESCHAKELD</string>
     <string name="privacyDashboardActivityTitle">Privacydashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBETERD VAN &lt;img src=\"%1$d\" /&gt; NAAR &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Privacyklasse</string>
+    <string name="privacyGradeContentDescription">Privacyniveau</string>
     <string name="privacyProtectionTemporarilyDisabled">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
 
     <string name="httpsGood">Gecodeerde verbinding</string>
@@ -139,17 +139,17 @@
         <item quantity="other">%1$s grote trackernetwerken geblokkeerd</item>
     </plurals>
 
-    <string name="scorecardActivityTitle">Privacyklasse</string>
+    <string name="scorecardActivityTitle">Privacyniveau</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Site is groot trackernetwerk</string>
-    <string name="scorecardPrivacyGrade">Privacyklasse</string>
-    <string name="scorecardEnhancedGrade">Verbeterde klasse</string>
+    <string name="scorecardPrivacyGrade">Privacyniveau</string>
+    <string name="scorecardEnhancedGrade">Verbeterd niveau</string>
 
     <string name="privacyTermsActivityTitle">Privacypraktijken</string>
     <string name="practicesGood">Goede privacypraktijken</string>
     <string name="practicesMixed">Gemengde privacypraktijken</string>
     <string name="practicesBad">Slechte privacypraktijken</string>
     <string name="practicesUnknown">Onbekende privacypraktijken</string>
-    <string name="practicesOverview">Privacypraktijken geven aan in hoeverre de persoonsgegevens die je deelt met een website beschermd zijn.</string>
+    <string name="practicesOverview">Privacypraktijken geven aan in hoeverre de persoonsgegevens die u deelt met een website beschermd zijn.</string>
     <string name="practicesTosdrLink">Privacypraktijken van <b><u>ToS;DR</u></b>.</string>
     <string name="practicesIconContentGood">Pictogram Goede praktijken</string>
     <string name="practicesIconContentBad">Pictogram Slechte praktijken</string>
@@ -167,13 +167,24 @@
     <string name="settingsActivityTitle">Instellingen</string>
     <string name="settingsMenuItemTitle">Instellingen</string>
     <string name="settingsHeadingGeneral">Algemeen</string>
-    <string name="settingsHeadingOther">Anders</string>
+    <string name="settingsHeadingOther">Overige</string>
     <string name="settingsHeadingPrivacy">Privacy</string>
     <string name="settingsAboutDuckduckgo">Over DuckDuckGo</string>
     <string name="settingsVersion">Versie</string>
     <string name="leaveFeedback">Feedback delen</string>
     <string name="settingsEmailProtectionTitle">E-mailbescherming</string>
-    <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres.</string>
+    <string name="settingsEmailProtectionSubtitle">Blokkeer e-mailtrackers en verberg je adres</string>
+    <string name="settingsHeadingMore">Meer over DuckDuckGo</string>
+    <string name="settingsLightTheme">Licht</string>
+    <string name="settingsTheme">Thema</string>
+    <string name="settingsDarkTheme">Donker</string>
+    <string name="settingsSystemTheme">Systeemstandaard</string>
+    <string name="settingsThemeDialogSave">Thema instellen</string>
+    <string name="settingsTitleAppLinks">Koppelingen openen in apps</string>
+    <string name="settingsTitleAppLinksDialog">Koppelingen openen in apps</string>
+    <string name="settingsAppLinksAskEveryTime">Elke keer vragen</string>
+    <string name="settingsAppLinksAlways">Altijd</string>
+    <string name="settingsAppLinksNever">Nooit</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -207,7 +218,7 @@
     <string name="brokenSitesCategoriesTitle">Beschrijf wat er is gebeurd</string>
     <string name="brokenSitesCategoriesHint">Beschrijf wat er is gebeurd</string>
     <string name="brokenSiteSubmitButton">Verzend Rapport</string>
-    <string name="brokenSiteDescription">Als je een anoniem rapport voor een defecte site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
+    <string name="brokenSiteDescription">Als u een anoniem rapport voor een gebroken site indient, kunnen we deze problemen oplossen en de app verbeteren.</string>
 
     <string name="brokenSiteCategoryImages">Afbeeldingen zijn niet geladen</string>
     <string name="brokenSiteCategoryPaywall">De site heeft me gevraagd om uit te schakelen</string>
@@ -249,10 +260,25 @@
     <string name="edit">Bewerken</string>
 
     <!-- Widget -->
-    <string name="searchWidgetTextHint">Zoek in DuckDuckGo</string>
+    <string name="searchWidgetTextHint">DuckDuckGo doorzoeken</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Favoriet toevoegen</string>
+    <string name="widgetConfigurationTitleText">Thema kiezen</string>
+    <string name="widgetConfigurationSystemThemeOption">Systeemstandaard</string>
+    <string name="widgetConfigurationLightThemeOption">Licht</string>
+    <string name="widgetConfigurationDarkThemeOption">Donker</string>
+    <string name="widgetConfigurationAddWidgetOption">Widget toevoegen</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Bezoek je favoriete websites in een oogwenk!<br/><br/>Ga naar een van je favoriete sites. Tik vervolgens op het pictogram \" ⠇\" en selecteer \'Toevoegen aan favorieten\'.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Bezoek je favoriete websites in een oogwenk! Ga naar een van je favoriete sites. Tik vervolgens op het browsermenupictogram en selecteer \'Toevoegen aan favorieten\'.</string>
+    <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
+    <string name="favoritesWidgetLabel">Favorieten</string>
+    <string name="searchWidgetLabel">Zoeken</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Toevoegen aan startscherm</string>
+    <string name="addToHome">Toevoegen aan Startscherm</string>
     <string name="shortcutAddedText">%1$s is toegevoegd aan je startscherm.</string>
 
     <!-- User Survey -->
@@ -264,7 +290,7 @@
     <string name="surveyTitle">ENQUÊTE DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Enquête negeren</string>
     <string name="surveyLoadingErrorTitle">Oh nee!</string>
-    <string name="surveyLoadingErrorText">Onze enquête kan momenteel niet worden geladen.\nProbeer het later opnieuw.</string>
+    <string name="surveyLoadingErrorText">Onze enquête wordt momenteel niet geladen.\nProbeer het later opnieuw.</string>
 
     <!-- Add widget -->
     <string name="addWidgetCtaTitle">Probeer onze zoekwidget!</string>
@@ -273,11 +299,11 @@
     <string name="addWidgetCtaInstructionsLaunchButton">Laat zien</string>
     <string name="addWidgetCtaDismissButton">Negeren</string>
     <string name="addWidgetInstructionsActivityTitle">Widget toevoegen</string>
-    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1Label">1.</string>
     <string name="addWidgetInstruction1">Druk lang op je startscherm en open dan het widgets-menu.</string>
-    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2Label">2.</string>
     <string name="addWidgetInstruction2">Vind de DuckDuckGo-widget.</string>
-    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3Label">3.</string>
     <string name="addWidgetInstruction3">Sleep de widget naar je startscherm.</string>
     <string name="addWidgetInstructionsButtonGoHome">Ga naar het startscherm</string>
     <string name="addWidgetInstructionsButtonClose">Sluiten</string>
@@ -289,7 +315,7 @@
     <string name="appEnjoymentDialogNegativeButton">Er moet aan gewerkt worden</string>
 
     <string name="rateAppDialogTitle">Beoordeel de app</string>
-    <string name="rateAppDialogMessage">Jouw feedback is belangrijk. Schrijf een beoordeling om te laten zien hoe blij je ermee bent.</string>
+    <string name="rateAppDialogMessage">Jouw feedback is belangrijk. Laat zien hoe blij je ermee bent met een beoordeling.</string>
     <string name="rateAppDialogPositiveButton">Beoordeel app</string>
     <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
 
@@ -310,8 +336,8 @@
     <string name="clearNotificationDescription">Pas DuckDuckGo aan om de browsegegevens na elke sessie automatisch te wissen.</string>
 
     <!-- Privacy Protection Notification -->
-    <string name="privacyProtectionNotificationDefaultTitle">Wij beschermen je privacy</string>
-    <string name="privacyProtectionNotificationReportTitle">Je privacyrapport</string>
+    <string name="privacyProtectionNotificationDefaultTitle">Wij beschermen jouw privacy</string>
+    <string name="privacyProtectionNotificationReportTitle">Jouw privacyrapport</string>
     <string name="privacyProtectionNotificationDefaultDescription">Het gebruik van de DuckDuckGo-app beschermt je gegevens door trackers te blokkeren en verbindingen te coderen.</string>
     <string name="privacyProtectionNotificationUpgadeDescription">Je hebt je gegevens beschermd door %1$d niet-gecodeerde verbindingen te beveiligen terwijl je DuckDuckGo gebruikt.</string>
     <string name="privacyProtectionNotificationTrackerDescription">Je hebt je gegevens beschermd door %1$d trackers te blokkeren terwijl je DuckDuckGo gebruikt.</string>
@@ -327,7 +353,7 @@
     <string name="authenticationDialogPasswordHint">Wachtwoord</string>
 
     <!-- User-facing label for when a user selects text and might want to search for that text -->
-    <string name="systemTextSearchMessage">Zoek in DuckDuckGo</string>
+    <string name="systemTextSearchMessage">DuckDuckGo doorzoeken</string>
 
     <!-- App feedback disambiguation -->
     <string name="feedbackActivityTitle">Feedback delen</string>
@@ -346,8 +372,8 @@
     <string name="websiteNotLoadingTitleShort">Problemen met laden van website</string>
     <string name="websiteNotLoadingSubtitle">Welke website is defect?</string>
 
-    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-zoekfunctie is niet goed genoeg</string>
-    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo-zoekproblemen</string>
+    <string name="searchNotGoodEnoughTitleLong">DuckDuckGo-zoekopdracht is niet goed genoeg</string>
+    <string name="searchNotGoodEnoughTitleShort">DuckDuckGo zoekproblemen</string>
     <string name="searchNotGoodEnoughSubtitle">Welke zoekfunctie kunnen we toevoegen of verbeteren?</string>
     <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Programmeren/technisch zoeken</string>
     <string name="searchNotGoodEnoughSubReasonGoogleLayout">De lay-out zou meer op Google moeten lijken</string>
@@ -407,9 +433,9 @@
 
     <!-- System Search-->
     <string name="systemSearchDeviceAppLabel">Van dit apparaat</string>
-    <string name="systemSearchOmnibarInputHint"><font size="13">URL typen of zoeken</font></string>
+    <string name="systemSearchOmnibarInputHint"><font size="13">URL zoeken of typen</font></string>
     <string name="systemSearchAppNotFound">Toepassing kon niet worden gevonden</string>
-    <string name="systemSearchOnboardingText">Bedankt dat je voor DuckDuckGo heeft gekozen!\nAls je nu onze zoekmachine of app gebruikt, zijn je zoekopdrachten beschermd.</string>
+    <string name="systemSearchOnboardingText">Bedankt dat u voor DuckDuckGo heeft gekozen!\nWanneer u nu onze zoekopdracht of app gebruikt, zijn uw zoekopdrachten beveiligd.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">De DuckDuckGo-app:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blokkeert onveilige trackers.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Dwingt codering af op websites.</string>
@@ -429,12 +455,12 @@
     <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Welkom bij DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Internet kan best eng zijn.<br/><br/>Maak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan je denkt.]]></string>
-    <string name="onboardingLetsDoItButton">Laten we het doen!</string>
-    <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van je favoriete sites te bezoeken!<br/><br/>Ik blokkeer trackers zodat ze je niet kunnen bespioneren. Indien mogelijk upgrade ik ook de beveiliging van je verbinding. 🔒]]></string>
+    <string name="onboardingWelcomeTitle">"WELKOM BIJ DUCKDUCKGO!"</string>
+    <string name="onboardingDaxText"><![CDATA[Het internet kan best eng zijn.<br/><br/>Maak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan u denkt.]]></string>
+    <string name="onboardingLetsDoItButton">Laten we het Doen!</string>
+    <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van uw favoriete sites te bezoeken! <br/><br/>Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Je kunt het!<br/><br/>Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👍]]></string>
-    <string name="daxSerpCtaText">Je DuckDuckGo-zoekopdrachten zijn anoniem en ik sla je zoekgeschiedenis nooit op. Nooit. 🙌</string>
+    <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
@@ -443,16 +469,16 @@
         <item quantity="one"><![CDATA[ probeerde je hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers.<br/><br/>Ga je gang, blijf browsen!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. <br/><br/>Ga je gang - blijf browsen!]]></string>
     <string name="daxMainNetworkCtaText">Opgelet! Ik kan niet voorkomen dat %1$s jouw activiteit op %2$s kan zien&lt;br/&gt;&lt;br/&gt;Maar als je met mij browset, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op veel andere sites te blokkeren.</string>
     <string name="daxMainNetworkOwnedCtaText">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Doorgaan</string>
-    <string name="downloadConfirmationSaveFileTitle">%1$s opslaan</string>
+    <string name="downloadConfirmationSaveFileTitle">Opslaan%1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Houd beide</string>
     <string name="downloadConfirmationReplaceOldFileText">Vervangen</string>
-    <string name="downloadConfirmationOpenFileText">Openen</string>
+    <string name="downloadConfirmationOpenFileText">Open</string>
     <string name="downloadConfirmationUnableToOpenFileText">Kon het bestand niet openen</string>
     <string name="downloadConfirmationUnableToDeleteFileText">Kon oud bestand niet verwijderen</string>
 
@@ -462,7 +488,7 @@
     <string name="changeIconCtaAccept">Toepassen</string>
     <string name="changeIconCtaCancel">Annuleren</string>
     <string name="changeIconDialogTitle">Nieuw pictogram toepassen?</string>
-    <string name="changeIconDialogMessage">De app wordt mogelijk gesloten om wijzigingen toe te passen. Kom terug nadat je je mooie nieuwe pictogram hebt bewonderd.</string>
+    <string name="changeIconDialogMessage">De app wordt mogelijk gesloten om wijzigingen toe te passen. Kom terug nadat je je knappe nieuwe icoon heeft bewonderd.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Onbeschermde sites</string>
@@ -496,7 +522,7 @@
     <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="fireproofWebsiteEmptyListHint">Geen brandveilige websites</string>
     <string name="fireproofWebsiteFeatureDescription">Websites gebruiken cookies om te zorgen dat je ingelogd blijft. Als je een site brandveilig maakt, worden de cookies niet gewist en blijf je ingelogd, zelfs nadat je de vuurknop hebt gebruikt. Trackers van derden worden ook op brandveilige websites geblokkeerd.</string>
-    <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een brandveilige website %1$s</string>
+    <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Wil je %1$s brandveilig maken?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Als je deze site brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Brandveilig</string>
@@ -568,6 +594,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Links openen in bijbehorende apps</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Uitschakelen om te voorkomen dat links automatisch geopend worden in andere geïnstalleerde apps.</string>
     <string name="appLinkDialogTitle">Openen in een andere app?</string>
+    <string name="appLinkSnackBarAction">Openen in de app</string>
+    <string name="appLinkMultipleSnackBarAction">App kiezen</string>
+    <string name="appLinkSnackBarMessage">Je kunt deze link openen in %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Je kunt deze link openen in andere apps.</string>
+    <string name="appLinkIntentChooserTitle">Openen met</string>
+    <string name="appLinkMenuItemTitle">Openen in de app</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Nieuw adres gekopieerd naar je klembord</string>
@@ -585,26 +617,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">E-mailwachtlijst</string>
-    <string name="waitlistNotificationTitle">Je hebt een uitnodiging voor E-mailbescherming ontvangen!</string>
-    <string name="waitlistNotificationDescription">Je hebt je ingeschreven voor de wachtlijst en ons gevraagd je te laten weten wanneer je aan de beurt bent om onze functie E-mailbescherming uit te proberen. Tik om je uitnodiging te bekijken.</string>
+    <string name="waitlistNotificationTitle">E-mailbescherming is klaar!</string>
+    <string name="waitlistNotificationDescription">Open je uitnodiging</string>
 
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
-    <string name="waitlistNotificationDialogNoThanks">NEE, BEDANKT</string>
+    <string name="waitlistNotificationDialogNoThanks">Nee, bedankt</string>
     <string name="waitlistNotificationDialogNotifyMe">MELDING STUREN</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">E-mailbescherming (bèta)</string>
     <string name="emailProtectionActivityTitle">E-mailbescherming (bèta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[We bewaren je e-mails niet. <b><a href=\"\">Meer informatie</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Je hoeft geen persoonsgegevens te delen om op de wachtlijst te komen. Je beveiligt je plaats met een tijdstempel die alleen op jouw apparaat bestaat. Zo kunnen we je informeren wanneer je aan de beurt bent.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
     <string name="emailProtectionDuckAddressCta">Ik heb al een Duck-adres</string>
     <string name="emailProtectionInviteCodeCta">Ik heb een uitnodigingscode</string>
     <string name="emailProtectionWaitlistCta">Schrijf je in voor de privéwachtlijst</string>
     <string name="emailProtectionGetStartedCta">Aan de slag</string>
+    <string name="emailNotSupported">Apparaat wordt niet ondersteund</string>
+    <string name="emailNotSupportedExplanation">Met E-mailbescherming maak je privémailadressen die e-mailtrackers verwijderen. De adressen die je lokaal op je apparaat maakt, dienen we te versleutelen en opslaan. E-mailbescherming is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
@@ -613,7 +647,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres,<br/>zonder van e-mailprovider te wisselen. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>
@@ -621,4 +655,44 @@
         <![CDATA[Als je E-mailbescherming van dit apparaat verwijdert, kun je je persoonlijke Duck-adres niet meer invullen en geen nieuwe privé-Duck-adressen genereren in e-mailvelden terwijl je op het internet browset.<br/><br/>Als je je Duck-adressen volledig wilt verwijderen of als je andere vragen of feedback hebt, neem dan contact met ons op via <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Verwijderen van apparaat</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>
+    <string name="favoriteDialogTitleEdit">Favoriet bewerken</string>
+    <string name="locationLabel">Locatie</string>
+    <string name="folderLocationTitle">Locatie selecteren</string>
+    <string name="addFolder">Map toevoegen</string>
+    <string name="editFolder">Map bewerken</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
+    <string name="bookmarkFolderEmpty">Leeg</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s %2$s en %3$d item?</item>
+        <item quantity="other">%1$s %2$s en %3$d items?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Toegankelijkheid</string>
+    <string name="accessibilityActivityTitle">Toegankelijkheid</string>
+    <string name="accessibilityFontSizeTitle">Lettergrootte</string>
+    <string name="accessibilityFontSizeHint">Sleep de schuifregelaar totdat je dit comfortabel kunt lezen. Websites die je in DuckDuckGo bekijkt, worden aan de tekstgrootte aangepast.</string>
+    <string name="accessibilityForceZoomTitle">Handmatig op de pagina inzoomen</string>
+    <string name="accessibilityForceZoomSubtitle">Knijp en zoom in op elke site, zelfs op sites die dit anders zouden voorkomen</string>
+    <string name="accessibilityTextSizeOverrideTitle">Tekstgrootte beheren</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Tekst op websites die je in DuckDuckGo bekijkt, wordt aangepast aan de onderstaande instelling</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privacybeleid</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Downloaden mislukt. Controleer uw internetverbinding.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%1$s widget toegevoegd aan startscherm</string>
+    <string name="settingsAddHomeScreenWidget">Startschermwidget</string>
 </resources>
