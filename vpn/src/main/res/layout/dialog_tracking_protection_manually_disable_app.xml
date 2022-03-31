@@ -83,7 +83,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppName"/>
 
             <Button
-                    android:id="@+id/trackingProtectionExcludeAppDialogSubmit"
+                    android:id="@+id/trackingProtectionExcludeAppDialogReport"
                     style="@style/Widget.DuckDuckGo.Button.Primary"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dialogButtonHeight"
@@ -91,7 +91,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:gravity="center|center_horizontal"
-                    android:text="@string/atp_ExcludeAppsManuallyCTASubmit"
+                    android:text="@string/atp_ExcludeAppsManuallyCTAReport"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/guideline2"
                     app:layout_constraintTop_toBottomOf="@+id/trackingProtectionAppLabel"

@@ -20,7 +20,6 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
@@ -31,7 +30,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyDisableAppProtectionDialogListener {
-        fun onAppProtectionDisabled(packageName: String)
+        fun onAppProtectionDisabled(
+            appName: String,
+            packageName: String,
+            report: Boolean = false
+        )
     }
 
     val listener: ManuallyDisableAppProtectionDialogListener
@@ -54,7 +57,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val disableLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
-        val submitCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSubmit)
+        val reportCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogReport)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
         val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
@@ -65,7 +68,7 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
 
         populateAppIcon(appIcon)
         populateLabel(disableLabel)
-        configureListeners(submitCTA, skipCTA)
+        configureListeners(reportCTA, skipCTA)
 
         return alertDialog.create()
     }
@@ -89,17 +92,17 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     }
 
     private fun configureListeners(
-        submitCTA: Button,
+        reportCTA: Button,
         skipCTA: Button
     ) {
-        submitCTA.setOnClickListener {
+        reportCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getPackageName())
+            listener.onAppProtectionDisabled(getAppName(), getPackageName(), true)
         }
 
         skipCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionDisabled(getPackageName())
+            listener.onAppProtectionDisabled(getAppName(), getPackageName())
         }
     }
 

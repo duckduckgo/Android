@@ -152,7 +152,7 @@
     <string name="atp_ExcludeAppsManuallyDisableAnswerOne">It stopped working as expected</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerTwo">I\'m OK being tracked in this app</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerThree">For other reason</string>
-    <string name="atp_ExcludeAppsManuallyCTASubmit">Submit</string>
+    <string name="atp_ExcludeAppsManuallyCTAReport">Report</string>
     <string name="atp_ExcludeAppsManuallyCTASkip">Skip</string>
     <string name="atp_ExcludeAppsManuallyDisableAnswerExplanation">Submissions are 100% anonymous and only include your selection above and the app name.</string>
     <string name="atp_ExcludeAppsManuallyMenuRestore">Restore Default Protected Apps</string>

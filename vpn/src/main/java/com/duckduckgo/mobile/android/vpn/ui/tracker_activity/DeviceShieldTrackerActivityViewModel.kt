@@ -169,7 +169,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CheckVPNPermission : Command()
         object VPNPermissionNotGranted : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-        object LaunchManageAppsProtection: Command()
+        object LaunchManageAppsProtection : Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()

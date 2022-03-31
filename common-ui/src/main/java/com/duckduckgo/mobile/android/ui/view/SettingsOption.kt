@@ -20,12 +20,9 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewSettingsOptionItemBinding
-import com.duckduckgo.mobile.android.databinding.ViewSingleLineListItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsOption : LinearLayout {
