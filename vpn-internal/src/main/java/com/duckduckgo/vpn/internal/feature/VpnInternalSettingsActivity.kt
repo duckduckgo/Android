@@ -20,22 +20,25 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
+import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
-import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
-import com.duckduckgo.mobile.android.vpn.store.VpnFeatureToggles
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
 import com.duckduckgo.vpn.internal.feature.logs.TimberExtensions
+import com.duckduckgo.vpn.internal.feature.remote.VpnRemoteFeatureReceiver
 import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -48,10 +51,10 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var appHealthMonitor: AppHealthMonitor
 
     @Inject
-    lateinit var featureToggle: FeatureToggle
+    lateinit var appTpConfig: AppTpFeatureConfig
 
     @Inject
-    lateinit var appTpFeatureToggleRepository: AppTpFeatureToggleRepository
+    lateinit var vpnStateMonitor: VpnStateMonitor
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -74,7 +77,11 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private val badHealthMitigationFeatureToggle = CompoundButton.OnCheckedChangeListener { _, toggleState ->
-        appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.BadHealthMitigation, toggleState))
+        if (toggleState) {
+            sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(AppTpSetting.BadHealthMitigation))
+        } else {
+            sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(AppTpSetting.BadHealthMitigation))
+        }
     }
 
     private val debugLoggingToggleListener = CompoundButton.OnCheckedChangeListener { _, toggleState ->
@@ -98,11 +105,29 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupViewDiagnosticsView()
         setupBadHealthMonitoring()
         setupConfigSection()
+        setupUiElementsState()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         transparencyModeDebugReceiver?.let { it.unregister() }
+    }
+
+    private fun setupUiElementsState() {
+        vpnStateMonitor.getStateFlow()
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
+            .onEach { isEnabled ->
+                binding.ipv6SupportToggle.isEnabled = isEnabled
+                binding.privateDnsToggle.isEnabled = isEnabled
+                binding.badHealthMonitorToggle.isEnabled = isEnabled
+                binding.badHealthMitigationToggle.isEnabled = isEnabled
+                binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
+                binding.debugLoggingToggle.isEnabled = isEnabled
+                binding.transparencyModeToggle.isEnabled = isEnabled
+                binding.settingsInfo.isVisible = !isEnabled
+            }
+            .launchIn(lifecycleScope)
     }
 
     private fun setupDeleteTrackingHistory() {
@@ -170,24 +195,42 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         binding.badHealthMonitorToggle.isChecked = appHealthMonitor.isMonitoringStarted()
         binding.badHealthMonitorToggle.setOnCheckedChangeListener(badHealthMonitoringToggleListener)
 
-        binding.badHealthMitigationToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.BadHealthMitigation, true)
+        binding.badHealthMitigationToggle.isChecked = appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)
         binding.badHealthMitigationToggle.setOnCheckedChangeListener(badHealthMitigationFeatureToggle)
     }
 
     private fun setupConfigSection() {
-        binding.ipv6SupportToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.Ipv6Support, false)
-        binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.Ipv6Support, isChecked))
+        with(AppTpSetting.Ipv6Support) {
+            binding.ipv6SupportToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.ipv6SupportToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
         }
 
-        binding.privateDnsToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
-        binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.PrivateDnsSupport, isChecked))
+        with(AppTpSetting.PrivateDnsSupport) {
+            binding.privateDnsToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.privateDnsToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
         }
 
-        binding.vpnUnderlyingNetworksToggle.isChecked = featureToggle.isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling, false)
-        binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
-            appTpFeatureToggleRepository.insert(VpnFeatureToggles(AppTpFeatureName.NetworkSwitchingHandling, isChecked))
+        with(AppTpSetting.NetworkSwitchHandling) {
+            binding.vpnUnderlyingNetworksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
         }
     }
 

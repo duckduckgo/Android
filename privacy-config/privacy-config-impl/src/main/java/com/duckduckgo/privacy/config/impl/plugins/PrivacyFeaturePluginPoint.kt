@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+package com.duckduckgo.privacy.config.impl.plugins
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 
-/** List of [FeatureName] that belong to the Privacy Configuration */
-enum class PrivacyFeatureName(override val value: String) : FeatureName {
-    ContentBlockingFeatureName("contentBlocking"),
-    GpcFeatureName("gpc"),
-    HttpsFeatureName("https"),
-    TrackerAllowlistFeatureName("trackerAllowlist"),
-    DrmFeatureName("eme"),
-    AmpLinksFeatureName("ampLinks"),
-    TrackingParametersFeatureName("trackingParameters"),
-    AutofillFeatureName("autofill"),
+class PrivacyFeaturePluginPoint(
+    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
+) : PluginPoint<PrivacyFeaturePlugin> {
+    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
+        return privacyFeatures.sortedBy { it.featureName.value }
+    }
 }

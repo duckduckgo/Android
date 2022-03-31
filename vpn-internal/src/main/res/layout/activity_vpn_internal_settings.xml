@@ -54,6 +54,14 @@
             android:orientation="vertical"
         >
 
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                    android:id="@+id/settings_info"
+                    style="@style/Widget.DuckDuckGo.InfoPanel"
+                    app:panelBackground="@drawable/background_yellow_tooltip"
+                    app:panelDrawable="@drawable/ic_alert_color_24"
+                    app:panelText="Turn AppTP ON to be able to configure this settings"
+                    android:layout_margin="16dp"/>
+
             <!-- Section Config -->
             <TextView
                 android:id="@+id/sectionConfigTitle"

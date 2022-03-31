@@ -59,12 +59,9 @@ class RealAppTpFeatureToggleRepositoryTest {
 
         whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
         assertEquals(false, repository.get(FEATURE, false))
-
-        whenever(vpnFeatureToggleStore.get(AppTpFeatureName.PrivateDnsSupport, false)).thenReturn(true)
-        assertEquals(false, repository.get(FEATURE, false))
     }
 
     companion object {
-        private val FEATURE = AppTpFeatureName.Ipv6Support
+        private val FEATURE = AppTpFeatureName.AppTrackerProtection
     }
 }

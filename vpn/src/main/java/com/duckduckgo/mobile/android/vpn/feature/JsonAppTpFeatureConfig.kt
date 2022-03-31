@@ -16,8 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.feature
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import org.json.JSONObject
 
-enum class AppTpFeatureName(override val value: String) : FeatureName {
-    AppTrackerProtection("appTrackerProtection"),
-}
+data class JsonAppTpFeatureConfig(
+    val state: String,
+    val settings: Map<String, JSONObject?>,
+)

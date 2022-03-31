@@ -27,8 +27,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.feature.isBadHealthMitigationEnabled
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
@@ -57,7 +57,7 @@ class AppBadHealthStateHandler @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val appHealthDatabase: AppHealthDatabase,
-    private val featureToggle: FeatureToggle,
+    private val appTpConfig: AppTpFeatureConfig,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -81,7 +81,7 @@ class AppBadHealthStateHandler @Inject constructor(
         }
 
     override suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean {
-        if (!featureToggle.isBadHealthMitigationEnabled()) {
+        if (!appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)) {
             Timber.d("Feature is disabled, skipping mitigation")
             return false
         }
