@@ -21,8 +21,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -30,28 +28,17 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedFragment.ActivityFeedConfig
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedViewModel.TrackingCompanyInfo
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerEmptyFeed
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem.TrackerLoadingSkeleton
 import com.squareup.anvil.annotations.ContributesMultibinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.threeten.bp.LocalDateTime
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
 import javax.inject.Provider
@@ -104,12 +91,21 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionDisabled(
-        packageName: String
+        appName: String,
+        packageName: String,
+        report: Boolean
     ) {
         recordManualChange(packageName)
         viewModelScope.launch {
-            pixel.didSubmitManuallyDisableAppProtectionDialog()
+
             excludedApps.manuallyExcludedApp(packageName)
+
+            if (report) {
+                pixel.didSubmitManuallyDisableAppProtectionDialog()
+                command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
+            } else {
+                pixel.didSkipManuallyDisableAppProtectionDialog()
+            }
         }
     }
 
@@ -181,7 +177,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         if (!excludedAppInfo.isProblematic()) {
             command.send(Command.ShowDisableProtectionDialog(excludedAppInfo))
         } else {
-            onAppProtectionDisabled(packageName = excludedAppInfo.packageName)
+            onAppProtectionDisabled(appName = excludedAppInfo.name, packageName = excludedAppInfo.packageName, report = false)
         }
     }
 

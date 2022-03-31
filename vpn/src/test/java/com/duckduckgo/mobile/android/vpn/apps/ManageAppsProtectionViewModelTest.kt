@@ -20,9 +20,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.mobile.android.vpn.apps.Command.LaunchFeedback
-import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
-import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog.Companion.STOPPED_WORKING
-import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen.IssueDescriptionForm
+import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -65,17 +63,48 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenPackageNameIsExcludedThenProtectedAppsExcludesIt() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(packageName)
+        val appName = "App"
+        val report = true
+
+        viewModel.onAppProtectionDisabled(appName, packageName, report)
 
         verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
     }
 
     @Test
-    fun whenAppProtectionisSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
+    fun whenAppProtectionisSubmittedAndReportIsSkippedThenSkipPixelIsSent() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(packageName)
+        val appName = "App"
+        val report = false
+
+        viewModel.onAppProtectionDisabled(appName, packageName, report)
+
+        verify(deviceShieldPixels).didSkipManuallyDisableAppProtectionDialog()
+    }
+
+    @Test
+    fun whenAppProtectionisSubmittedAndReportIsSentThenSubmitPixelIsSent() = runTest {
+        val packageName = "com.package.name"
+        val appName = "App"
+        val report = true
+
+        viewModel.onAppProtectionDisabled(appName, packageName, report)
 
         verify(deviceShieldPixels).didSubmitManuallyDisableAppProtectionDialog()
+    }
+
+    @Test
+    fun whenAppProtectionisSubmittedAndReportIsSentThenReportCommandIsSent() = runTest {
+        val packageName = "com.package.name"
+        val appName = "App"
+        val report = true
+
+        viewModel.commands().test {
+            viewModel.onAppProtectionDisabled(appName, packageName, report)
+
+            assertEquals(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)), awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -109,7 +138,9 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionDisabled(packageName)
+        val appName = "App"
+        val report = false
+        viewModel.onAppProtectionDisabled(appName, packageName, report)
 
         viewModel.commands().test {
             viewModel.onLeavingScreen()

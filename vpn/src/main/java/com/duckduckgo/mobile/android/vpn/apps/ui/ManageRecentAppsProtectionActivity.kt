@@ -34,7 +34,6 @@ import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityManageRecentAppsProtectionBinding
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
@@ -138,7 +137,7 @@ class ManageRecentAppsProtectionActivity :
                 command.position
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
-            is Command.LaunchAllAppsProtection ->  startActivity(TrackingProtectionExclusionListActivity.intent(this))
+            is Command.LaunchAllAppsProtection -> startActivity(TrackingProtectionExclusionListActivity.intent(this))
         }
     }
 
@@ -193,8 +192,8 @@ class ManageRecentAppsProtectionActivity :
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(packageName: String) {
-        viewModel.onAppProtectionDisabled(packageName = packageName)
+    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+        viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
     private fun launchFeedback() {
