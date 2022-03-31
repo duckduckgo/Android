@@ -73,14 +73,7 @@ class VoiceSearchViewModel constructor(
         speechRecognizer.start {
             when (it) {
                 is PartialResultReceived -> showRecognizedSpeech(it.partialResult)
-                is RecognitionSuccess -> sendCommand(
-                    HandleSpeechRecognitionSuccess(
-                        getFullResult(
-                            it.result,
-                            viewState.value.unsentResult
-                        )
-                    )
-                )
+                is RecognitionSuccess -> handleSuccess(it.result)
                 is VolumeUpdateReceived -> sendCommand(UpdateVoiceIndicator(it.normalizedVolume))
             }
         }
@@ -96,6 +89,17 @@ class VoiceSearchViewModel constructor(
         }
     }
 
+    private fun handleSuccess(result: String) {
+        sendCommand(
+            HandleSpeechRecognitionSuccess(
+                getFullResult(
+                    result,
+                    viewState.value.unsentResult
+                )
+            )
+        )
+    }
+
     private fun showRecognizedSpeech(result: String) {
         viewModelScope.launch {
             viewState.emit(
@@ -104,6 +108,13 @@ class VoiceSearchViewModel constructor(
                 )
             )
         }
+        if (result.hasReachedWordLimit()) {
+            handleSuccess(result)
+        }
+    }
+
+    private fun String.hasReachedWordLimit(): Boolean {
+        return this.isNotEmpty() && this.split(" ").size > 30
     }
 
     private fun getFullResult(

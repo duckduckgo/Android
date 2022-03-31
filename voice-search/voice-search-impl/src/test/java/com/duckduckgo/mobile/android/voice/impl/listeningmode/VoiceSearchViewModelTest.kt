@@ -85,6 +85,31 @@ class VoiceSearchViewModelTest {
             assertEquals(ViewState("This is the result", ""), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
+
+        testee.commands().test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenPartialResultsExceeds30WordsThenEmitNewViewStateAndEmitHandleSpeechRecognitionSuccessCommand() = runTest {
+        val result = "fermentum leo vel orci porta non pulvinar neque laoreet suspendisse interdum consectetur libero id faucibus nisl tincidunt " +
+            "eget nullam non nisi est sit amet facilisis magna etiam tempor orci eu lobortis"
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.start()
+        verify(speechRecognizer).start(captor.capture())
+
+        captor.firstValue.invoke(Event.PartialResultReceived(result))
+
+        testee.viewState().test {
+            assertEquals(ViewState(result, ""), expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+
+        testee.commands().test {
+            assertEquals(Command.HandleSpeechRecognitionSuccess(result), expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -143,7 +168,6 @@ class VoiceSearchViewModelTest {
             assertEquals(ViewState("First", "First"), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
-
     }
 
     @Test
@@ -160,7 +184,6 @@ class VoiceSearchViewModelTest {
             assertEquals(Command.HandleSpeechRecognitionSuccess("First Second"), expectMostRecentItem())
             cancelAndConsumeRemainingEvents()
         }
-
     }
 
     @Test
