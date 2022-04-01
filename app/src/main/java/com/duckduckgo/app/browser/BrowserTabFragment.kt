@@ -2467,6 +2467,7 @@ class BrowserTabFragment :
 
                 firstDivider.isVisible = viewState.browserShowing
                 secondDivider.isVisible = viewState.browserShowing
+                bottomDivider.isVisible = viewState.browserShowing
             }
         }
 

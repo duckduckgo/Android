@@ -194,6 +194,10 @@
                 app:labelText="@string/brokenSiteReportBrokenSiteMenuItem"
                 app:iconDrawable="@drawable/ic_feedback_16" />
 
+            <View
+                android:id="@+id/bottomDivider"
+                style="@style/OverflowMenuDivider" />
+
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"
                 android:layout_width="match_parent"
