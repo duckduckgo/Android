@@ -25,7 +25,6 @@
         android:layout_height="22dp"
         android:padding="3dp"
         tools:background="@drawable/ic_globe_gray_16dp"
-        app:tint="?attr/primaryIconColor"
         android:focusable="false"
         tools:ignore="ContentDescription" />
 
