@@ -14,10 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.remote_config
 
-import com.duckduckgo.feature.toggles.api.FeatureName
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.Query
 
-enum class AppTpFeatureName(override val value: String) : FeatureName {
-    AppTrackerProtection("appTrackerProtection"),
+@Dao
+interface VpnConfigTogglesDao {
+    @Insert(onConflict = REPLACE)
+    suspend fun insert(vpnConfigToggle: VpnConfigToggle)
+
+    @Query("SELECT * from vpn_config_toggles ORDER BY localtime DESC")
+    fun getConfigToggles(): List<VpnConfigToggle>
 }
