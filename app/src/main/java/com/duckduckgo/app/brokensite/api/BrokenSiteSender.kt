@@ -50,7 +50,7 @@ class BrokenSiteSubmitter(
 ) : BrokenSiteSender {
 
     override fun submitBrokenSiteFeedback(brokenSite: BrokenSite) {
-        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName()) == true && gpc.isEnabled()).toString()
+        val isGpcEnabled = (featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName) && gpc.isEnabled()).toString()
         val absoluteUrl = Uri.parse(brokenSite.siteUrl).absoluteString
 
         appCoroutineScope.launch(dispatcherProvider.io()) {

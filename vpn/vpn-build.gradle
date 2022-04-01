@@ -43,6 +43,7 @@ dependencies {
     implementation project(path: ':statistics')
     implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
 
     implementation Kotlin.stdlib.jdk7
 
@@ -130,4 +131,12 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':common-test')
+}
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
 }

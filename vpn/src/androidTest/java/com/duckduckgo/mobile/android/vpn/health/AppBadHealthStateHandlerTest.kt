@@ -21,6 +21,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
@@ -52,6 +54,7 @@ class AppBadHealthStateHandlerTest {
 
     @Mock private lateinit var deviceShieldPixels: DeviceShieldPixels
     @Mock private lateinit var appBuildConfig: AppBuildConfig
+    @Mock private lateinit var appTpConfig: AppTpFeatureConfig
     private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     private lateinit var db: AppHealthDatabase
@@ -68,9 +71,10 @@ class AppBadHealthStateHandlerTest {
             .build()
 
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
+        whenever(appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)).thenReturn(true)
 
         appBadHealthStateHandler = AppBadHealthStateHandler(
-            context, appBuildConfig, db, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
+            context, appBuildConfig, db, appTpConfig, deviceShieldPixels, coroutineRule.testDispatcherProvider, coroutineRule.testScope
         )
     }
 

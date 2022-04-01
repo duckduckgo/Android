@@ -98,7 +98,7 @@ class RealContentBlockingTest {
     private fun givenFeatureIsEnabled() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.ContentBlockingFeatureName(), true
+                PrivacyFeatureName.ContentBlockingFeatureName, true
             )
         )
             .thenReturn(true)
@@ -107,7 +107,7 @@ class RealContentBlockingTest {
     private fun givenFeatureIsDisabled() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.ContentBlockingFeatureName(), true
+                PrivacyFeatureName.ContentBlockingFeatureName, true
             )
         )
             .thenReturn(false)

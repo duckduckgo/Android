@@ -17,12 +17,12 @@
 package com.duckduckgo.app.browser.httpauth
 
 import android.webkit.WebView
-import android.webkit.WebViewDatabase
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.DatabaseCleaner
 import com.duckduckgo.app.fire.DatabaseLocator
@@ -75,7 +75,7 @@ interface WebViewHttpAuthStore {
 )
 @SingleInstanceIn(AppScope::class)
 class RealWebViewHttpAuthStore @Inject constructor(
-    private val webViewDatabase: WebViewDatabase,
+    private val webViewDatabaseProvider: WebViewDatabaseProvider,
     private val databaseCleaner: DatabaseCleaner,
     @Named("authDbLocator") private val authDatabaseLocator: DatabaseLocator,
     private val dispatcherProvider: DispatcherProvider,
@@ -101,7 +101,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         password: String
     ) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabase.setHttpAuthUsernamePassword(host, realm, username, password)
+            webViewDatabaseProvider.get().setHttpAuthUsernamePassword(host, realm, username, password)
         } else {
             webView.setHttpAuthUsernamePassword(host, realm, username, password)
         }
@@ -113,7 +113,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         realm: String
     ): WebViewHttpAuthCredentials? {
         val credentials = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            webViewDatabase.getHttpAuthUsernamePassword(host, realm)
+            webViewDatabaseProvider.get().getHttpAuthUsernamePassword(host, realm)
         } else {
             @Suppress("DEPRECATION")
             webView.getHttpAuthUsernamePassword(host, realm)
@@ -123,7 +123,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
     }
 
     override fun clearHttpAuthUsernamePassword(webView: WebView) {
-        webViewDatabase.clearHttpAuthUsernamePassword()
+        webViewDatabaseProvider.get().clearHttpAuthUsernamePassword()
     }
 
     override suspend fun cleanHttpAuthDatabase() {

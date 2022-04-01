@@ -34,11 +34,12 @@ class RealFeatureToggleImpl @Inject constructor(private val featureTogglesPlugin
     override fun isFeatureEnabled(
         featureName: FeatureName,
         defaultValue: Boolean
-    ): Boolean? {
+    ): Boolean {
         featureTogglesPluginPoint.getPlugins().forEach { plugin ->
             plugin.isEnabled(featureName, defaultValue)?.let { return it }
         }
-        return null
+
+        throw IllegalArgumentException("Unknown feature: ${featureName.value}")
     }
 }
 

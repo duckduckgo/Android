@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.feature
 
 import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.mobile.android.vpn.store.AppTpFeatureToggleRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -36,14 +37,11 @@ class AppTpFeatureTogglesPluginTest {
 
     @Test
     fun whenIsEnabledCalledOnAppTpFeatureNameThenReturnRepositoryValue() {
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(null)
-        assertNull(plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
+        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.AppTrackerProtection, false)).thenReturn(true)
+        assertEquals(true, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, false))
 
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(true)
-        assertEquals(true, plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
-
-        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.Ipv6Support().value, false)).thenReturn(false)
-        assertEquals(false, plugin.isEnabled(AppTpFeatureName.Ipv6Support(), false))
+        whenever(appTpFeatureToggleRepository.get(AppTpFeatureName.AppTrackerProtection, false)).thenReturn(false)
+        assertEquals(false, plugin.isEnabled(AppTpFeatureName.AppTrackerProtection, false))
     }
 
     @Test

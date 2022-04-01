@@ -17,9 +17,10 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import android.webkit.WebViewDatabase
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
+import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -32,8 +33,8 @@ class DatabaseModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideWebviewDatabase(context: Context): WebViewDatabase {
-        return WebViewDatabase.getInstance(context)
+    fun provideWebViewDatabaseProvider(context: Context): WebViewDatabaseProvider {
+        return DefaultWebViewDatabaseProvider(context)
     }
 
     @Provides

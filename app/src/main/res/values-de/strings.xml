@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
     <string name="search">Suche</string>
 
     <!-- Onboarding Activity -->
-    <string name="onboardingDefaultBrowserDescription">Navigiere zu den Einstellungen, damit du in Zukunft immer mit DuckDuckGo suchen und browsen kannst.</string>
+    <string name="onboardingDefaultBrowserDescription">Navigiere zu Einstellungen, damit du in Zukunft immer mit DuckDuckGo suchen und browsen kannst.</string>
     <string name="onboardingDefaultBrowserTitle">DuckDuckGo als Standard-Browser einstellen</string>
 
     <!-- Default Browser -->
@@ -36,8 +36,8 @@
     <string name="settingsDefaultBrowserEnabled">Als Standard-Browser festlegen</string>
     <string name="defaultBrowserMaybeLater">Vielleicht später</string>
     <string name="defaultBrowserLetsDoIt">Als Standard-Browser festlegen</string>
-    <string name="defaultBrowserDescriptionNoDefault">Öffne Links jederzeit sicher und ohne Sorge.</string>
-    <string name="defaultBrowserInstructions">Wähle DuckDuckGo aus und tippe auf <font color="#678fff">Immer</font>.</string>
+    <string name="defaultBrowserDescriptionNoDefault">Öffnen Sie Links jederzeit sicher und ohne Sorge.</string>
+    <string name="defaultBrowserInstructions">Wählen Sie DuckDuckGo aus und tippen Sie auf <font color="#678fff"> Immer </font>.</string>
 
     <!-- Browser Activity -->
     <string name="browserPopupMenu">Browsermenü</string>
@@ -66,7 +66,7 @@
     <!-- Sharing options -->
     <string name="options">Optionen</string>
     <string name="shareLink">Link teilen</string>
-    <string name="shareMenuTitle">Teilen …</string>
+    <string name="shareMenuTitle">Teilen…</string>
     <string name="copyUrl">Link-Adresse kopieren</string>
 
     <!-- Find in page -->
@@ -79,7 +79,7 @@
 
     <!-- AutoComplete Suggestions -->
     <string name="editQueryBeforeSubmitting">Anfrage vor der Suche bearbeiten</string>
-    <string name="settingsAutocompleteEnabled">Vorschläge für die Autovervollständigung</string>
+    <string name="settingsAutocompleteEnabled">Vorschläge für die Autovervollständigung anzeigen</string>
 
     <!-- Opening external apps -->
     <string name="openExternalApp">Externe App öffnen</string>
@@ -98,7 +98,7 @@
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Schließen</string>
     <string name="closeAllTabsMenuItem">Alle Tabs schließen</string>
-    <string name="closeTab">Tab schließen</string>
+    <string name="closeTab">Alle tab</string>
     <string name="tabClosed">Tab geschlossen</string>
     <string name="tabClosedUndo">Rückgängig machen</string>
 
@@ -108,7 +108,7 @@
     <string name="privacyProtectionDisabled">WEBSITE-SCHUTZ DEAKTIVIERT</string>
     <string name="privacyDashboardActivityTitle">Privatsphäre-Dashboard</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">VERBESSERT VON &lt;img src=\"%1$d\" /&gt; AUF &lt;img src=\"%2$d\" /&gt;</string>
-    <string name="privacyGradeContentDescription">Datenschutz-Stufe</string>
+    <string name="privacyGradeContentDescription">Datenschutzstufe</string>
     <string name="privacyProtectionTemporarilyDisabled">Wir haben den Datenschutz vorübergehend deaktiviert, da die Seite derzeit dadurch gestört wird.</string>
 
     <string name="httpsGood">Verschlüsselte Verbindung</string>
@@ -120,28 +120,28 @@
     <string name="networksOverview">Tracker-Netzwerke fassen deinen Browserverlauf in einem Datenprofil über dich zusammen. Große Tracker-Netzwerke sind schädlicher, da sie dich weiter im Internet verfolgen und gezielt ansprechen können.</string>
 
     <plurals name="trackersFound">
-        <item quantity="one">%1$s Tracker gefunden</item>
-        <item quantity="other">%1$s Tracker gefunden</item>
+        <item quantity="one">%1$s Tracker gefunden</item>
+        <item quantity="other">%1$s Tracker gefunden</item>
     </plurals>
 
     <plurals name="trackerBlocked">
-        <item quantity="one">%1$s Tracker blockiert</item>
-        <item quantity="other">%1$s Tracker blockiert</item>
+        <item quantity="one">%1$s Tracker blockiert</item>
+        <item quantity="other">%1$s Tracker blockiert</item>
     </plurals>
 
     <plurals name="majorNetworksFound">
-        <item quantity="one">%1$s großes Tracker-Netzwerk gefunden</item>
-        <item quantity="other">%1$s große Tracker-Netzwerke gefunden</item>
+        <item quantity="one">%1$s Großes Tracker-Netzwerk gefunden</item>
+        <item quantity="other">%1$s Große Tracker-Netzwerke gefunden</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
-        <item quantity="one">%1$s großes Tracker-Netzwerk blockiert</item>
-        <item quantity="other">%1$s große Tracker-Netzwerke blockiert</item>
+        <item quantity="one">%1$s Großes Tracker-Netzwerk blockiert</item>
+        <item quantity="other">%1$s Große Tracker-Netzwerke blockiert</item>
     </plurals>
 
-    <string name="scorecardActivityTitle">Datenschutz-Stufe</string>
+    <string name="scorecardActivityTitle">Datenschutzstufe</string>
     <string name="scorecardSiteIsMemberOfMajorNetwork">Diese Website gehört zu einem großen Tracker-Netzwerk</string>
-    <string name="scorecardPrivacyGrade">Datenschutz-Stufe</string>
+    <string name="scorecardPrivacyGrade">Datenschutzstufe</string>
     <string name="scorecardEnhancedGrade">Erhöhte Stufe</string>
 
     <string name="privacyTermsActivityTitle">Datenschutzpraktiken</string>
@@ -173,20 +173,31 @@
     <string name="settingsVersion">Version</string>
     <string name="leaveFeedback">Feedback teilen</string>
     <string name="settingsEmailProtectionTitle">E-Mail-Schutz</string>
-    <string name="settingsEmailProtectionSubtitle">E-Mail-Tracker blockieren und deine Adresse verbergen.</string>
+    <string name="settingsEmailProtectionSubtitle">E-Mail-Tracker blockieren und deine Adresse verbergen</string>
+    <string name="settingsHeadingMore">Mehr von DuckDuckGo</string>
+    <string name="settingsLightTheme">Hell</string>
+    <string name="settingsTheme">Thema</string>
+    <string name="settingsDarkTheme">Dunkel</string>
+    <string name="settingsSystemTheme">Standard</string>
+    <string name="settingsThemeDialogSave">Design festlegen</string>
+    <string name="settingsTitleAppLinks">Links in Apps öffnen</string>
+    <string name="settingsTitleAppLinksDialog">Links in Apps öffnen</string>
+    <string name="settingsAppLinksAskEveryTime">Jedes Mal fragen</string>
+    <string name="settingsAppLinksAlways">Immer</string>
+    <string name="settingsAppLinksNever">Nie</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
 
     <string name="settingsAutomaticallyClearWhat">Automatisches Löschen von …</string>
     <string name="settingsAutomaticallyClearWhatDialogTitle">Automatisches Löschen von …</string>
-    <string name="settingsAutomaticallyClearWhatOptionNone">Gar nichts</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">gar nichts</string>
     <string name="settingsAutomaticallyClearWhatOptionTabs">Tabs</string>
     <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tabs und Daten</string>
 
     <string name="settingsAutomaticallyClearWhen">Löschen …</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Löschen …</string>
-    <string name="settingsAutomaticallyClearWhenAppExitOnly">Nur beim Verlassen der App</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">nur beim Verlassen der App</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Beim Verlassen der App, 5 Sekunden lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Beim Verlassen der App, 5 Minuten lang inaktiv</string>
     <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Beim Verlassen der App, 15 Minuten lang inaktiv</string>
@@ -251,6 +262,21 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Favorit hinzufügen</string>
+    <string name="widgetConfigurationTitleText">Design auswählen</string>
+    <string name="widgetConfigurationSystemThemeOption">Standard</string>
+    <string name="widgetConfigurationLightThemeOption">Hell</string>
+    <string name="widgetConfigurationDarkThemeOption">Dunkel</string>
+    <string name="widgetConfigurationAddWidgetOption">Widget hinzufügen</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Noch keine Favoriten hinzugefügt</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Favorit hinzufügen</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Mit nur einem Klick auf deine Lieblingswebsites zugreifen!<br/><br/>Geh auf eine Website, die du oft besuchst. Tippe dann auf das Symbol „⠇“ und wähle *Zu Favoriten hinzufügen* aus.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Mit nur einem Klick auf deine Lieblingswebsites zugreifen! Geh auf eine Website, die du oft besuchst. Tippe dann auf das Browsermenü-Symbol und wählen *Zu Favoriten hinzufügen* aus.</string>
+    <string name="widgetConfigurationActivityTitle">Widget-Konfiguration</string>
+    <string name="favoritesWidgetLabel">Favoriten</string>
+    <string name="searchWidgetLabel">Suche</string>
+
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Zur Startseite hinzufügen</string>
     <string name="shortcutAddedText">%1$s wurde erfolgreich zu deinem Startbildschirm hinzugefügt.</string>
@@ -314,8 +340,8 @@
     <string name="privacyProtectionNotificationReportTitle">Dein Datenschutzbericht</string>
     <string name="privacyProtectionNotificationDefaultDescription">Die Verwendung der DuckDuckGo-App schützt deine Daten, indem Tracker blockiert und Verbindungen verschlüsselt werden.</string>
     <string name="privacyProtectionNotificationUpgadeDescription">Du hast deine Daten geschützt, indem du %1$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
-    <string name="privacyProtectionNotificationTrackerDescription">Du hast deine Daten geschützt, indem du %1$d Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
-    <string name="privacyProtectionNotificationBothDescription">Du hast deine Daten geschützt, indem du %1$d Tracker blockiert und %2$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
+    <string name="privacyProtectionNotificationTrackerDescription">Du hast deine Daten geschützt, indem du %1$d Tracker bei der Verwendung von DuckDuckGo blockiert hast.</string>
+    <string name="privacyProtectionNotificationBothDescription">Du hast deine Daten geschützt, indem du %1$d Tracker blockiert und %2$d unverschlüsselte Verbindungen bei der Verwendung von DuckDuckGo gesichert hast.</string>
     <string name="privacyProtectionNotificationLaunchButton">Weiter browsen</string>
 
     <!-- Authentication -->
@@ -386,7 +412,7 @@
     <string name="feedbackNegativeMainReasonPageSubtitle">Was stört dich am meisten?</string>
     <string name="feedbackNegativeMainReasonPageTitle">Es tut uns leid, das zu hören</string>
     <string name="feedbackShareDetails">Weitere Informationen teilen</string>
-    <string name="sharePositiveFeedbackWithTheTeam">Gibt es weitere Informationen, die du dem Team mitteilen möchtest?</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Gibt es weitere Informationen, die du dem Team mitteilen möchten?</string>
     <string name="whatHaveYouBeenEnjoying">Was hat dir gefallen?</string>
     <string name="awesomeToHear">Das freut uns!</string>
     <string name="shareTheLoveWithARating">Bitte teile deine Begeisterung mit einer Bewertung im Play Store.</string>
@@ -409,7 +435,7 @@
     <string name="systemSearchDeviceAppLabel">Von diesem Gerät</string>
     <string name="systemSearchOmnibarInputHint"><font size="13">URL eingeben oder suchen</font></string>
     <string name="systemSearchAppNotFound">Die Anwendung konnte nicht gefunden werden.</string>
-    <string name="systemSearchOnboardingText">Vielen Dank, dass du dich für DuckDuckGo entschieden hast!\nWenn du jetzt unsere Suche oder App verwendest, sind deine Suchanfragen geschützt.</string>
+    <string name="systemSearchOnboardingText">Vielen Dank, dass Sie sich für DuckDuckGo entschieden haben!\nWenn Sie jetzt unsere Suche oder App verwenden, sind Ihre Suchanfragen geschützt.</string>
     <string name="systemSearchOnboardingFeaturesIntroText">Das kann die DuckDuckGo App auch:</string>
     <string name="systemSearchOnboardingFeatureOneText">Blockiert unsichere Tracker.</string>
     <string name="systemSearchOnboardingFeatureTwoText">Erzwingt Verschlüsselung auf Websites.</string>
@@ -425,7 +451,7 @@
     <string name="daxDialogHighFive">Schlag ein!</string>
     <string name="daxDialogGotIt">Verstanden</string>
     <string name="hideTipsTitle">Verbleibende Tipps ausblenden?</string>
-    <string name="hideTipsText">Es gibt nur wenige und wir haben versucht, sie informativ zu gestalten.</string>
+    <string name="hideTipsText">Es gibt nur wenige, und wir haben versucht, sie informativ zu gestalten.</string>
     <string name="hideTipsButton">Tipps für immer ausblenden</string>
 
     <!-- New Onboarding Experience -->
@@ -449,7 +475,7 @@
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Fortsetzen</string>
-    <string name="downloadConfirmationSaveFileTitle">%1$s speichern</string>
+    <string name="downloadConfirmationSaveFileTitle">Speichern %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Beide behalten</string>
     <string name="downloadConfirmationReplaceOldFileText">Ersetzen</string>
     <string name="downloadConfirmationOpenFileText">Öffnen</string>
@@ -462,11 +488,11 @@
     <string name="changeIconCtaAccept">Übernehmen</string>
     <string name="changeIconCtaCancel">Abbrechen</string>
     <string name="changeIconDialogTitle">Neues Symbol übernehmen?</string>
-    <string name="changeIconDialogMessage">Die App wird möglicherweise geschlossen, um Änderungen anzuwenden. Komm zurück, nachdem du dein schönes neues Symbol bewundert hast.</string>
+    <string name="changeIconDialogMessage">Die App wird möglicherweise geschlossen, um Änderungen anzuwenden. Kommen Sie zurück, nachdem Sie Ihr schönes neues Symbol bewundert haben.</string>
 
     <!-- New dashboard / menu buttons -->
     <string name="manageWhitelist">Ungeschützte Websites</string>
-    <string name="reportBrokenSite">Fehlerhafte Seite melden</string>
+    <string name="reportBrokenSite">Fehlerhafte Website melden</string>
 
     <!-- Dialogs -->
     <string name="dialogAddTitle">Hinzufügen</string>
@@ -493,9 +519,9 @@
     <string name="fireproofWebsiteMenuTitleAdd">Feuerfeste Seite</string>
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ist jetzt feuerfest! Gehe auf Einstellungen, um das zu verwalten.</string>
     <string name="fireproofWebsiteSnackbarAction">Rückgängig machen</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">Möchtest du &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">Möchten Sie &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
     <string name="fireproofWebsiteEmptyListHint">Keine feuerfesten Websites</string>
-    <string name="fireproofWebsiteFeatureDescription">Websites sorgen mit Cookies dafür, dass du angemeldet bleibst. Wenn du eine Website feuerfest machst, werden Cookies nicht gelöscht und du bleibst angemeldet – auch nach Verwendung der Schaltfläche „Feuer“. Wir blockieren weiterhin auf feuerfest gemachten Websites gefundene Tracker von Dritten.</string>
+    <string name="fireproofWebsiteFeatureDescription">Websites sorgen mit Cookies dafür, dass du angemeldet bleibst. Wenn du eine Website feuerfest machst, werden Cookies nicht gelöscht und du bleibst angemeldet – auch nach Verwendung der Schaltfläche „Feuer“. Wir blockieren weiterhin auf feuerfest gemachten Websites gefundene Tracker von Dritten.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Weitere Optionen für die feuersichere Website %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Möchtest du %1$s feuerfest machen?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Wenn du diese Website feuerfest machst, bleibst du nach Verwendung der Schaltfläche „Feuer“ angemeldet.</string>
@@ -528,28 +554,28 @@
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>
-    <string name="preciseLocationSystemDialogSubtitle">%1$s erfragt deinen Gerätestandort. Zuerst musst du der App die Befugnis geben, den Standort deines Geräts weiterzugeben. Erst dann kann %2$s um Erlaubnis bitten.</string>
+    <string name="preciseLocationSystemDialogSubtitle">%1$s erfragt Ihren Gerätestandort. Zuerst müssen Sie der App die Befugnis geben, den Standort Ihres Geräts weiterzugeben, erst dann kann %2$s um Erlaubnis bitten.</string>
     <string name="preciseLocationSystemDialogAllow">Aktivieren</string>
     <string name="preciseLocationSystemDialogDeny">Vielleicht später</string>
     <string name="preciseLocationSystemDialogNeverAllow">Für diese Website nicht erneut fragen</string>
     <string name="preciseLocationSiteDialogTitle">%1$s Zugriffsberechtigung auf den Gerätestandort erteilen?</string>
     <string name="preciseLocationDDGDialogSubtitle">Wir verwenden deinen anonymen Standort nur, um dir genauere, standortbasierte Ergebnisse zu liefern. Diese Einstellung kann jederzeit rückgängig gemacht werden.</string>
-    <string name="preciseLocationSiteDialogSubtitle">Du kannst die Berechtigungen in den Einstellungen verwalten. Dort siehst du, welchen Websites du Zugriffsberechtigungen auf den Gerätestandort gewährt hast.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Sie können die Berechtigungen in den Einstellungen verwalten. Dort sehen Sie, welchen Websites Sie Zugriffsberechtigungen auf den Gerätestandort gewährt haben.</string>
     <string name="preciseLocationSiteDialogAllowAlways">Immer</string>
     <string name="preciseLocationSiteDialogAllowOnce">Nur für diese Sitzung</string>
     <string name="preciseLocationSiteDialogDenyAlways">Immer ablehnen</string>
     <string name="preciseLocationSiteDialogDenyOnce">Für diese Sitzung ablehnen</string>
     <string name="settingsPreciseLocation">Standort</string>
-    <string name="preciseLocationFeatureDescription">Von dir besuchte Websites können nach deinem Gerätestandort fragen. Ohne deine ausdrückliche Erlaubnis können diese aber nicht auf diese Information zugreifen. Um für deine Region relevante Suchergebnisse zu liefern, nutzt DuckDuckGo deinen anonymisierten Standort.</string>
+    <string name="preciseLocationFeatureDescription">Von Ihnen besuchte Websites können nach Ihrem Gerätestandort fragen. Ohne Ihre ausdrückliche Erlaubnis, können diese aber nicht auf diese Information zugreifen. Um für Ihre Region relevante Suchergebnisse zu liefern, nutzt DuckDuckGo Ihren anonymisierten Standort.</string>
     <string name="preciseLocationToggleText">Websites dürfen meinen Standort erfragen</string>
     <string name="preciseLocationEmptyListHint">Keinen Websites wurde Zugriff auf Ihren Gerätestandort gewährt</string>
-    <string name="preciseLocationNoSystemPermission">Aktiviere den Standort für diese App in den Android-Einstellungen, um die Zugriffsberechtigungen für einzelne Websites verwalten zu können.</string>
+    <string name="preciseLocationNoSystemPermission">Aktivieren Sie den Standort für diese App in den Android-Einstellungen, um die Zugriffsberechtigungen für einzelne Websites verwalten zu können.</string>
     <string name="preciseLocationActivityTitle">Standort</string>
-    <string name="preciseLocationDeleteConfirmMessage">Möchtest du &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
+    <string name="preciseLocationDeleteConfirmMessage">Möchten Sie &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
     <string name="preciseLocationDeleteContentDescription">Weitere Optionen für Standortberechtigungen in der Domain: %1$s</string>
     <string name="preciseLocationAllowedSitesSectionTitle">Gewährt</string>
     <string name="preciseLocationDeniedSitesSectionTitle">Abgelehnt</string>
-    <string name="preciseLocationSnackbarMessage">Du hast %1$s in der Vergangenheit den Zugriff auf deinen Gerätestandort gewährt.</string>
+    <string name="preciseLocationSnackbarMessage">Sie haben %1$s in der Vergangenheit den Zugriff auf Ihren Gerätestandort gewährt.</string>
 
     <!--Fire button education-->
     <string name="daxClearDataCtaText">In deinem Browser können sich personenbezogene Daten ablagern. Igitt. Mit der Schaltfläche „Feuer“ brennst du alles weg. Probier’s gleich aus! 👇</string>
@@ -568,6 +594,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Links in den dazugehörigen Apps öffnen</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Aktivieren, damit sich Links nicht automatisch in anderen installierten Apps öffnen.</string>
     <string name="appLinkDialogTitle">In einer anderen App öffnen?</string>
+    <string name="appLinkSnackBarAction">In App öffnen</string>
+    <string name="appLinkMultipleSnackBarAction">App auswählen</string>
+    <string name="appLinkSnackBarMessage">Du kannst diesen Link in %1$s öffnen.</string>
+    <string name="appLinkMultipleSnackBarMessage">Du kannst diesen Link in anderen Apps öffnen.</string>
+    <string name="appLinkIntentChooserTitle">Öffnen mit</string>
+    <string name="appLinkMenuItemTitle">In App öffnen</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">Neue Adresse wurde in deine Zwischenablage kopiert</string>
@@ -585,26 +617,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">E-Mail-Warteliste</string>
-    <string name="waitlistNotificationTitle">Deine Einladung zum E-Mail-Schutz ist da!</string>
-    <string name="waitlistNotificationDescription">Du hast dich auf die Warteliste setzen lassen und uns darum gebeten, dich zu benachrichtigen, wenn auch du die E-Mail-Schutzfunktion testen kannst. Tippe hier, um deine Einladung zu öffnen.</string>
+    <string name="waitlistNotificationTitle">E-Mail-Schutz ist bereit!</string>
+    <string name="waitlistNotificationDescription">Öffne deine Einladung</string>
 
     <string name="waitlistNotificationDialogDescription">Möchtest du eine Benachrichtigung erhalten, wenn du die E-Mail-Schutzfunktion testen kannst?</string>
-    <string name="waitlistNotificationDialogNoThanks">NEIN, DANKE</string>
+    <string name="waitlistNotificationDialogNoThanks">Nein, danke</string>
     <string name="waitlistNotificationDialogNotifyMe">ICH MÖCHTE BENACHRICHTIGT WERDEN</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">E-Mail-Schutz (Beta)</string>
     <string name="emailProtectionActivityTitle">E-Mail-Schutz (Beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[Wir speichern keine E-Mails. <b><a href=\"\">Mehr erfahren</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">Um dich in die Warteliste einzutragen, musst du keine persönlichen Daten angeben. Du sicherst deinen Platz mit einem Zeitstempel, der nur auf deinem Gerät vorhanden ist, damit wir dich benachrichtigen können, wenn du an der Reihe bist.</string>
     <string name="emailProtectionErrorJoiningWaitlist">Bei der Aktion „Auf die Warteliste setzen“ ist ein unerwarteter Fehler aufgetreten. Bitte versuche es später noch einmal.</string>
     <string name="emailProtectionDuckAddressCta">Ich habe bereits eine Duck-Adresse</string>
     <string name="emailProtectionInviteCodeCta">Ich habe einen Einladungscode</string>
     <string name="emailProtectionWaitlistCta">Auf die private Warteliste setzen</string>
     <string name="emailProtectionGetStartedCta">Los geht\'s!</string>
+    <string name="emailNotSupported">Gerät nicht unterstützt</string>
+    <string name="emailNotSupportedExplanation">Mit dem E-Mail-Schutz kannst du private E-Mail-Adressen erstellen, die E-Mail-Tracker entfernen. Wir müssen diese Adressen, die du erstellst, lokal auf deinem Gerät verschlüsseln und speichern. Da dein Gerät keine verschlüsselte Speicherung unterstützt, ist der E-Mail-Schutz nicht verfügbar.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
@@ -613,7 +647,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne dafür den E-Mail-Anbieter wechseln zu müssen. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>
@@ -621,4 +655,44 @@
         <![CDATA[Beim Entfernen des E-Mail-Schutzes von diesem Gerät wird auch die Option entfernt, über die beim Browsen automatisch deine persönliche Duck-Adresse oder deine neu erstellte private Duck-Adresse in die E-Mail-Felder eingegeben wird.<br/><br/>Wenn du mehr darüber erfahren möchtest, wie du deine Duck-Adressen vollständig löschen kannst oder andere Fragen oder Feedback an uns hast, melde dich bei uns unter <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Von diesem Gerät entfernen</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Lesezeichen bearbeiten</string>
+    <string name="favoriteDialogTitleEdit">Favorit bearbeiten</string>
+    <string name="locationLabel">Standort</string>
+    <string name="folderLocationTitle">Speicherort auswählen</string>
+    <string name="addFolder">Ordner hinzufügen</string>
+    <string name="editFolder">Ordner bearbeiten</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Möchtest du wirklich löschen "</string>
+    <string name="bookmarkFolderEmpty">Leer</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%1$s%2$s und %3$d Element?</item>
+        <item quantity="other">%1$s%2$s und %3$d Elemente?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%1$d Element</item>
+        <item quantity="other">%1$d Elemente</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Barrierefreiheit</string>
+    <string name="accessibilityActivityTitle">Barrierefreiheit</string>
+    <string name="accessibilityFontSizeTitle">Textgröße</string>
+    <string name="accessibilityFontSizeHint">Ziehe den Schieberegler, bis du dies bequem lesen kannst. In DuckDuckGo angezeigte Websites werden sich daran anpassen.</string>
+    <string name="accessibilityForceZoomTitle">Manuellen Seitenzoom erzwingen</string>
+    <string name="accessibilityForceZoomSubtitle">Zoome auf jeder Website, selbst auf solchen, die dies anderweitig verhindern würden</string>
+    <string name="accessibilityTextSizeOverrideTitle">Textgröße verwalten</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Der Text auf in DuckDuckGo angezeigten Websites wird an die folgende Einstellung angepasst</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Datenschutzrichtlinie</string>
+
+    <!-- Downloads -->
+    <string name="downloadsErrorMessage">Download fehlgeschlagen. Internetverbindung überprüfen.</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">Widget „%1$s“ zum Startbildschirm hinzugefügt</string>
+    <string name="settingsAddHomeScreenWidget">Widget für Startbildschirm</string>
 </resources>
