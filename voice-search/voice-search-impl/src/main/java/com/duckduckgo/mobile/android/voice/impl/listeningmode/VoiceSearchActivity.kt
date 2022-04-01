@@ -103,8 +103,8 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         if (!hasFocus) finish()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         binding.indicator.destroy()
     }
 
