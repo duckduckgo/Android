@@ -268,7 +268,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Help us improve the app!</string>
-    <string name="surveyCtaDescription">Take our short, anonymous survey and share your feedback.</string>
+    <string name="surveyCtaDescription">Take our short survey and share your feedback.</string>
     <string name="surveyCtaLaunchButton">Take the Survey</string>
     <string name="surveyCtaDismissButton">No thanks</string>
     <string name="surveyActivityTitle">User Survey</string>
