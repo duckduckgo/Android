@@ -209,7 +209,17 @@ class NetworkTypeCollector @Inject constructor(
     private fun getNetworkInfoJsonObject(): JSONObject {
         updateSecondsSinceLastSwitch()
         // redact the lastSwitchTimestampMillis from the report
-        val info = currentNetworkInfo?.let { adapter.toJson(adapter.fromJson(it)?.copy(lastSwitchTimestampMillis = -999)) } ?: return JSONObject()
+        val info = currentNetworkInfo?.let {
+            // Redact some values (set to -999) as they could be static values
+            val temp = adapter.fromJson(it)
+            adapter.toJson(
+                temp?.copy(
+                    lastSwitchTimestampMillis = -999,
+                    currentNetwork = temp.currentNetwork.copy(netId = -999),
+                    previousNetwork = temp.previousNetwork?.copy(netId = -999)
+                )
+            )
+        } ?: return JSONObject()
 
         return JSONObject(info)
     }
