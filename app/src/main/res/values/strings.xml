@@ -502,7 +502,7 @@
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Fireproof This Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof! Visit Settings to manage.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof!</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="fireproofWebsiteEmptyListHint">No Fireproof websites</string>
