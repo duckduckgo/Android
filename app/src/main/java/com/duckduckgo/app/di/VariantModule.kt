@@ -20,6 +20,7 @@ import com.duckduckgo.app.statistics.ExperimentationVariantManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.WeightedRandomizer
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
@@ -32,9 +33,10 @@ class VariantModule {
     @SingleInstanceIn(AppScope::class)
     fun variantManager(
         statisticsDataStore: StatisticsDataStore,
-        weightedRandomizer: WeightedRandomizer
+        weightedRandomizer: WeightedRandomizer,
+        appBuildConfig: AppBuildConfig,
     ): VariantManager =
-        ExperimentationVariantManager(statisticsDataStore, weightedRandomizer)
+        ExperimentationVariantManager(statisticsDataStore, weightedRandomizer, appBuildConfig)
 
     @Provides
     fun weightedRandomizer() = WeightedRandomizer()
