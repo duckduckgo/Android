@@ -65,6 +65,7 @@ dependencies {
 
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
+    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation AndroidX.archCore.testing
