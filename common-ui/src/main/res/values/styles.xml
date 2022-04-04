@@ -148,8 +148,8 @@
         <item name="android:background">?attr/overflowMenuDividerColor</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:layout_marginBottom">6dp</item>
+        <item name="android:layout_marginTop">3dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
         <item name="android:layout_marginStart">@dimen/keyline_5</item>
         <item name="android:layout_marginEnd">@dimen/keyline_5</item>
     </style>

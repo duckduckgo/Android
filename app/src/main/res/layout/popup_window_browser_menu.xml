@@ -92,7 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="@dimen/keyline_4">
+            android:paddingBottom="@dimen/keyline_2">
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/newTabMenuItem"
