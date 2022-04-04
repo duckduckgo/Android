@@ -141,6 +141,35 @@ class VoiceSearchViewModelTest {
     }
 
     @Test
+    fun whenRecognitionTimedoutWithNoPartialResultThenEmitTerminateVoiceSearch() = runTest {
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.start()
+        verify(speechRecognizer).start(captor.capture())
+
+        captor.firstValue.invoke(Event.RecognitionTimedOut)
+
+        testee.commands().test {
+            assertEquals(Command.TerminateVoiceSearch, expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRecognitionTimedoutWithPartialResultThenEmiHandleSpeechRecognitionSuccessCommand() = runTest {
+        val captor = argumentCaptor<(Event) -> Unit>()
+        testee.start()
+        verify(speechRecognizer).start(captor.capture())
+
+        captor.firstValue.invoke(Event.PartialResultReceived("This is the result"))
+        captor.firstValue.invoke(Event.RecognitionTimedOut)
+
+        testee.commands().test {
+            assertEquals(Command.HandleSpeechRecognitionSuccess("This is the result"), expectMostRecentItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenViewModelRestartedWithNoPartiaLResultThenEmitViewStateWithNoUnsentResult() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
         testee.start()

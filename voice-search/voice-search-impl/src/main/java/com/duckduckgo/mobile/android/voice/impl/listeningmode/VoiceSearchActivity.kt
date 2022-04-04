@@ -126,6 +126,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
                 when (it) {
                     is Command.UpdateVoiceIndicator -> handleVolume(it.volume)
                     is Command.HandleSpeechRecognitionSuccess -> handleSuccess(it.result)
+                    is Command.TerminateVoiceSearch -> finish()
                 }
             }
             .launchIn(lifecycleScope)

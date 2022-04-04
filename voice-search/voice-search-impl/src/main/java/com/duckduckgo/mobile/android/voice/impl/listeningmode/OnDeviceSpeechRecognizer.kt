@@ -45,6 +45,7 @@ interface OnDeviceSpeechRecognizer {
         data class PartialResultReceived(val partialResult: String) : Event()
         data class RecognitionSuccess(val result: String) : Event()
         data class VolumeUpdateReceived(val normalizedVolume: Float) : Event()
+        object RecognitionTimedOut : Event()
     }
 }
 
@@ -84,7 +85,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
         override fun onError(error: Int) {
             when (error) {
-                SpeechRecognizer.ERROR_NO_MATCH -> speechRecognizer?.restartListening()
+                SpeechRecognizer.ERROR_NO_MATCH -> _eventHandler(Event.RecognitionTimedOut)
                 else -> Timber.e("SpeechRecognizer error: $error")
             }
         }
@@ -124,11 +125,6 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
 
     override fun stop() {
         speechRecognizer?.destroy()
-    }
-
-    private fun SpeechRecognizer.restartListening() {
-        stopListening()
-        startListening(speechRecognizerIntent)
     }
 
     private fun Bundle.extractResult(): String {

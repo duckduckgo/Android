@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechReco
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchViewModel.Command.HandleSpeechRecognitionSuccess
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchViewModel.Command.UpdateVoiceIndicator
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionTimedOut
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -47,6 +48,7 @@ class VoiceSearchViewModel constructor(
     sealed class Command {
         data class UpdateVoiceIndicator(val volume: Float) : Command()
         data class HandleSpeechRecognitionSuccess(val result: String) : Command()
+        object TerminateVoiceSearch : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -75,7 +77,18 @@ class VoiceSearchViewModel constructor(
                 is PartialResultReceived -> showRecognizedSpeech(it.partialResult)
                 is RecognitionSuccess -> handleSuccess(it.result)
                 is VolumeUpdateReceived -> sendCommand(UpdateVoiceIndicator(it.normalizedVolume))
+                is RecognitionTimedOut -> handleTimeOut()
             }
+        }
+    }
+
+    private fun handleTimeOut() {
+        if (viewState.value.result.isEmpty()) {
+            viewModelScope.launch {
+                command.send(Command.TerminateVoiceSearch)
+            }
+        } else {
+            handleSuccess(viewState.value.result)
         }
     }
 
