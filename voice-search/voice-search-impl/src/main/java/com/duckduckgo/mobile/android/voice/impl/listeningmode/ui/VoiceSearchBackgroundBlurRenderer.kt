@@ -16,20 +16,31 @@
 
 package com.duckduckgo.mobile.android.voice.impl.listeningmode.ui
 
+import android.annotation.SuppressLint
 import android.graphics.RenderEffect
 import android.graphics.Shader
-import android.os.Build.VERSION_CODES
+import android.os.Build
 import android.view.View
-import androidx.annotation.RequiresApi
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import javax.inject.Inject
 
-@RequiresApi(VERSION_CODES.S)
-fun View.addBlur() {
-    this.setRenderEffect(
-        RenderEffect.createBlurEffect(70f, 70f, Shader.TileMode.MIRROR)
-    )
-}
+class VoiceSearchBackgroundBlurRenderer @Inject constructor(
+    private val appBuildConfig: AppBuildConfig
+) {
 
-@RequiresApi(VERSION_CODES.S)
-fun View.removeBlur() {
-    this.setRenderEffect(null)
+    @SuppressLint("NewApi")
+    fun addBlur(view: View) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {
+            view.setRenderEffect(
+                RenderEffect.createBlurEffect(70f, 70f, Shader.TileMode.MIRROR)
+            )
+        }
+    }
+
+    @SuppressLint("NewApi")
+    fun removeBlur(view: View) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {
+            view.setRenderEffect(null)
+        }
+    }
 }

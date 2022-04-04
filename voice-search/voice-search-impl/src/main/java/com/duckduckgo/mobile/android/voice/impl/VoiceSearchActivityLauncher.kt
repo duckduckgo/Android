@@ -19,18 +19,15 @@ package com.duckduckgo.mobile.android.voice.impl
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION_CODES
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.annotation.RequiresApi
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchActivity
-import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.addBlur
-import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.removeBlur
+import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -47,6 +44,7 @@ interface VoiceSearchActivityLauncher {
 
 @ContributesBinding(ActivityScope::class)
 class RealVoiceSearchActivityLauncher @Inject constructor(
+    private val blurRenderer: VoiceSearchBackgroundBlurRenderer,
     private val context: Context,
     private val pixel: Pixel
 ) : VoiceSearchActivityLauncher {
@@ -59,7 +57,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     private lateinit var _source: Source
     private var _activity: Activity? = null
 
-    @RequiresApi(VERSION_CODES.S)
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
@@ -85,18 +82,20 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     onEvent(Event.SearchCancelled)
                 }
             }
-            _activity?.window?.decorView?.rootView?.removeBlur()
+            _activity?.window?.decorView?.rootView?.let {
+                blurRenderer.removeBlur(it)
+            }
         }
     }
 
-    @RequiresApi(VERSION_CODES.S)
     override fun launch() {
         launchVoiceSearch()
     }
 
-    @RequiresApi(VERSION_CODES.S)
     private fun launchVoiceSearch() {
-        _activity?.window?.decorView?.rootView?.addBlur()
+        _activity?.window?.decorView?.rootView?.let {
+            blurRenderer.addBlur(it)
+        }
         pixel.fire(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
             parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
