@@ -41,17 +41,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-                android:id="@+id/manageRecentAppsSectionHeader"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/manageRecentAppsReportIssues"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_5"
-                android:layout_marginStart="@dimen/keyline_4"
-                android:layout_marginEnd="@dimen/keyline_4"
-                android:text="@string/atp_ManageRecentAppsProtectionSection"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/include_toolbar"/>
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/manageRecentAppsSkeleton"
@@ -86,8 +85,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/keyline_2"
-                android:paddingBottom="@dimen/keyline_2"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
@@ -102,17 +99,6 @@
                 android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
                 android:background="?selectableItemBackground"
                 android:textColor="?attr/listItemTitleColor"/>
-
-            <TextView
-                android:id="@+id/manageRecentAppsReportIssues"
-                style="@style/TextAppearance.DuckDuckGo.Body2"
-                tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/keyline_4"
-                android:paddingEnd="@dimen/keyline_4"
-                android:paddingTop="@dimen/keyline_2"
-                android:layout_marginBottom="@dimen/keyline_4"/>
 
         </LinearLayout>
 
