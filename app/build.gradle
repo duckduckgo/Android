@@ -265,7 +265,6 @@ dependencies {
     internalImplementation "com.facebook.soloader:soloader:_"
 
     // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
@@ -273,7 +272,6 @@ dependencies {
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
-    androidTestImplementation AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"
