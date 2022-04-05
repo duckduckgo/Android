@@ -1093,9 +1093,6 @@ class BrowserTabViewModel(
         omnibarViewState.value = currentOmnibarViewState.copy(omnibarText = omnibarTextForUrl(url), shouldMoveCaretToEnd = false)
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
-        val canWhitelist = domain != null
-        val canFireproofSite = domain != null
-        val canChangeBrowsingMode = domain != null
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
             HighlightableButton.Visible(enabled = true)
         } else {
@@ -1105,19 +1102,19 @@ class BrowserTabViewModel(
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
-            canSaveSite = true,
+            canSaveSite = domain != null,
             addFavorite = addFavorite,
-            addToHomeEnabled = true,
+            addToHomeEnabled = domain != null,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-            canSharePage = true,
+            canSharePage = domain != null,
             showPrivacyGrade = true,
-            canReportSite = true,
-            canChangePrivacyProtection = canWhitelist,
+            canReportSite = domain != null,
+            canChangePrivacyProtection = domain != null,
             isPrivacyProtectionEnabled = false,
             showSearchIcon = false,
             showClearButton = false,
-            canChangeBrowsingMode = canChangeBrowsingMode,
-            canFireproofSite = canFireproofSite,
+            canChangeBrowsingMode = true,
+            canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
             showDaxIcon = shouldShowDaxIcon(url, true)
         )
@@ -1129,7 +1126,7 @@ class BrowserTabViewModel(
         }
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
-        domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+        domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
 
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
@@ -1181,7 +1178,7 @@ class BrowserTabViewModel(
         }
     }
 
-    private suspend fun updateWhitelistedState(domain: String) {
+    private suspend fun updatePrivacyProtectionState(domain: String) {
         val isWhitelisted = isWhitelisted(domain)
         withContext(dispatchers.main()) {
             browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isWhitelisted)
@@ -1287,7 +1284,6 @@ class BrowserTabViewModel(
             canReportSite = false,
             showSearchIcon = true,
             showClearButton = true,
-            canChangeBrowsingMode = false,
             canFireproofSite = false,
             showDaxIcon = false
         )
