@@ -49,6 +49,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
@@ -572,7 +574,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
-        loadUrl("www.example.com", isBrowserShowing = true)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
         assertTrue(browserViewState().canSaveSite)
         assertTrue(browserViewState().addFavorite.isEnabled())
     }
@@ -586,7 +588,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
-        loadUrl("www.example.com", isBrowserShowing = false)
+        loadUrl("https://www.example.com", isBrowserShowing = false)
         assertFalse(browserViewState().canSaveSite)
         assertFalse(browserViewState().addFavorite.isEnabled())
     }
@@ -1615,6 +1617,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
+            assertEquals("www.example.com", this.domain)
+        }
+    }
+
+    @Test
     fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
@@ -1622,6 +1634,16 @@ class BrowserTabViewModelTest {
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
+            assertEquals("www.example.com", this.domain)
+        }
     }
 
     @Test
@@ -2320,6 +2342,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenShowConfirmationIsIssued() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
@@ -2338,6 +2370,29 @@ class BrowserTabViewModelTest {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenFireproofWebsiteIsAddedBack() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            testee.onRemoveFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        assertTrue(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenPixelSent() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            testee.onRemoveFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_REMOVE_WEBSITE_UNDO)
     }
 
     @Test
@@ -3941,6 +3996,22 @@ class BrowserTabViewModelTest {
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
+    }
+
+    @Test
+    fun whenDownloadsMenuItemClickedThenPixelSent() {
+        testee.onDonwloadsMenuItemClicked()
+
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+    }
+
+    @Test
+    fun whenConfigurationChangesThenForceRenderingMenu() {
+        val oldForceRenderingTicker = browserViewState().forceRenderingTicker
+
+        testee.onConfigurationChanged()
+
+        assertTrue(oldForceRenderingTicker != browserViewState().forceRenderingTicker)
     }
 
     private fun givenUrlCanUseGpc() {

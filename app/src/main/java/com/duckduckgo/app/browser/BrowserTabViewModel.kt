@@ -1813,7 +1813,7 @@ class BrowserTabViewModel(
     fun onRemoveFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.fireproofWebsite(fireproofWebsiteEntity.domain)
-            pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+            pixel.fire(AppPixelName.FIREPROOF_REMOVE_WEBSITE_UNDO)
         }
     }
 

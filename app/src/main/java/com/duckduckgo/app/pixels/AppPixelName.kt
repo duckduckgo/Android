@@ -211,6 +211,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
     FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
     FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+    FIREPROOF_REMOVE_WEBSITE_UNDO("m_remove_fireproofing_snackbar_undo"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
