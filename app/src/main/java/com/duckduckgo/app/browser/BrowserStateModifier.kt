@@ -26,11 +26,11 @@ class BrowserStateModifier {
     fun copyForBrowserShowing(original: BrowserViewState): BrowserViewState {
         return original.copy(
             browserShowing = true,
-            canWhitelist = true,
+            canChangePrivacyProtection = true,
             canFireproofSite = true,
             canReportSite = true,
             canSharePage = true,
-            canAddBookmarks = true,
+            canSaveSite = true,
             canChangeBrowsingMode = true,
             addFavorite = HighlightableButton.Visible(),
             addToHomeEnabled = true
@@ -41,11 +41,11 @@ class BrowserStateModifier {
     fun copyForHomeShowing(original: BrowserViewState): BrowserViewState {
         return original.copy(
             browserShowing = false,
-            canWhitelist = false,
+            canChangePrivacyProtection = false,
             canFireproofSite = false,
             canReportSite = false,
             canSharePage = false,
-            canAddBookmarks = false,
+            canSaveSite = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
             canChangeBrowsingMode = false,
             addToHomeEnabled = false,

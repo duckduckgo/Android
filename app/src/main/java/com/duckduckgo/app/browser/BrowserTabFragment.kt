@@ -2121,8 +2121,8 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(view.requestDesktopSiteMenuItem) {
-                    viewModel.onDesktopSiteModeToggled()
+                onMenuItemClicked(view.changeBrowserModeMenuItem) {
+                    viewModel.onChangeBrowserModeClicked()
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
@@ -2407,7 +2407,7 @@ class BrowserTabFragment :
 
                 newTabMenuItem.isVisible = browserShowing
                 sharePageMenuItem?.isVisible = viewState.canSharePage
-                addBookmarksMenuItem?.isVisible = viewState.canAddBookmarks
+                addBookmarksMenuItem?.isVisible = viewState.canSaveSite
                 val isBookmark = viewState.bookmark != null
                 addBookmarksMenuItem?.label {
                     getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
@@ -2439,8 +2439,8 @@ class BrowserTabFragment :
 
                 createAliasMenuItem?.isVisible = viewState.isEmailSignedIn
 
-                requestDesktopSiteMenuItem?.isVisible = viewState.canChangeBrowsingMode
-                requestDesktopSiteMenuItem.label {
+                changeBrowserModeMenuItem?.isVisible = viewState.canChangeBrowsingMode
+                changeBrowserModeMenuItem.label {
                     getString(
                         if (viewState.isDesktopBrowsingMode) {
                             R.string.requestMobileSiteMenuTitle
@@ -2449,19 +2449,19 @@ class BrowserTabFragment :
                         }
                     )
                 }
-                requestDesktopSiteMenuItem?.setIcon(
+                changeBrowserModeMenuItem?.setIcon(
                     if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16
                 )
 
                 openInAppMenuItem.isVisible = viewState.previousAppLink != null
 
                 addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
-                privacyProtectionMenuItem?.isVisible = viewState.canWhitelist
+                privacyProtectionMenuItem?.isVisible = viewState.canChangePrivacyProtection
                 privacyProtectionMenuItem?.label {
-                    getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
+                    getText(if (viewState.isPrivacyProtectionEnabled) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
                 }
                 privacyProtectionMenuItem?.setIcon(
-                    if (viewState.isWhitelisted) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
+                    if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
                 )
                 brokenSiteMenuItem?.isVisible = viewState.canReportSite
 

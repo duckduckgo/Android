@@ -205,7 +205,7 @@ class BrowserTabViewModel(
         val fireButton: HighlightableButton = HighlightableButton.Visible(),
         val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val canSharePage: Boolean = false,
-        val canAddBookmarks: Boolean = false,
+        val canSaveSite: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
@@ -213,8 +213,8 @@ class BrowserTabViewModel(
         val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
-        val canWhitelist: Boolean = false,
-        val isWhitelisted: Boolean = false,
+        val canChangePrivacyProtection: Boolean = false,
+        val isPrivacyProtectionEnabled: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
@@ -1105,15 +1105,15 @@ class BrowserTabViewModel(
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
-            canAddBookmarks = true,
+            canSaveSite = true,
             addFavorite = addFavorite,
             addToHomeEnabled = true,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
             canSharePage = true,
             showPrivacyGrade = true,
             canReportSite = true,
-            canWhitelist = canWhitelist,
-            isWhitelisted = false,
+            canChangePrivacyProtection = canWhitelist,
+            isPrivacyProtectionEnabled = false,
             showSearchIcon = false,
             showClearButton = false,
             canChangeBrowsingMode = canChangeBrowsingMode,
@@ -1184,7 +1184,7 @@ class BrowserTabViewModel(
     private suspend fun updateWhitelistedState(domain: String) {
         val isWhitelisted = isWhitelisted(domain)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = isWhitelisted)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isWhitelisted)
         }
     }
 
@@ -1278,7 +1278,7 @@ class BrowserTabViewModel(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            canAddBookmarks = false,
+            canSaveSite = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
@@ -1892,7 +1892,7 @@ class BrowserTabViewModel(
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
         }
     }
 
@@ -1903,7 +1903,7 @@ class BrowserTabViewModel(
         }
         withContext(dispatchers.main()) {
             command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
         }
     }
 
@@ -1911,7 +1911,7 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             userWhitelistDao.insert(domain)
             withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
                 command.value = Refresh
             }
         }
@@ -1921,7 +1921,7 @@ class BrowserTabViewModel(
         viewModelScope.launch(dispatchers.io()) {
             userWhitelistDao.delete(domain)
             withContext(dispatchers.main()) {
-                browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
                 command.value = Refresh
             }
         }
@@ -2017,7 +2017,7 @@ class BrowserTabViewModel(
         globalLayoutState.value = Browser(isNewTabState = false)
     }
 
-    fun onDesktopSiteModeToggled() {
+    fun onChangeBrowserModeClicked() {
         val currentBrowserViewState = currentBrowserViewState()
         val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)

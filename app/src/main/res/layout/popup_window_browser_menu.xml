@@ -152,7 +152,7 @@
                 app:iconDrawable="@drawable/ic_email_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                android:id="@+id/requestDesktopSiteMenuItem"
+                android:id="@+id/changeBrowserModeMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="@string/requestDesktopSiteMenuTitle"
