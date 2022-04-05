@@ -1599,7 +1599,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()
@@ -1609,7 +1609,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
+    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onPrivacyProtectionMenuClicked()

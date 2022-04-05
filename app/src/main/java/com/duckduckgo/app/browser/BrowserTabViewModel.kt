@@ -1891,7 +1891,7 @@ class BrowserTabViewModel(
             userWhitelistDao.insert(domain)
         }
         withContext(dispatchers.main()) {
-            command.value = Command.ShowPrivacyProtectionDisabledConfirmation(domain)
+            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
             browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
         }
     }
