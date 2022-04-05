@@ -130,7 +130,7 @@
     <string name="atp_NewTabEnabled"><b>App Tracking Protection is enabled</b> and blocking tracking attempts across your apps.</string>
 
     <!-- Exclusion List -->
-    <string name="atp_ExclusionListActivityTitle">All Apps</string>
+    <string name="atp_ExclusionListActivityTitle">Manage All Apps</string>
     <string name="atp_ExcludedAppsFeature">App Tracking Protection detects and blocks app trackers from other companies, like when Facebook tries to track you in a health app. Companies may still track you in apps they own.\n\nIf an app isn\'t working as expected, try disabling protection for that app.</string>
     <string name="atp_ExcludedAppsEnabledLabel">Protection for some apps may be disabled so that websites load normally or to resolve known issues during beta. Your custom settings won\'t change unless you restore to default settings.</string>
     <string name="atp_ExcludedAppsDisabledLabel"><b>App Tracking Protection is disabled</b> Did App Tracking Protection cause a problem with your apps <annotation type="report_issues_link">Report Issues</annotation></string>
