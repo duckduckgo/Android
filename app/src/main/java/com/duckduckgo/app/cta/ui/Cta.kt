@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.TypewriterDaxDialog
 import com.duckduckgo.app.global.view.html
-import com.duckduckgo.mobile.android.ui.view.*
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -257,20 +256,6 @@ sealed class DaxBubbleCta(
         AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         null,
         Pixel.PixelValues.DAX_INITIAL_CTA,
-        onboardingStore,
-        appInstallStore
-    )
-
-    class DaxFireproofCta(
-        override val onboardingStore: OnboardingStore,
-        override val appInstallStore: AppInstallStore
-    ) : DaxBubbleCta(
-        CtaId.DAX_FIREPROOF,
-        R.string.daxFireproofCtaText,
-        AppPixelName.ONBOARDING_FIREPROOF_CTA_SHOWN,
-        AppPixelName.ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON,
-        AppPixelName.ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON,
-        Pixel.PixelValues.DAX_FIREPROOF_CTA,
         onboardingStore,
         appInstallStore
     )

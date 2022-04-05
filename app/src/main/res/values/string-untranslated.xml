@@ -16,11 +16,4 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <!-- Fireproof CTA Experiment -->
-    <string name="daxFireproofCtaText"><![CDATA[Your data is toast!<br/><br/>Want me to \"Fireproof\" sites when you sign in? That way, you won\'t be signed out when you burn your data.<br/><br/>You can always change this later in settings.]]></string>
-    <string name="daxFireproofKeepMeSignedInButton">Keep Me Signed In To Sites</string>
-    <string name="daxFireproofBurnEverythingButton">Burn Everything</string>
-    <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
-    <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
-
 </resources>

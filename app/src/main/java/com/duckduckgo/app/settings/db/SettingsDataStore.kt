@@ -24,7 +24,6 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -92,11 +91,7 @@ class SettingsSharedPreferences @Inject constructor(
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
     override var appLoginDetection: Boolean
-        get() = if (variantManager.isFireproofExperimentEnabled()) {
-            preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, false)
-        } else {
-            preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
-        }
+        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
 
     override var appLocationPermission: Boolean

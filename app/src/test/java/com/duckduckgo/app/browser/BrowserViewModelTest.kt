@@ -81,9 +81,6 @@ class BrowserViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
-    @Mock
-    private lateinit var mockUserEventsStore: UserEventsStore
-
     private lateinit var testee: BrowserViewModel
 
     @Before
@@ -99,8 +96,7 @@ class BrowserViewModelTest {
             appEnjoymentPromptEmitter = mockAppEnjoymentPromptEmitter,
             appEnjoymentUserEventRecorder = mockAppEnjoymentUserEventRecorder,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            pixel = mockPixel,
-            userEventsStore = mockUserEventsStore
+            pixel = mockPixel
         )
 
         testee.command.observeForever(mockCommandObserver)

@@ -38,9 +38,6 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var faviconManager: FaviconManager
 
-    @Inject
-    lateinit var variantManager: VariantManager
-
     lateinit var adapter: FireproofWebsiteAdapter
 
     private val binding: ActivityFireproofWebsitesBinding by viewBinding()
@@ -61,7 +58,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun setupFireproofWebsiteRecycler() {
-        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager, variantManager)
+        adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
         binding.recycler.adapter = adapter
     }
 

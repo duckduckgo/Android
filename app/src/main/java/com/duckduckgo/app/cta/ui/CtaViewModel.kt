@@ -26,34 +26,40 @@ import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.onboarding.store.*
+import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.store.daxOnboardingActive
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.di.scopes.AppScope
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 import kotlin.coroutines.CoroutineContext
 
 @SingleInstanceIn(AppScope::class)
@@ -69,8 +75,6 @@ class CtaViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val tabRepository: TabRepository,
     private val dispatchers: DispatcherProvider,
-    private val variantManager: VariantManager,
-    private val userEventsStore: UserEventsStore,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector
 ) {
     val surveyLiveData: LiveData<Survey> = surveyDao.getLiveScheduled()
@@ -173,31 +177,6 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    suspend fun onUserClickFireproofExperimentButton(
-        isAutoFireproofingEnabled: Boolean,
-        cta: Cta
-    ) {
-
-        if (cta !is DaxBubbleCta.DaxFireproofCta) return
-
-        withContext(dispatchers.io()) {
-
-            if (isAutoFireproofingEnabled) {
-                cta.okPixel?.let {
-                    pixel.fire(it, cta.pixelOkParameters())
-                }
-            } else {
-                cta.cancelPixel?.let {
-                    pixel.fire(it, cta.pixelCancelParameters())
-                }
-            }
-
-            dismissedCtaDao.insert(DismissedCta(cta.ctaId))
-
-            completeStageIfDaxOnboardingCompleted()
-        }
-    }
-
     suspend fun refreshCta(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
@@ -236,9 +215,6 @@ class CtaViewModel @Inject constructor(
         return when {
             canShowDaxIntroCta() -> {
                 DaxBubbleCta.DaxIntroCta(onboardingStore, appInstallStore)
-            }
-            canShowDaxFireproofCta() -> {
-                DaxBubbleCta.DaxFireproofCta(onboardingStore, appInstallStore)
             }
             canShowDaxCtaEndOfJourney() -> {
                 DaxBubbleCta.DaxEndCta(onboardingStore, appInstallStore)
@@ -289,15 +265,6 @@ class CtaViewModel @Inject constructor(
 
     @WorkerThread
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
-
-    @WorkerThread
-    private suspend fun canShowDaxFireproofCta(): Boolean = variantManager.isFireproofExperimentEnabled() &&
-        daxOnboardingActive() &&
-        !daxDialogEndShown() &&
-        !daxDialogFireproofShown() &&
-        daxDialogIntroShown() &&
-        !settingsDataStore.hideTips &&
-        userEventsStore.getUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED) == null
 
     @WorkerThread
     private suspend fun canShowDaxCtaEndOfJourney(): Boolean = daxOnboardingActive() &&
@@ -353,8 +320,6 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun daxDialogIntroShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_INTRO)
-
-    private fun daxDialogFireproofShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_FIREPROOF)
 
     private fun daxDialogEndShown(): Boolean = dismissedCtaDao.exists(CtaId.DAX_END)
 

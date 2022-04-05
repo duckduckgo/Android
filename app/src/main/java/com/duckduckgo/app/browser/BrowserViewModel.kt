@@ -61,8 +61,7 @@ class BrowserViewModel(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val pixel: Pixel,
-    private val userEventsStore: UserEventsStore
+    private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -237,12 +236,6 @@ class BrowserViewModel(
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
         }
     }
-
-    fun promotedFireButtonCancelled() {
-        launch(dispatchers.io()) {
-            userEventsStore.registerUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED)
-        }
-    }
 }
 
 @ContributesMultibinding(AppScope::class)
@@ -253,8 +246,7 @@ class BrowserViewModelFactory @Inject constructor(
     val appEnjoymentPromptEmitter: Provider<AppEnjoymentPromptEmitter>,
     val appEnjoymentUserEventRecorder: Provider<AppEnjoymentUserEventRecorder>,
     val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    val pixel: Provider<Pixel>,
-    val userEventsStore: Provider<AppUserEventsStore>
+    val pixel: Provider<Pixel>
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -266,8 +258,7 @@ class BrowserViewModelFactory @Inject constructor(
                     appEnjoymentPromptEmitter.get(),
                     appEnjoymentUserEventRecorder.get(),
                     dispatchers,
-                    pixel.get(),
-                    userEventsStore.get()
+                    pixel.get()
                 ) as T
                 else -> null
             }

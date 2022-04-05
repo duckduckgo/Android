@@ -27,9 +27,7 @@ import java.util.*
 interface VariantManager {
 
     // variant-dependant features listed here
-    sealed class VariantFeature {
-        object FireproofExperiment : VariantFeature()
-    }
+    sealed class VariantFeature
 
     companion object {
 
@@ -42,11 +40,7 @@ interface VariantManager {
             // SERP variants. "sc" may also be used as a shared control for mobile experiments in
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // Fireproof experiment
-            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
+            Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() })
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -175,8 +169,6 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
-
-fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
 /**
  * A variant which can be used for experimentation.

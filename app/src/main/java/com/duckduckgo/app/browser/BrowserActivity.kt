@@ -380,12 +380,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
-            if (dialog.ctaVisible) {
-                viewModel.promotedFireButtonCancelled()
-                pixel.fire(FIRE_DIALOG_PROMOTED_CANCEL)
-            } else {
-                pixel.fire(FIRE_DIALOG_CANCEL)
-            }
+            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()
