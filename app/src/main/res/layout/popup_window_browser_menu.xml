@@ -102,7 +102,7 @@
                 app:iconDrawable="@drawable/ic_add_16" />
 
             <View
-                android:id="@+id/firstDivider"
+                android:id="@+id/siteOptionsMenuDivider"
                 style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -134,7 +134,7 @@
                 app:iconDrawable="@drawable/ic_library_16" />
 
             <View
-                android:id="@+id/secondDivider"
+                android:id="@+id/browserOptionsMenuDivider"
                 style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
@@ -195,7 +195,7 @@
                 app:iconDrawable="@drawable/ic_feedback_16" />
 
             <View
-                android:id="@+id/bottomDivider"
+                android:id="@+id/settingsMenuDivider"
                 style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView

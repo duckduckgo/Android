@@ -2465,9 +2465,9 @@ class BrowserTabFragment :
                 )
                 brokenSiteMenuItem?.isVisible = viewState.canReportSite
 
-                firstDivider.isVisible = viewState.browserShowing
-                secondDivider.isVisible = viewState.browserShowing
-                bottomDivider.isVisible = viewState.browserShowing
+                siteOptionsMenuDivider.isVisible = viewState.browserShowing
+                browserOptionsMenuDivider.isVisible = viewState.browserShowing
+                settingsMenuDivider.isVisible = viewState.browserShowing
             }
         }
 
