@@ -689,9 +689,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Datenschutzrichtlinie</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Download fehlgeschlagen. Internetverbindung überprüfen.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widget „%1$s“ zum Startbildschirm hinzugefügt</string>
     <string name="settingsAddHomeScreenWidget">Widget für Startbildschirm</string>

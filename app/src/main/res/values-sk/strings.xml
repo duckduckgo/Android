@@ -705,9 +705,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Zásady o ochrane súkromia</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Sťahovanie zlyhalo. Skontrolujte internetové pripojenie.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Miniaplikácia %1$s bola pridaná na úvodnú obrazovku</string>
     <string name="settingsAddHomeScreenWidget">Miniaplikácia úvodnej obrazovky</string>

@@ -673,9 +673,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Política de Privacidade</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Ocorreu uma falha na transferência. Verifique a ligação à Internet.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget adicionado ao ecrã inicial</string>
     <string name="settingsAddHomeScreenWidget">Widget da página principal</string>

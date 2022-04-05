@@ -673,9 +673,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Tietosuojakäytäntö</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Lataus epäonnistui. Tarkista internetyhteys.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s-widget lisätty aloitusnäyttöön</string>
     <string name="settingsAddHomeScreenWidget">Aloitusnäytön widget</string>

@@ -673,9 +673,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Политика за поверителност</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Неуспешно изтегляне. Проверете интернет връзката.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Уиджетът %1$s е добавен към началния екран</string>
     <string name="settingsAddHomeScreenWidget">Уиджет на началния екран</string>

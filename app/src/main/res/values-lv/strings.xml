@@ -681,9 +681,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privātuma politika</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Neizdevās lejupielādēt. Pārbaudi interneta savienojumu.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Sākuma ekrānam pievienots logrīks %1$s</string>
     <string name="settingsAddHomeScreenWidget">Sākuma ekrāna logrīks</string>

@@ -689,9 +689,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Πολιτική προστασίας προσωπικών δεδομένων</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Αποτυχία λήψης. Ελέγξτε τη σύνδεση στο διαδίκτυο.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
     <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>

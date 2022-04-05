@@ -689,9 +689,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Integritetspolicy</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Det gick inte att ladda ner. Kontrollera internetanslutningen.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widgeten %1$s har lagts till på startsidan</string>
     <string name="settingsAddHomeScreenWidget">Widget på startsidan</string>

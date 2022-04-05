@@ -705,9 +705,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Pravilnik o zasebnosti</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Prenos ni uspel. Preverite internetno povezavo.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Pripomoček %1$s je bil dodan na domači zaslon</string>
     <string name="settingsAddHomeScreenWidget">Pripomoček na domačem zaslonu</string>

@@ -33,12 +33,8 @@
     <string name="downloadsMenuItem">Downloads</string>
     <string name="downloadsActivityTitle">Downloads</string>
     <string name="downloadsActivityNoItemsDescription">No files downloaded yet</string>
-    <string name="downloadsDownloadManagerDisabledErrorMessage">Failed to download. Enable Download Manager to retry.</string>
     <string name="downloadsShareTitle">Share with…</string>
-    <string name="downloadsDownloadStartedMessage">Download started for %s</string>
-    <string name="downloadsDownloadFinishedMessage">Download complete for %s</string>
     <string name="downloadsDownloadFinishedActionName">Open</string>
-    <string name="downloadsDownloadGenericErrorMessage">Failed to download.</string>
     <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
     <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
     <string name="downloadsItemMenuShare">Share</string>

@@ -689,9 +689,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Política de Privacidad</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">No se ha podido descargar. Comprueba la conexión a internet.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widget %1$s añadido a la pantalla de inicio</string>
     <string name="settingsAddHomeScreenWidget">Widget de pantalla de inicio</string>

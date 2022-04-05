@@ -705,9 +705,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Polityka prywatności</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nie udało się pobrać. Sprawdź połączenie internetowe.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Dodano widżet %1$s do ekranu głównego</string>
     <string name="settingsAddHomeScreenWidget">Widżet ekranu głównego</string>

@@ -705,9 +705,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Zásady ochrany osobních údajů</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Stahování se nezdařilo. Zkontrolujte připojení k internetu.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Na plochu se přidal widget %1$s</string>
     <string name="settingsAddHomeScreenWidget">Widget na plochu</string>

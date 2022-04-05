@@ -15,9 +15,5 @@
   ~ limitations under the License.
   -->
 <resources>
-    <string name="downloadsDownloadStartedMessage">Download started for %s</string>
-    <string name="downloadsDownloadFinishedMessage">Download complete for %s</string>
-    <string name="downloadsDownloadErrorMessage">Failed to download. Check internet connection.</string>
-    <string name="downloadsDownloadManagerDisabledErrorMessage">Failed to download. Enable Download Manager to retry.</string>
-    <string name="downloadsDownloadGenericErrorMessage">Failed to download.</string>
+    <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
 </resources>

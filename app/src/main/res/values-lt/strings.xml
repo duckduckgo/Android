@@ -705,9 +705,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nepavyko atsisiųsti. Patikrinkite interneto ryšį.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
     <string name="settingsAddHomeScreenWidget">Pagrindinio ekrano valdiklis</string>

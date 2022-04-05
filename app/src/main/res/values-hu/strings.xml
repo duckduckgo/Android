@@ -673,9 +673,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Adatvédelmi szabályzat</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">A letöltés sikertelen. Ellenőrizd az internetkapcsolatot.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>
     <string name="settingsAddHomeScreenWidget">Kezdőképernyő-minialkalmazás</string>

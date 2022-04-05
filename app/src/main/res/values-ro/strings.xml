@@ -681,9 +681,6 @@
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Confidențialitate</string>
 
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nu s-a putut descărca. Verifică conexiunea la internet.</string>
-
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget adăugat la ecranul de întâmpinare</string>
     <string name="settingsAddHomeScreenWidget">Widget pe ecranul de întâmpinare</string>
