@@ -140,20 +140,6 @@
         <item name="android:layout_width">@dimen/popupMenuItemHeight</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text">
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textAlignment">viewStart</item>
-        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Body1</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox">
-        <item name="android:button">@null</item>
-        <item name="android:drawableEnd">?android:attr/listChoiceIndicatorMultiple</item>
-        <item name="android:paddingEnd">@dimen/keyline_2</item>
-    </style>
-
     <style name="Widget.DuckDuckGo.Switch">
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
