@@ -2458,7 +2458,13 @@ class BrowserTabFragment :
                 addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
                 privacyProtectionMenuItem?.isVisible = viewState.canChangePrivacyProtection
                 privacyProtectionMenuItem?.label {
-                    getText(if (viewState.isPrivacyProtectionEnabled) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection).toString()
+                    getText(
+                        if (viewState.isPrivacyProtectionEnabled) {
+                            R.string.enablePrivacyProtection
+                        } else {
+                            R.string.disablePrivacyProtection
+                        }
+                    ).toString()
                 }
                 privacyProtectionMenuItem?.setIcon(
                     if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
