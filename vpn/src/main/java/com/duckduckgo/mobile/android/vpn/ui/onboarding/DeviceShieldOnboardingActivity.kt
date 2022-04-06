@@ -56,16 +56,8 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    private lateinit var viewPager: ViewPager2
-
     private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
     private val binding: ActivityDeviceShieldOnboardingBinding by viewBinding()
-
-    private lateinit var nextOnboardingPageCta: ImageButton
-    private lateinit var enableDeviceShieldLayout: View
-    private lateinit var onboardingFAQCta: Button
-    private lateinit var onboardingClose: ImageButton
-    private lateinit var enableDeviceShieldToggle: View
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,23 +65,13 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
-        bindViews()
         configureUI()
         observeViewModel()
     }
 
-    private fun bindViews() {
-        onboardingClose = findViewById(R.id.onboarding_close)
-        enableDeviceShieldToggle = findViewById(R.id.onboarding_switch_layout)
-        viewPager = findViewById(R.id.onboarding_pager)
-        enableDeviceShieldLayout = findViewById(R.id.onboarding_cta_layout)
-        onboardingFAQCta = findViewById(R.id.onboarding_faq_cta)
-        nextOnboardingPageCta = findViewById(R.id.onboarding_next_cta)
-    }
-
     private fun configureUI() {
-        viewPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages)
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.onboardingPager.adapter = DeviceShieldOnboardingAdapter(viewModel.pages)
+        binding.onboardingPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
 
             override fun onPageSelected(position: Int) {
                 showOnboardingPage(position)
@@ -97,21 +79,21 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
             }
         })
 
-        onboardingFAQCta.setOnClickListener {
+        binding.onboardingFaqCta.setOnClickListener {
             DeviceShieldFAQActivity.intent(this).also {
                 startActivity(it)
             }
         }
 
-        nextOnboardingPageCta.setOnClickListener {
-            viewPager.currentItem = viewPager.currentItem + 1
+        binding.onboardingNextCta.setOnClickListener {
+            binding.onboardingPager.currentItem = binding.onboardingPager.currentItem + 1
         }
 
-        onboardingClose.setOnClickListener {
+        binding.onboardingClose.setOnClickListener {
             close()
         }
 
-        enableDeviceShieldToggle.setOnClickListener {
+        binding.onboardingSwitchLabel.setOnClickListener {
             viewModel.onTurnAppTpOffOn()
         }
     }
@@ -138,13 +120,13 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
     }
 
     private fun showEnableCTA() {
-        nextOnboardingPageCta.isGone = true
-        enableDeviceShieldLayout.isVisible = true
+        binding.onboardingNextCta.isGone = true
+        binding.onboardingCtaLayout.isVisible = true
     }
 
     private fun showNextPageCTA() {
-        nextOnboardingPageCta.isVisible = true
-        enableDeviceShieldLayout.isGone = true
+        binding.onboardingNextCta.isVisible = true
+        binding.onboardingCtaLayout.isGone = true
     }
 
     override fun onBackPressed() {

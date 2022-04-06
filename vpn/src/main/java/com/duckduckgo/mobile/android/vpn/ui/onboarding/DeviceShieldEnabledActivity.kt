@@ -46,11 +46,6 @@ class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityDeviceShieldEnabledBinding by viewBinding()
 
-    private lateinit var deviceShieldActivityCta: Button
-    private lateinit var settingsCta: TextView
-    private lateinit var viewKonfetti: KonfettiView
-    private lateinit var close: View
-
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setStatusBarColor(getResources().getColor(com.duckduckgo.mobile.android.R.color.atp_onboardingHeaderBg))
@@ -62,17 +57,14 @@ class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
-        close = findViewById(R.id.onboarding_close)
-        close.setOnClickListener {
+        binding.onboardingClose.setOnClickListener {
             close()
         }
-        deviceShieldActivityCta = findViewById(R.id.onboarding_enabled_activity_cta)
-        deviceShieldActivityCta.setOnClickListener {
+        binding.onboardingEnabledActivityCta.setOnClickListener {
             startActivity(DeviceShieldTrackerActivity.intent(this))
             finish()
         }
 
-        settingsCta = findViewById(R.id.onboarding_enabled_settings_text)
         val fullText = getText(R.string.atp_EnabledSettings) as SpannedString
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -100,12 +92,10 @@ class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
                 )
             }
         }
-        settingsCta.apply {
+        binding.onboardingEnabledSettingsText.apply {
             text = spannableString
             movementMethod = LinkMovementMethod.getInstance()
         }
-
-        viewKonfetti = findViewById(R.id.deviceShieldKonfetti)
     }
 
     private fun launchKonfetti() {
@@ -118,7 +108,7 @@ class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
 
         val displayWidth = resources.displayMetrics.widthPixels
 
-        viewKonfetti.build()
+        binding.deviceShieldKonfetti.build()
             .addColors(magenta, blue, purple, green, yellow)
             .setDirection(0.0, 359.0)
             .setSpeed(1f, 5f)
