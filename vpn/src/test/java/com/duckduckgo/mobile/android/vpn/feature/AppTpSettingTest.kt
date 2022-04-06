@@ -30,6 +30,8 @@ class AppTpSettingTest {
                 AppTpSetting.Ipv6Support -> assertFalse(setting.defaultValue)
                 AppTpSetting.PrivateDnsSupport -> assertFalse(setting.defaultValue)
                 AppTpSetting.NetworkSwitchHandling -> assertFalse(setting.defaultValue)
+                AppTpSetting.SetActiveNetworkDns -> assertFalse(setting.defaultValue)
+                AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
             }
         }
     }

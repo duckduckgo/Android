@@ -72,6 +72,15 @@
             />
 
             <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/setActiveNetworkDnsToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Set Active Network DNS"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/ipv6SupportToggle"
                     style="@style/SettingsSwitch"
                     android:layout_width="match_parent"
@@ -95,6 +104,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Network Switching handling"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/vpnAlwaysSetDNSToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Always set DNS"
                     android:theme="@style/SettingsSwitchTheme"
             />
 
