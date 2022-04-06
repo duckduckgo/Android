@@ -27,7 +27,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class StoreReferralModule {
+object StoreReferralModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

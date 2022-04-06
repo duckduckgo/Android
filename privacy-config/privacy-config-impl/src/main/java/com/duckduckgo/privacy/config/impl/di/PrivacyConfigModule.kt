@@ -78,7 +78,7 @@ abstract class PrivacyFeaturesBindingModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class NetworkModule {
+object NetworkModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -102,7 +102,7 @@ class NetworkModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class DatabaseModule {
+object DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

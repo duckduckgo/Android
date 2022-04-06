@@ -45,7 +45,7 @@ import dagger.multibindings.IntoSet
 import dagger.SingleInstanceIn
 
 @Module
-class PrivacyModule {
+object PrivacyModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

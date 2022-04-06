@@ -40,7 +40,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class DevicePropertiesModule {
+object DevicePropertiesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

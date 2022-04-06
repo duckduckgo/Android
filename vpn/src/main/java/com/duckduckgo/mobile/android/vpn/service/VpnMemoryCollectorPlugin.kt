@@ -54,7 +54,7 @@ abstract class VpnMemoryCollectorProviderModule {
 
     @Module
     @ContributesTo(VpnScope::class)
-    class VpnMemoryCollectorProviderModuleExt {
+    object VpnMemoryCollectorProviderModuleExt {
         @Provides
         @SingleInstanceIn(VpnScope::class)
         fun bindVpnMemoryCollectorPluginPoint(

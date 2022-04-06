@@ -26,7 +26,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-class WidgetModule {
+object WidgetModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
