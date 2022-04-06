@@ -138,7 +138,6 @@ import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -180,7 +179,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
-import kotlinx.android.synthetic.main.include_cta.*
 
 class BrowserTabFragment :
     Fragment(),
@@ -2454,7 +2452,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is BubbleCta -> showBubleCta(configuration)
+                is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
             messageCta.gone()
@@ -2490,7 +2488,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubleCta(configuration: BubbleCta) {
+        private fun showBubbleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
@@ -2526,12 +2524,12 @@ class BrowserTabFragment :
                 quickAccessRecyclerView.show()
             }
 
-            newTabQuickAcessItemsLayout.show()
+            newTabQuickAccessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            newTabQuickAcessItemsLayout.gone()
+            newTabQuickAccessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {

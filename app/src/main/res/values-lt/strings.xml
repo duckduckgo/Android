@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Išsaugoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neapsaugotos svetainės</string>
+    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Parinktis „Fireproof“</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne dabar</string>
     <string name="fireproofWebsiteItemsSectionTitle">Svetainės</string>
-    <string name="fireproofWebsiteToogleText">Klausti prisijungiant</string>
+    <string name="fireproofWebsiteToggleText">Klausti prisijungiant</string>
     <string name="disableLoginDetectionDialogTitle">Išjungti apsaugos priminimą prisijungiant prie svetainių?</string>
     <string name="disableLoginDetectionDialogDescription">Šią nuostatą galite bet kada pakeisti nustatymuose.</string>
     <string name="disableLoginDetectionDialogPositive">IŠJUNGTI</string>

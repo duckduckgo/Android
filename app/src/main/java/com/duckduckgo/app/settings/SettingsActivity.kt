@@ -283,7 +283,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.LaunchAccessibilitySettigns -> launchAccessibilitySettings()
+            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()

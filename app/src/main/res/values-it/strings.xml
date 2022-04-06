@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Salva</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Siti non protetti</string>
+    <string name="whitelistActivityTitle">Siti non protetti</string>
     <string name="enablePrivacyProtection">Attiva la tutela della privacy</string>
     <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
     <string name="whitelistEntryOverflowContentDescription">Altre opzioni per il sito non protetto %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Proteggi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti Web</string>
-    <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
+    <string name="fireproofWebsiteToggleText">Chiedi al momento dell\'accesso</string>
     <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
     <string name="disableLoginDetectionDialogPositive">DISABILITA</string>

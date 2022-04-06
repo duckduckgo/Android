@@ -35,7 +35,7 @@ import org.junit.Test
 class NotificationRegistrarTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
-    private val notifcationManagerCompat = NotificationManagerCompat.from(context)
+    private val notificationManagerCompat = NotificationManagerCompat.from(context)
     private val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
@@ -51,7 +51,7 @@ class NotificationRegistrarTest {
             TestScope(),
             context,
             notificationManager,
-            notifcationManagerCompat,
+            notificationManagerCompat,
             mockSettingsDataStore,
             mockPixel
         )

@@ -148,7 +148,7 @@
         </activity-alias>
 
         <activity-alias
-            android:name="com.duckduckgo.app.launch.LauncherSilhoutte"
+            android:name="com.duckduckgo.app.launch.LauncherSilhouette"
             android:enabled="false"
             android:icon="@mipmap/ic_launcher_silhouette"
             android:roundIcon="@mipmap/ic_launcher_silhouette_round"
@@ -328,7 +328,7 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"
-            android:label="@string/whitelisetActivityTitle"
+            android:label="@string/whitelistActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"

@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Uložit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nechráněné stránky</string>
+    <string name="whitelistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %1$s</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Ochrana</string>
     <string name="fireproofWebsiteLoginDialogNegative">Teď ne</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
-    <string name="fireproofWebsiteToogleText">Zeptat se při přihlašování</string>
+    <string name="fireproofWebsiteToggleText">Zeptat se při přihlašování</string>
     <string name="disableLoginDetectionDialogTitle">Zakázat připomenutí ochrany při přihlašování k webovým stránkám?</string>
     <string name="disableLoginDetectionDialogDescription">Tuto předvolbu můžete v Nastavení kdykoli změnit.</string>
     <string name="disableLoginDetectionDialogPositive">VYPNOUT</string>

@@ -1609,7 +1609,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
+    fun whenUserTogglesWhitelistedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
         testee.onWhitelistSelected()
@@ -2648,7 +2648,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = runTest {
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShouldBeEnabled() = runTest {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)

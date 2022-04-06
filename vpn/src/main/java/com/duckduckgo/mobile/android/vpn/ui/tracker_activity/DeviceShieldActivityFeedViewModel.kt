@@ -102,13 +102,13 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                         trackerBucket.value
                             .sortedByDescending { it.trackerCompanySignal.tracker.timestamp }
                             .first().trackerCompanySignal.tracker.timestamp
-                    val trackeCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
+                    val trackerCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
                     trackingCompanyInfo.add(
                         TrackingCompanyInfo(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
                             timestamp = timestamp,
-                            companyPrevalence = trackeCompanyPrevalence
+                            companyPrevalence = trackerCompanyPrevalence
                         )
                     )
                     totalTrackerCount += trackerBucket.value.size

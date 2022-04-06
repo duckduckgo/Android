@@ -274,11 +274,11 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onDismissConflictDialog() {
-        deviceShieldPixels.didChooseToDismissVpnConflicDialog()
+        deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
     override fun onOpenSettings() {
-        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflicDialog()
+        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
 
         val intent = Intent(Settings.ACTION_VPN_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -286,7 +286,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onContinue() {
-        deviceShieldPixels.didChooseToContinueFromVpnConflicDialog()
+        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
     }
 

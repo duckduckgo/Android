@@ -698,7 +698,7 @@
         <item name="android:listSelector">#00000000</item>
     </style>
 
-    <style name="SearchWidgetEmtpyFavoritesHintContainer">
+    <style name="SearchWidgetEmptyFavoritesHintContainer">
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/savedSiteGridItemFavicon</item>
@@ -707,7 +707,7 @@
         <item name="android:visibility">invisible</item>
     </style>
 
-    <style name="SearchWidgetEmtpyFavoritesHint">
+    <style name="SearchWidgetEmptyFavoritesHint">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
@@ -717,7 +717,7 @@
         <item name="android:textColor">@color/warGreyTwo</item>
     </style>
 
-    <style name="SearchWidgetEmtpyFavoritesAction">
+    <style name="SearchWidgetEmptyFavoritesAction">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>

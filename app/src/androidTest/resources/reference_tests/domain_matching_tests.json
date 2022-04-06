@@ -83,7 +83,7 @@
         ]
       },
       {
-        "name": "uncloacked tracker should contain original path and be checked against the ignore rules",
+        "name": "uncloaked tracker should contain original path and be checked against the ignore rules",
         "siteURL": "https://randomsite123.com/",
         "requestURL": "https://bad.cnames.test/breakage",
         "requestType": "script",

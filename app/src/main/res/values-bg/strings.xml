@@ -484,7 +484,7 @@
     <string name="dialogSaveAction">Запази</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Незащитени сайтове</string>
+    <string name="whitelistActivityTitle">Незащитени сайтове</string>
     <string name="enablePrivacyProtection">Активиране на защита на поверителността</string>
     <string name="disablePrivacyProtection">Деактивиране на защита на поверителността</string>
     <string name="whitelistEntryOverflowContentDescription">Още опции за незащитен сайт %1$s</string>
@@ -512,7 +512,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Направи огнеустойчив</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сега</string>
     <string name="fireproofWebsiteItemsSectionTitle">Уебсайтове</string>
-    <string name="fireproofWebsiteToogleText">Питай при влизане</string>
+    <string name="fireproofWebsiteToggleText">Питай при влизане</string>
     <string name="disableLoginDetectionDialogTitle">Да се деактивира ли напомняне за огнеустойчивост при вход в сайтове?</string>
     <string name="disableLoginDetectionDialogDescription">Можете да промените това предпочитание по всяко време в настройките.</string>
     <string name="disableLoginDetectionDialogPositive">ЗАБРАНИ</string>

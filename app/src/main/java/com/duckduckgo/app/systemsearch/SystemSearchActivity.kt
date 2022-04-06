@@ -196,7 +196,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         quickAccessAdapter = FavoritesQuickAccessAdapter(
             this, faviconManager,
             { viewHolder -> itemTouchHelper.startDrag(viewHolder) },
-            { viewModel.onQuickAccesItemClicked(it) },
+            { viewModel.onQuickAccessItemClicked(it) },
             { viewModel.onEditQuickAccessItemRequested(it) },
             { viewModel.onDeleteQuickAccessItemRequested(it) }
         )
