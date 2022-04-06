@@ -16,7 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.di
 
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldActivityFeedFragment
 import com.squareup.anvil.annotations.ContributesTo
@@ -38,13 +38,13 @@ interface DeviceShieldActivityFeedFragmentComponent : AndroidInjector<DeviceShie
     interface Factory : AndroidInjector.Factory<DeviceShieldActivityFeedFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface DeviceShieldActivityFeedFragmentComponentProvider {
     fun provideDeviceShieldActivityFeedFragmentComponentFactory(): DeviceShieldActivityFeedFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class DeviceShieldActivityFeedFragmentBindingModule {
     @Binds
     @IntoMap

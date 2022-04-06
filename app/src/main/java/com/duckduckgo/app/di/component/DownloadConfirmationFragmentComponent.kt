@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.browser.DownloadConfirmationFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface DownloadConfirmationFragmentComponent : AndroidInjector<DownloadConfir
     interface Factory : AndroidInjector.Factory<DownloadConfirmationFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface DownloadConfirmationFragmentComponentProvider {
     fun provideDownloadConfirmationFragmentComponentFactory(): DownloadConfirmationFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class DownloadConfirmationFragmentBindingModule {
     @Binds
     @IntoMap

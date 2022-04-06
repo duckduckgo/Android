@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.email.ui.EmailProtectionNotSupportedFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface EmailProtectionNotSupportedFragmentComponent : AndroidInjector<EmailPr
     interface Factory : AndroidInjector.Factory<EmailProtectionNotSupportedFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface EmailProtectionNotSupportedFragmentComponentProvider {
     fun provideEmailProtectionNotSupportedFragmentComponentFactory(): EmailProtectionNotSupportedFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class EmailProtectionNotSupportedFragmentBindingModule {
     @Binds
     @IntoMap
