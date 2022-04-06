@@ -23,7 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.fragmentKtx
+    implementation AndroidX.fragment.ktx
     implementation Google.dagger
     implementation AndroidX.appCompat
 }
