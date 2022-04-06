@@ -19,7 +19,5 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.feature.toggles.api.FeatureName
 
 enum class AppTpFeatureName(override val value: String) : FeatureName {
-    Ipv6Support("ipv6Support"),
-    PrivateDnsSupport("privateDnsSupport"),
-    NetworkSwitchingHandling("networkSwitchingHandling"),
+    AppTrackerProtection("appTrackerProtection"),
 }

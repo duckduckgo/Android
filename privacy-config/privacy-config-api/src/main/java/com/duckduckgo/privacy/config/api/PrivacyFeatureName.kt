@@ -29,10 +29,3 @@ enum class PrivacyFeatureName(override val value: String) : FeatureName {
     TrackingParametersFeatureName("trackingParameters"),
     AutofillFeatureName("autofill"),
 }
-
-/**
- * Convenience method to get the [PrivacyFeatureName] from its [String] value
- */
-fun privacyFeatureValueOf(value: String): PrivacyFeatureName? {
-    return PrivacyFeatureName.values().find { it.value == value }
-}

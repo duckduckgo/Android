@@ -16,10 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.store
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
@@ -29,7 +27,6 @@ import org.mockito.kotlin.whenever
 
 class RealAppTpFeatureToggleRepositoryTest {
 
-    private val appBuildConfig: AppBuildConfig = mock()
     private val vpnFeatureToggleStore: VpnFeatureToggleStore = mock()
 
     private lateinit var repository: RealAppTpFeatureToggleRepository
@@ -38,7 +35,7 @@ class RealAppTpFeatureToggleRepositoryTest {
     fun setup() {
         MockitoAnnotations.openMocks(this)
 
-        repository = RealAppTpFeatureToggleRepository(vpnFeatureToggleStore, appBuildConfig)
+        repository = RealAppTpFeatureToggleRepository(vpnFeatureToggleStore)
     }
 
     @Test
@@ -56,31 +53,7 @@ class RealAppTpFeatureToggleRepositoryTest {
     }
 
     @Test
-    fun whenGetFeatureAndPlayBuildThenReturnFalse() {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-
-        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
-        assertEquals(false, repository.get(FEATURE, false))
-
-        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
-        assertEquals(false, repository.get(FEATURE, false))
-    }
-
-    @Test
-    fun whenGetFeatureAndFdroidBuildThenReturnFalse() {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.FDROID)
-
-        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
-        assertEquals(false, repository.get(FEATURE, false))
-
-        whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(false)
-        assertEquals(false, repository.get(FEATURE, false))
-    }
-
-    @Test
-    fun whenGetFeatureAndInternalBuildThenReturnFalseOrValue() {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-
+    fun whenGetFeatureThenReturnStoredValue() {
         whenever(vpnFeatureToggleStore.get(FEATURE, false)).thenReturn(true)
         assertEquals(true, repository.get(FEATURE, false))
 
@@ -89,6 +62,6 @@ class RealAppTpFeatureToggleRepositoryTest {
     }
 
     companion object {
-        private val FEATURE = AppTpFeatureName.Ipv6Support
+        private val FEATURE = AppTpFeatureName.AppTrackerProtection
     }
 }

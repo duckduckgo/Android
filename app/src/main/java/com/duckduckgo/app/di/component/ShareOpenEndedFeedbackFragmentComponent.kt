@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedFeedbackFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface ShareOpenEndedFeedbackFragmentComponent : AndroidInjector<ShareOpenEnd
     interface Factory : AndroidInjector.Factory<ShareOpenEndedFeedbackFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface ShareOpenEndedFeedbackFragmentComponentProvider {
     fun provideShareOpenEndedFeedbackFragmentComponentFactory(): ShareOpenEndedFeedbackFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class ShareOpenEndedFeedbackFragmentBindingModule {
     @Binds
     @IntoMap

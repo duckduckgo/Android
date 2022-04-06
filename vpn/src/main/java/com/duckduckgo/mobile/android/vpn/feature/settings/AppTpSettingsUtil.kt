@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.feature
+package com.duckduckgo.mobile.android.vpn.feature.settings
 
-import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 
-internal fun FeatureToggle.isNetworkSwitchingHandlingEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.NetworkSwitchingHandling, false)
-}
-internal fun FeatureToggle.isIpv6SupportEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.Ipv6Support, false)
-}
-internal fun FeatureToggle.isPrivateDnsSupportEnabled(): Boolean {
-    return isFeatureEnabled(AppTpFeatureName.PrivateDnsSupport, false)
+/**
+ * Convenience method to get the [AppTpSetting] from its [String] value
+ */
+internal fun appTpSettingValueOf(value: String): AppTpSetting? {
+    return AppTpSetting.values().find { it.value == value }
 }

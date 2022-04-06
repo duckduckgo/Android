@@ -34,4 +34,25 @@ interface FeatureToggle {
  */
 interface FeatureName {
     val value: String
+
+    companion object {
+        /**
+         * Utility function to create a [FeatureName] from the passed in [block] lambda
+         * instead of using the anonymous `object : FeatureName` syntax.
+         *
+         * Usage:
+         *
+         * ```kotlin
+         * val feature = FeatureName {
+         *
+         * }
+         * ```
+         */
+        inline operator fun invoke(crossinline block: () -> String): FeatureName {
+            return object : FeatureName {
+                override val value: String
+                    get() = block()
+            }
+        }
+    }
 }

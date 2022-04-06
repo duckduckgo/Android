@@ -34,13 +34,18 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityApptpCompanyTrackersActivityBinding
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var pixels: DeviceShieldPixels
 
     private val binding: ActivityApptpCompanyTrackersActivityBinding by viewBinding()
     private val viewModel: AppTPCompanyTrackersViewModel by bindViewModel()
@@ -74,6 +79,8 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
         observeViewModel()
         binding.activityRecyclerView.adapter = itemsAdapter
+
+        pixels.didOpenCompanyTrackersScreen()
     }
 
     private fun observeViewModel() {
