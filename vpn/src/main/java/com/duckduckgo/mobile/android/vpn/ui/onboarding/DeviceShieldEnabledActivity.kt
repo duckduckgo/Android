@@ -32,13 +32,19 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldEnabledBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import nl.dionsegijn.konfetti.KonfettiView
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
-class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_shield_enabled) {
+class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
+
+    private val binding: ActivityDeviceShieldEnabledBinding by viewBinding()
 
     private lateinit var deviceShieldActivityCta: Button
     private lateinit var settingsCta: TextView
@@ -47,8 +53,10 @@ class DeviceShieldEnabledActivity : AppCompatActivity(R.layout.activity_device_s
 
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.setStatusBarColor(getResources().getColor(com.duckduckgo.mobile.android.R.color.atp_onboardingHeaderBg))
         super.onCreate(savedInstanceState)
 
+        setContentView(binding.root)
         bindViews()
         launchKonfetti()
     }

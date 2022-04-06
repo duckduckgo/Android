@@ -33,8 +33,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.CheckVPNPermission
@@ -48,15 +51,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_device_shield_onboarding), AppTPVpnConflictDialog.Listener {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     private lateinit var viewPager: ViewPager2
+
+    private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
+    private val binding: ActivityDeviceShieldOnboardingBinding by viewBinding()
 
     private lateinit var nextOnboardingPageCta: ImageButton
     private lateinit var enableDeviceShieldLayout: View
@@ -64,16 +67,12 @@ class DeviceShieldOnboardingActivity : AppCompatActivity(R.layout.activity_devic
     private lateinit var onboardingClose: ImageButton
     private lateinit var enableDeviceShieldToggle: View
 
-    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
-
-    private val viewModel: DeviceShieldOnboardingViewModel by bindViewModel()
-
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.setStatusBarColor(getResources().getColor(com.duckduckgo.mobile.android.R.color.atp_onboardingHeaderBg))
         super.onCreate(savedInstanceState)
 
-        AndroidInjection.inject(this)
-
+        setContentView(binding.root)
         bindViews()
         configureUI()
         observeViewModel()
