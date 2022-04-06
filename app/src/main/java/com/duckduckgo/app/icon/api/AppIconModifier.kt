@@ -68,7 +68,7 @@ enum class AppIcon(
         icon = R.drawable.ic_app_icon_black_round
     ),
     SILHOUETTE(
-        componentName = "$QUALIFIER.LauncherSilhouette",
+        componentName = "$QUALIFIER.LauncherSilhoutte",
         icon = R.drawable.ic_app_icon_silhouette_round
     );
 
