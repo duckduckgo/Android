@@ -18,19 +18,18 @@ package com.duckduckgo.app.audit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(AppScope::class)
 class AuditSettingsViewModel @Inject constructor(
     private val userAllowListDao: UserWhitelistDao,
     private val dispatchers: DispatcherProvider
@@ -101,21 +100,5 @@ class AuditSettingsViewModel @Inject constructor(
         const val GPC_OTHER = "https://global-privacy-control.glitch.me/"
         const val SURROGATES = "https://privacy-test-pages.glitch.me/privacy-protections/surrogates/"
         val domainsUsed = listOf("privacy-test-pages.glitch.me", "privacy-test-pages.glitch.me")
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AuditSettingsViewModelFactory @Inject constructor(
-    private val userAllowListDao: Provider<UserWhitelistDao>,
-    private val dispatchers: Provider<DispatcherProvider>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AuditSettingsViewModel::class.java) ->
-                    AuditSettingsViewModel(userAllowListDao.get(), dispatchers.get()) as T
-                else -> null
-            }
-        }
     }
 }

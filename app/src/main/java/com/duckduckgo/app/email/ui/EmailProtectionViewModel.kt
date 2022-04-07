@@ -18,19 +18,18 @@ package com.duckduckgo.app.email.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-import javax.inject.Provider
 
-class EmailProtectionViewModel(
+@ContributesViewModel(AppScope::class)
+class EmailProtectionViewModel @Inject constructor(
     private val emailManager: EmailManager
 ) : ViewModel() {
 
@@ -58,20 +57,6 @@ class EmailProtectionViewModel(
             }
         } else {
             emit(ViewState(EmailState.NotSupported))
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class EmailProtectionViewModelFactory @Inject constructor(
-    private val emailManager: Provider<EmailManager>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(EmailProtectionViewModel::class.java) -> (EmailProtectionViewModel(emailManager.get()) as T)
-                else -> null
-            }
         }
     }
 }

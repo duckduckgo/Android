@@ -20,27 +20,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.UriString
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
-class WhitelistViewModel(
+@ContributesViewModel(AppScope::class)
+class WhitelistViewModel @Inject constructor(
     private val dao: UserWhitelistDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     data class ViewState(
@@ -126,20 +124,5 @@ class WhitelistViewModel(
 
     private suspend fun deleteEntryFromDatabase(entry: UserWhitelistedDomain) {
         withContext(dispatchers.io()) { dao.delete(entry) }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class WhitelistViewModelFactory @Inject constructor(
-    private val dao: Provider<UserWhitelistDao>,
-    private val appCoroutineScope: Provider<CoroutineScope>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(WhitelistViewModel::class.java) -> (WhitelistViewModel(dao.get(), appCoroutineScope.get()) as T)
-                else -> null
-            }
-        }
     }
 }

@@ -18,18 +18,17 @@ package com.duckduckgo.app.onboarding.ui.page
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import javax.inject.Provider
 
-class DefaultBrowserPageViewModel(
+@ContributesViewModel(AppScope::class)
+class DefaultBrowserPageViewModel @Inject constructor(
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val pixel: Pixel,
     private val installStore: AppInstallStore
@@ -200,27 +199,5 @@ class DefaultBrowserPageViewModel(
     companion object {
         const val MAX_DIALOG_ATTEMPTS = 2
         const val DEFAULT_URL = "https://duckduckgo.com"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class DefaultBrowserPageViewModelFactory @Inject constructor(
-    private val defaultBrowserDetector: Provider<DefaultBrowserDetector>,
-    private val pixel: Provider<Pixel>,
-    private val installStore: Provider<AppInstallStore>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DefaultBrowserPageViewModel::class.java) -> (
-                    DefaultBrowserPageViewModel(
-                        defaultBrowserDetector.get(),
-                        pixel.get(),
-                        installStore.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

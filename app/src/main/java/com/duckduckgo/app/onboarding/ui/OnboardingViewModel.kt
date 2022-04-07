@@ -18,18 +18,17 @@ package com.duckduckgo.app.onboarding.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class OnboardingViewModel(
+@ContributesViewModel(AppScope::class)
+class OnboardingViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager,
     private val dispatchers: DispatcherProvider
@@ -51,28 +50,6 @@ class OnboardingViewModel(
         // Executing this on IO to avoid any delay changing threads between Main-IO.
         viewModelScope.launch(dispatchers.io()) {
             userStageStore.stageCompleted(AppStage.NEW)
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class OnboardingViewModelFactory @Inject constructor(
-    private val userStageStore: Provider<UserStageStore>,
-    private val pageLayoutManager: Provider<OnboardingPageManager>,
-    private val dispatchers: Provider<DispatcherProvider>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(OnboardingViewModel::class.java) -> (
-                    OnboardingViewModel(
-                        userStageStore.get(),
-                        pageLayoutManager.get(),
-                        dispatchers.get()
-                    ) as T
-                    )
-                else -> null
-            }
         }
     }
 }
