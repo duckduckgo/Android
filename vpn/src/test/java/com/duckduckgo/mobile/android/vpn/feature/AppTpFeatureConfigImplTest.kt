@@ -62,6 +62,8 @@ class AppTpFeatureConfigImplTest {
                 AppTpSetting.Ipv6Support -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.PrivateDnsSupport -> assertFalse(config.isEnabled(setting))
                 AppTpSetting.NetworkSwitchHandling -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.SetActiveNetworkDns -> assertFalse(config.isEnabled(setting))
+                AppTpSetting.AlwaysSetDNS -> assertFalse(config.isEnabled(setting))
             }
         }
     }
@@ -103,10 +105,10 @@ class AppTpFeatureConfigImplTest {
     fun whenNotInternalBuildThenNeverSetManualOverride() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
 
-        config.setEnabled(AppTpSetting.BadHealthMitigation, true, isManualOverride = true)
+        config.setEnabled(SettingName { "feature" }, true, isManualOverride = true)
 
         val toggle = toggleDao.getConfigToggles().first()
-        assertEquals(AppTpSetting.BadHealthMitigation.value, toggle.name)
+        assertEquals("feature", toggle.name)
         assertFalse(toggle.isManualOverride)
     }
 
@@ -114,10 +116,10 @@ class AppTpFeatureConfigImplTest {
     fun whenInternalBuildThenRespectManualOverride() {
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
 
-        config.setEnabled(AppTpSetting.BadHealthMitigation, true, isManualOverride = true)
+        config.setEnabled(SettingName { "feature" }, true, isManualOverride = true)
 
         val toggle = toggleDao.getConfigToggles().first()
-        assertEquals(AppTpSetting.BadHealthMitigation.value, toggle.name)
+        assertEquals("feature", toggle.name)
         assertTrue(toggle.isManualOverride)
     }
 

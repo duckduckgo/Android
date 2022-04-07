@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,8 @@
 
 package com.duckduckgo.app.notification
 
-import android.app.TaskStackBuilder
-import android.content.Context
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+import com.duckduckgo.app.notification.model.SchedulableNotification
 
-interface TaskStackBuilderFactory {
-    fun createTaskBuilder(): TaskStackBuilder
-}
-
-@ContributesBinding(AppScope::class)
-class RealTaskStackBuilderFactory @Inject constructor(
-    private val context: Context
-) : TaskStackBuilderFactory {
-    override fun createTaskBuilder(): TaskStackBuilder {
-        return TaskStackBuilder.create(context)
-    }
+interface NotificationSender {
+    suspend fun sendNotification(notification: SchedulableNotification)
 }

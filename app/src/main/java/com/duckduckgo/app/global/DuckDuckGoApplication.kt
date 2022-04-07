@@ -88,7 +88,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         configureUncaughtExceptionHandler(currentProcess)
         initializeDateLibrary()
 
-        if (appIsRestarting()) return
         if (currentProcess is VpnProcess) {
             Timber.i("VPN process, no further logic executed in application onCreate()")
             return
