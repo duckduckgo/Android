@@ -166,6 +166,8 @@ dependencies {
     implementation project(path: ':privacy-config-impl')
     implementation project(path: ':anrs-api')
     implementation project(path: ':anrs-impl')
+    implementation project(path: ':macos-api')
+    implementation project(path: ':macos-impl')
 
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':remote-messaging-impl')

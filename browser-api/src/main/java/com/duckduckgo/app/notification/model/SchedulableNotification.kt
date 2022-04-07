@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,13 @@
 package com.duckduckgo.app.notification.model
 
 import android.os.Bundle
-import com.duckduckgo.app.notification.NotificationRegistrar
+import androidx.annotation.StringRes
 
+/**
+ * This interface is used whenever we want to create a notification that can be scheduled
+ * if cancelIntent is null it then uses the default if "com.duckduckgo.notification.cancel"
+ * which will cancel the notification and send a pixel
+ */
 interface SchedulableNotification {
     val id: String
     val launchIntent: String
@@ -28,7 +33,7 @@ interface SchedulableNotification {
 }
 
 interface NotificationSpec {
-    val channel: NotificationRegistrar.Channel
+    val channel: Channel
     val systemId: Int
     val name: String
     val icon: Int
@@ -41,3 +46,9 @@ interface NotificationSpec {
     val bundle: Bundle
     val color: Int
 }
+
+data class Channel(
+    val id: String,
+    @StringRes val name: Int,
+    val priority: Int
+)

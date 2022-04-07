@@ -38,6 +38,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.macos_api.MacOsWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -74,7 +76,8 @@ class SettingsViewModel(
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
-    private val emailManager: EmailManager
+    private val emailManager: EmailManager,
+    private val macOsWaitlist: MacOsWaitlist
 ) : ViewModel(), LifecycleObserver {
 
     private var deviceShieldStatePollingJob: Job? = null
@@ -93,7 +96,8 @@ class SettingsViewModel(
         val appLinksSettingType: AppLinkSettingType = AppLinkSettingType.ASK_EVERYTIME,
         val appTrackingProtectionWaitlistState: WaitlistState = WaitlistState.NotJoinedQueue,
         val appTrackingProtectionEnabled: Boolean = false,
-        val emailAddress: String? = null
+        val emailAddress: String? = null,
+        val macOsWaitlistState: MacWaitlistState = MacWaitlistState.NotJoinedQueue
     )
 
     data class AutomaticallyClearData(
@@ -122,6 +126,7 @@ class SettingsViewModel(
         object UpdateTheme : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
+        object LaunchMacOs : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -156,7 +161,8 @@ class SettingsViewModel(
                     appLinksSettingType = getAppLinksSettingsState(settingsDataStore.appLinksEnabled, settingsDataStore.showAppLinksPrompt),
                     appTrackingProtectionEnabled = TrackerBlockingVpnService.isServiceRunning(appContext),
                     appTrackingProtectionWaitlistState = atpRepository.getState(),
-                    emailAddress = emailManager.getEmailAddress()
+                    emailAddress = emailManager.getEmailAddress(),
+                    macOsWaitlistState = macOsWaitlist.getWaitlistState()
                 )
             )
         }
@@ -246,6 +252,10 @@ class SettingsViewModel(
 
     fun onEmailProtectionSettingClicked() {
         viewModelScope.launch { command.send(Command.LaunchEmailProtection) }
+    }
+
+    fun onMacOsSettingClicked() {
+        viewModelScope.launch { command.send(Command.LaunchMacOs) }
     }
 
     fun onDefaultBrowserToggled(enabled: Boolean) {
@@ -456,6 +466,7 @@ class SettingsViewModelFactory @Inject constructor(
     private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
     private val appBuildConfig: Provider<AppBuildConfig>,
     private val emailManager: Provider<EmailManager>,
+    private val macOsWaitlist: Provider<MacOsWaitlist>,
 ) : ViewModelFactoryPlugin {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
         with(modelClass) {
@@ -474,7 +485,8 @@ class SettingsViewModelFactory @Inject constructor(
                         featureToggle.get(),
                         pixel.get(),
                         appBuildConfig.get(),
-                        emailManager.get()
+                        emailManager.get(),
+                        macOsWaitlist.get(),
                     ) as T
                     )
                 else -> null

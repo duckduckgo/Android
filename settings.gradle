@@ -34,6 +34,10 @@ include ':remote-messaging-api'
 include ':remote-messaging-impl'
 include ':remote-messaging-store'
 
+include ':macos-api'
+include ':macos-impl'
+include ':macos-store'
+
 include ':common-test'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
@@ -51,6 +55,10 @@ project(':traces-impl').projectDir = new File('traces/traces-impl')
 project(':anrs-api').projectDir = new File('anrs/anrs-api')
 project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
 project(':anrs-store').projectDir = new File('anrs/anrs-store')
+
+project(':macos-api').projectDir = new File('macos/macos-api')
+project(':macos-impl').projectDir = new File('macos/macos-impl')
+project(':macos-store').projectDir = new File('macos/macos-store')
 
 rootProject.children.each { subproject ->
 
