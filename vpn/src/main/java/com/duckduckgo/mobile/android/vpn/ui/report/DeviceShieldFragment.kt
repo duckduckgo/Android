@@ -28,7 +28,7 @@ import android.widget.TextView
 import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -46,7 +46,7 @@ import javax.inject.Inject
 class DeviceShieldFragment : Fragment() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels

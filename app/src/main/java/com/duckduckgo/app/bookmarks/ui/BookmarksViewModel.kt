@@ -35,14 +35,14 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     private val bookmarksRepository: BookmarksRepository,

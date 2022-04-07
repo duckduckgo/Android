@@ -21,7 +21,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,

@@ -22,7 +22,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class AppTPWaitlistViewModel @Inject constructor(
     private val waitlistManager: AppTPWaitlistManager,
     private val atpWaitlistStateRepository: AtpWaitlistStateRepository,

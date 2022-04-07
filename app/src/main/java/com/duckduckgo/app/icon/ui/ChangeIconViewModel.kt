@@ -25,10 +25,10 @@ import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class ChangeIconViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val appIconModifier: IconModifier,

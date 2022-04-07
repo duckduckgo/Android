@@ -21,10 +21,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class AddWidgetInstructionsViewModel @Inject constructor() : ViewModel() {
 
     sealed class Command {

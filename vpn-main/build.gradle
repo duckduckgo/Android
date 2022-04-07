@@ -25,6 +25,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     api project(path: ':vpn')
+    implementation project(path: ':common')
     implementation project(path: ':di')
 
     implementation Kotlin.stdlib.jdk7
