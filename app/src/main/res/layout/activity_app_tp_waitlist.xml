@@ -52,15 +52,13 @@
 
     <TextView
             android:id="@+id/appTPDescription"
+            style="@style/TextAppearance.DuckDuckGo.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
             android:text="@string/atp_WaitlistDescription"
             android:textAlignment="center"
             android:textColor="?attr/settingsMinorTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" app:layout_constraintTop_toBottomOf="@+id/statusTitle"
+            app:layout_constraintTop_toBottomOf="@+id/statusTitle"
             android:layout_marginTop="12dp" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"/>
@@ -105,7 +103,7 @@
 
     <TextView
             android:id="@+id/footerDescription"
-            style="@style/TextAppearance.DuckDuckGo.Body2"
+            style="@style/TextAppearance.DuckDuckGo.Caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom|center_horizontal"

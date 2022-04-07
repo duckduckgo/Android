@@ -24,7 +24,7 @@
     <string name="atp_MeteredConnection">"Metered: %s"</string>
     <string name="atp_ConnectionStatus">"VPN connected: %s"</string>
     <string name="atp_NetworkAvailable">"Connected to internet: %s"</string>
-    <string name="atp_DnsServers">"DNS servers: %s"</string>
+    <string name="atp_DnsServers">"Active network DNS: %s"</string>
     <string name="atp_AppExitsReasonsTitle">App exit reasons</string>
     <string name="atp_AppRestartsTitle">App restarts</string>
 

@@ -20,6 +20,8 @@ import android.app.NotificationManager
 import android.content.Context.NOTIFICATION_SERVICE
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -41,6 +43,7 @@ class NotificationRegistrarTest {
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
     private val mockPixel: Pixel = mock()
+    private val mockSchedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin> = mock()
 
     private lateinit var testee: NotificationRegistrar
 
@@ -53,7 +56,8 @@ class NotificationRegistrarTest {
             notificationManager,
             notifcationManagerCompat,
             mockSettingsDataStore,
-            mockPixel
+            mockPixel,
+            mockSchedulableNotificationPluginPoint
         )
     }
 

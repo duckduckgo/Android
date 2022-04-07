@@ -76,7 +76,7 @@ class AppShortcutCreator @Inject constructor(private val context: Context) {
         shortcutList.add(buildBookmarksShortcut(context))
 
         val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-        shortcutManager.dynamicShortcuts = shortcutList
+        kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }
     }
 
     @RequiresApi(Build.VERSION_CODES.N_MR1)

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.di.component
 
 import com.duckduckgo.app.feedback.ui.negative.mainreason.MainReasonNegativeFeedbackFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.MergeSubcomponent
@@ -38,13 +38,13 @@ interface MainReasonNegativeFeedbackFragmentComponent : AndroidInjector<MainReas
     interface Factory : AndroidInjector.Factory<MainReasonNegativeFeedbackFragment>
 }
 
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 interface MainReasonNegativeFeedbackFragmentComponentProvider {
     fun provideMainReasonNegativeFeedbackFragmentComponentFactory(): MainReasonNegativeFeedbackFragmentComponent.Factory
 }
 
 @Module
-@ContributesTo(AppScope::class)
+@ContributesTo(ActivityScope::class)
 abstract class MainReasonNegativeFeedbackFragmentBindingModule {
     @Binds
     @IntoMap
