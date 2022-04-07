@@ -73,7 +73,7 @@ class FileDownloadCallback @Inject constructor(
         pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
         appCoroutineScope.launch(dispatchers.io()) {
             downloadsRepository.update(downloadId = downloadId, downloadStatus = DownloadStatus.FINISHED, contentLength = contentLength)
-            downloadsRepository.getDownloadItem(downloadId).let {
+            downloadsRepository.getDownloadItem(downloadId)?.let {
                 command.send(
                     DownloadCommand.ShowDownloadSuccessMessage(
                         messageId = R.string.downloadsDownloadFinishedMessage,
@@ -104,18 +104,44 @@ class FileDownloadCallback @Inject constructor(
         }
     }
 
-    override fun onCancel(downloadId: Long) {
-        Timber.d("Download cancelled from the notification for file with downloadId $downloadId")
-        // Deliberately cancelled by the user. The DownloadManager handles this as a SUCCESS, however it removes the record from
-        // its internal DB.
-        pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED)
+    override fun onError(downloadId: Long) {
+        Timber.d("Download error for file with downloadId $downloadId")
+        // It happens on rare unknown occasions when the DownloadManager completes a download without a failed or success state.
+        // This is considered a failed download. A failed pixel is sent and the database record is cleared.
+        pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         appCoroutineScope.launch(dispatchers.io()) {
             downloadsRepository.delete(listOf(downloadId))
         }
     }
 
-    override fun onFailure(downloadId: Long?, url: String?, reason: DownloadFailReason) {
-        Timber.d("Failed to download file with downloadId $downloadId or url $url with reason $reason")
+    override fun onFailure(url: String?, reason: DownloadFailReason) {
+        Timber.d("Failed to download file with url $url and reason $reason.")
+        handleFailedDownload(showNotification = true, reason = reason)
+    }
+
+    override fun onFailOrCancel(downloadId: Long, reason: DownloadFailReason) {
+        // This is a failed / cancelled download as handled by DownloadManager.
+        // If the database doesn't contain a record for that downloadId it means the download was cancelled by the user from the
+        // application. A cancel pixel is sent as it was the user's decision to cancel the started download.
+        // If there is a record in the database it will be removed and a fail pixel sent.
+        appCoroutineScope.launch(dispatchers.io()) {
+            val item = downloadsRepository.getDownloadItem(downloadId)
+            if (item == null) {
+                Timber.d("Cancelled download file with downloadId $downloadId.")
+                pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED)
+            } else {
+                Timber.d("Failed to download file with downloadId $downloadId and reason $reason.")
+                downloadsRepository.delete(listOf(downloadId))
+                handleFailedDownload(showNotification = false, reason = reason)
+            }
+        }
+    }
+
+    override fun commands(): Flow<DownloadCommand> {
+        return command.receiveAsFlow()
+    }
+
+    private fun handleFailedDownload(showNotification: Boolean, reason: DownloadFailReason) {
         pixel.fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         val messageId = when (reason) {
             ConnectionRefused -> R.string.downloadsErrorMessage
@@ -124,7 +150,7 @@ class FileDownloadCallback @Inject constructor(
         }
         val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(
             messageId = messageId,
-            showNotification = downloadId == 0L,
+            showNotification = showNotification,
             showEnableDownloadManagerAction = reason == DownloadManagerDisabled
         )
         if (downloadFailedMessage.showNotification) {
@@ -133,9 +159,5 @@ class FileDownloadCallback @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             command.send(downloadFailedMessage)
         }
-    }
-
-    override fun commands(): Flow<DownloadCommand> {
-        return command.receiveAsFlow()
     }
 }

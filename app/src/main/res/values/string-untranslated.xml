@@ -39,6 +39,7 @@
     <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
     <string name="downloadsItemMenuShare">Share</string>
     <string name="downloadsItemMenuDelete">Delete</string>
+    <string name="downloadsItemMenuCancel">Cancel</string>
     <string name="downloadsActivityMenuDeleteAll">Delete All</string>
     <string name="downloadsFileDeletedMessage">Deleted %s</string>
     <string name="downloadsAllFilesDeletedMessage">All files deleted</string>

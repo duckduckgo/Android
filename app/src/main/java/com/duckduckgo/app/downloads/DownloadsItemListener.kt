@@ -25,4 +25,6 @@ interface DownloadsItemListener {
     fun onShareItemClicked(item: DownloadItem)
 
     fun onDeleteItemClicked(item: DownloadItem)
+
+    fun onCancelItemClicked(item: DownloadItem)
 }

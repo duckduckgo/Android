@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
@@ -62,6 +63,7 @@ class DownloadsViewModel @Inject constructor(
         data class DisplayUndoMessage(@StringRes val messageId: Int, val arg: String = "", val items: List<DownloadItem> = emptyList()) : Command()
         data class OpenFile(val item: DownloadItem) : Command()
         data class ShareFile(val item: DownloadItem) : Command()
+        data class CancelDownload(val item: DownloadItem) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -163,6 +165,13 @@ class DownloadsViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.id)
             command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
+        }
+    }
+
+    override fun onCancelItemClicked(item: DownloadItem) {
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(item.id)
+            command.send(CancelDownload(item))
         }
     }
 

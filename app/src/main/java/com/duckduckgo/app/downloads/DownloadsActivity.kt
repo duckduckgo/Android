@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.downloads
 
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -35,6 +36,8 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
 import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.api.model.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
@@ -121,6 +124,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
             is ShareFile -> showShare(command)
             is DisplayMessage -> showSnackbar(command.messageId, command.arg)
             is DisplayUndoMessage -> showUndo(command)
+            is CancelDownload -> cancelDownload(command)
         }
     }
 
@@ -157,11 +161,23 @@ class DownloadsActivity : DuckDuckGoActivity() {
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> viewModel.insert(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
-                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> viewModel.deleteFilesFromDisk(command.items)
+                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> handleDeleteAll(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE -> { /* noop */ }
                 }
             }
         }).show()
+    }
+
+    private fun handleDeleteAll(items: List<DownloadItem>) {
+        viewModel.deleteFilesFromDisk(items)
+        // Remove all unfinished downloads from DownloadManager.
+        (getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.let { manager ->
+            items.filter { it.downloadStatus != FINISHED }.forEach { manager.remove(it.downloadId) }
+        }
+    }
+
+    private fun cancelDownload(command: CancelDownload) {
+        (getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.remove(command.item.downloadId)
     }
 
     private fun showSnackbar(@StringRes messageId: Int, arg: String = "") {

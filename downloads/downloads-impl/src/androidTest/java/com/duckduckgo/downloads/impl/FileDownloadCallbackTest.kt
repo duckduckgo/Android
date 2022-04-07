@@ -147,10 +147,10 @@ class FileDownloadCallbackTest {
     }
 
     @Test
-    fun whenOnCancelCalledForDownloadIdThenPixelFiredAndItemDeleted() = runTest {
+    fun whenOnErrorCalledForDownloadIdThenPixelFiredAndItemDeleted() = runTest {
         val downloadId = 1L
 
-        callback.onCancel(downloadId = downloadId)
+        callback.onError(downloadId = downloadId)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED)
         verify(mockDownloadsRepository).delete(
@@ -159,31 +159,26 @@ class FileDownloadCallbackTest {
     }
 
     @Test
-    fun whenOnFailureCalledForDownloadIdAndUnsupportedUrlThenPixelFiredAndDownloadFailedCommandSent() = runTest {
+    fun whenOnFailOrCancelCalledForDownloadIdAndConnectionRefusedAndNoItemInDbThenPixelFired() = runTest {
         val downloadId = 1L
-        val failReason = DownloadFailReason.UnsupportedUrlType
+        val failReason = DownloadFailReason.ConnectionRefused
+        whenever(mockDownloadsRepository.getDownloadItem(downloadId)).thenReturn(null)
 
-        callback.onFailure(downloadId = downloadId, url = "url", reason = failReason)
+        callback.onFailOrCancel(downloadId = downloadId, reason = failReason)
 
-        verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
-        callback.commands().test {
-            val actualItem = awaitItem()
-            assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertFalse(actualItem.showNotification)
-            assertEquals(R.string.downloadsDownloadGenericErrorMessage, actualItem.messageId)
-            assertFalse((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
-        }
+        verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED)
     }
 
     @Test
-    fun whenOnFailureCalledForConnectionRefusedThenPixelFiredAndDownloadFailedCommandSent() = runTest {
+    fun whenOnFailOrCancelCalledForDownloadIdAndConnectionRefusedAndExistingItemInDbThenPixelFiredAndDownloadFailedCommandSent() = runTest {
         val downloadId = 1L
         val failReason = DownloadFailReason.ConnectionRefused
+        whenever(mockDownloadsRepository.getDownloadItem(downloadId)).thenReturn(oneItem())
 
-        callback.onFailure(downloadId = downloadId, url = "url", reason = failReason)
+        callback.onFailOrCancel(downloadId = downloadId, reason = failReason)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
+        verify(mockDownloadsRepository).delete(listOf(downloadId))
         verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
@@ -195,27 +190,42 @@ class FileDownloadCallbackTest {
     }
 
     @Test
-    fun whenOnFailureCalledForDownloadManagerDisabledThenPixelFiredAndDownloadFailedCommandSent() = runTest {
-        val downloadId = 1L
-        val failReason = DownloadFailReason.DownloadManagerDisabled
+    fun whenOnFailCalledForConnectionRefusedThenPixelFiredAndDownloadFailedCommandSent() = runTest {
+        val failReason = DownloadFailReason.ConnectionRefused
 
-        callback.onFailure(downloadId = downloadId, url = "url", reason = failReason)
+        callback.onFailure(url = "url", reason = failReason)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)
-            assertFalse(actualItem.showNotification)
+            assertTrue(actualItem.showNotification)
+            assertEquals(R.string.downloadsErrorMessage, actualItem.messageId)
+            assertFalse((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
+        }
+    }
+
+    @Test
+    fun whenOnFailCalledForDownloadManagerDisabledThenPixelFiredAndDownloadFailedCommandSent() = runTest {
+        val failReason = DownloadFailReason.DownloadManagerDisabled
+
+        callback.onFailure(url = "url", reason = failReason)
+
+        verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
+        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(anyString(), any(), anyOrNull())
+        callback.commands().test {
+            val actualItem = awaitItem()
+            assertTrue(actualItem is ShowDownloadFailedMessage)
+            assertTrue(actualItem.showNotification)
             assertEquals(R.string.downloadsDownloadManagerDisabledErrorMessage, actualItem.messageId)
             assertTrue((actualItem as ShowDownloadFailedMessage).showEnableDownloadManagerAction)
         }
     }
 
     @Test
-    fun whenOnFailureCalledForNoDownloadIdAndUnsupportedUrlThenPixelFiredAndNotificationSentAndDownloadFailedCommandSent() = runTest {
-        val noDownloadId = 0L
-        callback.onFailure(downloadId = noDownloadId, url = "url", reason = DownloadFailReason.UnsupportedUrlType)
+    fun whenOnFailCalledForNoDownloadIdAndUnsupportedUrlThenPixelFiredAndNotificationSentAndDownloadFailedCommandSent() = runTest {
+        callback.onFailure(url = "url", reason = DownloadFailReason.UnsupportedUrlType)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
         verify(mockFileDownloadNotificationManager).showDownloadFailedNotification()

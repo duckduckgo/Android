@@ -34,7 +34,7 @@ interface DownloadsRepository {
     suspend fun delete(downloadIdList: List<Long>)
     suspend fun deleteAll()
     suspend fun getDownloads(): List<DownloadItem>
-    suspend fun getDownloadItem(downloadId: Long): DownloadItem
+    suspend fun getDownloadItem(downloadId: Long): DownloadItem?
     fun getDownloadsAsFlow(): Flow<List<DownloadItem>>
 }
 
@@ -76,8 +76,8 @@ class DefaultDownloadsRepository @Inject constructor(
         return downloadsDatabase.downloadsDao().getDownloads().mapToDownloadItems()
     }
 
-    override suspend fun getDownloadItem(downloadId: Long): DownloadItem {
-        return downloadsDatabase.downloadsDao().getDownloadItem(downloadId).mapToDownloadItem()
+    override suspend fun getDownloadItem(downloadId: Long): DownloadItem? {
+        return downloadsDatabase.downloadsDao().getDownloadItem(downloadId)?.mapToDownloadItem()
     }
 
     override fun getDownloadsAsFlow(): Flow<List<DownloadItem>> {

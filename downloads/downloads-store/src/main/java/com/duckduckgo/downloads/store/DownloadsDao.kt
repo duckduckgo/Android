@@ -56,5 +56,5 @@ interface DownloadsDao {
     suspend fun getDownloads(): List<DownloadEntity>
 
     @Query("select * from downloads where downloadId = :downloadId")
-    suspend fun getDownloadItem(downloadId: Long): DownloadEntity
+    suspend fun getDownloadItem(downloadId: Long): DownloadEntity?
 }

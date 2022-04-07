@@ -31,7 +31,10 @@ import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
+import com.duckduckgo.downloads.api.model.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import javax.inject.Inject
 
 class DownloadsAdapter @Inject constructor(
@@ -132,9 +135,19 @@ class DownloadsAdapter @Inject constructor(
         private fun showPopupMenu(anchor: View, item: Item) {
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_download_item_menu)
             val view = popupMenu.contentView
+            val shareItemView = view.findViewById<View>(R.id.share)
+            val deleteItemView = view.findViewById<View>(R.id.delete)
+            val cancelItemView = view.findViewById<View>(R.id.cancel)
+
+            val downloadFinished = item.downloadItem.downloadStatus == FINISHED
+            shareItemView.show().takeIf { downloadFinished } ?: shareItemView.gone()
+            deleteItemView.show().takeIf { downloadFinished } ?: deleteItemView.gone()
+            cancelItemView.show().takeIf { !downloadFinished } ?: cancelItemView.gone()
+
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.share)) { listener.onShareItemClicked(item.downloadItem) }
-                onMenuItemClicked(view.findViewById(R.id.delete)) { listener.onDeleteItemClicked(item.downloadItem) }
+                onMenuItemClicked(shareItemView) { listener.onShareItemClicked(item.downloadItem) }
+                onMenuItemClicked(deleteItemView) { listener.onDeleteItemClicked(item.downloadItem) }
+                onMenuItemClicked(cancelItemView) { listener.onCancelItemClicked(item.downloadItem) }
             }
             popupMenu.show(binding.root, anchor)
         }
