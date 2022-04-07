@@ -19,10 +19,15 @@ package com.duckduckgo.app.settings.db
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting.ALWAYS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting.NEVER
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -38,7 +43,7 @@ interface SettingsDataStore {
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
-    var appLoginDetection: Boolean
+    var appLoginDetection: LoginDetectorSetting
     var appLocationPermission: Boolean
     var appLocationPermissionDeniedForever: Boolean
     var globalPrivacyControlEnabled: Boolean
@@ -90,9 +95,9 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
-    override var appLoginDetection: Boolean
-        get() = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
-        set(enabled) = preferences.edit { putBoolean(KEY_LOGIN_DETECTION_ENABLED, enabled) }
+    override var appLoginDetection: LoginDetectorSetting
+        get() = LoginDetectorSetting.valueOf(preferences.getString(KEY_LOGIN_DETECTION_ENABLED, ASK_EVERY_TIME.name) ?: ASK_EVERY_TIME.name)
+        set(loginDetectionSetting) = preferences.edit { putString(KEY_LOGIN_DETECTION_ENABLED, loginDetectionSetting.name) }
 
     override var appLocationPermission: Boolean
         get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
@@ -247,16 +252,16 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     class LoginDetectorPrefsMapper {
-        enum class LoginDetectorSetting {
-            ASK_EVERY_TIME,
-            ALWAYS,
-            NEVER
+        enum class LoginDetectorSetting(val stringRes: Int) {
+            ASK_EVERY_TIME(R.string.settingsAppLinksAskEveryTime),
+            ALWAYS(R.string.settingsAppLinksAlways),
+            NEVER(R.string.settingsAppLinksNever)
         }
 
         fun mapToNewLoginDetectorSetting(oldLoginDetectorValue: Boolean): LoginDetectorSetting {
             return when (oldLoginDetectorValue) {
-                false -> LoginDetectorSetting.NEVER
-                else -> LoginDetectorSetting.ASK_EVERY_TIME
+                false -> NEVER
+                else -> ASK_EVERY_TIME
             }
         }
     }

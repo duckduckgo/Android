@@ -209,6 +209,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
+    FIREPROOF_SETTING_SELECTION_ALWAYS("m_fireproof_setting_selection_always"),
+    FIREPROOF_SETTING_SELECTION_NEVER("m_fireproof_setting_selection_never"),
+    FIREPROOF_SETTING_SELECTION_ASK_EVERYTIME("m_fireproof_setting_selection_ask_every_time"),
+    FIREPROOF_AUTOMATIC_DIALOG_ALWAYS("m_fireproof_automatic_dialog_always"),
+    FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE("m_fireproof_automatic_dialog_fireproof_site"),
+    FIREPROOF_AUTOMATIC_DIALOG_NOT_NOW("m_fireproof_automatic_dialog_not_now"),
 
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),

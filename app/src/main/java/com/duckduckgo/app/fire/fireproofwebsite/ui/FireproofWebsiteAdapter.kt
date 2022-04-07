@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -68,7 +69,7 @@ class FireproofWebsiteAdapter(
             }
         }
 
-    var loginDetectionEnabled: Boolean = false
+    var loginDetectionEnabled: LoginDetectorSetting = LoginDetectorSetting.NEVER
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -174,8 +175,8 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         private val listener: CompoundButton.OnCheckedChangeListener
     ) :
         FireproofWebSiteViewHolder(binding.root) {
-        fun bind(loginDetectionEnabled: Boolean) {
-            binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled, listener)
+        fun bind(loginDetectionEnabled: LoginDetectorSetting) {
+            binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled != LoginDetectorSetting.NEVER, listener)
         }
     }
 

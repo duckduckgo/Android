@@ -35,6 +35,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import dagger.Lazy
@@ -110,7 +111,7 @@ class FireproofWebsitesViewModelTest {
 
     @Test
     fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
-        val defaultViewState = FireproofWebsitesViewModel.ViewState(false, emptyList())
+        val defaultViewState = FireproofWebsitesViewModel.ViewState(LoginDetectorSetting.NEVER, emptyList())
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertEquals(defaultViewState, viewStateCaptor.value)
     }
@@ -153,6 +154,18 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
+    fun whenUserTapsOnFireproofSettingsSelectionThenShowFireproofOptionsDialog() {
+
+    }
+
+    @Test
+    fun whenUserSelectsAskEveryTimeThenFireCorrectPixel() {
+        viewModel.onUserToggleLoginDetection(true)
+
+        verify(mockPixel).fire(FIREPROOF_LOGIN_TOGGLE_ENABLED)
+    }
+
+    @Test
     fun whenUserTogglesLoginDetectionThenFirePixel() {
         viewModel.onUserToggleLoginDetection(true)
 
@@ -164,7 +177,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.onUserToggleLoginDetection(true)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.loginDetectionEnabled)
+        assertTrue(viewStateCaptor.value.loginDetectionEnabled == LoginDetectorSetting.ASK_EVERY_TIME)
     }
 
     @Test
@@ -178,7 +191,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
         viewModel.onUserToggleLoginDetection(true)
 
-        verify(mockSettingsDataStore).appLoginDetection = true
+        verify(mockSettingsDataStore).appLoginDetection = LoginDetectorSetting.ASK_EVERY_TIME
     }
 
     @Test

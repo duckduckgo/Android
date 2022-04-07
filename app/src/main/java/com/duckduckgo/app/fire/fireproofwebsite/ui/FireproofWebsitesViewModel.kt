@@ -27,6 +27,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -43,12 +44,13 @@ class FireproofWebsitesViewModel(
 ) : ViewModel() {
 
     data class ViewState(
-        val loginDetectionEnabled: Boolean = false,
+        val loginDetectionEnabled: LoginDetectorSetting = LoginDetectorSetting.NEVER,
         val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
     )
 
     sealed class Command {
         class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
+        class SelectLoginDetectorSetting(val loginDetectorSetting: LoginDetectorSetting) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -103,8 +105,12 @@ class FireproofWebsitesViewModel(
                 userEventsStore.registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
             }
         }
-        settingsDataStore.appLoginDetection = enabled
-        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = enabled)
+        val loginDetectionSetting = when (enabled) {
+            false -> LoginDetectorSetting.NEVER
+            else -> LoginDetectorSetting.ASK_EVERY_TIME
+        }
+        settingsDataStore.appLoginDetection = loginDetectionSetting
+        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = loginDetectionSetting)
     }
 }
 

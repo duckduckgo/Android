@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.global.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -66,7 +67,7 @@ class NextPageLoginDetection constructor(
     private var loginDetectionJob: Job? = null
 
     override fun onEvent(navigationEvent: NavigationEvent) {
-        if (!settingsDataStore.appLoginDetection) return
+        if (settingsDataStore.appLoginDetection == LoginDetectorSetting.NEVER) return
 
         Timber.v("LoginDetectionDelegate $navigationEvent")
         return when (navigationEvent) {
