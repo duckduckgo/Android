@@ -44,7 +44,7 @@
     <string name="downloadsAllFilesDeletedMessage">All files deleted</string>
     <string name="downloadsMoreOptionsContentDescription">More options for %s</string>
     <string name="downloadsUndoActionName">Undo</string>
-    <string name="downloadsStateInProgress">In Progress…</string>
+    <string name="downloadsStateInProgress">In progress…</string>
 
     <!-- Tabs -->
     <string name="downloadsMenuItemTitle">Downloads</string>
