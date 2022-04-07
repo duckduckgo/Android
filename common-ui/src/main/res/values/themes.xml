@@ -137,6 +137,10 @@
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray80</item>
+
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
+
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -252,6 +256,9 @@
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray30</item>
+
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">
