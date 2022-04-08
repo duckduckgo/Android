@@ -74,7 +74,7 @@
                     android:id="@+id/excludedAppsSplitter"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/splitterGray"
+                    android:background="?splitterColor"
                     app:layout_constraintTop_toBottomOf="@+id/excludedAppsLabel"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
