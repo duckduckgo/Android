@@ -67,7 +67,7 @@ class VpnUncaughtExceptionHandler(
 
 @Module
 @ContributesTo(scope = AppScope::class)
-class VpnExceptionModule {
+object VpnExceptionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

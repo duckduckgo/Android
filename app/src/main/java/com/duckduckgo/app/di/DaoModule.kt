@@ -21,7 +21,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class DaoModule {
+object DaoModule {
 
     @Provides
     fun providesHttpsFalsePositivesDao(database: AppDatabase) = database.httpsFalsePositivesDao()

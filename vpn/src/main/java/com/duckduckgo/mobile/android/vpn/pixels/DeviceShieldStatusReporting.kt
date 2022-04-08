@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit
 
 @Module
 @ContributesTo(AppScope::class)
-class DeviceShieldStatusReportingModule {
+object DeviceShieldStatusReportingModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldStatusReporting(workManager: WorkManager): LifecycleObserver {

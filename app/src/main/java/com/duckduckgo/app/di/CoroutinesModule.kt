@@ -24,7 +24,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-class CoroutinesModule {
+object CoroutinesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
