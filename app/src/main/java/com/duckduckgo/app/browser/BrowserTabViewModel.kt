@@ -110,7 +110,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -129,7 +129,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
@@ -2564,7 +2564,10 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = initialUrl))
     }
 
-    override fun onUrlExtracted(initialUrl: String, extractedUrl: String?) {
+    override fun onUrlExtracted(
+        initialUrl: String,
+        extractedUrl: String?
+    ) {
         val destinationUrl: String = if (extractedUrl != null) {
             ampLinks.lastAmpLinkInfo = AmpLinkInfo(ampLink = initialUrl)
             Timber.d("AMP link detection: Success! Loading extracted URL: $extractedUrl")

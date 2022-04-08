@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,17 @@
 
 package com.duckduckgo.app.global.plugins.view_model
 
-import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.di.scopes.ActivityScope
+import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-interface ViewModelFactoryPlugin {
-    fun <T : ViewModel?> create(modelClass: Class<T>): T?
+@SingleInstanceIn(ActivityScope::class)
+class ActivityViewModelFactoryPluginPoint @Inject constructor(
+    private val injectorPlugins: DaggerSet<ViewModelFactoryPlugin>
+) : PluginPoint<ViewModelFactoryPlugin> {
+    override fun getPlugins(): List<ViewModelFactoryPlugin> {
+        return injectorPlugins.toList()
+    }
 }

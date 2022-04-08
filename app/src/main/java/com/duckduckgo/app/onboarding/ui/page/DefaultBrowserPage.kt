@@ -35,7 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
 import dagger.android.support.AndroidSupportInjection
@@ -47,7 +47,7 @@ import javax.inject.Inject
 class DefaultBrowserPage : OnboardingPageFragment() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var variantManager: VariantManager

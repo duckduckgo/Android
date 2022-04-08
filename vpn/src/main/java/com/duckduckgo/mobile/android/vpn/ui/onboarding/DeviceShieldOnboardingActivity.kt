@@ -233,6 +233,7 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         deviceShieldPixels.didChooseToContinueFromVpnConflicDialog()
         checkVPNPermission()
     }
+
     private sealed class VpnPermissionStatus {
         object Granted : VpnPermissionStatus()
         data class Denied(val intent: Intent) : VpnPermissionStatus()
@@ -245,5 +246,4 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
             return Intent(context, DeviceShieldOnboardingActivity::class.java)
         }
     }
-
 }
