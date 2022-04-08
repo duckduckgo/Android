@@ -41,8 +41,10 @@
 
     <TextView
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:fontFamily="sans-serif"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="?secondaryTextColor"
         android:textAlignment="center"
         android:layout_marginTop="12dp"
         android:paddingStart="40dp"
