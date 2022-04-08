@@ -32,15 +32,18 @@
 
     <TextView
         android:layout_marginTop="16dp"
-        style="@style/DeviceShieldOnboardingHeaderStyle"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+        android:fontFamily="sans-serif-medium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:text="@string/atp_ActivityEmptyListTitle" />
 
     <TextView
-        style="@style/DeviceShieldOnboardingTextStyle"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textAlignment="center"
         android:layout_marginTop="12dp"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"

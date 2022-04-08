@@ -90,7 +90,7 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
             close()
         }
 
-        binding.onboardingSwitchLabel.setOnClickListener {
+        binding.onboardingSwitchLayout.setOnClickListener {
             viewModel.onTurnAppTpOffOn()
         }
     }
