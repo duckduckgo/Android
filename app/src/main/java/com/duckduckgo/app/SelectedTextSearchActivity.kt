@@ -18,9 +18,7 @@ package com.duckduckgo.app
 
 import android.app.SearchManager
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import timber.log.Timber
@@ -31,7 +29,6 @@ import timber.log.Timber
  */
 class SelectedTextSearchActivity : AppCompatActivity() {
 
-    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -40,7 +37,6 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         finish()
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     private fun extractQuery(intent: Intent?): String? {
         if (intent == null) return null
 

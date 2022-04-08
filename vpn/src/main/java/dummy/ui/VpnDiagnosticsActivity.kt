@@ -29,7 +29,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -484,44 +483,21 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
     }
 
     private fun android.net.Network.isConnected(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        return connectivityManager
+            .getNetworkCapabilities(this)
+            ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
             connectivityManager
-                .getNetworkCapabilities(this)
-                ?.hasCapability(NET_CAPABILITY_INTERNET) == true &&
-                connectivityManager
-                .getNetworkCapabilities(this)
-                ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
-        } else {
-            isConnectedLegacy(this)
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    private fun isConnectedLegacy(network: android.net.Network): Boolean {
-        return connectivityManager.getNetworkInfo(network)?.isConnectedOrConnecting == true
+            .getNetworkCapabilities(this)
+            ?.hasCapability(NET_CAPABILITY_VALIDATED) == true
     }
 
     private fun isConnectedToInternet(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            isConnectedToInternetMarshmallowAndNewer()
-        } else {
-            isConnectedToInternetLegacy()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun isConnectedToInternetMarshmallowAndNewer(): Boolean {
 
         val capabilities =
             connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
                 ?: return false
 
         return capabilities.hasCapability(NET_CAPABILITY_VALIDATED)
-    }
-
-    @Suppress("DEPRECATION")
-    private fun isConnectedToInternetLegacy(): Boolean {
-        return connectivityManager.activeNetworkInfo?.isConnectedOrConnecting ?: false
     }
 
     private fun getCurrentNetworkAddresses(): List<Network> {

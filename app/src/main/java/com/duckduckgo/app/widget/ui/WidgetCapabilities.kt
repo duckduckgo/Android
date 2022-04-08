@@ -33,7 +33,7 @@ interface WidgetCapabilities {
 
 class AppWidgetCapabilities @Inject constructor(val context: Context) : WidgetCapabilities {
 
-    override val supportsStandardWidgetAdd: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    override val supportsStandardWidgetAdd: Boolean get() = true
 
     override val supportsAutomaticWidgetAdd: Boolean
         get() = context.supportsAutomaticWidgetAdd

@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity
@@ -39,7 +38,7 @@ class NotificationActionReportIssue {
         }
 
         private fun pendingIntentFlags(): Int {
-            return if (Build.VERSION.SDK_INT >= 23) PendingIntent.FLAG_IMMUTABLE else 0
+            return PendingIntent.FLAG_IMMUTABLE
         }
     }
 }
