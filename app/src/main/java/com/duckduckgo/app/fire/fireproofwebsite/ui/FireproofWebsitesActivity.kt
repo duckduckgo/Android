@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireproofWebsitesBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -29,10 +30,12 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     @Inject

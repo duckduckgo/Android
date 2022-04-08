@@ -16,7 +16,7 @@
 
 package com.duckduckgo.anvil.compiler
 
-import com.duckduckgo.anvil.annotations.ContributesDdgSubcomponent
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.google.auto.service.AutoService
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
@@ -31,10 +31,10 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtClassLiteralExpression
 import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
-import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -47,11 +47,10 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
         return projectFiles.classesAndInnerClass(module)
-            .filter { it.hasAnnotation(ContributesDdgSubcomponent::class.fqName, module) }
+            .filter { it.hasAnnotation(InjectWith::class.fqName, module) }
             .flatMap {
                 listOf(
                     generateSubcomponentFactory(it, codeGenDir, module),
-//                    generateSubcomponentFactoryProvider(it, codeGenDir, module),
                     generateSubcomponentFactoryBindingModule(it, codeGenDir, module),
                 )
             }
@@ -61,7 +60,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     private fun generateSubcomponentFactory(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
         val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
         val subcomponentFactoryClassName = vmClass.subComponentName()
-        val scope = vmClass.scope(ContributesDdgSubcomponent::class.fqName, module)
+        val scope = vmClass.scope(InjectWith::class.fqName, module)
 
         val content = FileSpec.buildFile(generatedPackage, subcomponentFactoryClassName) {
             addType(
@@ -94,7 +93,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     private fun generateParentComponentInterface(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): TypeSpec {
         val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
         val componentClassNAme = vmClass.subComponentName()
-        val scope = vmClass.scope(ContributesDdgSubcomponent::class.fqName, module)
+        val scope = vmClass.scope(InjectWith::class.fqName, module)
 
         return TypeSpec.funInterfaceBuilder("ParentComponent")
             .addAnnotation(
@@ -117,7 +116,8 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     private fun generateSubcomponentFactoryBindingModule(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
         val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
         val moduleClassName = "${vmClass.subComponentName()}_Module"
-        val scope = vmClass.scope(ContributesDdgSubcomponent::class.fqName, module)
+        val scope = vmClass.scope(InjectWith::class.fqName, module)
+        val bindingClassKey = vmClass.bindingKey(InjectWith::class.fqName, module)
 
         val content = FileSpec.buildFile(generatedPackage, moduleClassName) {
             addType(
@@ -137,7 +137,9 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                             )
                             .addAnnotation(AnnotationSpec.builder(Binds::class).build())
                             .addAnnotation(AnnotationSpec.builder(IntoMap::class).build())
-                            .addAnnotation(AnnotationSpec.builder(ClassKey::class).addMember("%T::class", vmClass.asClassName()).build())
+                            .addAnnotation(
+                                AnnotationSpec.builder(ClassKey::class).addMember("%T::class", bindingClassKey.asClassName(module)).build()
+                            )
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(duckduckgoAndroidInjectorFqName.asClassName(module).nestedClass("Factory").parameterizedBy(STAR))
                             .build()
@@ -165,6 +167,16 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         return "${name}_SubComponent"
     }
 
+    private fun KtClassOrObject.bindingKey(
+        annotationFqName: FqName,
+        module: ModuleDescriptor,
+    ): FqName {
+        return findAnnotation(annotationFqName, module)
+            ?.findAnnotationArgument<KtClassLiteralExpression>(name = "bindingKey", index = 1)
+            ?.requireFqName(module) ?: this.fqName!!
+
+    }
+
     companion object {
         private val duckduckgoAndroidInjectorFqName = FqName("dagger.android.AndroidInjector")
         private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
@@ -174,18 +186,5 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         private val receiverScopeFqName = FqName("com.duckduckgo.di.scopes.ReceiverScope")
         private val vpnScopeFqName = FqName("com.duckduckgo.di.scopes.VpnScope")
         private val quickSettingsScopeFqName = FqName("com.duckduckgo.di.scopes.QuickSettingsScope")
-    }
-
-    private fun TypeSpec.Builder.primaryConstructor(vararg properties: PropertySpec): TypeSpec.Builder {
-        val propertySpecs = properties.map { p -> p.toBuilder().initializer(p.name).build() }
-        val parameters = propertySpecs.map { ParameterSpec.builder(it.name, it.type).build() }
-        val constructor = FunSpec.constructorBuilder()
-            .addParameters(parameters)
-            .addAnnotation(AnnotationSpec.builder(Inject::class).build())
-            .build()
-
-        return this
-            .primaryConstructor(constructor)
-            .addProperties(propertySpecs)
     }
 }

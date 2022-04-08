@@ -24,8 +24,10 @@ import android.widget.CompoundButton
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAccessibilitySettingsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetValue
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.slider.Slider
@@ -34,6 +36,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.text.NumberFormat
 
+@InjectWith(ActivityScope::class)
 class AccessibilityActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAccessibilitySettingsBinding by viewBinding()

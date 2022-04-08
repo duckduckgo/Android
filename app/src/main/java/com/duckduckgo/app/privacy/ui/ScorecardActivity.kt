@@ -26,6 +26,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyScorecardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -33,10 +34,11 @@ import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.privacy.renderer.*
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+@InjectWith(ActivityScope::class)
 class ScorecardActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityPrivacyScorecardBinding by viewBinding()

@@ -29,7 +29,10 @@ import kotlin.reflect.KClass
  * }
  * ```
  */
-annotation class ContributesDdgSubcomponent(
+annotation class InjectWith(
     /** The parent component scope to the contributed subcomponent */
-    val scope: KClass<*>
+    val scope: KClass<*>,
+
+    /** (optional) The binding class key to bind the dagger component */
+    val bindingKey: KClass<*> = Unit::class,
 )
