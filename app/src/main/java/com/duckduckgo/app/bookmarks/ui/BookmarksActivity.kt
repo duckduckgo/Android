@@ -21,8 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
@@ -45,6 +43,8 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
@@ -283,13 +283,13 @@ class BookmarksActivity : DuckDuckGoActivity() {
     }
 
     private fun showSearchBar() {
-        toolbar.visibility = GONE
+        toolbar.gone()
         viewModel.fetchBookmarksAndFolders()
         searchBar.handle(SearchBar.Event.ShowSearchBar)
     }
 
     private fun hideSearchBar() {
-        toolbar.visibility = VISIBLE
+        toolbar.show()
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
         searchBar.handle(SearchBar.Event.DismissSearchBar)
     }

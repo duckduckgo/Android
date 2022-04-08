@@ -29,8 +29,8 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?toolbarBgColor"
-        android:theme="@style/ToolbarTheme">
+        android:background="?attr/toolbarBgColor"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -41,8 +41,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/toolbarBgColor"
-                android:theme="@style/ToolbarTheme"
-                app:popupTheme="@style/PopUpOverflowMenu" />
+                android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
             <com.duckduckgo.mobile.android.ui.view.SearchBarView
                 android:id="@+id/searchBar"
