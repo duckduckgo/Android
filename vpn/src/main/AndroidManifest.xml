@@ -32,13 +32,11 @@
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
-            android:theme="@style/AppTheme.Light.ATPOnboarding"
             android:screenOrientation="portrait"
             />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity"
-            android:theme="@style/AppTheme.Light.ATPOnboarding"
             android:screenOrientation="portrait"
             />
 
