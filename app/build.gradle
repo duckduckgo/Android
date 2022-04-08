@@ -149,6 +149,9 @@ fladle {
 }
 
 dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+
     implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')

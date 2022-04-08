@@ -33,13 +33,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
@@ -54,7 +54,6 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.applinks.DuckDuckGoAppLinksHandler
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -71,7 +70,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
-import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -89,7 +87,6 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.view.asLocationPermissionOrigin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -121,7 +118,6 @@ import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.jakewharton.rxrelay2.PublishRelay
-import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -132,9 +128,9 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
-class BrowserTabViewModel(
+@ContributesViewModel(AppScope::class)
+class BrowserTabViewModel @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
     private val queryUrlConverter: OmnibarEntryConverter,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
@@ -160,7 +156,7 @@ class BrowserTabViewModel(
     private val ctaViewModel: CtaViewModel,
     private val searchCountDao: SearchCountDao,
     private val pixel: Pixel,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val dispatchers: DispatcherProvider,
     private val userEventsStore: UserEventsStore,
     private val fileDownloader: FileDownloader,
     private val gpc: Gpc,
@@ -2588,93 +2584,5 @@ class BrowserTabViewModel(
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class BrowserTabViewModelFactory @Inject constructor(
-    private val statisticsUpdater: Provider<StatisticsUpdater>,
-    private val queryUrlConverter: Provider<QueryUrlConverter>,
-    private val duckDuckGoUrlDetector: Provider<DuckDuckGoUrlDetector>,
-    private val siteFactory: Provider<SiteFactory>,
-    private val tabRepository: Provider<TabRepository>,
-    private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val contentBlocking: Provider<ContentBlocking>,
-    private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
-    private val bookmarksRepository: Provider<BookmarksRepository>,
-    private val favoritesRepository: Provider<FavoritesRepository>,
-    private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
-    private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
-    private val geoLocationPermissions: Provider<GeoLocationPermissions>,
-    private val navigationAwareLoginDetector: Provider<NavigationAwareLoginDetector>,
-    private val autoComplete: Provider<AutoCompleteApi>,
-    private val appSettingsPreferencesStore: Provider<SettingsDataStore>,
-    private val longPressHandler: Provider<LongPressHandler>,
-    private val webViewSessionStorage: Provider<WebViewSessionStorage>,
-    private val specialUrlDetector: Provider<SpecialUrlDetector>,
-    private val faviconManager: Provider<FaviconManager>,
-    private val addToHomeCapabilityDetector: Provider<AddToHomeCapabilityDetector>,
-    private val remoteMessagingModel: Provider<RemoteMessagingModel>,
-    private val ctaViewModel: Provider<CtaViewModel>,
-    private val searchCountDao: Provider<SearchCountDao>,
-    private val pixel: Provider<Pixel>,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
-    private val userEventsStore: Provider<UserEventsStore>,
-    private val fileDownloader: Provider<FileDownloader>,
-    private val gpc: Provider<Gpc>,
-    private val fireproofDialogsEventHandler: Provider<FireproofDialogsEventHandler>,
-    private val emailManager: Provider<EmailManager>,
-    private val accessibilitySettingsDataStore: Provider<AccessibilitySettingsDataStore>,
-    private val appCoroutineScope: Provider<CoroutineScope>,
-    private val appLinksHandler: Provider<DuckDuckGoAppLinksHandler>,
-    private val variantManager: Provider<VariantManager>,
-    private val ampLinks: Provider<AmpLinks>,
-    private val trackingParameters: Provider<TrackingParameters>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BrowserTabViewModel::class.java) -> BrowserTabViewModel(
-                    statisticsUpdater.get(),
-                    queryUrlConverter.get(),
-                    duckDuckGoUrlDetector.get(),
-                    siteFactory.get(),
-                    tabRepository.get(),
-                    userWhitelistDao.get(),
-                    contentBlocking.get(),
-                    networkLeaderboardDao.get(),
-                    bookmarksRepository.get(),
-                    favoritesRepository.get(),
-                    fireproofWebsiteRepository.get(),
-                    locationPermissionsRepository.get(),
-                    geoLocationPermissions.get(),
-                    navigationAwareLoginDetector.get(),
-                    autoComplete.get(),
-                    appSettingsPreferencesStore.get(),
-                    longPressHandler.get(),
-                    webViewSessionStorage.get(),
-                    specialUrlDetector.get(),
-                    faviconManager.get(),
-                    addToHomeCapabilityDetector.get(),
-                    remoteMessagingModel.get(),
-                    ctaViewModel.get(),
-                    searchCountDao.get(),
-                    pixel.get(),
-                    dispatchers,
-                    userEventsStore.get(),
-                    fileDownloader.get(),
-                    gpc.get(),
-                    fireproofDialogsEventHandler.get(),
-                    emailManager.get(),
-                    accessibilitySettingsDataStore.get(),
-                    appCoroutineScope.get(),
-                    appLinksHandler.get(),
-                    variantManager.get(),
-                    ampLinks.get(),
-                    trackingParameters.get()
-                ) as T
-                else -> null
-            }
-        }
     }
 }

@@ -18,13 +18,12 @@ package com.duckduckgo.app.dev.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.traces.api.StartupTraces
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -34,8 +33,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(AppScope::class)
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
@@ -114,23 +113,6 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.selectedUA = userAgent
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class SettingsViewModelFactory @Inject constructor(
-    private val devSettingsDataStore: Provider<DevSettingsDataStore>,
-    private val userAgentProvider: Provider<UserAgentProvider>,
-    private val startupTraces: Provider<StartupTraces>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DevSettingsViewModel::class.java) ->
-                    DevSettingsViewModel(devSettingsDataStore.get(), startupTraces.get(), userAgentProvider.get()) as T
-                else -> null
-            }
         }
     }
 }

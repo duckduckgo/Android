@@ -20,10 +20,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.clear.ClearWhatOption
@@ -48,7 +48,6 @@ import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateReposito
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -61,9 +60,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
-class SettingsViewModel(
+@ContributesViewModel(AppScope::class)
+class SettingsViewModel @Inject constructor(
     private val appContext: Context,
     private val themingDataStore: ThemingDataStore,
     private val settingsDataStore: SettingsDataStore,
@@ -449,48 +448,4 @@ enum class AppLinkSettingType {
     ASK_EVERYTIME,
     ALWAYS,
     NEVER
-}
-
-@ContributesMultibinding(AppScope::class)
-class SettingsViewModelFactory @Inject constructor(
-    private val context: Provider<Context>,
-    private val themingDataStore: Provider<ThemingDataStore>,
-    private val settingsDataStore: Provider<SettingsDataStore>,
-    private val defaultWebBrowserCapability: Provider<DefaultBrowserDetector>,
-    private val variantManager: Provider<VariantManager>,
-    private val fireAnimationLoader: Provider<FireAnimationLoader>,
-    private val gpc: Provider<Gpc>,
-    private val featureToggle: Provider<FeatureToggle>,
-    private val pixel: Provider<Pixel>,
-    private val atpRepository: Provider<AtpWaitlistStateRepository>,
-    private val deviceShieldOnboardingStore: Provider<DeviceShieldOnboardingStore>,
-    private val appBuildConfig: Provider<AppBuildConfig>,
-    private val emailManager: Provider<EmailManager>,
-    private val macOsWaitlist: Provider<MacOsWaitlist>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SettingsViewModel::class.java) -> (
-                    SettingsViewModel(
-                        context.get(),
-                        themingDataStore.get(),
-                        settingsDataStore.get(),
-                        defaultWebBrowserCapability.get(),
-                        variantManager.get(),
-                        fireAnimationLoader.get(),
-                        atpRepository.get(),
-                        deviceShieldOnboardingStore.get(),
-                        gpc.get(),
-                        featureToggle.get(),
-                        pixel.get(),
-                        appBuildConfig.get(),
-                        emailManager.get(),
-                        macOsWaitlist.get(),
-                    ) as T
-                    )
-                else -> null
-            }
-        }
-    }
 }

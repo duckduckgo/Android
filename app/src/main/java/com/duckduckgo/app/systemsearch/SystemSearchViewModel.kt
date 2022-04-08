@@ -19,18 +19,16 @@ package com.duckduckgo.app.systemsearch
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.bookmarks.model.FavoritesRepository
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
@@ -39,7 +37,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.jakewharton.rxrelay2.PublishRelay
-import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -47,19 +44,18 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
     val deviceApps: List<DeviceApp>
 )
 
-class SystemSearchViewModel(
+@ContributesViewModel(AppScope::class)
+class SystemSearchViewModel @Inject constructor(
     private var userStageStore: UserStageStore,
     private val autoComplete: AutoComplete,
     private val deviceAppLookup: DeviceAppLookup,
@@ -67,7 +63,7 @@ class SystemSearchViewModel(
     private val favoritesRepository: FavoritesRepository,
     private val faviconManager: FaviconManager,
     private val appSettingsPreferencesStore: SettingsDataStore,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
@@ -345,36 +341,6 @@ class SystemSearchViewModel(
                 }
             }
             else -> throw IllegalArgumentException("Illegal SavedSite to delete received")
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class SystemSearchViewModelFactory @Inject constructor(
-    private val userStageStore: Provider<UserStageStore>,
-    private val autoComplete: Provider<AutoCompleteApi>,
-    private val deviceAppLookup: Provider<DeviceAppLookup>,
-    private val favoritesRepository: Provider<FavoritesRepository>,
-    private val faviconManager: Provider<FaviconManager>,
-    private val pixel: Provider<Pixel>,
-    private val appSettingsPreferencesStore: Provider<SettingsDataStore>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SystemSearchViewModel::class.java) -> (
-                    SystemSearchViewModel(
-                        userStageStore.get(),
-                        autoComplete.get(),
-                        deviceAppLookup.get(),
-                        pixel.get(),
-                        favoritesRepository.get(),
-                        faviconManager.get(),
-                        appSettingsPreferencesStore.get()
-                    ) as T
-                    )
-                else -> null
-            }
         }
     }
 }

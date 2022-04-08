@@ -20,14 +20,13 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -36,8 +35,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(AppScope::class)
 class DeviceShieldOnboardingViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
@@ -129,22 +128,4 @@ sealed class Command {
     object ShowVpnConflictDialog : Command()
     object ShowVpnAlwaysOnConflictDialog : Command()
     data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-}
-
-@ContributesMultibinding(AppScope::class)
-class DeviceShieldOnboardingViewModelFactory @Inject constructor(
-    private val viewModelProvider: Provider<DeviceShieldOnboardingViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DeviceShieldOnboardingViewModel::class.java) -> (
-                    (
-                        viewModelProvider.get()
-                        ) as T
-                    )
-                else -> null
-            }
-        }
-    }
 }
