@@ -18,16 +18,16 @@ package com.duckduckgo.app.global
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.app.global.plugins.view_model.ActivityViewModelFactoryPluginPoint
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.app.global.plugins.view_model.VpnViewModelFactoryPluginPoint
+import com.duckduckgo.di.scopes.VpnScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
-@SingleInstanceIn(ActivityScope::class)
-@ContributesBinding(ActivityScope::class)
-class ActivityViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: ActivityViewModelFactoryPluginPoint
+@SingleInstanceIn(VpnScope::class)
+@ContributesBinding(VpnScope::class)
+class VpnViewModelFactory @Inject constructor(
+    private val viewModelFactoryPluginPoint: VpnViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

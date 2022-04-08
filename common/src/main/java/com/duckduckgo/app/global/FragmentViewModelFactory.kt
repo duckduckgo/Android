@@ -20,10 +20,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.app.global.plugins.view_model.FragmentViewModelFactoryPluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(FragmentScope::class)
 class FragmentViewModelFactory @Inject constructor(
     private val viewModelFactoryPluginPoint: FragmentViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {
