@@ -23,6 +23,10 @@ import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.annotations.MergeSubcomponent
 import com.squareup.anvil.compiler.api.*
 import com.squareup.anvil.compiler.internal.*
+import com.squareup.anvil.compiler.internal.reference.ClassReference
+import com.squareup.anvil.compiler.internal.reference.argumentAt
+import com.squareup.anvil.compiler.internal.reference.asClassName
+import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
@@ -31,8 +35,6 @@ import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtClassLiteralExpression
-import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 
@@ -46,8 +48,9 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
-        return projectFiles.classesAndInnerClass(module)
-            .filter { it.hasAnnotation(InjectWith::class.fqName, module) }
+        return projectFiles.classAndInnerClassReferences(module)
+            .toList()
+            .filter { it.isAnnotatedWith(InjectWith::class.fqName) }
             .flatMap {
                 listOf(
                     generateSubcomponentFactory(it, codeGenDir, module),
@@ -57,20 +60,20 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateSubcomponentFactory(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
+    private fun generateSubcomponentFactory(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
         val subcomponentFactoryClassName = vmClass.subComponentName()
-        val scope = vmClass.scope(InjectWith::class.fqName, module)
+        val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
 
         val content = FileSpec.buildFile(generatedPackage, subcomponentFactoryClassName) {
             addType(
                 TypeSpec.interfaceBuilder(subcomponentFactoryClassName)
                     .addAnnotation(
                         AnnotationSpec
-                            .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName(module))
+                            .builder(singleInstanceAnnotationFqName.asClassName(module)).addMember("scope = %T::class", scope.asClassName())
                             .build()
                     )
-                    .addAnnotation(AnnotationSpec.builder(MergeSubcomponent::class).addMember("scope = %T::class", scope.asClassName(module)).build())
+                    .addAnnotation(AnnotationSpec.builder(MergeSubcomponent::class).addMember("scope = %T::class", scope.asClassName()).build())
                     .addSuperinterface(duckduckgoAndroidInjectorFqName.asClassName(module).parameterizedBy(vmClass.asClassName()))
                     .addType(
                         TypeSpec.interfaceBuilder("Factory")
@@ -90,19 +93,19 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, subcomponentFactoryClassName, content)
     }
 
-    private fun generateParentComponentInterface(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): TypeSpec {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
+    private fun generateParentComponentInterface(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): TypeSpec {
+        val generatedPackage = vmClass.packageFqName.toString()
         val componentClassNAme = vmClass.subComponentName()
-        val scope = vmClass.scope(InjectWith::class.fqName, module)
+        val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
 
         return TypeSpec.funInterfaceBuilder("ParentComponent")
             .addAnnotation(
                 AnnotationSpec
-                    .builder(ContributesTo::class).addMember("scope = %T::class", scope.getParentScope(module).asClassName(module))
+                    .builder(ContributesTo::class).addMember("scope = %T::class", scope.fqName.getParentScope(module).asClassName(module))
                     .build()
             )
             .addFunction(
-                FunSpec.builder("provide${vmClass.name}ComponentFactory")
+                FunSpec.builder("provide${vmClass.shortName}ComponentFactory")
                     .addModifiers(KModifier.ABSTRACT)
                     .returns(
                         FqName("$generatedPackage.$componentClassNAme").asClassName(module).nestedClass("Factory")
@@ -113,11 +116,11 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
 
     }
 
-    private fun generateSubcomponentFactoryBindingModule(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
+    private fun generateSubcomponentFactoryBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.subComponentName()}_Module"
-        val scope = vmClass.scope(InjectWith::class.fqName, module)
-        val bindingClassKey = vmClass.bindingKey(InjectWith::class.fqName, module)
+        val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
+        val bindingClassKey = vmClass.bindingKey(InjectWith::class.fqName) ?: vmClass.fqName
 
         val content = FileSpec.buildFile(generatedPackage, moduleClassName) {
             addType(
@@ -125,7 +128,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
                     .addAnnotation(AnnotationSpec.builder(dagger.Module::class).build())
                     .addAnnotation(
                         AnnotationSpec
-                            .builder(ContributesTo::class).addMember("scope = %T::class", scope.getParentScope(module).asClassName(module))
+                            .builder(ContributesTo::class).addMember("scope = %T::class", scope.fqName.getParentScope(module).asClassName(module))
                             .build()
                     )
                     .addModifiers(KModifier.ABSTRACT)
@@ -163,20 +166,20 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
         }
     }
 
-    private fun KtClassOrObject.subComponentName(): String {
-        return "${name}_SubComponent"
+    private fun ClassReference.Psi.subComponentName(): String {
+        return "${shortName}_SubComponent"
     }
 
-    private fun KtClassOrObject.bindingKey(
-        annotationFqName: FqName,
-        module: ModuleDescriptor,
-    ): FqName {
-        return findAnnotation(annotationFqName, module)
-            ?.findAnnotationArgument<KtClassLiteralExpression>(name = "bindingKey", index = 1)
-            ?.requireFqName(module) ?: this.fqName!!
-
+    private fun ClassReference.Psi.bindingKey(
+        fqName: FqName,
+    ): FqName? {
+        return annotations
+            .first { it.fqName == fqName }
+            .argumentAt(name = "bindingKey", index = 1)
+            ?.annotation
+            ?.bindingKeyOrNull()
+            ?.fqName
     }
-
     companion object {
         private val duckduckgoAndroidInjectorFqName = FqName("dagger.android.AndroidInjector")
         private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
