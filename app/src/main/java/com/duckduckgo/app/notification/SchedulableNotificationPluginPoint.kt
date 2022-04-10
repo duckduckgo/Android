@@ -16,39 +16,13 @@
 
 package com.duckduckgo.app.notification
 
-import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 
-class SchedulableNotificationPluginPoint(
-    private val schedulableNotificationPlugins: DaggerSet<SchedulableNotificationPlugin>
-) : PluginPoint<SchedulableNotificationPlugin> {
-    override fun getPlugins(): Collection<SchedulableNotificationPlugin> {
-        return schedulableNotificationPlugins
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-abstract class SchedulableNotificationPluginModule {
-    @Multibinds
-    abstract fun bindEmptySchedulableNotificationPlugins(): DaggerSet<SchedulableNotificationPlugin>
-
-    @Module
-    @ContributesTo(AppScope::class)
-    class SchedulableNotificationPluginModuleExt {
-        @Provides
-        @SingleInstanceIn(AppScope::class)
-        fun provideSchedulableNotificationPluginPoint(
-            plugins: DaggerSet<SchedulableNotificationPlugin>
-        ): PluginPoint<SchedulableNotificationPlugin> {
-            return SchedulableNotificationPluginPoint(plugins)
-        }
-    }
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = SchedulableNotificationPlugin::class
+)
+@Suppress("unused")
+interface SchedulableNotificationPluginPoint

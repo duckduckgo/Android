@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.api
+package com.duckduckgo.mobile.android.vpn.health
 
 import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import okhttp3.Interceptor
 
-@ContributesPluginPoint(AppScope::class)
-interface ApiInterceptorPlugin {
-    fun getInterceptor(): Interceptor
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = AppHealthCallback::class
+)
+@Suppress("unused")
+interface AppHealthCallbackImpl
