@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.voice.api
+package com.duckduckgo.mobile.android.voice.impl.fakes
 
-import android.app.Activity
 import androidx.activity.result.ActivityResultCaller
+import com.duckduckgo.mobile.android.voice.impl.ActivityResultLauncherWrapper
+import com.duckduckgo.mobile.android.voice.impl.ActivityResultLauncherWrapper.Action
+import com.duckduckgo.mobile.android.voice.impl.ActivityResultLauncherWrapper.Request
 
-interface VoiceSearchLauncher {
-    fun registerResultsCallback(
+class FakeActivityResultLauncherWrapper : ActivityResultLauncherWrapper {
+    var lastKnownRequest: Request? = null
+    var lastKnownAction: Action? = null
+
+    override fun register(
         caller: ActivityResultCaller,
-        activity: Activity,
-        source: Source,
-        onEvent: (Event) -> Unit
-    )
-
-    fun launch()
-
-    enum class Source(val paramValueName: String) {
-        BROWSER("browser"),
-        WIDGET("widget")
+        request: Request
+    ) {
+        lastKnownRequest = request
     }
 
-    sealed class Event {
-        data class VoiceRecognitionSuccess(val result: String) : Event()
-        object SearchCancelled : Event()
+    override fun launch(action: Action) {
+        lastKnownAction = action
     }
 }

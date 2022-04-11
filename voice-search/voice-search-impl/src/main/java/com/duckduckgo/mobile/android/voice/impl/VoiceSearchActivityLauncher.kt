@@ -17,16 +17,13 @@
 package com.duckduckgo.mobile.android.voice.impl
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import androidx.activity.result.ActivityResultCaller
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Event
 import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source
-import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchActivity
+import com.duckduckgo.mobile.android.voice.impl.ActivityResultLauncherWrapper.Action.LaunchVoiceSearch
+import com.duckduckgo.mobile.android.voice.impl.ActivityResultLauncherWrapper.Request
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceSearchBackgroundBlurRenderer
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -45,15 +42,14 @@ interface VoiceSearchActivityLauncher {
 @ContributesBinding(ActivityScope::class)
 class RealVoiceSearchActivityLauncher @Inject constructor(
     private val blurRenderer: VoiceSearchBackgroundBlurRenderer,
-    private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val activityResultLauncherWrapper: ActivityResultLauncherWrapper
 ) : VoiceSearchActivityLauncher {
 
     companion object {
         private const val KEY_PARAM_SOURCE = "source"
     }
 
-    private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
     private lateinit var _source: Source
     private var _activity: Activity? = null
 
@@ -65,10 +61,10 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     ) {
         _activity = activity
         _source = source
-        voiceSearchActivityLaucher = caller.registerForActivityResult(StartActivityForResult()) { result ->
-            result?.let {
-                if (it.resultCode == Activity.RESULT_OK) {
-                    val data = it.data?.getStringExtra(VoiceSearchActivity.EXTRA_VOICE_RESULT) ?: ""
+        activityResultLauncherWrapper.register(
+            caller,
+            Request.ResultFromVoiceSearch { code, data ->
+                if (code == Activity.RESULT_OK) {
                     if (data.isNotEmpty()) {
                         pixel.fire(
                             pixel = VoiceSearchPixelNames.VOICE_SEARCH_DONE,
@@ -81,11 +77,12 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                 } else {
                     onEvent(Event.SearchCancelled)
                 }
+
+                _activity?.window?.decorView?.rootView?.let {
+                    blurRenderer.removeBlur(it)
+                }
             }
-            _activity?.window?.decorView?.rootView?.let {
-                blurRenderer.removeBlur(it)
-            }
-        }
+        )
     }
 
     override fun launch() {
@@ -100,6 +97,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
             pixel = VoiceSearchPixelNames.VOICE_SEARCH_STARTED,
             parameters = mapOf(KEY_PARAM_SOURCE to _source.paramValueName)
         )
-        voiceSearchActivityLaucher.launch(Intent(context, VoiceSearchActivity::class.java))
+        activityResultLauncherWrapper.launch(LaunchVoiceSearch)
     }
 }
