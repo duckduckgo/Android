@@ -18,15 +18,14 @@ package com.duckduckgo.mobile.android.voice.impl.listeningmode
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.PartialResultReceived
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionSuccess
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.VolumeUpdateReceived
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchViewModel.Command.HandleSpeechRecognitionSuccess
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchViewModel.Command.UpdateVoiceIndicator
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event.RecognitionTimedOut
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -35,9 +34,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class VoiceSearchViewModel constructor(
+@ContributesViewModel(ActivityScope::class)
+class VoiceSearchViewModel @Inject constructor(
     private val speechRecognizer: OnDeviceSpeechRecognizer
 ) : ViewModel() {
     data class ViewState(
@@ -150,21 +149,5 @@ class VoiceSearchViewModel constructor(
                 )
             )
         )
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class VoiceSearchViewModelFactory @Inject constructor(
-    private val speechRecognizer: Provider<OnDeviceSpeechRecognizer>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(VoiceSearchViewModel::class.java) -> (
-                    VoiceSearchViewModel(speechRecognizer.get()) as T
-                    )
-                else -> null
-            }
-        }
     }
 }
