@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -44,6 +45,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.coroutineContext
 
+@ContributesViewModel(AppScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
@@ -212,18 +214,4 @@ internal sealed class Command {
     ) : Command()
 
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
-}
-
-@ContributesMultibinding(AppScope::class)
-class ManageAppsProtectionViewModelFactory @Inject constructor(
-    private val manageAppsProtectionViewModel: Provider<ManageAppsProtectionViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ManageAppsProtectionViewModel::class.java) -> (manageAppsProtectionViewModel.get() as T)
-                else -> null
-            }
-        }
-    }
 }

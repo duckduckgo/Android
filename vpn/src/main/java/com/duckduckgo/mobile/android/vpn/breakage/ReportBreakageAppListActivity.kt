@@ -134,7 +134,7 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
                 )
                 setSpan(
                     ForegroundColorSpan(
-                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.almostBlackDark)
+                        ContextCompat.getColor(baseContext, com.duckduckgo.mobile.android.R.color.cornflowerBlue)
                     ),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),

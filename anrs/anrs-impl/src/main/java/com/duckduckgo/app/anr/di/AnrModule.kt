@@ -27,7 +27,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class AnrModule {
+object AnrModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAnrDatabase(context: Context): AnrsDatabase {

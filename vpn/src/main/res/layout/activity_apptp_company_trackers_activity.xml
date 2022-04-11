@@ -42,7 +42,7 @@
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                 android:id="@+id/app_disabled_info_panel"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
-                app:panelBackground="@drawable/background_yellow_tooltip"
+                app:panelBackground="@drawable/info_panel_alert_background"
                 app:panelDrawable="@drawable/ic_alert_color_24"
                 app:panelText="@string/atp_CompanyDetailsAppInfoPanel"
                 android:visibility="gone"

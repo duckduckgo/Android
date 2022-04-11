@@ -27,6 +27,8 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.toStringDropScheme
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Observable
 import javax.inject.Inject
 
@@ -54,6 +56,7 @@ interface AutoComplete {
     }
 }
 
+@ContributesBinding(AppScope::class)
 class AutoCompleteApi @Inject constructor(
     private val autoCompleteService: AutoCompleteService,
     private val bookmarksDao: BookmarksDao,

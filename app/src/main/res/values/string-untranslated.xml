@@ -23,4 +23,9 @@
     <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
     <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
 
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Browse privately with our app for Mac</string>
+    <string name="macos_settings_description_list">You\'re on the list!</string>
+    <string name="macos_settings_description_ready">Available for download on Mac</string>
+    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 </resources>

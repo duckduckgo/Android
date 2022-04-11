@@ -20,6 +20,7 @@ import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 import java.util.*
 
@@ -94,7 +95,8 @@ interface VariantManager {
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
-    private val indexRandomizer: IndexRandomizer
+    private val indexRandomizer: IndexRandomizer,
+    private val appBuildConfig: AppBuildConfig,
 ) : VariantManager {
 
     @Synchronized
@@ -126,7 +128,7 @@ class ExperimentationVariantManager(
 
     private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
         var newVariant = generateVariant(activeVariants)
-        val compliesWithFilters = newVariant.filterBy()
+        val compliesWithFilters = newVariant.filterBy(appBuildConfig)
 
         if (!compliesWithFilters) {
             newVariant = DEFAULT_VARIANT
@@ -187,7 +189,7 @@ data class Variant(
     val key: String,
     override val weight: Double = 0.0,
     val features: List<VariantManager.VariantFeature> = emptyList(),
-    val filterBy: () -> Boolean
+    val filterBy: (config: AppBuildConfig) -> Boolean
 ) : Probabilistic {
 
     fun hasFeature(feature: VariantManager.VariantFeature) = features.contains(feature)

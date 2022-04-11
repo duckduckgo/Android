@@ -18,6 +18,7 @@ package com.duckduckgo.app.bookmarks.ui
 
 import android.net.Uri
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.*
 import com.duckduckgo.app.bookmarks.service.ExportSavedSitesResult
 import com.duckduckgo.app.bookmarks.service.ImportSavedSitesResult
@@ -32,19 +33,17 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogF
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
-class BookmarksViewModel(
+@ContributesViewModel(AppScope::class)
+class BookmarksViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     private val bookmarksRepository: BookmarksRepository,
     private val faviconManager: FaviconManager,
@@ -245,34 +244,6 @@ class BookmarksViewModel(
     fun insertDeletedFolderBranch(folderBranch: BookmarkFolderBranch) {
         viewModelScope.launch(dispatcherProvider.io() + NonCancellable) {
             bookmarksRepository.insertFolderBranch(folderBranch)
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class BookmarksViewModelFactory @Inject constructor(
-    private val favoritesRepository: Provider<FavoritesRepository>,
-    private val bookmarksRepository: Provider<BookmarksRepository>,
-    private val faviconManager: Provider<FaviconManager>,
-    private val savedSitesManager: Provider<SavedSitesManager>,
-    private val pixel: Provider<Pixel>,
-    private val dispatcherProvider: Provider<DispatcherProvider>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BookmarksViewModel::class.java) -> (
-                    BookmarksViewModel(
-                        favoritesRepository.get(),
-                        bookmarksRepository.get(),
-                        faviconManager.get(),
-                        savedSitesManager.get(),
-                        pixel.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
-                else -> null
-            }
         }
     }
 }

@@ -17,7 +17,9 @@
 package com.duckduckgo.app.global
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
 import android.content.BroadcastReceiver
+import android.content.Context
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.widget.Toolbar
@@ -25,6 +27,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import dagger.android.AndroidInjection
@@ -83,6 +87,20 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         toolbar.setNavigationIcon(R.drawable.ic_back_24)
+    }
+
+    fun isDarkThemeEnabled(): Boolean {
+        return when (themingDataStore.theme) {
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+                when (uiManager.nightMode) {
+                    UiModeManager.MODE_NIGHT_YES -> true
+                    else -> false
+                }
+            }
+            DARK -> true
+            else -> false
+        }
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {

@@ -19,6 +19,7 @@ package com.duckduckgo.app.bookmarks.ui.bookmarkfolders
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderItem
 import com.duckduckgo.app.bookmarks.model.BookmarksRepository
@@ -27,14 +28,12 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class BookmarkFoldersViewModel(
+@ContributesViewModel(AppScope::class)
+class BookmarkFoldersViewModel @Inject constructor(
     val bookmarksRepository: BookmarksRepository,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel(), AddBookmarkFolderListener {
@@ -90,25 +89,5 @@ class BookmarkFoldersViewModel(
             bookmarksRepository.insert(bookmarkFolder)
         }
         command.value = NewFolderCreatedUpdateTheStructure
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class BookmarkFoldersViewModelFactory @Inject constructor(
-    private val bookmarksRepository: Provider<BookmarksRepository>,
-    private val dispatcherProvider: Provider<DispatcherProvider>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BookmarkFoldersViewModel::class.java) -> (
-                    BookmarkFoldersViewModel(
-                        bookmarksRepository.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

@@ -18,18 +18,17 @@ package com.duckduckgo.app.accessibility
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
-class AccessibilitySettingsViewModel constructor(
+@ContributesViewModel(AppScope::class)
+class AccessibilitySettingsViewModel @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore
 ) : ViewModel() {
 
@@ -92,18 +91,4 @@ class AccessibilitySettingsViewModel constructor(
     }
 
     private fun currentViewState() = viewState.value
-}
-
-@ContributesMultibinding(AppScope::class)
-class AccessibilitySettingsViewModelFactory @Inject constructor(
-    private val accessibilitySettings: Provider<AccessibilitySettingsDataStore>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AccessibilitySettingsViewModel::class.java) -> (AccessibilitySettingsViewModel(accessibilitySettings.get()) as T)
-                else -> null
-            }
-        }
-    }
 }

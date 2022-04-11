@@ -19,20 +19,19 @@ package com.duckduckgo.mobile.android.vpn.ui.report
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(AppScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
@@ -71,22 +70,5 @@ class PrivacyReportViewModel @Inject constructor(
             val otherAppsSize: Int,
             val trackers: Int
         )
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class PrivacyReportViewModelFactory @Inject constructor(
-    private val viewModelProvider: Provider<PrivacyReportViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PrivacyReportViewModel::class.java) -> (
-                    viewModelProvider.get()
-                        as T
-                    )
-                else -> null
-            }
-        }
     }
 }

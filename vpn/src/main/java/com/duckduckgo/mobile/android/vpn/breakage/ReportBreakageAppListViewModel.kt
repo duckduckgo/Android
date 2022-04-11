@@ -18,18 +18,17 @@ package com.duckduckgo.mobile.android.vpn.breakage
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class ReportBreakageAppListViewModel constructor(
+@ContributesViewModel(AppScope::class)
+class ReportBreakageAppListViewModel @Inject constructor(
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository
 ) : ViewModel() {
 
@@ -76,19 +75,4 @@ class ReportBreakageAppListViewModel constructor(
     }
 
     private fun List<InstalledApp>.hasSelected() = find { it.isSelected } != null
-}
-
-@ContributesMultibinding(AppScope::class)
-class ReportBreakageAppListViewModelFactory @Inject constructor(
-    private val repository: Provider<TrackingProtectionAppsRepository>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ReportBreakageAppListViewModel::class.java) ->
-                    ReportBreakageAppListViewModel(repository.get()) as T
-                else -> null
-            }
-        }
-    }
 }

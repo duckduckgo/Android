@@ -18,13 +18,13 @@ package com.duckduckgo.app.feedback.ui.initial
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.feedback.ui.common.ViewState
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
-class InitialFeedbackFragmentViewModel : ViewModel() {
+@ContributesViewModel(AppScope::class)
+class InitialFeedbackFragmentViewModel @Inject constructor() : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: MutableLiveData<Command> = MutableLiveData()
@@ -41,17 +41,5 @@ class InitialFeedbackFragmentViewModel : ViewModel() {
         object PositiveFeedbackSelected : Command()
         object NegativeFeedbackSelected : Command()
         object UserCancelled : Command()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class InitialFeedbackFragmentViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(InitialFeedbackFragmentViewModel::class.java) -> (InitialFeedbackFragmentViewModel() as T)
-                else -> null
-            }
-        }
     }
 }

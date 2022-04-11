@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
@@ -38,13 +39,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
+@ContributesViewModel(AppScope::class)
 class AppTPCompanyTrackersViewModel
 @Inject
 constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
@@ -188,20 +190,4 @@ constructor(
         val trackingSignals: List<TrackingSignal>,
         val expanded: Boolean = false
     )
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTPCompanyTrackersViewModelFactory
-@Inject
-constructor(private val viewModel: Provider<AppTPCompanyTrackersViewModel>) :
-    ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) ->
-                    (viewModel.get() as T)
-                else -> null
-            }
-        }
-    }
 }

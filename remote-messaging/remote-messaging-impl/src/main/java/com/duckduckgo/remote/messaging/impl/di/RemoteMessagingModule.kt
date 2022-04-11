@@ -51,7 +51,7 @@ import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
-class DomainModule {
+object DomainModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -65,7 +65,7 @@ class DomainModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class NetworkModule {
+object NetworkModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -83,7 +83,7 @@ class NetworkModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class DataSourceModule {
+object DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
