@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
@@ -35,6 +36,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessag
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
@@ -46,6 +48,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class DownloadsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DownloadsViewModel by bindViewModel()
