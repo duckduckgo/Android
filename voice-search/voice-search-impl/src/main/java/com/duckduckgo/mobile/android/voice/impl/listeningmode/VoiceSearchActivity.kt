@@ -27,11 +27,13 @@ import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.mobile.android.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.voice.impl.R
 import com.duckduckgo.mobile.android.voice.impl.databinding.ActivityVoiceSearchBinding
@@ -40,6 +42,7 @@ import kotlinx.coroutines.flow.onEach
 import java.util.Locale
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class VoiceSearchActivity : DuckDuckGoActivity() {
     companion object {
         const val EXTRA_VOICE_RESULT = "extra.voice.result"
