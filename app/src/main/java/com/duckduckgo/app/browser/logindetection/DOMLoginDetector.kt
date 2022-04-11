@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.global.getValidUrl
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,7 +59,7 @@ class JsLoginDetector @Inject constructor(private val settingsDataStore: Setting
 
     @UiThread
     override fun onEvent(event: WebNavigationEvent) {
-        if (settingsDataStore.appLoginDetection != LoginDetectorSetting.NEVER) {
+        if (settingsDataStore.automaticFireproofSetting != AutomaticFireproofSetting.NEVER) {
             when (event) {
                 is WebNavigationEvent.OnPageStarted -> injectLoginFormDetectionJS(event.webView)
                 is WebNavigationEvent.ShouldInterceptRequest -> {

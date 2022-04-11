@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey.*
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.mockito.kotlin.mock
@@ -242,7 +242,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     fun whenUserConfirmsToDisableLoginDetectionThenLoginDetectionDisabled() = runTest {
         testee.onUserConfirmedDisableLoginDetectionDialog()
 
-        verify(mockAppSettingsPreferencesStore).appLoginDetection = LoginDetectorSetting.NEVER
+        verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.NEVER
     }
 
     @Test

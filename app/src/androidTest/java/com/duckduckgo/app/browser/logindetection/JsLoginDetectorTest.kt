@@ -25,7 +25,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.logindetection.LoginDetectionJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -55,7 +55,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionDisabledAndPageStartedEventThenNoWebViewInteractions() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.NEVER)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.NEVER)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.onEvent(WebNavigationEvent.OnPageStarted(webView))
         verifyNoInteractions(webView)
@@ -65,7 +65,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionDisabledAndInterceptRequestEventThenNoWebViewInteractions() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.NEVER)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.NEVER)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest()
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
@@ -76,7 +76,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionEnabledAndPageStartedEventThenJSLoginDetectionInjected() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.ASK_EVERY_TIME)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         testee.onEvent(WebNavigationEvent.OnPageStarted(webView))
         verify(webView).evaluateJavascript(any(), anyOrNull())
@@ -86,7 +86,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionEnabledAndLoginPostRequestCapturedThenJSLoginDetectionInjected() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.ASK_EVERY_TIME)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("POST", "login")
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
@@ -97,7 +97,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionEnabledAndNoLoginPostRequestCapturedThenNoWebViewInteractions() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.ASK_EVERY_TIME)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("POST", "")
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))
@@ -108,7 +108,7 @@ class JsLoginDetectorTest {
     @Test
     @SdkSuppress(minSdkVersion = 24)
     fun whenLoginDetectionEnabledAndGetRequestCapturedThenNoWebViewInteractions() = runTest {
-        whenever(settingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.ASK_EVERY_TIME)
+        whenever(settingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
         val webResourceRequest = aWebResourceRequest("GET")
         testee.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, webResourceRequest))

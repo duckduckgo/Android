@@ -27,7 +27,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
@@ -43,13 +43,13 @@ class FireproofWebsitesViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val loginDetectionEnabled: LoginDetectorSetting = LoginDetectorSetting.NEVER,
+        val loginDetectionEnabled: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER,
         val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
     )
 
     sealed class Command {
         class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
-        class SelectLoginDetectorSetting(val loginDetectorSetting: LoginDetectorSetting) : Command()
+        class SelectLoginDetectorSetting(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -61,7 +61,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     init {
         _viewState.value = ViewState(
-            loginDetectionEnabled = settingsDataStore.appLoginDetection
+            loginDetectionEnabled = settingsDataStore.automaticFireproofSetting
         )
         fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
@@ -104,11 +104,11 @@ class FireproofWebsitesViewModel @Inject constructor(
                 userEventsStore.registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
             }
         }
-        val loginDetectionSetting = when (enabled) {
-            false -> LoginDetectorSetting.NEVER
-            else -> LoginDetectorSetting.ASK_EVERY_TIME
+        val automaticFireproofSetting = when (enabled) {
+            false -> AutomaticFireproofSetting.NEVER
+            else -> AutomaticFireproofSetting.ASK_EVERY_TIME
         }
-        settingsDataStore.appLoginDetection = loginDetectionSetting
-        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = loginDetectionSetting)
+        settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
+        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = automaticFireproofSetting)
     }
 }

@@ -24,9 +24,9 @@ import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting.ASK_EVERY_TIME
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting.NEVER
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.NEVER
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -41,7 +41,7 @@ interface SettingsDataStore {
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
-    var appLoginDetection: LoginDetectorSetting
+    var automaticFireproofSetting: AutomaticFireproofSetting
     var appLocationPermission: Boolean
     var appLocationPermissionDeniedForever: Boolean
     var globalPrivacyControlEnabled: Boolean
@@ -92,9 +92,9 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
 
-    override var appLoginDetection: LoginDetectorSetting
-        get() = LoginDetectorSetting.valueOf(preferences.getString(KEY_LOGIN_DETECTION_ENABLED, ASK_EVERY_TIME.name) ?: ASK_EVERY_TIME.name)
-        set(loginDetectionSetting) = preferences.edit { putString(KEY_LOGIN_DETECTION_ENABLED, loginDetectionSetting.name) }
+    override var automaticFireproofSetting: AutomaticFireproofSetting
+        get() = AutomaticFireproofSetting.valueOf(preferences.getString(KEY_AUTOMATIC_FIREPROOF_SETTING, ASK_EVERY_TIME.name) ?: ASK_EVERY_TIME.name)
+        set(loginDetectionSetting) = preferences.edit { putString(KEY_AUTOMATIC_FIREPROOF_SETTING, loginDetectionSetting.name) }
 
     override var appLocationPermission: Boolean
         get() = preferences.getBoolean(KEY_SITE_LOCATION_PERMISSION_ENABLED, true)
@@ -204,7 +204,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val FILENAME = "com.duckduckgo.app.settings_activity.settings"
         const val KEY_BACKGROUND_JOB_ID = "BACKGROUND_JOB_ID"
         const val KEY_AUTOCOMPLETE_ENABLED = "AUTOCOMPLETE_ENABLED"
-        const val KEY_LOGIN_DETECTION_ENABLED = "KEY_LOGIN_DETECTION_ENABLED"
+        const val KEY_AUTOMATIC_FIREPROOF_SETTING = "KEY_AUTOMATIC_FIREPROOF_SETTING"
         const val KEY_AUTOMATICALLY_CLEAR_WHAT_OPTION = "AUTOMATICALLY_CLEAR_WHAT_OPTION"
         const val KEY_AUTOMATICALLY_CLEAR_WHEN_OPTION = "AUTOMATICALLY_CLEAR_WHEN_OPTION"
         const val KEY_APP_BACKGROUNDED_TIMESTAMP = "APP_BACKGROUNDED_TIMESTAMP"
@@ -249,13 +249,13 @@ class SettingsSharedPreferences @Inject constructor(
     }
 
     class LoginDetectorPrefsMapper {
-        enum class LoginDetectorSetting(val stringRes: Int) {
+        enum class AutomaticFireproofSetting(val stringRes: Int) {
             ASK_EVERY_TIME(R.string.settingsAppLinksAskEveryTime),
             ALWAYS(R.string.settingsAppLinksAlways),
             NEVER(R.string.settingsAppLinksNever)
         }
 
-        fun mapToNewLoginDetectorSetting(oldLoginDetectorValue: Boolean): LoginDetectorSetting {
+        fun mapToNewLoginDetectorSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {
             return when (oldLoginDetectorValue) {
                 false -> NEVER
                 else -> ASK_EVERY_TIME

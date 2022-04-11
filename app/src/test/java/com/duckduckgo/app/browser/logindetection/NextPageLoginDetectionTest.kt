@@ -23,7 +23,7 @@ import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.WebNavigationStateChange
 import com.duckduckgo.app.browser.WebNavigationStateChange.NewPage
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
@@ -307,7 +307,7 @@ class NextPageLoginDetectionTest {
     }
 
     private fun givenLoginDetector(enabled: Boolean) {
-        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(LoginDetectorSetting.ASK_EVERY_TIME)
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
     }
 
     companion object {

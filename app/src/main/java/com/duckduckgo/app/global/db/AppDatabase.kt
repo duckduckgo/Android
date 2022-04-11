@@ -49,9 +49,9 @@ import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.Companion.KEY_LOGIN_DETECTION_ENABLED
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.Companion.KEY_AUTOMATIC_FIREPROOF_SETTING
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -665,13 +665,13 @@ class MigrationsProvider(val context: Context) {
 
         fun updateFireproofSettingType() {
             val preferences = context.getSharedPreferences(SettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
-            val loginDetectionEnabled = preferences.getBoolean(KEY_LOGIN_DETECTION_ENABLED, true)
-            preferences.edit().remove(KEY_LOGIN_DETECTION_ENABLED).apply()
+            val loginDetectionEnabled = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
+            preferences.edit().remove("KEY_LOGIN_DETECTION_ENABLED").apply()
             val newLoginDetectorSetting = migratePreferencesType(loginDetectionEnabled)
-            preferences.edit().putString(KEY_LOGIN_DETECTION_ENABLED, newLoginDetectorSetting.name).apply()
+            preferences.edit().putString(KEY_AUTOMATIC_FIREPROOF_SETTING, newLoginDetectorSetting.name).apply()
         }
 
-        private fun migratePreferencesType(loginDetectionEnabled: Boolean): LoginDetectorSetting {
+        private fun migratePreferencesType(loginDetectionEnabled: Boolean): AutomaticFireproofSetting {
             val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
             return loginDetectorPrefsMapper.mapToNewLoginDetectorSetting(loginDetectionEnabled)
         }

@@ -26,7 +26,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.withContext
@@ -93,7 +93,7 @@ class BrowserTabFireproofDialogsEventHandler constructor(
     }
 
     override suspend fun onUserConfirmedDisableLoginDetectionDialog() {
-        appSettingsPreferencesStore.appLoginDetection = LoginDetectorSetting.NEVER
+        appSettingsPreferencesStore.automaticFireproofSetting = AutomaticFireproofSetting.NEVER
         pixel.fire(
             AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE,
             mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString())
@@ -101,7 +101,7 @@ class BrowserTabFireproofDialogsEventHandler constructor(
     }
 
     override suspend fun onUserDismissedDisableLoginDetectionDialog() {
-        appSettingsPreferencesStore.appLoginDetection = LoginDetectorSetting.ASK_EVERY_TIME
+        appSettingsPreferencesStore.automaticFireproofSetting = AutomaticFireproofSetting.ASK_EVERY_TIME
         userEventsStore.removeUserEvent(UserEventKey.FIREPROOF_LOGIN_DIALOG_DISMISSED)
         userEventsStore.registerUserEvent(UserEventKey.FIREPROOF_DISABLE_DIALOG_DISMISSED)
         pixel.fire(AppPixelName.FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL, mapOf(Pixel.PixelParameter.FIRE_EXECUTED to userTriedFireButton().toString()))
