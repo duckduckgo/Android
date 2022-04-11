@@ -121,9 +121,7 @@ class TrackingProtectionAppViewHolder(itemView: View) : RecyclerView.ViewHolder(
     ) {
         val appIcon = itemView.context.packageManager.safeGetApplicationIcon(excludedAppInfo.packageName)
         itemView.deviceShieldAppEntryIcon.setImageDrawable(appIcon)
-        itemView.deviceShieldAppEntryName.text =
-            String.format(itemView.context.resources.getString(R.string.atp_ExcludedAppEntry), excludedAppInfo.name)
-                .applyBoldSpanTo(listOf(excludedAppInfo.name!!))
+        itemView.deviceShieldAppEntryName.text = excludedAppInfo.name
 
         if (excludedAppInfo.isProblematic()) {
             if (excludedAppInfo.isExcluded) {

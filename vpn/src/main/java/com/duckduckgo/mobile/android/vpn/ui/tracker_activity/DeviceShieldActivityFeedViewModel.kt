@@ -23,11 +23,8 @@ import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-<<<<<<< HEAD
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-=======
 import com.duckduckgo.di.scopes.FragmentScope
->>>>>>> develop
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import kotlinx.coroutines.*
