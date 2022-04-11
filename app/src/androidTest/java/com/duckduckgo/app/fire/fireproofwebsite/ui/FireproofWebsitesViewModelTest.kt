@@ -154,18 +154,6 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
-    fun whenUserTapsOnFireproofSettingsSelectionThenShowFireproofOptionsDialog() {
-
-    }
-
-    @Test
-    fun whenUserSelectsAskEveryTimeThenFireCorrectPixel() {
-        viewModel.onUserToggleLoginDetection(true)
-
-        verify(mockPixel).fire(FIREPROOF_LOGIN_TOGGLE_ENABLED)
-    }
-
-    @Test
     fun whenUserTogglesLoginDetectionThenFirePixel() {
         viewModel.onUserToggleLoginDetection(true)
 
