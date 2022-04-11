@@ -56,9 +56,8 @@
                 android:visibility="gone"
                 android:layout_margin="16dp"/>
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/past_week_activity"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="0dp"
@@ -101,9 +100,8 @@
                 android:layout_marginTop="23dp"
                 android:background="?splitterColor" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/most_recent_activity"
-                style="@style/SettingsSectionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/atp_ActivityRecentActivity"
@@ -130,6 +128,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="?splitterColor" />
+
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="0dp"
+                android:text="@string/atp_ActivityAbout" />
+
+            <Sett
 
             <Button
                 android:id="@+id/cta_excluded_apps"
