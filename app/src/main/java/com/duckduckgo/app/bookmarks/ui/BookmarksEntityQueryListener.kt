@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
-import androidx.appcompat.widget.SearchView
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
@@ -25,9 +24,9 @@ class BookmarksEntityQueryListener(
     private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
-) : SearchView.OnQueryTextListener {
+) {
 
-    override fun onQueryTextChange(newText: String): Boolean {
+    fun onQueryTextChange(newText: String): Boolean {
         viewModel.viewState.value?.bookmarks?.let { bookmarks ->
             viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
                 val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
@@ -36,10 +35,6 @@ class BookmarksEntityQueryListener(
             }
         }
         return true
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
     }
 
     private fun filterBookmarks(

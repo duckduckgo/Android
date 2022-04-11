@@ -17,6 +17,7 @@
 package com.duckduckgo.app.fire.fireproofwebsite.ui
 
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
@@ -24,18 +25,16 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.LoginDetectorSetting
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class FireproofWebsitesViewModel(
+@ContributesViewModel(ActivityScope::class)
+class FireproofWebsitesViewModel @Inject constructor(
     private val fireproofWebsiteRepository: FireproofWebsiteRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
@@ -111,31 +110,5 @@ class FireproofWebsitesViewModel(
         }
         settingsDataStore.appLoginDetection = loginDetectionSetting
         _viewState.value = _viewState.value?.copy(loginDetectionEnabled = loginDetectionSetting)
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class FireproofWebsitesViewModelFactory @Inject constructor(
-    private val fireproofWebsiteRepository: Provider<FireproofWebsiteRepository>,
-    private val dispatcherProvider: Provider<DispatcherProvider>,
-    private val pixel: Provider<Pixel>,
-    private val settingsDataStore: Provider<SettingsDataStore>,
-    private val userEventsStore: Provider<UserEventsStore>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(FireproofWebsitesViewModel::class.java) -> (
-                    FireproofWebsitesViewModel(
-                        fireproofWebsiteRepository.get(),
-                        dispatcherProvider.get(),
-                        pixel.get(),
-                        settingsDataStore.get(),
-                        userEventsStore.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

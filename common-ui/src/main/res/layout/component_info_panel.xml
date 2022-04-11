@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
-        app:panelBackground="@drawable/background_blue_tooltip"
+        app:panelBackground="@drawable/info_panel_tooltip_background"
         app:panelDrawable="@drawable/ic_link_color_24"
         app:panelText="This is a Tooltip Info Panel, interesting information can be shown here"
         app:layout_constraintTop_toBottomOf="@+id/label"
@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_4"
         app:layout_constraintTop_toBottomOf="@+id/info_panel_tooltip"
-        app:panelBackground="@drawable/background_yellow_tooltip"
+        app:panelBackground="@drawable/info_panel_alert_background"
         app:panelDrawable="@drawable/ic_alert_color_24"
         app:panelText="This is an Alert Info Panel, warning information can be shown here"
         tools:layout_editor_absoluteX="@dimen/keyline_4"/>

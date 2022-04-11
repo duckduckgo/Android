@@ -90,7 +90,7 @@ class CategoriesTypeConverter {
 
 class Adapters {
     companion object {
-        private val moshi = JsonModule().moshi()
+        private val moshi = JsonModule.moshi()
         private val ruleListType = Types.newParameterizedType(List::class.java, Rule::class.java)
         private val stringListType = Types.newParameterizedType(List::class.java, String::class.java)
         val ruleListAdapter: JsonAdapter<List<Rule>> = moshi.adapter(ruleListType)

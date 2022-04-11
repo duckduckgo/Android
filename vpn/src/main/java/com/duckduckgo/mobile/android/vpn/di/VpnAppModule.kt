@@ -32,7 +32,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class VpnAppModule {
+object VpnAppModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

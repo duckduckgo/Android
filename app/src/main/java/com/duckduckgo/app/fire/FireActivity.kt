@@ -23,9 +23,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Process
 import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.fadeTransitionConfig
+import com.duckduckgo.di.scopes.ActivityScope
 
 /**
  * Activity which is responsible for killing the main process and restarting it. This Activity will automatically finish itself after a brief time.
@@ -36,6 +38,7 @@ import com.duckduckgo.app.global.view.fadeTransitionConfig
  *
  * This Activity was largely inspired by https://github.com/JakeWharton/ProcessPhoenix
  */
+@InjectWith(ActivityScope::class)
 class FireActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

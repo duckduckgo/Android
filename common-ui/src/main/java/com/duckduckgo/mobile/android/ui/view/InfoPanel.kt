@@ -30,7 +30,6 @@ import android.text.style.UnderlineSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewInfoPanelBinding
@@ -66,7 +65,7 @@ class InfoPanel : FrameLayout {
         setBackgroundResource(
             attributes.getResourceId(
                 R.styleable.InfoPanel_panelBackground,
-                R.drawable.background_blue_tooltip
+                R.drawable.info_panel_tooltip_background
             )
         )
         attributes.recycle()
@@ -108,9 +107,7 @@ class InfoPanel : FrameLayout {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
                 setSpan(
-                    ForegroundColorSpan(
-                        ContextCompat.getColor(context, R.color.almostBlackDark)
-                    ),
+                    ForegroundColorSpan(context.getColorFromAttr(R.attr.normalTextColor)),
                     fullText.getSpanStart(it),
                     fullText.getSpanEnd(it),
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

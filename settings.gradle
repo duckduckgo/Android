@@ -5,7 +5,6 @@ plugins {
 include ':browser-api'
 include ':vpn'
 include ':vpn-store'
-include ':vpn-main'
 include ':vpn-api'
 include ':vpn-internal'
 include ':di'
@@ -40,6 +39,9 @@ include ':macos-store'
 
 include ':common-test'
 
+include ':anvil-compiler'
+include ':anvil-annotations'
+
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
 project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
@@ -59,6 +61,9 @@ project(':anrs-store').projectDir = new File('anrs/anrs-store')
 project(':macos-api').projectDir = new File('macos/macos-api')
 project(':macos-impl').projectDir = new File('macos/macos-impl')
 project(':macos-store').projectDir = new File('macos/macos-store')
+
+project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
+project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
 
 rootProject.children.each { subproject ->
 

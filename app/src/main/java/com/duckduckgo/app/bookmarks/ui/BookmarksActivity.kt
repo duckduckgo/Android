@@ -22,8 +22,9 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.BookmarkFolderBranch
 import com.duckduckgo.app.bookmarks.model.SavedSite
@@ -42,6 +43,10 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.DividerAdapter
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
@@ -50,6 +55,7 @@ import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class BookmarksActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -68,7 +74,10 @@ class BookmarksActivity : DuckDuckGoActivity() {
     private lateinit var contentBookmarksBinding: ContentBookmarksBinding
 
     private val toolbar
-        get() = binding.includeToolbar.toolbar
+        get() = binding.toolbar
+
+    private val searchBar
+        get() = binding.searchBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -249,23 +258,43 @@ class BookmarksActivity : DuckDuckGoActivity() {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         searchMenuItem = menu?.findItem(R.id.action_search)
         setSearchMenuItemVisibility()
-        val searchView = searchMenuItem?.actionView as SearchView
-
-        searchMenuItem?.setOnActionExpandListener(
-            object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                    viewModel.fetchBookmarksAndFolders()
-                    return true
-                }
-
-                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                    viewModel.fetchBookmarksAndFolders(getParentFolderId())
-                    return true
-                }
-            }
-        )
-        searchView.setOnQueryTextListener(BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter))
+        initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun initializeSearchBar() {
+        val listener = BookmarksEntityQueryListener(viewModel, bookmarksAdapter, bookmarkFoldersAdapter)
+        searchMenuItem?.setOnMenuItemClickListener {
+            showSearchBar()
+            return@setOnMenuItemClickListener true
+        }
+
+        searchBar.onAction {
+            when (it) {
+                is SearchBar.Action.PerformUpAction -> hideSearchBar()
+                is SearchBar.Action.PerformSearch -> listener.onQueryTextChange(it.searchText)
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (searchBar.isVisible) {
+            hideSearchBar()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    private fun showSearchBar() {
+        toolbar.gone()
+        viewModel.fetchBookmarksAndFolders()
+        searchBar.handle(SearchBar.Event.ShowSearchBar)
+    }
+
+    private fun hideSearchBar() {
+        toolbar.show()
+        viewModel.fetchBookmarksAndFolders(getParentFolderId())
+        searchBar.handle(SearchBar.Event.DismissSearchBar)
     }
 
     private fun setSearchMenuItemVisibility() {

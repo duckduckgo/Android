@@ -41,7 +41,7 @@
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                 android:id="@+id/deviceShieldTrackerLabelEnabled"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
-                app:panelBackground="@drawable/background_blue_tooltip"
+                app:panelBackground="@drawable/info_panel_tooltip_background"
                 app:panelDrawable="@drawable/ic_link_color_24"
                 app:panelText="@string/atp_ActivityEnabledLabel"
                 android:visibility="gone"
@@ -50,7 +50,7 @@
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                 android:id="@+id/deviceShieldTrackerLabelDisabled"
                 style="@style/Widget.DuckDuckGo.InfoPanel"
-                app:panelBackground="@drawable/background_yellow_tooltip"
+                app:panelBackground="@drawable/info_panel_alert_background"
                 app:panelDrawable="@drawable/ic_alert_color_24"
                 app:panelText="@string/atp_ActivityDisabledLabel"
                 android:visibility="gone"
@@ -83,7 +83,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
                     android:layout_marginBottom="4dp"
-                    android:background="@color/splitterGray" />
+                    android:background="?splitterColor" />
 
                 <com.duckduckgo.mobile.android.vpn.ui.tracker_activity.PastWeekTrackerActivityContentView
                     android:id="@+id/tracking_apps_count"
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="23dp"
-                android:background="@color/splitterGray" />
+                android:background="?splitterColor" />
 
             <TextView
                 android:id="@+id/most_recent_activity"
@@ -129,7 +129,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/splitterGray" />
+                android:background="?splitterColor" />
 
             <Button
                 android:id="@+id/cta_excluded_apps"

@@ -24,9 +24,11 @@ import android.net.VpnService
 import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -55,6 +57,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
+@InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     @Inject

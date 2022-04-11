@@ -24,14 +24,17 @@ import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     @Inject

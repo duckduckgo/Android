@@ -52,7 +52,6 @@
                 app:lottie_imageAssetsFolder="images"
                 app:lottie_loop="true" />
 
-
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -64,18 +63,19 @@
 
             <TextView
                 android:id="@+id/onboarding_enabled_title"
-                style="@style/DeviceShieldOnboardingHeaderStyle"
+                style="@style/TextAppearance.DuckDuckGo.Headline2"
+                android:textAlignment="center"
+                android:textStyle="bold"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:paddingStart="40dp"
                 android:paddingEnd="40dp"
-                android:text="@string/atp_EnabledTitle"
-                android:textAlignment="center" />
+                android:text="@string/atp_EnabledTitle" />
 
             <TextView
                 android:id="@+id/onboarding_enabled_text"
-                style="@style/DeviceShieldOnboardingTextStyle"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -86,7 +86,7 @@
 
             <Button
                 android:id="@+id/onboarding_enabled_activity_cta"
-                style="@style/DeviceShieldTransparentRoundedButton"
+                style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="50dp"
@@ -96,7 +96,7 @@
 
             <TextView
                 android:id="@+id/onboarding_enabled_settings_text"
-                style="@style/DeviceShieldOnboardingTextStyle"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"

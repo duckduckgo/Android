@@ -19,7 +19,7 @@ package com.duckduckgo.macos_impl.waitlist.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_PRESSED
@@ -29,7 +29,6 @@ import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.Copy
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShareInviteCode
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistViewModel.Command.ShowErrorMessage
 import com.duckduckgo.macos_store.MacOsWaitlistState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,9 +36,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class MacOsWaitlistViewModel(
+@ContributesViewModel(AppScope::class)
+class MacOsWaitlistViewModel @Inject constructor(
     private val waitlistManager: MacOsWaitlistManager,
     private val waitlistService: MacOsWaitlistService,
     private val workManager: WorkManager,
@@ -108,32 +107,6 @@ class MacOsWaitlistViewModel(
         waitlistManager.getInviteCode()?.let {
             viewModelScope.launch {
                 commandChannel.send(CopyInviteToClipboard(it, onlyCode))
-            }
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTPWaitlistViewModelFactory @Inject constructor(
-    private val waitlistManager: Provider<MacOsWaitlistManager>,
-    private val waitlistService: Provider<MacOsWaitlistService>,
-    private val workManager: Provider<WorkManager>,
-    private val workRequestBuilder: Provider<MacOsWaitlistWorkRequestBuilder>,
-    private val pixel: Provider<Pixel>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(MacOsWaitlistViewModel::class.java) -> (
-                    MacOsWaitlistViewModel(
-                        waitlistManager.get(),
-                        waitlistService.get(),
-                        workManager.get(),
-                        workRequestBuilder.get(),
-                        pixel.get(),
-                    ) as T
-                    )
-                else -> null
             }
         }
     }

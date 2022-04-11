@@ -43,7 +43,7 @@ abstract class VpnServiceCallbacksProviderModule {
 
     @Module
     @ContributesTo(VpnScope::class)
-    class VpnServiceCallbacksProviderModuleExt {
+    object VpnServiceCallbacksProviderModuleExt {
         @Provides
         @SingleInstanceIn(VpnScope::class)
         fun bindVpnServiceCallbacksPluginPoint(

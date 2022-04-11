@@ -26,7 +26,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-class JsonModule {
+object JsonModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

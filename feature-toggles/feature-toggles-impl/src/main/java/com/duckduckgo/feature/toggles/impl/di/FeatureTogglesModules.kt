@@ -37,7 +37,7 @@ abstract class FeatureTogglesBindingModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class FeatureTogglesModule {
+object FeatureTogglesModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

@@ -19,19 +19,18 @@ package com.duckduckgo.app.globalprivacycontrol.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import javax.inject.Provider
 
-class GlobalPrivacyControlViewModel(
+@ContributesViewModel(ActivityScope::class)
+class GlobalPrivacyControlViewModel @Inject constructor(
     private val pixel: Pixel,
     private val featureToggle: FeatureToggle,
     private val gpc: Gpc
@@ -77,27 +76,5 @@ class GlobalPrivacyControlViewModel(
 
     companion object {
         const val LEARN_MORE_URL = "https://help.duckduckgo.com/duckduckgo-help-pages/privacy/gpc/"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class GlobalPrivacyControlViewModelFactory @Inject constructor(
-    private val pixel: Provider<Pixel>,
-    private val featureToggle: Provider<FeatureToggle>,
-    private val gpc: Provider<Gpc>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(GlobalPrivacyControlViewModel::class.java) -> (
-                    GlobalPrivacyControlViewModel(
-                        pixel.get(),
-                        featureToggle.get(),
-                        gpc.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

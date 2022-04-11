@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.ui.view
 
+import android.content.Context
 import android.text.Annotation
 import android.text.SpannableString
 import android.text.Spanned
@@ -24,11 +25,24 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
+}
 
 fun TextView.addClickableLink(
     annotation: String,

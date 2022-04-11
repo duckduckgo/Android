@@ -149,6 +149,9 @@ fladle {
 }
 
 dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+
     implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
@@ -156,7 +159,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn')
     implementation project(path: ':vpn-store')
     internalImplementation project(path: ':vpn-internal')
 

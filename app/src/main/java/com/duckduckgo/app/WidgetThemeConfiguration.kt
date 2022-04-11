@@ -22,15 +22,18 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
     @Inject

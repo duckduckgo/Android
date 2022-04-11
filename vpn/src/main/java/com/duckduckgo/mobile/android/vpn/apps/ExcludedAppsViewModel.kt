@@ -18,12 +18,11 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -31,9 +30,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class ExcludedAppsViewModel(
+@ContributesViewModel(ActivityScope::class)
+class ExcludedAppsViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val pixel: DeviceShieldPixels
 ) : ViewModel() {
@@ -164,24 +163,4 @@ internal sealed class Command {
     ) : Command()
 
     data class ShowDisableProtectionDialog(val excludingReason: TrackingProtectionAppInfo) : Command()
-}
-
-@ContributesMultibinding(AppScope::class)
-class ExcludedAppsViewModelFactory @Inject constructor(
-    private val deviceShieldExcludedApps: Provider<TrackingProtectionAppsRepository>,
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ExcludedAppsViewModel::class.java) -> (
-                    ExcludedAppsViewModel(
-                        deviceShieldExcludedApps.get(),
-                        deviceShieldPixels.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
-    }
 }
