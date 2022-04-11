@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Ladda ned bild</string>
     <string name="permissionRequiredToDownload">Nedladdning kräver lagringstillstånd</string>
-    <string name="downloadComplete">Nedladdning klar</string>
-    <string name="downloadFailed">Kunde inte ladda ned</string>
-    <string name="downloadInProgress">Laddar ner</string>
 
     <!-- Sharing options -->
     <string name="options">Alternativ</string>
@@ -327,8 +324,6 @@
     <string name="noThanks">Nej tack</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Filen laddas ned</string>
-    <string name="notificationChannelFileDownloaded">Filen har laddats ner</string>
     <string name="notificationChannelTutorials">Handledningar</string>
 
     <!-- Clear Notification -->

@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Descargar imagen</string>
     <string name="permissionRequiredToDownload">La descarga requiere permiso de almacenamiento</string>
-    <string name="downloadComplete">Descarga finalizada</string>
-    <string name="downloadFailed">No se ha podido descargar</string>
-    <string name="downloadInProgress">Descargando</string>
 
     <!-- Sharing options -->
     <string name="options">Opciones</string>
@@ -327,8 +324,6 @@
     <string name="noThanks">No, gracias</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Archivo descargándose</string>
-    <string name="notificationChannelFileDownloaded">Archivo descargado</string>
     <string name="notificationChannelTutorials">Tutoriales</string>
 
     <!-- Clear Notification -->

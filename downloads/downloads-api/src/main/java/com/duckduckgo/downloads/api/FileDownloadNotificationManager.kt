@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.downloads.api.model
+package com.duckduckgo.downloads.api
 
-/** Each downloaded file has a status which reflects the state of the download: either started or finished. */
-object DownloadStatus {
-    const val STARTED = 0
-    const val FINISHED = 1
+import android.net.Uri
+
+interface FileDownloadNotificationManager {
+    fun showDownloadInProgressNotification()
+    fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?)
+    fun showDownloadFailedNotification()
 }

@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Det var ikke muligt at downloade. Kontroller internetforbindelsen.</string>
+
+    <string name="notificationChannelFileDownloading">Fil downloader</string>
+    <string name="notificationChannelFileDownloaded">Fil downloadet</string>
+
+    <string name="downloadComplete">Download fuldført</string>
+    <string name="downloadFailed">Det var ikke muligt at downloade</string>
+    <string name="downloadInProgress">Downloader</string>
 </resources>

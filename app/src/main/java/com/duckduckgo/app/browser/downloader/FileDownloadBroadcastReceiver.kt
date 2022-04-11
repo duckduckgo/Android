@@ -77,13 +77,13 @@ class FileDownloadBroadcastReceiver @Inject constructor(
                         callback.onSuccess(downloadId = downloadId, contentLength = size)
                     }
                     DownloadManager.STATUS_FAILED -> {
-                        Timber.d("Download completed, but failed or was cancelled.")
-                        callback.onFailOrCancel(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+                        Timber.d("Download completed, but failed.")
+                        callback.onError(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
                     }
                 }
             } else {
-                Timber.d("Download unknown.")
-                callback.onError(downloadId)
+                Timber.d("Download cancelled by the user from the app or from the notification.")
+                callback.onCancel(downloadId = downloadId)
             }
         }
     }

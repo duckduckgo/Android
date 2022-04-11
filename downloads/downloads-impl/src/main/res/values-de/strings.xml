@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Download fehlgeschlagen. Internetverbindung überprüfen.</string>
+
+    <string name="notificationChannelFileDownloading">Datei wird heruntergeladen</string>
+    <string name="notificationChannelFileDownloaded">Datei erfolgreich heruntergeladen</string>
+
+    <string name="downloadComplete">Download abgeschlossen</string>
+    <string name="downloadFailed">Download fehlgeschlagen</string>
+    <string name="downloadInProgress">Wird heruntergeladen</string>
 </resources>

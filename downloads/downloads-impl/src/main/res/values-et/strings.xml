@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Allalaadimine ebaõnnestus. Kontrolli internetiühendust.</string>
+
+    <string name="notificationChannelFileDownloading">Failide allalaadimine</string>
+    <string name="notificationChannelFileDownloaded">Fail on alla laaditud</string>
+
+    <string name="downloadComplete">Allalaadimine lõpetatud</string>
+    <string name="downloadFailed">Allalaadimine ebaõnnestus</string>
+    <string name="downloadInProgress">Allalaadimine</string>
 </resources>

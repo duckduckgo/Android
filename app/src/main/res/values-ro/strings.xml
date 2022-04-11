@@ -43,9 +43,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Descărcare imagine</string>
     <string name="permissionRequiredToDownload">Descărcarea necesită permisiune de stocare</string>
-    <string name="downloadComplete">Descărcare completă</string>
-    <string name="downloadFailed">Descărcarea a eșuat</string>
-    <string name="downloadInProgress">Se descarcă</string>
 
     <!-- Sharing options -->
     <string name="options">Opțiuni</string>
@@ -315,8 +312,6 @@
     <string name="noThanks">Nu, mulțumesc</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Descărcare fișier</string>
-    <string name="notificationChannelFileDownloaded">Fișier descărcat</string>
     <string name="notificationChannelTutorials">Tutoriale</string>
 
     <!-- Clear Notification -->

@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.downloads.impl.pixels
+package com.duckduckgo.downloads.impl
 
-import com.duckduckgo.app.statistics.pixels.Pixel
+import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.app.notification.model.Channel
 
-enum class DownloadsPixelName(override val pixelName: String) : Pixel.PixelName {
-    DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
-    DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
-    DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),
-    DOWNLOAD_REQUEST_CANCELLED("m_download_request_cancelled"),
-
-    DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
+object FileDownloadNotificationChannelType {
+    val FILE_DOWNLOADING = Channel(
+        "com.duckduckgo.downloading",
+        R.string.notificationChannelFileDownloading,
+        NotificationManagerCompat.IMPORTANCE_LOW
+    )
+    val FILE_DOWNLOADED = Channel(
+        "com.duckduckgo.downloaded",
+        R.string.notificationChannelFileDownloaded,
+        NotificationManagerCompat.IMPORTANCE_LOW
+    )
 }

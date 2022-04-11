@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Pobierz obraz</string>
     <string name="permissionRequiredToDownload">Pobieranie wymaga pozwolenia na zapisanie</string>
-    <string name="downloadComplete">Pobieranie zakończone</string>
-    <string name="downloadFailed">Pobieranie nie powiodło się</string>
-    <string name="downloadInProgress">Pobieranie w toku</string>
 
     <!-- Sharing options -->
     <string name="options">Opcje</string>
@@ -335,8 +332,6 @@
     <string name="noThanks">Nie, dziękuję</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Pobieranie pliku</string>
-    <string name="notificationChannelFileDownloaded">Plik został pobrany</string>
     <string name="notificationChannelTutorials">Tutoriale</string>
 
     <!-- Clear Notification -->

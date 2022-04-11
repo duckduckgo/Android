@@ -43,9 +43,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Изтегляне на изображение</string>
     <string name="permissionRequiredToDownload">Изтеглянето изисква разрешение за съхранение</string>
-    <string name="downloadComplete">Изтеглянето е завършено</string>
-    <string name="downloadFailed">Неуспешно изтегляне</string>
-    <string name="downloadInProgress">Изтегля се</string>
 
     <!-- Sharing options -->
     <string name="options">Опции</string>
@@ -311,8 +308,6 @@
     <string name="noThanks">Не, благодаря</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Файлът се изтегля</string>
-    <string name="notificationChannelFileDownloaded">Файлът е изтеглен</string>
     <string name="notificationChannelTutorials">Указания</string>
 
     <!-- Clear Notification -->

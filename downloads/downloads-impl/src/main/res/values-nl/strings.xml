@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Downloaden mislukt. Controleer uw internetverbinding.</string>
+
+    <string name="notificationChannelFileDownloading">Bestand aan het downloaden</string>
+    <string name="notificationChannelFileDownloaded">Bestand gedownload</string>
+
+    <string name="downloadComplete">Download voltooid</string>
+    <string name="downloadFailed">Downloaden mislukt</string>
+    <string name="downloadInProgress">Aan het downloaden</string>
 </resources>

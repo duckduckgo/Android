@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads.di
+package com.duckduckgo.downloads.impl.di
 
-import com.duckduckgo.app.downloads.DownloadCallback
-import com.duckduckgo.app.downloads.FileDownloadCallback
-import com.duckduckgo.app.downloads.db.DownloadsDao
-import com.duckduckgo.app.downloads.model.DefaultDownloadsRepository
-import com.duckduckgo.app.downloads.model.DownloadsRepository
-import com.duckduckgo.app.statistics.pixels.Pixel
+import android.content.Context
+import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -34,13 +31,10 @@ class DownloadsModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun downloadsRepository(downloadsDao: DownloadsDao): DownloadsRepository {
-        return DefaultDownloadsRepository(downloadsDao)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun downloadCallback(downloadsRepository: DownloadsRepository, pixel: Pixel): DownloadCallback {
-        return FileDownloadCallback(downloadsRepository, pixel)
+    fun provideDownloadsDatabase(context: Context): DownloadsDatabase {
+        return Room.databaseBuilder(context, DownloadsDatabase::class.java, "downloads.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.downloads.model
+package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.downloads.db.DownloadEntity
-import com.duckduckgo.app.downloads.db.DownloadsDao
-import com.duckduckgo.app.downloads.model.DownloadStatus.FINISHED
-import com.duckduckgo.app.downloads.model.DownloadStatus.STARTED
+import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadEntity
+import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
+import com.duckduckgo.downloads.store.DownloadsDao
+import com.duckduckgo.downloads.store.DownloadsDatabase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.mockito.kotlin.mock
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,12 +40,15 @@ class DefaultDownloadsRepositoryTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val downloadsDao: DownloadsDao = mock()
+    private val mockDb: DownloadsDatabase = mock()
+    private val mockDao: DownloadsDao = mock()
     private lateinit var repository: DownloadsRepository
 
     @Before
     fun before() {
-        repository = DefaultDownloadsRepository(downloadsDao)
+        whenever(mockDb.downloadsDao()).thenReturn(mockDao)
+
+        repository = DefaultDownloadsRepository(mockDb)
     }
 
     @Test
@@ -52,7 +58,7 @@ class DefaultDownloadsRepositoryTest {
 
         repository.insert(item)
 
-        verify(downloadsDao).insert(entity)
+        verify(mockDb.downloadsDao()).insert(entity)
     }
 
     @Test
@@ -64,30 +70,48 @@ class DefaultDownloadsRepositoryTest {
 
         repository.insertAll(listOf(firstItem, secondItem))
 
-        verify(downloadsDao).insertAll(listOf(firstEntity, secondEntity))
+        verify(mockDb.downloadsDao()).insertAll(listOf(firstEntity, secondEntity))
     }
 
     @Test
-    fun whenUpdateDownloadItemByIdWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() = runTest {
-        val item = oneItem()
-        val updatedStatus = FINISHED
-        val updatedContentLength = 1111111L
+    fun whenUpdateDownloadItemByIdWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() =
+        runTest {
+            val item = oneItem()
+            val updatedStatus = FINISHED
+            val updatedContentLength = 1111111L
 
-        repository.update(downloadId = item.downloadId, downloadStatus = updatedStatus, contentLength = updatedContentLength)
+            repository.update(
+                downloadId = item.downloadId,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
 
-        verify(downloadsDao).update(downloadId = item.downloadId, downloadStatus = updatedStatus, contentLength = updatedContentLength)
-    }
+            verify(mockDb.downloadsDao()).update(
+                downloadId = item.downloadId,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+        }
 
     @Test
-    fun whenUpdateDownloadItemByFileNameWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() = runTest {
-        val item = oneItem().copy(downloadId = 0L)
-        val updatedStatus = FINISHED
-        val updatedContentLength = 1111111L
+    fun whenUpdateDownloadItemByFileNameWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() =
+        runTest {
+            val item = oneItem().copy(downloadId = 0L)
+            val updatedStatus = FINISHED
+            val updatedContentLength = 1111111L
 
-        repository.update(fileName = item.fileName, downloadStatus = updatedStatus, contentLength = updatedContentLength)
+            repository.update(
+                fileName = item.fileName,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
 
-        verify(downloadsDao).update(fileName = item.fileName, downloadStatus = updatedStatus, contentLength = updatedContentLength)
-    }
+            verify(mockDb.downloadsDao()).update(
+                fileName = item.fileName,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+        }
 
     @Test
     fun whenDeleteDownloadItemThenDeleteCalled() = runTest {
@@ -95,7 +119,7 @@ class DefaultDownloadsRepositoryTest {
 
         repository.delete(item.id)
 
-        verify(downloadsDao).delete(item.id)
+        verify(mockDb.downloadsDao()).delete(item.id)
     }
 
     @Test
@@ -105,34 +129,34 @@ class DefaultDownloadsRepositoryTest {
 
         repository.delete(listOf(firstItem.downloadId, secondItem.downloadId))
 
-        verify(downloadsDao).delete(listOf(firstItem.downloadId, secondItem.downloadId))
+        verify(mockDb.downloadsDao()).delete(listOf(firstItem.downloadId, secondItem.downloadId))
     }
 
     @Test
     fun whenDeleteAllDownloadItemsThenDeleteWithNoParamsCalled() = runTest {
         repository.deleteAll()
 
-        verify(downloadsDao).delete()
+        verify(mockDb.downloadsDao()).delete()
     }
 
     @Test
     fun whenGetDownloadItemCalledThenGetDownloadItemCalled() = runTest {
         val item = oneItem()
         val entity = oneEntity()
-        whenever(downloadsDao.getDownloadItem(item.downloadId)).thenReturn(entity)
+        whenever(mockDb.downloadsDao().getDownloadItem(item.downloadId)).thenReturn(entity)
 
         repository.getDownloadItem(item.downloadId)
 
-        verify(downloadsDao).getDownloadItem(item.downloadId)
+        verify(mockDb.downloadsDao()).getDownloadItem(item.downloadId)
     }
 
     @Test
     fun whenGetDownloadItemsCalledThenGetDownloadsCalled() = runTest {
-        whenever(downloadsDao.getDownloads()).thenReturn(listOf(oneEntity()))
+        whenever(mockDb.downloadsDao().getDownloads()).thenReturn(listOf(oneEntity()))
 
         repository.getDownloads()
 
-        verify(downloadsDao).getDownloads()
+        verify(mockDb.downloadsDao()).getDownloads()
     }
 
     private fun oneItem() = DownloadItem(

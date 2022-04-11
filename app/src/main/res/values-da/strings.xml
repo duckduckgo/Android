@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Download billede</string>
     <string name="permissionRequiredToDownload">Download kræver lagringstilladelse</string>
-    <string name="downloadComplete">Download fuldført</string>
-    <string name="downloadFailed">Det var ikke muligt at downloade</string>
-    <string name="downloadInProgress">Downloader</string>
 
     <!-- Sharing options -->
     <string name="options">Valgmuligheder</string>
@@ -327,8 +324,6 @@
     <string name="noThanks">Nej tak.</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Fil downloader</string>
-    <string name="notificationChannelFileDownloaded">Fil downloadet</string>
     <string name="notificationChannelTutorials">Vejledninger</string>
 
     <!-- Clear Notification -->

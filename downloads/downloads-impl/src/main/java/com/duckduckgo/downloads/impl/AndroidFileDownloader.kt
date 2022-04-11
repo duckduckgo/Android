@@ -37,7 +37,7 @@ class AndroidFileDownloader @Inject constructor(
         when {
             pending.isNetworkUrl -> networkFileDownloader.download(pending, callback)
             pending.isDataUrl -> dataUriDownloader.download(pending, callback)
-            else -> callback.onFailure(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
+            else -> callback.onError(url = pending.url, reason = DownloadFailReason.UnsupportedUrlType)
         }
     }
 }

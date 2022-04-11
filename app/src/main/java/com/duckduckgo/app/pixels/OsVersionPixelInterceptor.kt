@@ -55,6 +55,7 @@ class OsVersionPixelInterceptor @Inject constructor(private val appBuildConfig: 
             DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED.pixelName,
             DownloadsPixelName.DOWNLOAD_REQUEST_FAILED.pixelName,
             DownloadsPixelName.DOWNLOAD_REQUEST_STARTED.pixelName,
+            DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED.pixelName,
             StatisticsPixelName.APPLICATION_CRASH.pixelName,
             StatisticsPixelName.APPLICATION_CRASH_GLOBAL.pixelName
         )

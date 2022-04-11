@@ -16,7 +16,11 @@
 
 package com.duckduckgo.downloads.impl
 
-import org.junit.Assert
+import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.Invalid
+import com.duckduckgo.downloads.impl.DataUriParser.ParseResult.ParsedDataUri
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -26,49 +30,49 @@ class DataUriParserTest {
 
     @Before
     fun setup() {
-        testee = DataUriParser(DataUriSuffixParser())
+        testee = DataUriParser()
     }
 
     @Test
     fun whenMimeTypeProvidedAsImagePngThenPngSuffixGenerated() {
-        val parsed = testee.generate("data:image/png;base64,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertEquals("png", parsed.filename.fileType)
+        val parsed = testee.generate("data:image/png;base64,AAAA") as ParsedDataUri
+        assertEquals("png", parsed.filename.fileType)
     }
 
     @Test
     fun whenMimeTypeProvidedAsImageJpegThenJpgSuffixGenerated() {
-        val parsed = testee.generate("data:image/jpeg;base64,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertEquals("jpg", parsed.filename.fileType)
+        val parsed = testee.generate("data:image/jpeg;base64,AAAA") as ParsedDataUri
+        assertEquals("jpg", parsed.filename.fileType)
     }
 
     @Test
     fun whenMimeTypeProvidedAsArbitraryImageTypeThenNoSuffixGenerated() {
-        val parsed = testee.generate("data:image/foo;base64,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertEquals("", parsed.filename.fileType)
+        val parsed = testee.generate("data:image/foo;base64,AAAA") as ParsedDataUri
+        assertEquals("", parsed.filename.fileType)
     }
 
     @Test
     fun whenMimeTypeNotProvidedThenNoSuffixAdded() {
-        val parsed = testee.generate("data:,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertEquals("", parsed.filename.fileType)
+        val parsed = testee.generate("data:,AAAA") as ParsedDataUri
+        assertEquals("", parsed.filename.fileType)
     }
 
     @Test
     fun whenInvalidDataUriProvidedInvalidTypeTurned() {
         val parsed = testee.generate("AAAA")
-        Assert.assertTrue(parsed === DataUriParser.ParseResult.Invalid)
+        assertTrue(parsed === Invalid)
     }
 
     @Test
     fun whenKnownMimeTypeProvidedAsNonImageTypeThenSuffixStillGenerated() {
-        val parsed = testee.generate("data:text/plain;base64,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertEquals("txt", parsed.filename.fileType)
+        val parsed = testee.generate("data:text/plain;base64,AAAA") as ParsedDataUri
+        assertEquals("txt", parsed.filename.fileType)
     }
 
     @Test
     fun whenMimeTypeNotProvidedThenNoSuffixAddedInToString() {
-        val filename = testee.generate("data:,AAAA") as DataUriParser.ParseResult.ParsedDataUri
-        Assert.assertFalse(filename.toString().contains("."))
+        val filename = testee.generate("data:,AAAA") as ParsedDataUri
+        assertFalse(filename.toString().contains("."))
     }
 
     @Test

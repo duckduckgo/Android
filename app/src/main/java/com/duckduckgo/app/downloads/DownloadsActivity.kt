@@ -37,7 +37,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.model.DownloadItem
-import com.duckduckgo.downloads.api.model.DownloadStatus.FINISHED
+import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard

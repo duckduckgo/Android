@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Nu s-a putut descărca. Verifică conexiunea la internet.</string>
+
+    <string name="notificationChannelFileDownloading">Descărcare fișier</string>
+    <string name="notificationChannelFileDownloaded">Fișier descărcat</string>
+
+    <string name="downloadComplete">Descărcare completă</string>
+    <string name="downloadFailed">Descărcarea a eșuat</string>
+    <string name="downloadInProgress">Se descarcă</string>
 </resources>

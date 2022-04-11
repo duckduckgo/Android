@@ -28,7 +28,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.api.model.DownloadStatus.STARTED
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -46,7 +46,7 @@ class NetworkFileDownloader @Inject constructor(
         Timber.d("Start download for ${pendingDownload.url}.")
 
         if (!downloadManagerAvailable()) {
-            callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.DownloadManagerDisabled)
+            callback.onError(url = pendingDownload.url, reason = DownloadFailReason.DownloadManagerDisabled)
             return
         }
 
@@ -99,7 +99,7 @@ class NetworkFileDownloader @Inject constructor(
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
-                callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
+                callback.onError(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
             }
         })
     }

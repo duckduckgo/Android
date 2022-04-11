@@ -43,9 +43,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Lejupielādēt attēlu</string>
     <string name="permissionRequiredToDownload">Lai lejupielādētu, ir nepieciešama krātuves atļauja</string>
-    <string name="downloadComplete">Lejupielāde pabeigta</string>
-    <string name="downloadFailed">Neizdevās lejupielādēt</string>
-    <string name="downloadInProgress">Lejupielāde</string>
 
     <!-- Sharing options -->
     <string name="options">Iespējas</string>
@@ -315,8 +312,6 @@
     <string name="noThanks">Nē, paldies</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Failu lejupielāde</string>
-    <string name="notificationChannelFileDownloaded">Fails lejupielādēts</string>
     <string name="notificationChannelTutorials">Pamācības</string>
 
     <!-- Clear Notification -->

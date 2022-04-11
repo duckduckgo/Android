@@ -16,4 +16,11 @@
   -->
 <resources>
     <string name="downloadsErrorMessage">Failed to download. Check internet connection.</string>
+
+    <string name="notificationChannelFileDownloading">File downloading</string>
+    <string name="notificationChannelFileDownloaded">File downloaded</string>
+
+    <string name="downloadComplete">Download complete</string>
+    <string name="downloadFailed">Failed to download</string>
+    <string name="downloadInProgress">Downloading</string>
 </resources>

@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Prenesi sliko</string>
     <string name="permissionRequiredToDownload">Prenos zahteva dovoljenje za shranjevanje</string>
-    <string name="downloadComplete">Prenos končan</string>
-    <string name="downloadFailed">Prenos ni uspel</string>
-    <string name="downloadInProgress">Prenašanje</string>
 
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
@@ -335,8 +332,6 @@
     <string name="noThanks">Ne, hvala</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Prenašanje datoteke</string>
-    <string name="notificationChannelFileDownloaded">Datoteka prenesena</string>
     <string name="notificationChannelTutorials">Vadnice</string>
 
     <!-- Clear Notification -->

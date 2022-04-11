@@ -30,9 +30,9 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessag
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.api.model.DownloadItem
-import com.duckduckgo.downloads.api.model.DownloadStatus.FINISHED
-import com.duckduckgo.downloads.store.DownloadsRepository
+import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest

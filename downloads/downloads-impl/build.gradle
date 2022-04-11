@@ -31,6 +31,7 @@ android {
 
 dependencies {
     implementation project(path: ':downloads-api')
+    implementation project(path: ':browser-api')
     implementation project(path: ':di')
     implementation project(path: ':common')
     implementation project(path: ':statistics')

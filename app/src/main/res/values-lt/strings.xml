@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
     <string name="permissionRequiredToDownload">Norint atsisiųsti reikia leidimo išsaugoti</string>
-    <string name="downloadComplete">Atsisiuntimas baigtas</string>
-    <string name="downloadFailed">Atsisiųsti nepavyko</string>
-    <string name="downloadInProgress">Atsisiunčiama</string>
 
     <!-- Sharing options -->
     <string name="options">Parinktys</string>
@@ -335,8 +332,6 @@
     <string name="noThanks">Ne, dėkoju</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Failas atsisiunčiamas</string>
-    <string name="notificationChannelFileDownloaded">Failas atsiųstas</string>
     <string name="notificationChannelTutorials">Mokymo priemonės</string>
 
     <!-- Clear Notification -->

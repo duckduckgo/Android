@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Échec du téléchargement. Vérifiez la connexion Internet.</string>
+
+    <string name="notificationChannelFileDownloading">Téléchargement du fichier</string>
+    <string name="notificationChannelFileDownloaded">Fichier téléchargé</string>
+
+    <string name="downloadComplete">Téléchargement terminé</string>
+    <string name="downloadFailed">Échec du téléchargement</string>
+    <string name="downloadInProgress">Téléchargement en cours</string>
 </resources>

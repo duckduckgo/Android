@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Det gick inte att ladda ner. Kontrollera internetanslutningen.</string>
+
+    <string name="notificationChannelFileDownloading">Filen laddas ned</string>
+    <string name="notificationChannelFileDownloaded">Filen har laddats ner</string>
+
+    <string name="downloadComplete">Nedladdning klar</string>
+    <string name="downloadFailed">Kunde inte ladda ned</string>
+    <string name="downloadInProgress">Laddar ner</string>
 </resources>

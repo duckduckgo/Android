@@ -17,4 +17,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Неуспешно изтегляне. Проверете интернет връзката.</string>
+
+    <string name="notificationChannelFileDownloading">Файлът се изтегля</string>
+    <string name="notificationChannelFileDownloaded">Файлът е изтеглен</string>
+
+    <string name="downloadComplete">Изтеглянето е завършено</string>
+    <string name="downloadFailed">Неуспешно изтегляне</string>
+    <string name="downloadInProgress">Изтегля се</string>
 </resources>

@@ -185,6 +185,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.coroutines.flow.cancellable
+import javax.inject.Provider
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :

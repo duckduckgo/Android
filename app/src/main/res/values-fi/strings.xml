@@ -43,9 +43,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Lataa kuva</string>
     <string name="permissionRequiredToDownload">Lataaminen edellyttää tallennuslupaa</string>
-    <string name="downloadComplete">Lataus valmis</string>
-    <string name="downloadFailed">Lataaminen ei onnistunut</string>
-    <string name="downloadInProgress">Ladataan</string>
 
     <!-- Sharing options -->
     <string name="options">Valinnat</string>
@@ -311,8 +308,6 @@
     <string name="noThanks">Ei kiitos</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Tiedosto latautuu</string>
-    <string name="notificationChannelFileDownloaded">Tiedosto ladattu</string>
     <string name="notificationChannelTutorials">Opetusmateriaalit</string>
 
     <!-- Clear Notification -->

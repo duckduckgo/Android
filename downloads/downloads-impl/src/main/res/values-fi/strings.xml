@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Lataus epäonnistui. Tarkista internetyhteys.</string>
+
+    <string name="notificationChannelFileDownloading">Tiedosto latautuu</string>
+    <string name="notificationChannelFileDownloaded">Tiedosto ladattu</string>
+
+    <string name="downloadComplete">Lataus valmis</string>
+    <string name="downloadFailed">Lataaminen ei onnistunut</string>
+    <string name="downloadInProgress">Ladataan</string>
 </resources>

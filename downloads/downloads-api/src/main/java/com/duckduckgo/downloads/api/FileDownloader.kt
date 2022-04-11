@@ -27,7 +27,7 @@ interface FileDownloader {
     /** Starts a download. Takes as parameters a [PendingFileDownload] containing all details about the file to be downloaded and
      * a [DownloadCallback]. */
     @WorkerThread
-    suspend fun download(pending: PendingFileDownload, callback: DownloadCallback)
+    fun download(pending: PendingFileDownload, callback: DownloadCallback)
 
     /** Data class for pending download.*/
     data class PendingFileDownload(

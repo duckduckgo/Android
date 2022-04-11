@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Preuzimanje nije uspjelo. Provjerite internetsku vezu.</string>
+
+    <string name="notificationChannelFileDownloading">Preuzimanje datoteke</string>
+    <string name="notificationChannelFileDownloaded">Datoteka preuzeta</string>
+
+    <string name="downloadComplete">Preuzimanje dovršeno</string>
+    <string name="downloadFailed">Preuzimanje nije uspjelo</string>
+    <string name="downloadInProgress">Preuzimanje</string>
 </resources>

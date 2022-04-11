@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.downloads.store
+package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.store.DownloadEntity
+import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-
-interface DownloadsRepository {
-    suspend fun insert(downloadItem: DownloadItem): Long
-    suspend fun insertAll(downloadItems: List<DownloadItem>)
-    suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long)
-    suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
-    suspend fun delete(id: Long)
-    suspend fun delete(downloadIdList: List<Long>)
-    suspend fun deleteAll()
-    suspend fun getDownloads(): List<DownloadItem>
-    suspend fun getDownloadItem(downloadId: Long): DownloadItem?
-    fun getDownloadsAsFlow(): Flow<List<DownloadItem>>
-}
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)

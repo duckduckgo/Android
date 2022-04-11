@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Download non riuscito. Controlla la connessione a Internet.</string>
+
+    <string name="notificationChannelFileDownloading">Download del file in corso</string>
+    <string name="notificationChannelFileDownloaded">Il file è stato scaricato</string>
+
+    <string name="downloadComplete">Download completato</string>
+    <string name="downloadFailed">Download non riuscito</string>
+    <string name="downloadInProgress">Download in corso</string>
 </resources>

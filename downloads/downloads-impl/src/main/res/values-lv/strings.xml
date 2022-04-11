@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Neizdevās lejupielādēt. Pārbaudi interneta savienojumu.</string>
+
+    <string name="notificationChannelFileDownloading">Failu lejupielāde</string>
+    <string name="notificationChannelFileDownloaded">Fails lejupielādēts</string>
+
+    <string name="downloadComplete">Lejupielāde pabeigta</string>
+    <string name="downloadFailed">Neizdevās lejupielādēt</string>
+    <string name="downloadInProgress">Lejupielāde</string>
 </resources>

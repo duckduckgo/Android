@@ -106,13 +106,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_COPY_URL("mlp_c"),
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
-    DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
-
-    DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
-    DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
-    DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),
-    DOWNLOAD_REQUEST_CANCELLED("m_download_request_cancelled"),
-
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),

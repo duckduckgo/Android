@@ -42,9 +42,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Download Image</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
-    <string name="downloadComplete">Download complete</string>
-    <string name="downloadFailed">Failed to download</string>
-    <string name="downloadInProgress">Downloading</string>
 
     <!-- Sharing options -->
     <string name="options">Options</string>
@@ -312,8 +309,6 @@
     <string name="noThanks">No Thanks</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">File downloading</string>
-    <string name="notificationChannelFileDownloaded">File downloaded</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->

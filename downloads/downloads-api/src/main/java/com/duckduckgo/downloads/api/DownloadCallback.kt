@@ -25,37 +25,38 @@ interface DownloadCallback {
     /**
      * Called when a download started. Takes a [downloadItem] as parameter with all data related to the file that is downloaded.
      */
-    suspend fun onStart(downloadItem: DownloadItem)
+    fun onStart(downloadItem: DownloadItem)
 
     /**
      * Called when a download done using the DownloadManager finishes with success. Takes as parameters the [downloadId] and [contentLength]
      * provided by the DownloadManager.
      */
-    suspend fun onSuccess(downloadId: Long, contentLength: Long)
+    fun onSuccess(downloadId: Long, contentLength: Long)
 
     /**
      * Called when a download done without using the DownloadManager finishes with success. Takes as parameters the [file]
      * downloaded and the [mimeType] associated with the download.
      */
-    suspend fun onSuccess(file: File, mimeType: String?)
+    fun onSuccess(file: File, mimeType: String?)
 
     /**
-     * Called on rare unknown occasions when the DownloadManager completes a download without a failed or success state.
-     * Takes as parameter the [downloadId] provided by the DownloadManager when the download is enqueued.
+     * Called on when the DownloadManager completes a download with a failed state.
+     * Takes as mandatory parameters the [downloadId] provided by the DownloadManager when the download is enqueued and the [reason] describing
+     * why the download has failed.
      */
-    suspend fun onError(downloadId: Long)
+    fun onError(downloadId: Long, reason: DownloadFailReason)
 
     /**
      * Called when the download fails. Takes as optional parameter the [url] which started the download. Takes as mandatory parameter
      * the [reason] describing why the download has failed.
      */
-    suspend fun onFailure(url: String? = null, reason: DownloadFailReason)
+    fun onError(url: String? = null, reason: DownloadFailReason)
 
     /**
-     * Called when the download either fails or is cancelled. The DownloadManager doesn't differentiate between these states. Takes as
-     * mandatory parameters the [downloadId] provided by the DownloadManager and the [reason] describing why the download has failed.
+     * Called when the download is cancelled from the app or from the notification. Takes as mandatory parameter the [downloadId] provided by
+     * the DownloadManager.
      */
-    suspend fun onFailOrCancel(downloadId: Long, reason: DownloadFailReason)
+    fun onCancel(downloadId: Long)
 
     /**
      * Data stream that sequentially emits commands of type [DownloadCommand].

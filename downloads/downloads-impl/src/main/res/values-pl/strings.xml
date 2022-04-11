@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Nie udało się pobrać. Sprawdź połączenie internetowe.</string>
+
+    <string name="notificationChannelFileDownloading">Pobieranie pliku</string>
+    <string name="notificationChannelFileDownloaded">Plik został pobrany</string>
+
+    <string name="downloadComplete">Pobieranie zakończone</string>
+    <string name="downloadFailed">Pobieranie nie powiodło się</string>
+    <string name="downloadInProgress">Pobieranie w toku</string>
 </resources>

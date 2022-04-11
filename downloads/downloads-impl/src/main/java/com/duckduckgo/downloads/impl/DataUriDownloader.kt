@@ -23,9 +23,9 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.api.model.DownloadStatus.STARTED
 import com.duckduckgo.downloads.impl.DataUriParser.GeneratedFilename
 import com.duckduckgo.downloads.impl.DataUriParser.ParseResult
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -45,7 +45,7 @@ class DataUriDownloader @Inject constructor(
             when (val parsedDataUri = dataUriParser.generate(pending.url)) {
                 is ParseResult.Invalid -> {
                     Timber.w("Failed to extract data from data URI")
-                    callback.onFailure(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+                    callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
                     return
                 }
                 is ParseResult.ParsedDataUri -> {
@@ -72,13 +72,13 @@ class DataUriDownloader @Inject constructor(
                         }
                         .onFailure {
                             Timber.e(it, "Failed to decode Base64")
-                            callback.onFailure(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+                            callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
                         }
                 }
             }
         } catch (e: IOException) {
             Timber.e(e, "Failed to save data uri")
-            callback.onFailure(url = pending.url, reason = DownloadFailReason.DataUriParseException)
+            callback.onError(url = pending.url, reason = DownloadFailReason.DataUriParseException)
         }
     }
 

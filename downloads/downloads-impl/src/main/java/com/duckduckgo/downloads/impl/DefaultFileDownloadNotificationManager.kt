@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.downloader
+package com.duckduckgo.downloads.impl
 
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
-import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.notification.NotificationRegistrar.ChannelType
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-
-interface FileDownloadNotificationManager {
-    fun showDownloadInProgressNotification()
-    fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?)
-    fun showDownloadFailedNotification()
-}
 
 @AnyThread
 @ContributesBinding(AppScope::class)
@@ -49,7 +41,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     override fun showDownloadInProgressNotification() {
         mainThreadHandler().post {
-            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADING.id)
+            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
                 .setSmallIcon(R.drawable.ic_file_download_white_24dp)
                 .build()
@@ -66,7 +58,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
             val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
+            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(filename)
                 .setContentText(applicationContext.getString(R.string.downloadComplete))
                 .setContentIntent(PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags))
@@ -80,7 +72,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     override fun showDownloadFailedNotification() {
         mainThreadHandler().post {
-            val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
+            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadFailed))
                 .setSmallIcon(R.drawable.ic_file_download_white_24dp)
                 .build()

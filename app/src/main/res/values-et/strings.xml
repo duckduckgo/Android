@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Laadige pilt alla</string>
     <string name="permissionRequiredToDownload">Allalaadimiseks on vaja salvestusluba</string>
-    <string name="downloadComplete">Allalaadimine lõpetatud</string>
-    <string name="downloadFailed">Allalaadimine ebaõnnestus</string>
-    <string name="downloadInProgress">Allalaadimine</string>
 
     <!-- Sharing options -->
     <string name="options">Valikud</string>
@@ -327,8 +324,6 @@
     <string name="noThanks">Ei aitäh</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Failide allalaadimine</string>
-    <string name="notificationChannelFileDownloaded">Fail on alla laaditud</string>
     <string name="notificationChannelTutorials">Õpetused</string>
 
     <!-- Clear Notification -->

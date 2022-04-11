@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Stiahnuť obrázok</string>
     <string name="permissionRequiredToDownload">Stiahnutie vyžaduje povolenie ukladacieho priestoru</string>
-    <string name="downloadComplete">Sťahovanie je dokončené</string>
-    <string name="downloadFailed">Sťahovanie zlyhalo</string>
-    <string name="downloadInProgress">Prebieha sťahovanie</string>
 
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
@@ -335,8 +332,6 @@
     <string name="noThanks">Nie, ďakujem</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Sťahovanie súboru</string>
-    <string name="notificationChannelFileDownloaded">Súbor je stiahnutý</string>
     <string name="notificationChannelTutorials">Návody</string>
 
     <!-- Clear Notification -->

@@ -59,9 +59,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
     <string name="permissionRequiredToDownload">Stahování vyžaduje povolení k ukládání.</string>
-    <string name="downloadComplete">Stahování dokončeno</string>
-    <string name="downloadFailed">Stahování se nezdařilo.</string>
-    <string name="downloadInProgress">Stahování</string>
 
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
@@ -335,8 +332,6 @@
     <string name="noThanks">Ne, děkuji</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Stahování souboru</string>
-    <string name="notificationChannelFileDownloaded">Soubor stažen</string>
     <string name="notificationChannelTutorials">Školící semináře</string>
 
     <!-- Clear Notification -->

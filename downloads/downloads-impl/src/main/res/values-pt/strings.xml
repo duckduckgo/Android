@@ -16,4 +16,11 @@
 
 <resources>
     <string name="downloadsErrorMessage">Ocorreu uma falha na transferência. Verifique a ligação à Internet.</string>
+
+    <string name="notificationChannelFileDownloading">A transferir ficheiro</string>
+    <string name="notificationChannelFileDownloaded">Ficheiro transferido</string>
+
+    <string name="downloadComplete">Transferência concluída</string>
+    <string name="downloadFailed">Falha na transferência</string>
+    <string name="downloadInProgress">A transferir</string>
 </resources>

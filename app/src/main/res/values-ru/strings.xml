@@ -43,9 +43,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Загрузить изображение</string>
     <string name="permissionRequiredToDownload">Для загрузки требуется разрешение на сохранение</string>
-    <string name="downloadComplete">Загрузка завершена</string>
-    <string name="downloadFailed">Не удалось выполнить загрузку</string>
-    <string name="downloadInProgress">Загрузка</string>
 
     <!-- Sharing options -->
     <string name="options">Параметры</string>
@@ -319,8 +316,6 @@
     <string name="noThanks">Нет, спасибо</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Загрузка файла</string>
-    <string name="notificationChannelFileDownloaded">Файл загружен</string>
     <string name="notificationChannelTutorials">Руководства</string>
 
     <!-- Clear Notification -->

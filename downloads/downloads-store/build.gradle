@@ -23,7 +23,6 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(path: ':downloads-api')
     implementation project(path: ':common')
 
     implementation Kotlin.stdlib.jdk7
