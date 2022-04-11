@@ -16,9 +16,14 @@
 
 <resources>
 
+    <!--Common attributes-->
+    <attr name="settingsOptionColor" format="color"/>
+
     <!--Settings Option view-->
     <declare-styleable name="SettingsOption">
-        <attr name="settingsOptionTitle" format="string" />
+        <attr name="android:text" format="string" />
+        <attr name="android:background"/>
+        <attr name="settingsOptionColor"/>
     </declare-styleable>
 
 </resources>

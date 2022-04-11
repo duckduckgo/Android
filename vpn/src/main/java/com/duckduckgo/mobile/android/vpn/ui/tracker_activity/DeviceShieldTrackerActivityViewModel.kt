@@ -73,7 +73,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
-            enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
+            enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
     }
 
@@ -129,6 +129,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
+                ViewEvent.RemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
             }
         }
     }
@@ -160,6 +161,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : ViewEvent()
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
+        object RemoveFeature : ViewEvent()
     }
 
     sealed class Command {
@@ -173,9 +175,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
-        object ShowDisableConfirmationDialog : Command()
+        object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
+        object ShowRemoveFeatureConfirmationDialog : Command()
     }
 }
 

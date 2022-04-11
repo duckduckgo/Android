@@ -66,7 +66,8 @@ class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
-    AppTPVpnConflictDialog.Listener {
+    AppTPVpnConflictDialog.Listener,
+    AppTPRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -126,11 +127,6 @@ class DeviceShieldTrackerActivity :
         ctaTrackerFaq = binding.ctaTrackerFaq
         deviceShieldEnabledLabel = binding.deviceShieldTrackerLabelEnabled
         deviceShieldDisabledLabel = binding.deviceShieldTrackerLabelDisabled
-        ctaShowAll = binding.ctaShowAll
-
-        binding.ctaExcludedApps.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
-        }
 
         binding.ctaTrackerFaq.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
@@ -144,8 +140,16 @@ class DeviceShieldTrackerActivity :
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
         }
 
-        ctaShowAll.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
+        binding.ctaManageProtection.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
+
+        binding.ctaRemoveFeature.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.RemoveFeature)
+        }
+
+        binding.ctaShowAll.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.RemoveFeature)
         }
     }
 
@@ -224,10 +228,11 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection -> launchManageAppsProtection()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
-            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
+            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
         }
     }
 
@@ -247,6 +252,15 @@ class DeviceShieldTrackerActivity :
         dialog.show(
             supportFragmentManager,
             AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+        )
+    }
+
+    private fun launchRemoveFeatureConfirmationDialog() {
+        deviceShieldPixels.didShowRemoveTrackingProtectionFeatureDialog()
+        val dialog = AppTPRemoveFeatureConfirmationDialog.instance(this)
+        dialog.show(
+            supportFragmentManager,
+            AppTPRemoveFeatureConfirmationDialog.TAG_APPTP_REMOVE_FEATURE_DIALOG
         )
     }
 
@@ -290,6 +304,14 @@ class DeviceShieldTrackerActivity :
     override fun onContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflicDialog()
         checkVPNPermission()
+    }
+
+    override fun onCancel() {
+        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+    }
+
+    override fun onRemoveFeature() {
+        deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
     }
 
     private fun launchBetaInstructions() {

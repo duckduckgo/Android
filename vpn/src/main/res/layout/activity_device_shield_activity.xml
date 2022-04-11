@@ -58,9 +58,11 @@
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/past_week_activity"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="0dp"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"
+                android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityPastWeek" />
 
             <LinearLayout
@@ -105,7 +107,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/atp_ActivityRecentActivity"
-                android:textSize="14sp" />
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"/>
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/activity_list"
@@ -113,16 +117,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/cta_show_all"
-                style="@style/Widget.DuckDuckGo.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:visibility="gone"
-                android:text="@string/atp_ActivityCtaShowAll" />
+                android:text="@string/atp_ActivityCtaShowAll"/>
 
             <View
                 android:layout_width="match_parent"
@@ -130,53 +130,51 @@
                 android:background="?splitterColor" />
 
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="0dp"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"
+                android:paddingStart="@dimen/keyline_4"
                 android:text="@string/atp_ActivityAbout" />
 
-            <Sett
-
-            <Button
-                android:id="@+id/cta_excluded_apps"
-                style="@style/Widget.DuckDuckGo.Button.Secondary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/atp_ActivityManageProtection" />
-
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/cta_what_are_app_trackers"
-                style="@style/Widget.DuckDuckGo.Button.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/atp_ActivityAppTrackersFAQ" />
+                android:text="@string/atp_ActivityAppTrackersFAQ"/>
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/cta_tracker_faq"
-                style="@style/Widget.DuckDuckGo.Button.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:text="@string/atp_FAQCta" />
+                android:text="@string/atp_FAQCta"/>
 
-            <Button
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/cta_beta_instructions"
-                style="@style/Widget.DuckDuckGo.Button.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="24dp"
-                android:text="@string/atp_ActivityBetaInstructions" />
+                android:text="@string/atp_ActivityBetaInstructions"/>
+
+            <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_2"
+                android:paddingStart="@dimen/keyline_4"
+                android:text="@string/atp_ActivityPrivacy" />
+
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+                android:id="@+id/cta_manage_protection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/atp_ActivityManageProtection"/>
+
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
+                android:id="@+id/cta_remove_feature"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:settingsOptionColor="@color/red50"
+                android:text="@string/atp_ActivityRemoveFeature"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

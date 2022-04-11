@@ -41,7 +41,21 @@ class SettingsOption : LinearLayout {
         defStyle: Int
     ) : super(context, attrs, defStyle) {
         val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsOption)
-        setTitle(attributes.getString(R.styleable.SettingsOption_settingsOptionTitle) ?: "")
+        binding.root.setBackgroundResource(
+            attributes.getResourceId(
+                R.styleable.SearchBarView_android_background,
+                context.defaultSelectableItemBackground()
+            )
+        )
+
+        binding.title.setTextColor(
+            attributes.getColor(
+                R.styleable.SettingsOption_settingsOptionColor,
+                context.getColorFromAttr(R.attr.normalTextColor)
+            )
+        )
+
+        setTitle(attributes.getString(R.styleable.SettingsOption_android_text) ?: "")
         attributes.recycle()
     }
 

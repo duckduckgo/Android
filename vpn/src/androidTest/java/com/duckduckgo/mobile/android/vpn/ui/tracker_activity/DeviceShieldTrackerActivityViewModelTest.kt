@@ -212,7 +212,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         whenever(vpnDetector.isVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
