@@ -18,12 +18,15 @@ package com.duckduckgo.app.feedback.ui.negative.brokensite
 
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeBrokenSiteFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.common.LayoutScrollingTouchListener
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
+@InjectWith(FragmentScope::class)
 class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_broken_site_feedback) {
 
     interface BrokenSiteFeedbackListener {
