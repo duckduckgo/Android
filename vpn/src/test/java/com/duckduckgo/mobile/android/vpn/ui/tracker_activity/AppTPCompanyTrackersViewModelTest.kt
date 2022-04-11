@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -25,13 +24,17 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.Command.RestartVpn
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.*
 import kotlin.time.ExperimentalTime
 
@@ -43,15 +46,18 @@ class AppTPCompanyTrackersViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val repository = mock<AppTrackerBlockingStatsRepository>()
+    private val statsRepository = mock<AppTrackerBlockingStatsRepository>()
+    private val appsRepository = mock<TrackingProtectionAppsRepository>()
+    private val timeDiffFormatter = mock<TimeDiffFormatter>()
 
     private lateinit var viewModel: AppTPCompanyTrackersViewModel
 
     @Before
     fun setup() {
         viewModel = AppTPCompanyTrackersViewModel(
-            repository,
-            TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
+            statsRepository,
+            appsRepository,
+            timeDiffFormatter,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -64,9 +70,32 @@ class AppTPCompanyTrackersViewModelTest {
 
         val someTrackers = someTrackers()
 
-        whenever(repository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
-        viewModel.getTrackersForAppFromDate(date, packageName).test {
+        whenever(statsRepository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
+        viewModel.viewState().test {
             Assert.assertEquals(someTrackers, awaitItem())
+        }
+
+        viewModel.loadData(date, packageName)
+    }
+
+    @Test
+    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
+        val packageName = "com.package.name"
+        viewModel.onAppPermissionToggled(false, packageName)
+
+        viewModel.commands().test {
+            viewModel.onLeavingScreen()
+            Assert.assertEquals(Command.RestartVpn, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
+        viewModel.commands().test {
+            viewModel.onLeavingScreen()
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
         }
     }
 

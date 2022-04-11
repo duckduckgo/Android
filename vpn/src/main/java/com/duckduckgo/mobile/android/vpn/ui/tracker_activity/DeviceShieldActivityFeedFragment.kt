@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -68,7 +69,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
         lifecycleScope.launch {
             activityFeedViewModel.getMostRecentTrackers(
-                DeviceShieldActivityFeedViewModel.TimeWindow(
+                TimeWindow(
                     config.timeWindow.toLong(),
                     config.timeWindowUnits
                 ),

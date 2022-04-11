@@ -17,44 +17,69 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 
+@ContributesViewModel(ActivityScope::class)
 class AppTPCompanyTrackersViewModel
 @Inject
 constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
+    private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
-
-    private val tickerChannel = MutableStateFlow(System.currentTimeMillis())
 
     private val trackerCompanies = mutableMapOf<String, List<TrackingSignal>>()
 
-    suspend fun getTrackersForAppFromDate(date: String, packageName: String): Flow<ViewState> =
-        withContext(dispatchers.io()) {
-            return@withContext statsRepository
-                .getTrackersForAppFromDate(date, packageName)
-                .combine(tickerChannel.asStateFlow()) { trackers, _ -> trackers }
-                .map { aggregateDataPerApp(it) }
-                .flowOn(Dispatchers.Default)
-        }
+    private val command = Channel<Command>(1, DROP_OLDEST)
+    internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private fun aggregateDataPerApp(trackerData: List<VpnTrackerCompanySignal>): ViewState {
+    private var manualChanges: Boolean = false
+
+    private val viewStateFlow = MutableStateFlow(ViewState())
+    fun viewState(): StateFlow<ViewState> {
+        return viewStateFlow
+    }
+
+    suspend fun loadData(
+        date: String,
+        packageName: String
+    ) {
+        withContext(dispatchers.io()) {
+            statsRepository
+                .getTrackersForAppFromDate(date, packageName)
+                .map { aggregateDataPerApp(it, packageName) }
+                .flowOn(Dispatchers.Default)
+                .collectLatest { state ->
+                    viewStateFlow.emit(state)
+                }
+        }
+    }
+
+    private fun aggregateDataPerApp(
+        trackerData: List<VpnTrackerCompanySignal>,
+        packageName: String
+    ): ViewState {
         val sourceData = mutableListOf<CompanyTrackingDetails>()
 
         val lastTrackerBlockedAgo =
@@ -97,7 +122,12 @@ constructor(
             )
         }
 
-        return ViewState(trackerData.size, lastTrackerBlockedAgo, sourceData)
+        return viewStateFlow.value.copy(
+            totalTrackingAttempts = trackerData.size,
+            lastTrackerBlockedAgo = lastTrackerBlockedAgo,
+            trackingCompanies = sourceData,
+            protectionEnabled = excludedAppsRepository.isAppProtectionEnabled(packageName)
+        )
     }
 
     private fun mapTrackingSignals(signals: List<String>): List<TrackingSignal> {
@@ -106,11 +136,52 @@ constructor(
         return randomElements.distinctBy { it.signalDisplayName }
     }
 
+    fun onAppPermissionToggled(
+        checked: Boolean,
+        packageName: String
+    ) {
+        viewModelScope.launch {
+            withContext(dispatchers.io()) {
+                if (checked) {
+                    excludedAppsRepository.manuallyEnabledApp(packageName)
+                } else {
+                    excludedAppsRepository.manuallyExcludedApp(packageName)
+                }
+            }
+            viewStateFlow.emit(viewStateFlow.value.copy(userChangedState = true, manualProtectionState = checked))
+        }
+    }
+
+    fun onLeavingScreen() {
+        viewModelScope.launch {
+            if (userMadeChanges()) {
+                command.send(Command.RestartVpn)
+            }
+        }
+    }
+
+    fun userMadeChanges(): Boolean {
+        val currentState = viewStateFlow.value
+        if (currentState.userChangedState) {
+            return currentState.manualProtectionState != currentState.protectionEnabled
+        } else {
+            return false
+        }
+    }
+
     data class ViewState(
-        val totalTrackingAttempts: Int,
-        val lastTrackerBlockedAgo: String,
-        val trackingCompanies: List<CompanyTrackingDetails>
+        val totalTrackingAttempts: Int = 0,
+        val lastTrackerBlockedAgo: String = "",
+        val trackingCompanies: List<CompanyTrackingDetails> = emptyList(),
+        val protectionEnabled: Boolean = false,
+        val userChangedState: Boolean = false,
+        val manualProtectionState: Boolean = false
     )
+
+    internal sealed class Command {
+        object RestartVpn : Command()
+    }
+
     data class CompanyTrackingDetails(
         val companyName: String,
         val companyDisplayName: String,
@@ -119,20 +190,4 @@ constructor(
         val trackingSignals: List<TrackingSignal>,
         val expanded: Boolean = false
     )
-}
-
-@ContributesMultibinding(ActivityScope::class)
-class AppTPCompanyTrackersViewModelFactory
-@Inject
-constructor(private val viewModel: Provider<AppTPCompanyTrackersViewModel>) :
-    ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) ->
-                    (viewModel.get() as T)
-                else -> null
-            }
-        }
-    }
 }

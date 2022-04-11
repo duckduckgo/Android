@@ -39,12 +39,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                android:id="@+id/app_disabled_info_panel"
+                style="@style/Widget.DuckDuckGo.InfoPanel"
+                app:panelBackground="@drawable/info_panel_alert_background"
+                app:panelDrawable="@drawable/ic_alert_color_24"
+                app:panelText="@string/atp_CompanyDetailsAppInfoPanel"
+                android:visibility="gone"
+                android:layout_margin="16dp"/>
+
             <com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView
                 android:id="@+id/tracking_attempts"
                 android:paddingStart="@dimen/keyline_4"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:paddingTop="@dimen/keyline_5"
+                android:paddingTop="@dimen/keyline_4"
                 android:paddingBottom="@dimen/keyline_2"
                 tools:text="9 tracking attempts blocked"/>
 

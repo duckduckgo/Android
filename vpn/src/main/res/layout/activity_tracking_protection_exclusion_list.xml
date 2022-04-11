@@ -41,20 +41,6 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-            <TextView
-                    android:id="@+id/excludedAppsFeature"
-                    style="@style/TextAppearance.DuckDuckGo.Body2"
-                    android:paddingTop="@dimen/keyline_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/keyline_4"
-                    android:layout_marginEnd="@dimen/keyline_4"
-                    android:text="@string/atp_ExcludedAppsFeature"
-                    android:textColor="?attr/settingsMinorTextColor"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/include_toolbar"/>
-
             <com.duckduckgo.mobile.android.ui.view.InfoPanel
                     android:id="@+id/excludedAppsEnabledVPNLabel"
                     style="@style/Widget.DuckDuckGo.InfoPanel"
@@ -69,13 +55,6 @@
                     app:panelBackground="@drawable/info_panel_alert_background"
                     app:panelDrawable="@drawable/ic_alert_color_24"
                     android:layout_margin="16dp"/>
-
-            <View
-                    android:id="@+id/excludedAppsSplitter"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?splitterColor"
-                    app:layout_constraintTop_toBottomOf="@+id/excludedAppsLabel"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                     android:id="@+id/deviceShieldExclusionAppListSkeleton"
