@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
@@ -36,7 +36,7 @@ import javax.inject.Inject
 class DeviceShieldActivityFeedFragment : Fragment() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var trackerFeedAdapter: TrackerFeedAdapter

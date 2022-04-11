@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,16 @@ package com.duckduckgo.app.global
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPluginPoint
-import com.duckduckgo.di.scopes.AppScope
-import javax.inject.Inject
+import com.duckduckgo.app.global.plugins.view_model.VpnViewModelFactoryPluginPoint
+import com.duckduckgo.di.scopes.VpnScope
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-class ViewModelFactory @Inject constructor(
-    private val viewModelFactoryPluginPoint: ViewModelFactoryPluginPoint
+@SingleInstanceIn(VpnScope::class)
+@ContributesBinding(VpnScope::class)
+class VpnViewModelFactory @Inject constructor(
+    private val viewModelFactoryPluginPoint: VpnViewModelFactoryPluginPoint
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

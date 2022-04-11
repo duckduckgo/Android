@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 abstract class DuckDuckGoActivity : DaggerActivity() {
 
-    @Inject lateinit var viewModelFactory: ViewModelFactory
+    @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     @Inject lateinit var themingDataStore: ThemingDataStore
 

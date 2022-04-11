@@ -19,9 +19,14 @@ package com.duckduckgo.mobile.android.vpn.apps
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+<<<<<<< HEAD:vpn/src/main/java/com/duckduckgo/mobile/android/vpn/apps/ManageAppsProtectionViewModel.kt
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.di.scopes.AppScope
+=======
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
+>>>>>>> develop:vpn/src/main/java/com/duckduckgo/mobile/android/vpn/apps/ExcludedAppsViewModel.kt
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -45,8 +50,13 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlin.coroutines.coroutineContext
 
+<<<<<<< HEAD:vpn/src/main/java/com/duckduckgo/mobile/android/vpn/apps/ManageAppsProtectionViewModel.kt
 @ContributesViewModel(AppScope::class)
 class ManageAppsProtectionViewModel @Inject constructor(
+=======
+@ContributesViewModel(ActivityScope::class)
+class ExcludedAppsViewModel @Inject constructor(
+>>>>>>> develop:vpn/src/main/java/com/duckduckgo/mobile/android/vpn/apps/ExcludedAppsViewModel.kt
     private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,

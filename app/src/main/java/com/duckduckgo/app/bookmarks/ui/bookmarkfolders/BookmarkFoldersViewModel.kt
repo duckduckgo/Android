@@ -28,11 +28,11 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersViewModel.Command.SelectFolder
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(
     val bookmarksRepository: BookmarksRepository,
     private val dispatcherProvider: DispatcherProvider
@@ -65,7 +65,11 @@ class BookmarkFoldersViewModel @Inject constructor(
         }
     }
 
-    fun newFolderAdded(rootFolderName: String, selectedFolderId: Long, currentFolder: BookmarkFolder?) {
+    fun newFolderAdded(
+        rootFolderName: String,
+        selectedFolderId: Long,
+        currentFolder: BookmarkFolder?
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = bookmarksRepository.getFlatFolderStructure(
                 selectedFolderId,

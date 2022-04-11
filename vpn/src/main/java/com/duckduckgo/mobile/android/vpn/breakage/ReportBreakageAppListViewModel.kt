@@ -19,7 +19,7 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class ReportBreakageAppListViewModel @Inject constructor(
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository
 ) : ViewModel() {

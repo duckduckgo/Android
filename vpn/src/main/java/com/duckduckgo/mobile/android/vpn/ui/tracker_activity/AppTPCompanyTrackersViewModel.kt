@@ -22,11 +22,14 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+<<<<<<< HEAD
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+=======
+import com.duckduckgo.di.scopes.ActivityScope
+>>>>>>> develop
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -191,3 +194,22 @@ constructor(
         val expanded: Boolean = false
     )
 }
+<<<<<<< HEAD
+=======
+
+@ContributesMultibinding(ActivityScope::class)
+class AppTPCompanyTrackersViewModelFactory
+@Inject
+constructor(private val viewModel: Provider<AppTPCompanyTrackersViewModel>) :
+    ViewModelFactoryPlugin {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
+        with(modelClass) {
+            return when {
+                isAssignableFrom(AppTPCompanyTrackersViewModel::class.java) ->
+                    (viewModel.get() as T)
+                else -> null
+            }
+        }
+    }
+}
+>>>>>>> develop

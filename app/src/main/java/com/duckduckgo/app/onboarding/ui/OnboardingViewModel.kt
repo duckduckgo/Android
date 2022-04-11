@@ -23,11 +23,11 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class OnboardingViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val pageLayoutManager: OnboardingPageManager,
