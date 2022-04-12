@@ -35,7 +35,11 @@ interface DownloadsRepository {
     fun getDownloadsAsFlow(): Flow<List<DownloadItem>>
 }
 
-class DefaultDownloadsRepository(private val downloadsDao: DownloadsDao) : DownloadsRepository {
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class DefaultDownloadsRepository@Inject constructor(
+    private val downloadsDao: DownloadsDao
+) : DownloadsRepository {
 
     override suspend fun insert(downloadItem: DownloadItem): Long {
         return downloadsDao.insert(downloadItem.mapToDownloadEntity())

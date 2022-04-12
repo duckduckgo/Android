@@ -194,13 +194,13 @@ class DownloadsActivity : DuckDuckGoActivity() {
     }
 
     private fun showSearchBar() {
-        toolbar.visibility = View.GONE
+        toolbar.gone()
         searchBar.handle(SearchBar.Event.ShowSearchBar)
         searchBar.showKeyboard()
     }
 
     private fun hideSearchBar() {
-        toolbar.visibility = View.VISIBLE
+        toolbar.show()
         searchBar.handle(SearchBar.Event.DismissSearchBar)
         searchBar.hideKeyboard()
     }
