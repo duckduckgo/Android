@@ -178,8 +178,8 @@ import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider

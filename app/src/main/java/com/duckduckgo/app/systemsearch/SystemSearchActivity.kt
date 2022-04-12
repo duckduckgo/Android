@@ -55,9 +55,9 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailability
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchLauncher.Source.WIDGET
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 

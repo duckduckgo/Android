@@ -118,8 +118,6 @@ import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailability
-import com.duckduckgo.mobile.android.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -129,6 +127,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import org.mockito.kotlin.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce

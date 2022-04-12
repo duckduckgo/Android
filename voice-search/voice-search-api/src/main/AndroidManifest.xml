@@ -16,6 +16,6 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.mobile.android.voice.api">
+    package="com.duckduckgo.voice.api">
 
 </manifest>

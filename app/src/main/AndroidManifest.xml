@@ -385,7 +385,7 @@
             android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
 
         <activity
-            android:name="com.duckduckgo.mobile.android.voice.impl.listeningmode.VoiceSearchActivity"
+            android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
             android:label="@string/voiceSearchTitle"
             android:parentActivityName=".BrowserActivity" />
 
