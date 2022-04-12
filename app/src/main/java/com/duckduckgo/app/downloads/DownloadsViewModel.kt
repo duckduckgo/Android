@@ -115,7 +115,7 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
-    fun onQueryTextChange(newText: String): Boolean {
+    fun onQueryTextChange(newText: String) {
         val filtered = LinkedHashMap<Header, List<Item>>()
         viewModelScope.launch(dispatcher.io()) {
 
@@ -149,7 +149,6 @@ class DownloadsViewModel @Inject constructor(
                 )
             )
         }
-        return true
     }
 
     override fun onItemClicked(item: DownloadItem) {
