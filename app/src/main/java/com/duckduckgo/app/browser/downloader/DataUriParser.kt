@@ -16,13 +16,14 @@
 
 package com.duckduckgo.app.browser.downloader
 
+import android.webkit.MimeTypeMap
 import com.duckduckgo.app.browser.downloader.DataUriParser.ParseResult.ParsedDataUri
+import okio.ByteString.Companion.decodeBase64
+import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.inject.Inject
 
-class DataUriParser @Inject constructor(
-    private val dataUriSuffixParser: DataUriSuffixParser
-) {
+class DataUriParser @Inject constructor() {
 
     fun generate(url: String): ParseResult {
         val result = MIME_TYPE_REGEX.find(url)
@@ -35,11 +36,40 @@ class DataUriParser @Inject constructor(
         val fileTypeSpecific = result.groupValues[REGEX_GROUP_FILE_TYPE_SPECIFIC]
         val data = result.groupValues[REGEX_GROUP_DATA]
 
-        val suffix = dataUriSuffixParser.parseSuffix(mimeType, url, data)
+        val suffix = parseSuffix(mimeType, url, data)
         val filename = UUID.randomUUID().toString()
         val generatedFilename = GeneratedFilename(name = filename, fileType = suffix)
 
         return ParsedDataUri(fileTypeGeneral, fileTypeSpecific, data, mimeType, generatedFilename)
+    }
+
+    private fun parseSuffix(mimeType: String, url: String, data: String): String {
+        // MimeTypeMap returns the wrong value for "jpeg" types on some OS versions.
+        if (mimeType == "image/jpeg") return "jpg"
+
+        if (mimeType == "text/plain" && url.contains("base64", ignoreCase = true)) {
+            val dataPart = data.take(if (data.length > MAX_LENGTH_FOR_MIME_TYPE_DETECTION) MAX_LENGTH_FOR_MIME_TYPE_DETECTION else data.length)
+            val suffix = determineSuffixFromUrlPart(dataPart)
+            if (suffix != null) {
+                return suffix
+            }
+        }
+
+        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+    }
+
+    private fun determineSuffixFromUrlPart(dataPart: String): String? {
+        val decodedDataPart = dataPart.decodeBase64()?.string(StandardCharsets.UTF_8) ?: ""
+        return when {
+            decodedDataPart.contains("PNG") -> "png"
+            decodedDataPart.contains("JFIF") -> "jpg"
+            decodedDataPart.startsWith("<svg", true) -> "svg"
+            decodedDataPart.startsWith("GIF") -> "gif"
+            decodedDataPart.startsWith("%PDF") -> "pdf"
+            decodedDataPart.startsWith("RIFF") && decodedDataPart.contains("WEBP") -> "webp"
+            decodedDataPart.startsWith("BM") -> "bmp"
+            else -> null
+        }
     }
 
     companion object {
@@ -49,6 +79,8 @@ class DataUriParser @Inject constructor(
         private const val REGEX_GROUP_FILE_TYPE_GENERAL = 3
         private const val REGEX_GROUP_FILE_TYPE_SPECIFIC = 4
         private const val REGEX_GROUP_DATA = 5
+
+        private const val MAX_LENGTH_FOR_MIME_TYPE_DETECTION = 20
     }
 
     sealed class ParseResult {
