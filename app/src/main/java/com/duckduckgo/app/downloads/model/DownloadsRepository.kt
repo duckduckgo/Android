@@ -18,9 +18,13 @@ package com.duckduckgo.app.downloads.model
 
 import com.duckduckgo.app.downloads.db.DownloadEntity
 import com.duckduckgo.app.downloads.db.DownloadsDao
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 interface DownloadsRepository {
     suspend fun insert(downloadItem: DownloadItem): Long
@@ -37,7 +41,7 @@ interface DownloadsRepository {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class DefaultDownloadsRepository@Inject constructor(
+class DefaultDownloadsRepository @Inject constructor(
     private val downloadsDao: DownloadsDao
 ) : DownloadsRepository {
 

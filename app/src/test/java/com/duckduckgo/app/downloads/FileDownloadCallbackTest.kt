@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.downloads
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
@@ -37,34 +37,30 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import java.io.File
 
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
+@Config(manifest = Config.NONE)
 class FileDownloadCallbackTest {
-
-    @get:Rule
-    @Suppress("unused")
-    var instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @get:Rule
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var mockDownloadsRepository: DownloadsRepository
+    private val mockDownloadsRepository: DownloadsRepository = mock()
 
-    @Mock
-    private lateinit var mockPixel: Pixel
+    private val mockPixel: Pixel = mock()
 
     private lateinit var callback: FileDownloadCallback
 
     @Before
     fun before() {
-        MockitoAnnotations.openMocks(this)
         callback = FileDownloadCallback(mockDownloadsRepository, mockPixel)
     }
 
@@ -140,7 +136,7 @@ class FileDownloadCallbackTest {
 
         callback.onCancel(downloadId = downloadId)
 
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_CANCELLED)
         verify(mockDownloadsRepository).delete(
             downloadIdList = listOf(downloadId)
         )
@@ -220,6 +216,6 @@ class FileDownloadCallbackTest {
             fileName = "file.jpg",
             contentLength = 100L,
             createdAt = "2022-02-21T10:56:22",
-            filePath = "/file.jpg"
+            filePath = File("file.jpg").absolutePath
         )
 }

@@ -16,11 +16,10 @@
 
 package com.duckduckgo.app.downloads
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
@@ -38,42 +37,40 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.junit.runner.RunWith
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.annotation.Config
 import org.threeten.bp.LocalDateTime
 
+@RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
+@Config(manifest = Config.NONE)
 class DownloadsViewModelTest {
 
-    @get:Rule var instantTaskExecutorRule = InstantTaskExecutorRule()
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
-    @get:Rule val schedulers = InstantSchedulersRule()
+    private val mockDownloadsRepository: DownloadsRepository = mock()
 
-    @ExperimentalCoroutinesApi @get:Rule var coroutineRule = CoroutineTestRule()
-
-    @Mock private lateinit var mockDownloadsRepository: DownloadsRepository
+    private val context: Context = mock()
 
     private val testee: DownloadsViewModel by lazy {
         val model =
             DownloadsViewModel(
-                TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
+                TimeDiffFormatter(context),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider
             )
         model
     }
 
-    @Before
-    fun before() {
-        MockitoAnnotations.openMocks(this)
-    }
-
-    @Test fun whenDownloadsCalledAndNoDownloadsThenViewStateEmittedWithEmptyViewItem() = runTest {
+    @Test
+    fun whenDownloadsCalledAndNoDownloadsThenViewStateEmittedWithEmptyViewItem() = runTest {
         val list = emptyList<DownloadItem>()
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
 
@@ -86,7 +83,8 @@ class DownloadsViewModelTest {
         }
     }
 
-    @Test fun whenDownloadsCalledAndOneDownloadThenViewStateEmittedWithOneItem() = runTest {
+    @Test
+    fun whenDownloadsCalledAndOneDownloadThenViewStateEmittedWithOneItem() = runTest {
         val list = listOf(oneItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
 
@@ -101,7 +99,8 @@ class DownloadsViewModelTest {
         }
     }
 
-    @Test fun whenDownloadsCalledAndMultipleDownloadsThenViewStateEmittedWithMultipleItemsAndHeaders() = runTest {
+    @Test
+    fun whenDownloadsCalledAndMultipleDownloadsThenViewStateEmittedWithMultipleItemsAndHeaders() = runTest {
         val today = LocalDateTime.now()
         val yesterday = today.minusDays(1)
         val sometimeDuringPastWeek = today.minusDays(6)
@@ -119,6 +118,10 @@ class DownloadsViewModelTest {
         )
 
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
+        whenever(context.getString(R.string.common_Today)).thenReturn("Today")
+        whenever(context.getString(R.string.common_Yesterday)).thenReturn("Yesterday")
+        whenever(context.getString(R.string.common_PastWeek)).thenReturn("Past Week")
+        whenever(context.getString(R.string.common_PastMonth)).thenReturn("Past Month")
 
         testee.downloads()
 
@@ -158,7 +161,8 @@ class DownloadsViewModelTest {
         }
     }
 
-    @Test fun whenDeleteAllCalledThenRepositoryDeleteAllCalledAndMessageCommandSent() = runTest {
+    @Test
+    fun whenDeleteAllCalledThenRepositoryDeleteAllCalledAndMessageCommandSent() = runTest {
         val itemsToDelete = listOf(oneItem())
         whenever(mockDownloadsRepository.getDownloads()).thenReturn(itemsToDelete)
 
@@ -198,7 +202,8 @@ class DownloadsViewModelTest {
         verify(mockDownloadsRepository).insertAll(listOf(firstItem, secondItem))
     }
 
-    @Test fun whenOnQueryTextChangeThenViewStateEmittedWithTwoFilteredItems() = runTest {
+    @Test
+    fun whenOnQueryTextChangeThenViewStateEmittedWithTwoFilteredItems() = runTest {
         val list = listOf(oneItem(), otherItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
         testee.downloads()
@@ -215,7 +220,8 @@ class DownloadsViewModelTest {
         }
     }
 
-    @Test fun whenOnQueryTextChangeThenViewStateEmittedWithZeroFilteredItems() = runTest {
+    @Test
+    fun whenOnQueryTextChangeThenViewStateEmittedWithZeroFilteredItems() = runTest {
         val list = listOf(oneItem(), otherItem())
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(list))
         testee.downloads()

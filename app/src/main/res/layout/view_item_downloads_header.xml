@@ -14,13 +14,10 @@
   ~ limitations under the License.
   -->
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.duckduckgo.mobile.android.ui.view.SectionHeaderTextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/downloads_header_text_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:textAllCaps="true"
-    android:textColor="@color/cornflowerBlue"
-    android:textSize="14sp"
     tools:text="TODAY" />

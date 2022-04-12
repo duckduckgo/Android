@@ -23,5 +23,5 @@
     android:paddingTop="48dp"
     android:paddingEnd="24dp"
     android:textColor="?attr/secondaryTextColor"
-    android:textSize="16sp"
+    android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
     android:text="@string/downloadsActivityNoItemsDescription" />

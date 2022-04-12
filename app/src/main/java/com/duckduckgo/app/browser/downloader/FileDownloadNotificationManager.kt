@@ -21,7 +21,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
@@ -57,10 +56,7 @@ class FileDownloadNotificationManager @Inject constructor(
                 setDataAndType(uri, mimeType)
             }
 
-            val pendingIntentFlags = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                else -> PendingIntent.FLAG_UPDATE_CURRENT
-            }
+            val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(filename)
