@@ -21,8 +21,10 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.annotation.WorkerThread
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -36,6 +38,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(VpnScope::class)
 class VpnStateMonitorService : Service() {
 
     @Inject lateinit var vpnDatabase: VpnDatabase

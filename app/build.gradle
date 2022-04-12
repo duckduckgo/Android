@@ -159,7 +159,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn')
     implementation project(path: ':vpn-store')
     internalImplementation project(path: ':vpn-internal')
 

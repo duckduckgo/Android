@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.mobile.android.vpn.R
@@ -32,6 +33,7 @@ import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.app.global.formatters.time.model.dateOfPreviousMidnight
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.stats.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
@@ -45,6 +47,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 
+@InjectWith(ActivityScope::class)
 class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var lastAppTrackerDomainTextView: TextView

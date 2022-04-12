@@ -21,9 +21,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.downloader.FilenameExtractor
 import com.duckduckgo.app.browser.downloader.isDataUrl
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.leftDrawable
 import com.duckduckgo.mobile.android.ui.view.show
@@ -34,6 +36,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
 
     val listener: DownloadConfirmationDialogListener

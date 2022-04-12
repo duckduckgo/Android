@@ -29,6 +29,8 @@ import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.duckduckgo.app.global.FragmentViewModelFactory
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
@@ -43,6 +45,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class DeviceShieldFragment : Fragment() {
 
     @Inject
