@@ -277,4 +277,11 @@
         <item name="android:layout_marginBottom">@dimen/keyline_1</item>
     </style>
 
+    <!-- Dialogs -->
+    <style name="Widget.DuckDuckGo.Dialog"/>
+    <style name="Widget.DuckDuckGo.Dialog.Title">
+        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
 </resources>

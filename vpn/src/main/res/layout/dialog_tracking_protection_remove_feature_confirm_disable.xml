@@ -27,12 +27,11 @@
     android:padding="@dimen/keyline_4">
 
     <TextView
-        style="@style/TextAppearance.DuckDuckGo.Headline2"
+        style="@style/Widget.DuckDuckGo.Dialog.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:textAlignment="viewStart"
-        android:textColor="?normalTextColor"
         android:text="@string/atp_RemoveFeatureDialogTitle"/>
 
     <TextView
