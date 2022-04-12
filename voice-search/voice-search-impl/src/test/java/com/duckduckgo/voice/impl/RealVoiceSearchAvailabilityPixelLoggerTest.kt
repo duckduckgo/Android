@@ -17,6 +17,7 @@
 package com.duckduckgo.voice.impl
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -30,33 +31,33 @@ class RealVoiceSearchAvailabilityPixelLoggerTest {
     private lateinit var pixel: Pixel
 
     @Mock
-    private lateinit var voiceSearchChecksStore: VoiceSearchChecksStore
+    private lateinit var voiceSearchRepository: VoiceSearchRepository
 
     private lateinit var testee: RealVoiceSearchAvailabilityPixelLogger
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchChecksStore)
+        testee = RealVoiceSearchAvailabilityPixelLogger(pixel, voiceSearchRepository)
     }
 
     @Test
     fun whenHasNotLoggedAvailabilityThenLogPixel() {
-        whenever(voiceSearchChecksStore.hasLoggedAvailability()).thenReturn(false)
+        whenever(voiceSearchRepository.getHasLoggedAvailability()).thenReturn(false)
 
         testee.log()
 
         verify(pixel).fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE)
-        verify(voiceSearchChecksStore).saveLoggedAvailability()
+        verify(voiceSearchRepository).saveLoggedAvailability()
     }
 
     @Test
     fun whenHasLoggedAvailabilityThenDoNothing() {
-        whenever(voiceSearchChecksStore.hasLoggedAvailability()).thenReturn(true)
+        whenever(voiceSearchRepository.getHasLoggedAvailability()).thenReturn(true)
 
         testee.log()
 
         verify(pixel, never()).fire(VoiceSearchPixelNames.VOICE_SEARCH_AVAILABLE)
-        verify(voiceSearchChecksStore, never()).saveLoggedAvailability()
+        verify(voiceSearchRepository, never()).saveLoggedAvailability()
     }
 }

@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Action.LaunchPermissionRequest
 import com.duckduckgo.voice.impl.ActivityResultLauncherWrapper.Request
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -44,7 +45,7 @@ interface PermissionRequest {
 @ContributesBinding(ActivityScope::class)
 class MicrophonePermissionRequest @Inject constructor(
     private val pixel: Pixel,
-    private val voiceSearchChecksStore: VoiceSearchChecksStore,
+    private val voiceSearchRepository: VoiceSearchRepository,
     private val voiceSearchPermissionDialogsLauncher: VoiceSearchPermissionDialogsLauncher,
     private val activityResultLauncherWrapper: ActivityResultLauncherWrapper
 ) : PermissionRequest {
@@ -67,7 +68,7 @@ class MicrophonePermissionRequest @Inject constructor(
                     onPermissionsGranted()
                 } else {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.RECORD_AUDIO)) {
-                        voiceSearchChecksStore.declinePermissionForever(true)
+                        voiceSearchRepository.declinePermissionForever()
                     }
                 }
             }
@@ -75,13 +76,13 @@ class MicrophonePermissionRequest @Inject constructor(
     }
 
     override fun launch() {
-        if (voiceSearchChecksStore.hasPermissionDeclinedForever()) {
+        if (voiceSearchRepository.getHasPermissionDeclinedForever()) {
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
                 _activity,
                 { _activity.launchDuckDuckGoSettings() }
             )
         } else {
-            if (voiceSearchChecksStore.hasAcceptedRationaleDialog()) {
+            if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
                 activityResultLauncherWrapper.launch(LaunchPermissionRequest)
             } else {
                 voiceSearchPermissionDialogsLauncher.showPermissionRationale(
@@ -102,7 +103,7 @@ class MicrophonePermissionRequest @Inject constructor(
 
     private fun handleRationaleAccepted() {
         pixel.fire(VoiceSearchPixelNames.VOICE_SEARCH_PRIVACY_DIALOG_ACCEPTED)
-        voiceSearchChecksStore.acceptRationaleDialog(true)
+        voiceSearchRepository.acceptRationaleDialog()
         activityResultLauncherWrapper.launch(LaunchPermissionRequest)
     }
 
