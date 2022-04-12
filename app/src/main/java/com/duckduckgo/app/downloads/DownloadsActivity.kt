@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -38,7 +37,9 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.SearchBar
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -170,7 +171,12 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: DownloadsViewModel.ViewState) {
         downloadsAdapter.updateData(viewState.filteredItems)
-        searchMenuItem?.isVisible = viewState.filteredItems.size > 1
+        searchMenuItem?.isVisible = itemsAvailable(viewState)
+    }
+
+    private fun itemsAvailable(viewState: DownloadsViewModel.ViewState): Boolean {
+        // The empty view is part of the list.
+        return viewState.filteredItems.size > 1
     }
 
     private fun setupRecyclerView() {

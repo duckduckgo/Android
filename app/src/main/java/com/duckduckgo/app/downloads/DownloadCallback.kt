@@ -29,6 +29,9 @@ import com.duckduckgo.app.downloads.model.DownloadStatus
 import com.duckduckgo.app.downloads.model.DownloadsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +49,8 @@ interface DownloadCallback {
     fun commands(): Flow<FileDownloadCallback.DownloadCommand>
 }
 
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
     private val downloadsRepository: DownloadsRepository,
     private val pixel: Pixel
@@ -119,9 +124,9 @@ class FileDownloadCallback @Inject constructor(
 
     override suspend fun onCancel(downloadId: Long) {
         Timber.d("Download cancelled from the notification for file with downloadId $downloadId")
-        // This will be marked as successful as the download started and it was deliberately cancelled by the user.
-        // The DownloadManager also handles this as a SUCCESS, however it removes the record from its internal DB.
-        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        // Deliberately cancelled by the user. The DownloadManager handles this as a SUCCESS, however it removes the record from
+        // its internal DB.
+        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_CANCELLED)
         downloadsRepository.delete(listOf(downloadId))
     }
 
