@@ -19,6 +19,7 @@ package com.duckduckgo.app.downloads
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
@@ -31,9 +32,7 @@ import com.duckduckgo.app.downloads.model.DownloadItem
 import com.duckduckgo.app.downloads.model.DownloadsRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +43,8 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
 import java.io.File
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(ActivityScope::class)
 class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
@@ -201,19 +200,5 @@ class DownloadsViewModel @Inject constructor(
 
     private fun currentViewState(): ViewState {
         return viewState.value
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class DownloadsViewModelFactory
-@Inject
-constructor(private val viewModel: Provider<DownloadsViewModel>) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DownloadsViewModel::class.java) -> viewModel.get() as T
-                else -> null
-            }
-        }
     }
 }
