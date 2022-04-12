@@ -34,9 +34,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnDiagnosticsBinding
@@ -90,6 +92,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 
+@InjectWith(ActivityScope::class)
 class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var connectivityManager: ConnectivityManager

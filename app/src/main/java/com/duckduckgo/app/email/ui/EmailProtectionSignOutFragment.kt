@@ -26,14 +26,17 @@ import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.flowWithLifecycle
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignOutBinding
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@InjectWith(FragmentScope::class)
 class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
 
     private val viewModel by bindViewModel<EmailProtectionSignOutViewModel>()

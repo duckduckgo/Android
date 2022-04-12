@@ -29,7 +29,9 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldEnabledBinding
@@ -37,6 +39,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTracker
 import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
+@InjectWith(ActivityScope::class)
 class DeviceShieldEnabledActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityDeviceShieldEnabledBinding by viewBinding()
