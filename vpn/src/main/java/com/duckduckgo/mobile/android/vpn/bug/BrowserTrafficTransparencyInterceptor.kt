@@ -14,36 +14,33 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.vpn.internal.feature.transparency
+package com.duckduckgo.mobile.android.vpn.bug
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import timber.log.Timber
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
-
-    private val enable = AtomicBoolean(false)
-
-    fun setEnable(enable: Boolean) = this.enable.set(enable)
+class BrowserTrafficTransparencyInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
 
     override fun interceptTrackerRequest(
         hostname: String,
         packageId: String
     ): RequestTrackerType? {
         return when {
-            enable.get() -> {
-                Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
+            // we should never really block anything in our app, even if/when we pass its traffic through the VPN
+            VpnExclusionList.isDdgApp(packageId) -> {
+                Timber.v("Transparency mode for DDG app: Not Tracker returned for $packageId / $hostname")
                 RequestTrackerType.NotTracker(hostname)
             }
             else -> {
-                Timber.v("Transparency mode: Not intercepting for $packageId / $hostname")
+                Timber.v("Not intercepting for $packageId / $hostname")
                 null
             }
         }
