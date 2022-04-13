@@ -34,7 +34,7 @@ class DataUriDownloader @Inject constructor(
 ) {
 
     @WorkerThread
-    suspend fun download(
+    fun download(
         pending: FileDownloader.PendingFileDownload,
         callback: DownloadCallback
     ) {
