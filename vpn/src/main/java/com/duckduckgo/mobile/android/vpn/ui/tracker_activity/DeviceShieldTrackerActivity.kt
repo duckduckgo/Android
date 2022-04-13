@@ -302,7 +302,8 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onRemoveFeature() {
-        deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+        TrackerBlockingVpnService.stopService(this)
+        viewModel.removeFeature()
     }
 
     private fun launchBetaInstructions() {

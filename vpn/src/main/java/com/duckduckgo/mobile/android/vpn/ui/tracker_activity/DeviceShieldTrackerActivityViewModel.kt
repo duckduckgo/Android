@@ -25,8 +25,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -47,6 +49,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
+    private val vpnFeatureRemover: VpnFeatureRemover
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -132,6 +135,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.RemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
             }
         }
+    }
+
+    fun removeFeature() {
+        deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+        vpnFeatureRemover.manuallyRemoveFeature()
     }
 
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
