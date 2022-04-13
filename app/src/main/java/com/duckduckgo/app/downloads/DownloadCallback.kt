@@ -17,6 +17,7 @@
 package com.duckduckgo.app.downloads
 
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.ConnectionRefused
@@ -24,6 +25,7 @@ import com.duckduckgo.app.browser.downloader.DownloadFailReason.DataUriParseExce
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.DownloadManagerDisabled
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.Other
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.UnsupportedUrlType
+import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.downloads.model.DownloadItem
 import com.duckduckgo.app.downloads.model.DownloadStatus
 import com.duckduckgo.app.downloads.model.DownloadsRepository
@@ -52,6 +54,7 @@ interface DownloadCallback {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
+    private val fileDownloadNotificationManager: FileDownloadNotificationManager,
     private val downloadsRepository: DownloadsRepository,
     private val pixel: Pixel
 ) : DownloadCallback {
@@ -81,13 +84,15 @@ class FileDownloadCallback @Inject constructor(
     override suspend fun onStart(downloadItem: DownloadItem) {
         Timber.d("Download started for file ${downloadItem.fileName}")
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-        command.send(
-            DownloadCommand.ShowDownloadStartedMessage(
-                messageId = R.string.downloadsDownloadStartedMessage,
-                showNotification = downloadItem.downloadId == 0L,
-                fileName = downloadItem.fileName
-            )
+        val downloadStartedMessage = DownloadCommand.ShowDownloadStartedMessage(
+            messageId = R.string.downloadsDownloadStartedMessage,
+            showNotification = downloadItem.downloadId == 0L,
+            fileName = downloadItem.fileName
         )
+        if (downloadStartedMessage.showNotification) {
+            fileDownloadNotificationManager.showDownloadInProgressNotification()
+        }
+        command.send(downloadStartedMessage)
         downloadsRepository.insert(downloadItem)
     }
 
@@ -110,6 +115,7 @@ class FileDownloadCallback @Inject constructor(
     override suspend fun onSuccess(file: File, mimeType: String?) {
         Timber.d("Download succeeded for file with name ${file.name}")
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        fileDownloadNotificationManager.showDownloadFinishedNotification(filename = file.name, uri = file.absolutePath.toUri(), mimeType = mimeType)
         downloadsRepository.update(fileName = file.name, downloadStatus = DownloadStatus.FINISHED, contentLength = file.length())
         command.send(
             DownloadCommand.ShowDownloadSuccessMessage(
@@ -138,13 +144,15 @@ class FileDownloadCallback @Inject constructor(
             DownloadManagerDisabled -> R.string.downloadsDownloadManagerDisabledErrorMessage
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
-        command.send(
-            DownloadCommand.ShowDownloadFailedMessage(
-                messageId = messageId,
-                showNotification = downloadId == 0L,
-                showEnableDownloadManagerAction = reason == DownloadManagerDisabled
-            )
+        val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(
+            messageId = messageId,
+            showNotification = downloadId == 0L,
+            showEnableDownloadManagerAction = reason == DownloadManagerDisabled
         )
+        if (downloadFailedMessage.showNotification) {
+            fileDownloadNotificationManager.showDownloadFailedNotification()
+        }
+        command.send(downloadFailedMessage)
     }
 
     override fun commands(): Flow<DownloadCommand> {
