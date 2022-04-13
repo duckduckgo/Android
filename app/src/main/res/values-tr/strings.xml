@@ -45,7 +45,7 @@
     <string name="back">Geri</string>
     <string name="forward">İleri</string>
 
-    <string name="omnibarInputHint">Ara ya da URL girin</string>
+    <string name="omnibarInputHint">Arayın ya da URL girin</string>
     <string name="clearButtonContentDescription">Arama girişini temizle</string>
     <string name="no_compatible_third_party_app_installed">Yüklü uyumlu uygulama yok</string>
     <string name="addBookmarkMenuTitle">Yer imi ekle</string>
@@ -65,13 +65,13 @@
 
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
-    <string name="shareLink">Linki paylaş</string>
+    <string name="shareLink">Bağlantıyı paylaş</string>
     <string name="shareMenuTitle">Paylaş…</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
 
     <!-- Find in page -->
     <string name="findInPageMenuTitle">Sayfada bul</string>
-    <string name="nextSearchTermDescription">Sonraki bul</string>
+    <string name="nextSearchTermDescription">Sonrakini bul</string>
     <string name="previousSearchTermDescription">Öncekini bul</string>
     <string name="closeFindInPageButtonDescription">Sayfa görünümünde bul özelliğini kapat</string>
     <string name="findInPageHint">Sayfada bul</string>
@@ -93,8 +93,8 @@
     <string name="tabsMenuItem">Sekmeler</string>
     <string name="newTabMenuItem">Yeni sekme</string>
     <string name="openInNewTab">Yeni sekmede aç</string>
-    <string name="openInNewBackgroundTab">Arka Plan Sekmesinde Aç</string>
-    <string name="openImageInNewTab">Görüntüyü Arka Plan Sekmesinde Aç</string>
+    <string name="openInNewBackgroundTab">Arka Planda Aç</string>
+    <string name="openImageInNewTab">Görüntüyü Arka Planda Aç</string>
     <string name="faviconContentDescription">Favicon</string>
     <string name="closeContentDescription">Kapat</string>
     <string name="closeAllTabsMenuItem">Tüm Sekmeleri Kapat</string>
@@ -104,7 +104,7 @@
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
-    <string name="privacyProtectionEnabled">SAHA KORUMASI ETKİN</string>
+    <string name="privacyProtectionEnabled">SİTE KORUMASI ETKİN</string>
     <string name="privacyProtectionDisabled">SİTE KORUMASI KAPATILDI</string>
     <string name="privacyDashboardActivityTitle">Gizlilik Tablosu</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">&lt;img src=\"%1$d\" /&gt; \'dan &lt;img src=\"%2$d\" /&gt;\' ye GELİŞTİRİLDİ</string>
@@ -131,12 +131,12 @@
 
     <plurals name="majorNetworksFound">
         <item quantity="one">%1$s Ana İzleyici Ağı Bulundu</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Bulundu</item>
+        <item quantity="other">%1$s Başlıca İzleyici Ağı Bulundu</item>
     </plurals>
 
     <plurals name="majorNetworksBlocked">
         <item quantity="one">%1$s Başlıca İzleyici Ağı Engellendi</item>
-        <item quantity="other">%1$s Başlıca İzleyici Ağları Engellendi</item>
+        <item quantity="other">%1$s Başlıca İzleyici Ağı Engellendi</item>
     </plurals>
 
     <string name="scorecardActivityTitle">Gizlilik Derecesi</string>
@@ -161,7 +161,7 @@
     <string name="fireMenu">Verileri Temizle</string>
     <string name="fireClearAll">Tüm Sekmeleri ve Verileri Temizle</string>
     <string name="fireCancel">İptal</string>
-    <string name="fireDataCleared">Veri silindi</string>
+    <string name="fireDataCleared">Veriler temizlendi</string>
 
     <!-- Settings Activity -->
     <string name="settingsActivityTitle">Ayarlar</string>
@@ -170,7 +170,7 @@
     <string name="settingsHeadingOther">Diğer</string>
     <string name="settingsHeadingPrivacy">Gizlilik</string>
     <string name="settingsAboutDuckduckgo">DuckDuckGo Hakkında</string>
-    <string name="settingsVersion">Versiyon</string>
+    <string name="settingsVersion">Sürüm</string>
     <string name="leaveFeedback">Geri Bildirim Paylaş</string>
     <string name="settingsEmailProtectionTitle">E-posta Koruması</string>
     <string name="settingsEmailProtectionSubtitle">E-posta izleyicileri engelleyin ve adresinizi gizleyin</string>
@@ -180,8 +180,8 @@
     <string name="settingsDarkTheme">Koyu</string>
     <string name="settingsSystemTheme">Sistem Varsayılanı</string>
     <string name="settingsThemeDialogSave">Tema Ayarla</string>
-    <string name="settingsTitleAppLinks">Uygulamalarda Bağlantıları Aç</string>
-    <string name="settingsTitleAppLinksDialog">Uygulamalarda bağlantıları aç</string>
+    <string name="settingsTitleAppLinks">Bağlantıları Uygulamalarda Aç</string>
+    <string name="settingsTitleAppLinksDialog">Bağlantıları uygulamalarda aç</string>
     <string name="settingsAppLinksAskEveryTime">Her seferinde sor</string>
     <string name="settingsAppLinksAlways">Her zaman</string>
     <string name="settingsAppLinksNever">Hiçbir zaman</string>
@@ -198,10 +198,10 @@
     <string name="settingsAutomaticallyClearWhen">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenDialogTitle">Temizle…</string>
     <string name="settingsAutomaticallyClearWhenAppExitOnly">Uygulamadan çık</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca inaktif</string>
-    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca inaktif</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Uygulamadan çık, 5 saniye boyunca etkin değil</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Uygulamadan çık, 5 dakika boyunca etkin değil</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Uygulamadan çık, 15 dakika boyunca etkin değil</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Uygulamadan çık, 30 dakika boyunca etkin değil</string>
     <string name="settingsAutomaticallyClearWhenAppExit60Minutes">1 saat boyunca hareket yoksa uygulamadan çık</string>
 
     <!-- About Activity -->
