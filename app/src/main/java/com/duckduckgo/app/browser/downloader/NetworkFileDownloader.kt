@@ -24,14 +24,10 @@ import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
 import android.webkit.CookieManager
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadCallback
 import com.duckduckgo.app.downloads.model.DownloadItem
 import com.duckduckgo.app.downloads.model.DownloadStatus.STARTED
-import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,12 +38,10 @@ import javax.inject.Inject
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService,
-    private val dispatchers: DispatcherProvider,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
+    private val fileService: DownloadFileService
 ) {
 
-    suspend fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
+    fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         Timber.d("Start download for ${pendingDownload.url}.")
 
         if (!downloadManagerAvailable()) {
@@ -99,21 +93,17 @@ class NetworkFileDownloader @Inject constructor(
                     )
                 }
 
-                appCoroutineScope.launch(dispatchers.io()) {
-                    downloadFile(updatedPendingDownload, callback)
-                }
+                downloadFile(updatedPendingDownload, callback)
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Network exception occurred talking to the server or an unexpected exception occurred creating the request/processing the response.
-                appCoroutineScope.launch(dispatchers.io()) {
-                    callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
-                }
+                callback.onFailure(url = pendingDownload.url, reason = DownloadFailReason.ConnectionRefused)
             }
         })
     }
 
-    private suspend fun downloadFile(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
+    private fun downloadFile(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         when (val extractionResult = filenameExtractor.extract(pendingDownload)) {
             is FilenameExtractor.FilenameExtractionResult.Extracted -> downloadFile(pendingDownload, extractionResult.filename, callback)
             is FilenameExtractor.FilenameExtractionResult.Guess -> downloadFile(pendingDownload, extractionResult.bestGuess, callback)
@@ -129,7 +119,7 @@ class NetworkFileDownloader @Inject constructor(
         }
     }
 
-    private suspend fun downloadFile(
+    private fun downloadFile(
         pendingDownload: PendingFileDownload,
         guessedFileName: String,
         callback: DownloadCallback

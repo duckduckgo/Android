@@ -26,28 +26,32 @@ import com.duckduckgo.app.browser.downloader.DownloadFailReason.DownloadManagerD
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.Other
 import com.duckduckgo.app.browser.downloader.DownloadFailReason.UnsupportedUrlType
 import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.model.DownloadItem
 import com.duckduckgo.app.downloads.model.DownloadStatus
 import com.duckduckgo.app.downloads.model.DownloadsRepository
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 interface DownloadCallback {
-    suspend fun onStart(downloadItem: DownloadItem)
-    suspend fun onSuccess(downloadId: Long, contentLength: Long)
-    suspend fun onSuccess(file: File, mimeType: String?)
-    suspend fun onCancel(downloadId: Long)
-    suspend fun onFailure(downloadId: Long? = null, url: String? = null, reason: DownloadFailReason)
+    fun onStart(downloadItem: DownloadItem)
+    fun onSuccess(downloadId: Long, contentLength: Long)
+    fun onSuccess(file: File, mimeType: String?)
+    fun onCancel(downloadId: Long)
+    fun onFailure(downloadId: Long? = null, url: String? = null, reason: DownloadFailReason)
     fun commands(): Flow<FileDownloadCallback.DownloadCommand>
 }
 
@@ -56,7 +60,9 @@ interface DownloadCallback {
 class FileDownloadCallback @Inject constructor(
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
     private val downloadsRepository: DownloadsRepository,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : DownloadCallback {
 
     sealed class DownloadCommand(@StringRes val messageId: Int, val showNotification: Boolean) {
@@ -81,7 +87,7 @@ class FileDownloadCallback @Inject constructor(
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
 
-    override suspend fun onStart(downloadItem: DownloadItem) {
+    override fun onStart(downloadItem: DownloadItem) {
         Timber.d("Download started for file ${downloadItem.fileName}")
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
         val downloadStartedMessage = DownloadCommand.ShowDownloadStartedMessage(
@@ -92,51 +98,59 @@ class FileDownloadCallback @Inject constructor(
         if (downloadStartedMessage.showNotification) {
             fileDownloadNotificationManager.showDownloadInProgressNotification()
         }
-        command.send(downloadStartedMessage)
-        downloadsRepository.insert(downloadItem)
+        appCoroutineScope.launch(dispatchers.io()) {
+            command.send(downloadStartedMessage)
+            downloadsRepository.insert(downloadItem)
+        }
     }
 
-    override suspend fun onSuccess(downloadId: Long, contentLength: Long) {
+    override fun onSuccess(downloadId: Long, contentLength: Long) {
         Timber.d("Download succeeded for file with downloadId $downloadId")
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-        downloadsRepository.update(downloadId = downloadId, downloadStatus = DownloadStatus.FINISHED, contentLength = contentLength)
-        downloadsRepository.getDownloadItem(downloadId).let {
+        appCoroutineScope.launch(dispatchers.io()) {
+            downloadsRepository.update(downloadId = downloadId, downloadStatus = DownloadStatus.FINISHED, contentLength = contentLength)
+            downloadsRepository.getDownloadItem(downloadId).let {
+                command.send(
+                    DownloadCommand.ShowDownloadSuccessMessage(
+                        messageId = R.string.downloadsDownloadFinishedMessage,
+                        showNotification = false,
+                        fileName = it.fileName,
+                        filePath = it.filePath
+                    )
+                )
+            }
+        }
+    }
+
+    override fun onSuccess(file: File, mimeType: String?) {
+        Timber.d("Download succeeded for file with name ${file.name}")
+        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
+        fileDownloadNotificationManager.showDownloadFinishedNotification(filename = file.name, uri = file.absolutePath.toUri(), mimeType = mimeType)
+        appCoroutineScope.launch(dispatchers.io()) {
+            downloadsRepository.update(fileName = file.name, downloadStatus = DownloadStatus.FINISHED, contentLength = file.length())
             command.send(
                 DownloadCommand.ShowDownloadSuccessMessage(
                     messageId = R.string.downloadsDownloadFinishedMessage,
-                    showNotification = false,
-                    fileName = it.fileName,
-                    filePath = it.filePath
+                    showNotification = true,
+                    fileName = file.name,
+                    filePath = file.absolutePath,
+                    mimeType = mimeType
                 )
             )
         }
     }
 
-    override suspend fun onSuccess(file: File, mimeType: String?) {
-        Timber.d("Download succeeded for file with name ${file.name}")
-        pixel.fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-        fileDownloadNotificationManager.showDownloadFinishedNotification(filename = file.name, uri = file.absolutePath.toUri(), mimeType = mimeType)
-        downloadsRepository.update(fileName = file.name, downloadStatus = DownloadStatus.FINISHED, contentLength = file.length())
-        command.send(
-            DownloadCommand.ShowDownloadSuccessMessage(
-                messageId = R.string.downloadsDownloadFinishedMessage,
-                showNotification = true,
-                fileName = file.name,
-                filePath = file.absolutePath,
-                mimeType = mimeType
-            )
-        )
-    }
-
-    override suspend fun onCancel(downloadId: Long) {
+    override fun onCancel(downloadId: Long) {
         Timber.d("Download cancelled from the notification for file with downloadId $downloadId")
         // Deliberately cancelled by the user. The DownloadManager handles this as a SUCCESS, however it removes the record from
         // its internal DB.
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_CANCELLED)
-        downloadsRepository.delete(listOf(downloadId))
+        appCoroutineScope.launch(dispatchers.io()) {
+            downloadsRepository.delete(listOf(downloadId))
+        }
     }
 
-    override suspend fun onFailure(downloadId: Long?, url: String?, reason: DownloadFailReason) {
+    override fun onFailure(downloadId: Long?, url: String?, reason: DownloadFailReason) {
         Timber.d("Failed to download file with downloadId $downloadId or url $url with reason $reason")
         pixel.fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
         val messageId = when (reason) {
@@ -152,7 +166,9 @@ class FileDownloadCallback @Inject constructor(
         if (downloadFailedMessage.showNotification) {
             fileDownloadNotificationManager.showDownloadFailedNotification()
         }
-        command.send(downloadFailedMessage)
+        appCoroutineScope.launch(dispatchers.io()) {
+            command.send(downloadFailedMessage)
+        }
     }
 
     override fun commands(): Flow<DownloadCommand> {

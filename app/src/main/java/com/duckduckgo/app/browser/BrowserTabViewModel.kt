@@ -172,7 +172,6 @@ class BrowserTabViewModel @Inject constructor(
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadCallback,
-    private val trackingParameters: TrackingParameters,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
