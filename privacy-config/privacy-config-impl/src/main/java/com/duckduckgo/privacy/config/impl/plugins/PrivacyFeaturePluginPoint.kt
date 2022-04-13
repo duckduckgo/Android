@@ -16,14 +16,13 @@
 
 package com.duckduckgo.privacy.config.impl.plugins
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 
-class PrivacyFeaturePluginPoint(
-    private val privacyFeatures: DaggerSet<PrivacyFeaturePlugin>
-) : PluginPoint<PrivacyFeaturePlugin> {
-    override fun getPlugins(): Collection<PrivacyFeaturePlugin> {
-        return privacyFeatures.sortedBy { it.featureName.value }
-    }
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = PrivacyFeaturePlugin::class
+)
+@Suppress("unused")
+interface PrivacyFeaturePluginPoint
