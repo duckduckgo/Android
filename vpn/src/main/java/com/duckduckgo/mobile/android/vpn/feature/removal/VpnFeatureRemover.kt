@@ -16,14 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.removal
 
-import android.app.NotificationManager
-import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
+import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -52,7 +51,9 @@ class DefaultVpnFeatureRemover(
 
     override fun manuallyRemoveFeature() {
         disableNotifications()
+        removeNotificationChannels()
         deleteAllVpnTrackers()
+        disableFeature()
     }
 
     override fun scheduledRemoveFeature() {
@@ -66,11 +67,20 @@ class DefaultVpnFeatureRemover(
         notificationManager.cancel(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID)
     }
 
+    private fun removeNotificationChannels() {
+        notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_ALERTS_CHANNEL_ID)
+        notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_STATUS_CHANNEL_ID)
+    }
+
     private fun resetAppTPOnboarding() {
         deviceShieldOnboarding.onboardingDidNotShow()
     }
 
     private fun deleteAllVpnTrackers() {
         vpnTrackerDao.deleteAllTrackers()
+    }
+
+    private fun disableFeature() {
+        deviceShieldOnboarding.onFeatureDisabled()
     }
 }

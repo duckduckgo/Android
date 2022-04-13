@@ -222,8 +222,8 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
 
     companion object {
 
-        private const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
-        private const val VPN_STATUS_CHANNEL_ID = "AppTpStatusChannel"
+        const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
+        const val VPN_STATUS_CHANNEL_ID = "AppTpStatusChannel"
         private const val TRACKER_COMPANY_GOOGLE = "Google"
         private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
         private const val TRACKER_COMPANY_AMAZON = "Amazon"
