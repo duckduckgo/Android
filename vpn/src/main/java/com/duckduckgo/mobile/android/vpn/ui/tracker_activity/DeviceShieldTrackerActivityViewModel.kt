@@ -56,7 +56,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private var lastVpnRequestTime = -1L
 
     internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
-        return@withContext vpnStateMonitor.getStateFlow()
+        return@withContext vpnStateMonitor.getStateFlow().debounce(1000)
     }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {

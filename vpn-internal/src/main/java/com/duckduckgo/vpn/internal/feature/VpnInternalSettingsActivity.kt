@@ -114,7 +114,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElementsState() {
-        vpnStateMonitor.getStateFlow()
+        vpnStateMonitor.getStateFlow().debounce(1000)
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->

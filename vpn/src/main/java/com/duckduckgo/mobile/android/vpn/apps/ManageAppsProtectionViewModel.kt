@@ -114,9 +114,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int,
-        needsPixel: Boolean = false
+        packageName: String
     ) {
         recordManualChange(packageName)
         viewModelScope.launch {
@@ -171,7 +169,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         position: Int
     ) {
         if (!excludedAppInfo.isProblematic()) {
-            onAppProtectionEnabled(excludedAppInfo.packageName, excludedAppInfo.knownProblem)
+            onAppProtectionEnabled(excludedAppInfo.packageName)
         } else {
             command.send(Command.ShowEnableProtectionDialog(excludedAppInfo, position))
         }

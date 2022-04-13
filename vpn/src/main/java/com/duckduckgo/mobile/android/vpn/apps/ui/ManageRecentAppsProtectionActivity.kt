@@ -126,7 +126,7 @@ class ManageRecentAppsProtectionActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        if (viewState.excludedApps.isEmpty()){
+        if (viewState.excludedApps.isEmpty()) {
             binding.manageRecentAppsRecycler.gone()
             binding.manageRecentAppsEmptyView.show()
         } else {
@@ -192,18 +192,19 @@ class ManageRecentAppsProtectionActivity :
         return true
     }
 
-    override fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int
-    ) {
-        viewModel.onAppProtectionEnabled(packageName, excludingReason, needsPixel = true)
+    override fun onAppProtectionEnabled(packageName: String) {
+        viewModel.onAppProtectionEnabled(packageName)
     }
 
     override fun onDialogSkipped(position: Int) {
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+    override fun onAppProtectionDisabled(
+        appName: String,
+        packageName: String,
+        report: Boolean
+    ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
@@ -217,7 +218,6 @@ class ManageRecentAppsProtectionActivity :
 
     override fun onDefaultProtectionRestored() {
         viewModel.restoreProtectedApps()
-        restartVpn()
         Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG)
             .show()
     }
