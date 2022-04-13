@@ -20,6 +20,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -46,19 +48,19 @@ class PermissionAwareVoiceSearchLauncherTest {
     fun whenPermissionsNotGrantedThenLaunchPermissionRequest() {
         whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(false)
 
-        testee.launch()
+        testee.launch(mock())
 
-        verify(permissionRequest).launch()
-        verify(voiceSearchActivityLauncher, never()).launch()
+        verify(permissionRequest).launch(any())
+        verify(voiceSearchActivityLauncher, never()).launch(any())
     }
 
     @Test
     fun whenPermissionsGrantedThenLaunchVoiceSearchActivity() {
         whenever(voiceSearchPermissionCheck.hasRequiredPermissionsGranted()).thenReturn(true)
 
-        testee.launch()
+        testee.launch(mock())
 
-        verify(voiceSearchActivityLauncher).launch()
-        verify(permissionRequest, never()).launch()
+        verify(voiceSearchActivityLauncher).launch(any())
+        verify(permissionRequest, never()).launch(any())
     }
 }

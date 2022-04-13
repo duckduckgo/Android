@@ -154,7 +154,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun handleVoiceSearchLaunch(intent: Intent) {
         if (launchVoice(intent)) {
-            voiceSearchLauncher.launch()
+            voiceSearchLauncher.launch(this)
         }
     }
 
@@ -265,7 +265,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             }
             voiceSearch.setOnClickListener {
                 omnibarTextInput.hideKeyboard()
-                voiceSearchLauncher.launch()
+                voiceSearchLauncher.launch(this)
             }
         } else {
             voiceSearch.visibility = View.GONE

@@ -39,7 +39,7 @@ interface PermissionRequest {
         onPermissionsGranted: () -> Unit
     )
 
-    fun launch()
+    fun launch(activity: Activity)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -53,14 +53,11 @@ class MicrophonePermissionRequest @Inject constructor(
         private const val SCHEME_PACKAGE = "package"
     }
 
-    private lateinit var _activity: Activity
-
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
         activity: Activity,
         onPermissionsGranted: () -> Unit
     ) {
-        _activity = activity
         activityResultLauncherWrapper.register(
             caller,
             Request.Permission { result ->
@@ -75,18 +72,18 @@ class MicrophonePermissionRequest @Inject constructor(
         )
     }
 
-    override fun launch() {
+    override fun launch(activity: Activity) {
         if (voiceSearchRepository.getHasPermissionDeclinedForever()) {
             voiceSearchPermissionDialogsLauncher.showNoMicAccessDialog(
-                _activity,
-                { _activity.launchDuckDuckGoSettings() }
+                activity,
+                { activity.launchDuckDuckGoSettings() }
             )
         } else {
             if (voiceSearchRepository.getHasAcceptedRationaleDialog()) {
                 activityResultLauncherWrapper.launch(LaunchPermissionRequest)
             } else {
                 voiceSearchPermissionDialogsLauncher.showPermissionRationale(
-                    _activity,
+                    activity,
                     { handleRationaleAccepted() },
                     { handleRationaleCancelled() }
                 )
@@ -98,7 +95,7 @@ class MicrophonePermissionRequest @Inject constructor(
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts(SCHEME_PACKAGE, packageName, null)
         }
-        _activity.startActivity(intent)
+        startActivity(intent)
     }
 
     private fun handleRationaleAccepted() {

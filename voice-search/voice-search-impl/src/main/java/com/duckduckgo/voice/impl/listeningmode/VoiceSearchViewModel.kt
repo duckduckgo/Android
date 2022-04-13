@@ -62,7 +62,7 @@ class VoiceSearchViewModel @Inject constructor(
         return command.receiveAsFlow()
     }
 
-    fun start() {
+    fun startVoiceSearch() {
         if (viewState.value.result.isNotEmpty()) {
             viewModelScope.launch {
                 viewState.emit(
@@ -91,7 +91,7 @@ class VoiceSearchViewModel @Inject constructor(
         }
     }
 
-    fun stop() {
+    fun stopVoiceSearch() {
         speechRecognizer.stop()
     }
 

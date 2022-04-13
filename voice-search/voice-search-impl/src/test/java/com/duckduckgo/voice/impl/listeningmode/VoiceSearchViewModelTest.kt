@@ -51,21 +51,21 @@ class VoiceSearchViewModelTest {
 
     @Test
     fun whenStartThenStartSpeechRecognizer() {
-        testee.start()
+        testee.startVoiceSearch()
 
         verify(speechRecognizer).start(any())
     }
 
     @Test
     fun whenStopThenStopSpeechRecognizer() {
-        testee.stop()
+        testee.stopVoiceSearch()
 
         verify(speechRecognizer).stop()
     }
 
     @Test
     fun whenStartThenEmitInitialViewState() = runTest {
-        testee.start()
+        testee.startVoiceSearch()
 
         testee.viewState().test {
             assertEquals(ViewState("", ""), awaitItem())
@@ -76,7 +76,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenPartialResultsReceivedThenEmitNewViewState() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.PartialResultReceived("This is the result"))
@@ -96,7 +96,7 @@ class VoiceSearchViewModelTest {
         val result = "fermentum leo vel orci porta non pulvinar neque laoreet suspendisse interdum consectetur libero id faucibus nisl tincidunt " +
             "eget nullam non nisi est sit amet facilisis magna etiam tempor orci eu lobortis"
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.PartialResultReceived(result))
@@ -115,7 +115,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenVolumeUpdateReceivedThenEmitUpdateVoiceIndicatorCommand() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.VolumeUpdateReceived(10f))
@@ -129,7 +129,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenRecognitionSuccessThenEmitHandleSpeechRecognitionSuccessCommand() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.RecognitionSuccess("Final result"))
@@ -143,7 +143,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenRecognitionTimedoutWithNoPartialResultThenEmitTerminateVoiceSearch() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.RecognitionTimedOut)
@@ -157,7 +157,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenRecognitionTimedoutWithPartialResultThenEmiHandleSpeechRecognitionSuccessCommand() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
 
         captor.firstValue.invoke(Event.PartialResultReceived("This is the result"))
@@ -172,9 +172,9 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenViewModelRestartedWithNoPartiaLResultThenEmitViewStateWithNoUnsentResult() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
-        testee.start()
+        testee.startVoiceSearch()
         captor.firstValue.invoke(Event.PartialResultReceived("First"))
 
         testee.viewState().test {
@@ -187,11 +187,11 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenPartialResultReceivedAndViewModelRestartedThenEmitViewStateWithUnsentResult() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
         captor.firstValue.invoke(Event.PartialResultReceived("First"))
 
-        testee.start()
+        testee.startVoiceSearch()
 
         testee.viewState().test {
             assertEquals(ViewState("First", "First"), expectMostRecentItem())
@@ -202,10 +202,10 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenViewModelRestartedAndRecognitionSuccessEmittedThenEmitViewStateWithAppendedResultAndUnsentResult() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
         captor.firstValue.invoke(Event.PartialResultReceived("First"))
-        testee.start()
+        testee.startVoiceSearch()
 
         captor.firstValue.invoke(Event.RecognitionSuccess("Second"))
 
@@ -218,7 +218,7 @@ class VoiceSearchViewModelTest {
     @Test
     fun whenUserInitiatesSearchCompleteThenEmitHandleSpeechRecognitionSuccessCommand() = runTest {
         val captor = argumentCaptor<(Event) -> Unit>()
-        testee.start()
+        testee.startVoiceSearch()
         verify(speechRecognizer).start(captor.capture())
         captor.firstValue.invoke(Event.PartialResultReceived("Test"))
 

@@ -36,7 +36,7 @@ interface VoiceSearchActivityLauncher {
         onEvent: (Event) -> Unit
     )
 
-    fun launch()
+    fun launch(activity: Activity)
 }
 
 @ContributesBinding(ActivityScope::class)
@@ -51,7 +51,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
     }
 
     private lateinit var _source: Source
-    private var _activity: Activity? = null
 
     override fun registerResultsCallback(
         caller: ActivityResultCaller,
@@ -59,7 +58,6 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
         source: Source,
         onEvent: (Event) -> Unit
     ) {
-        _activity = activity
         _source = source
         activityResultLauncherWrapper.register(
             caller,
@@ -78,19 +76,19 @@ class RealVoiceSearchActivityLauncher @Inject constructor(
                     onEvent(Event.SearchCancelled)
                 }
 
-                _activity?.window?.decorView?.rootView?.let {
+                activity.window?.decorView?.rootView?.let {
                     blurRenderer.removeBlur(it)
                 }
             }
         )
     }
 
-    override fun launch() {
-        launchVoiceSearch()
+    override fun launch(activity: Activity) {
+        launchVoiceSearch(activity)
     }
 
-    private fun launchVoiceSearch() {
-        _activity?.window?.decorView?.rootView?.let {
+    private fun launchVoiceSearch(activity: Activity) {
+        activity.window?.decorView?.rootView?.let {
             blurRenderer.addBlur(it)
         }
         pixel.fire(

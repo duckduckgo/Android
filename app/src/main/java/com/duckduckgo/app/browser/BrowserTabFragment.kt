@@ -2231,7 +2231,7 @@ class BrowserTabFragment :
                 voiceSearchButton.setOnClickListener {
                     webView?.onPause()
                     hideKeyboardImmediately()
-                    voiceSearchLauncher.launch()
+                    voiceSearchLauncher.launch(requireActivity())
                 }
             } else {
                 voiceSearchButton.visibility = GONE

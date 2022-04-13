@@ -39,18 +39,18 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         onEvent: (Event) -> Unit
     ) {
         permissionRequest.registerResultsCallback(caller, activity) {
-            voiceSearchActivityLauncher.launch()
+            voiceSearchActivityLauncher.launch(activity)
         }
         voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
             onEvent(it)
         }
     }
 
-    override fun launch() {
+    override fun launch(activity: Activity) {
         if (voiceSearchPermissionCheck.hasRequiredPermissionsGranted()) {
-            voiceSearchActivityLauncher.launch()
+            voiceSearchActivityLauncher.launch(activity)
         } else {
-            permissionRequest.launch()
+            permissionRequest.launch(activity)
         }
     }
 }

@@ -27,7 +27,7 @@ interface VoiceSearchLauncher {
         onEvent: (Event) -> Unit
     )
 
-    fun launch()
+    fun launch(activity: Activity)
 
     enum class Source(val paramValueName: String) {
         BROWSER("browser"),

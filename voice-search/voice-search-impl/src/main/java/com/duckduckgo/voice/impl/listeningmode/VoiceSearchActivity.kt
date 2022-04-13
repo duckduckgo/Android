@@ -62,6 +62,7 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         configureToolbar()
         configureViews()
+        observeViewModel()
     }
 
     private fun configureViews() {
@@ -92,13 +93,12 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
 
     override fun onStart() {
         super.onStart()
-        observeViewModel()
-        viewModel.start()
+        viewModel.startVoiceSearch()
     }
 
     override fun onStop() {
         super.onStop()
-        viewModel.stop()
+        viewModel.stopVoiceSearch()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

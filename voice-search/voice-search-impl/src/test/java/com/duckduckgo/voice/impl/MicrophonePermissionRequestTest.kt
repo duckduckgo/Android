@@ -89,7 +89,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(true)
 
         testee.registerResultsCallback(mock(), mock()) { }
-        testee.launch()
+        testee.launch(mock())
 
         assertFalse(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
         assertTrue(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
@@ -101,7 +101,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
 
         testee.registerResultsCallback(mock(), mock()) { }
-        testee.launch()
+        testee.launch(mock())
 
         assertTrue(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
         assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
@@ -113,7 +113,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(true)
 
         testee.registerResultsCallback(mock(), mock()) { }
-        testee.launch()
+        testee.launch(mock())
 
         assertFalse(voiceSearchPermissionDialogsLauncher.rationaleDialogShown)
         assertFalse(voiceSearchPermissionDialogsLauncher.noMicAccessDialogShown)
@@ -125,7 +125,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
         testee.registerResultsCallback(mock(), mock()) { }
-        testee.launch()
+        testee.launch(mock())
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleAccepted.invoke()
 
@@ -139,7 +139,7 @@ class MicrophonePermissionRequestTest {
         whenever(voiceSearchRepository.getHasPermissionDeclinedForever()).thenReturn(false)
         whenever(voiceSearchRepository.getHasAcceptedRationaleDialog()).thenReturn(false)
         testee.registerResultsCallback(mock(), mock()) { }
-        testee.launch()
+        testee.launch(mock())
 
         voiceSearchPermissionDialogsLauncher.boundOnRationaleDeclined.invoke()
 

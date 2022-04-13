@@ -554,7 +554,7 @@ class BrowserTabViewModel @Inject constructor(
     init {
         initializeViewStates()
         configureAutoComplete()
-        configureVoiceSearch()
+        logVoiceSearchAvailability()
 
         fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
         fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
@@ -676,7 +676,7 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private fun configureVoiceSearch() {
+    private fun logVoiceSearchAvailability() {
         if (voiceSearchAvailability.isVoiceSearchSupported) voiceSearchPixelLogger.log()
     }
 
