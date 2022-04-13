@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
@@ -125,7 +126,14 @@ class ManageRecentAppsProtectionActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState.excludedApps)
+        if (viewState.excludedApps.isEmpty()){
+            binding.manageRecentAppsRecycler.gone()
+            binding.manageRecentAppsEmptyView.root.show()
+        } else {
+            binding.manageRecentAppsEmptyView.root.gone()
+            adapter.update(viewState.excludedApps)
+            binding.manageRecentAppsRecycler.show()
+        }
         shimmerLayout.gone()
     }
 

@@ -88,6 +88,11 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
+            <include
+                android:id="@+id/manageRecentAppsEmptyView"
+                android:visibility="gone"
+                layout="@layout/view_manage_recent_apps_empty"/>
+
             <TextView
                 android:id="@+id/manageRecentAppsShowAll"
                 android:layout_width="match_parent"
