@@ -88,10 +88,17 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
 
-            <include
+            <TextView
                 android:id="@+id/manageRecentAppsEmptyView"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
+                android:textAlignment="center"
+                android:paddingTop="40dp"
+                android:paddingBottom="40dp"
                 android:visibility="gone"
-                layout="@layout/view_manage_recent_apps_empty"/>
+                android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
 
             <TextView
                 android:id="@+id/manageRecentAppsShowAll"

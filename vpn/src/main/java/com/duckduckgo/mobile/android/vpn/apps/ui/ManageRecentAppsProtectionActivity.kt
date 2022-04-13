@@ -128,9 +128,9 @@ class ManageRecentAppsProtectionActivity :
         shimmerLayout.stopShimmer()
         if (viewState.excludedApps.isEmpty()){
             binding.manageRecentAppsRecycler.gone()
-            binding.manageRecentAppsEmptyView.root.show()
+            binding.manageRecentAppsEmptyView.show()
         } else {
-            binding.manageRecentAppsEmptyView.root.gone()
+            binding.manageRecentAppsEmptyView.gone()
             adapter.update(viewState.excludedApps)
             binding.manageRecentAppsRecycler.show()
         }
