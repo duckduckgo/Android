@@ -27,15 +27,26 @@ import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.notification.NotificationRegistrar.ChannelType
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+interface FileDownloadNotificationManager {
+    fun showDownloadInProgressNotification()
+    fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?)
+    fun showDownloadFailedNotification()
+}
+
 @AnyThread
-class FileDownloadNotificationManager @Inject constructor(
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
+class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManager,
     private val applicationContext: Context
-) {
+) : FileDownloadNotificationManager {
 
-    fun showDownloadInProgressNotification() {
+    override fun showDownloadInProgressNotification() {
         mainThreadHandler().post {
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADING.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
@@ -46,11 +57,7 @@ class FileDownloadNotificationManager @Inject constructor(
         }
     }
 
-    fun showDownloadFinishedNotification(
-        filename: String,
-        uri: Uri,
-        mimeType: String?
-    ) {
+    override fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?) {
         mainThreadHandler().post {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, mimeType)
@@ -70,7 +77,7 @@ class FileDownloadNotificationManager @Inject constructor(
         }
     }
 
-    fun showDownloadFailedNotification() {
+    override fun showDownloadFailedNotification() {
         mainThreadHandler().post {
             val notification = NotificationCompat.Builder(applicationContext, ChannelType.FILE_DOWNLOADED.id)
                 .setContentTitle(applicationContext.getString(R.string.downloadFailed))

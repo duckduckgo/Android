@@ -71,7 +71,6 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.downloader.DownloadFailReason
-import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
 import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -216,9 +215,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fileDownloader: FileDownloader
-
-    @Inject
-    lateinit var fileDownloadNotificationManager: FileDownloadNotificationManager
 
     @Inject
     lateinit var webViewSessionStorage: WebViewSessionStorage
@@ -636,16 +632,10 @@ class BrowserTabFragment :
     }
 
     private fun downloadStarted(command: FileDownloadCallback.DownloadCommand.ShowDownloadStartedMessage) {
-        if (command.showNotification) {
-            fileDownloadNotificationManager.showDownloadInProgressNotification()
-        }
         view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), 750)?.show()
     }
 
     private fun downloadFailed(command: FileDownloadCallback.DownloadCommand.ShowDownloadFailedMessage) {
-        if (command.showNotification) {
-            fileDownloadNotificationManager.showDownloadFailedNotification()
-        }
         val downloadFailedSnackbar = when {
             command.showEnableDownloadManagerAction ->
                 view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
@@ -660,9 +650,6 @@ class BrowserTabFragment :
     }
 
     private fun downloadSucceeded(command: FileDownloadCallback.DownloadCommand.ShowDownloadSuccessMessage) {
-        if (command.showNotification) {
-            fileDownloadNotificationManager.showDownloadFinishedNotification(command.fileName, command.filePath.toUri(), command.mimeType)
-        }
         val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
