@@ -49,7 +49,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
-    private val vpnFeatureRemover: VpnFeatureRemover
+    private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
