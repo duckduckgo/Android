@@ -32,6 +32,7 @@ import com.duckduckgo.app.downloads.model.DownloadsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -69,7 +70,13 @@ class FileDownloadCallbackTest {
 
     @Before
     fun before() {
-        callback = FileDownloadCallback(mockFileDownloadNotificationManager, mockDownloadsRepository, mockPixel)
+        callback = FileDownloadCallback(
+            fileDownloadNotificationManager = mockFileDownloadNotificationManager,
+            downloadsRepository = mockDownloadsRepository,
+            pixel = mockPixel,
+            dispatchers = coroutineRule.testDispatcherProvider,
+            appCoroutineScope = TestScope()
+        )
     }
 
     @Test

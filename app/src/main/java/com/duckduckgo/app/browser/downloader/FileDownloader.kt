@@ -29,7 +29,7 @@ import javax.inject.Inject
 interface FileDownloader {
 
     @WorkerThread
-    suspend fun download(
+    fun download(
         pending: PendingFileDownload,
         callback: DownloadCallback
     )
@@ -50,7 +50,7 @@ class AndroidFileDownloader @Inject constructor(
 ) : FileDownloader {
 
     @WorkerThread
-    override suspend fun download(
+    override fun download(
         pending: PendingFileDownload,
         callback: DownloadCallback
     ) {

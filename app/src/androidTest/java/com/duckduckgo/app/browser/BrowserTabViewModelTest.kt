@@ -454,7 +454,6 @@ class BrowserTabViewModelTest {
             variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
-            trackingParameters = mockTrackingParameters,
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
