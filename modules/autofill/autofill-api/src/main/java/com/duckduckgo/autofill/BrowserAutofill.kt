@@ -16,8 +16,11 @@
 
 package com.duckduckgo.autofill
 
+import android.webkit.WebView
+
 interface BrowserAutofill {
 
     fun isEnabled(): Boolean
+    fun addBrowserAutofillInterface(webView: WebView)
 
 }

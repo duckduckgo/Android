@@ -16,9 +16,11 @@
 
 package com.duckduckgo.autofill
 
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
 import timber.log.Timber
 
-class InlineBrowserAutofill : BrowserAutofill {
+internal class InlineBrowserAutofill : BrowserAutofill {
 
     val enabled: Boolean = true
 
@@ -27,4 +29,19 @@ class InlineBrowserAutofill : BrowserAutofill {
         return enabled
     }
 
+    override fun addBrowserAutofillInterface(webView: WebView) {
+        webView.addJavascriptInterface(AutofillJavascriptInterface(), AutofillJavascriptInterface.INTERFACE_NAME)
+    }
+}
+
+internal class AutofillJavascriptInterface {
+
+    @JavascriptInterface
+    fun hello() {
+
+    }
+
+    companion object {
+        const val INTERFACE_NAME = "BrowserAutofill"
+    }
 }
