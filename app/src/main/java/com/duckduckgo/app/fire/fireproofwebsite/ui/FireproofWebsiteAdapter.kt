@@ -68,7 +68,7 @@ class FireproofWebsiteAdapter(
             }
         }
 
-    var loginDetectionEnabled: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER
+    var automaticFireproofSetting: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -132,7 +132,7 @@ class FireproofWebsiteAdapter(
     ) {
         when (holder) {
             is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
-                holder.bind(loginDetectionEnabled)
+                holder.bind(automaticFireproofSetting)
             }
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(
                 fireproofWebsites[

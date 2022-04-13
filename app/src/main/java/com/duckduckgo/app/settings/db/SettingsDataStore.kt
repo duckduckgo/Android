@@ -255,7 +255,7 @@ class SettingsSharedPreferences @Inject constructor(
             NEVER(R.string.settingsAppLinksNever)
         }
 
-        fun mapToNewLoginDetectorSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {
+        fun mapToAutomaticFireproofSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {
             return when (oldLoginDetectorValue) {
                 false -> NEVER
                 else -> ASK_EVERY_TIME

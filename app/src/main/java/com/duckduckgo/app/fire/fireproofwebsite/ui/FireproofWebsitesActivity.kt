@@ -69,7 +69,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
             this,
             Observer { viewState ->
                 viewState?.let {
-                    adapter.loginDetectionEnabled = it.loginDetectionEnabled
+                    adapter.automaticFireproofSetting = it.automaticFireproofSetting
                     adapter.fireproofWebsites = it.fireproofWebsitesEntities
                 }
             }

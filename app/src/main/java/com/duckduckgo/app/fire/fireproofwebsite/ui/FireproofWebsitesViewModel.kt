@@ -43,7 +43,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class ViewState(
-        val loginDetectionEnabled: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER,
+        val automaticFireproofSetting: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER,
         val fireproofWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
     )
 
@@ -61,7 +61,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     init {
         _viewState.value = ViewState(
-            loginDetectionEnabled = settingsDataStore.automaticFireproofSetting
+            automaticFireproofSetting = settingsDataStore.automaticFireproofSetting
         )
         fireproofWebsites.observeForever(fireproofWebsitesObserver)
     }
@@ -109,6 +109,6 @@ class FireproofWebsitesViewModel @Inject constructor(
             else -> AutomaticFireproofSetting.ASK_EVERY_TIME
         }
         settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
-        _viewState.value = _viewState.value?.copy(loginDetectionEnabled = automaticFireproofSetting)
+        _viewState.value = _viewState.value?.copy(automaticFireproofSetting = automaticFireproofSetting)
     }
 }

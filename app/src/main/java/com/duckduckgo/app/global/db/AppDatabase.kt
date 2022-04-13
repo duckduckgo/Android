@@ -49,9 +49,7 @@ import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.Companion.KEY_AUTOMATIC_FIREPROOF_SETTING
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -663,17 +661,15 @@ class MigrationsProvider(val context: Context) {
 
     private inner class OldFireproofLoginDetector {
 
+        private val fileName = "com.duckduckgo.app.settings_activity.settings"
+        private val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
+
         fun updateFireproofSettingType() {
-            val preferences = context.getSharedPreferences(SettingsSharedPreferences.FILENAME, Context.MODE_PRIVATE)
+            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             val loginDetectionEnabled = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
             preferences.edit().remove("KEY_LOGIN_DETECTION_ENABLED").apply()
-            val newLoginDetectorSetting = migratePreferencesType(loginDetectionEnabled)
-            preferences.edit().putString(KEY_AUTOMATIC_FIREPROOF_SETTING, newLoginDetectorSetting.name).apply()
-        }
-
-        private fun migratePreferencesType(loginDetectionEnabled: Boolean): AutomaticFireproofSetting {
-            val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
-            return loginDetectorPrefsMapper.mapToNewLoginDetectorSetting(loginDetectionEnabled)
+            val automaticFireproofSetting = loginDetectorPrefsMapper.mapToAutomaticFireproofSetting(loginDetectionEnabled)
+            preferences.edit().putString(SettingsSharedPreferences.KEY_AUTOMATIC_FIREPROOF_SETTING, automaticFireproofSetting.name).apply()
         }
     }
 }

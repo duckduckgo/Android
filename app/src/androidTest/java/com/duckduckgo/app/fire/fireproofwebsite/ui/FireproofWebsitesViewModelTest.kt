@@ -35,7 +35,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import dagger.Lazy
@@ -47,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.doReturn
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
@@ -77,7 +78,9 @@ class FireproofWebsitesViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
-    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock {
+        on { it.automaticFireproofSetting } doReturn ASK_EVERY_TIME
+    }
 
     private val mockFaviconManager: FaviconManager = mock()
 
@@ -111,7 +114,7 @@ class FireproofWebsitesViewModelTest {
 
     @Test
     fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
-        val defaultViewState = FireproofWebsitesViewModel.ViewState(AutomaticFireproofSetting.NEVER, emptyList())
+        val defaultViewState = FireproofWebsitesViewModel.ViewState(ASK_EVERY_TIME, emptyList())
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertEquals(defaultViewState, viewStateCaptor.value)
     }
@@ -165,7 +168,7 @@ class FireproofWebsitesViewModelTest {
         viewModel.onUserToggleLoginDetection(true)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.loginDetectionEnabled == AutomaticFireproofSetting.ASK_EVERY_TIME)
+        assertTrue(viewStateCaptor.value.automaticFireproofSetting == ASK_EVERY_TIME)
     }
 
     @Test
@@ -179,7 +182,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
         viewModel.onUserToggleLoginDetection(true)
 
-        verify(mockSettingsDataStore).automaticFireproofSetting = AutomaticFireproofSetting.ASK_EVERY_TIME
+        verify(mockSettingsDataStore).automaticFireproofSetting = ASK_EVERY_TIME
     }
 
     @Test
