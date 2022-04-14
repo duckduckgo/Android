@@ -20,8 +20,8 @@ import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireproofWebsitesBinding
@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.snackbar.Snackbar
@@ -65,24 +66,23 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this,
-            Observer { viewState ->
-                viewState?.let {
-                    adapter.automaticFireproofSetting = it.automaticFireproofSetting
-                    adapter.fireproofWebsites = it.fireproofWebsitesEntities
-                }
+        viewModel.viewState.observe(this) { viewState ->
+            viewState?.let {
+                adapter.automaticFireproofSetting = it.automaticFireproofSetting
+                adapter.fireproofWebsites = it.fireproofWebsitesEntities
             }
-        )
+        }
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                when (it) {
-                    is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
-                }
+        viewModel.command.observe(this) {
+            when (it) {
+                is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
+                is FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog -> showAutomaticFireproofSettingSelectionDialog(it.automaticFireproofSetting)
             }
-        )
+        }
+    }
+
+    private fun showAutomaticFireproofSettingSelectionDialog(automaticFireproofSetting: AutomaticFireproofSetting) {
+        Toast.makeText(baseContext, "Show automatic fireproof setting selection dialog", Toast.LENGTH_SHORT).show()
     }
 
     @Suppress("deprecation")

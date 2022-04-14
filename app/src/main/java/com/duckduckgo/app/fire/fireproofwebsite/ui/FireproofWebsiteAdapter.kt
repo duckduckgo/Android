@@ -20,7 +20,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -29,15 +28,15 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
-import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteToggleBinding
+import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteSettingsSelectionBinding
 import com.duckduckgo.app.browser.databinding.ViewListItemDividerBinding
 import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
-import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -51,14 +50,14 @@ class FireproofWebsiteAdapter(
         const val FIREPROOF_WEBSITE_TYPE = 0
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
-        const val TOGGLE_TYPE = 3
+        const val SETTING_SELECTION_TYPE = 3
         const val DIVIDER_TYPE = 4
         const val SECTION_TITLE_TYPE = 5
 
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, TOGGLE_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
+    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, SETTING_SELECTION_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -80,15 +79,11 @@ class FireproofWebsiteAdapter(
                 val binding = ViewFireproofWebsiteDescriptionBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
-            TOGGLE_TYPE -> {
-                val binding = ViewFireproofWebsiteToggleBinding.inflate(inflater, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(
+            SETTING_SELECTION_TYPE -> {
+                val binding = ViewFireproofWebsiteSettingsSelectionBinding.inflate(inflater, parent, false)
+                FireproofWebSiteViewHolder.FireproofWebsiteSettingSelectionViewHolder(
                     binding,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked ->
-                        viewModel.onUserToggleLoginDetection(
-                            isChecked
-                        )
-                    }
+                    viewModel
                 )
             }
             DIVIDER_TYPE -> {
@@ -131,7 +126,7 @@ class FireproofWebsiteAdapter(
         position: Int
     ) {
         when (holder) {
-            is FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder -> {
+            is FireproofWebSiteViewHolder.FireproofWebsiteSettingSelectionViewHolder -> {
                 holder.bind(automaticFireproofSetting)
             }
             is FireproofWebSiteViewHolder.FireproofWebsiteItemViewHolder -> holder.bind(
@@ -169,13 +164,16 @@ class FireproofWebsiteAdapter(
 
 sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    class FireproofWebsiteToggleViewHolder(
-        private val binding: ViewFireproofWebsiteToggleBinding,
-        private val listener: CompoundButton.OnCheckedChangeListener
+    class FireproofWebsiteSettingSelectionViewHolder(
+        private val binding: ViewFireproofWebsiteSettingsSelectionBinding,
+        private val viewModel: FireproofWebsitesViewModel
     ) :
         FireproofWebSiteViewHolder(binding.root) {
-        fun bind(loginDetectionEnabled: AutomaticFireproofSetting) {
-            binding.fireproofWebsiteToggle.quietlySetIsChecked(loginDetectionEnabled != AutomaticFireproofSetting.NEVER, listener)
+        fun bind(automaticFireproofSetting: AutomaticFireproofSetting) {
+            binding.fireproofWebsiteUserSetting.text = itemView.context.getString(automaticFireproofSetting.stringRes)
+            binding.fireproofWebsiteSettingsSelection.setOnClickListener {
+                viewModel.command.value = ShowAutomaticFireproofSettingSelectionDialog(automaticFireproofSetting)
+            }
         }
     }
 

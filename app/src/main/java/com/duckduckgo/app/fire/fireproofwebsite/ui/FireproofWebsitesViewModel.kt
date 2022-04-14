@@ -49,7 +49,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     sealed class Command {
         class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
-        class SelectLoginDetectorSetting(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
+        class ShowAutomaticFireproofSettingSelectionDialog(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
