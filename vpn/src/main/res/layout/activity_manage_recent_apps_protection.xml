@@ -47,6 +47,7 @@
                 tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_4"
