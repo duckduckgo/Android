@@ -94,6 +94,11 @@ class DeviceShieldTileService : TileService() {
         super.onStopListening()
     }
 
+    override fun onDestroy() {
+        stopPollingDeviceShieldState()
+        super.onDestroy()
+    }
+
     private fun pollDeviceShieldState() {
         deviceShieldStatePollingJob +=
             serviceScope.launch {
