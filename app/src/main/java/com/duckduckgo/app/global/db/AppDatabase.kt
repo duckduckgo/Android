@@ -48,7 +48,7 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
-import com.duckduckgo.app.settings.db.SettingsSharedPreferences
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
@@ -146,7 +146,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context) {
+class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -555,7 +555,7 @@ class MigrationsProvider(val context: Context) {
     }
 
     val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
-        val fireproofLoginDetector = OldFireproofLoginDetector()
+        val fireproofLoginDetector = OldSettingsDataStore()
 
         override fun migrate(database: SupportSQLiteDatabase) {
             fireproofLoginDetector.updateFireproofSettingType()
@@ -659,17 +659,13 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
-    private inner class OldFireproofLoginDetector {
+    private inner class OldSettingsDataStore {
 
-        private val fileName = "com.duckduckgo.app.settings_activity.settings"
         private val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
 
         fun updateFireproofSettingType() {
-            val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-            val loginDetectionEnabled = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
-            preferences.edit().remove("KEY_LOGIN_DETECTION_ENABLED").apply()
-            val automaticFireproofSetting = loginDetectorPrefsMapper.mapToAutomaticFireproofSetting(loginDetectionEnabled)
-            preferences.edit().putString(SettingsSharedPreferences.KEY_AUTOMATIC_FIREPROOF_SETTING, automaticFireproofSetting.name).apply()
+            val automaticFireproofSetting = loginDetectorPrefsMapper.mapToAutomaticFireproofSetting(settingsDataStore.appLoginDetection)
+            settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
         }
     }
 }

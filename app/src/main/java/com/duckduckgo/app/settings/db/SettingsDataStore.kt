@@ -41,6 +41,8 @@ interface SettingsDataStore {
     var selectedFireAnimation: FireAnimation
     val fireAnimationEnabled: Boolean
     var appIconChanged: Boolean
+    @Deprecated(message = "Not used anymore after adding automatic fireproof", replaceWith = ReplaceWith(expression = "automaticFireproofSetting"))
+    var appLoginDetection: Boolean
     var automaticFireproofSetting: AutomaticFireproofSetting
     var appLocationPermission: Boolean
     var appLocationPermissionDeniedForever: Boolean
@@ -91,6 +93,10 @@ class SettingsSharedPreferences @Inject constructor(
     override var autoCompleteSuggestionsEnabled: Boolean
         get() = preferences.getBoolean(KEY_AUTOCOMPLETE_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_AUTOCOMPLETE_ENABLED, enabled) }
+
+    override var appLoginDetection: Boolean
+        get() = preferences.getBoolean("KEY_LOGIN_DETECTION_ENABLED", true)
+        set(enabled) = preferences.edit { putBoolean("KEY_LOGIN_DETECTION_ENABLED", enabled) }
 
     override var automaticFireproofSetting: AutomaticFireproofSetting
         get() = AutomaticFireproofSetting.valueOf(preferences.getString(KEY_AUTOMATIC_FIREPROOF_SETTING, ASK_EVERY_TIME.name) ?: ASK_EVERY_TIME.name)

@@ -27,7 +27,9 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.onboarding.store.AppStage
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.NEVER
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -37,6 +39,7 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class AppDatabaseTest {
@@ -49,7 +52,8 @@ class AppDatabaseTest {
     val testHelper = MigrationTestHelper(getInstrumentation(), AppDatabase::class.qualifiedName, FrameworkSQLiteOpenHelperFactory())
 
     private val context = mock<Context>()
-    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context)
+    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val migrationsProvider: MigrationsProvider = MigrationsProvider(context, mockSettingsDataStore)
     private val sharedPreferences: SharedPreferences = mock()
 
     @Before
@@ -462,11 +466,24 @@ class AppDatabaseTest {
         createDatabaseAndMigrate(41, 42, migrationsProvider.MIGRATION_41_TO_42)
     }
 
-    // @Test
-    // fun whenMigratingFromVersion42To43IfUserHasLoginDetectionEnabledThenMapToAskEveryTime() {
-    //     givenUserHasLoginDetectionEnabled()
-    //     createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
-    // }
+    @Test
+    fun whenMigratingFromVersion42To43ThenValidationSucceeds() {
+        createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
+    }
+
+    @Test
+    fun whenMigratingFromVersion42To43IfUserHasLoginDetectionEnabledThenMapToAskEveryTime() {
+        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(true)
+        createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
+        verify(mockSettingsDataStore).automaticFireproofSetting = ASK_EVERY_TIME
+    }
+
+    @Test
+    fun whenMigratingFromVersion42To43IfUserHasLoginDetectionDisabledThenMapToNever() {
+        whenever(mockSettingsDataStore.appLoginDetection).thenReturn(false)
+        createDatabaseAndMigrate(42, 43, migrationsProvider.MIGRATION_42_TO_43)
+        verify(mockSettingsDataStore).automaticFireproofSetting = NEVER
+    }
 
     private fun givenUserStageIs(
         database: SupportSQLiteDatabase,
@@ -524,10 +541,6 @@ class AppDatabaseTest {
 
     private fun givenUserSawOnboarding() {
         whenever(sharedPreferences.getInt(eq(PROPERTY_KEY), any())).thenReturn(1)
-    }
-
-    private fun givenUserHasLoginDetectionEnabled() {
-        whenever(sharedPreferences.getString(eq("KEY_LOGIN_DETECTION_ENABLED"), any())).thenReturn(ASK_EVERY_TIME.name)
     }
 
     companion object {

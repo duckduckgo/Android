@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import com.duckduckgo.app.browser.WebViewDatabaseProvider
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.db.MigrationsProvider
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
@@ -52,7 +53,10 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideDatabaseMigrations(context: Context): MigrationsProvider {
-        return MigrationsProvider(context)
+    fun provideDatabaseMigrations(
+        context: Context,
+        settingsDataStore: SettingsDataStore
+    ): MigrationsProvider {
+        return MigrationsProvider(context, settingsDataStore)
     }
 }
