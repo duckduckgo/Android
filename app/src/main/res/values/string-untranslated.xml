@@ -16,9 +16,13 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-   <!-- MacOs Settings -->
+    <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
     <string name="macos_settings_description_list">You\'re on the list!</string>
     <string name="macos_settings_description_ready">Available for download on Mac</string>
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+
+    <!-- Automatic Fireproof-->
+    <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
 </resources>

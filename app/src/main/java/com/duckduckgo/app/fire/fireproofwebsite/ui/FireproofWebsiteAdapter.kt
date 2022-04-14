@@ -29,7 +29,6 @@ import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteSettingsSelectionBinding
-import com.duckduckgo.app.browser.databinding.ViewListItemDividerBinding
 import com.duckduckgo.app.browser.databinding.ViewListSingleItemEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -51,13 +50,12 @@ class FireproofWebsiteAdapter(
         const val DESCRIPTION_TYPE = 1
         const val EMPTY_STATE_TYPE = 2
         const val SETTING_SELECTION_TYPE = 3
-        const val DIVIDER_TYPE = 4
-        const val SECTION_TITLE_TYPE = 5
+        const val SECTION_TITLE_TYPE = 4
 
         const val EMPTY_HINT_ITEM_SIZE = 1
     }
 
-    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, SETTING_SELECTION_TYPE, DIVIDER_TYPE, SECTION_TITLE_TYPE)
+    private val sortedHeaderElements = listOf(DESCRIPTION_TYPE, SETTING_SELECTION_TYPE, SECTION_TITLE_TYPE)
 
     var fireproofWebsites: List<FireproofWebsiteEntity> = emptyList()
         set(value) {
@@ -85,10 +83,6 @@ class FireproofWebsiteAdapter(
                     binding,
                     viewModel
                 )
-            }
-            DIVIDER_TYPE -> {
-                val binding = ViewListItemDividerBinding.inflate(inflater, parent, false)
-                FireproofWebSiteViewHolder.FireproofWebsiteSimpleViewViewHolder(binding)
             }
             SECTION_TITLE_TYPE -> {
                 val binding = ViewFireproofTitleBinding.inflate(inflater, parent, false)

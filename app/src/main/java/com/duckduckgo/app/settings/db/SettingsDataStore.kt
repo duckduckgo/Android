@@ -256,9 +256,9 @@ class SettingsSharedPreferences @Inject constructor(
 
     class LoginDetectorPrefsMapper {
         enum class AutomaticFireproofSetting(val stringRes: Int) {
-            ASK_EVERY_TIME(R.string.settingsAppLinksAskEveryTime),
-            ALWAYS(R.string.settingsAppLinksAlways),
-            NEVER(R.string.settingsAppLinksNever)
+            ASK_EVERY_TIME(R.string.fireproofWebsiteSettingsSelectionDialogAskEveryTime),
+            ALWAYS(R.string.fireproofWebsiteSettingsSelectionDialogAlways),
+            NEVER(R.string.fireproofWebsiteSettingsSelectionDialogNever)
         }
 
         fun mapToAutomaticFireproofSetting(oldLoginDetectorValue: Boolean): AutomaticFireproofSetting {
