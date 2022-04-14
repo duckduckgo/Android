@@ -110,7 +110,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
     }
 
     override fun onPause() {
-        viewModel.onLeavingScreen()
+        // viewModel.onLeavingScreen()
         super.onPause()
     }
 

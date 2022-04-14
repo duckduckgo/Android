@@ -148,6 +148,7 @@ constructor(
                     excludedAppsRepository.manuallyExcludedApp(packageName)
                 }
             }
+            command.send(Command.RestartVpn)
             viewStateFlow.emit(viewStateFlow.value.copy(userChangedState = true, manualProtectionState = checked))
         }
     }
