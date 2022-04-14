@@ -23,7 +23,6 @@ import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
-import com.duckduckgo.app.di.component.BookmarksActivityComponent
 import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.process.ProcessDetector
@@ -88,7 +87,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, Application() {
         configureUncaughtExceptionHandler(currentProcess)
         initializeDateLibrary()
 
-        if (appIsRestarting()) return
         if (currentProcess is VpnProcess) {
             Timber.i("VPN process, no further logic executed in application onCreate()")
             return

@@ -22,14 +22,14 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 abstract class FeedbackFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId) {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

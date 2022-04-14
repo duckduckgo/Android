@@ -20,32 +20,32 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     BadHealthMitigation("badHealthMitigation", defaultValue = true),
     Ipv6Support("ipv6Support"),
     PrivateDnsSupport("privateDnsSupport"),
-    NetworkSwitchHandling("networkSwitchHandling"),
+    NetworkSwitchHandling("networkSwitchSupport"),
+    SetActiveNetworkDns("setActiveNetworkDns"),
+    AlwaysSetDNS("alwaysSetDNS"),
 }
 
 interface SettingName {
     val value: String
     val defaultValue: Boolean
+}
 
-    companion object {
-        /**
-         * Utility function to create a [SettingName] from the passed in [block] lambda
-         * instead of using the anonymous `object : FeatureName` syntax.
-         *
-         * Usage:
-         *
-         * ```kotlin
-         * val name = SettingName {
-         *
-         * }
-         * ```
-         */
-        inline operator fun invoke(crossinline block: () -> String): SettingName {
-            return object : SettingName {
-                override val value: String
-                    get() = block()
-                override val defaultValue: Boolean = false
-            }
-        }
+/**
+ * Fake constructor for [SettingName] from the passed in [block] lambda
+ * instead of using the anonymous `object : FeatureName` syntax.
+ *
+ * Usage:
+ *
+ * ```kotlin
+ * val name = SettingName {
+ *
+ * }
+ * ```
+ */
+fun SettingName(block: () -> String): SettingName {
+    return object : SettingName {
+        override val value: String
+            get() = block()
+        override val defaultValue: Boolean = false
     }
 }

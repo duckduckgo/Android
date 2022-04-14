@@ -19,6 +19,8 @@ package com.duckduckgo.mobile.android.vpn.service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService.Companion.ACTION_VPN_REMINDER_RESTART
 import com.duckduckgo.mobile.android.vpn.ui.notification.ReminderNotificationPressedHandler
@@ -30,6 +32,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(ReceiverScope::class)
 class VpnReminderReceiver : BroadcastReceiver() {
 
     @Inject

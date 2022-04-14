@@ -21,16 +21,15 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -39,8 +38,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(ActivityScope::class)
 class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val applicationContext: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
@@ -57,7 +56,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private var lastVpnRequestTime = -1L
 
     internal suspend fun getRunningState(): Flow<VpnState> = withContext(dispatcherProvider.io()) {
-        return@withContext vpnStateMonitor.getStateFlow()
+        return@withContext vpnStateMonitor.getStateFlow().debounce(500)
     }
 
     internal suspend fun getTrackingAppsCount(): Flow<TrackingAppCount> = withContext(dispatcherProvider.io()) {
@@ -177,22 +176,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowDisableConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class PastWeekTrackerActivityViewModelFactory @Inject constructor(
-    private val viewModelProvider: Provider<DeviceShieldTrackerActivityViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DeviceShieldTrackerActivityViewModel::class.java) -> (
-                    (viewModelProvider.get()) as T
-                    )
-                else -> null
-            }
-        }
     }
 }
 

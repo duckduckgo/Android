@@ -33,22 +33,28 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_globe_gray_16dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/ic_globe_gray_16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/deviceShieldAppEntryName"
-        style="@style/TextAppearance.AppCompat.Body1"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        android:ellipsize="end" android:maxLines="1"
-        android:orientation="vertical" android:singleLine="true"
-        android:textColor="?normalTextColor" app:layout_constraintBottom_toTopOf="@+id/deviceShieldAppExclusionReason"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:orientation="vertical"
+        android:singleLine="true"
+        app:layout_constraintBottom_toTopOf="@+id/deviceShieldAppExclusionReason"
         app:layout_constraintEnd_toStartOf="@+id/verticalSplitter"
-        app:layout_constraintStart_toEndOf="@+id/deviceShieldAppEntryIcon" app:layout_constraintTop_toTopOf="parent" tools:text="Facebook"/>
+        app:layout_constraintStart_toEndOf="@+id/deviceShieldAppEntryIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Facebook"/>
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/deviceShieldAppEntryShieldEnabled"
@@ -56,16 +62,21 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:theme="@style/Widget.DuckDuckGo.Switch.Blue"
-        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <View
         android:id="@+id/verticalSplitter"
         android:layout_width="1dp"
-        android:layout_height="0dp" android:layout_marginEnd="8dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:background="@color/splitterGray" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/deviceShieldAppEntryShieldEnabled" app:layout_constraintTop_toTopOf="parent"/>
+        android:background="?splitterColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/deviceShieldAppEntryShieldEnabled"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/deviceShieldAppExclusionReason"
@@ -74,8 +85,10 @@
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_alert_yellow_16"
         android:drawablePadding="@dimen/keyline_1"
-        android:textColor="@color/brownishGrayTwo" app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName" app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
+        android:textColor="@color/brownishGrayTwo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/deviceShieldAppEntryName"
+        app:layout_constraintStart_toStartOf="@+id/deviceShieldAppEntryName"
         app:layout_constraintTop_toBottomOf="@+id/deviceShieldAppEntryName"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

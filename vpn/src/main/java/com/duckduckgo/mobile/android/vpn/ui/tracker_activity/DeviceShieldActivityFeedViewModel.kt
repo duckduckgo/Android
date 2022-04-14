@@ -17,26 +17,25 @@
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlin.coroutines.coroutineContext
 
+@ContributesViewModel(FragmentScope::class)
 class DeviceShieldActivityFeedViewModel @Inject constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val dispatcherProvider: DispatcherProvider,
@@ -166,18 +165,4 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val companyPrevalence: Int
     )
 
-}
-
-@ContributesMultibinding(AppScope::class)
-class DeviceShieldActivityFeedViewModelFactory @Inject constructor(
-    private val deviceShieldActivityFeedViewModel: Provider<DeviceShieldActivityFeedViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DeviceShieldActivityFeedViewModel::class.java) -> (deviceShieldActivityFeedViewModel.get() as T)
-                else -> null
-            }
-        }
-    }
 }

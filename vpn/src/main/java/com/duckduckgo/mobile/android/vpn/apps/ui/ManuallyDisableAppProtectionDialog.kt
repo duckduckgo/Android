@@ -56,7 +56,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_disable_app, null)
 
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
-        val disableLabel = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
         val reportCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogReport)
         val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
@@ -67,7 +66,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
         isCancelable = false
 
         populateAppIcon(appIcon)
-        populateLabel(disableLabel)
         configureListeners(reportCTA, skipCTA)
 
         return alertDialog.create()
@@ -76,11 +74,6 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     private fun populateAppIcon(appIcon: ImageView) {
         val icon = requireActivity().packageManager.safeGetApplicationIcon(getPackageName())
         appIcon.setImageDrawable(icon)
-    }
-
-    private fun populateLabel(disableLabel: TextView) {
-        disableLabel.text =
-            getString(R.string.atp_ExcludeAppsManuallyDisableAppLabel, getAppName()).applyBoldSpanTo(getAppName())
     }
 
     private fun getPackageName(): String {

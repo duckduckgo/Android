@@ -34,9 +34,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.historicalExitReasonsByProcessName
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.rightDrawable
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnDiagnosticsBinding
@@ -61,6 +63,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_U
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_WRITE_IO_MEMORY_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.UserHealthSubmission
+import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
@@ -89,6 +92,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 
+@InjectWith(ActivityScope::class)
 class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var connectivityManager: ConnectivityManager
@@ -434,7 +438,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         } else {
             networkInfo.networks.joinToString(
                 "\n\n",
-                transform = { "${it.type.type}:\n${it.address}" },
+                transform = { "${it.type.type} (${it.iface}):\n${it.address}" },
             )
         }
     }
@@ -473,17 +477,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
     }
 
     private fun retrieveDnsInfo(): String {
-        val dnsServerAddresses = mutableListOf<String>()
-
-        runCatching {
-            connectivityManager
-                .allNetworks
-                .filter { it.isConnected() }
-                .mapNotNull { connectivityManager.getLinkProperties(it) }
-                .map { it.dnsServers }
-                .flatten()
-                .forEach { dnsServerAddresses.add(it.hostAddress) }
-        }
+        val dnsServerAddresses = this.getSystemActiveNetworkDefaultDns()
 
         return if (dnsServerAddresses.isEmpty()) return "none"
         else
@@ -541,6 +535,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
                 if (!networkAddress.isLoopbackAddress) {
                     networks.add(
                         Network(
+                            iface = networkInterface.name,
                             address = networkAddress.hostAddress,
                             type = addressType(address = networkAddress),
                         ),
@@ -685,6 +680,7 @@ data class NetworkInfo(
 )
 
 data class Network(
+    val iface: String,
     val address: String,
     val type: NetworkType
 )

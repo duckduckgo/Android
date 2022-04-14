@@ -34,6 +34,7 @@ package com.duckduckgo.vpn.internal.feature.remote
 
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -42,6 +43,7 @@ import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -91,6 +93,7 @@ class VpnRemoteFeatureReceiver(
 class VpnRemoteFeatureReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTpFeatureConfig: AppTpFeatureConfig,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnServiceCallbacks {
 
     private var receiver: VpnRemoteFeatureReceiver? = null
@@ -106,12 +109,26 @@ class VpnRemoteFeatureReceiverRegister @Inject constructor(
                         appTpFeatureConfig.edit {
                             setEnabled(VpnRemoteFeatureReceiver.settingName(intent), true, isManualOverride = true)
                         }
+                        withContext(dispatcherProvider.main()) {
+                            Intent("vpn-service").apply {
+                                putExtra("action", "restart")
+                            }.also {
+                                context.sendBroadcast(it)
+                            }
+                        }
                     }
                 }
                 VpnRemoteFeatureReceiver.isOffIntent(intent) -> {
                     coroutineScope.launch {
                         appTpFeatureConfig.edit {
                             setEnabled(VpnRemoteFeatureReceiver.settingName(intent), false, isManualOverride = true)
+                        }
+                        withContext(dispatcherProvider.main()) {
+                            Intent("vpn-service").apply {
+                                putExtra("action", "restart")
+                            }.also {
+                                context.sendBroadcast(it)
+                            }
                         }
                     }
                 }

@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:background="@color/splitterGray"/>
+                android:background="?splitterColor"/>
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/deviceShieldReportBreakageAppListSkeleton"
@@ -109,7 +109,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/splitterGray"/>
+        android:background="?splitterColor"/>
 
     <Button
         android:id="@+id/ctaSubmitAppBreakage"

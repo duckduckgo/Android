@@ -24,8 +24,11 @@ import com.duckduckgo.app.global.AppUrl.Url
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.UrlScheme.Companion.https
 import com.duckduckgo.app.global.withScheme
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
+@ContributesBinding(AppScope::class)
 class QueryUrlConverter @Inject constructor(private val requestRewriter: RequestRewriter) : OmnibarEntryConverter {
 
     override fun convertQueryToUrl(

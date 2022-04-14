@@ -45,6 +45,10 @@ class VpnPreferences @Inject constructor(
         get() = preferences.getString("private_dns", null)
         set(value) = preferences.edit { putString("private_dns", value) }
 
+    var underlyingNetworks: String?
+        get() = preferences.getString("underlying_networks", null)
+        set(value) = preferences.edit(commit = true) { putString("underlying_networks", value) }
+
     fun isPrivateDnsKey(key: String) = key == "private_dns"
 
     fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {

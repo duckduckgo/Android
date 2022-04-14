@@ -63,7 +63,7 @@
         android:id="@+id/deviceShieldCtaSplitter"
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="@color/splitterGray"
+        android:background="?splitterColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -27,7 +27,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class StatisticsLibraryConfigModule {
+object StatisticsLibraryConfigModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideStatisticsLibraryConfig(

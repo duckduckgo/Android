@@ -16,29 +16,24 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Service
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
-import android.net.Network
 import android.net.VpnService
-import android.os.Binder
-import android.os.Build
-import android.os.IBinder
-import android.os.Parcel
-import android.os.ParcelFileDescriptor
+import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
-import com.duckduckgo.mobile.android.vpn.feature.*
-import com.duckduckgo.mobile.android.vpn.network.connection.ConnectionMonitor
-import com.duckduckgo.mobile.android.vpn.network.connection.NetworkConnectionListener
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.network.util.getActiveNetwork
+import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketReader
 import com.duckduckgo.mobile.android.vpn.processor.TunPacketWriter
@@ -52,13 +47,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -68,7 +57,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator, NetworkConnectionListener {
+@InjectWith(VpnScope::class)
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -115,9 +105,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     private var vpnStateServiceReference: IBinder? = null
 
     @Inject lateinit var appBuildConfig: AppBuildConfig
-
-    @Inject lateinit var connectionMonitorFactory: ConnectionMonitor.Factory
-    private var connectionMonitor: ConnectionMonitor? = null
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
 
@@ -218,6 +205,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             return@withContext
         }
 
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
+            applicationContext.getActiveNetwork()?.let { an ->
+                Timber.v("Setting underlying network $an")
+                setUnderlyingNetworks(arrayOf(an))
+            }
+        } else {
+            Timber.v("NetworkSwitchHandling disabled...skip setting underlying network")
+        }
+
         tunInterface?.let { vpnInterface ->
             executorService?.shutdownNow()
             val processors = listOf(
@@ -239,10 +235,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
-
-        connectionMonitor?.onSopMonitoring()
-        connectionMonitor = connectionMonitorFactory.create(this@TrackerBlockingVpnService, this@TrackerBlockingVpnService)
-            .apply { onStartMonitoring() }
     }
 
     private suspend fun establishVpnInterface() {
@@ -270,17 +262,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             if (vpnPreferences.isCustomDnsServerSet()) {
                 addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
             }
-            vpnPreferences.privateDns?.let { privateDnsName ->
-                if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
-                    runCatching {
-                        InetAddress.getAllByName(privateDnsName)
-                    }.getOrNull()?.forEach { addr ->
-                        // ensure we don't set IPv6 DNS if not enabled
-                        if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || addr is Inet4Address) {
-                            Timber.v("Setting private DNS: $addr")
-                            addDnsServer(addr)
-                        }
-                    }
+
+            // Set DNS
+            getDns().forEach {
+                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || it is Inet4Address) {
+                    Timber.v("Adding DNS $it")
+                    addDnsServer(it)
                 }
             }
 
@@ -305,6 +292,71 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             Timber.e("VPN log: Failed to establish VPN tunnel")
             stopVpn(VpnStateMonitor.VpnStopReason.ERROR)
         }
+    }
+
+    private fun getDns(): Set<InetAddress> {
+        // private extension function, this is purposely here to limit visibility
+        fun Set<InetAddress>.containsIpv4(): Boolean {
+            forEach {
+                if (it is Inet4Address) return true
+                return false
+            }
+            return false
+        }
+
+        val dns = mutableSetOf<InetAddress>()
+
+        // Default system DNS
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.SetActiveNetworkDns)) {
+            kotlin.runCatching {
+                applicationContext.getSystemActiveNetworkDefaultDns()
+                    .map { InetAddress.getByName(it) }
+            }.getOrNull()?.run { dns.addAll(this) }
+        }
+
+        // Android Private DNS (added by the user)
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
+            vpnPreferences.privateDns?.let { privateDnsName ->
+                runCatching {
+                    InetAddress.getAllByName(privateDnsName)
+                }.getOrNull()?.run { dns.addAll(this) }
+            }
+        }
+
+        // This is purely internal, never to go to production
+        if (appBuildConfig.isInternalBuild() && appTpFeatureConfig.isEnabled(AppTpSetting.AlwaysSetDNS)) {
+            // Always add DNS
+            if (dns.isEmpty()) {
+                kotlin.runCatching {
+                    dns.add(InetAddress.getByName("1.1.1.1"))
+                    dns.add(InetAddress.getByName("1.0.0.1"))
+                    if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)) {
+                        dns.add(InetAddress.getByName("2606:4700:4700::1111"))
+                        dns.add(InetAddress.getByName("2606:4700:4700::1001"))
+                    }
+                }.onFailure {
+                    Timber.w(it, "Error adding fallback DNS")
+                }
+            }
+
+            // always add ipv4 DNS
+            if (!dns.containsIpv4()) {
+                kotlin.runCatching {
+                    dns.add(InetAddress.getByName("1.1.1.1"))
+                    dns.add(InetAddress.getByName("1.0.0.1"))
+                }.onFailure {
+                    Timber.w(it, "Error adding fallback DNS")
+                }
+            }
+        }
+
+        if (!dns.containsIpv4()) {
+            // never allow IPv6-only DNS
+            Timber.v("No IPv4 DNS found, return empty DNS list")
+            return setOf()
+        }
+
+        return dns.toSet()
     }
 
     private fun Builder.safelyAddAllowedApps(apps: List<String>) {
@@ -335,8 +387,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         executorService?.shutdownNow()
         udpPacketProcessor.stop()
         tcpPacketProcessor.stop()
-        connectionMonitor?.onSopMonitoring()
-        connectionMonitor = null
         tunInterface?.close()
         tunInterface = null
 
@@ -348,7 +398,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         vpnStateServiceReference?.let {
-            unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null }
+            runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
 
         stopForeground(true)
@@ -509,34 +559,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_START_VPN = "ACTION_START_VPN"
         private const val ACTION_STOP_VPN = "ACTION_STOP_VPN"
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
-    }
-
-    @SuppressLint("NewApi")
-    override fun onNetworkDisconnected() {
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
-            // TODO maybe at some point show the user?
-            Timber.w("No network")
-            if (appBuildConfig.sdkInt >= 22) {
-                setUnderlyingNetworks(null)
-            }
-        }
-    }
-
-    @SuppressLint("NewApi")
-    override fun onNetworkConnected(networks: LinkedHashSet<Network>) {
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.NetworkSwitchHandling)) {
-            if (appBuildConfig.sdkInt >= 22) {
-                Timber.w("set underlying networks: $networks")
-                if (networks.isEmpty()) {
-                    // this should never happen. If networks.isEmpty() onNetworkDisconnected() should be called instead.
-                    // just safeguard
-                    Timber.w("onNetworkConnected called with empty networks...setting underlying networks to default")
-                    setUnderlyingNetworks(null)
-                } else {
-                    setUnderlyingNetworks(networks.toTypedArray())
-                }
-            }
-        }
     }
 
     override fun createDatagramChannel(): DatagramChannel {

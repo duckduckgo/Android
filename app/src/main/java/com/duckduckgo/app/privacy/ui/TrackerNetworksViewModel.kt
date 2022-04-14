@@ -20,22 +20,20 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Module
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(ActivityScope::class)
 class TrackerNetworksViewModel @Inject constructor(
     private val tabRepository: TabRepository
 ) : ViewModel() {
@@ -86,20 +84,5 @@ class TrackerNetworksViewModel @Inject constructor(
     private fun emptySortedTrackingEventMap(): SortedMap<Entity, List<TrackingEvent>> {
         val comparator = compareBy<Entity> { !it.isMajor }.thenBy { it.displayName }
         return emptyMap<Entity, List<TrackingEvent>>().toSortedMap(comparator)
-    }
-}
-
-@Module
-@ContributesMultibinding(AppScope::class)
-class TrackerNetworksViewModelFactory @Inject constructor(
-    private val viewModel: Provider<TrackerNetworksViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(TrackerNetworksViewModel::class.java) -> (viewModel.get() as T)
-                else -> null
-            }
-        }
     }
 }

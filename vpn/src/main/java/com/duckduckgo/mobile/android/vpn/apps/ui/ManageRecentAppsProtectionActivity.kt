@@ -22,10 +22,13 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
+import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
@@ -44,6 +47,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class ManageRecentAppsProtectionActivity :
     DuckDuckGoActivity(),
     ManuallyEnableAppProtectionDialog.ManuallyEnableAppsProtectionDialogListener,
@@ -122,7 +126,14 @@ class ManageRecentAppsProtectionActivity :
 
     private fun renderViewState(viewState: ViewState) {
         shimmerLayout.stopShimmer()
-        adapter.update(viewState.excludedApps)
+        if (viewState.excludedApps.isEmpty()) {
+            binding.manageRecentAppsRecycler.gone()
+            binding.manageRecentAppsEmptyView.show()
+        } else {
+            binding.manageRecentAppsEmptyView.gone()
+            adapter.update(viewState.excludedApps)
+            binding.manageRecentAppsRecycler.show()
+        }
         shimmerLayout.gone()
     }
 
@@ -181,18 +192,19 @@ class ManageRecentAppsProtectionActivity :
         return true
     }
 
-    override fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int
-    ) {
-        viewModel.onAppProtectionEnabled(packageName, excludingReason, needsPixel = true)
+    override fun onAppProtectionEnabled(packageName: String) {
+        viewModel.onAppProtectionEnabled(packageName)
     }
 
     override fun onDialogSkipped(position: Int) {
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+    override fun onAppProtectionDisabled(
+        appName: String,
+        packageName: String,
+        report: Boolean
+    ) {
         viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
@@ -206,7 +218,6 @@ class ManageRecentAppsProtectionActivity :
 
     override fun onDefaultProtectionRestored() {
         viewModel.restoreProtectedApps()
-        restartVpn()
         Snackbar.make(shimmerLayout, getString(R.string.atp_ExcludeAppsRestoreDefaultSnackbar), Snackbar.LENGTH_LONG)
             .show()
     }

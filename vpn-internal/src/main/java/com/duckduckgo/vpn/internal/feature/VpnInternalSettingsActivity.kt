@@ -114,7 +114,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun setupUiElementsState() {
-        vpnStateMonitor.getStateFlow()
+        vpnStateMonitor.getStateFlow().debounce(500)
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .map { it.state == VpnStateMonitor.VpnRunningState.ENABLED }
             .onEach { isEnabled ->
@@ -123,6 +123,8 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.badHealthMonitorToggle.isEnabled = isEnabled
                 binding.badHealthMitigationToggle.isEnabled = isEnabled
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
+                binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
+                binding.setActiveNetworkDnsToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.transparencyModeToggle.isEnabled = isEnabled
                 binding.settingsInfo.isVisible = !isEnabled
@@ -225,6 +227,28 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         with(AppTpSetting.NetworkSwitchHandling) {
             binding.vpnUnderlyingNetworksToggle.isChecked = appTpConfig.isEnabled(this)
             binding.vpnUnderlyingNetworksToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
+        with(AppTpSetting.AlwaysSetDNS) {
+            binding.vpnAlwaysSetDNSToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnAlwaysSetDNSToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
+        with(AppTpSetting.SetActiveNetworkDns) {
+            binding.setActiveNetworkDnsToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.setActiveNetworkDnsToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {

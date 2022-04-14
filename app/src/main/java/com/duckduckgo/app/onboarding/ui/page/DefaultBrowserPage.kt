@@ -32,22 +32,25 @@ import android.widget.Toast
 import androidx.core.view.ViewCompat.requestApplyInsets
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.global.ViewModelFactory
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class DefaultBrowserPage : OnboardingPageFragment() {
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var variantManager: VariantManager
