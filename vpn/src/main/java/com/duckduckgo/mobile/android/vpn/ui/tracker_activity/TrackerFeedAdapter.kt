@@ -58,7 +58,7 @@ class TrackerFeedAdapter @Inject constructor(
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
                 onAppClick,
-                position == trackerFeedItems.size -1 ,
+                position == trackerFeedItems.size - 1,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
