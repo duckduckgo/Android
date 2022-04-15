@@ -20,7 +20,6 @@ import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -82,7 +81,8 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     private fun showAutomaticFireproofSettingSelectionDialog(automaticFireproofSetting: AutomaticFireproofSetting) {
-        Toast.makeText(baseContext, "Show automatic fireproof setting selection dialog", Toast.LENGTH_SHORT).show()
+        val dialog = FireproofSettingsSelectorFragment.create(automaticFireproofSetting)
+        dialog.show(supportFragmentManager, FIREPROOF_SETTING_SELECTOR_DIALOG_TAG)
     }
 
     @Suppress("deprecation")
@@ -104,6 +104,8 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        private const val FIREPROOF_SETTING_SELECTOR_DIALOG_TAG = "FIREPROOF_SETTING_SELECTOR_DIALOG_TAG"
+
         fun intent(context: Context): Intent {
             return Intent(context, FireproofWebsitesActivity::class.java)
         }

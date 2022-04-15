@@ -37,20 +37,20 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AppLinkSettingType? ?: AppLinkSettingType.ASK_EVERYTIME
 
         val rootView =
-            View.inflate(activity, R.layout.settings_app_links_selector_fragment, null)
+            View.inflate(activity, R.layout.dialog_radio_group_selector_fragment, null)
 
-        updateCurrentSelection(currentOption, rootView.findViewById(R.id.appLinksSelectorGroup))
+        updateCurrentSelection(currentOption, rootView.findViewById(R.id.selectorRadioGroup))
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
             .setView(rootView)
             .setTitle(R.string.settingsTitleAppLinksDialog)
             .setPositiveButton(R.string.dialogSave) { _, _ ->
                 dialog?.let {
-                    val radioGroup = it.findViewById(R.id.appLinksSelectorGroup) as RadioGroup
+                    val radioGroup = it.findViewById(R.id.selectorRadioGroup) as RadioGroup
                     val selectedOption = when (radioGroup.checkedRadioButtonId) {
-                        R.id.appLinksSelectorAskEveryTime -> AppLinkSettingType.ASK_EVERYTIME
-                        R.id.appLinksSelectorAlways -> AppLinkSettingType.ALWAYS
-                        R.id.appLinksSelectorNever -> AppLinkSettingType.NEVER
+                        R.id.selectorRadioButton1 -> AppLinkSettingType.ASK_EVERYTIME
+                        R.id.selectorRadioButton2 -> AppLinkSettingType.ALWAYS
+                        R.id.selectorRadioButton3 -> AppLinkSettingType.NEVER
                         else -> AppLinkSettingType.ASK_EVERYTIME
                     }
                     val listener = activity as Listener?
@@ -73,9 +73,9 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
     @IdRes
     private fun AppLinkSettingType.radioButtonId(): Int {
         return when (this) {
-            AppLinkSettingType.ASK_EVERYTIME -> R.id.appLinksSelectorAskEveryTime
-            AppLinkSettingType.ALWAYS -> R.id.appLinksSelectorAlways
-            AppLinkSettingType.NEVER -> R.id.appLinksSelectorNever
+            AppLinkSettingType.ASK_EVERYTIME -> R.id.selectorRadioButton1
+            AppLinkSettingType.ALWAYS -> R.id.selectorRadioButton2
+            AppLinkSettingType.NEVER -> R.id.selectorRadioButton3
         }
     }
 
