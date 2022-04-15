@@ -85,13 +85,13 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
             val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
 
-            perAppData.values.distinct().forEach { appTrackers ->
+            perAppData.values.forEach { appTrackers ->
                 val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
                 sourceData.add(item.trackerCompanySignal.tracker.trackingApp)
             }
         }
 
-        return sourceData
+        return sourceData.distinct()
     }
 
     fun onAppProtectionDisabled(
