@@ -178,6 +178,8 @@ import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
@@ -297,6 +299,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
 
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -396,6 +401,22 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
+            when (it) {
+                is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
+                    omnibarTextInput.setText(it.result)
+                    userEnteredQuery(it.result)
+                    resumeWebView()
+                }
+                else -> resumeWebView()
+            }
+        }
+    }
+
+    private fun resumeWebView() {
+        webView?.let {
+            if (it.isShown) it.onResume()
+        }
     }
 
     override fun onCreateView(
@@ -489,6 +510,7 @@ class BrowserTabFragment :
         }
 
         addTextChangedListeners()
+        resumeWebView()
     }
 
     override fun onPause() {
@@ -2198,6 +2220,21 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
                 }
+
+                renderVoiceSearch(viewState)
+            }
+        }
+
+        private fun renderVoiceSearch(viewState: OmnibarViewState) {
+            if (viewState.showVoiceSearch) {
+                voiceSearchButton.visibility = VISIBLE
+                voiceSearchButton.setOnClickListener {
+                    webView?.onPause()
+                    hideKeyboardImmediately()
+                    voiceSearchLauncher.launch(requireActivity())
+                }
+            } else {
+                voiceSearchButton.visibility = GONE
             }
         }
 
@@ -2517,7 +2554,10 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
+        private fun showHomeBackground(
+            favorites: List<QuickAccessFavorite>,
+            hideLogo: Boolean = false
+        ) {
             if (favorites.isEmpty()) {
                 if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
