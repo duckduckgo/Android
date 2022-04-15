@@ -20,10 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.vpn.apps.ui.ManuallyDisableAppProtectionDialog
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -31,7 +28,6 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
@@ -44,7 +40,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
-import javax.inject.Provider
 import kotlin.coroutines.coroutineContext
 
 @ContributesViewModel(ActivityScope::class)
@@ -91,7 +86,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
             }
         }
 
-        return sourceData
+        return sourceData.distinct()
     }
 
     fun onAppProtectionDisabled(
@@ -114,9 +109,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     }
 
     fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int,
-        needsPixel: Boolean = false
+        packageName: String
     ) {
         recordManualChange(packageName)
         viewModelScope.launch {
@@ -171,7 +164,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         position: Int
     ) {
         if (!excludedAppInfo.isProblematic()) {
-            onAppProtectionEnabled(excludedAppInfo.packageName, excludedAppInfo.knownProblem)
+            onAppProtectionEnabled(excludedAppInfo.packageName)
         } else {
             command.send(Command.ShowEnableProtectionDialog(excludedAppInfo, position))
         }

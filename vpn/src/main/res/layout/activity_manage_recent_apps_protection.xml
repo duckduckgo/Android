@@ -47,6 +47,7 @@
                 tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
                 android:paddingStart="@dimen/keyline_4"
                 android:paddingEnd="@dimen/keyline_4"
                 android:paddingTop="@dimen/keyline_4"
@@ -87,6 +88,18 @@
                 android:clipToPadding="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
+
+            <TextView
+                android:id="@+id/manageRecentAppsEmptyView"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
+                android:textAlignment="center"
+                android:paddingTop="40dp"
+                android:paddingBottom="40dp"
+                android:visibility="gone"
+                android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
 
             <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/manageRecentAppsShowAll"

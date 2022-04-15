@@ -19,14 +19,10 @@ package com.duckduckgo.app.global
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
 
+@ContributesPluginPoint(AppScope::class)
 interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(
         activity: Activity,
@@ -49,22 +45,4 @@ interface ActivityLifecycleCallbacks : Application.ActivityLifecycleCallbacks {
     }
 
     override fun onActivityDestroyed(activity: Activity) {}
-}
-
-private class ActivityLifecycleCallbacksPluginPoint(
-    private val plugins: DaggerSet<ActivityLifecycleCallbacks>
-) : PluginPoint<ActivityLifecycleCallbacks> {
-    override fun getPlugins(): Collection<ActivityLifecycleCallbacks> {
-        return plugins.sortedBy { it.javaClass.simpleName }
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-class ActivityLifecycleCallbacksModule {
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideActivityLifecycleCallbacksPluginPoint(
-        plugins: DaggerSet<ActivityLifecycleCallbacks>
-    ): PluginPoint<ActivityLifecycleCallbacks> = ActivityLifecycleCallbacksPluginPoint(plugins)
 }

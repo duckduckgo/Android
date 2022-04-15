@@ -226,11 +226,8 @@ class TrackingProtectionExclusionListActivity :
         return true
     }
 
-    override fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int
-    ) {
-        viewModel.onAppProtectionEnabled(packageName, excludingReason, needsPixel = true)
+    override fun onAppProtectionEnabled(packageName: String) {
+        viewModel.onAppProtectionEnabled(packageName)
     }
 
     override fun onDialogSkipped(position: Int) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.di
+package com.duckduckgo.voice.impl.di
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.app.global.plugins.migrations.MigrationPlugin
-import com.duckduckgo.app.global.plugins.migrations.MigrationPluginPoint
-import com.duckduckgo.di.DaggerSet
+import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.voice.store.RealVoiceSearchRepository
+import com.duckduckgo.voice.store.SharedPreferencesVoiceSearchDataStore
+import com.duckduckgo.voice.store.VoiceSearchDataStore
+import com.duckduckgo.voice.store.VoiceSearchRepository
 import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
 import dagger.Module
-import dagger.multibindings.Multibinds
+import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-abstract class MigrationsPluginProviderModule {
-    // we use multibinds as the list of plugins can be empty
-    @Multibinds
-    abstract fun provideMigrationsPlugins(): DaggerSet<MigrationPlugin>
-
-    @Binds
+object VoiceSearchModule {
     @SingleInstanceIn(AppScope::class)
-    abstract fun provideMigrationsPluginProvider(
-        migrationPluginPoint: MigrationPluginPoint
-    ): PluginPoint<MigrationPlugin>
+    @Provides
+    fun provideVoiceSearchRepository(dataStore: VoiceSearchDataStore): VoiceSearchRepository {
+        return RealVoiceSearchRepository(dataStore)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideVoiceSearchDataStore(context: Context): VoiceSearchDataStore {
+        return SharedPreferencesVoiceSearchDataStore(context)
+    }
 }

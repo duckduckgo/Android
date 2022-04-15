@@ -17,15 +17,10 @@
 package com.duckduckgo.app.settings.extension
 
 import android.content.Context
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.Multibinds
-import dagger.SingleInstanceIn
 
+@ContributesPluginPoint(AppScope::class)
 interface InternalFeaturePlugin {
     /** @return the title of the internal feature */
     fun internalFeatureTitle(): String
@@ -39,31 +34,4 @@ interface InternalFeaturePlugin {
      * [activityContext] is the Activity context that hosted the feature
      */
     fun onInternalFeatureClicked(activityContext: Context)
-}
-
-private class SettingsInternalFeaturePluginPoint(
-    private val plugins: DaggerSet<InternalFeaturePlugin>
-) : PluginPoint<InternalFeaturePlugin> {
-    override fun getPlugins(): Collection<InternalFeaturePlugin> {
-        return plugins.sortedBy { it.internalFeatureTitle() }
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-abstract class SettingInternalFeaturePluginModule {
-    @Multibinds
-    abstract fun bindEmptySettingInternalFeaturePlugins(): DaggerSet<InternalFeaturePlugin>
-
-    @Module
-    @ContributesTo(AppScope::class)
-    class SettingInternalFeaturePluginModuleExt {
-        @Provides
-        @SingleInstanceIn(AppScope::class)
-        fun provideSettingInternalFeaturePlugins(
-            plugins: DaggerSet<InternalFeaturePlugin>
-        ): PluginPoint<InternalFeaturePlugin> {
-            return SettingsInternalFeaturePluginPoint(plugins)
-        }
-    }
 }

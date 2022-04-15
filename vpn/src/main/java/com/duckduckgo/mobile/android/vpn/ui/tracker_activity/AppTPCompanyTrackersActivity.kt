@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
 import com.duckduckgo.di.scopes.ActivityScope
@@ -107,11 +108,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         binding.activityRecyclerView.adapter = itemsAdapter
 
         pixels.didOpenCompanyTrackersScreen()
-    }
-
-    override fun onPause() {
-        viewModel.onLeavingScreen()
-        super.onPause()
     }
 
     private fun observeViewModel() {
