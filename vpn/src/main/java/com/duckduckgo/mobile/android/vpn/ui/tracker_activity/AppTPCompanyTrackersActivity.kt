@@ -109,11 +109,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         pixels.didOpenCompanyTrackersScreen()
     }
 
-    override fun onPause() {
-        // viewModel.onLeavingScreen()
-        super.onPause()
-    }
-
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
