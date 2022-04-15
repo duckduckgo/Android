@@ -110,7 +110,7 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenPackageNameIsEnabledAndAppHasNoIssuesThenProtectedAppsEnablesIt() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionEnabled(packageName, 0)
+        viewModel.onAppProtectionEnabled(packageName)
 
         verifyNoInteractions(deviceShieldPixels)
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
@@ -119,7 +119,7 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenPackageNameIsEnabledAndAppHasIssuesThenProtectedAppsEnablesItAndSendsPixel() = runTest {
         val packageName = "com.package.name"
-        viewModel.onAppProtectionEnabled(packageName, 1, true)
+        viewModel.onAppProtectionEnabled(packageName)
 
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }

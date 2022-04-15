@@ -24,17 +24,14 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
-import com.duckduckgo.mobile.android.vpn.apps.Command.RestartVpn
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersViewModel.Command
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.junit.*
 import kotlin.time.ExperimentalTime
 
@@ -78,27 +75,6 @@ class AppTPCompanyTrackersViewModelTest {
         viewModel.loadData(date, packageName)
     }
 
-    @Test
-    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
-        val packageName = "com.package.name"
-        viewModel.onAppPermissionToggled(false, packageName)
-
-        viewModel.commands().test {
-            viewModel.onLeavingScreen()
-            Assert.assertEquals(Command.RestartVpn, awaitItem())
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
-        viewModel.commands().test {
-            viewModel.onLeavingScreen()
-            expectNoEvents()
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
     private fun getTrackersFlow(trackers: List<VpnTrackerCompanySignal>): Flow<List<VpnTrackerCompanySignal>> = flow {
         while (true) {
             emit(trackers)
@@ -106,7 +82,6 @@ class AppTPCompanyTrackersViewModelTest {
     }
 
     private fun someTrackers(): List<VpnTrackerCompanySignal> {
-
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val domain: String = "example.com"
         val trackerCompanyId: Int = -1
