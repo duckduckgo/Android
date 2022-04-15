@@ -224,6 +224,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
         }
     }
 
@@ -302,7 +303,6 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onRemoveFeature() {
-        TrackerBlockingVpnService.stopService(this)
         viewModel.removeFeature()
     }
 

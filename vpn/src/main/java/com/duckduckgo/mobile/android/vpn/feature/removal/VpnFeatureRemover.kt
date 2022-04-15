@@ -18,14 +18,21 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
@@ -34,11 +41,13 @@ interface VpnFeatureRemover {
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class DefaultVpnFeatureRemover(
+class DefaultVpnFeatureRemover @Inject constructor(
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val vpnTrackerDao: VpnTrackerDao
+    private val vpnDatabase: VpnDatabase,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnFeatureRemover {
 
     // Disabling reminder notifications
@@ -50,10 +59,12 @@ class DefaultVpnFeatureRemover(
     // Force users to complete AppTP Onboarding
 
     override fun manuallyRemoveFeature() {
-        disableNotifications()
-        removeNotificationChannels()
-        deleteAllVpnTrackers()
-        disableFeature()
+        appCoroutineScope.launch(dispatcherProvider.io()){
+            disableNotifications()
+            removeNotificationChannels()
+            deleteAllVpnTrackers()
+            disableFeature()
+        }
     }
 
     override fun scheduledRemoveFeature() {
@@ -77,7 +88,7 @@ class DefaultVpnFeatureRemover(
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnTrackerDao.deleteAllTrackers()
+        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
     }
 
     private fun disableFeature() {

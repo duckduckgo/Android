@@ -140,6 +140,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
         vpnFeatureRemover.manuallyRemoveFeature()
+        viewModelScope.launch {
+            command.send(Command.StopVPN)
+            command.send(Command.CloseScreen)
+        }
     }
 
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
@@ -187,6 +191,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
         object ShowRemoveFeatureConfirmationDialog : Command()
+        object CloseScreen : Command()
     }
 }
 
