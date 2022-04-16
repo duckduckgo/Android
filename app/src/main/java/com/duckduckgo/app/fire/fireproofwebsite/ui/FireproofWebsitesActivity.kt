@@ -35,7 +35,7 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class FireproofWebsitesActivity : DuckDuckGoActivity() {
+class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelectorFragment.Listener {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -75,7 +75,8 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
         viewModel.command.observe(this) {
             when (it) {
                 is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
-                is FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog -> showAutomaticFireproofSettingSelectionDialog(it.automaticFireproofSetting)
+                is FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog ->
+                    showAutomaticFireproofSettingSelectionDialog(it.automaticFireproofSetting)
             }
         }
     }
@@ -109,5 +110,9 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
         fun intent(context: Context): Intent {
             return Intent(context, FireproofWebsitesActivity::class.java)
         }
+    }
+
+    override fun onAutomaticFireproofSettingSelected(selectedSetting: AutomaticFireproofSetting) {
+        viewModel.onAutomaticFireproofSettingChanged(selectedSetting)
     }
 }

@@ -37,7 +37,9 @@ class FireproofSettingsSelectorFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val currentOption: AutomaticFireproofSetting = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AutomaticFireproofSetting? ?: AutomaticFireproofSetting.ASK_EVERY_TIME
+        val currentOption: AutomaticFireproofSetting =
+            arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AutomaticFireproofSetting? ?: AutomaticFireproofSetting.ASK_EVERY_TIME
+
         binding = DialogRadioGroupSelectorFragmentBinding.inflate(LayoutInflater.from(context))
 
         setRadioButtonOptions(binding)

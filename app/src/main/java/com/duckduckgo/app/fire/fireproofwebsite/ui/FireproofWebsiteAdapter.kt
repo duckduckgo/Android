@@ -66,6 +66,12 @@ class FireproofWebsiteAdapter(
         }
 
     var automaticFireproofSetting: AutomaticFireproofSetting = AutomaticFireproofSetting.NEVER
+        set(value) {
+            if (field != value) {
+                field = value
+                notifyDataSetChanged()
+            }
+        }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

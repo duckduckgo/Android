@@ -31,6 +31,7 @@ import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPre
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -95,20 +96,24 @@ class FireproofWebsitesViewModel @Inject constructor(
         }
     }
 
-    fun onUserToggleLoginDetection(enabled: Boolean) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val pixelName = if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
-            pixel.fire(pixelName)
+    fun onAutomaticFireproofSettingChanged(newAutomaticFireproofSetting: AutomaticFireproofSetting) {
+        Timber.i("User changed automatic fireproof setting, is now: ${newAutomaticFireproofSetting.name}")
 
-            if (enabled) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (newAutomaticFireproofSetting != AutomaticFireproofSetting.NEVER) {
                 userEventsStore.registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
             }
         }
-        val automaticFireproofSetting = when (enabled) {
-            false -> AutomaticFireproofSetting.NEVER
-            else -> AutomaticFireproofSetting.ASK_EVERY_TIME
-        }
-        settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
-        _viewState.value = _viewState.value?.copy(automaticFireproofSetting = automaticFireproofSetting)
+
+        settingsDataStore.automaticFireproofSetting = newAutomaticFireproofSetting
+        val pixelName =
+            when (newAutomaticFireproofSetting) {
+                AutomaticFireproofSetting.ASK_EVERY_TIME -> FIREPROOF_SETTING_SELECTION_ASK_EVERYTIME
+                AutomaticFireproofSetting.ALWAYS -> FIREPROOF_SETTING_SELECTION_ALWAYS
+                AutomaticFireproofSetting.NEVER -> FIREPROOF_SETTING_SELECTION_NEVER
+            }
+        _viewState.value = _viewState.value?.copy(automaticFireproofSetting = newAutomaticFireproofSetting)
+
+        pixel.fire(pixelName)
     }
 }
