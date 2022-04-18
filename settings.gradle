@@ -37,6 +37,9 @@ include ':macos-api'
 include ':macos-impl'
 include ':macos-store'
 
+include ':bandwidth-impl'
+include ':bandwidth-store'
+
 include ':common-test'
 
 include ':anvil-compiler'
@@ -69,6 +72,9 @@ project(':anrs-store').projectDir = new File('anrs/anrs-store')
 project(':macos-api').projectDir = new File('macos/macos-api')
 project(':macos-impl').projectDir = new File('macos/macos-impl')
 project(':macos-store').projectDir = new File('macos/macos-store')
+
+project(':bandwidth-impl').projectDir = new File('bandwidth/bandwidth-impl')
+project(':bandwidth-store').projectDir = new File('bandwidth/bandwidth-store')
 
 project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
 project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
