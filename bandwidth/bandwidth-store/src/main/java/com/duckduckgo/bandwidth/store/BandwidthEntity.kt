@@ -21,8 +21,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "bandwidth")
 data class BandwidthEntity(
-    @PrimaryKey val id: Int,
-    val timestamp: Long = System.currentTimeMillis(),
+    @PrimaryKey val id: Int = 0,
+    val timestamp: Long,
     val appBytes: Long,
     val totalBytes: Long
 )

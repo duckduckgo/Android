@@ -45,7 +45,7 @@ class RealBandwidthRepository @Inject constructor(
     override fun persistBandwidthData(bandwidthData: BandwidthData) {
         database.bandwidthDao().insert(
             BandwidthEntity(
-                id = 0,
+                timestamp = bandwidthData.timestamp,
                 appBytes = bandwidthData.appBytes,
                 totalBytes = bandwidthData.totalBytes
             )
