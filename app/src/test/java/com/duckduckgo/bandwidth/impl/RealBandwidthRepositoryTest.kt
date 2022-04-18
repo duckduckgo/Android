@@ -56,7 +56,7 @@ class RealBandwidthRepositoryTest {
     @Test
     fun whenGetStoredBandwidthDataThenReturnStoredBandwidthDataFromDatabase() {
         val bandwidthEntity = BandwidthEntity(timestamp = 123, appBytes = 456, totalBytes = 789)
-        whenever(mockBandWidthDao.getBandwidthEntity()).thenReturn(bandwidthEntity)
+        whenever(mockBandWidthDao.getBandwidth()).thenReturn(bandwidthEntity)
 
         val storedBandwidthData = testee.getStoredBandwidthData()
 

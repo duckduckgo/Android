@@ -53,7 +53,7 @@ class RealBandwidthRepository @Inject constructor(
     }
 
     override fun getStoredBandwidthData(): BandwidthData? {
-        val bandwidthEntity = database.bandwidthDao().getBandwidthEntity() ?: return null
+        val bandwidthEntity = database.bandwidthDao().getBandwidth() ?: return null
 
         return BandwidthData(
             timestamp = bandwidthEntity.timestamp,

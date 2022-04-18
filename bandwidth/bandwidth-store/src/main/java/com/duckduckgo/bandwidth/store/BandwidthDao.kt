@@ -28,5 +28,5 @@ interface BandwidthDao {
     fun insert(bandwidthEntity: BandwidthEntity)
 
     @Query("SELECT * FROM bandwidth")
-    fun getBandwidthEntity(): BandwidthEntity?
+    fun getBandwidth(): BandwidthEntity?
 }

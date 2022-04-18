@@ -21,6 +21,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "bandwidth")
 data class BandwidthEntity(
+    // There will only ever be one entry in this table, so the ID is always 0.
     @PrimaryKey val id: Int = 0,
     val timestamp: Long,
     val appBytes: Long,
