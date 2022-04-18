@@ -30,8 +30,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState.InBeta
+import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -45,8 +44,8 @@ import java.util.concurrent.TimeUnit
 class BandwidthSchedulerModule {
     @Provides
     @IntoSet
-    fun provideBandwidthScheduler(workManager: WorkManager, atpWaitlistRepository: AtpWaitlistStateRepository): LifecycleObserver {
-        return BandwidthScheduler(workManager, atpWaitlistRepository)
+    fun provideBandwidthScheduler(workManager: WorkManager, atpCohortManager: AtpCohortManager): LifecycleObserver {
+        return BandwidthScheduler(workManager, atpCohortManager)
     }
 
     @Provides
@@ -73,11 +72,11 @@ class BandwidthWorkerInjectorPlugin(
 
 class BandwidthScheduler(
     private val workManager: WorkManager,
-    private val atpWaitlistRepository: AtpWaitlistStateRepository
+    private val atpCohortManager: AtpCohortManager
 ) : DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        if (atpWaitlistRepository.getState() != InBeta) return
+        if (atpCohortManager.getCohort() == null) return
         Timber.v("Scheduling Bandwidth Worker")
         val workerRequest = PeriodicWorkRequestBuilder<BandwidthWorker>(1, TimeUnit.HOURS)
             .addTag(BANDWIDTH_WORKER_TAG)

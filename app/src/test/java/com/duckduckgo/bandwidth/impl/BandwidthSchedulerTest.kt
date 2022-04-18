@@ -20,9 +20,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy.KEEP
 import androidx.work.WorkManager
 import com.duckduckgo.bandwidth.impl.BandwidthScheduler.Companion.BANDWIDTH_WORKER_TAG
-import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState.InBeta
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState.NotJoinedQueue
+import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
@@ -34,14 +32,14 @@ import org.mockito.kotlin.whenever
 class BandwidthSchedulerTest {
 
     private val mockWorkManager: WorkManager = mock()
-    private val mockAtpWaitlistStateRepository: AtpWaitlistStateRepository = mock()
+    private val mockAtpCohortManager: AtpCohortManager = mock()
     private val mockLifecycleOwner: LifecycleOwner = mock()
 
-    private val testee = BandwidthScheduler(mockWorkManager, mockAtpWaitlistStateRepository)
+    private val testee = BandwidthScheduler(mockWorkManager, mockAtpCohortManager)
 
     @Test
     fun whenOnCreateAndIsInAppTPBetaThenScheduleWork() {
-        whenever(mockAtpWaitlistStateRepository.getState()).thenReturn(InBeta)
+        whenever(mockAtpCohortManager.getCohort()).thenReturn("cohort")
 
         testee.onCreate(mockLifecycleOwner)
 
@@ -54,7 +52,7 @@ class BandwidthSchedulerTest {
 
     @Test
     fun whenOnCreateAndIsNotInAppTPBetaThenDoNotScheduleWork() {
-        whenever(mockAtpWaitlistStateRepository.getState()).thenReturn(NotJoinedQueue)
+        whenever(mockAtpCohortManager.getCohort()).thenReturn(null)
 
         testee.onCreate(mockLifecycleOwner)
 

@@ -29,7 +29,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
-    implementation project(path: ':vpn')
+    implementation project(path: ':vpn-api')
 
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.core.ktx
