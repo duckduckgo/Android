@@ -42,16 +42,23 @@ class RealBandwidthCollector @Inject constructor(
         if (lastBandwidthData == null) return
         if (lastBandwidthData.totalBytes > currentBandwidthData.totalBytes) return
 
+        val params = getPixelParams(currentBandwidthData, lastBandwidthData)
+
+        pixel.fire(BANDWIDTH, params)
+    }
+
+    private fun getPixelParams(
+        currentBandwidthData: BandwidthData,
+        lastBandwidthData: BandwidthData
+    ): Map<String, String> {
         val period = currentBandwidthData.timestamp - lastBandwidthData.timestamp
         val appBytes = currentBandwidthData.appBytes - lastBandwidthData.appBytes
         val totalBytes = currentBandwidthData.totalBytes - lastBandwidthData.totalBytes
 
-        val params = mapOf(
+        return mapOf(
             PERIOD to period.toString(),
             APP_BYTES to appBytes.toString(),
             TOTAL_BYTES to totalBytes.toString()
         )
-
-        pixel.fire(BANDWIDTH, params)
     }
 }
