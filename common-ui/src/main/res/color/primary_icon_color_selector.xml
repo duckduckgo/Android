@@ -15,6 +15,6 @@
   -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_enabled="false" android:color="?attr/primaryDisabledIconColor" />
+    <item android:state_enabled="false" android:color="?attr/primaryIconDisabledColor" />
     <item android:color="?attr/primaryIconColor"/>
 </selector>
