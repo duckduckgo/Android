@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.fire
 
-import android.webkit.CookieManager
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,7 +29,7 @@ interface DuckDuckGoCookieManager {
 }
 
 class WebViewCookieManager(
-    private val cookieManager: CookieManager,
+    private val cookieManager: CookieManagerProvider,
     private val host: String,
     private val removeCookies: RemoveCookiesStrategy,
     private val dispatcher: DispatcherProvider
@@ -44,7 +44,7 @@ class WebViewCookieManager(
         // These cookies are not stored in a personally identifiable way. For example, the large size setting is stored as 's=l.'
         // More info in https://duckduckgo.com/privacy
         val ddgCookies = getDuckDuckGoCookies()
-        if (cookieManager.hasCookies()) {
+        if (cookieManager.get().hasCookies()) {
             removeCookies.removeCookies()
             storeDuckDuckGoCookies(ddgCookies)
         }
@@ -63,7 +63,7 @@ class WebViewCookieManager(
 
     private suspend fun storeCookie(cookie: String) {
         suspendCoroutine<Unit> { continuation ->
-            cookieManager.setCookie(host, cookie) { success ->
+            cookieManager.get().setCookie(host, cookie) { success ->
                 Timber.v("Cookie $cookie stored successfully: $success")
                 continuation.resume(Unit)
             }
@@ -71,10 +71,10 @@ class WebViewCookieManager(
     }
 
     private fun getDuckDuckGoCookies(): List<String> {
-        return cookieManager.getCookie(host)?.split(";").orEmpty()
+        return cookieManager.get().getCookie(host)?.split(";").orEmpty()
     }
 
     override fun flush() {
-        cookieManager.flush()
+        cookieManager.get().flush()
     }
 }

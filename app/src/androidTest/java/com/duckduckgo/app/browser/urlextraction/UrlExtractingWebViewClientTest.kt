@@ -23,6 +23,7 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.privacy.config.api.Gpc
@@ -47,6 +48,7 @@ class UrlExtractingWebViewClientTest {
     private lateinit var testee: UrlExtractingWebViewClient
 
     private val requestInterceptor: RequestInterceptor = mock()
+    private val cookieManagerProvider: CookieManagerProvider = mock()
     private val cookieManager: CookieManager = mock()
     private val gpc: Gpc = mock()
     private val trustedCertificateStore: TrustedCertificateStore = mock()
@@ -62,13 +64,14 @@ class UrlExtractingWebViewClientTest {
             webViewHttpAuthStore,
             trustedCertificateStore,
             requestInterceptor,
-            cookieManager,
+            cookieManagerProvider,
             gpc,
             thirdPartyCookieManager,
             TestScope(),
             coroutinesTestRule.testDispatcherProvider,
             urlExtractor
         )
+        whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }
 
     @UiThreadTest
