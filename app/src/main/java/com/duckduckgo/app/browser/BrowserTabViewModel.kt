@@ -222,7 +222,7 @@ class BrowserTabViewModel(
         val isEmailSignedIn: Boolean = false,
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
-        val forceRenderingTicker: String = ""
+        val forceRenderingTicker: Long = System.currentTimeMillis()
     )
 
     sealed class HighlightableButton {
@@ -2621,7 +2621,7 @@ class BrowserTabViewModel(
 
     fun onConfigurationChanged() {
         browserViewState.value = currentBrowserViewState().copy(
-            forceRenderingTicker = System.currentTimeMillis().toString()
+            forceRenderingTicker = System.currentTimeMillis()
         )
     }
 
