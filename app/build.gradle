@@ -175,8 +175,13 @@ dependencies {
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':remote-messaging-impl')
 
+    implementation project(path: ':voice-search-api')
+    implementation project(path: ':voice-search-impl')
+
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
+
+    implementation project(path: ':bandwidth-impl')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

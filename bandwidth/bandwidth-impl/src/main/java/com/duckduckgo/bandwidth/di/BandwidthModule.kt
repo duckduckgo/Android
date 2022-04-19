@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,26 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.feature.toggles.impl.di
+package com.duckduckgo.bandwidth.di
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import android.content.Context
+import androidx.room.Room
+import com.duckduckgo.bandwidth.store.BandwidthDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
-import com.duckduckgo.feature.toggles.impl.FeatureCustomConfigPluginPoint
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.Multibinds
 import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-abstract class FeatureTogglesBindingModule {
-
-    @Multibinds
-    abstract fun provideFeatureTogglesPlugins(): DaggerSet<FeatureTogglesPlugin>
-}
-
-@Module
-@ContributesTo(AppScope::class)
-object FeatureTogglesModule {
-
+object BandwidthModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideFeatureTogglesPluginPoint(toggles: DaggerSet<FeatureTogglesPlugin>): PluginPoint<FeatureTogglesPlugin> {
-        return FeatureCustomConfigPluginPoint(toggles)
+    fun provideBandwidthDatabase(context: Context): BandwidthDatabase {
+        return Room.databaseBuilder(context, BandwidthDatabase::class.java, "bandwidth_database.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 }

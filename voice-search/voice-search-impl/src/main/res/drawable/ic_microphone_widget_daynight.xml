@@ -1,0 +1,28 @@
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/searchWidgetSearchBarLoupeColor"
+        android:pathData="M9,6C9,4.3432 10.3431,3 12,3C13.6569,3 15,4.3432 15,6V11C15,12.6569 13.6569,14 12,14C10.3431,14 9,12.6569 9,11V6Z" />
+    <path
+        android:fillColor="@color/searchWidgetSearchBarLoupeColor"
+        android:pathData="M7,19C6.4477,19 6,19.4477 6,20C6,20.5523 6.4477,21 7,21H17C17.5523,21 18,20.5523 18,20C18,19.4477 17.5523,19 17,19H13V17.9291C16.3923,17.4439 19,14.5265 19,11C19,10.4477 18.5523,10 18,10C17.4477,10 17,10.4477 17,11C17,13.7614 14.7614,16 12,16C9.2386,16 7,13.7614 7,11C7,10.4477 6.5523,10 6,10C5.4477,10 5,10.4477 5,11C5,14.5265 7.6077,17.4439 11,17.9291V19H7Z" />
+</vector>
