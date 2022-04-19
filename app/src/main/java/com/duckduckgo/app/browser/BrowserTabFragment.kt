@@ -134,7 +134,6 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
@@ -174,6 +173,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.R.layout
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -311,7 +312,7 @@ class BrowserTabFragment :
 
     private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
 
-    private lateinit var popupMenu: PopupMenu
+    private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -2064,20 +2065,10 @@ class BrowserTabFragment :
             tabsButton?.show()
         }
 
-        private fun getPopupMenuWidth(): Int {
-            val orientation = context?.resources?.configuration?.orientation
-            return if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                LayoutParams.WRAP_CONTENT
-            } else {
-                resources.getDimensionPixelSize(R.dimen.popupMenuWidth)
-            }
-        }
-
         private fun createPopupMenu() {
-            popupMenu = PopupMenu(
-                layoutInflater = layoutInflater,
-                resourceId = R.layout.popup_window_browser_menu,
-                width = getPopupMenuWidth()
+            popupMenu = BrowserPopupMenu(
+                context = requireContext(),
+                layoutInflater = layoutInflater
             )
             val view = popupMenu.contentView
             popupMenu.apply {
@@ -2362,7 +2353,7 @@ class BrowserTabFragment :
                 }
 
                 renderToolbarMenus(viewState)
-                renderPopupMenus(browserShowing, viewState)
+                popupMenu.renderState(browserShowing, viewState)
                 renderFullscreenMode(viewState)
             }
         }
@@ -2395,87 +2386,6 @@ class BrowserTabFragment :
             if (viewState.refreshWebView) {
                 Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
                 refresh()
-            }
-        }
-
-        private fun renderPopupMenus(
-            browserShowing: Boolean,
-            viewState: BrowserViewState
-        ) {
-            popupMenu.contentView.apply {
-                backMenuItem.isEnabled = viewState.canGoBack
-                forwardMenuItem.isEnabled = viewState.canGoForward
-                refreshMenuItem.isEnabled = browserShowing
-
-                newTabMenuItem.isVisible = browserShowing
-                sharePageMenuItem?.isVisible = viewState.canSharePage
-                addBookmarksMenuItem?.isVisible = viewState.canSaveSite
-                val isBookmark = viewState.bookmark != null
-                addBookmarksMenuItem?.label {
-                    getString(if (isBookmark) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
-                }
-                addBookmarksMenuItem?.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
-
-                val isFavorite = viewState.favorite != null
-                addFavoriteMenuItem?.isVisible = viewState.addFavorite.isEnabled()
-                addFavoriteMenuItem.label {
-                    when {
-                        viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
-                        isFavorite -> getString(R.string.removeFavoriteMenuTitle)
-                        else -> getString(R.string.addFavoriteMenuTitle)
-                    }
-                }
-                addFavoriteMenuItem.setIcon(if (isFavorite) drawable.ic_favorite_solid_16 else drawable.ic_favorite_16)
-
-                fireproofWebsiteMenuItem?.isVisible = viewState.canFireproofSite
-                fireproofWebsiteMenuItem?.label {
-                    getString(
-                        if (viewState.isFireproofWebsite) {
-                            R.string.fireproofWebsiteMenuTitleRemove
-                        } else {
-                            R.string.fireproofWebsiteMenuTitleAdd
-                        }
-                    )
-                }
-                fireproofWebsiteMenuItem?.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
-
-                createAliasMenuItem?.isVisible = viewState.isEmailSignedIn
-
-                changeBrowserModeMenuItem?.isVisible = viewState.canChangeBrowsingMode
-                changeBrowserModeMenuItem.label {
-                    getString(
-                        if (viewState.isDesktopBrowsingMode) {
-                            R.string.requestMobileSiteMenuTitle
-                        } else {
-                            R.string.requestDesktopSiteMenuTitle
-                        }
-                    )
-                }
-                changeBrowserModeMenuItem?.setIcon(
-                    if (viewState.isDesktopBrowsingMode) drawable.ic_device_mobile_16 else drawable.ic_device_desktop_16
-                )
-
-                openInAppMenuItem.isVisible = viewState.previousAppLink != null
-
-                addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
-                privacyProtectionMenuItem?.isVisible = viewState.canChangePrivacyProtection
-                privacyProtectionMenuItem?.label {
-                    getText(
-                        if (viewState.isPrivacyProtectionEnabled) {
-                            R.string.enablePrivacyProtection
-                        } else {
-                            R.string.disablePrivacyProtection
-                        }
-                    ).toString()
-                }
-                privacyProtectionMenuItem?.setIcon(
-                    if (viewState.isPrivacyProtectionEnabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16
-                )
-                brokenSiteMenuItem?.isVisible = viewState.canReportSite
-
-                siteOptionsMenuDivider.isVisible = viewState.browserShowing
-                browserOptionsMenuDivider.isVisible = viewState.browserShowing
-                settingsMenuDivider.isVisible = viewState.browserShowing
             }
         }
 

@@ -22,7 +22,7 @@ import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 
-class PopupMenu(
+open class PopupMenu(
     layoutInflater: LayoutInflater,
     resourceId: Int,
     view: View = inflate(layoutInflater, resourceId),
