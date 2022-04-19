@@ -32,6 +32,8 @@ class AppTpSettingTest {
                 AppTpSetting.NetworkSwitchHandling -> assertFalse(setting.defaultValue)
                 AppTpSetting.SetActiveNetworkDns -> assertFalse(setting.defaultValue)
                 AppTpSetting.AlwaysSetDNS -> assertFalse(setting.defaultValue)
+                AppTpSetting.VpnDdgBrowserTraffic -> assertFalse(setting.defaultValue)
+                else -> throw java.lang.IllegalStateException("Missing AppTpSetting default checks")
             }
         }
     }
