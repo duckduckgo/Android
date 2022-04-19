@@ -60,6 +60,9 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
     @Inject
     lateinit var gridCalculator: SearchAndFavoritesGridCalculator
 
+    @Inject
+    lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onReceive(
@@ -120,6 +123,8 @@ class SearchAndFavoritesWidget() : AppWidgetProvider() {
 
         remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
         remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
+
+        voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
         configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
         configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
 

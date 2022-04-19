@@ -55,6 +55,9 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 
@@ -76,6 +79,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var gridViewColumnCalculator: GridViewColumnCalculator
 
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var voiceSearchAvailability: VoiceSearchAvailability
+
     private val viewModel: SystemSearchViewModel by bindViewModel()
     private val binding: ActivitySystemSearchBinding by viewBinding()
     private lateinit var quickAccessItemsBinding: IncludeQuickAccessItemsBinding
@@ -89,6 +98,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private val omnibarTextInput
         get() = binding.omnibarTextInput
+
+    private val voiceSearch
+        get() = binding.voiceSearchButton
 
     private val textChangeWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
@@ -110,9 +122,13 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         configureOmnibar()
         configureTextInput()
         configureQuickAccessGrid()
+        configureVoiceSearch()
 
         if (savedInstanceState == null) {
-            intent?.let { sendLaunchPixels(it) }
+            intent?.let {
+                sendLaunchPixels(it)
+                handleVoiceSearchLaunch(it)
+            }
         }
     }
 
@@ -120,7 +136,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         super.onNewIntent(newIntent)
         dataClearerForegroundAppRestartPixel.registerIntent(newIntent)
         viewModel.resetViewState()
-        newIntent?.let { sendLaunchPixels(it) }
+        newIntent?.let {
+            sendLaunchPixels(it)
+            handleVoiceSearchLaunch(it)
+        }
     }
 
     private fun sendLaunchPixels(intent: Intent) {
@@ -130,6 +149,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             launchedFromSearchWithFavsWidget(intent) -> pixel.fire(AppPixelName.APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH)
             launchedFromNotification(intent) -> pixel.fire(AppPixelName.APP_NOTIFICATION_LAUNCH)
             launchedFromSystemSearchBox(intent) -> pixel.fire(AppPixelName.APP_SYSTEM_SEARCH_BOX_LAUNCH)
+        }
+    }
+
+    private fun handleVoiceSearchLaunch(intent: Intent) {
+        if (launchVoice(intent)) {
+            voiceSearchLauncher.launch(this)
         }
     }
 
@@ -228,6 +253,23 @@ class SystemSearchActivity : DuckDuckGoActivity() {
 
     private fun configureOmnibar() {
         binding.resultsContent.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateScroll() }
+    }
+
+    private fun configureVoiceSearch() {
+        if (voiceSearchAvailability.isVoiceSearchSupported) {
+            voiceSearch.visibility = View.VISIBLE
+            voiceSearchLauncher.registerResultsCallback(this, this, WIDGET) {
+                if (it is VoiceSearchLauncher.Event.VoiceRecognitionSuccess) {
+                    viewModel.onUserSelectedToEditQuery(it.result)
+                }
+            }
+            voiceSearch.setOnClickListener {
+                omnibarTextInput.hideKeyboard()
+                voiceSearchLauncher.launch(this)
+            }
+        } else {
+            voiceSearch.visibility = View.GONE
+        }
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
@@ -384,24 +426,37 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         return intent.getBooleanExtra(NOTIFICATION_SEARCH_EXTRA, false)
     }
 
+    private fun launchVoice(intent: Intent): Boolean {
+        return intent.getBooleanExtra(WIDGET_SEARCH_LAUNCH_VOICE, false)
+    }
+
     companion object {
         const val NOTIFICATION_SEARCH_EXTRA = "NOTIFICATION_SEARCH_EXTRA"
         const val WIDGET_SEARCH_EXTRA = "WIDGET_SEARCH_EXTRA"
         const val WIDGET_SEARCH_WITH_FAVS_EXTRA = "WIDGET_SEARCH_WITH_FAVS_EXTRA"
+        const val WIDGET_SEARCH_LAUNCH_VOICE = "WIDGET_SEARCH_LAUNCH_VOICE"
         const val NEW_SEARCH_ACTION = "com.duckduckgo.mobile.android.NEW_SEARCH"
         private const val QUICK_ACCESS_GRID_MAX_COLUMNS = 6
 
-        fun fromWidget(context: Context): Intent {
+        fun fromWidget(
+            context: Context,
+            launchVoice: Boolean = false
+        ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, true)
             intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
+            intent.putExtra(WIDGET_SEARCH_LAUNCH_VOICE, launchVoice)
             return intent
         }
 
-        fun fromFavWidget(context: Context): Intent {
+        fun fromFavWidget(
+            context: Context,
+            launchVoice: Boolean = false
+        ): Intent {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_WITH_FAVS_EXTRA, true)
             intent.putExtra(NOTIFICATION_SEARCH_EXTRA, false)
+            intent.putExtra(WIDGET_SEARCH_LAUNCH_VOICE, launchVoice)
             return intent
         }
 
@@ -409,6 +464,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             val intent = Intent(context, SystemSearchActivity::class.java)
             intent.putExtra(WIDGET_SEARCH_EXTRA, false)
             intent.putExtra(NOTIFICATION_SEARCH_EXTRA, true)
+            intent.putExtra(WIDGET_SEARCH_LAUNCH_VOICE, false)
             return intent
         }
     }

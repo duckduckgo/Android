@@ -22,6 +22,12 @@ plugins {
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+}
+
 dependencies {
 
     implementation project(path: ':common')
