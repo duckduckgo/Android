@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Spara</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Oskyddade webbplatser</string>
+    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="whitelistEntryOverflowContentDescription">Fler alternativ för den oskyddade webbplatsen %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brandsäkra</string>
     <string name="fireproofWebsiteLoginDialogNegative">Inte nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webbplatser</string>
-    <string name="fireproofWebsiteToogleText">Fråga när du loggar in</string>
+    <string name="fireproofWebsiteToggleText">Fråga när du loggar in</string>
     <string name="disableLoginDetectionDialogTitle">Vill du inaktivera påminnelse om brandsäkring när du loggar in på webbplatser?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan när som helst ändra denna inställning i Inställningar.</string>
     <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>

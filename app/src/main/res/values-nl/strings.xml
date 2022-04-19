@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Opslaan</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Onbeschermde sites</string>
+    <string name="whitelistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brandveilig</string>
     <string name="fireproofWebsiteLoginDialogNegative">Niet nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Vragen bij inloggen</string>
+    <string name="fireproofWebsiteToggleText">Vragen bij inloggen</string>
     <string name="disableLoginDetectionDialogTitle">Herinnering voor brandveiligheid uitschakelen bij het inloggen?</string>
     <string name="disableLoginDetectionDialogDescription">Je kunt deze voorkeur op elk moment wijzigen in de instellingen.</string>
     <string name="disableLoginDetectionDialogPositive">UITSCHAKELEN</string>

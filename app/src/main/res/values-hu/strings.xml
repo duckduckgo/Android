@@ -484,7 +484,7 @@
     <string name="dialogSaveAction">Mentés</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Védelem nélküli weboldalak</string>
+    <string name="whitelistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="whitelistEntryOverflowContentDescription">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
@@ -512,7 +512,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tűzálló</string>
     <string name="fireproofWebsiteLoginDialogNegative">Most nem</string>
     <string name="fireproofWebsiteItemsSectionTitle">Weboldalak</string>
-    <string name="fireproofWebsiteToogleText">Kérdezze meg bejelentkezéskor</string>
+    <string name="fireproofWebsiteToggleText">Kérdezze meg bejelentkezéskor</string>
     <string name="disableLoginDetectionDialogTitle">Letiltod a tűzálló emlékeztetőt a weboldalakra történő bejelentkezéskor?</string>
     <string name="disableLoginDetectionDialogDescription">Ezt a beállítást bármikor megváltoztathatod a Beállításokban.</string>
     <string name="disableLoginDetectionDialogPositive">LETILT</string>

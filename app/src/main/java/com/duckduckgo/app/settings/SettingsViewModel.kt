@@ -110,7 +110,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
-        object LaunchAccessibilitySettigns : Command()
+        object LaunchAccessibilitySettings : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
@@ -216,7 +216,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAccessibilitySettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettigns) }
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
     }
 
     fun userRequestedToChangeTheme() {

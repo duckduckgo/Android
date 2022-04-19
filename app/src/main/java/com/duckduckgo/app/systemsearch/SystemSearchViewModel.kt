@@ -292,7 +292,7 @@ class SystemSearchViewModel @Inject constructor(
         }
     }
 
-    fun onQuickAccesItemClicked(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
+    fun onQuickAccessItemClicked(it: FavoritesQuickAccessAdapter.QuickAccessFavorite) {
         pixel.fire(FAVORITE_SYSTEM_SEARCH_ITEM_PRESSED)
         command.value = Command.LaunchBrowser(it.favorite.url)
     }

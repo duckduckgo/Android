@@ -268,11 +268,11 @@ interface DeviceShieldPixels {
      */
     fun didShowVpnConflictDialog()
 
-    fun didChooseToDismissVpnConflicDialog()
+    fun didChooseToDismissVpnConflictDialog()
 
-    fun didChooseToOpenSettingsFromVpnConflicDialog()
+    fun didChooseToOpenSettingsFromVpnConflictDialog()
 
-    fun didChooseToContinueFromVpnConflicDialog()
+    fun didChooseToContinueFromVpnConflictDialog()
 
     /**
      * Will fire when the waitlist dialog is showed to the user
@@ -305,7 +305,7 @@ interface DeviceShieldPixels {
     fun sendUnknownPacketProtocol(protocol: Int)
 
     /**
-     * Will fire when the VPN detected bad health, restarted and fixex the bad health
+     * Will fire when the VPN detected bad health, restarted and fixed the bad health
      */
     fun badHealthResolvedByRestart(data: Map<String, String>)
 
@@ -626,17 +626,17 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToDismissVpnConflicDialog() {
+    override fun didChooseToDismissVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToOpenSettingsFromVpnConflicDialog() {
+    override fun didChooseToOpenSettingsFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToContinueFromVpnConflicDialog() {
+    override fun didChooseToContinueFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
     }

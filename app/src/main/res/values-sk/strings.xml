@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Uložiť</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezabezpečené webové stránky</string>
+    <string name="whitelistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
     <string name="whitelistEntryOverflowContentDescription">Viac možností pre nezabezpečené webové stránky %1$s</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpečiť funkciou ohňovzdornosti</string>
     <string name="fireproofWebsiteLoginDialogNegative">Teraz nie</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
-    <string name="fireproofWebsiteToogleText">Opýtať sa pri prihlásení</string>
+    <string name="fireproofWebsiteToggleText">Opýtať sa pri prihlásení</string>
     <string name="disableLoginDetectionDialogTitle">Vypnúť pripomienku na zabezpečenie pri prihlasovaní sa na lokalitách?</string>
     <string name="disableLoginDetectionDialogDescription">Tento výber môžete kedykoľvek zmeniť v Nastaveniach.</string>
     <string name="disableLoginDetectionDialogPositive">VYPNÚŤ</string>

@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Speichern</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ungeschützte Websites</string>
+    <string name="whitelistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
     <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
     <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für die ungeschützte Website %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Feuerfest machen</string>
     <string name="fireproofWebsiteLoginDialogNegative">Jetzt nicht</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Beim Anmelden fragen</string>
+    <string name="fireproofWebsiteToggleText">Beim Anmelden fragen</string>
     <string name="disableLoginDetectionDialogTitle">Erinnerung zur Feuerfest-Einstellung bei der Anmeldung auf Websites deaktivieren?</string>
     <string name="disableLoginDetectionDialogDescription">Diese Auswahl kann in den Einstellungen jederzeit rückgängig gemacht werden.</string>
     <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
