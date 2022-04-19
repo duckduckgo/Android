@@ -2101,7 +2101,9 @@ class BrowserTabFragment :
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsiteMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
+                onMenuItemClicked(view.fireproofWebsiteMenuItem) {
+                    viewModel.onFireproofWebsiteMenuClicked()
+                }
                 onMenuItemClicked(view.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
