@@ -64,6 +64,7 @@ data class SimpleEvent(
         fun TUN_WRITE_IO_EXCEPTION() = build("TUN_WRITE_IO_EXCEPTION")
         fun TUN_READ_IO_EXCEPTION() = build("TUN_READ_IO_EXCEPTION")
         fun TUN_WRITE_IO_MEMORY_EXCEPTION() = build("TUN_WRITE_IO_EXCEPTION_NO_BUFFER_SPACE")
+        fun NO_NETWORK_CONNECTIVITY() = build("NO_NETWORK_CONNECTIVITY")
     }
 }
 

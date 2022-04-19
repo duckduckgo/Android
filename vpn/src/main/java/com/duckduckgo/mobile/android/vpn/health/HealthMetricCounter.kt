@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_NETWORK_CONNECTIVITY
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
@@ -141,6 +142,12 @@ class HealthMetricCounter @Inject constructor(
     fun onTunWriteIOExceptionNoBufferSpace() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(TUN_WRITE_IO_MEMORY_EXCEPTION())
+        }
+    }
+
+    fun onNoNetworkConnectivity() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(NO_NETWORK_CONNECTIVITY())
         }
     }
 

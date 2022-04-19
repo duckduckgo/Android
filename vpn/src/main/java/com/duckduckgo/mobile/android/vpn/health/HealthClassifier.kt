@@ -45,6 +45,15 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
+    fun determineHealthNetworkConnectivity(connectivityEvents: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("no-connectivity-events", rawMetrics)
+
+        rawMetrics["events"] = Metric(connectivityEvents.toString(), badHealthIf { connectivityEvents >= 2 }, isCritical = true)
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
     fun determineHealthSocketChannelReadExceptions(readExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-readExceptions", rawMetrics)
