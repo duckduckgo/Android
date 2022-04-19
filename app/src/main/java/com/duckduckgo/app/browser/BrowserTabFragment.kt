@@ -2417,8 +2417,6 @@ class BrowserTabFragment :
             } else {
                 hideFindInPage()
             }
-
-            popupMenu.contentView.findInPageMenuItem?.isVisible = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {

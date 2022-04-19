@@ -95,7 +95,7 @@ class BrowserPopupMenu(
             )
 
             openInAppMenuItem.isVisible = viewState.previousAppLink != null
-
+            findInPageMenuItem.isVisible = viewState.canFindInPage
             addToHomeMenuItem.isVisible = viewState.addToHomeVisible && viewState.addToHomeEnabled
             privacyProtectionMenuItem?.isVisible = viewState.canChangePrivacyProtection
             privacyProtectionMenuItem?.label {

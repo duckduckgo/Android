@@ -1840,7 +1840,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canReportSite)
         assertFalse(browserViewState().canChangeBrowsingMode)
         assertFalse(browserViewState().canFireproofSite)
-        assertFalse(findInPageViewState().canFindInPage)
+        assertFalse(browserViewState().canFindInPage)
     }
 
     @Test
@@ -2515,7 +2515,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesBackThenCannotFindInPage() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
-        assertFalse(findInPageViewState().canFindInPage)
+        assertFalse(browserViewState().canFindInPage)
     }
 
     @Test
@@ -2571,7 +2571,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
-        assertTrue(findInPageViewState().canFindInPage)
+        assertTrue(browserViewState().canFindInPage)
     }
 
     @Test

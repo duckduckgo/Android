@@ -221,6 +221,7 @@ class BrowserTabViewModel(
         val showDaxIcon: Boolean = false,
         val isEmailSignedIn: Boolean = false,
         var previousAppLink: AppLink? = null,
+        val canFindInPage: Boolean = false,
         val forceRenderingTicker: String = ""
     )
 
@@ -270,8 +271,7 @@ class BrowserTabViewModel(
         val showNumberMatches: Boolean = false,
         val activeMatchIndex: Int = 0,
         val searchTerm: String = "",
-        val numberMatches: Int = 0,
-        val canFindInPage: Boolean = false
+        val numberMatches: Int = 0
     )
 
     data class PrivacyGradeViewState(
@@ -824,7 +824,7 @@ class BrowserTabViewModel(
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(omnibarText = trimmedInput, shouldMoveCaretToEnd = false)
         browserViewState.value = currentBrowserViewState().copy(browserShowing = true, showClearButton = false)
         autoCompleteViewState.value =
@@ -951,7 +951,6 @@ class BrowserTabViewModel(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
-            findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
             command.value = Refresh
         } else {
             command.value = NavigateForward
@@ -1098,7 +1097,7 @@ class BrowserTabViewModel(
         } else {
             currentBrowserViewState.addFavorite
         }
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = false)
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
@@ -1113,6 +1112,7 @@ class BrowserTabViewModel(
             isPrivacyProtectionEnabled = false,
             showSearchIcon = false,
             showClearButton = false,
+            canFindInPage = true,
             canChangeBrowsingMode = true,
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
@@ -1978,7 +1978,7 @@ class BrowserTabViewModel(
     }
 
     fun onFindInPageSelected() {
-        findInPageViewState.value = FindInPageViewState(visible = true, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = true)
     }
 
     fun userFindingInPage(searchTerm: String) {
