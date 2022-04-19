@@ -16,23 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.removal
 
-import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy.KEEP
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
-import com.duckduckgo.mobile.android.vpn.model.VpnServiceStateStats
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.ERROR
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.UNKNOWN
-import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -41,16 +32,14 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.HOURS
 import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleInstanceIn(AppScope::class)
 class FeatureRemoverVpnStateListener @Inject constructor(
-    private val vpnFeatureRemover: VpnFeatureRemover,
     private val workManager: WorkManager,
 ) : VpnServiceCallbacks {
 

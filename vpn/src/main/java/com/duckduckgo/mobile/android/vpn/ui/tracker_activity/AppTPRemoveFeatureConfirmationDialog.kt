@@ -19,10 +19,8 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog.Companion
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {

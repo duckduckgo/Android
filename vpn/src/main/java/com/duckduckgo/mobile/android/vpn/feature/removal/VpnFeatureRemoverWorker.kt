@@ -19,30 +19,17 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
+import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
+import javax.inject.Inject
 
-@Module
-@ContributesTo(VpnScope::class)
-object VpnFeatureRemoverWorkerModule {
-
-    @Provides
-    @IntoSet
-    fun provideVpnFeatureRemoverWorkerInjectorPlugin(
-        vpnFeatureRemover: VpnFeatureRemover
-    ): WorkerInjectorPlugin {
-        return VpnFeatureRemoverlWorkerInjectorPlugin(vpnFeatureRemover)
-    }
-}
-
-class VpnFeatureRemoverlWorkerInjectorPlugin(
+@ContributesMultibinding(VpnScope::class)
+class VpnFeatureRemoverWorkerInjectorPlugin @Inject constructor(
     private val vpnFeatureRemover: VpnFeatureRemover
 ) : WorkerInjectorPlugin {
 
@@ -60,6 +47,7 @@ class VpnFeatureRemoverWorker(
     val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
+
     lateinit var vpnFeatureRemover: VpnFeatureRemover
 
     override suspend fun doWork(): Result {
@@ -67,6 +55,11 @@ class VpnFeatureRemoverWorker(
         vpnFeatureRemover.scheduledRemoveFeature()
         return Result.success()
     }
+
+    // private fun disableNotificationReminders() {
+    //     workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+    //     workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+    // }
 
     companion object {
         const val WORKER_VPN_FEATURE_REMOVER_TAG = "VpnFeatureRemoverTagWorker"
