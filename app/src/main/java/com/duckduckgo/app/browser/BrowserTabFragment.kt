@@ -2144,7 +2144,7 @@ class BrowserTabFragment :
                 }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
-                view.dividerShadow.isInvisible = !view.menuScrollableContent.canScrollVertically(-1)
+                view.dividerShadow.isVisible = view.menuScrollableContent.canScrollVertically(-1)
             }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
