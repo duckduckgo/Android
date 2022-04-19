@@ -18,14 +18,13 @@ package com.duckduckgo.app.privacy.ui
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.brokensite.BrokenSiteData
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
@@ -37,22 +36,21 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchManageWhitelist
 import com.duckduckgo.app.privacy.ui.PrivacyDashboardViewModel.Command.LaunchReportBrokenSite
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
-class PrivacyDashboardViewModel(
+@ContributesViewModel(ActivityScope::class)
+class PrivacyDashboardViewModel @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
     networkLeaderboardDao: NetworkLeaderboardDao,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     data class ViewState(
@@ -213,29 +211,5 @@ class PrivacyDashboardViewModel(
     private companion object {
         private const val LEADERBOARD_MIN_NETWORKS = 3
         private const val LEADERBOARD_MIN_DOMAINS_EXCLUSIVE = 30
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class PrivacyDashboardViewModelFactory @Inject constructor(
-    private val userWhitelistDao: Provider<UserWhitelistDao>,
-    private val contentBlocking: Provider<ContentBlocking>,
-    private val networkLeaderboardDao: Provider<NetworkLeaderboardDao>,
-    private val pixel: Provider<Pixel>,
-    private val appCoroutineScope: Provider<CoroutineScope>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PrivacyDashboardViewModel::class.java) -> PrivacyDashboardViewModel(
-                    userWhitelistDao.get(),
-                    contentBlocking.get(),
-                    networkLeaderboardDao.get(),
-                    pixel.get(),
-                    appCoroutineScope.get()
-                ) as T
-                else -> null
-            }
-        }
     }
 }

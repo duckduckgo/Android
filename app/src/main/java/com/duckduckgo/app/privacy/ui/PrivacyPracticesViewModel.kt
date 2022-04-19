@@ -19,18 +19,17 @@ package com.duckduckgo.app.privacy.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
-import javax.inject.Provider
 
-class PrivacyPracticesViewModel(
+@ContributesViewModel(ActivityScope::class)
+class PrivacyPracticesViewModel @Inject constructor(
     private val tabRepository: TabRepository
 ) : ViewModel() {
 
@@ -53,18 +52,4 @@ class PrivacyPracticesViewModel(
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
-}
-
-@ContributesMultibinding(AppScope::class)
-class PrivacyPracticesViewModelFactory @Inject constructor(
-    private val tabRepository: Provider<TabRepository>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(PrivacyPracticesViewModel::class.java) -> (PrivacyPracticesViewModel(tabRepository.get()) as T)
-                else -> null
-            }
-        }
-    }
 }

@@ -26,7 +26,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class JobsModule {
+object JobsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

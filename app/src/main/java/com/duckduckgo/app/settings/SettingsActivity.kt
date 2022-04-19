@@ -32,6 +32,7 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
@@ -57,6 +58,7 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.macos_api.MacWaitlistState.InBeta
 import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
@@ -74,6 +76,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class SettingsActivity :
     DuckDuckGoActivity(),
     SettingsAutomaticallyClearWhatFragment.Listener,

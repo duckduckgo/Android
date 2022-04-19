@@ -29,8 +29,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -41,6 +43,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
+@InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment() {
 
     @Inject

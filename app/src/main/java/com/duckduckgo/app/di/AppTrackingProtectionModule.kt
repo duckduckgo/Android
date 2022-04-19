@@ -35,7 +35,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class AppTrackingProtectionModule {
+object AppTrackingProtectionModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

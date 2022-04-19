@@ -40,7 +40,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
-class NotificationModule {
+object NotificationModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

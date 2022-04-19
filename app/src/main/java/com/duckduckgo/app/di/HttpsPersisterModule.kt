@@ -25,7 +25,7 @@ import dagger.Provides
 
 @Module
 @ContributesTo(AppScope::class)
-class HttpsPersisterModule {
+object HttpsPersisterModule {
 
     @Provides
     fun providesHttpsDataManager(): HttpsEmbeddedDataPersister {

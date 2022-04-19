@@ -16,13 +16,10 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.multibindings.Multibinds
 
+@ContributesPluginPoint(AppScope::class)
 interface RefreshRetentionAtbPlugin {
     /**
      * Will be called right after we have refreshed the ATB retention on search
@@ -33,19 +30,4 @@ interface RefreshRetentionAtbPlugin {
      * Will be called right after we have refreshed the ATB retention on search
      */
     fun onAppRetentionAtbRefreshed()
-}
-
-class RefreshRetentionAtbPluginPoint(
-    private val plugins: DaggerSet<RefreshRetentionAtbPlugin>
-) : PluginPoint<RefreshRetentionAtbPlugin> {
-    override fun getPlugins(): Collection<RefreshRetentionAtbPlugin> {
-        return plugins.sortedBy { it.javaClass.simpleName }
-    }
-}
-
-@Module
-@ContributesTo(AppScope::class)
-abstract class RefreshRetentionAtbPluginModule {
-    @Multibinds
-    abstract fun bindRefreshRetentionAtbPlugins(): DaggerSet<RefreshRetentionAtbPlugin>
 }

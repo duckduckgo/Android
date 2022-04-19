@@ -24,7 +24,9 @@ import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
@@ -35,6 +37,13 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.N)
+// We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
+// exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
+// at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
+@InjectWith(
+    scope = QuickSettingsScope::class,
+    bindingKey = TileServiceBingingKey::class
+)
 class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels

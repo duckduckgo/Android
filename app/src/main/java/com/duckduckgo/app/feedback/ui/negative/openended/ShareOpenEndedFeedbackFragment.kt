@@ -19,6 +19,7 @@ package com.duckduckgo.app.feedback.ui.negative.openended
 import android.os.Bundle
 import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackOpenEndedFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
@@ -28,8 +29,10 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.mainReasons
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.Companion.subReasons
 import com.duckduckgo.app.feedback.ui.negative.openended.ShareOpenEndedNegativeFeedbackViewModel.Command
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
+@InjectWith(FragmentScope::class)
 class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedback_open_ended_feedback) {
 
     interface OpenEndedFeedbackListener {

@@ -16,18 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.bugreport
 
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
 import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
@@ -54,31 +50,9 @@ class RealVpnStateCollector @Inject constructor(
     }
 }
 
-private class VpnStateCollectorPluginPoint(
-    private val plugins: DaggerSet<VpnStateCollectorPlugin>
-) : PluginPoint<VpnStateCollectorPlugin> {
-    override fun getPlugins(): Collection<VpnStateCollectorPlugin> {
-        return plugins.sortedBy { it.collectorName }
-    }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class VpnStateCollectorProviderModule {
-
-    @Multibinds
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun bindVpnStateCollectorEmptyPlugins(): DaggerSet<VpnStateCollectorPlugin>
-
-    @Module
-    @ContributesTo(VpnScope::class)
-    class VpnStateCollectorProviderModuleExt {
-        @Provides
-        @SingleInstanceIn(VpnScope::class)
-        fun bindVpnMemoryCollectorPluginPoint(
-            plugins: DaggerSet<VpnStateCollectorPlugin>
-        ): PluginPoint<VpnStateCollectorPlugin> {
-            return VpnStateCollectorPluginPoint(plugins)
-        }
-    }
-}
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = VpnStateCollectorPlugin::class
+)
+@Suppress("unused")
+interface VpnStateCollectorPluginPoint
