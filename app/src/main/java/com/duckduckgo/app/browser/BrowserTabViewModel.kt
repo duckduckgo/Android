@@ -98,6 +98,7 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -168,7 +169,8 @@ class BrowserTabViewModel @Inject constructor(
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
+    private val settingsDataStore: SettingsDataStore
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
@@ -536,7 +538,11 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    if (settingsDataStore.automaticFireproofSetting == ALWAYS) {
+                        fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                    } else {
+                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    }
                 }
             }
         }
