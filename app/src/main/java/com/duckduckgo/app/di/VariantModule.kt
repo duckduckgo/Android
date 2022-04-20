@@ -27,7 +27,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-class VariantModule {
+object VariantModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

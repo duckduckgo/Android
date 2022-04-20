@@ -52,7 +52,7 @@ class AppTPWaitlistCodeNotification(
 }
 
 class AppTPWaitlistCodeSpecification(context: Context) : NotificationSpec {
-    override val channel = NotificationRegistrar.ChannelType.EMAIL_WAITLIST
+    override val channel = NotificationRegistrar.ChannelType.APP_TP_WAITLIST
     override val systemId = NotificationRegistrar.NotificationId.EmailWaitlist
     override val name = context.getString(R.string.atp_WaitlistNotificationTitle)
     override val icon = R.drawable.notification_logo

@@ -140,7 +140,7 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
         val exceptPlatforms: List<String>
     )
 
-    data class GloballExceptionsTest(
+    data class GlobalExceptionsTest(
         val name: String,
         val desc: String,
         val referenceConfig: String,
@@ -148,6 +148,6 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
     )
 
     data class ReferenceTest(
-        val globalExceptions: GloballExceptionsTest
+        val globalExceptions: GlobalExceptionsTest
     )
 }

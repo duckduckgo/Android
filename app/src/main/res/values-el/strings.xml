@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Αποθήκευση</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="whitelistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Διαγραφή δραστηριότητας</string>
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
     <string name="fireproofWebsiteItemsSectionTitle">Ιστότοποι</string>
-    <string name="fireproofWebsiteToogleText">Ερώτηση κατά τη σύνδεση</string>
+    <string name="fireproofWebsiteToggleText">Ερώτηση κατά τη σύνδεση</string>
     <string name="disableLoginDetectionDialogTitle">Απενεργοποίηση της υπενθύμισης Διαγραφής δραστηριότητας κατά τη σύνδεση σε ιστότοπους;</string>
     <string name="disableLoginDetectionDialogDescription">Μπορείτε να αλλάξετε την προτίμηση αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
     <string name="disableLoginDetectionDialogPositive">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>

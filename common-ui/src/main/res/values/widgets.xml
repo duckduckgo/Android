@@ -235,7 +235,7 @@
         </item>
         <item name="searchHint">@string/searchbar_searchhint_default</item>
         <item name="upActionContentDescription">
-            @string/searhbar_upaction_content_description_default
+            @string/searchbar_upaction_content_description_default
         </item>
     </style>
 

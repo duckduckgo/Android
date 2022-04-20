@@ -496,7 +496,7 @@
     <string name="dialogSaveAction">Сохранить</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Незащищенные сайты</string>
+    <string name="whitelistActivityTitle">Незащищенные сайты</string>
     <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
     <string name="whitelistEntryOverflowContentDescription">Дополнительные опции для незащищенного сайта %1$s</string>
@@ -524,7 +524,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Защитить</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
     <string name="fireproofWebsiteItemsSectionTitle">Сайты</string>
-    <string name="fireproofWebsiteToogleText">Спрашивать при входе</string>
+    <string name="fireproofWebsiteToggleText">Спрашивать при входе</string>
     <string name="disableLoginDetectionDialogTitle">Отключить напоминание про огнеупорность при входе на сайты?</string>
     <string name="disableLoginDetectionDialogDescription">Это предпочтение можно в любое время изменить в «Настройках».</string>
     <string name="disableLoginDetectionDialogPositive">Выключить</string>

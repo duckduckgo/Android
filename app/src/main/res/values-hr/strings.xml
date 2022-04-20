@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Spremi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezaštićena mrežna mjesta</string>
+    <string name="whitelistActivityTitle">Nezaštićena mrežna mjesta</string>
     <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
     <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>
     <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
-    <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
+    <string name="fireproofWebsiteToggleText">Pitaj pri prijavi</string>
     <string name="disableLoginDetectionDialogTitle">Onemogućiti podsjetnik za označavanje sigurnog web-mjesta prilikom prijave?</string>
     <string name="disableLoginDetectionDialogDescription">Ovu postavku možete promijeniti bilo kada u Postavkama.</string>
     <string name="disableLoginDetectionDialogPositive">ONEMOGUĆI</string>

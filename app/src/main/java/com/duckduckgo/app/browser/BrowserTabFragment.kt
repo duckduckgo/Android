@@ -105,7 +105,6 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.DaxDialogListener
@@ -137,7 +136,6 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -161,6 +159,7 @@ import android.content.pm.ResolveInfo
 import android.view.ViewGroup.LayoutParams
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -176,18 +175,23 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.R.*
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
 import kotlinx.android.synthetic.main.include_cta.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.*
 
+@InjectWith(FragmentScope::class)
 class BrowserTabFragment :
     Fragment(),
     FindListener,
@@ -210,7 +214,7 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
@@ -301,6 +305,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -401,6 +408,22 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
+            when (it) {
+                is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
+                    omnibarTextInput.setText(it.result)
+                    userEnteredQuery(it.result)
+                    resumeWebView()
+                }
+                else -> resumeWebView()
+            }
+        }
+    }
+
+    private fun resumeWebView() {
+        webView?.let {
+            if (it.isShown) it.onResume()
+        }
     }
 
     override fun onCreateView(
@@ -494,6 +517,7 @@ class BrowserTabFragment :
         }
 
         addTextChangedListeners()
+        resumeWebView()
     }
 
     override fun onPause() {
@@ -2266,6 +2290,21 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
                 }
+
+                renderVoiceSearch(viewState)
+            }
+        }
+
+        private fun renderVoiceSearch(viewState: OmnibarViewState) {
+            if (viewState.showVoiceSearch) {
+                voiceSearchButton.visibility = VISIBLE
+                voiceSearchButton.setOnClickListener {
+                    webView?.onPause()
+                    hideKeyboardImmediately()
+                    voiceSearchLauncher.launch(requireActivity())
+                }
+            } else {
+                voiceSearchButton.visibility = GONE
             }
         }
 
@@ -2478,7 +2517,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is BubbleCta -> showBubleCta(configuration)
+                is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
             messageCta.gone()
@@ -2514,7 +2553,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubleCta(configuration: BubbleCta) {
+        private fun showBubbleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
@@ -2540,7 +2579,10 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
+        private fun showHomeBackground(
+            favorites: List<QuickAccessFavorite>,
+            hideLogo: Boolean = false
+        ) {
             if (favorites.isEmpty()) {
                 if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
@@ -2550,12 +2592,12 @@ class BrowserTabFragment :
                 quickAccessRecyclerView.show()
             }
 
-            newTabQuickAcessItemsLayout.show()
+            newTabQuickAccessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            newTabQuickAcessItemsLayout.gone()
+            newTabQuickAccessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {

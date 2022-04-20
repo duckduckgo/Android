@@ -20,22 +20,21 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.brokensite.api.BrokenSiteSender
 import com.duckduckgo.app.brokensite.model.BrokenSite
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory
 import com.duckduckgo.app.brokensite.model.BrokenSiteCategory.*
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.isMobileSite
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.AmpLinks
-import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import javax.inject.Provider
 
-class BrokenSiteViewModel(
+@ContributesViewModel(ActivityScope::class)
+class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
     private val ampLinks: AmpLinks
@@ -127,7 +126,10 @@ class BrokenSiteViewModel(
     }
 
     @VisibleForTesting
-    fun getBrokenSite(urlString: String, webViewVersion: String): BrokenSite {
+    fun getBrokenSite(
+        urlString: String,
+        webViewVersion: String
+    ): BrokenSite {
         val category = categories[viewValue.indexSelected]
         return BrokenSite(
             category = category.key,
@@ -147,27 +149,5 @@ class BrokenSiteViewModel(
         const val WEBVIEW_UNKNOWN_VERSION = "unknown"
         const val MOBILE_SITE = "mobile"
         const val DESKTOP_SITE = "desktop"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class BrokenSiteViewModelFactory @Inject constructor(
-    private val pixel: Provider<Pixel>,
-    private val brokenSiteSender: Provider<BrokenSiteSender>,
-    private val ampLinks: Provider<AmpLinks>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BrokenSiteViewModel::class.java) -> (
-                    BrokenSiteViewModel(
-                        pixel.get(),
-                        brokenSiteSender.get(),
-                        ampLinks.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

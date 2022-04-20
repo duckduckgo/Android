@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Zapisz</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Niezabezpieczone witryny</string>
+    <string name="whitelistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
     <string name="whitelistEntryOverflowContentDescription">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpiecz</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nie teraz</string>
     <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
-    <string name="fireproofWebsiteToogleText">Zapytaj przy logowaniu</string>
+    <string name="fireproofWebsiteToggleText">Zapytaj przy logowaniu</string>
     <string name="disableLoginDetectionDialogTitle">Wyłączyć przypomnienie o zabezpieczeniach podczas logowania się do witryn internetowych?</string>
     <string name="disableLoginDetectionDialogDescription">W każdej chwili można zmienić ten wybór w Ustawieniach.</string>
     <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>

@@ -484,7 +484,7 @@
     <string name="dialogSaveAction">Guardar</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sites desprotegidos</string>
+    <string name="whitelistActivityTitle">Sites desprotegidos</string>
     <string name="enablePrivacyProtection">Ativar Proteção de Privacidade</string>
     <string name="disablePrivacyProtection">Desativar Proteção de Privacidade</string>
     <string name="whitelistEntryOverflowContentDescription">Mais opções para o site desprotegido %1$s</string>
@@ -512,7 +512,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Barreira de segurança</string>
     <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Perguntar ao iniciar sessão</string>
+    <string name="fireproofWebsiteToggleText">Perguntar ao iniciar sessão</string>
     <string name="disableLoginDetectionDialogTitle">Desativar lembrete de barreira de segurança ao iniciar sessão em sites?</string>
     <string name="disableLoginDetectionDialogDescription">Pode alterar esta preferência nas definições em qualquer altura.</string>
     <string name="disableLoginDetectionDialogPositive">DESATIVAR</string>

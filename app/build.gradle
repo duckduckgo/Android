@@ -149,6 +149,9 @@ fladle {
 }
 
 dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+
     implementation project(path: ':appbuildconfig-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':statistics')
@@ -156,7 +159,7 @@ dependencies {
     implementation project(path: ':app-store')
     implementation project(path: ':common-ui')
     implementation project(path: ':di')
-    implementation project(path: ':vpn-main')
+    implementation project(path: ':vpn')
     implementation project(path: ':vpn-store')
     internalImplementation project(path: ':vpn-internal')
 
@@ -166,14 +169,22 @@ dependencies {
     implementation project(path: ':privacy-config-impl')
     implementation project(path: ':anrs-api')
     implementation project(path: ':anrs-impl')
+    implementation project(path: ':macos-api')
+    implementation project(path: ':macos-impl')
 
     implementation project(path: ':remote-messaging-api')
     implementation project(path: ':remote-messaging-impl')
 
+    implementation project(path: ':voice-search-api')
+    implementation project(path: ':voice-search-impl')
+
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
 
-    implementation AndroidX.legacy.supportV4
+    implementation project(path: ':bandwidth-impl')
+
+    // Deprecated. TODO: Stop using this artifact.
+    implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -212,7 +223,7 @@ dependencies {
 
     // Android KTX
     implementation AndroidX.core.ktx
-    implementation AndroidX.fragmentKtx
+    implementation AndroidX.fragment.ktx
 
     // ViewModel and LiveData
     implementation AndroidX.lifecycle.runtimeKtx
@@ -273,7 +284,7 @@ dependencies {
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation Square.okHttp3.mockWebServer
     androidTestImplementation CashApp.turbine
-    androidTestImplementation AndroidX.test.orchestrator
+    androidTestUtil AndroidX.test.orchestrator
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation "androidx.test.ext:junit-ktx:_"
     androidTestImplementation "androidx.test.espresso:espresso-core:_"

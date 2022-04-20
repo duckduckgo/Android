@@ -16,21 +16,18 @@
 
 package com.duckduckgo.vpn.internal.feature.transparency
 
-import android.os.Build
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.apps.VpnExclusionList
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class TransparencyTrackerDetectorInterceptor @Inject constructor(private val appBuildConfig: AppBuildConfig) : VpnTrackerDetectorInterceptor {
+class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerDetectorInterceptor {
 
     private val enable = AtomicBoolean(false)
 
@@ -41,10 +38,6 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor(private val app
         packageId: String
     ): RequestTrackerType? {
         return when {
-            transparencyModeBugFixForAndroid12(packageId) -> {
-                Timber.v("Transparency mode for Android 12 and DDG: Not Tracker returned for $packageId / $hostname")
-                RequestTrackerType.NotTracker(hostname)
-            }
             enable.get() -> {
                 Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
                 RequestTrackerType.NotTracker(hostname)
@@ -54,11 +47,5 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor(private val app
                 null
             }
         }
-    }
-
-    // https://issuetracker.google.com/issues/217570500
-    // https://app.asana.com/0/1174433894299346/1201657419006650
-    private fun transparencyModeBugFixForAndroid12(packageId: String): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(packageId)
     }
 }

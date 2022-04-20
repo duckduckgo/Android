@@ -64,7 +64,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppProtectionisDisabledAndReportIsSkippedThenDisablePixelIsSent() = runTest {
+    fun whenAppProtectionIsDisabledAndReportIsSkippedThenDisablePixelIsSent() = runTest {
         val packageName = "com.package.name"
         val skippedReport = true
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
@@ -73,7 +73,7 @@ class ExcludedAppsViewModelTest {
     }
 
     @Test
-    fun whenAppProtectionisSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
+    fun whenAppProtectionIsSubmittedAndReportIsSkippedThenSubmitPixelIsSent() = runTest {
         val packageName = "com.package.name"
         val skippedReport = false
         viewModel.onAppProtectionDisabled(ManuallyDisableAppProtectionDialog.NO_REASON_NEEDED, packageName, packageName, skippedReport)
@@ -251,7 +251,7 @@ class ExcludedAppsViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-        userModifed = false
+        userModified = false
     )
 
     private val appLoadsWebsites = TrackingProtectionAppInfo(
@@ -261,7 +261,7 @@ class ExcludedAppsViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.LOADS_WEBSITES_EXCLUSION_REASON,
-        userModifed = false
+        userModified = false
     )
 
     private val appManuallyExcluded = TrackingProtectionAppInfo(
@@ -271,7 +271,7 @@ class ExcludedAppsViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = true,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModifed = true
+        userModified = true
     )
 
     private val appWithoutIssues = TrackingProtectionAppInfo(
@@ -281,6 +281,6 @@ class ExcludedAppsViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModifed = false
+        userModified = false
     )
 }

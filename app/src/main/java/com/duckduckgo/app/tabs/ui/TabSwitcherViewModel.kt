@@ -20,17 +20,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
-import javax.inject.Provider
 
-class TabSwitcherViewModel(
+@ContributesViewModel(ActivityScope::class)
+class TabSwitcherViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val webViewSessionStorage: WebViewSessionStorage
 ) : ViewModel() {
@@ -70,20 +69,5 @@ class TabSwitcherViewModel(
 
     suspend fun purgeDeletableTabs() {
         tabRepository.purgeDeletableTabs()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class TabSwitcherViewModelFactory @Inject constructor(
-    private val tabRepository: Provider<TabRepository>,
-    private val webViewSessionStorage: Provider<WebViewSessionStorage>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(TabSwitcherViewModel::class.java) -> TabSwitcherViewModel(tabRepository.get(), webViewSessionStorage.get()) as T
-                else -> null
-            }
-        }
     }
 }

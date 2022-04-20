@@ -52,4 +52,15 @@
         app:pillSubtitle="@string/atp_SettingsDeviceShieldDisabled"
         app:pillTitle="@string/atp_SettingsTitle" />
 
+    <com.duckduckgo.app.settings.SettingsPillWithSubtitle
+        android:id="@+id/macOsSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceShieldSetting"
+        app:pillDrawable="@drawable/ic_beta_pill"
+        app:pillSubtitle="@string/macos_settings_description"
+        app:pillTitle="@string/macos_settings_title" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

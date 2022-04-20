@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyPracticesBinding
 import com.duckduckgo.app.global.AppUrl.Url
@@ -30,10 +31,11 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.privacy.renderer.banner
 import com.duckduckgo.app.privacy.renderer.text
 import com.duckduckgo.app.tabs.tabId
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.collect
 
+@InjectWith(ActivityScope::class)
 class PrivacyPracticesActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityPrivacyPracticesBinding by viewBinding()

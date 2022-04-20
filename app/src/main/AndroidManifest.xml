@@ -11,6 +11,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <queries>
+        <intent>
+            <action
+                android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
 
     <application
         android:name="com.duckduckgo.app.global.DuckDuckGoApplication"
@@ -328,7 +335,7 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"
-            android:label="@string/whitelisetActivityTitle"
+            android:label="@string/whitelistActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"
@@ -377,6 +384,11 @@
             android:label="@string/folderLocationTitle"
             android:parentActivityName="com.duckduckgo.app.bookmarks.ui.BookmarksActivity" />
 
+        <activity
+            android:name="com.duckduckgo.voice.impl.listeningmode.VoiceSearchActivity"
+            android:label="@string/voiceSearchTitle"
+            android:parentActivityName=".BrowserActivity" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -416,6 +428,12 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/search_favorites_widget_info" />
+        </receiver>
+
+        <receiver android:name="com.duckduckgo.widget.VoiceSearchWidgetUpdater">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
         </receiver>
 
     </application>

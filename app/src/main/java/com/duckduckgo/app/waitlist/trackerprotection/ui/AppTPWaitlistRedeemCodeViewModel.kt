@@ -18,20 +18,19 @@ package com.duckduckgo.app.waitlist.trackerprotection.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.waitlist.RedeemCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
-class AppTPWaitlistRedeemCodeViewModel(
+@ContributesViewModel(ActivityScope::class)
+class AppTPWaitlistRedeemCodeViewModel @Inject constructor(
     private val waitlistManager: AppTPWaitlistManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
@@ -61,26 +60,6 @@ class AppTPWaitlistRedeemCodeViewModel(
                 else -> ViewState.ErrorRedeeming
             }
             viewStateFlow.emit(redeemState)
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTPWaitlistRedeemCodeViewModelFactory @Inject constructor(
-    private val waitlistManager: Provider<AppTPWaitlistManager>,
-    private val dispatcherProvider: Provider<DispatcherProvider>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AppTPWaitlistRedeemCodeViewModel::class.java) -> (
-                    AppTPWaitlistRedeemCodeViewModel(
-                        waitlistManager.get(),
-                        dispatcherProvider.get()
-                    ) as T
-                    )
-                else -> null
-            }
         }
     }
 }

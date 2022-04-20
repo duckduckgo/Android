@@ -21,15 +21,15 @@
      xmlns:tools="http://schemas.android.com/tools"
      android:layout_width="match_parent"
      android:layout_height="wrap_content"
-     android:theme="@style/AppTheme.Dark.AppBarOverlay">
+     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/default_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/toolbarBgColor"
-        android:theme="@style/ToolbarTheme"
-        app:popupTheme="@style/AppTheme.Dark.PopupOverlay" >
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
@@ -58,7 +58,7 @@
                 tools:text="Uber"/>
 
             <TextView
-                android:id="@+id/app_trackd_ago"
+                android:id="@+id/app_tracked_ago"
                 style="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

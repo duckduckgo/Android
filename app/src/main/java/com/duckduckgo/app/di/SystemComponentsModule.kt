@@ -41,7 +41,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 
 @Module
-class SystemComponentsModule {
+object SystemComponentsModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides

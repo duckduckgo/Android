@@ -20,10 +20,10 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -121,7 +121,7 @@ constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(ActivityScope::class)
 class AppTPCompanyTrackersViewModelFactory
 @Inject
 constructor(private val viewModel: Provider<AppTPCompanyTrackersViewModel>) :

@@ -1,11 +1,10 @@
 plugins {
-    id("de.fayard.refreshVersions") version "0.23.0"
+    id("de.fayard.refreshVersions") version "0.40.1"
 }
 
 include ':browser-api'
 include ':vpn'
 include ':vpn-store'
-include ':vpn-main'
 include ':vpn-api'
 include ':vpn-internal'
 include ':di'
@@ -34,7 +33,21 @@ include ':remote-messaging-api'
 include ':remote-messaging-impl'
 include ':remote-messaging-store'
 
+include ':macos-api'
+include ':macos-impl'
+include ':macos-store'
+
+include ':bandwidth-impl'
+include ':bandwidth-store'
+
 include ':common-test'
+
+include ':anvil-compiler'
+include ':anvil-annotations'
+
+include ':voice-search-api'
+include ':voice-search-impl'
+include ':voice-search-store'
 
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
 project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
@@ -45,12 +58,26 @@ project(':remote-messaging-api').projectDir = new File('remote-messaging/remote-
 project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
 project(':remote-messaging-store').projectDir = new File('remote-messaging/remote-messaging-store')
 
+project(':voice-search-api').projectDir = new File('voice-search/voice-search-api')
+project(':voice-search-impl').projectDir = new File('voice-search/voice-search-impl')
+project(':voice-search-store').projectDir = new File('voice-search/voice-search-store')
+
 project(':traces-api').projectDir = new File('traces/traces-api')
 project(':traces-impl').projectDir = new File('traces/traces-impl')
 
 project(':anrs-api').projectDir = new File('anrs/anrs-api')
 project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
 project(':anrs-store').projectDir = new File('anrs/anrs-store')
+
+project(':macos-api').projectDir = new File('macos/macos-api')
+project(':macos-impl').projectDir = new File('macos/macos-impl')
+project(':macos-store').projectDir = new File('macos/macos-store')
+
+project(':bandwidth-impl').projectDir = new File('bandwidth/bandwidth-impl')
+project(':bandwidth-store').projectDir = new File('bandwidth/bandwidth-store')
+
+project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
+project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
 
 rootProject.children.each { subproject ->
 

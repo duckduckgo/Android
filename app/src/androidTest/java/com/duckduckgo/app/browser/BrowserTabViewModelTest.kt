@@ -129,6 +129,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import org.mockito.kotlin.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
@@ -305,6 +307,12 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
+    @Mock
+    private lateinit var voiceSearchAvailability: VoiceSearchAvailability
+
+    @Mock
+    private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -445,7 +453,9 @@ class BrowserTabViewModelTest {
             variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
-            trackingParameters = mockTrackingParameters
+            trackingParameters = mockTrackingParameters,
+            voiceSearchAvailability = voiceSearchAvailability,
+            voiceSearchPixelLogger = voiceSearchPixelLogger
         )
 
         testee.loadData("abc", null, false, false)
@@ -2709,7 +2719,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = runTest {
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShouldBeEnabled() = runTest {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -4012,6 +4022,49 @@ class BrowserTabViewModelTest {
         testee.onConfigurationChanged()
 
         assertTrue(oldForceRenderingTicker != browserViewState().forceRenderingTicker)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserSubmittedQueryThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserNavigatesHomeThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserLoadedUrlThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        loadUrl("https://test.com")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndOmnibarInputStateChangedThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenInitializedAndVoiceSearchNotSupportedThenDontLogVoiceSearch() {
+        verify(voiceSearchPixelLogger, never()).log()
     }
 
     private fun givenUrlCanUseGpc() {

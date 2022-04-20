@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Lagre</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ubeskyttede nettsteder</string>
+    <string name="whitelistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
     <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brannsikre</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
     <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
-    <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
+    <string name="fireproofWebsiteToggleText">Spør ved innlogging</string>
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere påminnelser om brannsikring når du logger inn på nettsteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan når som helst endre dette under Innstillinger.</string>
     <string name="disableLoginDetectionDialogPositive">DEAKTIVER</string>

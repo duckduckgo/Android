@@ -17,6 +17,7 @@
 package com.duckduckgo.app.feedback.ui.common
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.ui.common.Command.Exit
@@ -30,27 +31,24 @@ import com.duckduckgo.app.feedback.ui.common.FragmentState.PositiveShareFeedback
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
-import com.duckduckgo.app.global.DefaultDispatcherProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
-class FeedbackViewModel(
+@ContributesViewModel(ActivityScope::class)
+class FeedbackViewModel @Inject constructor(
     private val playStoreUtils: PlayStoreUtils,
     private val feedbackSubmitter: FeedbackSubmitter,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -338,27 +336,3 @@ data class UpdateViewCommand(
     val mainReason: MainReason? = null,
     val subReason: SubReason? = null
 )
-
-@ContributesMultibinding(AppScope::class)
-class FeedbackViewModelFactory @Inject constructor(
-    private val playStoreUtils: Provider<PlayStoreUtils>,
-    private val feedbackSubmitter: Provider<FeedbackSubmitter>,
-    private val appCoroutineScope: Provider<CoroutineScope>,
-    private val appBuildConfig: Provider<AppBuildConfig>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(FeedbackViewModel::class.java) -> (
-                    FeedbackViewModel(
-                        playStoreUtils.get(),
-                        feedbackSubmitter.get(),
-                        appCoroutineScope.get(),
-                        appBuildConfig.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
-    }
-}

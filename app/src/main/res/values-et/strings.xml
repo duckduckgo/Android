@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Salvesta</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Kaitseta saidid</string>
+    <string name="whitelistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
     <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tulekindel</string>
     <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
-    <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
+    <string name="fireproofWebsiteToggleText">Küsi sisselogimisel</string>
     <string name="disableLoginDetectionDialogTitle">Kas keelata tulekindel meeldetuletus saitidele sisselogimisel?</string>
     <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
     <string name="disableLoginDetectionDialogPositive">KEELA</string>

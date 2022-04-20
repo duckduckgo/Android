@@ -133,12 +133,16 @@
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
         <item name="splitterColor">@color/gray85</item>
         <item name="secondaryButtonPressedColor">@color/black36</item>
+        <item name="primaryButtonDisabledColor">@color/gray85</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray80</item>
         <item name="bottomShadowBackground">@null</item>
+
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorDark</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorDark</item>
     </style>
 
     <style name="AppTheme.Dark" parent="AppTheme.BaseDark" />
@@ -250,12 +254,16 @@
         <item name="textInputOutlinedBoxColorHighlight">@color/cornflowerBlue</item>
         <item name="splitterColor">@color/gray25</item>
         <item name="secondaryButtonPressedColor">@color/black18</item>
+        <item name="primaryButtonDisabledColor">@color/gray30</item>
 
         <item name="dialogPrimaryButtonColor">@color/cornflowerBlue</item>
         <item name="dialogSecondaryButtonColor">?attr/dialogBgColor</item>
 
         <item name="overflowMenuDividerColor">@color/gray30</item>
         <item name="bottomShadowBackground">@drawable/divider_shadow_background</item>
+
+        <item name="tooltipPanelBackgroundColor">@color/tooltipPanelBackgroundColorLight</item>
+        <item name="alertPanelBackgroundColor">@color/alertPanelBackgroundColorLight</item>
     </style>
 
     <style name="AppTheme.Light" parent="AppTheme.BaseLight">

@@ -20,14 +20,15 @@ import android.content.Context
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPluginPoint
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module
-class WorkerModule {
+object WorkerModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -45,7 +46,7 @@ class WorkerModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun workerFactory(
-        workerInjectorPluginPoint: WorkerInjectorPluginPoint,
+        workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
     ): WorkerFactory {
         return DaggerWorkerFactory(workerInjectorPluginPoint)
     }

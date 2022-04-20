@@ -25,8 +25,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -38,10 +40,10 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -95,7 +97,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                         R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
                         it.totalTrackingAttempts, it.totalTrackingAttempts
                     )
-                    binding.includeToolbar.appTrackdAgo.text = it.lastTrackerBlockedAgo
+                    binding.includeToolbar.appTrackedAgo.text = it.lastTrackerBlockedAgo
                     itemsAdapter.updateData(it.trackingCompanies)
                 }
         }

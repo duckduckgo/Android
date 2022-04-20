@@ -16,14 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 
 /**
  * Implement this plugin interface if you want the [TrackerBlockingVpnService] to notify you when it's
@@ -32,35 +26,7 @@ import dagger.multibindings.Multibinds
  * The [VpnMemoryCollectorPlugin.collectMemoryMetrics] method will be called to give you the chance
  * to collect and return a map with the metrics that are interesting for you.
  */
+@ContributesPluginPoint(VpnScope::class)
 interface VpnMemoryCollectorPlugin {
     fun collectMemoryMetrics(): Map<String, String>
-}
-
-private class VpnMemoryCollectorPluginPoint(
-    private val plugins: DaggerSet<VpnMemoryCollectorPlugin>
-) : PluginPoint<VpnMemoryCollectorPlugin> {
-    override fun getPlugins(): Collection<VpnMemoryCollectorPlugin> {
-        return plugins
-    }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class VpnMemoryCollectorProviderModule {
-
-    @Multibinds
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun bindVpnMemoryCollectorPlugins(): DaggerSet<VpnMemoryCollectorPlugin>
-
-    @Module
-    @ContributesTo(VpnScope::class)
-    class VpnMemoryCollectorProviderModuleExt {
-        @Provides
-        @SingleInstanceIn(VpnScope::class)
-        fun bindVpnMemoryCollectorPluginPoint(
-            plugins: DaggerSet<VpnMemoryCollectorPlugin>
-        ): PluginPoint<VpnMemoryCollectorPlugin> {
-            return VpnMemoryCollectorPluginPoint(plugins)
-        }
-    }
 }
