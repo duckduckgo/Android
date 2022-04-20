@@ -38,7 +38,7 @@ import javax.inject.Inject
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-@SingleInstanceIn(AppScope::class)
+@SingleInstanceIn(VpnScope::class)
 class FeatureRemoverVpnStateListener @Inject constructor(
     private val workManager: WorkManager,
 ) : VpnServiceCallbacks {
