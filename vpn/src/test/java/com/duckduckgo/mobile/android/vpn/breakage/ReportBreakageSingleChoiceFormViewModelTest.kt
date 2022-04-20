@@ -69,27 +69,6 @@ class ReportBreakageSingleChoiceFormViewModelTest {
     }
 
     @Test
-    fun whenOnChoiceSelectedThenEmitUpdatedChoices() = runTest {
-        viewModel.getChoices().test {
-            val selectedChoice = CHOICES.first().copy(isSelected = true)
-            viewModel.onChoiceSelected(selectedChoice)
-
-            var expectedChoices = ReportBreakageSingleChoiceFormView.State(CHOICES, false)
-
-            assertEquals(expectedChoices, awaitItem())
-
-            expectedChoices = ReportBreakageSingleChoiceFormView.State(
-                CHOICES.map { if (it.questionStringRes == selectedChoice.questionStringRes) selectedChoice else it },
-                true
-            )
-
-            assertEquals(expectedChoices, awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenOnSubmitChoicesAndNoChoiceSelectedThenEmitNoEvent() = runTest {
         viewModel.commands().test {
             viewModel.onSubmitChoices()
