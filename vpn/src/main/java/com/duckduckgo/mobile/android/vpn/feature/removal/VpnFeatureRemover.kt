@@ -17,35 +17,43 @@
 package com.duckduckgo.mobile.android.vpn.feature.removal
 
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.ListenableWorker
+import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_WEEKLY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Scope
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
 }
 
-@ContributesBinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
+@ContributesMultibinding(scope = AppScope::class, boundType = WorkerInjectorPlugin::class)
 class DefaultVpnFeatureRemover @Inject constructor(
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
+    private val workManager: WorkManager,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
-) : VpnFeatureRemover {
+) : VpnFeatureRemover, WorkerInjectorPlugin {
 
     // Disabling reminder notifications
     // Disable daily / weekly notifications
@@ -55,13 +63,28 @@ class DefaultVpnFeatureRemover @Inject constructor(
     // If manual removal
     // Force users to complete AppTP Onboarding
 
+    override fun inject(worker: ListenableWorker): Boolean {
+        if (worker is VpnFeatureRemoverWorker) {
+            worker.vpnFeatureRemover = this
+            return true
+        }
+
+        return false
+    }
+
     override fun manuallyRemoveFeature() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             disableNotifications()
+            disableNotificationReminders()
             removeNotificationChannels()
             deleteAllVpnTrackers()
             disableFeature()
         }
+    }
+
+    private fun disableNotificationReminders() {
+        workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
+        workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
     }
 
     override fun scheduledRemoveFeature() {
@@ -90,4 +113,5 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private fun disableFeature() {
         deviceShieldOnboarding.onFeatureDisabled()
     }
+
 }

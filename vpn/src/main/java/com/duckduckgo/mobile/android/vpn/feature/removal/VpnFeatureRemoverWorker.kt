@@ -22,26 +22,12 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import javax.inject.Inject
-
-@ContributesMultibinding(VpnScope::class)
-class VpnFeatureRemoverWorkerInjectorPlugin @Inject constructor(
-    private val vpnFeatureRemover: VpnFeatureRemover
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is VpnFeatureRemoverWorker) {
-            worker.vpnFeatureRemover = vpnFeatureRemover
-            return true
-        }
-
-        return false
-    }
-}
 
 class VpnFeatureRemoverWorker(
     val context: Context,
@@ -55,11 +41,6 @@ class VpnFeatureRemoverWorker(
         vpnFeatureRemover.scheduledRemoveFeature()
         return Result.success()
     }
-
-    // private fun disableNotificationReminders() {
-    //     workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
-    //     workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
-    // }
 
     companion object {
         const val WORKER_VPN_FEATURE_REMOVER_TAG = "VpnFeatureRemoverTagWorker"

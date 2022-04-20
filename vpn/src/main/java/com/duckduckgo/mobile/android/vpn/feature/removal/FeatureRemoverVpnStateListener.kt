@@ -48,7 +48,7 @@ class FeatureRemoverVpnStateListener @Inject constructor(
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcher) {
             Timber.d("FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal")
-
+            workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
         }
     }
 
