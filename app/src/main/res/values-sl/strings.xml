@@ -512,7 +512,7 @@
     <string name="dialogSaveAction">Shrani</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezaščitene strani</string>
+    <string name="whitelistActivityTitle">Nezaščitene strani</string>
     <string name="enablePrivacyProtection">Omogoči zaščito zasebnosti</string>
     <string name="disablePrivacyProtection">Onemogoči zaščito zasebnosti</string>
     <string name="whitelistEntryOverflowContentDescription">Več možnosti za nezaščiteno stran %1$s</string>
@@ -540,7 +540,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Požarna zaščita</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne zdaj</string>
     <string name="fireproofWebsiteItemsSectionTitle">Spletna mesta</string>
-    <string name="fireproofWebsiteToogleText">Vprašajte ob prijavi</string>
+    <string name="fireproofWebsiteToggleText">Vprašajte ob prijavi</string>
     <string name="disableLoginDetectionDialogTitle">Onemogoči opomnik o požarni zaščiti pri prijavi na spletna mesta?</string>
     <string name="disableLoginDetectionDialogDescription">To nastavitev lahko kadar koli spremenite v možnosti Nastavitve.</string>
     <string name="disableLoginDetectionDialogPositive">ONEMOGOČI</string>

@@ -71,7 +71,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistSuccesfullyThenNotificationDialogIsShown() = runTest {
+    fun whenUserJoinsWaitlistSuccessfullyThenNotificationDialogIsShown() = runTest {
         val success = WaitlistResponse("token", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -86,7 +86,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageisShown() = runTest {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageIsShown() = runTest {
         val success = WaitlistResponse("", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -97,7 +97,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageisShown() = runTest {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageIsShown() = runTest {
         val success = WaitlistResponse("token", null)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -157,7 +157,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
+    fun whenDialogDismissedThenWaitlistStateIsJoinedQueue() = runTest {
         val waitlistState = WaitlistState.JoinedWaitlist(false)
         whenever(repository.getState()).thenReturn(waitlistState)
         viewModel.viewState.test {

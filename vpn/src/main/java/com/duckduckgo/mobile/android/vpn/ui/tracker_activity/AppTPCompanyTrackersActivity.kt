@@ -138,7 +138,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
             viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
         )
-        binding.includeToolbar.appTrackdAgo.text = viewState.lastTrackerBlockedAgo
+        binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
         lifecycleScope.launch {
             itemsAdapter.updateData(viewState.trackingCompanies)

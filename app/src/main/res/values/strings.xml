@@ -485,7 +485,7 @@
     <string name="dialogSaveAction">Save</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
@@ -513,7 +513,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+    <string name="fireproofWebsiteToggleText">Ask When Signing In</string>
     <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>

@@ -21,11 +21,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -69,6 +70,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     private val appTrackerRepository: AppTrackerRepository,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val appBuildConfig: AppBuildConfig,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
     private val dispatcherProvider: DispatcherProvider
 ) : TrackingProtectionAppsRepository {
 
@@ -108,7 +110,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModifed = isUserModified(it.packageName, manualList)
+                            userModified = isUserModified(it.packageName, manualList)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -137,10 +139,10 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverriden(appInfo)
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
-    private fun isSystemAppAndNotOverriden(appInfo: ApplicationInfo): Boolean {
+    private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
         return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
             false
         } else {
@@ -158,14 +160,16 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return false
         }
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            isSystemAppAndNotOverriden(appInfo) ||
+            isSystemAppAndNotOverridden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 
     // https://issuetracker.google.com/issues/217570500
     // https://app.asana.com/0/1174433894299346/1201657419006650
     private fun transparencyModeBugFixForAndroid12(appInfo: ApplicationInfo): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.S && VpnExclusionList.isDdgApp(appInfo.packageName) && appBuildConfig.flavor == INTERNAL
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.S &&
+            VpnExclusionList.isDdgApp(appInfo.packageName) &&
+            appTpFeatureConfig.isEnabled(AppTpSetting.VpnDdgBrowserTraffic)
     }
 
     private fun isManuallyExcluded(

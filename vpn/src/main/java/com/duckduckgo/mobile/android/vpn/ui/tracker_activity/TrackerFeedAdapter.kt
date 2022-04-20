@@ -214,7 +214,7 @@ class TrackerFeedAdapter @Inject constructor(
                     .into(trackingAppIcon)
 
                 with(trackerBadgesView) {
-                    // click through recyvlerview
+                    // click through recyclerview
                     suppressLayout(false)
                     (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
                     suppressLayout(true)

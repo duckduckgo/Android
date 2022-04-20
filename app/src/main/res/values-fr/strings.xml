@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Enregistrer</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sites non protégés</string>
+    <string name="whitelistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
     <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Mode coupe-feu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sites Web</string>
-    <string name="fireproofWebsiteToogleText">Choisir à la connexion</string>
+    <string name="fireproofWebsiteToggleText">Choisir à la connexion</string>
     <string name="disableLoginDetectionDialogTitle">Désactiver le rappel du mode coupe-feu lors de la connexion aux sites ?</string>
     <string name="disableLoginDetectionDialogDescription">Vous pouvez modifier cette préférence à tout moment dans Paramètres.</string>
     <string name="disableLoginDetectionDialogPositive">DÉSACTIVER</string>

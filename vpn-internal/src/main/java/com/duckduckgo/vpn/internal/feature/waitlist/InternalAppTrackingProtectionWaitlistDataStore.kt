@@ -25,7 +25,7 @@ import javax.inject.Inject
     scope = AppScope::class,
     priority = ContributesBinding.Priority.HIGHEST
 )
-class InternalAppTrackingProtectionWailistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
+class InternalAppTrackingProtectionWaitlistDataStore @Inject constructor() : AppTrackingProtectionWaitlistDataStore {
 
     override var inviteCode: String?
         get() = "internaltoken"

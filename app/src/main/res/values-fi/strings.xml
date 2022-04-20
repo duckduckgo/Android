@@ -484,7 +484,7 @@
     <string name="dialogSaveAction">Tallenna</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Suojaamattomat sivustot</string>
+    <string name="whitelistActivityTitle">Suojaamattomat sivustot</string>
     <string name="enablePrivacyProtection">Ota yksityisyyden suoja käyttöön</string>
     <string name="disablePrivacyProtection">Poista yksityisyyden suoja käytöstä</string>
     <string name="whitelistEntryOverflowContentDescription">Lisää valintoja suojaamattomalle sivustolle %1$s</string>
@@ -512,7 +512,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tee palovarmaksi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ei nyt</string>
     <string name="fireproofWebsiteItemsSectionTitle">Verkkosivustot</string>
-    <string name="fireproofWebsiteToogleText">Kysy kirjautuessa sisään</string>
+    <string name="fireproofWebsiteToggleText">Kysy kirjautuessa sisään</string>
     <string name="disableLoginDetectionDialogTitle">Poistetaanko palonkestävyyden muistutus käytöstä sivustoille kirjauduttaessa?</string>
     <string name="disableLoginDetectionDialogDescription">Voit muuttaa valintaa milloin tahansa asetuksista.</string>
     <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>

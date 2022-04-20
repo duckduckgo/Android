@@ -181,6 +181,8 @@ dependencies {
     internalImplementation project(path: ':traces-api')
     internalImplementation project(path: ':traces-impl')
 
+    implementation project(path: ':bandwidth-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android

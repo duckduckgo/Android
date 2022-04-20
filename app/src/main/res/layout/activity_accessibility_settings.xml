@@ -110,7 +110,7 @@
             </LinearLayout>
 
             <View
-                android:id="@+id/accessitilityDivider"
+                android:id="@+id/accessibilityDivider"
                 style="@style/SettingsGroupDivider"
                 android:layout_marginBottom="@dimen/keyline_5" />
 

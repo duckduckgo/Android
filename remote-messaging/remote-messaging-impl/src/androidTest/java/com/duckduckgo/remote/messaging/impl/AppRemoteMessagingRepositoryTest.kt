@@ -250,7 +250,7 @@ class AppRemoteMessagingRepositoryTest {
     }
 
     @Test
-    fun whenGetDismisedMessagesThenReturnDismissedMessageIds() = runTest {
+    fun whenGetDismissedMessagesThenReturnDismissedMessageIds() = runTest {
         testee.activeMessage(
             RemoteMessage(
                 id = "id",
