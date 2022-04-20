@@ -23,17 +23,6 @@
     <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
     <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
 
-    <!-- New overflow Menu -->
-    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
-    <string name="requestMobileSiteMenuTitle">Mobile Site</string>
-    <string name="downloadsMenuTitle">Downloads</string>
-    <string name="printMenuTitle">Print Page</string>
-    <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
-    <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
-    <string name="privacyProtectionEnabledConfirmationMessage">Privacy Protection enabled for %s</string>
-    <string name="privacyProtectionDisabledConfirmationMessage">Privacy Protection disabled for %s</string>
-    <string name="undoSnackbarAction">Undo</string>
-
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
     <string name="macos_settings_description_list">You\'re on the list!</string>
