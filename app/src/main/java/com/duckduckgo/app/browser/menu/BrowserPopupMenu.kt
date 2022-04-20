@@ -114,7 +114,7 @@ class BrowserPopupMenu(
 
             siteOptionsMenuDivider.isVisible = viewState.browserShowing
             browserOptionsMenuDivider.isVisible = viewState.browserShowing
-            settingsMenuDivider.isVisible = viewState.browserShowing
+            // settingsMenuDivider.isVisible = viewState.browserShowing
         }
     }
 }

@@ -187,13 +187,15 @@
 
             <View
                 android:id="@+id/settingsMenuDivider"
-                style="@style/OverflowMenuDivider" />
+                style="@style/OverflowMenuDivider"
+                android:visibility="gone"/>
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:labelText="@string/downloadsMenuTitle"
+                android:visibility="gone"
                 app:iconDrawable="@drawable/ic_downloads_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
