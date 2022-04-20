@@ -124,6 +124,7 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
                 binding.badHealthMitigationToggle.isEnabled = isEnabled
                 binding.vpnUnderlyingNetworksToggle.isEnabled = isEnabled
                 binding.vpnAlwaysSetDNSToggle.isEnabled = isEnabled
+                binding.vpnConnectivityChecksToggle.isEnabled = isEnabled
                 binding.setActiveNetworkDnsToggle.isEnabled = isEnabled
                 binding.debugLoggingToggle.isEnabled = isEnabled
                 binding.transparencyModeToggle.isEnabled = isEnabled
@@ -249,6 +250,17 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         with(AppTpSetting.SetActiveNetworkDns) {
             binding.setActiveNetworkDnsToggle.isChecked = appTpConfig.isEnabled(this)
             binding.setActiveNetworkDnsToggle.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
+                } else {
+                    sendBroadcast(VpnRemoteFeatureReceiver.disableIntent(this))
+                }
+            }
+        }
+
+        with(AppTpSetting.ConnectivityChecks) {
+            binding.vpnConnectivityChecksToggle.isChecked = appTpConfig.isEnabled(this)
+            binding.vpnConnectivityChecksToggle.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     sendBroadcast(VpnRemoteFeatureReceiver.enableIntent(this))
                 } else {

@@ -53,11 +53,6 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     private val job = ConflatedJob()
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (!appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
-            Timber.d("AppTpSetting.ConnectivityChecks is disabled")
-            return
-        }
-
         job += coroutineScope.launch {
             while (isActive) {
                 delay(10_000)
@@ -65,7 +60,12 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                     if (hasDeviceConnectivity()) {
                         Timber.d("Active VPN network does not have connectivity")
                         pixel.enqueueFire(PixelName { "m_atp_report_no_vpn_connectivity_c" })
-                        healthMetricCounter.onNoNetworkConnectivity()
+                        if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
+                            Timber.d("AppTpSetting.ConnectivityChecks is enabled, logging health event")
+                            healthMetricCounter.onVpnConnectivityError()
+                        } else {
+                            Timber.d("AppTpSetting.ConnectivityChecks is disabled")
+                        }
                     } else {
                         Timber.d("Device doesn't have connectivity either")
                         pixel.enqueueFire(PixelName { "m_atp_report_no_device_connectivity_c" })

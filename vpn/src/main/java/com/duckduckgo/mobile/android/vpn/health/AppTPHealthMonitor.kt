@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.BadHealth
 import com.duckduckgo.mobile.android.vpn.health.AppTPHealthMonitor.HealthState.GoodHealth
-import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_NETWORK_CONNECTIVITY
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
@@ -140,7 +140,7 @@ class AppTPHealthMonitor @Inject constructor(
         healthStates += sampleTunWriteNoMemoryExceptions(timeWindow, tunWriteIOMemoryExceptionsAlerts)
         healthStates += sampleBufferAllocations(timeWindow, bufferAllocationsAlerts)
         healthStates += sampleIpPackets(timeWindow, ipPacketCounts)
-        healthStates += sampleNetworkConnectivityEvents(timeWindow, noNetworkConnectivityAlert)
+        healthStates += sampleVpnConnectivityEvents(timeWindow, noNetworkConnectivityAlert)
 
         /*
          * useful for testing notifications; can trigger good or bad health from diagnostics screen
@@ -196,12 +196,12 @@ class AppTPHealthMonitor @Inject constructor(
         return state
     }
 
-    private fun sampleNetworkConnectivityEvents(
+    private fun sampleVpnConnectivityEvents(
         timeWindow: Long,
         healthAlerts: HealthRule
     ): HealthState {
-        val noConnectivityStats = healthMetricCounter.getStat(NO_NETWORK_CONNECTIVITY(), timeWindow)
-        val state = healthClassifier.determineHealthNetworkConnectivity(noConnectivityStats)
+        val noConnectivityStats = healthMetricCounter.getStat(NO_VPN_CONNECTIVITY(), timeWindow)
+        val state = healthClassifier.determineHealthVpnConnectivity(noConnectivityStats)
         healthAlerts.updateAlert(state)
         return state
     }

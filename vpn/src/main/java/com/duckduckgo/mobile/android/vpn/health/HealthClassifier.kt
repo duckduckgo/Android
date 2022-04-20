@@ -45,9 +45,9 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
-    fun determineHealthNetworkConnectivity(connectivityEvents: Long): HealthState {
+    fun determineHealthVpnConnectivity(connectivityEvents: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
-        val metricSummary = RawMetricsSubmission("no-connectivity-events", rawMetrics)
+        val metricSummary = RawMetricsSubmission("vpn-no-connectivity-events", rawMetrics)
 
         rawMetrics["events"] = Metric(connectivityEvents.toString(), badHealthIf { connectivityEvents >= 2 }, isCritical = true)
 
