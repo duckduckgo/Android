@@ -124,6 +124,15 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                 getDate(),
                 getPackage()
             )
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .collect {
+                    binding.trackingAttempts.text = resources.getQuantityString(
+                        R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
+                        it.totalTrackingAttempts, it.totalTrackingAttempts
+                    )
+                    binding.includeToolbar.appTrackedAgo.text = it.lastTrackerBlockedAgo
+                    itemsAdapter.updateData(it.trackingCompanies)
+                }
         }
 
         viewModel.commands()

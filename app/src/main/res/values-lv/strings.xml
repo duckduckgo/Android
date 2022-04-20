@@ -490,7 +490,7 @@
     <string name="dialogSaveAction">Saglabāt</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neaizsargātas vietnes</string>
+    <string name="whitelistActivityTitle">Neaizsargātas vietnes</string>
     <string name="enablePrivacyProtection">Iespējot privātuma aizsardzību</string>
     <string name="disablePrivacyProtection">Atspējot privātuma aizsardzību</string>
     <string name="whitelistEntryOverflowContentDescription">Citas iespējas neaizsargātai vietnei %1$s</string>
@@ -518,7 +518,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Padarīt ugunsdrošu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tīmekļa vietnes</string>
-    <string name="fireproofWebsiteToogleText">Jautāt, kad pierakstos</string>
+    <string name="fireproofWebsiteToggleText">Jautāt, kad pierakstos</string>
     <string name="disableLoginDetectionDialogTitle">Vai atspējot atgādinājumu par ugunsdrošību, kad pierakstāties vietnēs?</string>
     <string name="disableLoginDetectionDialogDescription">Šo preferenci varēsi jebkurā laikā mainīt iestatījumu sadaļā.</string>
     <string name="disableLoginDetectionDialogPositive">ATSPĒJOT</string>

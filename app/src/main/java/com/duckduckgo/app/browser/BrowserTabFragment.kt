@@ -2492,7 +2492,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is BubbleCta -> showBubleCta(configuration)
+                is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
             messageCta.gone()
@@ -2528,7 +2528,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubleCta(configuration: BubbleCta) {
+        private fun showBubbleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
@@ -2567,12 +2567,12 @@ class BrowserTabFragment :
                 quickAccessRecyclerView.show()
             }
 
-            newTabQuickAcessItemsLayout.show()
+            newTabQuickAccessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            newTabQuickAcessItemsLayout.gone()
+            newTabQuickAccessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {

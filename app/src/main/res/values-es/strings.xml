@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Guardar</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sitios no protegidos</string>
+    <string name="whitelistActivityTitle">Sitios no protegidos</string>
     <string name="enablePrivacyProtection">Habilitar Protección</string>
     <string name="disablePrivacyProtection">Deshabilitar Protección</string>
     <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio no protegido %1$s</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">A prueba de fuego</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web</string>
-    <string name="fireproofWebsiteToogleText">Preguntar al iniciar sesión</string>
+    <string name="fireproofWebsiteToggleText">Preguntar al iniciar sesión</string>
     <string name="disableLoginDetectionDialogTitle">¿Deshabilitar recordatorio de a prueba de fuego al iniciar sesión en los sitios?</string>
     <string name="disableLoginDetectionDialogDescription">Puedes cambiar esta preferencia en cualquier momento en Ajustes.</string>
     <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>

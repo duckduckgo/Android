@@ -490,7 +490,7 @@
     <string name="dialogSaveAction">Salvează</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Site-uri neprotejate</string>
+    <string name="whitelistActivityTitle">Site-uri neprotejate</string>
     <string name="enablePrivacyProtection">Activează protecția confidențialității</string>
     <string name="disablePrivacyProtection">Dezactivează protecția confidențialității</string>
     <string name="whitelistEntryOverflowContentDescription">Mai multe opțiuni pentru site-ul neprotejat %1$s</string>
@@ -518,7 +518,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Ștergerea activității și istoricului din browser</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
-    <string name="fireproofWebsiteToogleText">Întreabă la conectare</string>
+    <string name="fireproofWebsiteToggleText">Întreabă la conectare</string>
     <string name="disableLoginDetectionDialogTitle">Dezactivezi memento pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
     <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
     <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>

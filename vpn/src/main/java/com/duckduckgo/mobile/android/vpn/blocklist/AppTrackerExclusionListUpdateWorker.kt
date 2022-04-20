@@ -48,7 +48,7 @@ class AppTrackerExclusionListUpdateWorker(
 
             val success = Result.success()
             if (exclusionListResult != success) {
-                Timber.w("Failed downloading exclution or system app override lists, scheduling a retry")
+                Timber.w("Failed downloading exclusion or system app override lists, scheduling a retry")
                 return@withContext Result.retry()
             }
 

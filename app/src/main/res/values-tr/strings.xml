@@ -500,7 +500,7 @@
     <string name="dialogSaveAction">Kaydet</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Korumasız Siteler</string>
+    <string name="whitelistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>
@@ -528,7 +528,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
-    <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+    <string name="fireproofWebsiteToggleText">Oturum Açarken Sor</string>
     <string name="disableLoginDetectionDialogTitle">Sitelerde oturum açılırken Koruma hatırlatıcısı devre dışı bırakılsın mı?</string>
     <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>

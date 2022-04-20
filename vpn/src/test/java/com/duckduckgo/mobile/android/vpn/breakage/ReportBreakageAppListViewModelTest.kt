@@ -170,7 +170,7 @@ class ReportBreakageAppListViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.NO_ISSUES,
-        userModifed = false
+        userModified = false
     )
 
     private val appWithIssues = TrackingProtectionAppInfo(
@@ -180,6 +180,6 @@ class ReportBreakageAppListViewModelTest {
         category = AppCategory.Undefined,
         isExcluded = false,
         knownProblem = TrackingProtectionAppInfo.KNOWN_ISSUES_EXCLUSION_REASON,
-        userModifed = false
+        userModified = false
     )
 }

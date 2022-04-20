@@ -110,7 +110,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModifed = isUserModified(it.packageName, manualList)
+                            userModified = isUserModified(it.packageName, manualList)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -139,10 +139,10 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverriden(appInfo)
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
-    private fun isSystemAppAndNotOverriden(appInfo: ApplicationInfo): Boolean {
+    private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
         return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
             false
         } else {
@@ -160,7 +160,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return false
         }
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            isSystemAppAndNotOverriden(appInfo) ||
+            isSystemAppAndNotOverridden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 
