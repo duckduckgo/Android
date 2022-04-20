@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
     <string name="bookmarkAddedMessage">Žymė pridėta</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Šalinti apsaugą</string>
+    <string name="requestMobileSiteMenuTitle">Mobilioji svetainė</string>
+    <string name="downloadsMenuTitle">Atsisiuntimai</string>
+    <string name="printMenuTitle">Spausdinti puslapį</string>
+    <string name="favoriteDeleteConfirmationMessage">Mėgstamas pašalintas</string>
+    <string name="fireproofDeleteConfirmationMessage">Apsauga pašalinta</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privatumo apsauga įjungta dėl %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privatumo apsauga išjungta dėl %1$s</string>
+    <string name="undoSnackbarAction">Anuliuoti</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
-    <string name="shareMenuTitle">Bendrinti…</string>
+    <string name="shareMenuTitle">Bendrinti</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Paieška</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridėti prie pradžios puslapio</string>
+    <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
     <string name="shortcutAddedText">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
     <string name="settingsFireproofWebsites">Apsaugoti svetaines</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti svetainę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota! Apsilankykite „Nustatymai“ ir sužinokite daugiau.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti šią svetainę</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota!</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Apsaugotų svetainių nėra</string>
