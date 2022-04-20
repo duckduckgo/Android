@@ -50,6 +50,7 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTracker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -119,20 +120,12 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
+
         lifecycleScope.launch {
             viewModel.loadData(
                 getDate(),
                 getPackage()
             )
-                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
-                .collect {
-                    binding.trackingAttempts.text = resources.getQuantityString(
-                        R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
-                        it.totalTrackingAttempts, it.totalTrackingAttempts
-                    )
-                    binding.includeToolbar.appTrackedAgo.text = it.lastTrackerBlockedAgo
-                    itemsAdapter.updateData(it.trackingCompanies)
-                }
         }
 
         viewModel.commands()
@@ -147,7 +140,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
             R.plurals.atp_CompanyDetailsTrackingAttemptsTitle,
             viewState.totalTrackingAttempts, viewState.totalTrackingAttempts
         )
-        binding.includeToolbar.appTrackdAgo.text = viewState.lastTrackerBlockedAgo
+        binding.includeToolbar.appTrackedAgo.text = viewState.lastTrackerBlockedAgo
 
         lifecycleScope.launch {
             itemsAdapter.updateData(viewState.trackingCompanies)
