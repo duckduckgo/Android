@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -59,14 +58,12 @@ class BrowserTabFireproofDialogsEventHandlerTest {
     private val mockUserEventsStore: UserEventsStore = mock()
     private val mockPixel: Pixel = mock()
     private val mockAppSettingsPreferencesStore: SettingsDataStore = mock()
-    private val mockVariantManager: VariantManager = mock()
     private lateinit var db: AppDatabase
     private lateinit var fireproofWebsiteDao: FireproofWebsiteDao
     private lateinit var testee: FireproofDialogsEventHandler
 
     @Before
     fun before() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
@@ -77,7 +74,6 @@ class BrowserTabFireproofDialogsEventHandlerTest {
             mockPixel,
             fireproofWebsiteRepository,
             mockAppSettingsPreferencesStore,
-            mockVariantManager,
             coroutineRule.testDispatcherProvider
         )
     }
@@ -274,6 +270,57 @@ class BrowserTabFireproofDialogsEventHandlerTest {
         testee.onUserDismissedDisableLoginDetectionDialog()
 
         verify(mockUserEventsStore).registerUserEvent(FIREPROOF_DISABLE_DIALOG_DISMISSED)
+    }
+
+    @Test
+    fun whenUserEnabledAutomaticFireproofLoginDialogThenPixelSent() = runTest {
+        testee.onUserEnabledAutomaticFireproofLoginDialog("twitter.com")
+
+        verify(mockPixel).fire(
+            pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_ALWAYS,
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+        )
+    }
+
+    @Test
+    fun whenUserEnabledAutomaticFireproofLoginDialogThenSetAutomaticFireproofSettingToAlways() = runTest {
+        testee.onUserEnabledAutomaticFireproofLoginDialog("twitter.com")
+
+        verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.ALWAYS
+    }
+
+    @Test
+    fun whenUserFireproofSiteInAutomaticFireproofLoginDialogThenPixelSent() = runTest {
+        testee.onUserFireproofSiteAutomaticFireproofLoginDialog("twitter.com")
+
+        verify(mockPixel).fire(
+            pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE,
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+        )
+    }
+
+    @Test
+    fun whenUserFireproofSiteInAutomaticFireproofLoginDialogThenSetAutomaticFireproofSettingToAskEveryTime() = runTest {
+        testee.onUserFireproofSiteAutomaticFireproofLoginDialog("twitter.com")
+
+        verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.ASK_EVERY_TIME
+    }
+
+    @Test
+    fun whenUserDismissesAutomaticFireproofLoginDialogThenPixelSent() = runTest {
+        testee.onUserDismissedAutomaticFireproofLoginDialog()
+
+        verify(mockPixel).fire(
+            pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_NOT_NOW,
+            parameters = mapOf(Pixel.PixelParameter.FIRE_EXECUTED to "false")
+        )
+    }
+
+    @Test
+    fun whenUserDismissesAutomaticFireproofLoginDialogThenSetAutomaticFireproofSettingToAskEveryTime() = runTest {
+        testee.onUserDismissedAutomaticFireproofLoginDialog()
+
+        verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.ASK_EVERY_TIME
     }
 
     private suspend fun givenUserDidNotDisableLoginDetection() {

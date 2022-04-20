@@ -180,6 +180,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import javax.inject.Provider
 
@@ -385,6 +386,8 @@ class BrowserTabFragment :
     private var appLinksSnackBar: Snackbar? = null
 
     private var loginDetectionDialog: AlertDialog? = null
+
+    private var automaticFireproofDialog: AlertDialog? = null
 
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
@@ -797,6 +800,7 @@ class BrowserTabFragment :
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is DownloadCommand -> processDownloadCommand(it)
@@ -1127,6 +1131,30 @@ class BrowserTabFragment :
                 }.setOnCancelListener {
                     viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
+
+            viewModel.onFireproofLoginDialogShown()
+        }
+    }
+
+    private fun askToAutomateFireproofWebsite(
+        context: Context,
+        fireproofWebsite: FireproofWebsiteEntity
+    ) {
+        val isShowing = automaticFireproofDialog?.isShowing
+
+        if (isShowing != true) {
+            automaticFireproofDialog = MaterialAlertDialogBuilder(context)
+                .setTitle(getString(R.string.automaticFireproofWebsiteLoginDialogTitle))
+                .setMessage(R.string.automaticFireproofWebsiteLoginDialogDescription)
+                .setPositiveButton(R.string.automaticFireproofWebsiteLoginDialogFirstOption) { _, _ ->
+                    viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNegativeButton(R.string.automaticFireproofWebsiteLoginDialogSecondOption) { _, _ ->
+                    viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNeutralButton(R.string.automaticFireproofWebsiteLoginDialogThirdOption) { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.onUserDismissedAutomaticFireproofLoginDialog()
+                }.setOnCancelListener { it.dismiss() }
+                .show()
 
             viewModel.onFireproofLoginDialogShown()
         }
@@ -1701,6 +1729,7 @@ class BrowserTabFragment :
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
+        automaticFireproofDialog?.dismiss()
         emailAutofillTooltipDialog?.dismiss()
         destroyWebView()
         super.onDestroy()

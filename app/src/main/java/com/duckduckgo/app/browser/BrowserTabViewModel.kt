@@ -99,6 +99,7 @@ import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -332,6 +333,7 @@ class BrowserTabViewModel @Inject constructor(
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
+        class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -538,10 +540,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    if (settingsDataStore.automaticFireproofSetting == ALWAYS) {
-                        fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
-                    } else {
-                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    val showAutomaticFireproofDialog =
+                        settingsDataStore.automaticFireproofSetting == ASK_EVERY_TIME && settingsDataStore.showAutomaticFireproofDialog
+                    when {
+                        showAutomaticFireproofDialog ->
+                            command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                        settingsDataStore.automaticFireproofSetting == ALWAYS ->
+                            fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                        else ->
+                            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
                     }
                 }
             }
@@ -1832,6 +1839,24 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
             pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+        }
+    }
+
+    fun onUserDismissedAutomaticFireproofLoginDialog() {
+        viewModelScope.launch {
+            fireproofDialogsEventHandler.onUserDismissedAutomaticFireproofLoginDialog()
+        }
+    }
+
+    fun onUserFireproofSiteInAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserFireproofSiteAutomaticFireproofLoginDialog(domain)
+        }
+    }
+
+    fun onUserEnabledAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserEnabledAutomaticFireproofLoginDialog(domain)
         }
     }
 

@@ -25,4 +25,9 @@
     <!-- Automatic Fireproof-->
     <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Fireproofing sites will keep you signed in after using the Fire Button. You can always change this later in Settings. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Fireproof this site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Not now</string>
 </resources>
