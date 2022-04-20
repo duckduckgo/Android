@@ -24,6 +24,7 @@ import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -59,7 +60,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                 if (!hasVpnConnectivity() && !context.isAirplaneModeOn()) {
                     if (hasDeviceConnectivity()) {
                         Timber.d("Active VPN network does not have connectivity")
-                        pixel.enqueueFire(PixelName { "m_atp_report_no_vpn_connectivity_c" })
+                        pixel.enqueueFire(DeviceShieldPixelNames.ATP_REPORT_VPN_CONNECTIVITY_ERROR)
                         if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
                             Timber.d("AppTpSetting.ConnectivityChecks is enabled, logging health event")
                             healthMetricCounter.onVpnConnectivityError()
@@ -68,7 +69,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                         }
                     } else {
                         Timber.d("Device doesn't have connectivity either")
-                        pixel.enqueueFire(PixelName { "m_atp_report_no_device_connectivity_c" })
+                        pixel.enqueueFire(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR)
                     }
                 }
             }
@@ -118,12 +119,5 @@ class NetworkConnectivityHealthHandler @Inject constructor(
 
         // default to "has connectivity"
         return true
-    }
-
-    private fun PixelName(block: () -> String): Pixel.PixelName {
-        return object : Pixel.PixelName {
-            override val pixelName: String
-                get() = block()
-        }
     }
 }
