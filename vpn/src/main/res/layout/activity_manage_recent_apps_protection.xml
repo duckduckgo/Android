@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2021 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/include_default_toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/manageRecentAppsReportIssues"
+                style="@style/TextAppearance.DuckDuckGo.Body2"
+                tools:text="@string/atp_ManageRecentAppsProtectionReportIssues"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
+                android:paddingStart="@dimen/keyline_4"
+                android:paddingEnd="@dimen/keyline_4"
+                android:paddingTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"/>
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/manageRecentAppsSkeleton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/include_toolbar">
+
+                <LinearLayout
+                    android:paddingTop="@dimen/keyline_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
+
+                    <include layout="@layout/view_device_shield_excluded_app_entry_skeleton"/>
+
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/manageRecentAppsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listItem="@layout/view_device_shield_excluded_app_entry"/>
+
+            <TextView
+                android:id="@+id/manageRecentAppsEmptyView"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="?secondaryTextColor"
+                android:textAlignment="center"
+                android:paddingTop="40dp"
+                android:paddingBottom="40dp"
+                android:visibility="gone"
+                android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
+
+            <TextView
+                android:id="@+id/manageRecentAppsShowAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/keyline_4"
+                android:paddingBottom="@dimen/keyline_4"
+                android:paddingStart="72dp"
+                android:text="@string/atp_ManageRecentAppsProtectionShowAll"
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
+                android:background="?selectableItemBackground"
+                android:textColor="?attr/listItemTitleColor"/>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

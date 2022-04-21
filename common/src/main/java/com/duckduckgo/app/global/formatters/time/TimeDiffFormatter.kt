@@ -19,6 +19,8 @@ package com.duckduckgo.app.global.formatters.time
 import android.content.Context
 import com.duckduckgo.app.global.R
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
@@ -26,10 +28,24 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class TimeDiffFormatter @Inject constructor(private val context: Context) {
-
+interface TimeDiffFormatter {
     fun formatTimePassedInDays(
         endLocalDateTime: LocalDateTime = LocalDateTime.now(),
+        startLocalDateTime: LocalDateTime
+    ): String
+
+    fun formatTimePassed(
+        endLocalDateTime: LocalDateTime = LocalDateTime.now(),
+        startLocalDateTime: LocalDateTime
+    ): String
+
+}
+
+@ContributesBinding(AppScope::class)
+class RealTimeDiffFormatter @Inject constructor(private val context: Context) : TimeDiffFormatter {
+
+    override fun formatTimePassedInDays(
+        endLocalDateTime: LocalDateTime,
         startLocalDateTime: LocalDateTime
     ): String {
         val startDate = DatabaseDateFormatter.timestamp(startLocalDateTime).substringBefore("T")
@@ -46,8 +62,8 @@ class TimeDiffFormatter @Inject constructor(private val context: Context) {
         }
     }
 
-    fun formatTimePassed(
-        endLocalDateTime: LocalDateTime = LocalDateTime.now(),
+    override fun formatTimePassed(
+        endLocalDateTime: LocalDateTime,
         startLocalDateTime: LocalDateTime
     ): String {
         val timeDifferenceMillis = Duration.between(startLocalDateTime, endLocalDateTime).toMillis()
