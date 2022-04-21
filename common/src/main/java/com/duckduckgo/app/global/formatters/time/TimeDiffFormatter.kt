@@ -21,7 +21,6 @@ import com.duckduckgo.app.global.R
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDateTime
 import java.text.SimpleDateFormat
