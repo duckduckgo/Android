@@ -22,9 +22,6 @@ import android.os.Build
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
-import com.duckduckgo.mobile.android.vpn.model.TrackingApp
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
@@ -38,10 +35,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlin.coroutines.coroutineContext
 
 interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
@@ -60,7 +55,7 @@ interface TrackingProtectionAppsRepository {
     suspend fun restoreDefaultProtectedList()
 
     /** Returns if an app tracking attempts are being blocked or not */
-    fun isAppProtectionEnabled(packageName: String): Boolean
+    suspend fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -68,33 +63,12 @@ interface TrackingProtectionAppsRepository {
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
-    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val appBuildConfig: AppBuildConfig,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     private val dispatcherProvider: DispatcherProvider
 ) : TrackingProtectionAppsRepository {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
-
-    private suspend fun aggregateDataPerApp(
-        trackerData: List<BucketizedVpnTracker>
-    ): List<TrackingApp> {
-        val sourceData = mutableListOf<TrackingApp>()
-        val perSessionData = trackerData.groupBy { it.bucket }
-
-        perSessionData.values.forEach { sessionTrackers ->
-            coroutineContext.ensureActive()
-
-            val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
-
-            perAppData.values.forEach { appTrackers ->
-                val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
-                sourceData.add(item.trackerCompanySignal.tracker.trackingApp)
-            }
-        }
-
-        return sourceData
-    }
 
     override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
@@ -231,7 +205,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         }
     }
 
-    override fun isAppProtectionEnabled(packageName: String): Boolean {
+    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
         Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
