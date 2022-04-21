@@ -108,7 +108,6 @@ class DeviceShieldTrackerActivityViewModelTest {
             vpnStateMonitor,
             vpnDetector,
             featureRemover,
-            workManager,
             CoroutineTestRule().testDispatcherProvider
         )
     }
