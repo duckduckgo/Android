@@ -39,7 +39,8 @@ import javax.inject.Inject
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService
+    private val fileService: DownloadFileService,
+    private val appBuildConfig: AppBuildConfig
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
