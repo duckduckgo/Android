@@ -16,22 +16,33 @@
 
 package com.duckduckgo.autofill.di
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InlineBrowserAutofill
+import com.duckduckgo.autofill.domain.AutofillRequestParser
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
-import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 class AutofillModule {
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun f(): BrowserAutofill {
-        return InlineBrowserAutofill()
+    fun browserAutofill(javascriptInterface: AutofillJavascriptInterface): BrowserAutofill {
+        return InlineBrowserAutofill(javascriptInterface)
     }
 
+    @Provides
+    fun providesAutofillInterface(
+        moshi: Moshi,
+        requestParser: AutofillRequestParser,
+        @AppCoroutineScope coroutineScope: CoroutineScope
+    ): AutofillJavascriptInterface {
+        return AutofillJavascriptInterface(moshi, requestParser, coroutineScope)
+    }
 }
