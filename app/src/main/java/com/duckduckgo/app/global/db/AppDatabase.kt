@@ -555,15 +555,10 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
     }
 
     val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
-        val fireproofLoginDetector = OldSettingsDataStore()
+        val oldSettingsDataStore = OldSettingsDataStore()
 
         override fun migrate(database: SupportSQLiteDatabase) {
-            fireproofLoginDetector.updateFireproofSettingType()
-
-            database.execSQL(
-                "UPDATE $USER_STAGE_TABLE_NAME SET appStage = \"${AppStage.ESTABLISHED}\" " +
-                    "WHERE appStage = \"${AppStage.DAX_ONBOARDING}\""
-            )
+            oldSettingsDataStore.updateFireproofSettingType()
         }
     }
 
