@@ -72,7 +72,7 @@ constructor(
         }
     }
 
-    private fun aggregateDataPerApp(
+    private suspend fun aggregateDataPerApp(
         trackerData: List<VpnTrackerCompanySignal>,
         packageName: String
     ): ViewState {

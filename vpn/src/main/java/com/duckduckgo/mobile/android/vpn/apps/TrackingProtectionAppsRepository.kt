@@ -60,7 +60,7 @@ interface TrackingProtectionAppsRepository {
     suspend fun restoreDefaultProtectedList()
 
     /** Returns if an app tracking attempts are being blocked or not */
-    fun isAppProtectionEnabled(packageName: String): Boolean
+    suspend fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -75,26 +75,6 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 ) : TrackingProtectionAppsRepository {
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
-
-    private suspend fun aggregateDataPerApp(
-        trackerData: List<BucketizedVpnTracker>
-    ): List<TrackingApp> {
-        val sourceData = mutableListOf<TrackingApp>()
-        val perSessionData = trackerData.groupBy { it.bucket }
-
-        perSessionData.values.forEach { sessionTrackers ->
-            coroutineContext.ensureActive()
-
-            val perAppData = sessionTrackers.groupBy { it.trackerCompanySignal.tracker.trackingApp.packageId }
-
-            perAppData.values.forEach { appTrackers ->
-                val item = appTrackers.sortedByDescending { it.trackerCompanySignal.tracker.timestamp }.first()
-                sourceData.add(item.trackerCompanySignal.tracker.trackingApp)
-            }
-        }
-
-        return sourceData
-    }
 
     override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
@@ -231,7 +211,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         }
     }
 
-    override fun isAppProtectionEnabled(packageName: String): Boolean {
+    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
         Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
         val appExclusionList = appTrackerRepository.getAppExclusionList()
         val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
