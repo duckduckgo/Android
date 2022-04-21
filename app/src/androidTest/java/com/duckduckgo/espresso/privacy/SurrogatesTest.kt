@@ -99,8 +99,8 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(withId(R.id.browserMenu)).perform(ViewActions.click())
-        onView(isRoot()).perform(waitForView(withId(R.id.changeBrowserModeMenuItem)))
-        onView(withId(R.id.changeBrowserModeMenuItem)).perform(ViewActions.click())
+        onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
+        onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)
