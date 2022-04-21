@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Oblíbené položky uloženy</string>
     <string name="bookmarkAddedMessage">Záložka přidána</string>
     <string name="requestDesktopSiteMenuTitle">Verze pro počítač</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Odstranit ochranu</string>
+    <string name="requestMobileSiteMenuTitle">Mobilní režim</string>
+    <string name="downloadsMenuTitle">Stahování</string>
+    <string name="printMenuTitle">Vytisknout stránku</string>
+    <string name="favoriteDeleteConfirmationMessage">Oblíbená položka odstraněna</string>
+    <string name="fireproofDeleteConfirmationMessage">Ochrana odstraněna</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Ochrana soukromí zapnutá pro %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Ochrana soukromí vypnutá pro %1$s</string>
+    <string name="undoSnackbarAction">Vrátit</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stáhnout obrázek</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
     <string name="shareLink">Sdílet odkaz</string>
-    <string name="shareMenuTitle">Sdílet…</string>
+    <string name="shareMenuTitle">Sdílet</string>
     <string name="copyUrl">Kopírovat adresu odkazu</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Vyhledávání</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Přidat na domovskou stránku</string>
+    <string name="addToHome">Přidat na domovskou obrazovku</string>
     <string name="shortcutAddedText">Podařilo se! %1$s byla přidána na vaši domovskou obrazovku.</string>
 
     <!-- User Survey -->
@@ -512,7 +521,7 @@
     <string name="dialogSaveAction">Uložit</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nechráněné stránky</string>
+    <string name="whitelistActivityTitle">Nechráněné stránky</string>
     <string name="enablePrivacyProtection">Povolit ochranu soukromí</string>
     <string name="disablePrivacyProtection">Zakázat ochranu soukromí</string>
     <string name="whitelistEntryOverflowContentDescription">Další možnosti pro nechráněný web %1$s</string>
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Weby s ochranou</string>
     <string name="settingsFireproofWebsites">Weby s ochranou</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Ochránit web</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt;je nyní chráněný! Pro správu navštivte Nastavení.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ochránit tento web</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt;je nyní chráněný!</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátit</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Opravdu chcete smazat &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky spoléhají na soubory cookie, aby vás udržely přihlášené. Když na webu zapnete ochranu, soubory cookie se nevymažou a zůstanete přihlášeni, a to i po použití tlačítka pro mazání. Stále přitom blokujeme sledovací programy třetích stran nalezené na webových stránkách s ochranou.</string>

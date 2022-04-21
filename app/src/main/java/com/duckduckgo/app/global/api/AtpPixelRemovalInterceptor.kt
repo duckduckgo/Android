@@ -33,7 +33,7 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
         val pixel = chain.request().url.pathSegments.last()
-        val url = if (pixel.startsWith(PIXEL_PREFIX) && !PIXEL_EXCEPTIONS.contains(pixel)) {
+        val url = if (pixel.startsWith(PIXEL_PREFIX) && !isInExceptionList(pixel)) {
             chain.request().url.newBuilder()
                 .removeAllQueryParameters(AppUrl.ParamKey.ATB)
                 .build()
@@ -46,11 +46,38 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
         return chain.proceed(request.url(url).build())
     }
 
+    private fun isInExceptionList(pixel: String): Boolean {
+        return PIXEL_EXCEPTIONS.firstOrNull { pixel.startsWith(it) } != null
+    }
+
     companion object {
         private const val PIXEL_PREFIX = "m_atp_"
 
         // list here the pixels that except from this interceptor
-        private val PIXEL_EXCEPTIONS = listOf<String>()
+        private val PIXEL_EXCEPTIONS = listOf(
+            "m_atp_imp_beta_instructions_d",
+            "m_atp_imp_beta_instructions_c",
+            "m_atp_imp_article_d",
+            "m_atp_imp_article_c",
+            "m_atp_imp_exclusion_list_activity_u",
+            "m_atp_imp_exclusion_list_activity_d",
+            "m_atp_imp_exclusion_list_activity_c",
+            "m_atp_ev_exclusion_list_activity_open_trackers_u",
+            "m_atp_ev_exclusion_list_activity_open_trackers_d",
+            "m_atp_ev_exclusion_list_activity_open_trackers_c",
+            "m_atp_imp_company_trackers_activity_u",
+            "m_atp_imp_company_trackers_activity_d",
+            "m_atp_imp_company_trackers_activity_c",
+            "m_atp_imp_tracker_activity_detail_u",
+            "m_atp_imp_tracker_activity_detail_d",
+            "m_atp_imp_tracker_activity_detail_c",
+            "m_atp_imp_company_trackers_activity_u",
+            "m_atp_imp_company_trackers_activity_d",
+            "m_atp_imp_company_trackers_activity_c",
+            "m_atp_imp_manage_recent_app_settings_activity_u",
+            "m_atp_imp_manage_recent_app_settings_activity_d",
+            "m_atp_imp_manage_recent_app_settings_activity_c",
+        )
     }
 
     override fun getInterceptor(): Interceptor {

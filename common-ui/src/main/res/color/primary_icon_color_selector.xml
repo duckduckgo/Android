@@ -14,12 +14,7 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?colorControlHighlight">
-    <item android:id="@android:id/mask">
-        <shape android:shape="rectangle">
-            <solid android:color="@color/black" />
-            <corners android:bottomLeftRadius="8dp" android:bottomRightRadius="8dp" />
-        </shape>
-    </item>
-</ripple>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="?attr/primaryIconDisabledColor" />
+    <item android:color="?attr/primaryIconColor"/>
+</selector>

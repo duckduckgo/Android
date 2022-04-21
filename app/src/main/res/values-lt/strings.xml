@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
     <string name="bookmarkAddedMessage">Žymė pridėta</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Šalinti apsaugą</string>
+    <string name="requestMobileSiteMenuTitle">Mobilioji svetainė</string>
+    <string name="downloadsMenuTitle">Atsisiuntimai</string>
+    <string name="printMenuTitle">Spausdinti puslapį</string>
+    <string name="favoriteDeleteConfirmationMessage">Mėgstamas pašalintas</string>
+    <string name="fireproofDeleteConfirmationMessage">Apsauga pašalinta</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privatumo apsauga įjungta dėl %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privatumo apsauga išjungta dėl %1$s</string>
+    <string name="undoSnackbarAction">Anuliuoti</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
-    <string name="shareMenuTitle">Bendrinti…</string>
+    <string name="shareMenuTitle">Bendrinti</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Paieška</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridėti prie pradžios puslapio</string>
+    <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
     <string name="shortcutAddedText">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
@@ -512,7 +521,7 @@
     <string name="dialogSaveAction">Išsaugoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neapsaugotos svetainės</string>
+    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
     <string name="settingsFireproofWebsites">Apsaugoti svetaines</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti svetainę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota! Apsilankykite „Nustatymai“ ir sužinokite daugiau.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti šią svetainę</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota!</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Svetainės pagrįstos slapukais, kad liktumėte prisijungę. Pasirinkus parinktį „Fireproof“, slapukai nėra ištrinami ir liksite prisijungę net panaudoję mygtuką „Fire“. Vis tiek blokuosime trečiųjų šalių stebėjimo priemones, randamas svetainėse, kuriose pasinaudosite parinktimi „Fireproof“.</string>

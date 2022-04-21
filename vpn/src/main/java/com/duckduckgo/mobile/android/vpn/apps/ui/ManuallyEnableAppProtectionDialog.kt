@@ -59,8 +59,8 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
         val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
         val appName = rootView.findViewById<TextView>(R.id.trackingProtectionAppName)
         val label = rootView.findViewById<TextView>(R.id.trackingProtectionAppLabel)
-        val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogEnable)
-        val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExlucdeAppDialogSkip)
+        val enableCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogEnable)
+        val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
 
         val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
             .setView(rootView)

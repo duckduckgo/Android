@@ -22,6 +22,7 @@ enum class AppTpSetting(override val value: String, override val defaultValue: B
     PrivateDnsSupport("privateDnsSupport"),
     NetworkSwitchHandling("networkSwitchSupport"),
     SetActiveNetworkDns("setActiveNetworkDns"),
+    VpnDdgBrowserTraffic("vpnDdgBrowserTraffic"),
     AlwaysSetDNS("alwaysSetDNS"),
 }
 

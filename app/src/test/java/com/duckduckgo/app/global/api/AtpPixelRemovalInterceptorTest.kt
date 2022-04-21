@@ -35,12 +35,37 @@ class AtpPixelRemovalInterceptorTest {
             val pixelUrl = String.format(PIXEL_TEMPLATE, pixelName)
 
             val interceptedUrl = atpPixelRemovalInterceptor.intercept(FakeChain(pixelUrl)).request.url
-            assertTrue(interceptedUrl.queryParameter("atb") == null)
+            assertEquals(!PIXELS_WITH_ATB_INFO.contains(pixelName), interceptedUrl.queryParameter("atb") == null)
             assertFalse(interceptedUrl.queryParameter("appVersion") == null)
         }
     }
 
     companion object {
         private const val PIXEL_TEMPLATE = "https://improving.duckduckgo.com/t/%s_android_phone?atb=v255-7zu&appVersion=5.74.0&test=1"
+
+        private val PIXELS_WITH_ATB_INFO = listOf(
+            "m_atp_imp_beta_instructions_d",
+            "m_atp_imp_beta_instructions_c",
+            "m_atp_imp_article_d",
+            "m_atp_imp_article_c",
+            "m_atp_imp_exclusion_list_activity_u",
+            "m_atp_imp_exclusion_list_activity_d",
+            "m_atp_imp_exclusion_list_activity_c",
+            "m_atp_ev_exclusion_list_activity_open_trackers_u",
+            "m_atp_ev_exclusion_list_activity_open_trackers_d",
+            "m_atp_ev_exclusion_list_activity_open_trackers_c",
+            "m_atp_imp_company_trackers_activity_u",
+            "m_atp_imp_company_trackers_activity_d",
+            "m_atp_imp_company_trackers_activity_c",
+            "m_atp_imp_tracker_activity_detail_u",
+            "m_atp_imp_tracker_activity_detail_d",
+            "m_atp_imp_tracker_activity_detail_c",
+            "m_atp_imp_company_trackers_activity_u",
+            "m_atp_imp_company_trackers_activity_d",
+            "m_atp_imp_company_trackers_activity_c",
+            "m_atp_imp_manage_recent_app_settings_activity_u",
+            "m_atp_imp_manage_recent_app_settings_activity_d",
+            "m_atp_imp_manage_recent_app_settings_activity_c",
+        )
     }
 }

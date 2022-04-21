@@ -196,7 +196,7 @@ class BrowserTabViewModel @Inject constructor(
         val browserShowing: Boolean = false,
         val isFullScreen: Boolean = false,
         val isDesktopBrowsingMode: Boolean = false,
-        val canChangeBrowsingMode: Boolean = true,
+        val canChangeBrowsingMode: Boolean = false,
         val showPrivacyGrade: Boolean = false,
         val showSearchIcon: Boolean = false,
         val showClearButton: Boolean = false,
@@ -204,7 +204,7 @@ class BrowserTabViewModel @Inject constructor(
         val fireButton: HighlightableButton = HighlightableButton.Visible(),
         val showMenuButton: HighlightableButton = HighlightableButton.Visible(),
         val canSharePage: Boolean = false,
-        val canAddBookmarks: Boolean = false,
+        val canSaveSite: Boolean = false,
         val bookmark: SavedSite.Bookmark? = null,
         val addFavorite: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val favorite: SavedSite.Favorite? = null,
@@ -212,14 +212,16 @@ class BrowserTabViewModel @Inject constructor(
         val isFireproofWebsite: Boolean = false,
         val canGoBack: Boolean = false,
         val canGoForward: Boolean = false,
-        val canWhitelist: Boolean = false,
-        val isWhitelisted: Boolean = false,
+        val canChangePrivacyProtection: Boolean = false,
+        val isPrivacyProtectionEnabled: Boolean = false,
         val canReportSite: Boolean = false,
         val addToHomeEnabled: Boolean = false,
         val addToHomeVisible: Boolean = false,
         val showDaxIcon: Boolean = false,
         val isEmailSignedIn: Boolean = false,
-        var previousAppLink: AppLink? = null
+        var previousAppLink: AppLink? = null,
+        val canFindInPage: Boolean = false,
+        val forceRenderingTicker: Long = System.currentTimeMillis()
     )
 
     sealed class HighlightableButton {
@@ -269,8 +271,7 @@ class BrowserTabViewModel @Inject constructor(
         val showNumberMatches: Boolean = false,
         val activeMatchIndex: Int = 0,
         val searchTerm: String = "",
-        val numberMatches: Int = 0,
-        val canFindInPage: Boolean = false
+        val numberMatches: Int = 0
     )
 
     data class PrivacyGradeViewState(
@@ -330,6 +331,9 @@ class BrowserTabViewModel @Inject constructor(
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         class ShowFireproofWebSiteConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        class DeleteFireproofConfirmation(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Command()
+        class ShowPrivacyProtectionEnabledConfirmation(val domain: String) : Command()
+        class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
@@ -824,7 +828,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         globalLayoutState.value = Browser(isNewTabState = false)
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = trimmedInput,
             shouldMoveCaretToEnd = false,
@@ -955,7 +959,6 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
-            findInPageViewState.value = currentFindInPageViewState().copy(canFindInPage = true)
             command.value = Refresh
         } else {
             command.value = NavigateForward
@@ -1106,29 +1109,29 @@ class BrowserTabViewModel @Inject constructor(
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
-        val canWhitelist = domain != null
-        val canFireproofSite = domain != null
         val addFavorite = if (!currentBrowserViewState.addFavorite.isEnabled()) {
             HighlightableButton.Visible(enabled = true)
         } else {
             currentBrowserViewState.addFavorite
         }
-        findInPageViewState.value = FindInPageViewState(visible = false, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = false)
 
         browserViewState.value = currentBrowserViewState.copy(
             browserShowing = true,
-            canAddBookmarks = true,
+            canSaveSite = domain != null,
             addFavorite = addFavorite,
-            addToHomeEnabled = true,
+            addToHomeEnabled = domain != null,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
-            canSharePage = true,
+            canSharePage = domain != null,
             showPrivacyGrade = true,
-            canReportSite = true,
-            canWhitelist = canWhitelist,
-            isWhitelisted = false,
+            canReportSite = domain != null,
+            canChangePrivacyProtection = domain != null,
+            isPrivacyProtectionEnabled = false,
             showSearchIcon = false,
             showClearButton = false,
-            canFireproofSite = canFireproofSite,
+            canFindInPage = true,
+            canChangeBrowsingMode = true,
+            canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
             showDaxIcon = shouldShowDaxIcon(url, true)
         )
@@ -1140,7 +1143,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         domain?.let { viewModelScope.launch { updateLoadingStatePrivacy(domain) } }
-        domain?.let { viewModelScope.launch { updateWhitelistedState(domain) } }
+        domain?.let { viewModelScope.launch { updatePrivacyProtectionState(domain) } }
 
         viewModelScope.launch { updateBookmarkAndFavoriteState(url) }
 
@@ -1192,10 +1195,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateWhitelistedState(domain: String) {
+    private suspend fun updatePrivacyProtectionState(domain: String) {
         val isWhitelisted = isWhitelisted(domain)
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = isWhitelisted)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = isWhitelisted)
         }
     }
 
@@ -1296,7 +1299,7 @@ class BrowserTabViewModel @Inject constructor(
 
         val currentBrowserViewState = currentBrowserViewState()
         browserViewState.value = currentBrowserViewState.copy(
-            canAddBookmarks = false,
+            canSaveSite = false,
             addFavorite = HighlightableButton.Visible(enabled = false),
             addToHomeEnabled = false,
             addToHomeVisible = addToHomeCapabilityDetector.isAddToHomeSupported(),
@@ -1780,7 +1783,9 @@ class BrowserTabViewModel @Inject constructor(
         val domain = site?.domain ?: return
         viewModelScope.launch {
             if (currentBrowserViewState().isFireproofWebsite) {
-                fireproofWebsiteRepository.removeFireproofWebsite(FireproofWebsiteEntity(domain))
+                val fireproofWebsiteEntity = FireproofWebsiteEntity(domain)
+                fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
+                command.value = DeleteFireproofConfirmation(fireproofWebsiteEntity = fireproofWebsiteEntity)
                 pixel.fire(AppPixelName.FIREPROOF_WEBSITE_REMOVE)
             } else {
                 fireproofWebsiteRepository.fireproofWebsite(domain)?.let {
@@ -1832,6 +1837,13 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(fireproofWebsiteEntity)
             pixel.fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+        }
+    }
+
+    fun onRemoveFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofWebsiteRepository.fireproofWebsite(fireproofWebsiteEntity.domain)
+            pixel.fire(AppPixelName.FIREPROOF_REMOVE_WEBSITE_UNDO)
         }
     }
 
@@ -1887,7 +1899,7 @@ class BrowserTabViewModel @Inject constructor(
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site))
     }
 
-    fun onWhitelistSelected() {
+    fun onPrivacyProtectionMenuClicked() {
         val domain = site?.domain ?: return
         appCoroutineScope.launch(dispatchers.io()) {
             if (isWhitelisted(domain)) {
@@ -1905,7 +1917,8 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.insert(domain)
         }
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = true)
+            command.value = ShowPrivacyProtectionDisabledConfirmation(domain)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
         }
     }
 
@@ -1915,7 +1928,28 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.delete(domain)
         }
         withContext(dispatchers.main()) {
-            browserViewState.value = currentBrowserViewState().copy(isWhitelisted = false)
+            command.value = ShowPrivacyProtectionEnabledConfirmation(domain)
+            browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
+        }
+    }
+
+    fun onDisablePrivacyProtectionSnackbarUndoClicked(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            userWhitelistDao.insert(domain)
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
+                command.value = Refresh
+            }
+        }
+    }
+
+    fun onEnablePrivacyProtectionSnackbarUndoClicked(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            userWhitelistDao.delete(domain)
+            withContext(dispatchers.main()) {
+                browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
+                command.value = Refresh
+            }
         }
     }
 
@@ -1974,7 +2008,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onFindInPageSelected() {
-        findInPageViewState.value = FindInPageViewState(visible = true, canFindInPage = true)
+        findInPageViewState.value = FindInPageViewState(visible = true)
     }
 
     fun userFindingInPage(searchTerm: String) {
@@ -2009,8 +2043,9 @@ class BrowserTabViewModel @Inject constructor(
         globalLayoutState.value = Browser(isNewTabState = false)
     }
 
-    fun onDesktopSiteModeToggled(desktopSiteRequested: Boolean) {
+    fun onChangeBrowserModeClicked() {
         val currentBrowserViewState = currentBrowserViewState()
+        val desktopSiteRequested = !currentBrowserViewState().isDesktopBrowsingMode
         browserViewState.value = currentBrowserViewState.copy(isDesktopBrowsingMode = desktopSiteRequested)
         command.value = RefreshUserAgent(site?.uri?.toString(), desktopSiteRequested)
 
@@ -2303,6 +2338,10 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value?.previousAppLink?.let { appLink ->
             command.value = OpenAppLink(appLink)
         }
+    }
+
+    fun onDonwloadsMenuItemClicked() {
+        pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
     }
 
     fun clearPreviousUrl() {
@@ -2607,6 +2646,12 @@ class BrowserTabViewModel @Inject constructor(
             initialUrl
         }
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
+    }
+
+    fun onConfigurationChanged() {
+        browserViewState.value = currentBrowserViewState().copy(
+            forceRenderingTicker = System.currentTimeMillis()
+        )
     }
 
     companion object {

@@ -65,7 +65,7 @@ class NewAppBroadcastReceiver @Inject constructor(
         val pendingResult = goAsync()
         goAsync(pendingResult) {
             if (isGame(packageName) || isInExclusionList(packageName)) {
-                Timber.i("Newly installed package $packageName is in exclusion list, disabling/renabling vpn")
+                Timber.i("Newly installed package $packageName is in exclusion list, disabling/re-enabling vpn")
                 TrackerBlockingVpnService.restartVpnService(applicationContext)
             } else {
                 Timber.i("Newly installed package $packageName not in exclusion list")

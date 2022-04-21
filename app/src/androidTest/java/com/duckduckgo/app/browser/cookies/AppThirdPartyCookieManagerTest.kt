@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.cookies
 
 import android.content.Context
-import android.webkit.CookieManager
 import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.room.Room
@@ -43,7 +42,8 @@ class AppThirdPartyCookieManagerTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    private val cookieManager = CookieManager.getInstance()
+    private val cookieManagerProvider = DefaultCookieManagerProvider()
+    private val cookieManager = cookieManagerProvider.get()
     private lateinit var db: AppDatabase
     private lateinit var authCookiesAllowedDomainsDao: AuthCookiesAllowedDomainsDao
     private lateinit var authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
@@ -61,7 +61,7 @@ class AppThirdPartyCookieManagerTest {
             AuthCookiesAllowedDomainsRepository(authCookiesAllowedDomainsDao, coroutinesTestRule.testDispatcherProvider)
         webView = TestWebView(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        testee = AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
+        testee = AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }
 
     @UiThreadTest
