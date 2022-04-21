@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Android</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.2">
+    <link rel="stylesheet" href="/assets/stylesheet.css">
+</head>
+<body>
+<form action="https://appassets.androidplatform.net/assets/index.html" onsubmit = "return(validate());">
+    <label for="username">Username</label>
+    <br>
+    <input id="username" type="text" placeholder="username">
+    <br>
+    <br>
+    <label for="password">Password</label>
+    <br>
+    <input id="password" type="password" placeholder="Password">
+    <br>
+    <br>
+    <button type="submit">Sign in</button>
+</form>
+
+
+
+<script>
+
+function validate() {
+    return false
+}
+
+window.addEventListener("message", (event) => {
+   console.log(`Received a message from the native layer: \norigin=${event.origin} \nisTrusted=${event.isTrusted} \ndata=${event.data}`);
+}, false);
+
+
+wm.onmessage = function(event) {
+    console.log("received a message through the named wm object: " + event.data);
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+    console.log("dom content loaded");
+    wm.postMessage("I'm ready!");
+});
+
+</script>
+</body>
+</html>
