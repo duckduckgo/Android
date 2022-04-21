@@ -126,7 +126,7 @@ class FireproofWebsiteRepositoryTest {
     }
 
     @Test
-    fun whenFireproofWebsitesCountByDomainAndWebsitsMatchThenReturnCount() = runTest {
+    fun whenFireproofWebsitesCountByDomainAndWebsitesMatchThenReturnCount() = runTest {
         givenFireproofWebsiteDomain("example.com")
 
         val count = fireproofWebsiteRepository.fireproofWebsitesCountByDomain("example.com")

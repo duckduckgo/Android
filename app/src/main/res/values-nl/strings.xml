@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Favoriet toegevoegd</string>
     <string name="bookmarkAddedMessage">Bladwijzer toegevoegd</string>
     <string name="requestDesktopSiteMenuTitle">Desktopsite</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Brandveiligheid uitschakelen</string>
+    <string name="requestMobileSiteMenuTitle">Mobiele site</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Pagina printen</string>
+    <string name="favoriteDeleteConfirmationMessage">Favoriet verwijderd</string>
+    <string name="fireproofDeleteConfirmationMessage">Brandveiligheid uitgeschakeld</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privacybescherming ingeschakeld voor %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privacybescherming uitgeschakeld voor %1$s</string>
+    <string name="undoSnackbarAction">Ongedaan maken</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Afbeelding downloaden</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opties</string>
     <string name="shareLink">Link delen</string>
-    <string name="shareMenuTitle">Delen…</string>
+    <string name="shareMenuTitle">Delen</string>
     <string name="copyUrl">Link adres kopiëren</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Zoeken</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Toevoegen aan Startscherm</string>
+    <string name="addToHome">Toevoegen aan Home Screen</string>
     <string name="shortcutAddedText">%1$s is toegevoegd aan je startscherm.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Opslaan</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Onbeschermde sites</string>
+    <string name="whitelistActivityTitle">Onbeschermde sites</string>
     <string name="enablePrivacyProtection">Privacybescherming inschakelen</string>
     <string name="disablePrivacyProtection">Privacybescherming uitschakelen</string>
     <string name="whitelistEntryOverflowContentDescription">Meer opties voor onbeschermde site %1$s</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
     <string name="settingsFireproofWebsites">Brandveilige websites</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Brandveilige website</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig! Ga naar Instellingen om dit te beheren.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Deze website brandveilig maken</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig!</string>
     <string name="fireproofWebsiteSnackbarAction">Ongedaan maken</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
     <string name="fireproofWebsiteFeatureDescription">Websites gebruiken cookies om te zorgen dat je ingelogd blijft. Als je een site brandveilig maakt, worden de cookies niet gewist en blijf je ingelogd, zelfs nadat je de vuurknop hebt gebruikt. Trackers van derden worden ook op brandveilige websites geblokkeerd.</string>

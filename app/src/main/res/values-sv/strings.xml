@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Favorit har lagts till</string>
     <string name="bookmarkAddedMessage">Bokmärke sparat</string>
     <string name="requestDesktopSiteMenuTitle">Stationär datorwebbplats</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Ta bort brandsäkring</string>
+    <string name="requestMobileSiteMenuTitle">Webbplats för mobil</string>
+    <string name="downloadsMenuTitle">Nerladdningar</string>
+    <string name="printMenuTitle">Skriv ut sidan</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorit borttagen</string>
+    <string name="fireproofDeleteConfirmationMessage">Brandsäkring har tagits bort</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Integritetsskydd aktiverat för %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Integritetsskydd inaktiverat för %1$s</string>
+    <string name="undoSnackbarAction">Återställ</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Ladda ned bild</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Alternativ</string>
     <string name="shareLink">Dela länk</string>
-    <string name="shareMenuTitle">Dela …</string>
+    <string name="shareMenuTitle">Dela</string>
     <string name="copyUrl">Kopia länkadress</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Sökning</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lägg till Start</string>
+    <string name="addToHome">Lägg till på hemskärmen</string>
     <string name="shortcutAddedText">Klart! %1$s har lagts till på din startsida.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Spara</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Oskyddade webbplatser</string>
+    <string name="whitelistActivityTitle">Oskyddade webbplatser</string>
     <string name="enablePrivacyProtection">Aktivera integritetsskydd</string>
     <string name="disablePrivacyProtection">Inaktivera integritetsskydd</string>
     <string name="whitelistEntryOverflowContentDescription">Fler alternativ för den oskyddade webbplatsen %1$s</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>
     <string name="settingsFireproofWebsites">Brandsäkra webbplatser</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Brandsäkra webbplats</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäkrad! Gå till Inställningar för att hantera.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Brandsäkra den här webbplatsen</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäkrad!</string>
     <string name="fireproofWebsiteSnackbarAction">Återställ</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Webbplatser använder kakor för att hålla dig inloggad. Om du brandsäkrar en webbplats kommer kakor inte att raderas och du förblir inloggad även efter att du har använt brännarknappen. Vi blockerar fortfarande tredje parters spårare som finns på brandsäkrade webbplatser.</string>

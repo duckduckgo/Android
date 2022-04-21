@@ -193,6 +193,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_REPORT_BROKEN_SITE_PRESSED("m_nav_rbs_p"),
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
+    MENU_ACTION_DOWNLOADS_PRESSED("m_downloads_menu_item_pressed"),
 
     COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
     COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
@@ -206,6 +207,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
     FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
     FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+    FIREPROOF_REMOVE_WEBSITE_UNDO("m_remove_fireproofing_snackbar_undo"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),

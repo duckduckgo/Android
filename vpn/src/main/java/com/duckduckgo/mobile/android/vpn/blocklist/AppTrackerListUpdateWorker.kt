@@ -55,7 +55,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 
     private fun updateTrackerBlocklist(): Result {
-        Timber.d("Updating the app tracker bloclist")
+        Timber.d("Updating the app tracker blocklist")
         val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
         when (blocklist.etag) {
             is ETag.ValidETag -> {

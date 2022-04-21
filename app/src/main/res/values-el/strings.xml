@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Προστέθηκε αγαπημένο</string>
     <string name="bookmarkAddedMessage">Προστέθηκε σελιδοδείκτης</string>
     <string name="requestDesktopSiteMenuTitle">Ιστότοπος επιφάνειας εργασίας</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Αφαίρεση διαγραφής δραστηριότητας</string>
+    <string name="requestMobileSiteMenuTitle">Ιστότοπος για κινητά</string>
+    <string name="downloadsMenuTitle">Λήψεις</string>
+    <string name="printMenuTitle">Εκτύπωση σελίδας</string>
+    <string name="favoriteDeleteConfirmationMessage">Το Αγαπημένο αφαιρέθηκε</string>
+    <string name="fireproofDeleteConfirmationMessage">Η διαγραφή δραστηριότητας αφαιρέθηκε</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Η προστασία απορρήτου ενεργοποιήθηκε για %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Η προστασία απορρήτου απενεργοποιήθηκε για %1$s</string>
+    <string name="undoSnackbarAction">Αναίρεση</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Λήψη εικόνας</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Επιλογές</string>
     <string name="shareLink">Κοινή χρήση συνδέσμου</string>
-    <string name="shareMenuTitle">Κοινή χρήση…</string>
+    <string name="shareMenuTitle">Κοινή χρήση</string>
     <string name="copyUrl">Αντιγραφή διεύθυνσης συνδέσμου</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Αναζήτηση</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Προσθήκη στην αρχική σελίδα</string>
+    <string name="addToHome">Προσθήκη στην Αρχική Οθόνη</string>
     <string name="shortcutAddedText">Επιτυχία! Το %1$s έχει προστεθεί στην αρχική οθόνη σας.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Αποθήκευση</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
+    <string name="whitelistActivityTitle">Μη προστατευόμενοι ιστότοποι</string>
     <string name="enablePrivacyProtection">Ενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="disablePrivacyProtection">Απενεργοποίηση Προστασίας προσωπικών δεδομένων</string>
     <string name="whitelistEntryOverflowContentDescription">Περισσότερες επιλογές για τον μη προστατευόμενο ιστότοπο %1$s</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
     <string name="settingsFireproofWebsites">Ασφαλείς ιστότοποι</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Ασφαλής ιστότοπος</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές! Επισκεφτείτε τις Ρυθμίσεις για να το διαχειριστείτε.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Διαγράψτε τη δραστηριότητα γι\' αυτόν τον ιστότοπο</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές!</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
     <string name="fireproofWebsiteFeatureDescription">Οι ιστότοποι βασίζονται σε cookies για να σας διατηρούν συνδεδεμένους. Όταν ενεργοποιείτε τη διαγραφή δραστηριότητας για έναν ιστότοπο, τα cookies δεν διαγράφονται και παραμένετε συνδεδεμένοι, ακόμα και μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Εξακολουθούμε να αποκλείουμε εφαρμογές παρακολούθησης από τρίτους που υπάρχουν σε ιστότοπους με διαγραφή δραστηριότητας.</string>

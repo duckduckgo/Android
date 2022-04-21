@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -39,6 +55,15 @@
     <string name="favoriteAddedMessage">Kedvenc hozzáadva</string>
     <string name="bookmarkAddedMessage">Könyvjelző hozzáadva</string>
     <string name="requestDesktopSiteMenuTitle">Weboldal asztali nézete</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Tűzállóság eltávolítása</string>
+    <string name="requestMobileSiteMenuTitle">Weboldal mobil nézete</string>
+    <string name="downloadsMenuTitle">Letöltések</string>
+    <string name="printMenuTitle">Oldal nyomtatása</string>
+    <string name="favoriteDeleteConfirmationMessage">Kedvenc eltávolítva</string>
+    <string name="fireproofDeleteConfirmationMessage">Tűzállóság eltávolítva</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Adatvédelem engedélyezve a következőhöz: %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Adatvédelem letiltva a következőhöz: %1$s</string>
+    <string name="undoSnackbarAction">Visszavonás</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Kép letöltése</string>
@@ -50,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opciók</string>
     <string name="shareLink">Link megosztása</string>
-    <string name="shareMenuTitle">Megosztás…</string>
+    <string name="shareMenuTitle">Megosztás</string>
     <string name="copyUrl">Link címének másolása</string>
 
     <!-- Find in page -->
@@ -262,7 +287,7 @@
     <string name="searchWidgetLabel">Keresés</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Hozzáadás a Kezdőlaphoz</string>
+    <string name="addToHome">Hozzáadás a kezdőlaphoz</string>
     <string name="shortcutAddedText">Siker! %1$s hozzáadva a kezdőképernyődhöz.</string>
 
     <!-- User Survey -->
@@ -484,7 +509,7 @@
     <string name="dialogSaveAction">Mentés</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Védelem nélküli weboldalak</string>
+    <string name="whitelistActivityTitle">Védelem nélküli weboldalak</string>
     <string name="enablePrivacyProtection">Adatvédelem engedélyezése</string>
     <string name="disablePrivacyProtection">Adatvédelem letiltása</string>
     <string name="whitelistEntryOverflowContentDescription">További lehetőségek az %1$s védelem nélküli weboldalhoz</string>
@@ -500,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>
     <string name="settingsFireproofWebsites">Tűzálló weboldalak</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Tűzálló weboldal</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">A(z) &lt;b&gt;%1$s&lt;/b&gt; most már tűzálló! A kezeléshez lépj a Beállításokra.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Weboldal tűzállóvá tétele</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">A(z) &lt;b&gt;%1$s&lt;/b&gt; most már tűzálló!</string>
     <string name="fireproofWebsiteSnackbarAction">Visszavonás</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Biztos, hogy törölni akarod a (z) &lt;b&gt;%1$s&lt;/b&gt; fájlt?</string>
     <string name="fireproofWebsiteFeatureDescription">A webhelyek sütik segítségével teszik lehetővé, hogy bejelentkezve maradhass. Ha tűzállóvá teszel egy weboldalt, a sütik nem törlődnek, és még a Fire gomb használata után is bejelentkezve maradsz. A tűzálló webhelyeken a külső felek nyomkövetőit azonban blokkoljuk.</string>

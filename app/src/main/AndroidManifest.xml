@@ -335,7 +335,7 @@
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.privacy.ui.WhitelistActivity"
-            android:label="@string/whitelisetActivityTitle"
+            android:label="@string/whitelistActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity"

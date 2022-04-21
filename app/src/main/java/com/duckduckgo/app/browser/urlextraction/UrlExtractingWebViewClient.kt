@@ -27,6 +27,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.DispatcherProvider
@@ -38,7 +39,7 @@ class UrlExtractingWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestInterceptor: RequestInterceptor,
-    private val cookieManager: CookieManager,
+    private val cookieManagerProvider: CookieManagerProvider,
     private val gpc: Gpc,
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
@@ -76,7 +77,7 @@ class UrlExtractingWebViewClient(
     }
 
     private fun flushCookies() {
-        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManager.flush() }
+        appCoroutineScope.launch(dispatcherProvider.io()) { cookieManagerProvider.get().flush() }
     }
 
     @WorkerThread
