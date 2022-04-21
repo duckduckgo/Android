@@ -369,4 +369,5 @@
     <string name="atp_RemoveFeatureDialogMessage">App Tracking Protection will be disabled and its settings and data will be deleted. You can enable it again at any time in Settings.</string>
     <string name="atp_RemoveFeatureDialogCancel">Cancel</string>
     <string name="atp_RemoveFeatureDialogRemove">Disable</string>
+
 </resources>
