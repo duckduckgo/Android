@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV4_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV6_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
@@ -122,6 +123,12 @@ class HealthMetricCounter @Inject constructor(
     fun onSocketChannelConnectError() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(SOCKET_CHANNEL_CONNECT_EXCEPTION())
+        }
+    }
+
+    fun onTunReadIOException() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_READ_IO_EXCEPTION())
         }
     }
 

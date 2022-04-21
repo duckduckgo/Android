@@ -86,6 +86,7 @@
     <attr name="secondaryTextColor" format="color" />
     <attr name="accentTextColor" format="color" />
     <attr name="primaryIconColor" format="color" />
+    <attr name="primaryIconDisabledColor" format="color" />
     <attr name="secondaryIconColor" format="color" />
     <attr name="accentIconColor" format="color" />
     <attr name="splitterColor" format="color" />
@@ -97,4 +98,5 @@
     <attr name="dialogSecondaryButtonColor" format="color" />
 
     <attr name="overflowMenuDividerColor" format="color" />
+    <attr name="bottomShadowBackground" format="reference" />
 </resources>

@@ -37,7 +37,10 @@
     <dimen name="listItemImageSize">22dp</dimen>
 
     <!-- PopupMenu -->
+    <dimen name="popupMenuWidth">280dp</dimen>
+    <dimen name="popupMenuNavigationItemHeight">24dp</dimen>
     <dimen name="popupMenuItemHeight">48dp</dimen>
+    <dimen name="popupMenuNavigationItemSize">40dp</dimen>
 
     <!-- Dialogs -->
     <dimen name="dialogButtonHeight">40dp</dimen>

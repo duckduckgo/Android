@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Priljubljeni dodan</string>
     <string name="bookmarkAddedMessage">Zaznamek je dodan</string>
     <string name="requestDesktopSiteMenuTitle">Namizna stran</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Odstrani požarno zaščito</string>
+    <string name="requestMobileSiteMenuTitle">Mobilna stran</string>
+    <string name="downloadsMenuTitle">Prenosi</string>
+    <string name="printMenuTitle">Natisni stran</string>
+    <string name="favoriteDeleteConfirmationMessage">Priljubljeni odstranjeni</string>
+    <string name="fireproofDeleteConfirmationMessage">Požarna zaščita je odstranjena</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Zaščita zasebnosti je omogočena za spletno mesto %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Zaščita zasebnosti je onemogočena za spletno mesto %1$s</string>
+    <string name="undoSnackbarAction">Prekliči spremembe</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Prenesi sliko</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
     <string name="shareLink">Daj povezavo v skupno rabo</string>
-    <string name="shareMenuTitle">Deli …</string>
+    <string name="shareMenuTitle">Deli</string>
     <string name="copyUrl">Kopiraj naslov povezave</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Iskanje</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Dodaj na začetno stran</string>
+    <string name="addToHome">Dodaj na Domači Zaslon</string>
     <string name="shortcutAddedText">Uspeh! %1$s je dodan na vaš začetni zaslon.</string>
 
     <!-- User Survey -->
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Spletne strani s požarno zaščito</string>
     <string name="settingsFireproofWebsites">Spletne strani s požarno zaščito</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Spletna stran s požarno zaščito</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ima sedaj požarno zaščito! Za upravljanje odprite Nastavitve.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Ta stran je požarno zaščitena</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ima sedaj požarno zaščito!</string>
     <string name="fireproofWebsiteSnackbarAction">Prekliči spremembe</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ste prepričani, da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Spletne strani brez požarne zaščite</string>

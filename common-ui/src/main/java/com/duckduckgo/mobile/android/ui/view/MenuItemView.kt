@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewMenuItemBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -69,14 +68,7 @@ constructor(
     }
 
     fun setIcon(@DrawableRes iconResId: Int) {
-        val drawable = VectorDrawableCompat.create(resources, iconResId, null)
-        binding.icon.setImageDrawable(drawable)
-    }
-
-    fun setOnClickListener(onClick: () -> Unit) {
-        binding.root.setOnClickListener {
-            onClick()
-        }
+        binding.icon.setImageResource(iconResId)
     }
 
     private fun updateContentDescription() {
