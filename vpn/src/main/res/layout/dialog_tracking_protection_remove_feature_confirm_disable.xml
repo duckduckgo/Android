@@ -65,7 +65,6 @@
             android:textColor="@color/cornflowerBlue"
             android:text="@string/atp_RemoveFeatureDialogRemove"/>
 
-
     </LinearLayout>
 
 </LinearLayout>
