@@ -64,7 +64,6 @@ interface TrackingProtectionAppsRepository {
 class RealTrackingProtectionAppsRepository @Inject constructor(
     private val packageManager: PackageManager,
     private val appTrackerRepository: AppTrackerRepository,
-    private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val appBuildConfig: AppBuildConfig,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     private val dispatcherProvider: DispatcherProvider
