@@ -39,8 +39,7 @@ import javax.inject.Inject
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService,
-    private val appBuildConfig: AppBuildConfig
+    private val fileService: DownloadFileService
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
@@ -134,19 +133,24 @@ class NetworkFileDownloader @Inject constructor(
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
-        (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.let { manager ->
+
+        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager? ?: return
+
+        try {
             val downloadId = manager.enqueue(request)
-            callback.onStart(
-                DownloadItem(
-                    id = 0,
-                    downloadId = downloadId,
-                    downloadStatus = STARTED,
-                    fileName = guessedFileName,
-                    contentLength = 0,
-                    filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
-                    createdAt = DatabaseDateFormatter.timestamp()
-                )
+            val downloadItem = DownloadItem(
+                id = 0,
+                downloadId = downloadId,
+                downloadStatus = STARTED,
+                fileName = guessedFileName,
+                contentLength = 0,
+                filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
+                createdAt = DatabaseDateFormatter.timestamp()
             )
+            callback.onStart(downloadItem)
+        } catch (e: IllegalArgumentException) {
+            Timber.e(e, "Failed when trying to enqueue the download.")
+            callback.onError(pendingDownload.url, DownloadFailReason.Other)
         }
     }
 
