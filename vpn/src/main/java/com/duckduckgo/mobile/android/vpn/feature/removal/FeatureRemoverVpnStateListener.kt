@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import androidx.work.ExistingWorkPolicy.KEEP
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -67,7 +66,7 @@ class FeatureRemoverVpnStateListener @Inject constructor(
     private fun scheduleFeatureRemoval() {
         Timber.v("Scheduling the VpnFeatureRemoverWorker worker 7 days from now")
         val request = OneTimeWorkRequestBuilder<VpnFeatureRemoverWorker>()
-            .setInitialDelay(15, TimeUnit.MINUTES)
+            .setInitialDelay(7, TimeUnit.DAYS)
             .addTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
             .build()
 

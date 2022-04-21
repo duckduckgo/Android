@@ -18,16 +18,8 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
-import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
-import javax.inject.Inject
 
 class VpnFeatureRemoverWorker(
     val context: Context,

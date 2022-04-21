@@ -23,7 +23,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -33,11 +32,10 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Scope
+import javax.inject.Provider
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
@@ -50,7 +48,8 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
-    private val workManager: WorkManager,
+    // we use the Provider to avoid a cycle dependency
+    private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
 ) : VpnFeatureRemover, WorkerInjectorPlugin {
@@ -83,6 +82,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun disableNotificationReminders() {
+        val workManager = workManagerProvider.get()
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
         workManager.cancelAllWorkByTag(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
     }

@@ -50,7 +50,6 @@ import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTracker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.include_company_trackers_toolbar.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -119,7 +118,6 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
                 }
             }
             .launchIn(lifecycleScope)
-
 
         lifecycleScope.launch {
             viewModel.loadData(
