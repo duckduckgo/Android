@@ -102,7 +102,6 @@ data class DataTransfer(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealAppTrackerBlockingStatsRepository @Inject constructor(
     val vpnDatabase: VpnDatabase
 ) : AppTrackerBlockingStatsRepository {
