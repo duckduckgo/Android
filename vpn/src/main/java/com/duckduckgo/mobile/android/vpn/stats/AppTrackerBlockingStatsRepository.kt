@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.LocalDateTime
