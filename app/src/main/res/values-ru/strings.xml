@@ -176,7 +176,7 @@
 
     <!-- Fire -->
     <string name="fireMenu">Сбросить данные</string>
-    <string name="fireClearAll">Сбросить все вкладки и данные</string>
+    <string name="fireClearAll">Закрыть вкладки и удалить данные</string>
     <string name="fireCancel">Отменить</string>
     <string name="fireDataCleared">Данные сброшены</string>
 
@@ -538,14 +538,14 @@
     <string name="fireproofWebsitesActivityTitle">Огнеупорные сайты</string>
     <string name="settingsFireproofWebsites">Огнеупорные сайты</string>
     <string name="fireproofWebsiteMenuTitleAdd">Сделать огнеупорным</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; теперь в безопасности!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; теперь огнеупорный</string>
     <string name="fireproofWebsiteSnackbarAction">Отменить действие</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Чтобы вам не приходилось каждый раз входить в свою учетную запись, сайты используют куки-файлы. Если сделать сайт «огнеупорным», мы не будем стирать его куки-файлы, даже если вы воспользуетесь кнопкой «Огонь». Но мы по-прежнему будем блокировать сторонние трекеры, в том числе на огнеупорных сайтах.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Дополнительные параметры для безопасного сайта %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Сделать сайт %1$s огнеупорным?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Вам не придется заново входить в свою учетную запись даже после применения кнопки «Огонь».</string>
-    <string name="fireproofWebsiteLoginDialogPositive">Защитить</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Сделать</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
     <string name="fireproofWebsiteItemsSectionTitle">Огнеупорные сайты</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Спрашивать каждый раз</string>
@@ -558,12 +558,12 @@
     <string name="fireproofWebsiteRemovalConfirmation">С сайта &lt;b&gt;%1$s&lt;/b&gt; снята огнеупорность</string>
 
     <!-- Fire Animation settings -->
-    <string name="settingsFireAnimation">Анимация кнопки «Пожар»</string>
+    <string name="settingsFireAnimation">Aнимация кнопки «Огонь»</string>
     <string name="settingsHeroFireAnimation">Инферно</string>
     <string name="settingsHeroWaterAnimation">Водоворот</string>
     <string name="settingsHeroAbstractAnimation">Воздушный поток</string>
     <string name="settingsNoneAnimation">Ничего</string>
-    <string name="settingsSelectFireAnimationDialog">Анимация кнопки «Пожар»</string>
+    <string name="settingsSelectFireAnimationDialog">Анимация кнопки «Огонь»</string>
     <string name="settingsSelectFireAnimationDialogSave">Сохранить</string>
 
     <!-- Dos Attack error-->
@@ -600,7 +600,7 @@
     <string name="preciseLocationSnackbarMessage">Ранее вы предоставили %1$s разрешение на доступ к местоположению вашего устройства.</string>
 
     <!--Fire button education-->
-    <string name="daxClearDataCtaText">В браузере могут скапливаться личные данные. Фу! Пользуйтесь кнопкой «Пожар», чтобы сжечь весь лишний мусор. Попробуйте сами! 👇</string>
+    <string name="daxClearDataCtaText">В браузере могут скапливаться личные данные. Фу! Пользуйтесь кнопкой «Огонь», чтобы сжечь весь лишний мусор. Попробуйте сами! 👇</string>
 
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
