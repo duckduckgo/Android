@@ -42,7 +42,6 @@ interface TimeDiffFormatter {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
 class RealTimeDiffFormatter @Inject constructor(private val context: Context) : TimeDiffFormatter {
 
     override fun formatTimePassedInDays(
