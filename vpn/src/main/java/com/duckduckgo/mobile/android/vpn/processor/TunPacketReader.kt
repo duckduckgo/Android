@@ -83,7 +83,15 @@ class TunPacketReader @AssistedInject constructor(
     private fun executeReadLoop(vpnInput: FileChannel) {
         bufferToNetwork = byteBuffer()
 
-        val inPacketLength = vpnInput.read(bufferToNetwork)
+        val inPacketLength = try {
+            vpnInput.read(bufferToNetwork)
+        } catch (t: Throwable) {
+            healthMetricCounter.onTunReadIOException()
+            // buffer clean up and re-throw on purpose
+            ByteBufferPool.release(bufferToNetwork)
+            throw t
+        }
+
         if (inPacketLength == 0) {
             ByteBufferPool.release(bufferToNetwork)
             return

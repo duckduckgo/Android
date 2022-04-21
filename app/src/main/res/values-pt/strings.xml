@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -39,6 +55,15 @@
     <string name="favoriteAddedMessage">Favorito adicionado</string>
     <string name="bookmarkAddedMessage">Favorito adicionado</string>
     <string name="requestDesktopSiteMenuTitle">Site para computador de secretária</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Remover barreira de segurança</string>
+    <string name="requestMobileSiteMenuTitle">Site móvel</string>
+    <string name="downloadsMenuTitle">Transferências</string>
+    <string name="printMenuTitle">Imprimir página</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorito removido</string>
+    <string name="fireproofDeleteConfirmationMessage">Barreira de segurança removida</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Proteção de Privacidade ativada para %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Proteção de Privacidade desativada para %1$s</string>
+    <string name="undoSnackbarAction">Anular</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Transferir imagem</string>
@@ -50,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opções</string>
     <string name="shareLink">Partilhar ligação</string>
-    <string name="shareMenuTitle">Partilhar…</string>
+    <string name="shareMenuTitle">Partilhar</string>
     <string name="copyUrl">Copiar endereço de ligação</string>
 
     <!-- Find in page -->
@@ -262,7 +287,7 @@
     <string name="searchWidgetLabel">Pesquisar</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Adicionar à página inicial</string>
+    <string name="addToHome">Adicionar à Página Inicial</string>
     <string name="shortcutAddedText">Sucesso! %1$s foi adicionado ao seu ecrã inicial.</string>
 
     <!-- User Survey -->
@@ -500,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites com barreira de segurança</string>
     <string name="settingsFireproofWebsites">Sites com barreira de segurança</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Site com barreira de segurança</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já tem barreira de segurança! Visite as Definições para gerir.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Coloque uma barreira de segurança neste site</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já tem barreira de segurança!</string>
     <string name="fireproofWebsiteSnackbarAction">Anular</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Sem sites com barreiras de segurança</string>
