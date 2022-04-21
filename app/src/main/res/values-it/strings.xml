@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Preferito aggiunto</string>
     <string name="bookmarkAddedMessage">Segnalibro aggiunto</string>
     <string name="requestDesktopSiteMenuTitle">Sito desktop</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Rimuovi protezione</string>
+    <string name="requestMobileSiteMenuTitle">Sito per dispositivi mobili</string>
+    <string name="downloadsMenuTitle">Download</string>
+    <string name="printMenuTitle">Stampa pagina</string>
+    <string name="favoriteDeleteConfirmationMessage">Preferito rimosso</string>
+    <string name="fireproofDeleteConfirmationMessage">Protezione rimossa</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Tutela della privacy attivata per %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Tutela della privacy disattivata per %1$s</string>
+    <string name="undoSnackbarAction">Annulla</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Scarica immagine</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opzioni</string>
     <string name="shareLink">Condividi link</string>
-    <string name="shareMenuTitle">Condividi…</string>
+    <string name="shareMenuTitle">Condividi</string>
     <string name="copyUrl">Copia l\'indirizzo del link</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Ricerca</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Aggiungi alla Home</string>
+    <string name="addToHome">Aggiungi alla Schermata Home</string>
     <string name="shortcutAddedText">Azione completa. %1$s è stato aggiunto alla schermata principale.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Salva</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Siti non protetti</string>
+    <string name="whitelistActivityTitle">Siti non protetti</string>
     <string name="enablePrivacyProtection">Attiva la tutela della privacy</string>
     <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
     <string name="whitelistEntryOverflowContentDescription">Altre opzioni per il sito non protetto %1$s</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Siti protetti</string>
     <string name="settingsFireproofWebsites">Siti protetti</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Sito protetto</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; è adesso protetto! Visita Impostazioni per la gestione.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Attiva protezione per questo sito</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ora è a prova di fuoco!</string>
     <string name="fireproofWebsiteSnackbarAction">Annulla</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Nessun sito protetto</string>
@@ -528,7 +537,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Proteggi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti Web</string>
-    <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
+    <string name="fireproofWebsiteToggleText">Chiedi al momento dell\'accesso</string>
     <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
     <string name="disableLoginDetectionDialogPositive">DISABILITA</string>

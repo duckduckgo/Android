@@ -84,7 +84,7 @@ class AppRemoteMessagingRepository(
 
     override suspend fun dismissMessage(id: String) {
         withContext(dispatchers.io()) {
-            remoteMessagesDao.udpateState(id, Status.DISMISSED)
+            remoteMessagesDao.updateState(id, Status.DISMISSED)
             remoteMessagingConfigRepository.invalidate()
         }
     }

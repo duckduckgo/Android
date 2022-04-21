@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -39,6 +55,15 @@
     <string name="favoriteAddedMessage">Сайт добавлен в избранное</string>
     <string name="bookmarkAddedMessage">Закладка добавлена</string>
     <string name="requestDesktopSiteMenuTitle">Версия сайта для компьютера</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Снять огнеупорность</string>
+    <string name="requestMobileSiteMenuTitle">Мобильная версия</string>
+    <string name="downloadsMenuTitle">Загрузки</string>
+    <string name="printMenuTitle">Печать страницы</string>
+    <string name="favoriteDeleteConfirmationMessage">Страница удалена из избранного</string>
+    <string name="fireproofDeleteConfirmationMessage">Огнеупорность снята</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Защита конфиденциальности на сайте %1$s включена</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Защита конфиденциальности на сайте %1$s выключена</string>
+    <string name="undoSnackbarAction">Отменить</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Загрузить изображение</string>
@@ -50,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Параметры</string>
     <string name="shareLink">Поделиться ссылкой</string>
-    <string name="shareMenuTitle">Поделиться…</string>
+    <string name="shareMenuTitle">Поделиться</string>
     <string name="copyUrl">Скопировать ссылку</string>
 
     <!-- Find in page -->
@@ -270,7 +295,7 @@
     <string name="searchWidgetLabel">Поиск</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Добавить на главный экран</string>
+    <string name="addToHome">Добавить на домашнюю страницу</string>
     <string name="shortcutAddedText">Готово! Мы добавили %1$s на ваш домашний экран.</string>
 
     <!-- User Survey -->
@@ -496,7 +521,7 @@
     <string name="dialogSaveAction">Сохранить</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Незащищенные сайты</string>
+    <string name="whitelistActivityTitle">Незащищенные сайты</string>
     <string name="enablePrivacyProtection">Включить защиту конфиденциальности</string>
     <string name="disablePrivacyProtection">Отключить защиту конфиденциальности</string>
     <string name="whitelistEntryOverflowContentDescription">Дополнительные опции для незащищенного сайта %1$s</string>
@@ -512,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Огнеупорные сайты</string>
     <string name="settingsFireproofWebsites">Огнеупорные сайты</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Огнеупорный сайт</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; теперь в безопасности. Огнеупорность можно изменить в настройках.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Сделать огнеупорным</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; теперь в безопасности!</string>
     <string name="fireproofWebsiteSnackbarAction">Отменить действие</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Вы уверены, что хотите удалить &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Огнеупорных сайтов нет</string>
@@ -524,7 +549,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Защитить</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сейчас</string>
     <string name="fireproofWebsiteItemsSectionTitle">Сайты</string>
-    <string name="fireproofWebsiteToogleText">Спрашивать при входе</string>
+    <string name="fireproofWebsiteToggleText">Спрашивать при входе</string>
     <string name="disableLoginDetectionDialogTitle">Отключить напоминание про огнеупорность при входе на сайты?</string>
     <string name="disableLoginDetectionDialogDescription">Это предпочтение можно в любое время изменить в «Настройках».</string>
     <string name="disableLoginDetectionDialogPositive">Выключить</string>

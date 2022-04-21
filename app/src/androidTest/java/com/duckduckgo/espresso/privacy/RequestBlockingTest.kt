@@ -85,8 +85,8 @@ class RequestBlockingTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(withId(R.id.browserMenu)).perform(click())
-        onView(isRoot()).perform(waitForView(withId(R.id.whitelistPopupMenuItem)))
-        onView(withId(R.id.whitelistPopupMenuItem)).perform(click())
+        onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
+        onView(withId(R.id.privacyProtectionMenuItem)).perform(click())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)

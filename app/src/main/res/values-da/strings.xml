@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Favorit tilføjet</string>
     <string name="bookmarkAddedMessage">Bogmærke tilføjet</string>
     <string name="requestDesktopSiteMenuTitle">Stationær computer</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Fjern brandsikring</string>
+    <string name="requestMobileSiteMenuTitle">Mobilwebsted</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Udskriv side</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorit fjernet</string>
+    <string name="fireproofDeleteConfirmationMessage">Brandsikring fjernet</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Beskyttelse af privatlivet aktiveret for %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Beskyttelse af privatlivet deaktiveret for %1$s</string>
+    <string name="undoSnackbarAction">Fortryd</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download billede</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Valgmuligheder</string>
     <string name="shareLink">Del link</string>
-    <string name="shareMenuTitle">Del …</string>
+    <string name="shareMenuTitle">Del</string>
     <string name="copyUrl">Kopiér linkadresse</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Søg</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Føj til startsiden</string>
+    <string name="addToHome">Tilføj til startskærm</string>
     <string name="shortcutAddedText">Det lykkedes! %1$s er blevet føjet til din startskærm.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Gem</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ubeskyttede websteder</string>
+    <string name="whitelistActivityTitle">Ubeskyttede websteder</string>
     <string name="enablePrivacyProtection">Aktiver Beskyttelse af privatlivet</string>
     <string name="disablePrivacyProtection">Deaktiver Beskyttelse af privatlivet</string>
     <string name="whitelistEntryOverflowContentDescription">Flere indstillinger for ubeskyttet websted %1$s</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brandsikre websteder</string>
     <string name="settingsFireproofWebsites">Brandsikre websteder</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Brandsikkert websted</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nu brandsikkert! Besøg Indstillinger for at administrere.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Gør dette websted brandsikkert</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nu brandsikker!</string>
     <string name="fireproofWebsiteSnackbarAction">Fortryd</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på, at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen brandsikre websteder</string>
@@ -528,7 +537,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brandsikker</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websider</string>
-    <string name="fireproofWebsiteToogleText">Spørg, når der logges ind</string>
+    <string name="fireproofWebsiteToggleText">Spørg, når der logges ind</string>
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere brandsikker-påmindelse, når du logger ind på websteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan ændre denne præference til enhver tid i Indstillinger.</string>
     <string name="disableLoginDetectionDialogPositive">Deaktiver</string>

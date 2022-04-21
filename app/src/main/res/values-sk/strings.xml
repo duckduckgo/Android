@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Obľúbená položka bola pridaná</string>
     <string name="bookmarkAddedMessage">Záložka je pridaná</string>
     <string name="requestDesktopSiteMenuTitle">Stránka pre stolové počítače</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Odstrániť zabezpečenie</string>
+    <string name="requestMobileSiteMenuTitle">Mobilný režim</string>
+    <string name="downloadsMenuTitle">Stiahnuté</string>
+    <string name="printMenuTitle">Tlačiť stranu</string>
+    <string name="favoriteDeleteConfirmationMessage">Obľúbená položka bola odstránená</string>
+    <string name="fireproofDeleteConfirmationMessage">Zabezpečenie bolo odstránené</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Ochrana súkromia je zapnutá pre %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Ochrana súkromia vypnutá pre %1$s</string>
+    <string name="undoSnackbarAction">Vrátenie späť</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Stiahnuť obrázok</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Možnosti</string>
     <string name="shareLink">Zdieľať odkaz</string>
-    <string name="shareMenuTitle">Zdieľať…</string>
+    <string name="shareMenuTitle">Zdieľať</string>
     <string name="copyUrl">Kopírovať adresu odkazu</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Vyhľadávať</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridať do časti Domov</string>
+    <string name="addToHome">Pridať na domovskú obrazovku</string>
     <string name="shortcutAddedText">Úspech! Na vašej ploche pribudla položka %1$s.</string>
 
     <!-- User Survey -->
@@ -512,7 +521,7 @@
     <string name="dialogSaveAction">Uložiť</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezabezpečené webové stránky</string>
+    <string name="whitelistActivityTitle">Nezabezpečené webové stránky</string>
     <string name="enablePrivacyProtection">Povoliť ochranu súkromia</string>
     <string name="disablePrivacyProtection">Vypnúť ochranu súkromia</string>
     <string name="whitelistEntryOverflowContentDescription">Viac možností pre nezabezpečené webové stránky %1$s</string>
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zabezpečené stránky</string>
     <string name="settingsFireproofWebsites">Zabezpečené stránky</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Zabezpečená stránka</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Stránka &lt;b&gt;%1$s&lt;/b&gt; je teraz zabezpečená! Spravovať to môžete v Nastaveniach.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Zabezpečiť túto lokalitu</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">Stránka &lt;b&gt;%1$s&lt;/b&gt; je teraz zabezpečená!</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátenie späť</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Žiadne zabezpečené webové stránky</string>
@@ -540,7 +549,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpečiť funkciou ohňovzdornosti</string>
     <string name="fireproofWebsiteLoginDialogNegative">Teraz nie</string>
     <string name="fireproofWebsiteItemsSectionTitle">Webové stránky</string>
-    <string name="fireproofWebsiteToogleText">Opýtať sa pri prihlásení</string>
+    <string name="fireproofWebsiteToggleText">Opýtať sa pri prihlásení</string>
     <string name="disableLoginDetectionDialogTitle">Vypnúť pripomienku na zabezpečenie pri prihlasovaní sa na lokalitách?</string>
     <string name="disableLoginDetectionDialogDescription">Tento výber môžete kedykoľvek zmeniť v Nastaveniach.</string>
     <string name="disableLoginDetectionDialogPositive">VYPNÚŤ</string>

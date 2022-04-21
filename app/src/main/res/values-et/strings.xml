@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Lemmik lisatud</string>
     <string name="bookmarkAddedMessage">Järjehoidja lisatud</string>
     <string name="requestDesktopSiteMenuTitle">Arvuti sait</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Eemalda tulekindlus</string>
+    <string name="requestMobileSiteMenuTitle">Mobiilisait</string>
+    <string name="downloadsMenuTitle">Allalaadimised</string>
+    <string name="printMenuTitle">Prindi leht</string>
+    <string name="favoriteDeleteConfirmationMessage">Lemmik on eemaldatud</string>
+    <string name="fireproofDeleteConfirmationMessage">Tulekindlus on eemaldatud</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privaatsuskaitse on domeeni %1$s jaoks lubatud</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privaatsuskaitse on domeeni %1$s jaoks keelatud</string>
+    <string name="undoSnackbarAction">Võta tagasi</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Laadige pilt alla</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Valikud</string>
     <string name="shareLink">Jaga linki</string>
-    <string name="shareMenuTitle">Jaga…</string>
+    <string name="shareMenuTitle">Jaga</string>
     <string name="copyUrl">Kopeeri lingi aadress</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Otsing</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Lisage avalehele</string>
+    <string name="addToHome">Lisa kodukuvale</string>
     <string name="shortcutAddedText">Õnnestus! %1$s lisati teie avaekraanile.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Salvesta</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Kaitseta saidid</string>
+    <string name="whitelistActivityTitle">Kaitseta saidid</string>
     <string name="enablePrivacyProtection">Luba Eraelu puutumatuse kaitse</string>
     <string name="disablePrivacyProtection">Keela Eraelu puutumatuse kaitse</string>
     <string name="whitelistEntryOverflowContentDescription">Rohkem võimalusi kaitseta saidi %1$s jaoks</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>
     <string name="settingsFireproofWebsites">Tulekindlad veebisaidid</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Tulekindel veebisait</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel! Lisateabe saamiseks vaata üle seaded.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Muuda see sait tulekindlaks</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel!</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Tulekindlaid veebisaite ei ole</string>
@@ -528,7 +537,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tulekindel</string>
     <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Veebilehed</string>
-    <string name="fireproofWebsiteToogleText">Küsi sisselogimisel</string>
+    <string name="fireproofWebsiteToggleText">Küsi sisselogimisel</string>
     <string name="disableLoginDetectionDialogTitle">Kas keelata tulekindel meeldetuletus saitidele sisselogimisel?</string>
     <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
     <string name="disableLoginDetectionDialogPositive">KEELA</string>

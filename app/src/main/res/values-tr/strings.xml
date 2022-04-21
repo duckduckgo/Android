@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Favori eklendi</string>
     <string name="bookmarkAddedMessage">Yer imi eklendi</string>
     <string name="requestDesktopSiteMenuTitle">Masaüstü Sitesi</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Korumayı Kaldır</string>
+    <string name="requestMobileSiteMenuTitle">Mobil Site</string>
+    <string name="downloadsMenuTitle">İndirilenler</string>
+    <string name="printMenuTitle">Sayfayı Yazdır</string>
+    <string name="favoriteDeleteConfirmationMessage">Favori kaldırıldı</string>
+    <string name="fireproofDeleteConfirmationMessage">Koruma kaldırıldı</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">%1$s için Gizlilik Koruması etkin</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">%1$s için Gizlilik Koruması devre dışı</string>
+    <string name="undoSnackbarAction">Geri al</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Resmi İndir</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
     <string name="shareLink">Linki paylaş</string>
-    <string name="shareMenuTitle">Paylaş…</string>
+    <string name="shareMenuTitle">Paylaş</string>
     <string name="copyUrl">Bağlantı Adresini Kopyala</string>
 
     <!-- Find in page -->
@@ -278,7 +287,7 @@
     <string name="searchWidgetLabel">Arama yap</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Ana Sayfaya Ekle</string>
+    <string name="addToHome">Ana ekrana ekle</string>
     <string name="shortcutAddedText">Başarılı! %1$s ana ekranınıza eklendi.</string>
 
     <!-- User Survey -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Kaydet</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Korumasız Siteler</string>
+    <string name="whitelistActivityTitle">Korumasız Siteler</string>
     <string name="enablePrivacyProtection">Gizlilik Korumasını Etkinleştir</string>
     <string name="disablePrivacyProtection">Gizlilik Korumasını Devre Dışı Bırak</string>
     <string name="whitelistEntryOverflowContentDescription">Korumasız %1$s sitesi için diğer seçenekler</string>
@@ -516,8 +525,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Korumalı Siteler</string>
     <string name="settingsFireproofWebsites">Korumalı Siteler</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Korumalı Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı! Yönetmek için Ayarlar bölümünü ziyaret edin.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Bu Siteyi Korumalı Yap</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı!</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
     <string name="fireproofWebsiteEmptyListHint">Korumalı web sitesi yok</string>
@@ -528,7 +537,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Web siteleri</string>
-    <string name="fireproofWebsiteToogleText">Oturum Açarken Sor</string>
+    <string name="fireproofWebsiteToggleText">Oturum Açarken Sor</string>
     <string name="disableLoginDetectionDialogTitle">Sitelerde oturum açılırken Koruma hatırlatıcısı devre dışı bırakılsın mı?</string>
     <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>

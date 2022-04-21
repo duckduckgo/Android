@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Dodano ulubione</string>
     <string name="bookmarkAddedMessage">Dodano zakładkę</string>
     <string name="requestDesktopSiteMenuTitle">Strona w wersji komputerowej</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Usuń zabezpieczenie</string>
+    <string name="requestMobileSiteMenuTitle">Witryna mobilna</string>
+    <string name="downloadsMenuTitle">Pobrane</string>
+    <string name="printMenuTitle">Drukuj stronę</string>
+    <string name="favoriteDeleteConfirmationMessage">Usunięto ulubione</string>
+    <string name="fireproofDeleteConfirmationMessage">Zabezpieczenie zostało usunięte</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Ochrona prywatności włączona dla %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Ochrona prywatności wyłączona dla %1$s</string>
+    <string name="undoSnackbarAction">Cofnij</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Pobierz obraz</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opcje</string>
     <string name="shareLink">Udostępnij link</string>
-    <string name="shareMenuTitle">Udostępnij…</string>
+    <string name="shareMenuTitle">Udostępnij</string>
     <string name="copyUrl">Skopiuj adres linku</string>
 
     <!-- Find in page -->
@@ -512,7 +521,7 @@
     <string name="dialogSaveAction">Zapisz</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Niezabezpieczone witryny</string>
+    <string name="whitelistActivityTitle">Niezabezpieczone witryny</string>
     <string name="enablePrivacyProtection">Włącz ochronę prywatności</string>
     <string name="disablePrivacyProtection">Wyłącz ochronę prywatności</string>
     <string name="whitelistEntryOverflowContentDescription">Więcej opcji dla niezabezpieczonej witryny %1$s</string>
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Bezpieczne witryny internetowe</string>
     <string name="settingsFireproofWebsites">Bezpieczne witryny internetowe</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Bezpiecza witryna internetowa</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz bezpieczna! Otwórz Ustawienia, aby zarządzać opcjami.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Zabezpiecz tę witrynę</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz bezpieczna!</string>
     <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Brak bezpiecznych witryn internetowych</string>
@@ -540,7 +549,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpiecz</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nie teraz</string>
     <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
-    <string name="fireproofWebsiteToogleText">Zapytaj przy logowaniu</string>
+    <string name="fireproofWebsiteToggleText">Zapytaj przy logowaniu</string>
     <string name="disableLoginDetectionDialogTitle">Wyłączyć przypomnienie o zabezpieczeniach podczas logowania się do witryn internetowych?</string>
     <string name="disableLoginDetectionDialogDescription">W każdej chwili można zmienić ten wybór w Ustawieniach.</string>
     <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>

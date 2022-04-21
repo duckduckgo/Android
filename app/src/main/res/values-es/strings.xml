@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Favorito añadido</string>
     <string name="bookmarkAddedMessage">Marcador añadido</string>
     <string name="requestDesktopSiteMenuTitle">Versión de escritorio del sitio web</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Desactivar a prueba de fuego</string>
+    <string name="requestMobileSiteMenuTitle">Sitio móvil</string>
+    <string name="downloadsMenuTitle">Descargas</string>
+    <string name="printMenuTitle">Imprimir página</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorito eliminado</string>
+    <string name="fireproofDeleteConfirmationMessage">A prueba de fuego desactivado</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Protección de privacidad activada para %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Protección de privacidad desactivada para %1$s</string>
+    <string name="undoSnackbarAction">Deshacer</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Descargar imagen</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opciones</string>
     <string name="shareLink">Compartir enlace</string>
-    <string name="shareMenuTitle">Compartir…</string>
+    <string name="shareMenuTitle">Compartir</string>
     <string name="copyUrl">Copiar dirección de enlace</string>
 
     <!-- Find in page -->
@@ -227,7 +236,7 @@
     <string name="brokenSiteCategoryLinks">Los enlaces o botones no funcionan</string>
     <string name="brokenSiteCategoryContent">Falta contenido</string>
     <string name="brokenSiteCategoryLogin">No puedo iniciar sesión</string>
-    <string name="brokenSiteCategoryUnsupported">El navegador es incompatible</string>
+    <string name="brokenSiteCategoryUnsupported">El navegador es incompatible.</string>
     <string name="brokenSiteCategoryOther">Otro problema</string>
 
     <!-- Bookmarks Activity -->
@@ -500,7 +509,7 @@
     <string name="dialogSaveAction">Guardar</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sitios no protegidos</string>
+    <string name="whitelistActivityTitle">Sitios no protegidos</string>
     <string name="enablePrivacyProtection">Habilitar Protección</string>
     <string name="disablePrivacyProtection">Deshabilitar Protección</string>
     <string name="whitelistEntryOverflowContentDescription">Más opciones para el sitio no protegido %1$s</string>
@@ -516,10 +525,10 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sitios web a prueba de fuego</string>
     <string name="settingsFireproofWebsites">Sitios web a prueba de fuego</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Sitio web a prueba de fuego</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ya está a prueba de fuego. Entra en ajustes para gestionarlo.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Activar a prueba de fuego para este sitio</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ya está a prueba de fuego.</string>
     <string name="fireproofWebsiteSnackbarAction">Deshacer</string>
-    <string name="fireproofWebsiteDeleteConfirmMessage">¿Seguro que deseas eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage">¿Está seguro de que desea eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">No hay sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteFeatureDescription">Los sitios web dependen de cookies para mantener tu sesión iniciada. Cuando marcas una web como «a prueba de fuego» no se borrarán las cookies y tu sesión permanecerá iniciada, incluso después de utilizar el botón Fuego. Seguiremos bloqueando rastreadores de terceros que se encuentren en sitios web a prueba de fuego.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Más opciones para el sitio web a prueba de fuego %1$s</string>
@@ -528,7 +537,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">A prueba de fuego</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web</string>
-    <string name="fireproofWebsiteToogleText">Preguntar al iniciar sesión</string>
+    <string name="fireproofWebsiteToggleText">Preguntar al iniciar sesión</string>
     <string name="disableLoginDetectionDialogTitle">¿Deshabilitar recordatorio de a prueba de fuego al iniciar sesión en los sitios?</string>
     <string name="disableLoginDetectionDialogDescription">Puedes cambiar esta preferencia en cualquier momento en Ajustes.</string>
     <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>

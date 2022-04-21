@@ -55,6 +55,15 @@
     <string name="favoriteAddedMessage">Dodano u Omiljeno</string>
     <string name="bookmarkAddedMessage">Knjižna je oznaka dodana</string>
     <string name="requestDesktopSiteMenuTitle">Mjesto radne površine</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Ukloni oznaku sigurnog web-mjesta</string>
+    <string name="requestMobileSiteMenuTitle">Mobilno mrežno mjesto</string>
+    <string name="downloadsMenuTitle">Preuzimanja</string>
+    <string name="printMenuTitle">Ispiši stranicu</string>
+    <string name="favoriteDeleteConfirmationMessage">Omiljena je stavka uklonjena</string>
+    <string name="fireproofDeleteConfirmationMessage">Oznaka sigurnog web-mjesta je uklonjena</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Zaštita privatnosti omogućena za %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Zaštita privatnosti onemogućena za %1$s</string>
+    <string name="undoSnackbarAction">Poništi</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Preuzmi sliku</string>
@@ -66,7 +75,7 @@
     <!-- Sharing options -->
     <string name="options">Opcije</string>
     <string name="shareLink">Podijeli poveznicu</string>
-    <string name="shareMenuTitle">Podijeli…</string>
+    <string name="shareMenuTitle">Podijeli</string>
     <string name="copyUrl">Kopiraj adresu poveznice</string>
 
     <!-- Find in page -->
@@ -286,7 +295,7 @@
     <string name="searchWidgetLabel">Pretraga</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Dodaj na početnu stranicu</string>
+    <string name="addToHome">Dodaj na početni zaslon</string>
     <string name="shortcutAddedText">Uspjeh! %1$s dodan je na vaš početni zaslon.</string>
 
     <!-- User Survey -->
@@ -512,7 +521,7 @@
     <string name="dialogSaveAction">Spremi</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Nezaštićena mrežna mjesta</string>
+    <string name="whitelistActivityTitle">Nezaštićena mrežna mjesta</string>
     <string name="enablePrivacyProtection">Omogući zaštitu privatnosti</string>
     <string name="disablePrivacyProtection">Onemogući zaštitu privatnosti</string>
     <string name="whitelistEntryOverflowContentDescription">Dodatne mogućnosti za nezaštićeno mrežno mjesto %1$s</string>
@@ -528,8 +537,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Zaštićena web-mjesta</string>
     <string name="settingsFireproofWebsites">Zaštićena web-mjesta</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Zaštićeno web-mjesto</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; sada je zaštićen! Posjetite Postavke da biste saznali više.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Uključi oznaku da je ovo web-mjesto sigurno</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; sad je zaštićen!</string>
     <string name="fireproofWebsiteSnackbarAction">Poništi</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Jeste li sigurni da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Nema zaštićenih web-mjesta</string>
@@ -540,7 +549,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne sada</string>
     <string name="fireproofWebsiteItemsSectionTitle">Mrežna mjesta</string>
-    <string name="fireproofWebsiteToogleText">Pitaj pri prijavi</string>
+    <string name="fireproofWebsiteToggleText">Pitaj pri prijavi</string>
     <string name="disableLoginDetectionDialogTitle">Onemogućiti podsjetnik za označavanje sigurnog web-mjesta prilikom prijave?</string>
     <string name="disableLoginDetectionDialogDescription">Ovu postavku možete promijeniti bilo kada u Postavkama.</string>
     <string name="disableLoginDetectionDialogPositive">ONEMOGUĆI</string>

@@ -38,6 +38,15 @@
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
+    <string name="requestMobileSiteMenuTitle">Mobile Site</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Print Page</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
+    <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privacy Protection enabled for %s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privacy Protection disabled for %s</string>
+    <string name="undoSnackbarAction">Undo</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download Image</string>
@@ -49,7 +58,7 @@
     <!-- Sharing options -->
     <string name="options">Options</string>
     <string name="shareLink">Share Link</string>
-    <string name="shareMenuTitle">Share…</string>
+    <string name="shareMenuTitle">Share</string>
     <string name="copyUrl">Copy Link Address</string>
 
     <!-- Find in page -->
@@ -263,7 +272,7 @@
     <string name="searchWidgetLabel">Search</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Add to Home</string>
+    <string name="addToHome">Add to Home Screen</string>
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
 
     <!-- User Survey -->
@@ -485,7 +494,7 @@
     <string name="dialogSaveAction">Save</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
@@ -501,8 +510,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Fireproof Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof! Visit Settings to manage.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Fireproof This Site</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof!</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="fireproofWebsiteEmptyListHint">No Fireproof websites</string>
@@ -513,7 +522,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+    <string name="fireproofWebsiteToggleText">Ask When Signing In</string>
     <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>

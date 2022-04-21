@@ -44,7 +44,7 @@ class AppUsageModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun appDaysUsedRespository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
+    fun appDaysUsedRepository(appDaysUsedDao: AppDaysUsedDao): AppDaysUsedRepository {
         return AppDaysUsedDatabaseRepository(appDaysUsedDao)
     }
 }
