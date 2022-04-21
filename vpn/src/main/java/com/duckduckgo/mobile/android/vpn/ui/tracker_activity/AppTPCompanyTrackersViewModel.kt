@@ -50,8 +50,6 @@ constructor(
     private val command = Channel<Command>(1, DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
 
-    private var manualChanges: Boolean = false
-
     private val viewStateFlow = MutableStateFlow(ViewState())
     fun viewState(): StateFlow<ViewState> {
         return viewStateFlow
