@@ -220,6 +220,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
+            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
@@ -261,6 +262,15 @@ class DeviceShieldTrackerActivity :
         dialog.show(
             supportFragmentManager,
             AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+        )
+    }
+
+    private fun launchAlwaysOnPromotionDialog() {
+        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
+        val dialog = AppTPDisableConfirmationDialog.instance(this)
+        dialog.show(
+            supportFragmentManager,
+            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
         )
     }
 

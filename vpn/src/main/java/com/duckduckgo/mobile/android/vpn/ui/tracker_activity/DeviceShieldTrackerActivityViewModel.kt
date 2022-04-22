@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,6 +48,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
     private val vpnFeatureRemover: VpnFeatureRemover,
+    private val vpnStore: DeviceShieldOnboardingStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -72,6 +74,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
+            enabled && vpnStore.shouldPromoteAlwaysOn() -> sendCommand(Command.ShowAlwaysOnPromotionDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
@@ -92,6 +95,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
                 sendCommand(Command.LaunchVPN)
+                vpnStore.onAppTPManuallyEnabled()
                 return
             }
             else -> {
@@ -187,6 +191,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
+        object ShowAlwaysOnPromotionDialog : Command()
         object ShowRemoveFeatureConfirmationDialog : Command()
         object CloseScreen : Command()
     }
