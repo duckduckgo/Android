@@ -26,8 +26,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun onOpenAppProtection()
-        fun onTurnAppTrackingProtectionOff()
+        fun onGoToVPNSettings()
+        fun onPromoteAlwaysOn()
         fun onDisableDialogCancelled()
     }
 
@@ -38,11 +38,11 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_confirm_disable, null)
+        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_promote_always_on, null)
 
-        val disableOneApp = rootView.findViewById<Button>(R.id.disableConfirmationDialogOneApp)
-        val disableAllApps = rootView.findViewById<Button>(R.id.disableConfirmationDialogAllApps)
-        val cancel = rootView.findViewById<Button>(R.id.disableConfirmationDialogCancel)
+        val goToSettings = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogSettings)
+        val remindLater = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogLater)
+        val forget = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogForget)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
@@ -52,25 +52,25 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
 
         isCancelable = false
 
-        configureListeners(disableOneApp, disableAllApps, cancel)
+        configureListeners(goToSettings, remindLater, forget)
 
         return alertDialog.create()
     }
 
     private fun configureListeners(
-        disableOneApp: Button,
-        disableAllApps: Button,
-        cancel: Button
+        goToSettings: Button,
+        remindLater: Button,
+        forget: Button
     ) {
-        disableOneApp.setOnClickListener {
+        goToSettings.setOnClickListener {
             dismiss()
             listener.onOpenAppProtection()
         }
-        disableAllApps.setOnClickListener {
+        remindLater.setOnClickListener {
             dismiss()
             listener.onTurnAppTrackingProtectionOff()
         }
-        cancel.setOnClickListener {
+        forget.setOnClickListener {
             dismiss()
             listener.onDisableDialogCancelled()
         }

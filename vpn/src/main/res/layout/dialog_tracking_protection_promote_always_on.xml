@@ -27,50 +27,50 @@
         android:padding="@dimen/keyline_4">
 
     <TextView
-            android:id="@+id/disableConfirmationDialogTitle"
+            android:id="@+id/promoteAlwaysOnDialogTitle"
             style="@style/Widget.DuckDuckGo.Dialog.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:textAlignment="viewStart"
-            android:text="@string/atp_DisableConfirmationDialogTitle"/>
+            android:text="@string/atp_PromoteAlwaysOnDialogTitle"/>
 
     <TextView
-            android:id="@+id/disableConfirmationDialogMessage"
+            android:id="@+id/promoteAlwaysOnDialogMessage"
             style="@style/TextAppearance.DuckDuckGo.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAlignment="viewStart"
             android:textColor="?attr/settingsMinorTextColor"
             android:layout_marginTop="@dimen/keyline_3"
-            android:text="@string/atp_DisableConfirmationDialogMessage"/>
+            android:text="@string/atp_PromoteAlwaysOnDialogMessage"/>
 
     <Button
-            android:id="@+id/disableConfirmationDialogOneApp"
+            android:id="@+id/promoteAlwaysOnDialogSettings"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
             android:layout_marginTop="@dimen/keyline_5"
-            android:text="@string/atp_DisableConfirmationDisableApp"/>
+            android:text="@string/atp_PromoteAlwaysOnDialogSettings"/>
     <Button
-            android:id="@+id/disableConfirmationDialogAllApps"
+            android:id="@+id/promoteAlwaysOnDialogLater"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:layout_marginTop="@dimen/keyline_2"
-            android:text="@string/atp_DisableConfirmationDisableAllApps"/>
+            android:text="@string/atp_PromoteAlwaysOnDialogLater"/>
 
     <Button
-            android:id="@+id/disableConfirmationDialogCancel"
+            android:id="@+id/promoteAlwaysOnDialogForget"
             android:layout_gravity="end"
             style="@style/Widget.DuckDuckGo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/dialogButtonHeight"
             android:textColor="@color/cornflowerBlue"
             android:layout_marginTop="@dimen/keyline_2"
-            android:text="@string/atp_DisableConfirmationCancel"/>
+            android:text="@string/atp_PromoteAlwaysOnDialogForget"/>
 
 </LinearLayout>
