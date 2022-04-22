@@ -64,7 +64,7 @@ class DeviceShieldOnboardingImpl @Inject constructor(
 
     companion object {
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_FEATURE_ENABLED"
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
     }
 }
