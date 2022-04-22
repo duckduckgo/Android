@@ -65,7 +65,8 @@ class DownloadsViewModelTest {
             DownloadsViewModel(
                 TimeDiffFormatter(context),
                 mockDownloadsRepository,
-                coroutineRule.testDispatcherProvider
+                coroutineRule.testDispatcherProvider,
+                context
             )
         model
     }
