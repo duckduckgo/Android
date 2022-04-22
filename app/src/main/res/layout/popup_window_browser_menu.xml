@@ -187,8 +187,7 @@
 
             <View
                 android:id="@+id/settingsMenuDivider"
-                style="@style/OverflowMenuDivider"
-                android:visibility="gone"/>
+                style="@style/OverflowMenuDivider" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/downloadsMenuItem"

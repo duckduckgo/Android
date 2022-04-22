@@ -2187,9 +2187,6 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
-                onMenuItemClicked(view.downloadsMenuItem) {
-                    viewModel.onDonwloadsMenuItemClicked()
-                }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
                 view.dividerShadow.isVisible = view.menuScrollableContent.canScrollVertically(-1)
