@@ -26,10 +26,12 @@ interface DeviceShieldOnboardingStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
+
     fun onFeatureEnabled()
     fun onFeatureDisabled()
     fun isFeatureEnabled(): Boolean
-    fun onManualAppTPEnable()
+
+    fun onAppTPManuallyEnabled()
     fun shouldPromoteAlwaysOn(): Boolean
 }
 
@@ -64,10 +66,25 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false)
     }
 
+    override fun onAppTPManuallyEnabled() {
+        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getTotalEnabled() + 1) }
+    }
+
+    private fun getTotalEnabled(): Int {
+        return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0)
+    }
+
+    override fun shouldPromoteAlwaysOn(): Boolean {
+        return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) >= ALWAYS_ON_PROMOTION_DELTA
+    }
+
     companion object {
-        private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
+
+        private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_FEATURE_ENABLED"
+
+        private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
+        private const val ALWAYS_ON_PROMOTION_DELTA = 5
     }
 }
