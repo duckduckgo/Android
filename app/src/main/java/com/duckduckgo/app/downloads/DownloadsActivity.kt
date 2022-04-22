@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,12 +30,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
-import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.*
+import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
@@ -116,12 +116,13 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun processCommands(command: DownloadsViewModel.Command) {
+    private fun processCommands(command: Command) {
         when (command) {
             is OpenFile -> showOpen(command)
             is ShareFile -> showShare(command)
             is DisplayMessage -> showSnackbar(command.messageId, command.arg)
             is DisplayUndoMessage -> showUndo(command)
+            is CancelDownload -> cancelDownload(command)
         }
     }
 
@@ -158,18 +159,26 @@ class DownloadsActivity : DuckDuckGoActivity() {
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_ACTION -> viewModel.insert(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_SWIPE,
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_MANUAL,
-                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> viewModel.deleteFilesFromDisk(command.items)
+                    BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_TIMEOUT -> handleDeleteAll(command.items)
                     BaseTransientBottomBar.BaseCallback.DISMISS_EVENT_CONSECUTIVE -> { /* noop */ }
                 }
             }
         }).show()
     }
 
+    private fun handleDeleteAll(items: List<DownloadItem>) {
+        viewModel.removeFromDiskAndFromDownloadManager(items)
+    }
+
+    private fun cancelDownload(command: CancelDownload) {
+        viewModel.removeFromDownloadManager(command.item.downloadId)
+    }
+
     private fun showSnackbar(@StringRes messageId: Int, arg: String = "") {
         Snackbar.make(binding.root, getString(messageId, arg), Snackbar.LENGTH_LONG).show()
     }
 
-    private fun render(viewState: DownloadsViewModel.ViewState) {
+    private fun render(viewState: ViewState) {
         downloadsAdapter.updateData(viewState.filteredItems)
         searchMenuItem?.isVisible = itemsAvailable(viewState)
     }

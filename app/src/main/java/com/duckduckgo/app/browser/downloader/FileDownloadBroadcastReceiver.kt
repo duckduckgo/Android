@@ -25,9 +25,10 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.downloads.DownloadCallback
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadCallback
+import com.duckduckgo.downloads.api.DownloadFailReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -67,6 +68,7 @@ class FileDownloadBroadcastReceiver @Inject constructor(
             val cursor = downloadManager?.query(query)
             if (cursor?.moveToFirst() == true) {
                 val index = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)
+
                 when (cursor.getInt(index)) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         Timber.d("Download completed with success.")
@@ -76,12 +78,12 @@ class FileDownloadBroadcastReceiver @Inject constructor(
                     }
                     DownloadManager.STATUS_FAILED -> {
                         Timber.d("Download completed, but failed.")
-                        callback.onFailure(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
+                        callback.onError(downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
                     }
                 }
             } else {
-                Timber.d("Download cancelled.")
-                callback.onCancel(downloadId)
+                Timber.d("Download cancelled by the user from the app or from the notification.")
+                callback.onCancel(downloadId = downloadId)
             }
         }
     }

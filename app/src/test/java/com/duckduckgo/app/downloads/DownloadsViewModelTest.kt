@@ -24,14 +24,15 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
-import com.duckduckgo.app.downloads.model.DownloadItem
-import com.duckduckgo.app.downloads.model.DownloadStatus.FINISHED
-import com.duckduckgo.app.downloads.model.DownloadsRepository
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
+import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -64,7 +65,8 @@ class DownloadsViewModelTest {
             DownloadsViewModel(
                 RealTimeDiffFormatter(context),
                 mockDownloadsRepository,
-                coroutineRule.testDispatcherProvider
+                coroutineRule.testDispatcherProvider,
+                context
             )
         model
     }
@@ -278,6 +280,21 @@ class DownloadsViewModelTest {
                     arg = item.fileName,
                     items = listOf(item)
                 ),
+                awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun whenCancelItemClickedThenItemDeletedAndCancelDownloadCommandSent() = runTest {
+        val item = oneItem()
+
+        testee.onCancelItemClicked(item)
+
+        verify(mockDownloadsRepository).delete(item.id)
+        testee.commands().test {
+            assertEquals(
+                CancelDownload(item),
                 awaitItem()
             )
         }

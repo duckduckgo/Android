@@ -56,7 +56,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -79,7 +78,6 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
-import com.duckduckgo.app.downloads.DownloadCallback
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -119,6 +117,9 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.downloads.api.DownloadCallback
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
@@ -3809,8 +3810,8 @@ class BrowserTabViewModelTest {
         url: String,
         contentDisposition: String?,
         mimeType: String?
-    ): FileDownloader.PendingFileDownload {
-        return FileDownloader.PendingFileDownload(
+    ): PendingFileDownload {
+        return PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,

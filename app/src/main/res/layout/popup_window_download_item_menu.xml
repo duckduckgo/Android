@@ -33,4 +33,10 @@
         android:minWidth="198dp"
         android:text="@string/downloadsItemMenuDelete" />
 
+    <TextView
+        android:id="@+id/cancel"
+        style="@style/Widget.DuckDuckGo.PopupMenuItem"
+        android:minWidth="198dp"
+        android:text="@string/downloadsItemMenuCancel" />
+
 </LinearLayout>

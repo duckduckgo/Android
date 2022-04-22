@@ -22,9 +22,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
-import com.duckduckgo.app.browser.downloader.FilenameExtractor
-import com.duckduckgo.app.browser.downloader.isDataUrl
+import com.duckduckgo.downloads.impl.FilenameExtractor
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.isDataUrl
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection

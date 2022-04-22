@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.downloads
 
+import android.app.DownloadManager
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,15 +26,17 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
-import com.duckduckgo.app.downloads.model.DownloadItem
-import com.duckduckgo.app.downloads.model.DownloadsRepository
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.store.DownloadStatus
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +53,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val applicationContext: Context
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -62,10 +67,12 @@ class DownloadsViewModel @Inject constructor(
         data class DisplayUndoMessage(@StringRes val messageId: Int, val arg: String = "", val items: List<DownloadItem> = emptyList()) : Command()
         data class OpenFile(val item: DownloadItem) : Command()
         data class ShareFile(val item: DownloadItem) : Command()
+        data class CancelDownload(val item: DownloadItem) : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
+    private val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
 
     fun downloads() {
         viewModelScope.launch(dispatcher.io()) {
@@ -109,10 +116,19 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
-    fun deleteFilesFromDisk(items: List<DownloadItem>) {
+    fun removeFromDiskAndFromDownloadManager(items: List<DownloadItem>) {
         items.forEach {
             File(it.filePath).delete()
         }
+
+        if (downloadManager == null) return
+
+        // Remove all unfinished downloads from DownloadManager.
+        items.filter { it.downloadStatus != DownloadStatus.FINISHED }.forEach { removeFromDownloadManager(it.downloadId) }
+    }
+
+    fun removeFromDownloadManager(downloadId: Long) {
+        downloadManager?.remove(downloadId)
     }
 
     fun onQueryTextChange(newText: String) {
@@ -163,6 +179,13 @@ class DownloadsViewModel @Inject constructor(
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.id)
             command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
+        }
+    }
+
+    override fun onCancelItemClicked(item: DownloadItem) {
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(item.id)
+            command.send(CancelDownload(item))
         }
     }
 
