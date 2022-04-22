@@ -3982,13 +3982,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDownloadsMenuItemClickedThenPixelSent() {
-        testee.onDonwloadsMenuItemClicked()
-
-        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
-    }
-
-    @Test
     fun whenConfigurationChangesThenForceRenderingMenu() {
         val oldForceRenderingTicker = browserViewState().forceRenderingTicker
 
