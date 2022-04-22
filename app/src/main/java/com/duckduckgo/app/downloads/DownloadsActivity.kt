@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.downloads
 
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -37,7 +36,6 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.ViewState
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.model.DownloadItem
-import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.ui.view.SearchBar
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
@@ -169,15 +167,11 @@ class DownloadsActivity : DuckDuckGoActivity() {
     }
 
     private fun handleDeleteAll(items: List<DownloadItem>) {
-        viewModel.deleteFilesFromDisk(items)
-        // Remove all unfinished downloads from DownloadManager.
-        (getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.let { manager ->
-            items.filter { it.downloadStatus != FINISHED }.forEach { manager.remove(it.downloadId) }
-        }
+        viewModel.removeFromDiskAndFromDownloadManager(items)
     }
 
     private fun cancelDownload(command: CancelDownload) {
-        (getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.remove(command.item.downloadId)
+        viewModel.removeFromDownloadManager(command.item.downloadId)
     }
 
     private fun showSnackbar(@StringRes messageId: Int, arg: String = "") {
