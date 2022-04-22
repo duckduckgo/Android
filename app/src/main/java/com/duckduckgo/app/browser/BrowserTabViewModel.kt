@@ -2346,7 +2346,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-
     fun clearPreviousUrl() {
         appLinksHandler.updatePreviousUrl(null)
     }
