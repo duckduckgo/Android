@@ -121,8 +121,10 @@
                 android:id="@+id/cta_show_all"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:text="@string/atp_ActivityCtaShowAll"/>
+                android:paddingBottom="@dimen/keyline_4"
+                android:paddingStart="72dp"
+                android:text="@string/atp_ActivityCtaShowAll"
+                android:visibility="gone"/>
 
             <View
                 android:layout_width="match_parent"
