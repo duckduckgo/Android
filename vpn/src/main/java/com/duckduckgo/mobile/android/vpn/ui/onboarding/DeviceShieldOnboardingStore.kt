@@ -26,6 +26,9 @@ interface DeviceShieldOnboardingStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
+    fun onFeatureEnabled()
+    fun onFeatureDisabled()
+    fun isFeatureEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,8 +49,22 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
+    override fun onFeatureEnabled() {
+        onboardingDidShow()
+        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, true) }
+    }
+
+    override fun onFeatureDisabled() {
+        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false) }
+    }
+
+    override fun isFeatureEnabled(): Boolean {
+        return preferences.getBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false)
+    }
+
     companion object {
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
+        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
     }
 }

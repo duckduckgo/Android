@@ -81,6 +81,7 @@ class DeviceShieldOnboardingViewModel @Inject constructor(
     }
 
     fun onTurnAppTpOffOn() {
+        deviceShieldOnboardingStore.onFeatureEnabled()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {

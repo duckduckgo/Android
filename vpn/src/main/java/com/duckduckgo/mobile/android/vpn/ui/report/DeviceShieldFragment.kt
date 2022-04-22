@@ -110,7 +110,7 @@ class DeviceShieldFragment : Fragment() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        if (viewState.onboardingComplete) {
+        if (viewState.isFeatureEnabled) {
             this.view?.show()
         } else {
             this.view?.gone()
