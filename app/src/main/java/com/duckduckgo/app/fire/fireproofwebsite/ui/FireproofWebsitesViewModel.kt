@@ -116,4 +116,8 @@ class FireproofWebsitesViewModel @Inject constructor(
 
         pixel.fire(pixelName)
     }
+
+    fun removeAllSelected() {
+        TODO("Not yet implemented")
+    }
 }
