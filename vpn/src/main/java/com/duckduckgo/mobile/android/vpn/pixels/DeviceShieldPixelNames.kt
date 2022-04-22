@@ -193,5 +193,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_remove_tracking_protection_feature_c"),
     ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cance_tracking_protection_feature_d"),
     ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cance_tracking_protection_feature_c"),
+
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
     ;
 }

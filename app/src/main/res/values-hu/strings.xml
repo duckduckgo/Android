@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Kép letöltése</string>
     <string name="permissionRequiredToDownload">A letöltéshez tárolási engedély szükséges</string>
-    <string name="downloadComplete">Letöltés kész</string>
-    <string name="downloadFailed">A letöltés sikertelen volt</string>
-    <string name="downloadInProgress">Letöltés</string>
 
     <!-- Sharing options -->
     <string name="options">Opciók</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Nem, köszönöm</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Fájl letöltése folyamatban</string>
-    <string name="notificationChannelFileDownloaded">Fájl letöltve</string>
     <string name="notificationChannelTutorials">Útmutatók</string>
 
     <!-- Clear Notification -->
@@ -697,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Adatvédelmi szabályzat</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">A letöltés sikertelen. Ellenőrizd az internetkapcsolatot.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>

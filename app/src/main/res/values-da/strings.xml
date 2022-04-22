@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Download billede</string>
     <string name="permissionRequiredToDownload">Download kræver lagringstilladelse</string>
-    <string name="downloadComplete">Download fuldført</string>
-    <string name="downloadFailed">Det var ikke muligt at downloade</string>
-    <string name="downloadInProgress">Downloader</string>
 
     <!-- Sharing options -->
     <string name="options">Valgmuligheder</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Nej tak.</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Fil downloader</string>
-    <string name="notificationChannelFileDownloaded">Fil downloadet</string>
     <string name="notificationChannelTutorials">Vejledninger</string>
 
     <!-- Clear Notification -->
@@ -697,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privatlivspolitik</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Det var ikke muligt at downloade. Kontroller internetforbindelsen.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget tilføjet til startskærmen</string>
