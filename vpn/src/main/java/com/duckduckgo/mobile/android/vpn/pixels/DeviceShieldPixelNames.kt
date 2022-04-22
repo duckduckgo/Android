@@ -185,5 +185,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_UNIQUE("m_atp_imp_manage_recent_app_settings_activity_u"),
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY("m_atp_imp_manage_recent_app_settings_activity_d"),
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_("m_atp_imp_manage_recent_app_settings_activity_c"),
+
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
     ;
 }
