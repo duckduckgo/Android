@@ -271,6 +271,7 @@
     <string name="dialogSave">Saglabāt</string>
     <string name="delete">Dzēst</string>
     <string name="edit">Rediģēt</string>
+    <string name="remove">Noņemt</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>

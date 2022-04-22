@@ -271,6 +271,7 @@
     <string name="dialogSave">Salvare</string>
     <string name="delete">Ștergere</string>
     <string name="edit">Editare</string>
+    <string name="remove">Elimină</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>

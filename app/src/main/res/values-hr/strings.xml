@@ -275,6 +275,7 @@
     <string name="dialogSave">Spremi</string>
     <string name="delete">Izbriši</string>
     <string name="edit">Uredi</string>
+    <string name="remove">Ukloni</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pretraži DuckDuckGo</string>

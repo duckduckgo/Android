@@ -275,6 +275,7 @@
     <string name="dialogSave">Išsaugoti</string>
     <string name="delete">Trinti</string>
     <string name="edit">Redaguoti</string>
+    <string name="remove">Pašalinti</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>

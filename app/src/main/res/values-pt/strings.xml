@@ -267,6 +267,7 @@
     <string name="dialogSave">Guardar</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
+    <string name="remove">Eliminar</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>

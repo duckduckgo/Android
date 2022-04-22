@@ -267,6 +267,7 @@
     <string name="dialogSave">Kaydet</string>
     <string name="delete">Sil</string>
     <string name="edit">Düzenle</string>
+    <string name="remove">Kaldır</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>

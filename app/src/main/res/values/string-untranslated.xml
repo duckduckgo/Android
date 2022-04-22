@@ -22,7 +22,7 @@
     <string name="macos_settings_description_ready">Available for download on Mac</string>
     <string name="macos_settings_title">DuckDuckGo Desktop App</string>
 
-    <!-- Automatic Fireproof-->
+    <!-- Fireproof websites -->
     <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
     <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
     <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
@@ -30,4 +30,8 @@
     <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
     <string name="automaticFireproofWebsiteLoginDialogSecondOption">Fireproof this site</string>
     <string name="automaticFireproofWebsiteLoginDialogThirdOption">Not now</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
+
+    <!-- Dialogs -->
+    <string name="removeAll">Remove All</string>
 </resources>

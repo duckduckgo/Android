@@ -267,6 +267,7 @@
     <string name="dialogSave">Запази</string>
     <string name="delete">Изтриване</string>
     <string name="edit">Редактиране</string>
+    <string name="remove">Премахване</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Търсене с DuckDuckGo</string>
