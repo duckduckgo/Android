@@ -118,6 +118,9 @@ class FireproofWebsitesViewModel @Inject constructor(
     }
 
     fun removeAllSelected() {
-        TODO("Not yet implemented")
+        viewModelScope.launch(dispatcherProvider.io()) {
+            fireproofWebsiteRepository.removeAllFireproofWebsites()
+            pixel.fire(FIREPROOF_WEBSITE_ALL_DELETED)
+        }
     }
 }
