@@ -37,6 +37,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.FileDownloadNotificationChannelType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -63,16 +64,8 @@ class NotificationRegistrar @Inject constructor(
     }
 
     object ChannelType {
-        val FILE_DOWNLOADING = Channel(
-            "com.duckduckgo.downloading",
-            R.string.notificationChannelFileDownloading,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
-        val FILE_DOWNLOADED = Channel(
-            "com.duckduckgo.downloaded",
-            R.string.notificationChannelFileDownloaded,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
+        val FILE_DOWNLOADING = FileDownloadNotificationChannelType.FILE_DOWNLOADING
+        val FILE_DOWNLOADED = FileDownloadNotificationChannelType.FILE_DOWNLOADED
         val TUTORIALS = Channel(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,

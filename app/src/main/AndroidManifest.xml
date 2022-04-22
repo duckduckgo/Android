@@ -389,6 +389,11 @@
             android:label="@string/voiceSearchTitle"
             android:parentActivityName=".BrowserActivity" />
 
+        <activity
+            android:name="com.duckduckgo.app.downloads.DownloadsActivity"
+            android:label="@string/downloadsActivityTitle"
+            android:parentActivityName=".BrowserActivity" />
+
         <service
             android:name="com.duckduckgo.app.job.AppConfigurationJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
