@@ -46,7 +46,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNoti
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.Inet4Address
@@ -258,10 +258,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             // This is effectively capping the max segment size too
             setMtu(16_384)
             configureMeteredConnection()
-
-            if (vpnPreferences.isCustomDnsServerSet()) {
-                addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
-            }
 
             // Set DNS
             getDns().forEach {

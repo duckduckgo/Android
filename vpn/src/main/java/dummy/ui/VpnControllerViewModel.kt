@@ -37,7 +37,6 @@ class VpnControllerViewModel @Inject constructor(
     private val appTrackerBlockedRepository: AppTrackerBlockingStatsRepository,
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
     private val applicationContext: Context,
-    private val vpnPreferences: VpnPreferences
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
@@ -65,8 +64,6 @@ class VpnControllerViewModel @Inject constructor(
     fun getVpnState(): LiveData<VpnState> {
         return appTrackerBlockedRepository.getVpnState().asLiveData()
     }
-
-    fun getDebugLoggingPreference(): Boolean = vpnPreferences.getDebugLoggingPreference()
 
     data class VpnRunningStatus(
         val runningTimeMillis: Long,

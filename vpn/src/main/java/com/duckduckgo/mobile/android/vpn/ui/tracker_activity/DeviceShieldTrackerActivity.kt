@@ -410,13 +410,8 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.customDnsServer)?.let {
-            it.isChecked = viewModel.isCustomDnsServerSet()
-            it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
-        }
         menu.findItem(R.id.diagnosticsScreen).isVisible = appBuildConfig.isDebug
         menu.findItem(R.id.dataScreen).isVisible = appBuildConfig.isDebug
-        menu.findItem(R.id.customDnsServer).isVisible = appBuildConfig.isDebug
 
         vpnCachedState?.let { vpnState ->
             deviceShieldSwitch.quietlySetIsChecked(vpnState.state == VpnRunningState.ENABLED, enableAppTPSwitchListener)
@@ -433,11 +428,6 @@ class DeviceShieldTrackerActivity :
             }
             R.id.diagnosticsScreen -> {
                 startActivity(VpnDiagnosticsActivity.intent(this)); true
-            }
-            R.id.customDnsServer -> {
-                val enabled = !item.isChecked
-                viewModel.useCustomDnsServer(enabled)
-                true
             }
             else -> super.onOptionsItemSelected(item)
         }

@@ -38,7 +38,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
