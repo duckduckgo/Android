@@ -68,7 +68,8 @@ class DeviceShieldTrackerActivity :
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
     AppTPVpnConflictDialog.Listener,
-    AppTPRemoveFeatureConfirmationDialog.Listener {
+    AppTPRemoveFeatureConfirmationDialog.Listener,
+    AppTPPromoteAlwaysOnDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -139,7 +140,6 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
-
     }
 
     override fun onActivityResult(
@@ -220,7 +220,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
-            is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchDisableConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog -> launchAlwaysOnPromotionDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
@@ -267,10 +267,10 @@ class DeviceShieldTrackerActivity :
 
     private fun launchAlwaysOnPromotionDialog() {
         deviceShieldPixels.didShowDisableTrackingProtectionDialog()
-        val dialog = AppTPDisableConfirmationDialog.instance(this)
+        val dialog = AppTPPromoteAlwaysOnDialog.instance(this)
         dialog.show(
             supportFragmentManager,
-            AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+            AppTPPromoteAlwaysOnDialog.TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
         )
     }
 
@@ -289,29 +289,47 @@ class DeviceShieldTrackerActivity :
         deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
     }
 
-    override fun onDismissConflictDialog() {
+    override fun onVpnConflictDialogDismiss() {
         deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
-    override fun onOpenSettings() {
+    override fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
-
-        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
+        openVPNSettings()
     }
 
-    override fun onContinue() {
+    override fun onVpnConflictDialogContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
     }
 
-    override fun onCancel() {
+    override fun OnRemoveFeatureDialogCancel() {
         deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
     }
 
     override fun onRemoveFeature() {
         viewModel.removeFeature()
+    }
+
+    override fun onPromoteAlwaysOnGoToVPNSettings() {
+        deviceShieldPixels.didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
+        openVPNSettings()
+    }
+
+    private fun openVPNSettings(){
+        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
+    override fun onPromoteAlwaysOnRemindLater() {
+        deviceShieldPixels.didChooseToDismissPromoteAlwaysOnDialog()
+        viewModel.onAppTPToggleSwitched(true)
+    }
+
+    override fun onPromoteAlwaysOnForget() {
+        deviceShieldPixels.didChooseToForgetPromoteAlwaysOnDialog()
+        viewModel.onForgetPromoteAlwaysOnDialog()
     }
 
     private fun launchBetaInstructions() {
@@ -498,4 +516,5 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
+
 }

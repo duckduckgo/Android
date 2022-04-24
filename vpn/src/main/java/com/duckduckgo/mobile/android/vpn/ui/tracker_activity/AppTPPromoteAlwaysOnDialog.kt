@@ -26,9 +26,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun onGoToVPNSettings()
-        fun onPromoteAlwaysOn()
-        fun onDisableDialogCancelled()
+        fun onPromoteAlwaysOnGoToVPNSettings()
+        fun onPromoteAlwaysOnRemindLater()
+        fun onPromoteAlwaysOnForget()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,21 +64,21 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
     ) {
         goToSettings.setOnClickListener {
             dismiss()
-            listener.onOpenAppProtection()
+            listener.onPromoteAlwaysOnGoToVPNSettings()
         }
         remindLater.setOnClickListener {
             dismiss()
-            listener.onTurnAppTrackingProtectionOff()
+            listener.onPromoteAlwaysOnRemindLater()
         }
         forget.setOnClickListener {
             dismiss()
-            listener.onDisableDialogCancelled()
+            listener.onPromoteAlwaysOnForget()
         }
     }
 
     companion object {
 
-        const val TAG_APPTP_DISABLE_DIALOG = "AppTPDisableConfirmationDialog"
+        const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
 
         fun instance(listener: Listener): AppTPPromoteAlwaysOnDialog {
             return AppTPPromoteAlwaysOnDialog(listener)

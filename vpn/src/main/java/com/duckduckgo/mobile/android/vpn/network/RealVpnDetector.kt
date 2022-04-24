@@ -19,7 +19,9 @@ package com.duckduckgo.mobile.android.vpn.network
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.VpnService
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -34,5 +36,9 @@ class RealVpnDetector @Inject constructor(
         val connectivityManager = context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork
         return connectivityManager.getNetworkCapabilities(activeNetwork)?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) ?: false
+    }
+
+    override fun isAppTpInAlwaysOn(): Boolean {
+        return false
     }
 }

@@ -74,10 +74,14 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
-            enabled && vpnStore.shouldPromoteAlwaysOn() -> sendCommand(Command.ShowAlwaysOnPromotionDialog)
+            enabled && shouldPromoteAlwaysOn() -> sendCommand(Command.ShowAlwaysOnPromotionDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
+    }
+
+    private fun shouldPromoteAlwaysOn(): Boolean {
+        return vpnStore.shouldPromoteAlwaysOn() && !vpnDetector.isAppTpInAlwaysOn()
     }
 
     private fun sendCommand(newCommand: Command) {
@@ -145,6 +149,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             command.send(Command.StopVPN)
             command.send(Command.CloseScreen)
         }
+    }
+
+    fun onForgetPromoteAlwaysOnDialog() {
+        vpnStore.onForgetPromoteAlwaysOn()
+        onAppTPToggleSwitched(true)
     }
 
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()

@@ -26,7 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class AppTPRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun onCancel()
+        fun OnRemoveFeatureDialogCancel()
         fun onRemoveFeature()
     }
 
@@ -61,7 +61,7 @@ class AppTPRemoveFeatureConfirmationDialog private constructor(private val liste
     ) {
         cancelCta.setOnClickListener {
             dismiss()
-            listener.onCancel()
+            listener.OnRemoveFeatureDialogCancel()
         }
         removeCta.setOnClickListener {
             dismiss()

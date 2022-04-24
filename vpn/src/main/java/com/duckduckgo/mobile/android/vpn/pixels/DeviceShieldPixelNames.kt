@@ -196,5 +196,15 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
     ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
+
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_UNIQUE("m_atp_imp_promote_always_on_dialog_u"),
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_imp_promote_always_on_dialog_d"),
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG("m_atp_imp_promote_always_on_dialog_c"),
+    ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_settings_promote_always_on_d"),
+    ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_settings_promote_always_on_c"),
+    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_remind_later_promote_always_on_d"),
+    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_remind_later_promote_always_on_c"),
+    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_forget_later_promote_always_on_d"),
+    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_forget_later_promote_always_on_c"),
     ;
 }

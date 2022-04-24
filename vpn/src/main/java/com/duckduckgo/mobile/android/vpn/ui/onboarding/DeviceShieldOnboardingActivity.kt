@@ -219,11 +219,11 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         )
     }
 
-    override fun onDismissConflictDialog() {
+    override fun onVpnConflictDialogDismiss() {
         deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
-    override fun onOpenSettings() {
+    override fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
 
         val intent = Intent(Settings.ACTION_VPN_SETTINGS)
@@ -231,7 +231,7 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         startActivity(intent)
     }
 
-    override fun onContinue() {
+    override fun onVpnConflictDialogContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
     }
