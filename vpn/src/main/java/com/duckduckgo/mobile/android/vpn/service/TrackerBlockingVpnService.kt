@@ -45,6 +45,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*
@@ -107,6 +108,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var appTpFeatureConfig: AppTpFeatureConfig
+
+    @Inject lateinit var onboardingStore: DeviceShieldOnboardingStore
 
     private val vpnStateServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -234,6 +237,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
+        }
+
+        if (appBuildConfig.sdkInt >= 29){
+            Timber.i("Always ON mode detected: $isAlwaysOn")
+            onboardingStore.setAlwaysOn(isAlwaysOn)
         }
     }
 

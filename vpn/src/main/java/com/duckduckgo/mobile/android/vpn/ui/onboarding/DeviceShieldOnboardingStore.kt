@@ -34,6 +34,9 @@ interface DeviceShieldOnboardingStore {
     fun onAppTPManuallyEnabled()
     fun shouldPromoteAlwaysOn(): Boolean
     fun onForgetPromoteAlwaysOn()
+
+    fun setAlwaysOn(enabled: Boolean)
+    fun isAlwaysOnEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -83,6 +86,14 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         preferences.edit { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
     }
 
+    override fun setAlwaysOn(enabled: Boolean) {
+        preferences.edit { putBoolean(KEY_ALWAYS_ON_ENABLED, enabled) }
+    }
+
+    override fun isAlwaysOnEnabled(): Boolean {
+        return preferences.getBoolean(KEY_ALWAYS_ON_ENABLED, false)
+    }
+
     private fun canShowPromoteAlwaysOnDialog(): Boolean {
         return preferences.getBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, true)
     }
@@ -96,5 +107,7 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
         private const val ALWAYS_ON_PROMOTION_DELTA = 5
+
+        private const val KEY_ALWAYS_ON_ENABLED = "KEY_ALWAYS_ON_ENABLED"
     }
 }

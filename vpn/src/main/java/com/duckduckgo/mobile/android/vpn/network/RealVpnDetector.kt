@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -28,6 +29,7 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealVpnDetector @Inject constructor(
     private val context: Context,
+    private val onboardingStore: DeviceShieldOnboardingStore
 ) : VpnDetector {
 
     override fun isVpnDetected(): Boolean {
@@ -37,6 +39,6 @@ class RealVpnDetector @Inject constructor(
     }
 
     override fun isAppTpInAlwaysOn(): Boolean {
-        return false
+        return onboardingStore.isAlwaysOnEnabled()
     }
 }
