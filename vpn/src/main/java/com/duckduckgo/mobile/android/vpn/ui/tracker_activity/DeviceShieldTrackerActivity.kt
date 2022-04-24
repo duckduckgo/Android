@@ -316,7 +316,7 @@ class DeviceShieldTrackerActivity :
         openVPNSettings()
     }
 
-    private fun openVPNSettings(){
+    private fun openVPNSettings() {
         val intent = Intent(Settings.ACTION_VPN_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
@@ -342,8 +342,7 @@ class DeviceShieldTrackerActivity :
     private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
-                deviceShieldPixels.enableFromSummaryTrackerActivity()
-                startVPN()
+                viewModel.onVPNPermissionResult(RESULT_OK)
             }
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
@@ -370,6 +369,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun startVPN() {
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
         quietlyToggleAppTpSwitch(true)
         TrackerBlockingVpnService.startService(this)
     }
