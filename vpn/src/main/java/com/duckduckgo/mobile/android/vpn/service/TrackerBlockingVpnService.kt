@@ -239,6 +239,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
 
+        // this works for 85% of our users as of April 2022
         if (appBuildConfig.sdkInt >= 29){
             Timber.i("Always ON mode detected: $isAlwaysOn")
             onboardingStore.setAlwaysOn(isAlwaysOn)

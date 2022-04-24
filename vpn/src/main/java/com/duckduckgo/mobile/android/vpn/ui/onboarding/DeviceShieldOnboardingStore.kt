@@ -79,6 +79,7 @@ class DeviceShieldOnboardingImpl @Inject constructor(
     }
 
     override fun shouldPromoteAlwaysOn(): Boolean {
+
         return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) >= ALWAYS_ON_PROMOTION_DELTA && canShowPromoteAlwaysOnDialog()
     }
 
@@ -90,8 +91,9 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         preferences.edit { putBoolean(KEY_ALWAYS_ON_ENABLED, enabled) }
     }
 
+    // true by default, so all users in pre 29 don't ever see the dialog
     override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_ENABLED, false)
+        return preferences.getBoolean(KEY_ALWAYS_ON_ENABLED, true)
     }
 
     private fun canShowPromoteAlwaysOnDialog(): Boolean {
