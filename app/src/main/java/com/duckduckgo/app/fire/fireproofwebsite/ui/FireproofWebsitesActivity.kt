@@ -125,7 +125,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            // TODO viewModel.onSnackBarUndoFireproofAll()
+            viewModel.onSnackBarUndoRemoveAllWebsites()
         }.show()
     }
 

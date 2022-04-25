@@ -60,6 +60,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
+    private var removedWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
 
     init {
         _viewState.value = ViewState(
@@ -123,10 +124,19 @@ class FireproofWebsitesViewModel @Inject constructor(
     }
 
     fun removeAllWebsites() {
+        removedWebsitesEntities = fireproofWebsites.value ?: emptyList()
         viewModelScope.launch(dispatcherProvider.io()) {
 
             fireproofWebsiteRepository.removeAllFireproofWebsites()
             pixel.fire(FIREPROOF_WEBSITE_ALL_DELETED)
+        }
+    }
+
+    fun onSnackBarUndoRemoveAllWebsites() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            removedWebsitesEntities.forEach { fireproofWebsiteEntity ->
+                onSnackBarUndoFireproof(fireproofWebsiteEntity)
+            }
         }
     }
 }
