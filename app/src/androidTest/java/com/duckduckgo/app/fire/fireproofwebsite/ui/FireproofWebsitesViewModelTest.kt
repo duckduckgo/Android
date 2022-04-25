@@ -27,7 +27,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -124,7 +124,7 @@ class FireproofWebsitesViewModelTest {
         val fireproofWebsiteEntity = FireproofWebsiteEntity("domain.com")
         viewModel.onDeleteRequested(fireproofWebsiteEntity)
 
-        assertCommandIssued<ConfirmDeleteFireproofWebsite> {
+        assertCommandIssued<ConfirmRemoveFireproofWebsite> {
             assertEquals(fireproofWebsiteEntity, this.entity)
         }
     }
@@ -133,7 +133,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserConfirmsToDeleteThenEntityRemovedAndViewStateUpdated() {
         givenFireproofWebsiteDomain("domain.com")
 
-        viewModel.delete(FireproofWebsiteEntity("domain.com"))
+        viewModel.remove(FireproofWebsiteEntity("domain.com"))
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
@@ -143,7 +143,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserConfirmsToDeleteThenPixelSent() {
         givenFireproofWebsiteDomain("domain.com")
 
-        viewModel.delete(FireproofWebsiteEntity("domain.com"))
+        viewModel.remove(FireproofWebsiteEntity("domain.com"))
 
         verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_DELETED)
     }

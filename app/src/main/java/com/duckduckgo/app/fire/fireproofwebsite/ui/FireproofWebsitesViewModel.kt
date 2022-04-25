@@ -20,7 +20,7 @@ import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -49,7 +49,8 @@ class FireproofWebsitesViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
+        class ConfirmRemoveFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
+        class ConfirmRemoveAllFireproofWebsites() : Command()
         class ShowAutomaticFireproofSettingSelectionDialog(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
     }
 
@@ -79,7 +80,7 @@ class FireproofWebsitesViewModel @Inject constructor(
     }
 
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {
-        command.value = ConfirmDeleteFireproofWebsite(entity)
+        command.value = ConfirmRemoveFireproofWebsite(entity)
     }
 
     fun onSnackBarUndoFireproof(entity: FireproofWebsiteEntity) {
@@ -89,7 +90,7 @@ class FireproofWebsitesViewModel @Inject constructor(
         }
     }
 
-    fun delete(entity: FireproofWebsiteEntity) {
+    fun remove(entity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(entity)
             pixel.fire(FIREPROOF_WEBSITE_DELETED)
@@ -117,8 +118,13 @@ class FireproofWebsitesViewModel @Inject constructor(
         pixel.fire(pixelName)
     }
 
-    fun removeAllSelected() {
+    fun removeAllRequested() {
+        command.value = Command.ConfirmRemoveAllFireproofWebsites()
+    }
+
+    fun removeAllWebsites() {
         viewModelScope.launch(dispatcherProvider.io()) {
+
             fireproofWebsiteRepository.removeAllFireproofWebsites()
             pixel.fire(FIREPROOF_WEBSITE_ALL_DELETED)
         }
