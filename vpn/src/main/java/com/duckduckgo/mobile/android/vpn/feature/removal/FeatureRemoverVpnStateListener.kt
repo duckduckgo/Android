@@ -24,7 +24,6 @@ import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
