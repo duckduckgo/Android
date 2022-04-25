@@ -99,7 +99,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
+        vpnDatabase.clearAllTables()
     }
 
     private fun disableFeature() {
