@@ -29,7 +29,7 @@ import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_WEEKLY_NOTIFICATION_ID
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +45,7 @@ interface VpnFeatureRemover {
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = WorkerInjectorPlugin::class)
 class DefaultVpnFeatureRemover @Inject constructor(
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val deviceShieldOnboarding: VpnStore,
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
     // we use the Provider to avoid a cycle dependency

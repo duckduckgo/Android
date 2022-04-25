@@ -20,9 +20,10 @@ import android.content.Context
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import timber.log.Timber
 import javax.inject.Inject
 
-interface DeviceShieldOnboardingStore {
+interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
@@ -31,19 +32,21 @@ interface DeviceShieldOnboardingStore {
     fun onFeatureDisabled()
     fun isFeatureEnabled(): Boolean
 
+    fun resetAppTPManuallyEnablesCounter()
     fun onAppTPManuallyEnabled()
-    fun shouldPromoteAlwaysOn(): Boolean
+    fun getAppTPManuallyEnables(): Int
     fun onForgetPromoteAlwaysOn()
+    fun userAllowsShowPromoteAlwaysOn(): Boolean
 
     fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
-class DeviceShieldOnboardingImpl @Inject constructor(
+class SharedPreferencesVpnStore @Inject constructor(
     context: Context
-) : DeviceShieldOnboardingStore {
-    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_PRIVATE)
+) : VpnStore {
+    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_MULTI_PROCESS)
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
@@ -70,34 +73,33 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false)
     }
 
+    override fun resetAppTPManuallyEnablesCounter() {
+        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) }
+    }
+
     override fun onAppTPManuallyEnabled() {
-        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getTotalEnabled() + 1) }
+        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
+        Timber.d("onAppTPManuallyEnabled ${getAppTPManuallyEnables()} times")
     }
 
-    private fun getTotalEnabled(): Int {
+    override fun getAppTPManuallyEnables(): Int {
         return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0)
-    }
-
-    override fun shouldPromoteAlwaysOn(): Boolean {
-
-        return preferences.getInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) >= ALWAYS_ON_PROMOTION_DELTA && canShowPromoteAlwaysOnDialog()
     }
 
     override fun onForgetPromoteAlwaysOn() {
         preferences.edit { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
     }
 
-    override fun setAlwaysOn(enabled: Boolean) {
-        preferences.edit { putBoolean(KEY_ALWAYS_ON_ENABLED, enabled) }
-    }
-
-    // true by default, so all users in pre 29 don't ever see the dialog
-    override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_ENABLED, true)
-    }
-
-    private fun canShowPromoteAlwaysOnDialog(): Boolean {
+    override fun userAllowsShowPromoteAlwaysOn(): Boolean {
         return preferences.getBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, true)
+    }
+
+    override fun setAlwaysOn(enabled: Boolean) {
+        preferences.edit { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
+    }
+
+    override fun isAlwaysOnEnabled(): Boolean {
+        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, true)
     }
 
     companion object {
@@ -110,6 +112,6 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
         private const val ALWAYS_ON_PROMOTION_DELTA = 5
 
-        private const val KEY_ALWAYS_ON_ENABLED = "KEY_ALWAYS_ON_ENABLED"
+        private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
     }
 }

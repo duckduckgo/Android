@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -34,7 +34,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val deviceShieldOnboarding: VpnStore,
     private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 

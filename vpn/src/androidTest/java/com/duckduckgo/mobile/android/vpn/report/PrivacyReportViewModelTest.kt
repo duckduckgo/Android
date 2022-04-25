@@ -32,7 +32,7 @@ import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.mockito.kotlin.mock
@@ -62,7 +62,7 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val appBuildConfig: AppBuildConfig = mock()
-    private val onboardingStore = mock<DeviceShieldOnboardingStore>()
+    private val onboardingStore = mock<VpnStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext

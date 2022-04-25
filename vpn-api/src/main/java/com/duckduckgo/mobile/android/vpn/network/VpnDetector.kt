@@ -25,11 +25,4 @@ interface VpnDetector {
      */
     fun isVpnDetected(): Boolean
 
-    /**
-     * Returns if AppTP is running in Always ON mode
-     *
-     * @return returns a boolean that identifies AppTP running in Always On
-     */
-    fun isAppTpInAlwaysOn(): Boolean
-
 }

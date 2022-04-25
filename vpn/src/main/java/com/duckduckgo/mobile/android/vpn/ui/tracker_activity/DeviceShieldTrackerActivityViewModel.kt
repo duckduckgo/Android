@@ -30,7 +30,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -48,7 +48,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
     private val vpnFeatureRemover: VpnFeatureRemover,
-    private val vpnStore: DeviceShieldOnboardingStore,
+    private val vpnStore: VpnStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -74,14 +74,22 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     internal fun onAppTPToggleSwitched(enabled: Boolean) {
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
-            enabled && shouldPromoteAlwaysOn() -> sendCommand(Command.ShowAlwaysOnPromotionDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
             enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
     }
 
     private fun shouldPromoteAlwaysOn(): Boolean {
-        return vpnStore.shouldPromoteAlwaysOn() && !vpnDetector.isAppTpInAlwaysOn()
+        val shouldPromoteAlwaysOn =
+            vpnStore.getAppTPManuallyEnables() >= ALWAYS_ON_PROMOTION_DELTA
+                && vpnStore.userAllowsShowPromoteAlwaysOn()
+                && !vpnStore.isAlwaysOnEnabled()
+
+        if (shouldPromoteAlwaysOn){
+            vpnStore.resetAppTPManuallyEnablesCounter()
+        }
+
+        return shouldPromoteAlwaysOn
     }
 
     private fun sendCommand(newCommand: Command) {
@@ -99,6 +107,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
                 sendCommand(Command.LaunchVPN)
+                if (shouldPromoteAlwaysOn()){
+                    sendCommand(Command.ShowAlwaysOnPromotionDialog)
+                }
                 vpnStore.onAppTPManuallyEnabled()
                 return
             }
@@ -154,6 +165,10 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onForgetPromoteAlwaysOnDialog() {
         vpnStore.onForgetPromoteAlwaysOn()
         onAppTPToggleSwitched(true)
+    }
+
+    companion object {
+        private const val ALWAYS_ON_PROMOTION_DELTA = 5
     }
 
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()

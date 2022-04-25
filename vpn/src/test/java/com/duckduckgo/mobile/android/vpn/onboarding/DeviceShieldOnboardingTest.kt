@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.onboarding
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingImpl
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.SharedPreferencesVpnStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.junit.Before
@@ -39,7 +39,7 @@ class DeviceShieldOnboardingTest {
     @Mock
     lateinit var mockContext: Context
 
-    lateinit var deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+    lateinit var vpnStore: VpnStore
 
     @Before
     fun setup() {
@@ -47,7 +47,7 @@ class DeviceShieldOnboardingTest {
 
         whenever(mockContext.getSharedPreferences(anyString(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences)
 
-        deviceShieldOnboardingStore = DeviceShieldOnboardingImpl(mockContext)
+        vpnStore = SharedPreferencesVpnStore(mockContext)
     }
 
     @Test
@@ -55,7 +55,7 @@ class DeviceShieldOnboardingTest {
         val editor = mock(SharedPreferences.Editor::class.java)
 
         whenever(sharedPreferences.edit()).thenReturn(editor)
-        deviceShieldOnboardingStore.onboardingDidShow()
+        vpnStore.onboardingDidShow()
 
         verify(editor).putBoolean("KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED", true)
     }
@@ -65,7 +65,7 @@ class DeviceShieldOnboardingTest {
         val editor = mock(SharedPreferences.Editor::class.java)
 
         whenever(sharedPreferences.edit()).thenReturn(editor)
-        deviceShieldOnboardingStore.onboardingDidNotShow()
+        vpnStore.onboardingDidNotShow()
 
         verify(editor).putBoolean("KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED", false)
     }
