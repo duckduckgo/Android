@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.domain
+package com.duckduckgo.autofill.jsbridge.request
 
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers

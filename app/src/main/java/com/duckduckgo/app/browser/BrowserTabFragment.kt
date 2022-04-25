@@ -1486,7 +1486,7 @@ class BrowserTabFragment :
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
-            browserAutofill.addBrowserAutofillInterface(it)
+            browserAutofill.addJsInterface(it)
         }
 
         if (appBuildConfig.isDebug) {

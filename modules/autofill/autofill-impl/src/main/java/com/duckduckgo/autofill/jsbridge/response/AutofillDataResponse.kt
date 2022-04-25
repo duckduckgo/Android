@@ -14,13 +14,28 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill
+package com.duckduckgo.autofill.jsbridge.response
 
-import android.webkit.WebView
+data class AutofillDataResponse(
+    val type: String = "getAutofillDataResponse",
+    val success: CredentialSuccessResponse
+) {
 
-interface BrowserAutofill {
-
-    fun isEnabled(): Boolean
-    fun addJsInterface(webView: WebView)
-
+    data class CredentialSuccessResponse(
+        val username: String = "",
+        val password: String? = null
+    )
 }
+
+data class AutofillAvailableInputTypesResponse(
+    val type: String = "getAvailableInputTypesResponse",
+    val success: AvailableInputSuccessResponse
+) {
+
+    data class AvailableInputSuccessResponse(
+        val credentials: Boolean
+    )
+}
+
+
+

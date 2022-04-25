@@ -30,18 +30,8 @@ function validate() {
 }
 
 window.addEventListener("message", (event) => {
-   console.log(`Received a message from the native layer: \norigin=${event.origin} \nisTrusted=${event.isTrusted} \ndata=${event.data}`);
+   console.log(`Received a message from the native layer: \norigin=${event.origin} \noriginType=${typeof event.origin} \nisTrusted=${event.isTrusted} \ndata=${event.data}`);
 }, false);
-
-
-wm.onmessage = function(event) {
-    console.log("received a message through the named wm object: " + event.data);
-}
-
-document.addEventListener("DOMContentLoaded", function(){
-    console.log("dom content loaded");
-    wm.postMessage("I'm ready!");
-});
 
 </script>
 </body>

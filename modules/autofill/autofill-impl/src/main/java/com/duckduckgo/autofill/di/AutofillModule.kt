@@ -18,9 +18,12 @@ package com.duckduckgo.autofill.di
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.AutofillJavascriptInterface
+import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.InlineBrowserAutofill
-import com.duckduckgo.autofill.domain.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -38,11 +41,29 @@ class AutofillModule {
     }
 
     @Provides
+    fun providesAutofillMessagePoster(): AutofillMessagePoster {
+        return AutofillMessagePoster()
+    }
+
+    @Provides
+    fun providesAutofillResponseWriter(moshi: Moshi): AutofillResponseWriter {
+        return AutofillResponseWriter(moshi)
+    }
+
+    @Provides
     fun providesAutofillInterface(
-        moshi: Moshi,
         requestParser: AutofillRequestParser,
-        @AppCoroutineScope coroutineScope: CoroutineScope
+        autofillStore: AutofillStore,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        autofillMessagePoster: AutofillMessagePoster,
+        autofillResponseWriter: AutofillResponseWriter
     ): AutofillJavascriptInterface {
-        return AutofillJavascriptInterface(moshi, requestParser, coroutineScope)
+        return AutofillJavascriptInterface(
+            requestParser = requestParser,
+            autofillStore = autofillStore,
+            coroutineScope = coroutineScope,
+            autofillMessagePoster = autofillMessagePoster,
+            autofillResponseWriter = autofillResponseWriter
+        )
     }
 }

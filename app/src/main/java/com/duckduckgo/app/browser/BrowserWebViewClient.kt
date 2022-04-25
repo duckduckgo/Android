@@ -26,6 +26,7 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import androidx.webkit.WebViewAssetLoader
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
@@ -65,7 +66,8 @@ class BrowserWebViewClient(
     private val dispatcherProvider: DispatcherProvider,
     private val emailInjector: EmailInjector,
     private val accessibilityManager: AccessibilityManager,
-    private val ampLinks: AmpLinks
+    private val ampLinks: AmpLinks,
+    private val assetLoader: WebViewAssetLoader
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -296,6 +298,14 @@ class BrowserWebViewClient(
         webView: WebView,
         request: WebResourceRequest
     ): WebResourceResponse? {
+
+        // TODO: Can likely be removed after autofill development is completed
+        // For loading local HTML bundled in assets.
+        val localResponse = assetLoader.shouldInterceptRequest(request.url)
+        if (localResponse != null) {
+            return localResponse
+        }
+
         return runBlocking {
             try {
                 val documentUrl = withContext(Dispatchers.Main) { webView.url }

@@ -20,6 +20,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
+import androidx.webkit.WebViewAssetLoader
+import androidx.webkit.WebViewAssetLoader.AssetsPathHandler
+import androidx.webkit.WebViewAssetLoader.ResourcesPathHandler
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -125,7 +128,8 @@ class BrowserModule {
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
-        ampLinks: AmpLinks
+        ampLinks: AmpLinks,
+        assetLoader: WebViewAssetLoader
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -144,8 +148,18 @@ class BrowserModule {
             dispatcherProvider,
             emailInjector,
             accessibilityManager,
-            ampLinks
+            ampLinks,
+            assetLoader
         )
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun webViewAssetLoader(context: Context): WebViewAssetLoader {
+        return WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", AssetsPathHandler(context))
+            .addPathHandler("/res/", ResourcesPathHandler(context))
+            .build()
     }
 
     @Provides
