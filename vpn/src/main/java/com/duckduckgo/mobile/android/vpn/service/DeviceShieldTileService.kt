@@ -30,7 +30,6 @@ import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import dagger.android.AndroidInjection
@@ -76,7 +75,7 @@ class DeviceShieldTileService : TileService() {
         } else {
             deviceShieldPixels.enableFromQuickSettingsTile()
             if (hasVpnPermission()) {
-                if (shouldPromoteAlwaysOn()){
+                if (shouldPromoteAlwaysOn()) {
                     launchActivity(DeviceShieldTrackerActivity::class.java)
                 } else {
                     startDeviceShield()
