@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.service.state
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
@@ -44,7 +43,7 @@ class AlwaysOnMonitor @Inject constructor(
         if (appBuildConfig.sdkInt >= 29) {
             try {
                 val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
-                Timber.i("AlwaysOnMonitor, Always On Enabled: ${isAlwaysOnEnabled}")
+                Timber.i("AlwaysOnMonitor, Always On Enabled: $isAlwaysOnEnabled")
                 vpnStore.setAlwaysOn(isAlwaysOnEnabled)
             } catch (e: Exception) {
                 vpnStore.setAlwaysOn(false)

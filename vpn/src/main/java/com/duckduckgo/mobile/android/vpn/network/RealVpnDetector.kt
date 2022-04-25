@@ -20,7 +20,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject

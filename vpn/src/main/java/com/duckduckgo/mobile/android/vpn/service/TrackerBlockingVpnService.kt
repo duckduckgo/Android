@@ -45,7 +45,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import dagger.android.AndroidInjection
 import dummy.ui.VpnPreferences
 import kotlinx.coroutines.*

@@ -81,11 +81,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private fun shouldPromoteAlwaysOn(): Boolean {
         val shouldPromoteAlwaysOn =
-            vpnStore.getAppTPManuallyEnables() >= ALWAYS_ON_PROMOTION_DELTA
-                && vpnStore.userAllowsShowPromoteAlwaysOn()
-                && !vpnStore.isAlwaysOnEnabled()
+            vpnStore.getAppTPManuallyEnables() >= ALWAYS_ON_PROMOTION_DELTA &&
+                vpnStore.userAllowsShowPromoteAlwaysOn() &&
+                !vpnStore.isAlwaysOnEnabled()
 
-        if (shouldPromoteAlwaysOn){
+        if (shouldPromoteAlwaysOn) {
             vpnStore.resetAppTPManuallyEnablesCounter()
         }
 
@@ -107,7 +107,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
                 sendCommand(Command.LaunchVPN)
-                if (shouldPromoteAlwaysOn()){
+                if (shouldPromoteAlwaysOn()) {
                     sendCommand(Command.ShowAlwaysOnPromotionDialog)
                 }
                 vpnStore.onAppTPManuallyEnabled()
