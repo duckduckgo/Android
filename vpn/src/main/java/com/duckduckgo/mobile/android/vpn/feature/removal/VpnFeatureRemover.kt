@@ -54,14 +54,6 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : VpnFeatureRemover, WorkerInjectorPlugin {
 
-    // Disabling reminder notifications
-    // Disable daily / weekly notifications
-    // Remove CTA in New Tab
-    // Remove all app trackers blocked
-    // Remove app shortcut
-    // If manual removal
-    // Force users to complete AppTP Onboarding
-
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is VpnFeatureRemoverWorker) {
             worker.vpnFeatureRemover = this
