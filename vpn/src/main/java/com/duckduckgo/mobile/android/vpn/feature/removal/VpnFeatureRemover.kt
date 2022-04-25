@@ -103,7 +103,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun disableFeature() {
-        deviceShieldOnboarding.onFeatureDisabled()
+        deviceShieldOnboarding.disableVPNFeature()
     }
 
 }

@@ -25,10 +25,8 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -40,10 +38,8 @@ class FeatureRemoverVpnStateListener @Inject constructor(
     private val workManager: WorkManager,
 ) : VpnServiceCallbacks {
 
-    private val dispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        coroutineScope.launch(dispatcher) {
+        coroutineScope.launch() {
             Timber.d("FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal")
             workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
         }
@@ -54,7 +50,7 @@ class FeatureRemoverVpnStateListener @Inject constructor(
         vpnStopReason: VpnStopReason
     ) {
         if (vpnStopReason == VpnStopReason.SELF_STOP) {
-            coroutineScope.launch(dispatcher) {
+            coroutineScope.launch() {
                 Timber.d("FeatureRemoverVpnStateListener, new state DISABLED and it was MANUALLY. Scheduling automatic feature removal")
                 scheduleFeatureRemoval()
             }

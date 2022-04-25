@@ -26,9 +26,9 @@ interface DeviceShieldOnboardingStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
-    fun onFeatureEnabled()
-    fun onFeatureDisabled()
-    fun isFeatureEnabled(): Boolean
+    fun enableVPNFeature()
+    fun disableVPNFeature()
+    fun isVPNFeatureEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -49,16 +49,16 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
-    override fun onFeatureEnabled() {
+    override fun enableVPNFeature() {
         onboardingDidShow()
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, true) }
     }
 
-    override fun onFeatureDisabled() {
+    override fun disableVPNFeature() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false) }
     }
 
-    override fun isFeatureEnabled(): Boolean {
+    override fun isVPNFeatureEnabled(): Boolean {
         return preferences.getBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false)
     }
 
