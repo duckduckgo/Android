@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store
 
 import androidx.core.net.toUri
+import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -26,9 +27,9 @@ import timber.log.Timber
 
 interface AutofillStore {
 
-    fun getCredentials(url: String): List<Credentials>
+    fun getCredentials(rawUrl: String): List<Credentials>
 
-    fun saveCredentials(url: String, credentials: Credentials)
+    fun saveCredentials(rawUrl: String, credentials: Credentials)
 }
 
 class MockAutofillStore : AutofillStore {
@@ -37,7 +38,9 @@ class MockAutofillStore : AutofillStore {
 
     init {
         Timber.i("Initialising MockAutofillStore %s", this)
-        saveCredentials("https://appassets.androidplatform.net", Credentials("foo", "bar"))
+
+        // hacky (temporary) - for testing (hardcode a login)
+        saveCredentials("https://trello.com/login", Credentials("foo", "bar"))
     }
 
     override fun getCredentials(rawUrl: String): List<Credentials> {
@@ -70,11 +73,6 @@ class MockAutofillStore : AutofillStore {
         }
     }
 }
-
-data class Credentials(
-    val username: String,
-    val password: String
-)
 
 @Module
 @ContributesTo(AppScope::class)
