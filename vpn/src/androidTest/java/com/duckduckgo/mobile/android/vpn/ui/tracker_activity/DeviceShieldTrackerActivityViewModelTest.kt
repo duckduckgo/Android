@@ -54,7 +54,9 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
 
@@ -244,6 +246,62 @@ class DeviceShieldTrackerActivityViewModelTest {
     }
 
     @Test
+    fun whenVPNLaunchedAndShouldPromoteAlwaysOnThenShowPromoteAlwaysOnDialogCommandisSent() = runBlocking {
+        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
+        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, awaitItem())
+            verify(vpnStore).resetAppTPManuallyEnablesCounter()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenVPNLaunchedLessThanEnoughTimesThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
+        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(1)
+        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
+            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+        }
+    }
+
+    @Test
+    fun whenUserForgotAlwaysOnPromotionDialogThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
+        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
+        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(false)
+        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
+            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+        }
+    }
+
+    @Test
+    fun whenVPNInAlwaysOnModeThenShowPromoteAlwaysOnDialogCommandisNotSent() = runBlocking {
+        whenever(vpnStore.getAppTPManuallyEnables()).thenReturn(6)
+        whenever(vpnStore.userAllowsShowPromoteAlwaysOn()).thenReturn(true)
+        whenever(vpnStore.isAlwaysOnEnabled()).thenReturn(true)
+
+        viewModel.commands().test {
+            viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
+            verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+        }
+    }
+
+
+    @Test
     fun whenVpnPermissionResultIsDeniedAndRequestTimeWasSmallerThanNeededThenVpnConflictDialogIsShown() = runBlocking {
         viewModel.commands().test {
             val permissionIntent = Intent()
@@ -287,7 +345,6 @@ class DeviceShieldTrackerActivityViewModelTest {
 
             verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
-
             cancelAndConsumeRemainingEvents()
         }
     }

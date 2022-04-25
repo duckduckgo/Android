@@ -81,7 +81,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private fun shouldPromoteAlwaysOn(): Boolean {
         val shouldPromoteAlwaysOn =
-            vpnStore.getAppTPManuallyEnables() >= ALWAYS_ON_PROMOTION_DELTA &&
+            vpnStore.getAppTPManuallyEnables() >= VpnStore.ALWAYS_ON_PROMOTION_DELTA &&
                 vpnStore.userAllowsShowPromoteAlwaysOn() &&
                 !vpnStore.isAlwaysOnEnabled()
 
@@ -165,10 +165,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onForgetPromoteAlwaysOnDialog() {
         vpnStore.onForgetPromoteAlwaysOn()
         onAppTPToggleSwitched(true)
-    }
-
-    companion object {
-        private const val ALWAYS_ON_PROMOTION_DELTA = 5
     }
 
     internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()

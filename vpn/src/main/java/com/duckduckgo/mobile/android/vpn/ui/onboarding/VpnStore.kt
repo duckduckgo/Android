@@ -40,6 +40,10 @@ interface VpnStore {
 
     fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
+
+    companion object {
+        const val ALWAYS_ON_PROMOTION_DELTA = 5
+    }
 }
 
 @ContributesBinding(AppScope::class)
@@ -110,7 +114,6 @@ class SharedPreferencesVpnStore @Inject constructor(
 
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
-        private const val ALWAYS_ON_PROMOTION_DELTA = 5
 
         private const val KEY_ALWAYS_ON_MODE_ENABLED = "KEY_ALWAYS_ON_MODE_ENABLED"
     }
