@@ -55,8 +55,8 @@ class FeatureRemoverVpnStateListener @Inject constructor(
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason
     ) {
-        coroutineScope.launch(dispatcher) {
-            if (vpnStopReason == VpnStopReason.SELF_STOP) {
+        if (vpnStopReason == VpnStopReason.SELF_STOP) {
+            coroutineScope.launch(dispatcher) {
                 Timber.d("FeatureRemoverVpnStateListener, new state DISABLED and it was MANUALLY. Scheduling automatic feature removal")
                 scheduleFeatureRemoval()
             }
