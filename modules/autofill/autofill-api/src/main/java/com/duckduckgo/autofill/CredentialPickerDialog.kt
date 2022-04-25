@@ -16,17 +16,20 @@
 
 package com.duckduckgo.autofill
 
-import android.webkit.WebView
+import androidx.fragment.app.DialogFragment
 
-interface BrowserAutofill {
+interface CredentialAutofillPickerDialog {
+    fun asDialogFragment(): DialogFragment
 
-    fun isEnabled(): Boolean
-
-    fun addJsInterface(webView: WebView, callback: Callback)
-
-    fun injectCredentials(credentials: Credentials)
+    companion object {
+        const val TAG = "CredentialAutofillPickerDialog"
+        const val RESULT_KEY_CREDENTIAL_PICKER = "CredentialAutofillPickerDialogResult"
+    }
 }
 
-interface Callback {
-    fun onCredentialsAvailable(credentials: List<Credentials>)
+interface CredentialAutofillPickerDialogFactory {
+    fun create(
+        url: String,
+        credentials: List<Credentials>
+    ): CredentialAutofillPickerDialog
 }

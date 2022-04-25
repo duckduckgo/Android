@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
+    implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
     api project(path: ':autofill-store')
@@ -37,6 +38,7 @@ dependencies {
     implementation JakeWharton.timber
 
     implementation KotlinX.coroutines.core
+    implementation AndroidX.fragment.ktx
     implementation "androidx.webkit:webkit:_"
 
     testImplementation (KotlinX.coroutines.test) {

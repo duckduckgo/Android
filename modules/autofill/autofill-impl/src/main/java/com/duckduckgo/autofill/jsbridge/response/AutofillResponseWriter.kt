@@ -16,9 +16,9 @@
 
 package com.duckduckgo.autofill.jsbridge.response
 
+import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.autofill.jsbridge.response.AutofillAvailableInputTypesResponse.AvailableInputSuccessResponse
 import com.duckduckgo.autofill.jsbridge.response.AutofillDataResponse.CredentialSuccessResponse
-import com.duckduckgo.autofill.store.Credentials
 import com.squareup.moshi.Moshi
 
 class AutofillResponseWriter(val moshi: Moshi) {

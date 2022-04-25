@@ -35,7 +35,8 @@ class AutofillJavascriptInterface(
     private val autofillStore: AutofillStore,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    var callback: Callback? = null
 ) {
 
     var webView: WebView? = null
@@ -56,16 +57,11 @@ class AutofillJavascriptInterface(
 
             val credentials = autofillStore.getCredentials(url)
 
-            //todo - populate bottom sheet, let user select 1 of the (possibly) many retrieved credentials
-            //todo - hack for now
-
-            val creds = credentials.firstOrNull() ?: return@launch
-            autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(creds))
-
+            withContext(Dispatchers.Main) {
+                callback?.onCredentialsAvailable(credentials)
+            }
         }
     }
-
-
 
     /**
      * Requested from JS; requesting to know if we have autofill data saved.
@@ -91,6 +87,8 @@ class AutofillJavascriptInterface(
                 savedCredentials.isNotEmpty()
             }
 
+            Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
+
             val message = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable)
             autofillMessagePoster.postMessage(webView, message)
         }
@@ -105,6 +103,12 @@ class AutofillJavascriptInterface(
         }
     }
 
+    fun injectCredentials(credentials: Credentials) {
+        getAutofillDataJob += coroutineScope.launch {
+            autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(credentials))
+        }
+    }
+
     private suspend fun currentUrl(): String? {
         return withContext(Dispatchers.Main) {
             webView?.url
@@ -114,4 +118,5 @@ class AutofillJavascriptInterface(
     companion object {
         const val INTERFACE_NAME = "BrowserAutofill"
     }
+
 }

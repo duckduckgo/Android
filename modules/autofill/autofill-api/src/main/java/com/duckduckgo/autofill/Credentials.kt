@@ -16,17 +16,11 @@
 
 package com.duckduckgo.autofill
 
-import android.webkit.WebView
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
-interface BrowserAutofill {
-
-    fun isEnabled(): Boolean
-
-    fun addJsInterface(webView: WebView, callback: Callback)
-
-    fun injectCredentials(credentials: Credentials)
-}
-
-interface Callback {
-    fun onCredentialsAvailable(credentials: List<Credentials>)
-}
+@Parcelize
+data class Credentials(
+    val username: String,
+    val password: String
+) : Parcelable

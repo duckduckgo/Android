@@ -29,6 +29,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.webkit.WebViewAssetLoader
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
@@ -88,6 +89,7 @@ class BrowserWebViewClientTest {
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
     private val ampLinks: AmpLinks = mock()
+    private val assetLoader: WebViewAssetLoader = WebViewAssetLoader.Builder().build()
 
     @UiThreadTest
     @Before
@@ -110,7 +112,8 @@ class BrowserWebViewClientTest {
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
             accessibilitySettings,
-            ampLinks
+            ampLinks,
+            assetLoader
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)

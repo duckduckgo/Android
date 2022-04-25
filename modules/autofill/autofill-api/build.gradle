@@ -30,5 +30,8 @@ java {
 
 dependencies {
     implementation Kotlin.stdlib.jdk7
+    implementation project(path: ':common')
+    implementation project(path: ':common-ui')
+    implementation 'com.google.android.material:material:1.5.0'
 }
 

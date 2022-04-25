@@ -36,6 +36,3 @@ data class AutofillAvailableInputTypesResponse(
         val credentials: Boolean
     )
 }
-
-
-
