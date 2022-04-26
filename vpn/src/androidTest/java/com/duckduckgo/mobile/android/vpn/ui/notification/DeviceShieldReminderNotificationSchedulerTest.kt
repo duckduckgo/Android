@@ -109,7 +109,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsThenDailyReminderIsEnqueued() {
-        whenever(deviceShieldOnboardingStore.isVPNFeatureEnabled()).thenReturn(true)
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
         testee.onVpnStopped(TestScope(), SELF_STOP)
@@ -119,7 +119,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNStoppedBecauseFeatureWasRemovedThenNothingIsEnqueued() {
-        whenever(deviceShieldOnboardingStore.isVPNFeatureEnabled()).thenReturn(false)
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(true)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
@@ -130,7 +130,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsAndDailyReminderWasEnqueuedThenDailyReminderIsStillEnqueued() {
-        whenever(deviceShieldOnboardingStore.isVPNFeatureEnabled()).thenReturn(true)
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         enqueueDailyReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
@@ -141,7 +141,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsThenUndesiredReminderIsNotScheduled() {
-        whenever(deviceShieldOnboardingStore.isVPNFeatureEnabled()).thenReturn(true)
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
@@ -149,7 +149,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsAndUndesiredReminderWasScheduledThenUndesiredReminderIsNoLongerScheduled() {
-        whenever(deviceShieldOnboardingStore.isVPNFeatureEnabled()).thenReturn(true)
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         enqueueUndesiredReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
 
