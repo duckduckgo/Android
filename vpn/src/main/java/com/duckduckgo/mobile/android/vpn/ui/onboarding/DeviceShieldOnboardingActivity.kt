@@ -93,7 +93,7 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         }
 
         binding.onboardingSwitchLayout.setOnClickListener {
-            viewModel.onTurnAppTpOffOn()
+            viewModel.onTurnAppTpOn()
         }
     }
 

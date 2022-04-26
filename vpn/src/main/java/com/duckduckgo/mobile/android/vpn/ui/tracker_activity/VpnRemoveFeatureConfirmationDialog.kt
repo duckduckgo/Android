@@ -23,7 +23,7 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class AppTPRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
+class VpnRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
         fun OnRemoveFeatureDialogCancel()
@@ -70,10 +70,10 @@ class AppTPRemoveFeatureConfirmationDialog private constructor(private val liste
     }
     companion object {
 
-        const val TAG_APPTP_REMOVE_FEATURE_DIALOG = "AppTPRemoveFeatureDialog"
+        const val TAG_VPN_REMOVE_FEATURE_DIALOG = "VpnRemoveFeatureDialog"
 
-        fun instance(listener: Listener): AppTPRemoveFeatureConfirmationDialog {
-            return AppTPRemoveFeatureConfirmationDialog(listener)
+        fun instance(listener: Listener): VpnRemoveFeatureConfirmationDialog {
+            return VpnRemoveFeatureConfirmationDialog(listener)
         }
     }
 }

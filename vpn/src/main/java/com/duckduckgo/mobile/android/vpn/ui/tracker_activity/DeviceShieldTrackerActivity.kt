@@ -68,8 +68,8 @@ class DeviceShieldTrackerActivity :
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
     AppTPVpnConflictDialog.Listener,
-    AppTPRemoveFeatureConfirmationDialog.Listener,
-    AppTPPromoteAlwaysOnDialog.Listener {
+    AppTPPromoteAlwaysOnDialog.Listener,
+    VpnRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -248,10 +248,10 @@ class DeviceShieldTrackerActivity :
 
     private fun launchRemoveFeatureConfirmationDialog() {
         deviceShieldPixels.didShowRemoveTrackingProtectionFeatureDialog()
-        val dialog = AppTPRemoveFeatureConfirmationDialog.instance(this)
+        val dialog = VpnRemoveFeatureConfirmationDialog.instance(this)
         dialog.show(
             supportFragmentManager,
-            AppTPRemoveFeatureConfirmationDialog.TAG_APPTP_REMOVE_FEATURE_DIALOG
+            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG
         )
     }
 

@@ -54,14 +54,6 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val dispatcherProvider: DispatcherProvider
 ) : VpnFeatureRemover, WorkerInjectorPlugin {
 
-    // Disabling reminder notifications
-    // Disable daily / weekly notifications
-    // Remove CTA in New Tab
-    // Remove all app trackers blocked
-    // Remove app shortcut
-    // If manual removal
-    // Force users to complete AppTP Onboarding
-
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is VpnFeatureRemoverWorker) {
             worker.vpnFeatureRemover = this
@@ -77,7 +69,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
             disableNotificationReminders()
             removeNotificationChannels()
             deleteAllVpnTrackers()
-            disableFeature()
+            removeVPNFeature()
         }
     }
 
@@ -100,6 +92,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     private fun removeNotificationChannels() {
         notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_ALERTS_CHANNEL_ID)
+        notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_STATUS_CHANNEL_ID)
     }
 
     private fun resetAppTPOnboarding() {
@@ -107,11 +100,11 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
+        vpnDatabase.clearAllTables()
     }
 
-    private fun disableFeature() {
-        deviceShieldOnboarding.onFeatureDisabled()
+    private fun removeVPNFeature() {
+        deviceShieldOnboarding.removeVPNFeature()
     }
 
 }

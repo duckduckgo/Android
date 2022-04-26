@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -51,14 +52,15 @@ class DeviceShieldReminderNotificationSchedulerTest {
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var testee: DeviceShieldReminderNotificationScheduler
     private val notificationBuilder: DeviceShieldAlertNotificationBuilder = mock()
-
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore = mock()
     private val mockVpnReminderReceiverManager: VpnReminderReceiverManager = mock()
 
     @Before
     fun before() {
         initializeWorkManager()
         notificationManager = NotificationManagerCompat.from(context)
-        testee = DeviceShieldReminderNotificationScheduler(context, workManager, notificationManager, notificationBuilder)
+        testee =
+            DeviceShieldReminderNotificationScheduler(context, workManager, notificationManager, notificationBuilder, deviceShieldOnboardingStore)
         configureMockNotifications()
     }
 
@@ -107,6 +109,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsThenDailyReminderIsEnqueued() {
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
         testee.onVpnStopped(TestScope(), SELF_STOP)
@@ -115,7 +118,19 @@ class DeviceShieldReminderNotificationSchedulerTest {
     }
 
     @Test
+    fun whenVPNStoppedBecauseFeatureWasRemovedThenNothingIsEnqueued() {
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(true)
+
+        assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+
+        testee.onVpnStopped(TestScope(), SELF_STOP)
+
+        assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
+    }
+
+    @Test
     fun whenVPNManuallyStopsAndDailyReminderWasEnqueuedThenDailyReminderIsStillEnqueued() {
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         enqueueDailyReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
@@ -126,6 +141,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsThenUndesiredReminderIsNotScheduled() {
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreNotEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
@@ -133,6 +149,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
 
     @Test
     fun whenVPNManuallyStopsAndUndesiredReminderWasScheduledThenUndesiredReminderIsNoLongerScheduled() {
+        whenever(deviceShieldOnboardingStore.isVPNFeatureRemoved()).thenReturn(false)
         enqueueUndesiredReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_UNDESIRED_TAG)
 
