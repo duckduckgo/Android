@@ -25,17 +25,24 @@
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <!-- Settings -->
+    <style name="Widget.DuckDuckGo.SettingsOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 
     <!-- List Items -->
@@ -127,30 +134,11 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu">
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:textColor">@color/browser_menu_text</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/popupMenuItemHeight</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Icon">
-        <item name="android:tint">?attr/browserIconColorSelector</item>
-        <item name="android:layout_width">@dimen/popupMenuItemHeight</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text">
-        <item name="android:paddingEnd">@dimen/keyline_4</item>
-        <item name="android:paddingStart">@dimen/keyline_4</item>
-        <item name="android:gravity">center</item>
-        <item name="android:textAlignment">viewStart</item>
-        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Body1</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.BrowserPopupMenu.Text.CheckBox">
-        <item name="android:button">@null</item>
-        <item name="android:drawableEnd">?android:attr/listChoiceIndicatorMultiple</item>
-        <item name="android:paddingEnd">@dimen/keyline_2</item>
+    <style name="Widget.DuckDuckGo.NavigationalIcon">
+        <item name="android:background">@drawable/ripple_rectangle_rounded</item>
+        <item name="android:layout_width">@dimen/popupMenuNavigationItemSize</item>
+        <item name="android:layout_height">@dimen/popupMenuNavigationItemSize</item>
+        <item name="android:tint">@color/primary_icon_color_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Switch">
@@ -180,7 +168,7 @@
     <style name="Widget.DuckDuckGo.MenuItemView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingStart">@dimen/keyline_5</item>
+        <item name="android:paddingStart">20dp</item>
         <item name="android:paddingEnd">@dimen/keyline_5</item>
         <item name="android:paddingTop">@dimen/keyline_3</item>
         <item name="android:paddingBottom">@dimen/keyline_3</item>
@@ -254,7 +242,7 @@
         </item>
         <item name="searchHint">@string/searchbar_searchhint_default</item>
         <item name="upActionContentDescription">
-            @string/searhbar_upaction_content_description_default
+            @string/searchbar_upaction_content_description_default
         </item>
     </style>
 

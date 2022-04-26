@@ -28,7 +28,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataStats
+import com.duckduckgo.mobile.android.vpn.stats.DataStats
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

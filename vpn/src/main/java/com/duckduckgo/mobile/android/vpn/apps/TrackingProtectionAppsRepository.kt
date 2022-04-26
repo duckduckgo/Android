@@ -36,6 +36,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 
 interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps and information about its excluded state */
@@ -52,6 +53,9 @@ interface TrackingProtectionAppsRepository {
 
     /** Restore protection to the default list */
     suspend fun restoreDefaultProtectedList()
+
+    /** Returns if an app tracking attempts are being blocked or not */
+    suspend fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -80,7 +84,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
                             category = it.parseAppCategory(),
                             isExcluded = isExcluded,
                             knownProblem = hasKnownIssue(it, ddgExclusionList),
-                            userModifed = isUserModified(it.packageName, manualList)
+                            userModified = isUserModified(it.packageName, manualList)
                         )
                     }
                     .sortedBy { it.name.lowercase() }
@@ -109,10 +113,10 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
-        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverriden(appInfo)
+        return VpnExclusionList.isDdgApp(appInfo.packageName) || isSystemAppAndNotOverridden(appInfo)
     }
 
-    private fun isSystemAppAndNotOverriden(appInfo: ApplicationInfo): Boolean {
+    private fun isSystemAppAndNotOverridden(appInfo: ApplicationInfo): Boolean {
         return if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(appInfo.packageName)) {
             false
         } else {
@@ -130,7 +134,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             return false
         }
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
-            isSystemAppAndNotOverriden(appInfo) ||
+            isSystemAppAndNotOverridden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
     }
 
@@ -199,6 +203,23 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             appTrackerRepository.restoreDefaultProtectedList()
         }
+    }
+
+    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
+        Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
+        val appExclusionList = appTrackerRepository.getAppExclusionList()
+        val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
+
+        if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
+            return true
+        }
+
+        val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
+        if (userExcludedApp != null) {
+            return userExcludedApp.isProtected
+        }
+
+        return !appExclusionList.any { it.packageId == packageName }
     }
 
     companion object {

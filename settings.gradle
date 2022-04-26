@@ -1,5 +1,5 @@
 plugins {
-    id("de.fayard.refreshVersions") version "0.40.0"
+    id("de.fayard.refreshVersions") version "0.40.1"
 }
 
 include ':browser-api'
@@ -40,6 +40,10 @@ include ':macos-store'
 include ':bandwidth-impl'
 include ':bandwidth-store'
 
+include ':downloads-api'
+include ':downloads-impl'
+include ':downloads-store'
+
 include ':common-test'
 
 include ':anvil-compiler'
@@ -61,6 +65,10 @@ project(':remote-messaging-store').projectDir = new File('remote-messaging/remot
 project(':voice-search-api').projectDir = new File('voice-search/voice-search-api')
 project(':voice-search-impl').projectDir = new File('voice-search/voice-search-impl')
 project(':voice-search-store').projectDir = new File('voice-search/voice-search-store')
+
+project(':downloads-api').projectDir = new File('downloads/downloads-api')
+project(':downloads-impl').projectDir = new File('downloads/downloads-impl')
+project(':downloads-store').projectDir = new File('downloads/downloads-store')
 
 project(':traces-api').projectDir = new File('traces/traces-api')
 project(':traces-impl').projectDir = new File('traces/traces-impl')

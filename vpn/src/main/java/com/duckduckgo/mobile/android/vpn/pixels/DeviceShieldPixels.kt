@@ -268,11 +268,11 @@ interface DeviceShieldPixels {
      */
     fun didShowVpnConflictDialog()
 
-    fun didChooseToDismissVpnConflicDialog()
+    fun didChooseToDismissVpnConflictDialog()
 
-    fun didChooseToOpenSettingsFromVpnConflicDialog()
+    fun didChooseToOpenSettingsFromVpnConflictDialog()
 
-    fun didChooseToContinueFromVpnConflicDialog()
+    fun didChooseToContinueFromVpnConflictDialog()
 
     /**
      * Will fire when the waitlist dialog is showed to the user
@@ -305,7 +305,7 @@ interface DeviceShieldPixels {
     fun sendUnknownPacketProtocol(protocol: Int)
 
     /**
-     * Will fire when the VPN detected bad health, restarted and fixex the bad health
+     * Will fire when the VPN detected bad health, restarted and fixed the bad health
      */
     fun badHealthResolvedByRestart(data: Map<String, String>)
 
@@ -335,14 +335,17 @@ interface DeviceShieldPixels {
     fun didShowExclusionListActivity()
 
     /**
-     * Will fire when the user wants to open the Exclusion List Activity from the Trackers Screen
+     * Will fire when the user wants to open the Exclusion List Activity from the Manage Recent Apps Protection Screen
      */
-    fun didOpenExclusionListActivityFromTrackersScreen()
+    fun didOpenExclusionListActivityFromManageAppsProtectionScreen()
 
     /**
      * Will fire when the user opens the Company Trackers Screen
      */
     fun didOpenCompanyTrackersScreen()
+
+    /** Will fire when the user launches the Recent App Settings Screen */
+    fun didOpenManageRecentAppSettings()
 
 }
 
@@ -626,17 +629,17 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToDismissVpnConflicDialog() {
+    override fun didChooseToDismissVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToOpenSettingsFromVpnConflicDialog() {
+    override fun didChooseToOpenSettingsFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToContinueFromVpnConflicDialog() {
+    override fun didChooseToContinueFromVpnConflictDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
     }
@@ -699,16 +702,22 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY)
     }
 
-    override fun didOpenExclusionListActivityFromTrackersScreen() {
+    override fun didOpenExclusionListActivityFromManageAppsProtectionScreen() {
         tryToFireUniquePixel(
-            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_UNIQUE,
+            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_UNIQUE,
             tag = FIRST_OPEN_ENTRY_POINT_TAG
         )
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_TRACKERS)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION)
     }
 
     override fun didOpenCompanyTrackersScreen() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun didOpenManageRecentAppSettings() {
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)

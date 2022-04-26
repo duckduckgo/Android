@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
@@ -25,6 +24,7 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTrackerCompanySignal
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -43,15 +43,18 @@ class AppTPCompanyTrackersViewModelTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    private val repository = mock<AppTrackerBlockingStatsRepository>()
+    private val statsRepository = mock<AppTrackerBlockingStatsRepository>()
+    private val appsRepository = mock<TrackingProtectionAppsRepository>()
+    private val timeDiffFormatter = mock<TimeDiffFormatter>()
 
     private lateinit var viewModel: AppTPCompanyTrackersViewModel
 
     @Before
     fun setup() {
         viewModel = AppTPCompanyTrackersViewModel(
-            repository,
-            TimeDiffFormatter(InstrumentationRegistry.getInstrumentation().targetContext),
+            statsRepository,
+            appsRepository,
+            timeDiffFormatter,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -64,10 +67,12 @@ class AppTPCompanyTrackersViewModelTest {
 
         val someTrackers = someTrackers()
 
-        whenever(repository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
-        viewModel.getTrackersForAppFromDate(date, packageName).test {
+        whenever(statsRepository.getTrackersForAppFromDate(packageName, date)).thenReturn(getTrackersFlow(someTrackers))
+        viewModel.viewState().test {
             Assert.assertEquals(someTrackers, awaitItem())
         }
+
+        viewModel.loadData(date, packageName)
     }
 
     private fun getTrackersFlow(trackers: List<VpnTrackerCompanySignal>): Flow<List<VpnTrackerCompanySignal>> = flow {
@@ -77,7 +82,6 @@ class AppTPCompanyTrackersViewModelTest {
     }
 
     private fun someTrackers(): List<VpnTrackerCompanySignal> {
-
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
         val domain: String = "example.com"
         val trackerCompanyId: Int = -1
