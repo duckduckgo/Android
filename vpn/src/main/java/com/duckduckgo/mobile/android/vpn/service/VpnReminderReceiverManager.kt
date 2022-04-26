@@ -24,7 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import timber.log.Timber
 import javax.inject.Inject
 

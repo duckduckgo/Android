@@ -38,7 +38,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -110,21 +110,17 @@ class NetworkTypeCollector @Inject constructor(
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
+            vpnPreferences.isPrivateDnsEnabled = if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && context.isPrivateDnsActive()) {
                 Timber.v(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
                     context.getPrivateDnsServerName(),
                     runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
                 )
-
-                vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
-                    context.getPrivateDnsServerName()
-                } else {
-                    null
-                }
+                true
             } else {
-                Timber.d("Private DNS support is disabled...skip")
+                Timber.v("Private DNS support is disabled or not set")
+                false
             }
         }
     }
