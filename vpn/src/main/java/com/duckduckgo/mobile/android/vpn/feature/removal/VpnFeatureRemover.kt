@@ -16,9 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.feature.removal
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.ListenableWorker
 import androidx.work.WorkManager
@@ -28,7 +25,6 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
-import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.notification.AndroidDeviceShieldAlertNotificationBuilder
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_DAILY_NOTIFICATION_ID
@@ -73,7 +69,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
             disableNotificationReminders()
             removeNotificationChannels()
             deleteAllVpnTrackers()
-            disableFeature()
+            removeVPNFeature()
         }
     }
 
@@ -107,8 +103,8 @@ class DefaultVpnFeatureRemover @Inject constructor(
         vpnDatabase.clearAllTables()
     }
 
-    private fun disableFeature() {
-        deviceShieldOnboarding.disableVPNFeature()
+    private fun removeVPNFeature() {
+        deviceShieldOnboarding.removeVPNFeature()
     }
 
 }

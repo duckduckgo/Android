@@ -58,9 +58,9 @@ class PrivacyReportViewModel @Inject constructor(
         }
     }
 
-    private fun shouldShowCTA(): Boolean{
-        if (deviceShieldOnboarding.isVPNFeatureEnabled()){
-            return true
+    private fun shouldShowCTA(): Boolean {
+        if (deviceShieldOnboarding.isVPNFeatureRemoved()) {
+            return false
         } else {
             return deviceShieldOnboarding.didShowOnboarding()
         }
