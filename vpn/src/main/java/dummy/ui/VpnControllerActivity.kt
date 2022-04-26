@@ -22,7 +22,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -45,7 +44,6 @@ import kotlinx.coroutines.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
-import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
@@ -91,8 +89,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         configureUiHandlers()
 
         subscribeForViewUpdates()
-
-        reconfigureTimber(viewModel.getDebugLoggingPreference())
     }
 
     private fun subscribeForViewUpdates() {
@@ -183,17 +179,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
                 uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT
             )
                 .show()
-        }
-    }
-
-    private fun reconfigureTimber(debugLoggingEnabled: Boolean) {
-        if (debugLoggingEnabled) {
-            Timber.uprootAll()
-            Timber.plant(Timber.DebugTree())
-            Timber.w("Logging Started")
-        } else {
-            Timber.w("Logging Ended")
-            Timber.uprootAll()
         }
     }
 
@@ -319,17 +304,9 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         }
     }
 
-    private sealed class VpnPermissionStatus {
-        object Granted : VpnPermissionStatus()
-        data class Denied(val intent: Intent) : VpnPermissionStatus()
-    }
-
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, VpnControllerActivity::class.java)
         }
-
-        private const val RC_REQUEST_VPN_PERMISSION = 100
-        val FEEDBACK_URL = "https://form.asana.com?k=j2t0mHOc9nMVTDqg5OHPJw&d=137249556945".toUri()
     }
 }
