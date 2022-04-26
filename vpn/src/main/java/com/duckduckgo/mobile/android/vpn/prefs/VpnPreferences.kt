@@ -27,11 +27,11 @@ class VpnPreferences @Inject constructor(
     private val applicationContext: Context,
 ) {
 
-    var privateDns: String?
-        get() = preferences.getString("private_dns", null)
-        set(value) = preferences.edit { putString("private_dns", value) }
+    var isPrivateDnsEnabled: Boolean
+        get() = preferences.getBoolean(PRIVATE_DNS_ENABLED, false)
+        set(value) = preferences.edit { putBoolean(PRIVATE_DNS_ENABLED, value) }
 
-    fun isPrivateDnsKey(key: String) = key == "private_dns"
+    fun isPrivateDnsKey(key: String) = key == PRIVATE_DNS_ENABLED
 
     fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
         preferences.registerOnSharedPreferenceChangeListener(listener)
@@ -47,8 +47,9 @@ class VpnPreferences @Inject constructor(
     companion object {
 
         @VisibleForTesting
-        const val PREFS_FILENAME = "VpnDummySettings"
+        const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.prefs"
 
+        private const val PRIVATE_DNS_ENABLED = "private_dns_enabled"
         const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"
     }
 }

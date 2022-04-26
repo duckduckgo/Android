@@ -25,6 +25,7 @@ import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
@@ -311,12 +312,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         // Android Private DNS (added by the user)
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
-            vpnPreferences.privateDns?.let { privateDnsName ->
-                runCatching {
-                    InetAddress.getAllByName(privateDnsName)
-                }.getOrNull()?.run { dns.addAll(this) }
-            }
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled) {
+            runCatching {
+                InetAddress.getAllByName(applicationContext.getPrivateDnsServerName())
+            }.getOrNull()?.run { dns.addAll(this) }
         }
 
         // This is purely internal, never to go to production
