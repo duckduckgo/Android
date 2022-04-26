@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -69,7 +68,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
-        if (vpnStore.isFeatureEnabled()) {
+        if (vpnStore.isVPNFeatureRemoved()) {
             Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
         } else {
             Timber.d("VPN Manually stopped, showing disabled notification")

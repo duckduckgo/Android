@@ -28,9 +28,9 @@ interface VpnStore {
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
 
-    fun onFeatureEnabled()
-    fun onFeatureDisabled()
-    fun isFeatureEnabled(): Boolean
+    fun enableVPNFeature()
+    fun removeVPNFeature()
+    fun isVPNFeatureRemoved(): Boolean
 
     fun resetAppTPManuallyEnablesCounter()
     fun onAppTPManuallyEnabled()
@@ -64,17 +64,17 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
     }
 
-    override fun onFeatureEnabled() {
+    override fun enableVPNFeature() {
         onboardingDidShow()
-        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, true) }
+        preferences.edit { putBoolean(KEY_VPN_FEATURE_REMOVED, false) }
     }
 
-    override fun onFeatureDisabled() {
-        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false) }
+    override fun removeVPNFeature() {
+        preferences.edit { putBoolean(KEY_VPN_FEATURE_REMOVED, true) }
     }
 
-    override fun isFeatureEnabled(): Boolean {
-        return preferences.getBoolean(KEY_DEVICE_SHIELD_FEATURE_ENABLED, false)
+    override fun isVPNFeatureRemoved(): Boolean {
+        return preferences.getBoolean(KEY_VPN_FEATURE_REMOVED, false)
     }
 
     override fun resetAppTPManuallyEnablesCounter() {
@@ -110,7 +110,7 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_DEVICE_SHIELD_FEATURE_ENABLED = "KEY_DEVICE_SHIELD_FEATURE_ENABLED"
+        private const val KEY_VPN_FEATURE_REMOVED = "KEY_VPN_FEATURE_REMOVED"
 
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"

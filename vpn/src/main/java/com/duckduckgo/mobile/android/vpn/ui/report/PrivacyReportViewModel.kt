@@ -34,7 +34,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val deviceShieldOnboarding: VpnStore,
+    private val vpnStore: VpnStore,
     private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
@@ -59,10 +59,10 @@ class PrivacyReportViewModel @Inject constructor(
     }
 
     private fun shouldShowCTA(): Boolean {
-        if (deviceShieldOnboarding.isVPNFeatureRemoved()) {
+        if (vpnStore.isVPNFeatureRemoved()) {
             return false
         } else {
-            return deviceShieldOnboarding.didShowOnboarding()
+            return vpnStore.didShowOnboarding()
         }
     }
 
