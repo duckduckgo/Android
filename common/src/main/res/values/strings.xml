@@ -18,4 +18,6 @@
     <string name="common_Today">Today</string>
     <string name="common_Yesterday">Yesterday</string>
     <string name="common_DaysAgo">%d days ago</string>
+    <string name="common_PastWeek">Past Week</string>
+    <string name="common_PastMonth">Past Month</string>
 </resources>

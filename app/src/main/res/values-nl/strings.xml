@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Afbeelding downloaden</string>
     <string name="permissionRequiredToDownload">Voor downloaden is opslagtoestemming vereist</string>
-    <string name="downloadComplete">Download voltooid</string>
-    <string name="downloadFailed">Downloaden mislukt</string>
-    <string name="downloadInProgress">Aan het downloaden</string>
 
     <!-- Sharing options -->
     <string name="options">Opties</string>
@@ -337,8 +334,6 @@
     <string name="noThanks">Nee, bedankt</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Bestand aan het downloaden</string>
-    <string name="notificationChannelFileDownloaded">Bestand gedownload</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
@@ -699,9 +694,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privacybeleid</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Downloaden mislukt. Controleer uw internetverbinding.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget toegevoegd aan startscherm</string>

@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Scarica immagine</string>
     <string name="permissionRequiredToDownload">Il download richiede l\'autorizzazione di archiviazione</string>
-    <string name="downloadComplete">Download completato</string>
-    <string name="downloadFailed">Download non riuscito</string>
-    <string name="downloadInProgress">Download in corso</string>
 
     <!-- Sharing options -->
     <string name="options">Opzioni</string>
@@ -337,8 +334,6 @@
     <string name="noThanks">No, grazie</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Download del file in corso</string>
-    <string name="notificationChannelFileDownloaded">Il file è stato scaricato</string>
     <string name="notificationChannelTutorials">Tutorial</string>
 
     <!-- Clear Notification -->
@@ -699,9 +694,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Normativa sulla privacy</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Download non riuscito. Controlla la connessione a Internet.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Aggiungi %1$s widget alla schermata iniziale</string>
