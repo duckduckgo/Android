@@ -140,6 +140,17 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
+    fun whenUserConfirmsToRemoveAllThenEntitiesRemovedAndViewStateUpdated() {
+        fireproofWebsiteDao.insert(FireproofWebsiteEntity("domain.com"))
+        fireproofWebsiteDao.insert(FireproofWebsiteEntity("domain2.com"))
+
+        viewModel.removeAllWebsites()
+
+        verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
+        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
+    }
+
+    @Test
     fun whenUserConfirmsToDeleteThenPixelSent() {
         givenFireproofWebsiteDomain("domain.com")
 
@@ -187,10 +198,18 @@ class FireproofWebsitesViewModelTest {
 
     @Test
     fun whenUserUndosDeleteFireproofThenSiteIsAddedBack() {
-
         val entity = FireproofWebsiteEntity("domain.com")
 
         viewModel.onSnackBarUndoFireproof(entity)
+
+        verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
+        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
+    }
+
+    @Test
+    fun whenUserUndosRemoveAllFireproofSitesThenSitesAreAddedBack() {
+        givenFireproofWebsiteDomain("domain.com")
+        viewModel.onSnackBarUndoRemoveAllWebsites()
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
