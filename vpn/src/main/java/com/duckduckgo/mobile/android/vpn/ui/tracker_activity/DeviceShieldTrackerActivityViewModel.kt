@@ -30,6 +30,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -44,7 +45,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
-    private val vpnFeatureRemover: VpnFeatureRemover,
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -134,7 +135,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
-        vpnFeatureRemover.manuallyRemoveFeature()
+        deviceShieldOnboardingStore.removeVPNFeature()
         viewModelScope.launch {
             command.send(Command.StopVPN)
             command.send(Command.CloseScreen)

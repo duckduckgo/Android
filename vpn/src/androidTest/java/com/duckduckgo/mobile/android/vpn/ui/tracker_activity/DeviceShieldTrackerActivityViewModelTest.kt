@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -72,7 +73,7 @@ class DeviceShieldTrackerActivityViewModelTest {
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
-    private val featureRemover = mock<VpnFeatureRemover>()
+    private val deviceShieldOnboardingStore = mock<DeviceShieldOnboardingStore>()
     private val workManager = mock<WorkManager>()
 
     @Before
@@ -97,7 +98,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             appTrackerBlockingStatsRepository,
             vpnStateMonitor,
             vpnDetector,
-            featureRemover,
+            deviceShieldOnboardingStore,
             CoroutineTestRule().testDispatcherProvider
         )
     }

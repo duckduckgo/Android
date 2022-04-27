@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ import javax.inject.Inject
     boundType = VpnServiceCallbacks::class
 )
 class FeatureRemoverVpnStateListener @Inject constructor(
-    private val workManager: WorkManager,
+    private val workManager: WorkManager
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
