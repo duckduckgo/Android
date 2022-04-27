@@ -38,7 +38,7 @@ class ReportBreakageAppListViewModel @Inject constructor(
     internal fun commands(): Flow<ReportBreakageAppListView.Command> = command.receiveAsFlow()
 
     internal suspend fun getInstalledApps(): Flow<ReportBreakageAppListView.State> {
-        return trackingProtectionAppsRepository.getProtectedApps()
+        return trackingProtectionAppsRepository.getAppsAndProtectionInfo()
             .combine(selectedAppFlow.asStateFlow()) { apps, selectedApp ->
                 val installedApps = apps.map { InstalledApp(it.packageName, it.name) }
                 selectedApp?.let { appSelected ->

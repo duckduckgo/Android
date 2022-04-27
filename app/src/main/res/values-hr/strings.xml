@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Preuzmi sliku</string>
     <string name="permissionRequiredToDownload">Preuzimanje zahtijeva dozvolu za pohranu</string>
-    <string name="downloadComplete">Preuzimanje dovršeno</string>
-    <string name="downloadFailed">Preuzimanje nije uspjelo</string>
-    <string name="downloadInProgress">Preuzimanje</string>
 
     <!-- Sharing options -->
     <string name="options">Opcije</string>
@@ -344,8 +341,6 @@
     <string name="noThanks">Ne, hvala</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Preuzimanje datoteke</string>
-    <string name="notificationChannelFileDownloaded">Datoteka preuzeta</string>
     <string name="notificationChannelTutorials">Vodiči</string>
 
     <!-- Clear Notification -->
@@ -714,9 +709,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Pravila o zaštiti privatnosti</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Preuzimanje nije uspjelo. Provjerite internetsku vezu.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget dodan na početni zaslon</string>

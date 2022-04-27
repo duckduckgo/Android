@@ -30,11 +30,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class ManuallyEnableAppProtectionDialog : DialogFragment() {
 
     interface ManuallyEnableAppsProtectionDialogListener {
-        fun onAppProtectionEnabled(
-            packageName: String,
-            excludingReason: Int
-        )
-
+        fun onAppProtectionEnabled(packageName: String)
         fun onDialogSkipped(position: Int)
     }
 
@@ -115,7 +111,7 @@ class ManuallyEnableAppProtectionDialog : DialogFragment() {
     ) {
         enableCTA.setOnClickListener {
             dismiss()
-            listener.onAppProtectionEnabled(getPackageName(), getExcludingReason())
+            listener.onAppProtectionEnabled(getPackageName())
         }
         skipCTA.setOnClickListener {
             dismiss()

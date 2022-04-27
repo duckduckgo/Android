@@ -25,17 +25,24 @@
         <item name="colorControlNormal">?attr/toolbarIconColor</item>
         <item name="android:textColorPrimary">?attr/toolbarTextColor</item>
         <item name="colorControlHighlight">@color/subtleGrayTwo</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.ToolbarTheme.Green">
-        <item name="colorAccent">@color/cornflowerGreen</item>
-        <item name="colorControlActivated">@color/cornflowerGreen</item>
+        <item name="colorAccent">@color/cornflowerBlue</item>
+        <item name="colorControlActivated">@color/cornflowerBlue</item>
         <item name="colorSwitchThumbNormal">@color/white</item>
         <item name="android:colorForeground">?attr/settingsSwitchBackgroundColor</item>
     </style>
 
     <style name="Widget.DuckDuckGo.PopUpOverflowMenu" parent="@style/Widget.MaterialComponents.PopupMenu.Overflow">
         <item name="android:popupBackground">@drawable/popup_menu_bg</item>
+    </style>
+
+    <!-- Settings -->
+    <style name="Widget.DuckDuckGo.SettingsOption">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingStart">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:background">?selectableItemBackground</item>
     </style>
 
     <!-- List Items -->
