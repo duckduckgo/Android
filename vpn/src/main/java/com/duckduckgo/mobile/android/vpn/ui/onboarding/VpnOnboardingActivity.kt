@@ -46,7 +46,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Listener {
+class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -245,7 +245,7 @@ class DeviceShieldOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDia
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
         fun intent(context: Context): Intent {
-            return Intent(context, DeviceShieldOnboardingActivity::class.java)
+            return Intent(context, VpnOnboardingActivity::class.java)
         }
     }
 }

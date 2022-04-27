@@ -21,7 +21,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
+    tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity">
 
     <ScrollView
         android:layout_width="match_parent"
