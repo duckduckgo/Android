@@ -260,6 +260,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
             verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -273,6 +274,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
             verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+            cancelAndConsumeRemainingEvents()
         }
     }
 
@@ -286,6 +288,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             viewModel.onVPNPermissionResult(AppCompatActivity.RESULT_OK)
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.LaunchVPN, expectMostRecentItem())
             verify(vpnStore, times(0)).resetAppTPManuallyEnablesCounter()
+            cancelAndConsumeRemainingEvents()
         }
     }
 
