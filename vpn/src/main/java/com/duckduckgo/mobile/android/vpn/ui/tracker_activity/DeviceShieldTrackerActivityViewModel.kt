@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -151,7 +150,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             }
         }
     }
-    
+
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
         vpnFeatureRemover.manuallyRemoveFeature()
@@ -165,9 +164,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         vpnStore.onForgetPromoteAlwaysOn()
         onAppTPToggleSwitched(true)
     }
-
-    internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
-    internal fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
 
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
