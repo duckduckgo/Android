@@ -22,11 +22,9 @@ import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -36,7 +34,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 import org.mockito.kotlin.mock
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -44,7 +42,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDateTime
 import kotlin.time.ExperimentalTime
 
@@ -62,7 +59,7 @@ class PrivacyReportViewModelTest {
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val appBuildConfig: AppBuildConfig = mock()
-    private val onboardingStore = mock<VpnStore>()
+    private val vpnStore = mock<VpnStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -74,14 +71,12 @@ class PrivacyReportViewModelTest {
     fun before() {
         prepareDb()
 
-        whenever(appBuildConfig.isDebug).thenReturn(true)
-
         repository = RealAppTrackerBlockingStatsRepository(db)
 
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        vpnPreferences = VpnPreferences(context, appBuildConfig)
+        vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, onboardingStore, vpnStateMonitor)
+        testee = PrivacyReportViewModel(repository, vpnStore, vpnStateMonitor)
     }
 
     private fun prepareDb() {

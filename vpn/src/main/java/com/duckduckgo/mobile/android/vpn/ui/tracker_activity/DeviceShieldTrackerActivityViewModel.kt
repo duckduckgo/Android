@@ -43,7 +43,6 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
@@ -152,7 +151,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
             }
         }
     }
-
+    
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
         vpnFeatureRemover.manuallyRemoveFeature()
