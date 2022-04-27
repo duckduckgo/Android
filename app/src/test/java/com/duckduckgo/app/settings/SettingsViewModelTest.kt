@@ -33,6 +33,8 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.Variant
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.VariantManager.Companion
+import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
@@ -584,9 +586,9 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
-
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
             whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
@@ -599,9 +601,9 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
-
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
             whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
@@ -614,9 +616,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
         testee.commands().test {
 
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
 
             testee.onAppTPSettingClicked()
@@ -628,9 +631,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
 
             testee.onAppTPSettingClicked()
@@ -642,14 +646,43 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(appTPRepository.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
 
             testee.onAppTPSettingClicked()
 
             assertEquals(Command.LaunchAppTPWaitlist, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInAppTPRetentionStudyAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+        testee.commands().test {
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
+
+            testee.onAppTPSettingClicked()
+
+            assertEquals(Command.LaunchAppTPTrackersScreen, expectMostRecentItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInAppTPRetentionStudyAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+        testee.commands().test {
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
+
+            testee.onAppTPSettingClicked()
+
+            assertEquals(Command.LaunchAppTPOnboarding, expectMostRecentItem())
 
             cancelAndConsumeRemainingEvents()
         }

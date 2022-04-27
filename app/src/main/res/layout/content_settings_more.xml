@@ -42,7 +42,7 @@
         app:pillTitle="@string/settingsEmailProtectionTitle" />
 
     <com.duckduckgo.app.settings.SettingsPillWithSubtitle
-        android:id="@+id/deviceShieldSetting"
+        android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"

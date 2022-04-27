@@ -166,7 +166,7 @@ class SettingsActivity :
 
         with(viewsMore) {
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
-            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            vpnSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
     }
 
@@ -320,12 +320,12 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    vpnSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
                 }
             }
         }
