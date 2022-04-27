@@ -66,7 +66,6 @@ import com.duckduckgo.mobile.android.vpn.health.UserHealthSubmission
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.moshi.Moshi
 import dagger.android.AndroidInjection
@@ -102,8 +101,6 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
     @Inject lateinit var repository: AppTrackerBlockingStatsRepository
 
     @Inject lateinit var healthMetricCounter: HealthMetricCounter
-
-    @Inject lateinit var vpnQueues: VpnQueues
 
     @Inject lateinit var appTPHealthMonitor: AppTPHealthMonitor
 

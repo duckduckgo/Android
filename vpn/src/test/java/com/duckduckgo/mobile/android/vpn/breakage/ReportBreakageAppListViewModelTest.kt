@@ -76,7 +76,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndNoInstalledAppsThenEmitNoItem() = runTest {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             expectNoEvents()
         }
@@ -84,7 +84,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             protectedAppsChannel.send(listOf(appWithoutIssues))
             assertEquals(
@@ -99,7 +99,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndSelectedAppThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = appWithIssues.packageName, name = appWithIssues.name))
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))
@@ -116,7 +116,7 @@ class ReportBreakageAppListViewModelTest {
 
     @Test
     fun whenGetInstalledAppsAndUnknownSelectedAppThenEmitState() = runTest {
-        whenever(trackingProtectionAppsRepository.getProtectedApps()).thenReturn(protectedAppsChannel.receiveAsFlow())
+        whenever(trackingProtectionAppsRepository.getAppsAndProtectionInfo()).thenReturn(protectedAppsChannel.receiveAsFlow())
         viewModel.getInstalledApps().test {
             viewModel.onAppSelected(InstalledApp(packageName = "unknown.package.name", name = appWithIssues.name))
             protectedAppsChannel.send(listOf(appWithoutIssues, appWithIssues))

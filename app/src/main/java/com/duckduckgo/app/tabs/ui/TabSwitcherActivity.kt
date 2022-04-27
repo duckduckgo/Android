@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -196,6 +197,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.fire -> onFire()
             R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
+            R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
         }
         return super.onOptionsItemSelected(item)
@@ -267,6 +269,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 viewModel.onTabDeleted(it)
             }
         }
+    }
+
+    private fun showDownloads() {
+        startActivity(DownloadsActivity.intent(this))
     }
 
     private fun showSettings() {

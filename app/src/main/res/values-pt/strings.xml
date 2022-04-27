@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Transferir imagem</string>
     <string name="permissionRequiredToDownload">A transferência requer permissão de armazenamento</string>
-    <string name="downloadComplete">Transferência concluída</string>
-    <string name="downloadFailed">Falha na transferência</string>
-    <string name="downloadInProgress">A transferir</string>
 
     <!-- Sharing options -->
     <string name="options">Opções</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Não, obrigado</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">A transferir ficheiro</string>
-    <string name="notificationChannelFileDownloaded">Ficheiro transferido</string>
     <string name="notificationChannelTutorials">Tutoriais</string>
 
     <!-- Clear Notification -->
@@ -698,9 +693,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Política de Privacidade</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Ocorreu uma falha na transferência. Verifique a ligação à Internet.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget adicionado ao ecrã inicial</string>
