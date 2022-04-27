@@ -16,11 +16,9 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
@@ -38,7 +36,6 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.take
@@ -67,15 +64,12 @@ class DeviceShieldTrackerActivityViewModelTest {
     private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
     private lateinit var viewModel: DeviceShieldTrackerActivityViewModel
     private lateinit var defaultTracker: VpnTracker
-    private lateinit var vpnPreferences: VpnPreferences
 
     @Mock private lateinit var appBuildConfig: AppBuildConfig
 
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
-
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Before
     fun setup() {
@@ -93,14 +87,9 @@ class DeviceShieldTrackerActivityViewModelTest {
             domain = "doubleclick.net"
         )
 
-        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        vpnPreferences = VpnPreferences(context, appBuildConfig)
-
         appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
         viewModel = DeviceShieldTrackerActivityViewModel(
-            InstrumentationRegistry.getInstrumentation().context,
             deviceShieldPixels,
-            vpnPreferences,
             appTrackerBlockingStatsRepository,
             vpnStateMonitor,
             vpnDetector,
