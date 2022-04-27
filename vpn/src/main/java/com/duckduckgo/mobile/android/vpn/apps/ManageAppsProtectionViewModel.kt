@@ -57,14 +57,16 @@ class ManageAppsProtectionViewModel @Inject constructor(
 
     private val defaultTimeWindow = TimeWindow(5, DAYS)
 
-    internal suspend fun getProtectedApps() = excludedApps.getProtectedApps().map { ViewState(it) }
+    internal suspend fun getProtectedApps() = excludedApps.getAppsAndProtectionInfo().map { ViewState(it) }
 
     internal suspend fun getRecentApps() =
         appTrackersRepository.getMostRecentVpnTrackers { defaultTimeWindow.asString() }.map { aggregateDataPerApp(it) }
-            .combine(excludedApps.getProtectedApps()) { recentAppsBlocked, protectedApps ->
+            .combine(excludedApps.getAppsAndProtectionInfo()) { recentAppsBlocked, protectedApps ->
                 recentAppsBlocked.map {
-                    protectedApps.first { protectedApp -> protectedApp.packageName == it.packageId }
-                }.take(5)
+                    protectedApps.firstOrNull { protectedApp -> protectedApp.packageName == it.packageId }
+                }
+                    .filterNotNull()
+                    .take(5)
             }.map { ViewState(it) }
             .onStart { pixel.didShowExclusionListActivity() }
             .flowOn(dispatcherProvider.io())
