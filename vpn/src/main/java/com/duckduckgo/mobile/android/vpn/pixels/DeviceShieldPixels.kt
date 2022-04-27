@@ -347,6 +347,14 @@ interface DeviceShieldPixels {
     /** Will fire when the user launches the Recent App Settings Screen */
     fun didOpenManageRecentAppSettings()
 
+    /**
+     * Will fire when the user wants to remove the VPN feature all together
+     */
+    fun didShowRemoveTrackingProtectionFeatureDialog()
+
+    fun didChooseToRemoveTrackingProtectionFeature()
+
+    fun didChooseToCancelRemoveTrakcingProtectionDialog()
 }
 
 @ContributesBinding(AppScope::class)
@@ -721,6 +729,22 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun didShowRemoveTrackingProtectionFeatureDialog() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG)
+    }
+
+    override fun didChooseToRemoveTrackingProtectionFeature() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didChooseToCancelRemoveTrakcingProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG)
     }
 
     private fun suddenKill() {

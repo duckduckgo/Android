@@ -39,7 +39,7 @@ class PrivacyReportViewModel @Inject constructor(
 ) : ViewModel(), LifecycleObserver {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow().combine(getReport()) { vpnState, trackersBlocked ->
-        PrivacyReportView.ViewState(vpnState, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
+        PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())
     }
 
     @VisibleForTesting
@@ -58,11 +58,19 @@ class PrivacyReportViewModel @Inject constructor(
         }
     }
 
+    private fun shouldShowCTA(): Boolean {
+        if (deviceShieldOnboarding.isVPNFeatureRemoved()) {
+            return false
+        } else {
+            return deviceShieldOnboarding.didShowOnboarding()
+        }
+    }
+
     object PrivacyReportView {
         data class ViewState(
             val vpnState: VpnState,
             val trackersBlocked: TrackersBlocked,
-            val onboardingComplete: Boolean
+            val isFeatureEnabled: Boolean
         )
 
         data class TrackersBlocked(

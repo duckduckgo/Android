@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +45,8 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val context: Context,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
+    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -66,10 +68,15 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
-        Timber.d("VPN Manually stopped, showing disabled notification")
-        showImmediateReminderNotification()
-        cancelUndesiredStopReminderAlarm()
-        scheduleReminderForTomorrow()
+        if (deviceShieldOnboardingStore.isVPNFeatureRemoved()) {
+            Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
+        } else {
+            Timber.d("VPN Manually stopped, showing disabled notification")
+            showImmediateReminderNotification()
+            cancelUndesiredStopReminderAlarm()
+            scheduleReminderForTomorrow()
+        }
+
     }
 
     private fun onVPNRevoked() {

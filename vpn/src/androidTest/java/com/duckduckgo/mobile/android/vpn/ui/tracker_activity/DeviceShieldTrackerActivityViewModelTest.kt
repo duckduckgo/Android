@@ -21,9 +21,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
@@ -70,6 +72,8 @@ class DeviceShieldTrackerActivityViewModelTest {
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
+    private val featureRemover = mock<VpnFeatureRemover>()
+    private val workManager = mock<WorkManager>()
 
     @Before
     fun setup() {
@@ -93,6 +97,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             appTrackerBlockingStatsRepository,
             vpnStateMonitor,
             vpnDetector,
+            featureRemover,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -201,7 +206,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         whenever(vpnDetector.isVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
