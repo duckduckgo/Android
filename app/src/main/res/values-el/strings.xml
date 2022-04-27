@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Λήψη εικόνας</string>
     <string name="permissionRequiredToDownload">Η λήψη απαιτεί άδεια αποθήκευσης</string>
-    <string name="downloadComplete">Η λήψη ολοκληρώθηκε</string>
-    <string name="downloadFailed">Αποτυχία λήψης</string>
-    <string name="downloadInProgress">Λήψη…</string>
 
     <!-- Sharing options -->
     <string name="options">Επιλογές</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Όχι, ευχαριστώ</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Λήψη αρχείου</string>
-    <string name="notificationChannelFileDownloaded">Έγινε λήψη του αρχείου</string>
     <string name="notificationChannelTutorials">Προγράμματα εκμάθησης</string>
 
     <!-- Clear Notification -->
@@ -697,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Πολιτική προστασίας προσωπικών δεδομένων</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Αποτυχία λήψης. Ελέγξτε τη σύνδεση στο διαδίκτυο.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>

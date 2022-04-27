@@ -56,8 +56,6 @@ import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.downloader.DownloadFailReason
-import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -117,6 +115,9 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.downloads.api.DownloadCallback
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
@@ -300,6 +301,9 @@ class BrowserTabViewModelTest {
     private lateinit var mockTrackingParameters: TrackingParameters
 
     @Mock
+    private lateinit var mockDownloadCallback: DownloadCallback
+
+    @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
 
     @Mock
@@ -445,6 +449,7 @@ class BrowserTabViewModelTest {
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
+            downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
             voiceSearchPixelLogger = voiceSearchPixelLogger
@@ -3759,52 +3764,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDownloadIsCalledThenDownloadRequestStartedPixelFired() {
+    fun whenDownloadIsCalledThenDownloadRequestedForUrl() = runTest {
         val pendingFileDownload = buildPendingDownload(url = "http://www.example.com/download.pdf", contentDisposition = null, mimeType = null)
 
         testee.download(pendingFileDownload)
 
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-    }
-
-    @Test
-    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestSucceededPixelsFired() {
-        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
-        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
-            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFinishedDataUri(
-                file = File("image.jpg"),
-                mimeType = null
-            )
-        }
-
-        testee.download(pendingFileDownload)
-
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-    }
-
-    @Test
-    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestFailedPixelsFired() {
-        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
-        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
-            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFailed(
-                message = "message",
-                downloadFailReason = DownloadFailReason.ConnectionRefused
-            )
-        }
-
-        testee.download(pendingFileDownload)
-
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+        verify(mockFileDownloader).download(pendingFileDownload, mockDownloadCallback)
     }
 
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,
         mimeType: String?
-    ): FileDownloader.PendingFileDownload {
-        return FileDownloader.PendingFileDownload(
+    ): PendingFileDownload {
+        return PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
@@ -3972,13 +3945,6 @@ class BrowserTabViewModelTest {
 
         verify(mockRemoteMessagingRepository).dismissMessage("id1")
         verify(mockPixel).fire(AppPixelName.REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED, mapOf("cta" to "id1"))
-    }
-
-    @Test
-    fun whenDownloadsMenuItemClickedThenPixelSent() {
-        testee.onDonwloadsMenuItemClicked()
-
-        verify(mockPixel).fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
     }
 
     @Test

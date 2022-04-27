@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Last ned bilde</string>
     <string name="permissionRequiredToDownload">Nedlasting krever lagringstillatelse</string>
-    <string name="downloadComplete">Nedlastingen er fullført</string>
-    <string name="downloadFailed">Nedlastingen feilet</string>
-    <string name="downloadInProgress">Laster ned</string>
 
     <!-- Sharing options -->
     <string name="options">Alternativer</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Nei takk</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Filen lastes ned</string>
-    <string name="notificationChannelFileDownloaded">Filen er lastet ned</string>
     <string name="notificationChannelTutorials">Veiledninger</string>
 
     <!-- Clear Notification -->
@@ -697,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Personvernerklæring</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nedlastingen mislyktes. Sjekk internettforbindelsen.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget er lagt til på startskjermen</string>

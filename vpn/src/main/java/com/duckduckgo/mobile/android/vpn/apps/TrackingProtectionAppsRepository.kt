@@ -38,8 +38,9 @@ import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.flowOn
 
 interface TrackingProtectionAppsRepository {
+
     /** @return the list of installed apps and information about its excluded state */
-    suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>>
+    suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>>
 
     /** @return the list of installed apps currently excluded */
     suspend fun getExclusionAppsList(): List<String>
@@ -52,6 +53,9 @@ interface TrackingProtectionAppsRepository {
 
     /** Restore protection to the default list */
     suspend fun restoreDefaultProtectedList()
+
+    /** Returns if an app tracking attempts are being blocked or not */
+    suspend fun isAppProtectionEnabled(packageName: String): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -66,7 +70,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
-    override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
+    override suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
                 Timber.d("getProtectedApps flow")
@@ -199,6 +203,23 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         withContext(dispatcherProvider.io()) {
             appTrackerRepository.restoreDefaultProtectedList()
         }
+    }
+
+    override suspend fun isAppProtectionEnabled(packageName: String): Boolean {
+        Timber.d("TrackingProtectionAppsRepository: Checking $packageName protection status")
+        val appExclusionList = appTrackerRepository.getAppExclusionList()
+        val manualAppExclusionList = appTrackerRepository.getManualAppExclusionList()
+
+        if (appTrackerRepository.getSystemAppOverrideList().map { it.packageId }.contains(packageName)) {
+            return true
+        }
+
+        val userExcludedApp = manualAppExclusionList.find { it.packageId == packageName }
+        if (userExcludedApp != null) {
+            return userExcludedApp.isProtected
+        }
+
+        return !appExclusionList.any { it.packageId == packageName }
     }
 
     companion object {

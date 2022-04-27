@@ -116,6 +116,15 @@
                     android:theme="@style/SettingsSwitchTheme"
             />
 
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/vpnConnectivityChecksToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="VPN connectivity checks"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
             <!-- Section Trackers -->
             <View style="@style/SettingsGroupDivider" />
             <TextView

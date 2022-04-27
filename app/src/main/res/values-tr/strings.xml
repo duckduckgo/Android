@@ -68,9 +68,6 @@
     <!-- Downloading files -->
     <string name="downloadImage">Resmi İndir</string>
     <string name="permissionRequiredToDownload">İndirme için depolama izni gerekiyor</string>
-    <string name="downloadComplete">İndirme tamamlandı</string>
-    <string name="downloadFailed">İndirme başarısız</string>
-    <string name="downloadInProgress">İndiriliyor</string>
 
     <!-- Sharing options -->
     <string name="options">Seçenekler</string>
@@ -336,8 +333,6 @@
     <string name="noThanks">Hayır teşekkürler</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Dosya İndiriliyor</string>
-    <string name="notificationChannelFileDownloaded">Dosya indirildi</string>
     <string name="notificationChannelTutorials">Öğreticiler</string>
 
     <!-- Clear Notification -->
@@ -697,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Gizlilik Politikası</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">İndirme başarısız. İnternet bağlantınızı kontrol edin.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget ana ekrana eklendi</string>

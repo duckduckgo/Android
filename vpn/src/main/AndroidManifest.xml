@@ -69,9 +69,15 @@
             />
 
         <activity
+            android:name="com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity"
+            android:label="@string/atp_ManageRecentAppsProtectionActivityTitle"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity"
             android:label="@string/atp_ExclusionListActivityTitle"
-            android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:parentActivityName="com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity"
             android:screenOrientation="portrait"/>
 
         <activity
