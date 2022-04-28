@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_TCP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.ADD_TO_UDP_DEVICE_TO_NETWORK_QUEUE
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.NO_VPN_CONNECTIVITY
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_TCP_DEVICE_TO_NETWORK_QUEUE
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.REMOVE_FROM_UDP_DEVICE_TO_NETWORK_QUEUE
@@ -30,6 +31,7 @@ import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHA
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_READ_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.SOCKET_CHANNEL_WRITE_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ
+import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IO_EXCEPTION
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV4_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_IPV6_PACKET
 import com.duckduckgo.mobile.android.vpn.health.SimpleEvent.Companion.TUN_READ_UNKNOWN_PACKET
@@ -125,6 +127,12 @@ class HealthMetricCounter @Inject constructor(
         }
     }
 
+    fun onTunReadIOException() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(TUN_READ_IO_EXCEPTION())
+        }
+    }
+
     fun onTunWriteIOException() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(TUN_WRITE_IO_EXCEPTION())
@@ -134,6 +142,12 @@ class HealthMetricCounter @Inject constructor(
     fun onTunWriteIOExceptionNoBufferSpace() {
         coroutineScope.launch(databaseDispatcher) {
             healthStatsDao.insertEvent(TUN_WRITE_IO_MEMORY_EXCEPTION())
+        }
+    }
+
+    fun onVpnConnectivityError() {
+        coroutineScope.launch(databaseDispatcher) {
+            healthStatsDao.insertEvent(NO_VPN_CONNECTIVITY())
         }
     }
 

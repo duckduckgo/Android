@@ -16,38 +16,12 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp.tracker
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 
-private class VpnTrackerDetectorInterceptorPluginPoint(
-    private val requestInterceptors: DaggerSet<VpnTrackerDetectorInterceptor>
-) : PluginPoint<VpnTrackerDetectorInterceptor> {
-    override fun getPlugins(): Collection<VpnTrackerDetectorInterceptor> {
-        return requestInterceptors
-    }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class VpnTrackerDetectorInterceptorModule {
-    @Multibinds
-    abstract fun bindVpnTrackerDetectorInterceptorPlugins(): DaggerSet<VpnTrackerDetectorInterceptor>
-
-    @Module
-    @ContributesTo(VpnScope::class)
-    class VpnTrackerDetectorInterceptorModuleProvider {
-        @Provides
-        @SingleInstanceIn(VpnScope::class)
-        fun provideVpnTrackerDetectorInterceptorPluginPoint(
-            plugins: DaggerSet<VpnTrackerDetectorInterceptor>
-        ): PluginPoint<VpnTrackerDetectorInterceptor> {
-            return VpnTrackerDetectorInterceptorPluginPoint(plugins)
-        }
-    }
-}
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = VpnTrackerDetectorInterceptor::class
+)
+@Suppress("unused")
+interface VpnTrackerDetectorInterceptorPluginPoint

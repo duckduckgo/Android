@@ -26,23 +26,26 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@InjectWith(ActivityScope::class)
 class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppTPWaitlistViewModel by bindViewModel()
@@ -188,7 +191,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(DeviceShieldOnboardingActivity.intent(this))
+        startActivity(VpnOnboardingActivity.intent(this))
         finish()
     }
 

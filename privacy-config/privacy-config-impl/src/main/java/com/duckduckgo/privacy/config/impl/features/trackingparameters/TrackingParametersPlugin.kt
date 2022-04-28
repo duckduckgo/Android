@@ -17,8 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,7 +34,9 @@ class TrackingParametersPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: PrivacyFeatureName, jsonString: String): Boolean {
+    override fun store(name: FeatureName, jsonString: String): Boolean {
+        @Suppress("NAME_SHADOWING")
+        val name = privacyFeatureValueOf(name.value)
         if (name == featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<TrackingParametersFeature> =

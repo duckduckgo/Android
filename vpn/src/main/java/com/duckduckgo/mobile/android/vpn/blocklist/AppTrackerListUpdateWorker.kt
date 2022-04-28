@@ -35,10 +35,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.R
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerBlocklist
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser.Companion
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi.Builder
@@ -74,7 +72,7 @@ class AppTrackerListUpdateWorker(
     }
 
     private fun updateTrackerBlocklist(): Result {
-        Timber.d("Updating the app tracker bloclist")
+        Timber.d("Updating the app tracker blocklist")
         val blocklist = appTrackerListDownloader.downloadAppTrackerBlocklist()
         when (blocklist.etag) {
             is ETag.ValidETag -> {

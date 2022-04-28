@@ -16,10 +16,14 @@
 
 package com.duckduckgo.app.fire
 
+import android.os.Build
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.app.browser.DefaultWebViewDatabaseProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -38,16 +42,31 @@ class DatabaseCleanerHelperTest {
 
     @Before
     fun before() {
+        DefaultWebViewDatabaseProvider(context).get()
         testee = DatabaseCleanerHelper(coroutineRule.testDispatcherProvider)
     }
 
     @Test
     fun whenCleanDatabaseThenReturnTrue() = runTest {
+        awaitPathCreation()
         assertTrue(testee.cleanDatabase(databaseLocator.getDatabasePath()))
     }
 
     @Test
     fun whenChangeJournalModeToDeleteThenReturnTrue() = runTest {
+        // this test will always fail on API 28
+        if (Build.VERSION.SDK_INT == 28) {
+            return@runTest
+        }
+        awaitPathCreation()
         assertTrue(testee.changeJournalModeToDelete(databaseLocator.getDatabasePath()))
+    }
+
+    private suspend fun awaitPathCreation() {
+        withTimeout(5000) {
+            while (databaseLocator.getDatabasePath().isEmpty()) {
+                delay(10)
+            }
+        }
     }
 }

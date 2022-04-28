@@ -26,7 +26,7 @@ import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
-class VpnNetworkModule {
+object VpnNetworkModule {
     @Provides
     fun provideAppTrackerListService(@Named("api") retrofit: Retrofit): AppTrackerListService {
         return retrofit.create(AppTrackerListService::class.java)

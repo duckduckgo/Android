@@ -54,6 +54,14 @@
             android:orientation="vertical"
         >
 
+            <com.duckduckgo.mobile.android.ui.view.InfoPanel
+                    android:id="@+id/settings_info"
+                    style="@style/Widget.DuckDuckGo.InfoPanel"
+                    app:panelBackground="@drawable/info_panel_alert_background"
+                    app:panelDrawable="@drawable/ic_alert_color_24"
+                    app:panelText="Turn AppTP ON to be able to configure this settings"
+                    android:layout_margin="16dp"/>
+
             <!-- Section Config -->
             <TextView
                 android:id="@+id/sectionConfigTitle"
@@ -61,6 +69,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Config"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/setActiveNetworkDnsToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Set Active Network DNS"
+                    android:theme="@style/SettingsSwitchTheme"
             />
 
             <androidx.appcompat.widget.SwitchCompat
@@ -87,6 +104,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Network Switching handling"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/vpnAlwaysSetDNSToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Always set DNS"
+                    android:theme="@style/SettingsSwitchTheme"
+            />
+
+            <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/vpnConnectivityChecksToggle"
+                    style="@style/SettingsSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="VPN connectivity checks"
                     android:theme="@style/SettingsSwitchTheme"
             />
 

@@ -45,7 +45,7 @@ interface VpnAppTrackerBlockingDao {
     fun deleteAppPackages()
 
     @Query("DELETE FROM vpn_app_tracker_entities")
-    fun deleTrackerEntities()
+    fun deleteTrackerEntities()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAppPackages(appPackages: List<AppTrackerPackage>)
@@ -71,7 +71,7 @@ interface VpnAppTrackerBlockingDao {
         deleteAppPackages()
         insertAppPackages(appPackages)
 
-        deleTrackerEntities()
+        deleteTrackerEntities()
         insertTrackerEntities(entities)
     }
 

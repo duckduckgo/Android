@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.statistics.AtbInitializer
 import com.duckduckgo.app.statistics.AtbInitializerListener
 import com.duckduckgo.app.statistics.VariantManager
@@ -45,7 +46,7 @@ import dagger.SingleInstanceIn
 
 @Module
 @ContributesTo(AppScope::class)
-class StatisticsModule {
+object StatisticsModule {
 
     @Provides
     fun statisticsService(@Named("api") retrofit: Retrofit): StatisticsService = retrofit.create(StatisticsService::class.java)
@@ -55,10 +56,10 @@ class StatisticsModule {
         statisticsDataStore: StatisticsDataStore,
         statisticsService: StatisticsService,
         variantManager: VariantManager,
-        plugins: DaggerSet<RefreshRetentionAtbPlugin>,
+        plugins: PluginPoint<RefreshRetentionAtbPlugin>,
     ): StatisticsUpdater {
         return StatisticsRequester(
-            statisticsDataStore, statisticsService, variantManager, RefreshRetentionAtbPluginPoint(plugins)
+            statisticsDataStore, statisticsService, variantManager, plugins
         )
     }
 

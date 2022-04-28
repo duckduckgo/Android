@@ -24,6 +24,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityLocationPermissionsBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -34,9 +35,11 @@ import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermissionDialog.SiteLocationPermissionDialogListener {
 
     @Inject

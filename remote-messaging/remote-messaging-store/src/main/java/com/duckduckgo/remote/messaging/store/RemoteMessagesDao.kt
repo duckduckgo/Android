@@ -37,7 +37,7 @@ abstract class RemoteMessagesDao {
     abstract fun dismissedMessages(): List<RemoteMessageEntity>
 
     @Query("update remote_message set status = :newState where id = :id")
-    abstract fun udpateState(id: String, newState: Status)
+    abstract fun updateState(id: String, newState: Status)
 
     @Query("select * from remote_message where status = \"SCHEDULED\"")
     abstract fun messagesFlow(): Flow<RemoteMessageEntity?>

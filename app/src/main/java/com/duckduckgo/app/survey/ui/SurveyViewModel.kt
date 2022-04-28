@@ -20,30 +20,28 @@ import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
-class SurveyViewModel(
+@ContributesViewModel(ActivityScope::class)
+class SurveyViewModel @Inject constructor(
     private val surveyDao: SurveyDao,
     private val statisticsStore: StatisticsDataStore,
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     sealed class Command {
@@ -112,29 +110,5 @@ class SurveyViewModel(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class SurveyViewModelFactory @Inject constructor(
-    private val surveyDao: Provider<SurveyDao>,
-    private val statisticsStore: Provider<StatisticsDataStore>,
-    private val appInstallStore: Provider<AppInstallStore>,
-    private val appBuildConfig: Provider<AppBuildConfig>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(SurveyViewModel::class.java) -> (
-                    SurveyViewModel(
-                        surveyDao.get(),
-                        statisticsStore.get(),
-                        appInstallStore.get(),
-                        appBuildConfig.get()
-                    ) as T
-                    )
-                else -> null
-            }
-        }
     }
 }

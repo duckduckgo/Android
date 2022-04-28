@@ -26,7 +26,7 @@ import com.duckduckgo.privacy.config.impl.features.https.HttpsPlugin
 import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllowlistPlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository

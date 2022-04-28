@@ -23,8 +23,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
@@ -65,8 +67,8 @@ class VpnServiceHeartbeatMonitor(
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun startHearbeatMonitor() {
-        Companion.startHearbeatMonitor(workManager)
+    fun startHeartbeatMonitor() {
+        Companion.startHeartbeatMonitor(workManager)
     }
 
     class VpnServiceHeartbeatMonitorWorker(
@@ -104,7 +106,7 @@ class VpnServiceHeartbeatMonitor(
         const val DATA_HEART_BEAT_TYPE_STOPPED = "STOPPED"
         private const val WORKER_HEART_BEAT_MONITOR_TAG = "VpnServiceHeartbeatMonitorWorker"
 
-        fun startHearbeatMonitor(workManager: WorkManager) {
+        fun startHeartbeatMonitor(workManager: WorkManager) {
             Timber.v("(Re)Scheduling the VpnServiceHeartbeatMonitor worker")
             workManager.cancelAllWorkByTag(WORKER_HEART_BEAT_MONITOR_TAG)
 
@@ -136,6 +138,7 @@ class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
     }
 }
 
+@InjectWith(ReceiverScope::class)
 class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
     @Inject
     lateinit var workManager: WorkManager
@@ -149,7 +152,7 @@ class VpnHeartbeatDeviceBootMonitor : BroadcastReceiver() {
         if (intent.action == "android.intent.action.BOOT_COMPLETED") {
             Timber.v("Checking if VPN was running before device BOOT")
 
-            VpnServiceHeartbeatMonitor.startHearbeatMonitor(workManager)
+            VpnServiceHeartbeatMonitor.startHeartbeatMonitor(workManager)
         }
     }
 }

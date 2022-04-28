@@ -22,11 +22,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityBookmarkFoldersBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 
+@InjectWith(ActivityScope::class)
 class BookmarkFoldersActivity : DuckDuckGoActivity() {
 
     private lateinit var binding: ActivityBookmarkFoldersBinding

@@ -2,9 +2,9 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.6.10'
+        kotlin_version = '1.6.21'
         spotless = "6.1.2"
-        anvil_version = "2.3.10-1-6-0"
+        anvil_version = "2.3.11-1-6-10"
         gradle_plugin = "7.0.3"
         min_sdk = 23
         target_sdk = 30

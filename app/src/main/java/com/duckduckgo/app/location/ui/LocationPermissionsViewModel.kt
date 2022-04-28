@@ -17,9 +17,9 @@
 package com.duckduckgo.app.location.ui
 
 import androidx.lifecycle.*
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionEntity
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -27,13 +27,12 @@ import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class LocationPermissionsViewModel(
+@ContributesViewModel(ActivityScope::class)
+class LocationPermissionsViewModel @Inject constructor(
     private val locationPermissionsRepository: LocationPermissionsRepository,
     private val geoLocationPermissions: GeoLocationPermissions,
     private val dispatcherProvider: DispatcherProvider,
@@ -133,32 +132,6 @@ class LocationPermissionsViewModel(
                 viewModelScope.launch {
                     locationPermissionsRepository.deletePermission(domain)
                 }
-            }
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class LocationPermissionsViewModelFactory @Inject constructor(
-    private val locationPermissionsRepository: Provider<LocationPermissionsRepository>,
-    private val geoLocationPermissions: Provider<GeoLocationPermissions>,
-    private val dispatcherProvider: Provider<DispatcherProvider>,
-    private val settingsDataStore: Provider<SettingsDataStore>,
-    private val pixel: Provider<Pixel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(LocationPermissionsViewModel::class.java) -> (
-                    LocationPermissionsViewModel(
-                        locationPermissionsRepository.get(),
-                        geoLocationPermissions.get(),
-                        dispatcherProvider.get(),
-                        settingsDataStore.get(),
-                        pixel.get()
-                    ) as T
-                    )
-                else -> null
             }
         }
     }

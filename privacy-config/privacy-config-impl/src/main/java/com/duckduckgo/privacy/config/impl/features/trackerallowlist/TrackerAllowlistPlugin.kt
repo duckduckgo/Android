@@ -17,8 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -35,9 +37,11 @@ class TrackerAllowlistPlugin @Inject constructor(
 ) : PrivacyFeaturePlugin {
 
     override fun store(
-        name: PrivacyFeatureName,
+        name: FeatureName,
         jsonString: String
     ): Boolean {
+        @Suppress("NAME_SHADOWING")
+        val name = privacyFeatureValueOf(name.value)
         if (name == featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<TrackerAllowlistFeature> =
