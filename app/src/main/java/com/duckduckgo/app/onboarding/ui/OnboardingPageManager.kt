@@ -68,7 +68,7 @@ class OnboardingPageManagerWithTrackerBlocking(
             is WelcomeBlueprint -> buildWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             is VpnIntroBlueprint -> buildVpnIntroPage()
-            is DefaultBrowserBlueprint -> buildVpnPermissionPage()
+            is VpnPermissionBlueprint -> buildVpnPermissionPage()
             else -> null
         }
     }
