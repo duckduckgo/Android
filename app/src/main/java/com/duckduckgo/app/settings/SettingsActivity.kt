@@ -174,7 +174,6 @@ class SettingsActivity :
 
         with(viewsMore) {
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
-            deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
             macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
             vpnSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
         }
