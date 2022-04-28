@@ -89,7 +89,7 @@ class VpnIntroPage : OnboardingPageFragment() {
 
     private fun setButtonsBehaviour() {
         binding.onboardingMaybeLater.setOnClickListener {
-            viewModel.onLeaveVpnOnboarding()
+            viewModel.onLeaveVpnIntro()
         }
         binding.onboardingNextCta.setOnClickListener {
             viewModel.onContinueToVpnExplanation()

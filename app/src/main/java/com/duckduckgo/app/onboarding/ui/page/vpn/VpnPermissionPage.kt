@@ -25,10 +25,13 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnIntroBinding
+import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnPermissionBinding
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.AskVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnIntro
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnPermission
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import dagger.android.support.AndroidSupportInjection
@@ -44,7 +47,7 @@ class VpnPermissionPage : OnboardingPageFragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-    private val binding: ContentOnboardingVpnIntroBinding by viewBinding()
+    private val binding: ContentOnboardingVpnPermissionBinding by viewBinding()
 
     private val viewModel: VpnPagesViewModel by lazy {
         ViewModelProvider(this, viewModelFactory).get(VpnPagesViewModel::class.java)
@@ -82,17 +85,17 @@ class VpnPermissionPage : OnboardingPageFragment() {
 
     private fun processCommand(command: VpnPagesViewModel.Command) {
         when (command) {
-            is ContinueToVpnExplanation -> onContinuePressed()
-            is LeaveVpnIntro -> onOnboardingDone()
+            is AskVpnPermission -> onContinuePressed()
+            is LeaveVpnPermission -> onOnboardingDone()
         }
     }
 
     private fun setButtonsBehaviour() {
         binding.onboardingMaybeLater.setOnClickListener {
-            viewModel.onLeaveVpnOnboarding()
+            viewModel.onLeaveVpnPermission()
         }
         binding.onboardingNextCta.setOnClickListener {
-            viewModel.onContinueToVpnExplanation()
+            viewModel.onAskVpnPermission()
         }
     }
 
