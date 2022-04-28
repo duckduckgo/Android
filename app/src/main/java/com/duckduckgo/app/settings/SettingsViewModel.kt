@@ -268,15 +268,16 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (atpRepository.getState() == WaitlistState.InBeta) {
-            if (deviceShieldOnboardingStore.didShowOnboarding()) {
-                viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
-            } else {
-                viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
-            }
-        } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
-        }
+        viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+        // if (atpRepository.getState() == WaitlistState.InBeta) {
+        //     if (deviceShieldOnboardingStore.didShowOnboarding()) {
+        //         viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
+        //     } else {
+        //         viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+        //     }
+        // } else {
+        //     viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
+        // }
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {

@@ -34,6 +34,7 @@
     <style name="TextAppearance.DuckDuckGo.Headline2">
         <item name="android:textSize">24sp</item>
         <item name="android:lineSpacingExtra">6sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.DuckDuckGo.Headline3">
