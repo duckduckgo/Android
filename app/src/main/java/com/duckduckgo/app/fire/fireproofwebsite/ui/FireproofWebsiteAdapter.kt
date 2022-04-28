@@ -216,10 +216,10 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
             anchor: View,
             entity: FireproofWebsiteEntity
         ) {
-            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
+            val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_remove_menu)
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
+                onMenuItemClicked(view.findViewById(R.id.remove)) { deleteEntity(entity) }
             }
             popupMenu.show(binding.root, anchor)
         }
