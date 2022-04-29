@@ -90,7 +90,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onVPNPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                sendCommand(Command.LaunchVPN)
+                viewModelScope.launch {
+                    launchVpn()
+                }
                 return
             }
             else -> {
@@ -129,15 +131,21 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
                 ViewEvent.RemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.StartVpn -> launchVpn()
             }
         }
     }
 
+    private suspend fun launchVpn(){
+        deviceShieldOnboardingStore.enableVPNFeature()
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
+        command.send(Command.LaunchVPN)
+    }
+
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
-        deviceShieldOnboardingStore.removeVPNFeature()
         viewModelScope.launch {
-            command.send(Command.StopVPN)
+            command.send(Command.RemoveFeature)
             command.send(Command.CloseScreen)
         }
     }
@@ -167,10 +175,12 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
+        object StartVpn : ViewEvent()
     }
 
     sealed class Command {
         object StopVPN : Command()
+        object RemoveFeature : Command()
         object LaunchVPN : Command()
         object CheckVPNPermission : Command()
         object VPNPermissionNotGranted : Command()

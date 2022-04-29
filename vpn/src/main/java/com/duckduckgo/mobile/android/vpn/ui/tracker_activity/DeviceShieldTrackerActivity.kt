@@ -44,6 +44,7 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActiv
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemoverReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
@@ -51,6 +52,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
@@ -209,6 +211,7 @@ class DeviceShieldTrackerActivity :
     private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command?) {
         when (it) {
             is DeviceShieldTrackerActivityViewModel.Command.StopVPN -> stopDeviceShield()
+            is DeviceShieldTrackerActivityViewModel.Command.RemoveFeature -> removeFeature()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchVPN -> startVPN()
             is DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission -> checkVPNPermission()
             is DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission -> obtainVpnRequestPermission(it.vpnIntent)
@@ -314,8 +317,7 @@ class DeviceShieldTrackerActivity :
     private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
-                deviceShieldPixels.enableFromSummaryTrackerActivity()
-                startVPN()
+                viewModel.onViewEvent(StartVpn)
             }
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
@@ -348,7 +350,12 @@ class DeviceShieldTrackerActivity :
 
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
-        TrackerBlockingVpnService.stopService(this)
+        VpnFeatureRemoverReceiver.removeFeatureIntent().also { sendBroadcast(it) }
+    }
+
+    private fun removeFeature() {
+        quietlyToggleAppTpSwitch(false)
+        VpnFeatureRemoverReceiver.removeFeatureIntent().also { sendBroadcast(it) }
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

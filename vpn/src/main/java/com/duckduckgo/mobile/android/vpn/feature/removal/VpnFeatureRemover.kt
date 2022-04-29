@@ -38,6 +38,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
+import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -47,13 +48,6 @@ import javax.inject.Provider
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class DefaultVpnFeatureRemoverModule {
-    @Binds
-    abstract fun bindDefaultVpnFeatureRemoverCallbacks(defaultVpnFeatureRemover: DefaultVpnFeatureRemover): VpnServiceCallbacks
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
@@ -66,7 +60,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
-) : VpnFeatureRemover, WorkerInjectorPlugin, VpnServiceCallbacks {
+) : VpnFeatureRemover, WorkerInjectorPlugin {
 
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is VpnFeatureRemoverWorker) {
@@ -75,23 +69,6 @@ class DefaultVpnFeatureRemover @Inject constructor(
         }
 
         return false
-    }
-
-    override fun onVpnStarted(coroutineScope: CoroutineScope) {
-        if (deviceShieldOnboarding.isVPNFeatureRemoved()){
-            Timber.d("Feature was previously removed, resetting the flag so others behave properly")
-            deviceShieldOnboarding.enableVPNFeature()
-        }
-    }
-
-    override fun onVpnStopped(
-        coroutineScope: CoroutineScope,
-        vpnStopReason: VpnStopReason
-    ) {
-        if (deviceShieldOnboarding.isVPNFeatureRemoved()) {
-            Timber.d("Manually removing VPN feature")
-            manuallyRemoveFeature()
-        }
     }
 
     override fun manuallyRemoveFeature() {
