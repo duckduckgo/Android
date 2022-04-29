@@ -724,7 +724,8 @@
           "hmb_medium"
         ]
       },
-      "state": "disabled"
+      "state": "enabled",
+      "minSupportedVersion": "5.119.0"
     },
     "userAgentRotation": {
       "settings": {
