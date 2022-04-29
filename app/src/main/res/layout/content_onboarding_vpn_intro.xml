@@ -63,7 +63,7 @@
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginTop="@dimen/keyline_2"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
         android:drawablePadding="@dimen/keyline_2"

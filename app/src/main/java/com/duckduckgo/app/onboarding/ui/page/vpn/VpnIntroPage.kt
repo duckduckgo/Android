@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnIntroBinding
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnIntro
 import com.duckduckgo.di.scopes.FragmentScope
@@ -60,7 +61,7 @@ class VpnIntroPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
-            viewModel.introPageBecameVisible()
+            viewModel.onAction(Action.IntroPageBecameVisible)
         }
     }
 
@@ -88,10 +89,10 @@ class VpnIntroPage : OnboardingPageFragment() {
 
     private fun setButtonsBehaviour() {
         binding.onboardingMaybeLater.setOnClickListener {
-            viewModel.onLeaveVpnIntro()
+            viewModel.onAction(Action.LeaveVpnIntro)
         }
         binding.onboardingNextCta.setOnClickListener {
-            viewModel.onContinueToVpnExplanation()
+            viewModel.onAction(Action.ContinueToVpnExplanation)
         }
     }
 

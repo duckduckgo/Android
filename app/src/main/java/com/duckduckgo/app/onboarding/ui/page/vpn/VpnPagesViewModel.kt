@@ -19,6 +19,15 @@ package com.duckduckgo.app.onboarding.ui.page.vpn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.AskVpnPermission
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.ContinueToVpnExplanation
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.FinishVpnOnboarding
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.IntroPageBecameVisible
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LearnMore
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.PermissionPageBecameVisible
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LeaveVpnIntro
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LeaveVpnPermission
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnFAQ
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
@@ -30,7 +39,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
-class VpnPagesViewModel  @Inject constructor(
+class VpnPagesViewModel @Inject constructor(
     private val pixel: Pixel
 ) : ViewModel() {
 
@@ -39,53 +48,84 @@ class VpnPagesViewModel  @Inject constructor(
 
     private var viewHasShown: Boolean = false
 
-    fun introPageBecameVisible() {
+    fun onAction(action: Action) {
+        when (action) {
+            IntroPageBecameVisible -> introPageBecameVisible()
+            PermissionPageBecameVisible -> permissionPageBecameVisible()
+            ContinueToVpnExplanation -> onContinueToVpnExplanation()
+            AskVpnPermission -> onAskVpnPermission()
+            FinishVpnOnboarding -> onFinishVpnOnboarding()
+            LeaveVpnIntro -> onLeaveVpnIntro()
+            LeaveVpnPermission -> onLeaveVpnPermission()
+            LearnMore -> introPageBecameVisible()
+        }
+    }
+
+    private fun introPageBecameVisible() {
         if (!viewHasShown) {
             viewHasShown = true
             pixel.fire(AppPixelName.ONBOARDING_VPN_INTRO_SHOWN)
         }
     }
 
-    fun permissionPageBecameVisible() {
+    private fun permissionPageBecameVisible() {
         if (!viewHasShown) {
             viewHasShown = true
             pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_SHOWN)
         }
     }
 
-    fun onContinueToVpnExplanation() {
+    private fun onContinueToVpnExplanation() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_INTRO_CONTINUED)
         viewModelScope.launch {
             command.send(Command.ContinueToVpnExplanation)
         }
     }
 
-    fun onAskVpnPermission() {
+    private fun onAskVpnPermission() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_LAUNCHED)
         viewModelScope.launch {
             command.send(Command.AskVpnPermission)
         }
     }
 
-    fun onFinishVpnOnboarding() {
+    private fun onFinishVpnOnboarding() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_CONTINUED)
         viewModelScope.launch {
             command.send(Command.ContinueToVpnExplanation)
         }
     }
 
-    fun onLeaveVpnIntro() {
+    private fun onLeaveVpnIntro() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_INTRO_SKIPPED)
         viewModelScope.launch {
             command.send(Command.LeaveVpnIntro)
         }
     }
 
-    fun onLeaveVpnPermission() {
+    private fun onLeaveVpnPermission() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_SKIPPED)
         viewModelScope.launch {
             command.send(Command.LeaveVpnPermission)
         }
+    }
+
+    private fun openFAQ() {
+        pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_FAQ_LAUNCHED)
+        viewModelScope.launch {
+            command.send(Command.OpenVpnFAQ)
+        }
+    }
+
+    sealed class Action {
+        object IntroPageBecameVisible : Action()
+        object PermissionPageBecameVisible : Action()
+        object ContinueToVpnExplanation : Action()
+        object AskVpnPermission : Action()
+        object FinishVpnOnboarding : Action()
+        object LeaveVpnIntro : Action()
+        object LeaveVpnPermission : Action()
+        object LearnMore : Action()
     }
 
     sealed class Command {
@@ -93,7 +133,7 @@ class VpnPagesViewModel  @Inject constructor(
         object LeaveVpnIntro : Command()
         object LeaveVpnPermission : Command()
         object AskVpnPermission : Command()
+
+        object OpenVpnFAQ : Command()
     }
-
-
 }

@@ -48,6 +48,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_VPN_PERMISSION_GRANTED("m_onboarding_vpn_permission_granted"),
     ONBOARDING_VPN_PERMISSION_DENIED("m_onboarding_vpn_permission_denied"),
     ONBOARDING_VPN_PERMISSION_SKIPPED("m_onboarding_vpn_permission_skipped"),
+    ONBOARDING_VPN_PERMISSION_FAQ_LAUNCHED("m_onboarding_vpn_permission_faq_launched"),
 
     ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
     ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),

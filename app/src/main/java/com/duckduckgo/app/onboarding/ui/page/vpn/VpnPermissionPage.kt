@@ -28,12 +28,16 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnIntroBinding
 import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnPermissionBinding
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.AskVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnIntro
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnPermission
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnFAQ
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
@@ -63,7 +67,7 @@ class VpnPermissionPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
-            viewModel.permissionPageBecameVisible()
+            viewModel.onAction(Action.PermissionPageBecameVisible)
         }
     }
 
@@ -71,6 +75,12 @@ class VpnPermissionPage : OnboardingPageFragment() {
         super.onActivityCreated(savedInstanceState)
         observeViewModel()
         setButtonsBehaviour()
+        binding.onboardingPageText.addClickableLink(
+            "learn_more_link",
+            getText(com.duckduckgo.mobile.android.vpn.R.string.atp_daxOnboardingPermissionMessage)
+        ) {
+            viewModel.onAction(Action.LearnMore)
+        }
     }
 
     private fun observeViewModel() {
@@ -80,21 +90,24 @@ class VpnPermissionPage : OnboardingPageFragment() {
             .launchIn(lifecycleScope)
     }
 
-
     private fun processCommand(command: VpnPagesViewModel.Command) {
         when (command) {
             is AskVpnPermission -> onContinuePressed()
             is LeaveVpnPermission -> onOnboardingDone()
+            is OpenVpnFAQ -> openFAQ()
         }
+    }
+
+    private fun openFAQ() {
+        startActivity(DeviceShieldFAQActivity.intent(requireContext()))
     }
 
     private fun setButtonsBehaviour() {
         binding.onboardingMaybeLater.setOnClickListener {
-            viewModel.onLeaveVpnPermission()
+            viewModel.onAction(Action.LeaveVpnPermission)
         }
         binding.onboardingNextCta.setOnClickListener {
-            viewModel.onAskVpnPermission()
+            viewModel.onAction(Action.AskVpnPermission)
         }
     }
-
 }
