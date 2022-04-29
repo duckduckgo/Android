@@ -237,6 +237,7 @@
     <style name="Widget.DuckDuckGo.Button.Secondary.Rounded">
         <item name="android:background">@drawable/background_white_button_secondary_rounded</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/cornflowerBlue</item>
     </style>
 
     <style name="Widget.DuckDuckGo.IconButton">

@@ -15,7 +15,7 @@
   -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/white">
+    android:color="@color/gray50">
     <item>
         <selector>
             <item android:state_enabled="true">

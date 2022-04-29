@@ -63,8 +63,7 @@ class VpnPermissionPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
-            applyStyle()
-            viewModel.introPageBecameVisible()
+            viewModel.permissionPageBecameVisible()
         }
     }
 
@@ -73,7 +72,6 @@ class VpnPermissionPage : OnboardingPageFragment() {
         observeViewModel()
         setButtonsBehaviour()
     }
-
 
     private fun observeViewModel() {
         viewModel.commands()

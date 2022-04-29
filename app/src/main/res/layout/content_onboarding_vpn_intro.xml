@@ -23,7 +23,7 @@
     <FrameLayout
         android:id="@+id/onboarding_page_header"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
+        android:layout_height="280dp"
         android:background="@color/light_blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,31 +31,52 @@
 
         <ImageView
             android:id="@+id/onboarding_page_image"
+            android:layout_marginTop="@dimen/keyline_6"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="5dp"
-            android:paddingBottom="12dp"
             android:contentDescription="@string/atp_OnboardingLogoDescription"
             android:importantForAccessibility="no"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/device_shield_onboarding_report" />
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/device_shield_onboarding_report"/>
 
     </FrameLayout>
 
-
-    <ImageButton
-        android:id="@+id/onboarding_close"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?selectableItemBackground"
-        android:src="@drawable/ic_baseline_close_24"
+    <TextView
+        android:id="@+id/onboarding_page_title"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+        android:textColor="@color/almostBlackDark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_6"
+        android:paddingStart="50dp"
+        android:paddingEnd="50dp"
+        android:text="@string/atp_daxOnboardingIntroTitle"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="SpeakableTextPresentCheck"/>
+        app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header" />
+
+    <TextView
+        android:id="@+id/onboarding_page_text"
+        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+        android:textColor="@color/gray70"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
+        android:drawablePadding="@dimen/keyline_2"
+        android:drawableTop="@drawable/ic_beta_pill"
+        android:text="@string/atp_daxOnboardingIntroMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />
 
     <Button
         android:id="@+id/onboarding_next_cta"
         style="@style/Widget.DuckDuckGo.Button.Rounded"
+        android:text="@string/atp_OnboardingContinue"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
@@ -72,7 +93,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
-        android:layout_marginBottom="@dimen/keyline_4"
+        android:layout_marginBottom="20dp"
+        android:text="@string/atp_OnboardingMaybeLater"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>

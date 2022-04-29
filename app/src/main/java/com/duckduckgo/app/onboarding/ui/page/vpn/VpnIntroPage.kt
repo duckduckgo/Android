@@ -60,7 +60,6 @@ class VpnIntroPage : OnboardingPageFragment() {
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser)
         if (isVisibleToUser) {
-            applyStyle()
             viewModel.introPageBecameVisible()
         }
     }

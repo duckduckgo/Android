@@ -29,6 +29,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.requestApplyInsets
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -77,6 +78,18 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             applyStyle()
             viewModel.pageBecameVisible()
         }
+    }
+
+    internal fun applyStyle() {
+        activity?.window?.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+            statusBarColor = Color.WHITE
+        }
+        ViewCompat.requestApplyInsets(longDescriptionContainer)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
