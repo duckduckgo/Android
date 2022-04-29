@@ -17,7 +17,10 @@
 package com.duckduckgo.app.onboarding.ui.page.vpn
 
 import android.content.Context
+import android.content.Intent
+import android.net.VpnService
 import android.os.Bundle
+import android.provider.Settings
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -29,15 +32,32 @@ import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnPermissionBind
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.ContinueVpnConflictDialog
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.DismissVpnConflictDialog
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.OpenSettingVpnConflictDialog
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionDenied
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionGranted
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.AskVpnPermission
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.CheckVPNPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnIntro
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnFAQ
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnSettings
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.RequestVpnPermission
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ShowVpnAlwaysOnConflictDialog
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ShowVpnConflictDialog
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.StartVpn
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.VpnPermissionStatus
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity.Companion
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog.Listener
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 import kotlinx.android.synthetic.main.include_default_browser_buttons.*
@@ -46,7 +66,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class VpnPermissionPage : OnboardingPageFragment() {
+class VpnPermissionPage : OnboardingPageFragment(), Listener {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -92,14 +112,15 @@ class VpnPermissionPage : OnboardingPageFragment() {
 
     private fun processCommand(command: VpnPagesViewModel.Command) {
         when (command) {
-            is AskVpnPermission -> onContinuePressed()
+            is ShowVpnConflictDialog -> launchVPNConflictDialog(false)
+            is ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is LeaveVpnPermission -> onOnboardingDone()
             is OpenVpnFAQ -> openFAQ()
+            is OpenVpnSettings -> openVpnSettings()
+            is CheckVPNPermission -> checkVPNPermission()
+            is StartVpn -> startVpn()
+            is RequestVpnPermission -> obtainVpnRequestPermission(command.intent)
         }
-    }
-
-    private fun openFAQ() {
-        startActivity(DeviceShieldFAQActivity.intent(requireContext()))
     }
 
     private fun setButtonsBehaviour() {
@@ -107,7 +128,72 @@ class VpnPermissionPage : OnboardingPageFragment() {
             viewModel.onAction(Action.LeaveVpnPermission)
         }
         binding.onboardingNextCta.setOnClickListener {
-            viewModel.onAction(Action.AskVpnPermission)
+            viewModel.onAction(Action.EnableVPN)
         }
+    }
+
+    private fun openFAQ() {
+        startActivity(DeviceShieldFAQActivity.intent(requireContext()))
+    }
+
+    private fun openVpnSettings() {
+        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
+    private fun launchVPNConflictDialog(isAlwaysOn: Boolean) {
+        val dialog = AppTPVpnConflictDialog.instance(this, isAlwaysOn)
+        dialog.show(
+            requireActivity().supportFragmentManager,
+            AppTPVpnConflictDialog.TAG_VPN_CONFLICT_DIALOG
+        )
+    }
+
+
+    private fun checkVPNPermission() {
+        when (val permissionStatus = checkVpnPermissionStatus()) {
+            is VpnPermissionStatus.Granted -> {
+                viewModel.onAction(VpnPermissionGranted)
+            }
+            is VpnPermissionStatus.Denied -> {
+                viewModel.onAction(VpnPermissionDenied(permissionStatus.intent))
+            }
+        }
+    }
+
+    private fun checkVpnPermissionStatus(): VpnPermissionStatus {
+        val intent = VpnService.prepare(requireContext())
+        return if (intent == null) {
+            VpnPermissionStatus.Granted
+        } else {
+            VpnPermissionStatus.Denied(intent)
+        }
+    }
+
+    private fun startVpn(){
+        TrackerBlockingVpnService.startService(requireContext())
+        onContinuePressed()
+    }
+
+    override fun onDismissConflictDialog() {
+        viewModel.onAction(DismissVpnConflictDialog)
+    }
+
+    override fun onOpenSettings() {
+        viewModel.onAction(OpenSettingVpnConflictDialog)
+    }
+
+    override fun onContinue() {
+        viewModel.onAction(ContinueVpnConflictDialog)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun obtainVpnRequestPermission(intent: Intent) {
+        startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
+    }
+
+    companion object {
+        private const val REQUEST_ASK_VPN_PERMISSION = 101
     }
 }

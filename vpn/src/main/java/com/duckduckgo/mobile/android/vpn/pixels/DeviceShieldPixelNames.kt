@@ -47,6 +47,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_ENABLE_FROM_ONBOARDING_UNIQUE("m_atp_ev_enabled_onboarding_u"),
     ATP_ENABLE_FROM_ONBOARDING_DAILY("m_atp_ev_enabled_onboarding_d"),
     ATP_ENABLE_FROM_ONBOARDING("m_atp_ev_enabled_onboarding_c"),
+    ATP_ENABLE_FROM_DAX_ONBOARDING("m_atp_ev_enabled_dax_onboarding_u"),
     ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE("m_atp_ev_enabled_quick_settings_u"),
     ATP_ENABLE_FROM_SETTINGS_TILE_DAILY("m_atp_ev_enabled_quick_settings_d"),
     ATP_ENABLE_FROM_SETTINGS_TILE("m_atp_ev_quick_enabled_settings_c"),

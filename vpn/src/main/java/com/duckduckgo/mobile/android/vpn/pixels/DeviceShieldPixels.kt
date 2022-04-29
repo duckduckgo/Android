@@ -89,6 +89,14 @@ interface DeviceShieldPixels {
      * daily -> fire only once a day no matter how many times we call this fun
      * count -> fire a pixel on every call
      */
+    fun enableFromDaxOnboarding()
+
+    /**
+     * This fun will fire three pixels
+     * unique -> fire only once ever no matter how many times we call this fun
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
     fun enableFromQuickSettingsTile()
 
     /**
@@ -404,6 +412,10 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun enableFromOnboarding() {
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_DAX_ONBOARDING)
+    }
+
+    override fun enableFromDaxOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
@@ -411,6 +423,7 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
     }
+
 
     override fun enableFromQuickSettingsTile() {
         tryToFireUniquePixel(
