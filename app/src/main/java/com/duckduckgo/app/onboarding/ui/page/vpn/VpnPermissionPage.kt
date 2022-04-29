@@ -37,6 +37,7 @@ import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.Dismis
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.OpenSettingVpnConflictDialog
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionDenied
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionGranted
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionResult
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.AskVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.CheckVPNPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
@@ -82,6 +83,17 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        if (requestCode == REQUEST_ASK_VPN_PERMISSION) {
+            viewModel.onAction(VpnPermissionResult(resultCode))
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {

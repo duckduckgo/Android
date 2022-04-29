@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.ui.page.vpn
 
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -31,15 +32,16 @@ import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.Permis
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LeaveVpnIntro
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LeaveVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.OpenSettingVpnConflictDialog
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.RequestVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionDenied
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionGranted
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionResult
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.RequestVpnPermission
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -65,7 +67,7 @@ class VpnPagesViewModel @Inject constructor(
             IntroPageBecameVisible -> introPageBecameVisible()
             PermissionPageBecameVisible -> permissionPageBecameVisible()
             ContinueToVpnExplanation -> onContinueToVpnExplanation()
-            EnableVPN -> onAskVpnPermission()
+            EnableVPN -> onCheckVpnPermission()
             FinishVpnOnboarding -> onFinishVpnOnboarding()
             LeaveVpnIntro -> onLeaveVpnIntro()
             LeaveVpnPermission -> onLeaveVpnPermission()
@@ -74,7 +76,9 @@ class VpnPagesViewModel @Inject constructor(
             OpenSettingVpnConflictDialog -> onOpenVpnSettings()
             ContinueVpnConflictDialog -> onContinueVpnConflictDialog()
             VpnPermissionGranted -> onVpnPermissionGranted()
+            LearnMore -> onLearnMore()
             is VpnPermissionDenied -> onVpnPermissionDenied(action.intent)
+            is VpnPermissionResult -> onVPNPermissionResult(action.resultCode)
         }
     }
 
@@ -112,9 +116,8 @@ class VpnPagesViewModel @Inject constructor(
         }
     }
 
-    private fun onAskVpnPermission() {
-        pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_LAUNCHED)
-        sendCommand(Command.AskVpnPermission)
+    private fun onCheckVpnPermission() {
+        sendCommand(Command.CheckVPNPermission)
     }
 
     private fun onFinishVpnOnboarding() {
@@ -148,13 +151,33 @@ class VpnPagesViewModel @Inject constructor(
     }
 
     private fun onVpnPermissionGranted(){
-        vpnPixels.enableFromOnboarding()
+        vpnPixels.enableFromDaxOnboarding()
         sendCommand(Command.StartVpn)
+    }
+
+    private fun onLearnMore(){
+        sendCommand(Command.OpenVpnFAQ)
     }
 
     private fun onVpnPermissionDenied(intent: Intent) {
         lastVpnRequestTime = System.currentTimeMillis()
+        pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_LAUNCHED)
         sendCommand(RequestVpnPermission(intent))
+    }
+
+    private fun onVPNPermissionResult(resultCode: Int) {
+        when (resultCode) {
+            AppCompatActivity.RESULT_OK -> {
+                sendCommand(Command.StartVpn)
+                return
+            }
+            else -> {
+                if (System.currentTimeMillis() - lastVpnRequestTime < 1000) {
+                    sendCommand(Command.ShowVpnAlwaysOnConflictDialog)
+                }
+                lastVpnRequestTime = -1
+            }
+        }
     }
 
     sealed class Action {
@@ -172,6 +195,7 @@ class VpnPagesViewModel @Inject constructor(
         object ContinueVpnConflictDialog : Action()
         object VpnPermissionGranted : Action()
         data class VpnPermissionDenied(val intent: Intent) : Action()
+        data class VpnPermissionResult(val resultCode: Int) : Action()
     }
 
     sealed class Command {
@@ -183,11 +207,8 @@ class VpnPagesViewModel @Inject constructor(
 
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
-        object AskVpnPermission : Command()
         object OpenVpnSettings : Command()
-
         object StartVpn : Command()
-
         data class RequestVpnPermission(val intent: Intent) : Command()
     }
 
