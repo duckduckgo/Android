@@ -71,12 +71,11 @@ class VpnPagesViewModel @Inject constructor(
             FinishVpnOnboarding -> onFinishVpnOnboarding()
             LeaveVpnIntro -> onLeaveVpnIntro()
             LeaveVpnPermission -> onLeaveVpnPermission()
-            LearnMore -> introPageBecameVisible()
+            LearnMore -> onLearnMore()
             DismissVpnConflictDialog -> vpnPixels.didChooseToDismissVpnConflictDialog()
             OpenSettingVpnConflictDialog -> onOpenVpnSettings()
             ContinueVpnConflictDialog -> onContinueVpnConflictDialog()
             VpnPermissionGranted -> onVpnPermissionGranted()
-            LearnMore -> onLearnMore()
             is VpnPermissionDenied -> onVpnPermissionDenied(action.intent)
             is VpnPermissionResult -> onVPNPermissionResult(action.resultCode)
         }
