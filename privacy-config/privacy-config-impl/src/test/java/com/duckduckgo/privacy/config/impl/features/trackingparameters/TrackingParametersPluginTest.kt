@@ -58,6 +58,8 @@ class TrackingParametersPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingParametersAndIsEnabledThenStoreFeatureEnabled() {
+        whenever(mockVersionHandler.isSupportedVersion(anyString())).thenReturn(true)
+
         val jsonString = FileUtilities.loadText(TrackingParametersPluginTest::class.java.classLoader!!, "json/tracking_parameters.json")
 
         testee.store(FEATURE_NAME, jsonString)

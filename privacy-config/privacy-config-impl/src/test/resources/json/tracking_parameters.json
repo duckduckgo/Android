@@ -1,5 +1,6 @@
 {
   "state": "enabled",
+  "minSupportedVersion": "1.2.3",
   "exceptions": [
     {
       "domain": "example.com",
