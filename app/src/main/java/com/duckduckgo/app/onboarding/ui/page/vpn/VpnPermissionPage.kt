@@ -27,7 +27,6 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnIntroBinding
 import com.duckduckgo.app.browser.databinding.ContentOnboardingVpnPermissionBinding
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
@@ -39,8 +38,6 @@ import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPer
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionGranted
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.VpnPermissionResult
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.CheckVPNPermission
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ContinueToVpnExplanation
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnIntro
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.LeaveVpnPermission
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnFAQ
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.OpenVpnSettings
@@ -54,8 +51,6 @@ import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity.Companion
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog.Listener
 import dagger.android.support.AndroidSupportInjection
@@ -161,7 +156,6 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
         )
     }
 
-
     private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
@@ -182,7 +176,7 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
         }
     }
 
-    private fun startVpn(){
+    private fun startVpn() {
         TrackerBlockingVpnService.startService(requireContext())
         onContinuePressed()
     }

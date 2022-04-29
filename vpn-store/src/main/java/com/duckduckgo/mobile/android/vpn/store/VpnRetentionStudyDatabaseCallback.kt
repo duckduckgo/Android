@@ -32,11 +32,10 @@ import java.util.*
 import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class VpnDatabaseCallback(
+internal class VpnRetentionStudyDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
     private val dispatcherProvider: DispatcherProvider,
-    private val variantManager
 ) : RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {

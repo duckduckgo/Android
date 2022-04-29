@@ -428,7 +428,6 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
     }
 
-
     override fun enableFromQuickSettingsTile() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE,

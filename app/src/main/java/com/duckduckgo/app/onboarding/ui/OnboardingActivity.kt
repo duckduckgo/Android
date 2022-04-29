@@ -53,7 +53,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onOnboardingDone(){
+    fun onOnboardingDone() {
         viewModel.onOnboardingDone()
         startActivity(BrowserActivity.intent(this@OnboardingActivity))
         finish()

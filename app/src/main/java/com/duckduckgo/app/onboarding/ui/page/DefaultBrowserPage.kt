@@ -30,7 +30,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.view.ViewCompat
-import androidx.core.view.ViewCompat.requestApplyInsets
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith

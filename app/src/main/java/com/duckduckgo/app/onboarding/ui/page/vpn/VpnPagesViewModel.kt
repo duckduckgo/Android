@@ -139,22 +139,22 @@ class VpnPagesViewModel @Inject constructor(
         sendCommand(Command.OpenVpnFAQ)
     }
 
-    private fun onOpenVpnSettings(){
+    private fun onOpenVpnSettings() {
         vpnPixels.didChooseToOpenSettingsFromVpnConflictDialog()
         sendCommand(Command.OpenVpnSettings)
     }
 
-    private fun onContinueVpnConflictDialog(){
+    private fun onContinueVpnConflictDialog() {
         vpnPixels.didChooseToContinueFromVpnConflictDialog()
         sendCommand(Command.CheckVPNPermission)
     }
 
-    private fun onVpnPermissionGranted(){
+    private fun onVpnPermissionGranted() {
         vpnPixels.enableFromDaxOnboarding()
         sendCommand(Command.StartVpn)
     }
 
-    private fun onLearnMore(){
+    private fun onLearnMore() {
         sendCommand(Command.OpenVpnFAQ)
     }
 

@@ -16,15 +16,11 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
-import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.annotation.LayoutRes
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import kotlinx.android.synthetic.main.content_onboarding_default_browser.*

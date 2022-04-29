@@ -28,4 +28,8 @@ class VpnDatabaseCallbackProvider constructor(
     fun provideCallbacks(): RoomDatabase.Callback {
         return VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
     }
+
+    fun provideRetentionStudyCallbacks(): RoomDatabase.Callback {
+        return VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
+    }
 }

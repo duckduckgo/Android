@@ -71,14 +71,12 @@ class VpnIntroPage : OnboardingPageFragment() {
         setButtonsBehaviour()
     }
 
-
     private fun observeViewModel() {
         viewModel.commands()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
     }
-
 
     private fun processCommand(command: VpnPagesViewModel.Command) {
         when (command) {
