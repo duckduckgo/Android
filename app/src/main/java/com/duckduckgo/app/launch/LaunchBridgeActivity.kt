@@ -18,15 +18,18 @@ package com.duckduckgo.app.launch
 
 import android.os.Bundle
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     @Inject

@@ -59,7 +59,7 @@ class RealTrackingParameters @Inject constructor(
     }
 
     override fun cleanTrackingParameters(url: String): String? {
-        if (featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName()) == false) return null
+        if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName)) return null
         if (isAnException(url)) return null
 
         val trackingParameters = trackingParametersRepository.parameters

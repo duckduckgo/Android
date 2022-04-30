@@ -19,15 +19,14 @@ package com.duckduckgo.app.email.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,9 +34,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class EmailProtectionSignInViewModel(
+@ContributesViewModel(FragmentScope::class)
+class EmailProtectionSignInViewModel @Inject constructor(
     private val emailManager: EmailManager,
     private val emailService: EmailService,
     private val workManager: WorkManager,
@@ -102,12 +101,6 @@ class EmailProtectionSignInViewModel(
         }
     }
 
-    fun readPrivacyGuarantees() {
-        viewModelScope.launch {
-            commandChannel.send(Command.OpenUrl(url = PRIVACY_GUARANTEE))
-        }
-    }
-
     fun onNotifyMeClicked() {
         pixel.fire(AppPixelName.EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME)
         viewModelScope.launch {
@@ -132,42 +125,16 @@ class EmailProtectionSignInViewModel(
         pixel.fire(AppPixelName.EMAIL_DID_SHOW_WAITLIST_DIALOG)
         viewModelScope.launch {
             emailManager.joinWaitlist(timestamp, token)
-            commandChannel.send(Command.ShowNotificationDialog)
+            emailManager.notifyOnJoinedWaitlist()
+            viewStateFlow.emit(ViewState(emailManager.waitlistState()))
             workManager.enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork(withBigDelay = false))
         }
     }
 
     companion object {
-        const val PRIVACY_GUARANTEE = "https://duckduckgo.com/email/privacy-guarantees"
         const val ADDRESS_BLOG_POST = "https://duckduckgo.com/email/learn-more"
         const val GET_STARTED_URL = "https://duckduckgo.com/email/start?inviteCode="
         const val SIGN_UP_URL = "https://duckduckgo.com/email/signup?inviteCode="
         const val LOGIN_URL = "https://duckduckgo.com/email/login"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class EmailProtectionSignViewModelFactory @Inject constructor(
-    private val emailManager: Provider<EmailManager>,
-    private val emailService: Provider<EmailService>,
-    private val workManager: Provider<WorkManager>,
-    private val emailWaitlistWorkRequestBuilder: Provider<EmailWaitlistWorkRequestBuilder>,
-    private val pixel: Provider<Pixel>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(EmailProtectionSignInViewModel::class.java) -> {
-                    EmailProtectionSignInViewModel(
-                        emailManager.get(),
-                        emailService.get(),
-                        workManager.get(),
-                        emailWaitlistWorkRequestBuilder.get(),
-                        pixel.get()
-                    ) as T
-                }
-                else -> null
-            }
-        }
     }
 }

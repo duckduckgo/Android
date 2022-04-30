@@ -90,7 +90,7 @@ class TcpDeviceToNetwork(
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue()
 
-        val destinationAddress = packet.ip4Header.destinationAddress
+        val destinationAddress = packet.ipHeader.destinationAddress
         val destinationPort = packet.tcpHeader.destinationPort
         val sourcePort = packet.tcpHeader.sourcePort
 
@@ -381,7 +381,7 @@ class TcpDeviceToNetwork(
         Timber.v("Determining if a tracker. Already determined? %s", tcb.trackerTypeDetermined)
         if (tcb.trackerTypeDetermined) {
             return if (tcb.isTracker) (RequestTrackerType.Tracker(tcb.trackerHostName)) else RequestTrackerType.NotTracker(
-                tcb.hostName ?: packet.ip4Header.destinationAddress.hostName
+                tcb.hostName ?: packet.ipHeader.destinationAddress.hostName
             )
         }
 
@@ -389,7 +389,7 @@ class TcpDeviceToNetwork(
     }
 
     private fun determineIfLocalIpAddress(packet: Packet): Boolean {
-        return localAddressDetector.isLocalAddress(packet.ip4Header.destinationAddress)
+        return localAddressDetector.isLocalAddress(packet.ipHeader.destinationAddress)
     }
 
     private fun determineRequestingApp(

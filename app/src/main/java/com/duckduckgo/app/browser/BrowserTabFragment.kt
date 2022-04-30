@@ -23,7 +23,6 @@ import android.app.ActivityOptions
 import android.content.*
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
@@ -47,7 +46,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
@@ -68,15 +66,10 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.DownloadCommand
 import com.duckduckgo.app.browser.DownloadConfirmationFragment.DownloadConfirmationDialogListener
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
-import com.duckduckgo.app.browser.downloader.DownloadFailReason
-import com.duckduckgo.app.browser.downloader.FileDownloadNotificationManager
-import com.duckduckgo.app.browser.downloader.FileDownloader
-import com.duckduckgo.app.browser.downloader.FileDownloader.PendingFileDownload
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -105,7 +98,6 @@ import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.ViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.DaxDialog
 import com.duckduckgo.app.global.view.DaxDialogListener
@@ -134,11 +126,9 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_settings_general.*
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
 import kotlinx.android.synthetic.main.include_cta_buttons.view.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -159,6 +149,10 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import android.webkit.URLUtil
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -171,18 +165,31 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.downloads.DownloadsFileActions
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
+import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.downloads.api.DownloadCommand
+import com.duckduckgo.downloads.api.DownloadFailReason
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import javax.inject.Provider
 import kotlinx.coroutines.flow.cancellable
+import javax.inject.Provider
 
+@InjectWith(FragmentScope::class)
 class BrowserTabFragment :
     Fragment(),
     FindListener,
@@ -205,16 +212,13 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
     lateinit var fileChooserIntentBuilder: FileChooserIntentBuilder
 
     @Inject
     lateinit var fileDownloader: FileDownloader
-
-    @Inject
-    lateinit var fileDownloadNotificationManager: FileDownloadNotificationManager
 
     @Inject
     lateinit var webViewSessionStorage: WebViewSessionStorage
@@ -289,6 +293,9 @@ class BrowserTabFragment :
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
+    lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
     lateinit var urlExtractingWebViewClient: Provider<UrlExtractingWebViewClient>
 
     @Inject
@@ -296,6 +303,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -307,7 +317,7 @@ class BrowserTabFragment :
 
     private val favoritesOnboarding get() = requireArguments().getBoolean(FAVORITES_ONBOARDING_ARG, false)
 
-    private lateinit var popupMenu: PopupMenu
+    private lateinit var popupMenu: BrowserPopupMenu
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -326,11 +336,12 @@ class BrowserTabFragment :
     private lateinit var omnibarQuickAccessAdapter: FavoritesQuickAccessAdapter
     private lateinit var omnibarQuickAccessItemTouchHelper: ItemTouchHelper
 
-    private val tabsJob = ConflatedJob()
+    private val downloadMessagesJob = ConflatedJob()
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
         viewModel.loadData(tabId, initialUrl, skipHome, favoritesOnboarding)
+        launchDownloadMessagesJob()
         viewModel
     }
 
@@ -398,6 +409,22 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
+            when (it) {
+                is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
+                    omnibarTextInput.setText(it.result)
+                    userEnteredQuery(it.result)
+                    resumeWebView()
+                }
+                else -> resumeWebView()
+            }
+        }
+    }
+
+    private fun resumeWebView() {
+        webView?.let {
+            if (it.isShown) it.onResume()
+        }
     }
 
     override fun onCreateView(
@@ -491,6 +518,7 @@ class BrowserTabFragment :
         }
 
         addTextChangedListeners()
+        resumeWebView()
     }
 
     override fun onPause() {
@@ -599,12 +627,55 @@ class BrowserTabFragment :
         addTabsObserver()
     }
 
-    private fun addTabsObserver() {
-        tabsJob += lifecycleScope.launch {
-            viewModel.tabs.cancellable().collect {
-                decorator.renderTabIcon(it)
-            }
+    private fun processFileDownloadedCommand(command: DownloadCommand) {
+        when (command) {
+            is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
+            is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
+            is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
         }
+    }
+
+    @SuppressLint("WrongConstant")
+    private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+    }
+
+    private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
+        val downloadFailedSnackbar = when {
+            command.showEnableDownloadManagerAction ->
+                view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+                    ?.apply {
+                        this.setAction(R.string.enable) {
+                            showDownloadManagerAppSettings()
+                        }
+                    }
+            else -> view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        }
+        view?.postDelayed({ downloadFailedSnackbar ?.show() }, DOWNLOAD_SNACKBAR_DELAY)
+    }
+
+    private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
+        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
+            ?.apply {
+                this.setAction(R.string.downloadsDownloadFinishedActionName) {
+                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
+                    if (!result) {
+                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+        view?.postDelayed({ downloadSucceededSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
+    }
+
+    private fun addTabsObserver() {
+        viewModel.tabs.observe(
+            viewLifecycleOwner,
+            Observer<List<TabEntity>> {
+                it?.let {
+                    decorator.renderTabIcon(it)
+                }
+            }
+        )
     }
 
     private fun fragmentIsVisible(): Boolean {
@@ -674,6 +745,9 @@ class BrowserTabFragment :
             is Command.ShowEditSavedSiteDialog -> editSavedSite(it.savedSiteChangedViewState)
             is Command.DeleteSavedSiteConfirmation -> confirmDeleteSavedSite(it.savedSite)
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
+            is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
             is Command.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
@@ -777,7 +851,6 @@ class BrowserTabFragment :
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
-            is DownloadCommand -> processDownloadCommand(it)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
             is Command.RequestFileDownload -> requestFileDownload(it.url, it.contentDisposition, it.mimeType, it.requestUserConfirmation)
             is Command.ChildTabClosed -> processUriForThirdPartyCookies()
@@ -813,7 +886,7 @@ class BrowserTabFragment :
 
     private fun injectEmailAddress(alias: String) {
         webView?.let {
-            emailInjector.injectAddressInEmailField(it, alias)
+            emailInjector.injectAddressInEmailField(it, alias, it.url)
         }
     }
 
@@ -822,7 +895,10 @@ class BrowserTabFragment :
             val clipboard: ClipboardManager? = ContextCompat.getSystemService(it, ClipboardManager::class.java)
             val clip: ClipData = ClipData.newPlainText("Alias", alias)
             clipboard?.setPrimaryClip(clip)
-            showToast(R.string.aliasToClipboardMessage)
+            rootView.makeSnackbarWithNoBottomInset(
+                getString(R.string.aliasToClipboardMessage),
+                Snackbar.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -831,34 +907,6 @@ class BrowserTabFragment :
             val url = it.url ?: return
             launch {
                 thirdPartyCookieManager.processUriForThirdPartyCookies(it, url.toUri())
-            }
-        }
-    }
-
-    private fun processDownloadCommand(it: DownloadCommand) {
-        when (it) {
-            is DownloadCommand.ScanMediaFiles -> {
-                context?.applicationContext?.let { context ->
-                    MediaScannerConnection.scanFile(context, arrayOf(it.file.absolutePath), null, null)
-                }
-            }
-            is DownloadCommand.ShowDownloadFinishedNotification -> {
-                fileDownloadNotificationManager.showDownloadFinishedNotification(it.file.name, it.file.absolutePath.toUri(), it.mimeType)
-            }
-            DownloadCommand.ShowDownloadInProgressNotification -> {
-                fileDownloadNotificationManager.showDownloadInProgressNotification()
-            }
-            is DownloadCommand.ShowDownloadFailedNotification -> {
-                fileDownloadNotificationManager.showDownloadFailedNotification()
-
-                val snackbar = toolbar.makeSnackbarWithNoBottomInset(R.string.downloadFailed, Snackbar.LENGTH_INDEFINITE)
-                if (it.reason == DownloadFailReason.DownloadManagerDisabled) {
-                    snackbar.setText(it.message)
-                    snackbar.setAction(getString(R.string.enable)) {
-                        showDownloadManagerAppSettings()
-                    }
-                }
-                snackbar.show()
             }
         }
     }
@@ -951,7 +999,7 @@ class BrowserTabFragment :
 
     private fun openInNewBackgroundTab() {
         appBarLayout.setExpanded(true, true)
-        tabsJob.cancel()
+        viewModel.tabs.removeObservers(this)
         decorator.incrementTabs()
     }
 
@@ -1536,7 +1584,10 @@ class BrowserTabFragment :
     }
 
     private fun confirmDeleteSavedSite(savedSite: SavedSite) {
-        val message = getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
+        val message = when (savedSite) {
+            is Favorite -> getString(R.string.favoriteDeleteConfirmationMessage)
+            is Bookmark -> getString(R.string.bookmarkDeleteConfirmationMessage, savedSite.title).html(requireContext())
+        }
         viewModel.deleteQuickAccessItem(savedSite)
         rootView.makeSnackbarWithNoBottomInset(
             message,
@@ -1572,6 +1623,42 @@ class BrowserTabFragment :
             })
         }
         snackbar.show()
+    }
+
+    private fun removeFireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
+        rootView.makeSnackbarWithNoBottomInset(
+            getString(R.string.fireproofDeleteConfirmationMessage),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.fireproofWebsiteSnackbarAction) {
+                viewModel.onRemoveFireproofWebsiteSnackbarUndoClicked(entity)
+            }
+            show()
+        }
+    }
+
+    private fun privacyProtectionEnabledConfirmation(domain: String) {
+        rootView.makeSnackbarWithNoBottomInset(
+            HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.undoSnackbarAction) {
+                viewModel.onEnablePrivacyProtectionSnackbarUndoClicked(domain)
+            }
+            show()
+        }
+    }
+
+    private fun privacyProtectionDisabledConfirmation(domain: String) {
+        rootView.makeSnackbarWithNoBottomInset(
+            HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
+            Snackbar.LENGTH_LONG
+        ).apply {
+            setAction(R.string.undoSnackbarAction) {
+                viewModel.onDisablePrivacyProtectionSnackbarUndoClicked(domain)
+            }
+            show()
+        }
     }
 
     private fun launchSharePageChooser(url: String) {
@@ -1659,12 +1746,29 @@ class BrowserTabFragment :
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (hidden) {
-            viewModel.onViewHidden()
-            webView?.onPause()
-        } else {
-            webView?.onResume()
-            viewModel.onViewVisible()
+        when {
+            hidden -> onTabHidden()
+            else -> onTabVisible()
+        }
+    }
+
+    private fun onTabHidden() {
+        viewModel.onViewHidden()
+        downloadMessagesJob.cancel()
+        webView?.onPause()
+    }
+
+    private fun onTabVisible() {
+        webView?.onResume()
+        launchDownloadMessagesJob()
+        viewModel.onViewVisible()
+    }
+
+    private fun launchDownloadMessagesJob() {
+        downloadMessagesJob += lifecycleScope.launch {
+            viewModel.downloadCommands().cancellable().collect {
+                processFileDownloadedCommand(it)
+            }
         }
     }
 
@@ -1679,6 +1783,8 @@ class BrowserTabFragment :
         }
         configureQuickAccessGridLayout(quickAccessRecyclerView)
         configureQuickAccessGridLayout(quickAccessSuggestionsRecyclerView)
+        decorator.recreatePopupMenu()
+        viewModel.onConfigurationChanged()
     }
 
     fun onBackPressed(): Boolean {
@@ -1730,7 +1836,7 @@ class BrowserTabFragment :
         )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation)
+            downloadFile(requestUserConfirmation && !URLUtil.isDataUrl(url))
         } else {
             requestWriteStoragePermission()
         }
@@ -1801,7 +1907,7 @@ class BrowserTabFragment :
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Timber.i("Write external storage permission granted")
-                    downloadFile(requestUserConfirmation = false)
+                    downloadFile(requestUserConfirmation = true)
                 } else {
                     Timber.i("Write external storage permission refused")
                     toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
@@ -1963,6 +2069,11 @@ class BrowserTabFragment :
             configureLongClickOpensNewTabListener()
         }
 
+        fun recreatePopupMenu() {
+            popupMenu.dismiss()
+            createPopupMenu()
+        }
+
         fun updateToolbarActionsVisibility(viewState: BrowserViewState) {
             tabsButton?.isVisible = viewState.showTabsButton
             fireMenuButton?.isVisible = viewState.fireButton is HighlightableButton.Visible
@@ -2008,65 +2119,77 @@ class BrowserTabFragment :
         }
 
         private fun createPopupMenu() {
-            popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_browser_menu)
+            popupMenu = BrowserPopupMenu(
+                context = requireContext(),
+                layoutInflater = layoutInflater
+            )
             val view = popupMenu.contentView
             popupMenu.apply {
-                onMenuItemClicked(view.forwardPopupMenuItem) {
+                onMenuItemClicked(view.forwardMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_FORWARD_PRESSED)
                     viewModel.onUserPressedForward()
                 }
-                onMenuItemClicked(view.backPopupMenuItem) {
+                onMenuItemClicked(view.backMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
-                onMenuItemClicked(view.refreshPopupMenuItem) {
+                onMenuItemClicked(view.refreshMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.newTabPopupMenuItem) {
+                onMenuItemClicked(view.newTabMenuItem) {
                     viewModel.userRequestedOpeningNewTab()
                     pixel.fire(AppPixelName.MENU_ACTION_NEW_TAB_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.bookmarksPopupMenuItem) {
+                onMenuItemClicked(view.bookmarksMenuItem) {
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(view.fireproofWebsitePopupMenuItem) { launch { viewModel.onFireproofWebsiteMenuClicked() } }
-                onMenuItemClicked(view.addBookmarksPopupMenuItem) {
+                onMenuItemClicked(view.fireproofWebsiteMenuItem) {
+                    viewModel.onFireproofWebsiteMenuClicked()
+                }
+                onMenuItemClicked(view.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
-                onMenuItemClicked(view.addFavoritePopupMenuItem) {
+                onMenuItemClicked(view.addFavoriteMenuItem) {
                     viewModel.onFavoriteMenuClicked()
                 }
                 onMenuItemClicked(view.findInPageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_FIND_IN_PAGE_PRESSED)
                     viewModel.onFindInPageSelected()
                 }
-                onMenuItemClicked(view.whitelistPopupMenuItem) { viewModel.onWhitelistSelected() }
-                onMenuItemClicked(view.brokenSitePopupMenuItem) {
+                onMenuItemClicked(view.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked() }
+                onMenuItemClicked(view.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
                 }
-                onMenuItemClicked(view.settingsPopupMenuItem) {
+                onMenuItemClicked(view.downloadsMenuItem) {
+                    pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
+                    browserActivity?.launchDownloads()
+                }
+                onMenuItemClicked(view.settingsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SETTINGS_PRESSED)
                     browserActivity?.launchSettings()
                 }
-                onMenuItemClicked(view.requestDesktopSiteCheckMenuItem) {
-                    viewModel.onDesktopSiteModeToggled(view.requestDesktopSiteCheckMenuItem.isChecked)
+                onMenuItemClicked(view.changeBrowserModeMenuItem) {
+                    viewModel.onChangeBrowserModeClicked()
                 }
                 onMenuItemClicked(view.sharePageMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_SHARE_PRESSED)
                     viewModel.onShareSelected()
                 }
-                onMenuItemClicked(view.addToHome) {
+                onMenuItemClicked(view.addToHomeMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(view.newEmailAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                onMenuItemClicked(view.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(view.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
                 }
+            }
+            view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
+                view.dividerShadow.isVisible = view.menuScrollableContent.canScrollVertically(-1)
             }
             browserMenu.setOnClickListener {
                 viewModel.onBrowserMenuClicked()
@@ -2197,6 +2320,21 @@ class BrowserTabFragment :
                 lastSeenBrowserViewState?.let {
                     renderToolbarMenus(it)
                 }
+
+                renderVoiceSearch(viewState)
+            }
+        }
+
+        private fun renderVoiceSearch(viewState: OmnibarViewState) {
+            if (viewState.showVoiceSearch) {
+                voiceSearchButton.visibility = VISIBLE
+                voiceSearchButton.setOnClickListener {
+                    webView?.onPause()
+                    hideKeyboardImmediately()
+                    voiceSearchLauncher.launch(requireActivity())
+                }
+            } else {
+                voiceSearchButton.visibility = GONE
             }
         }
 
@@ -2284,7 +2422,7 @@ class BrowserTabFragment :
                 }
 
                 renderToolbarMenus(viewState)
-                renderPopupMenus(browserShowing, viewState)
+                popupMenu.renderState(browserShowing, viewState)
                 renderFullscreenMode(viewState)
             }
         }
@@ -2320,49 +2458,6 @@ class BrowserTabFragment :
             }
         }
 
-        private fun renderPopupMenus(
-            browserShowing: Boolean,
-            viewState: BrowserViewState
-        ) {
-            popupMenu.contentView.apply {
-                backPopupMenuItem.isEnabled = viewState.canGoBack
-                forwardPopupMenuItem.isEnabled = viewState.canGoForward
-                refreshPopupMenuItem.isEnabled = browserShowing
-                newTabPopupMenuItem.isEnabled = browserShowing
-                addBookmarksPopupMenuItem?.isEnabled = viewState.canAddBookmarks
-                addBookmarksPopupMenuItem?.text =
-                    getString(if (viewState.bookmark != null) R.string.editBookmarkMenuTitle else R.string.addBookmarkMenuTitle)
-                addFavoritePopupMenuItem?.isEnabled = viewState.addFavorite.isEnabled()
-                addFavoritePopupMenuItem.text = when {
-                    viewState.addFavorite.isHighlighted() -> getString(R.string.addFavoriteMenuTitleHighlighted)
-                    viewState.favorite != null -> getString(R.string.removeFavoriteMenuTitle)
-                    else -> getString(R.string.addFavoriteMenuTitle)
-                }
-                fireproofWebsitePopupMenuItem?.isEnabled = viewState.canFireproofSite
-                fireproofWebsitePopupMenuItem?.isChecked = viewState.canFireproofSite && viewState.isFireproofWebsite
-                sharePageMenuItem?.isEnabled = viewState.canSharePage
-                whitelistPopupMenuItem?.isEnabled = viewState.canWhitelist
-                whitelistPopupMenuItem?.text =
-                    getText(if (viewState.isWhitelisted) R.string.enablePrivacyProtection else R.string.disablePrivacyProtection)
-                brokenSitePopupMenuItem?.isEnabled = viewState.canReportSite
-                requestDesktopSiteCheckMenuItem?.isEnabled = viewState.canChangeBrowsingMode
-                requestDesktopSiteCheckMenuItem?.isChecked = viewState.isDesktopBrowsingMode
-
-                newEmailAliasMenuItem?.let {
-                    it.visibility = if (viewState.isEmailSignedIn) VISIBLE else GONE
-                }
-
-                addToHome?.let {
-                    it.visibility = if (viewState.addToHomeVisible) VISIBLE else GONE
-                    it.isEnabled = viewState.addToHomeEnabled
-                }
-
-                openInAppMenuItem?.let {
-                    it.visibility = if (viewState.previousAppLink != null) VISIBLE else GONE
-                }
-            }
-        }
-
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 daxIcon?.isVisible = viewState.showDaxIcon
@@ -2391,8 +2486,6 @@ class BrowserTabFragment :
             } else {
                 hideFindInPage()
             }
-
-            popupMenu.contentView.findInPageMenuItem?.isEnabled = viewState.canFindInPage
         }
 
         fun renderCtaViewState(viewState: CtaViewState) {
@@ -2454,7 +2547,7 @@ class BrowserTabFragment :
             when (configuration) {
                 is HomePanelCta -> showHomeCta(configuration, favorites)
                 is DaxBubbleCta -> showDaxCta(configuration)
-                is BubbleCta -> showBubleCta(configuration)
+                is BubbleCta -> showBubbleCta(configuration)
                 is DialogCta -> showDaxDialogCta(configuration)
             }
             messageCta.gone()
@@ -2490,7 +2583,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showBubleCta(configuration: BubbleCta) {
+        private fun showBubbleCta(configuration: BubbleCta) {
             hideHomeBackground()
             hideHomeCta()
             configuration.showCta(daxCtaContainer)
@@ -2516,7 +2609,10 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showHomeBackground(favorites: List<QuickAccessFavorite>, hideLogo: Boolean = false) {
+        private fun showHomeBackground(
+            favorites: List<QuickAccessFavorite>,
+            hideLogo: Boolean = false
+        ) {
             if (favorites.isEmpty()) {
                 if (hideLogo) homeBackgroundLogo.hideLogo() else homeBackgroundLogo.showLogo()
                 quickAccessRecyclerView.gone()
@@ -2526,12 +2622,12 @@ class BrowserTabFragment :
                 quickAccessRecyclerView.show()
             }
 
-            newTabQuickAcessItemsLayout.show()
+            newTabQuickAccessItemsLayout.show()
         }
 
         private fun hideHomeBackground() {
             homeBackgroundLogo.hideLogo()
-            newTabQuickAcessItemsLayout.gone()
+            newTabQuickAccessItemsLayout.gone()
         }
 
         private fun hideDaxCta() {
@@ -2624,32 +2720,6 @@ class BrowserTabFragment :
             (!viewState.isEditing || omnibarInput.isNullOrEmpty()) && omnibarTextInput.isDifferent(omnibarInput)
     }
 
-    override fun openExistingFile(file: File?) {
-        if (file == null) {
-            Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val intent = context?.let { createIntentToOpenFile(it, file) }
-        activity?.packageManager?.let { packageManager ->
-            if (intent?.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            } else {
-                Timber.e("No suitable activity found")
-                Toast.makeText(activity, R.string.downloadConfirmationUnableToOpenFileText, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    override fun replaceExistingFile(
-        file: File?,
-        pendingFileDownload: PendingFileDownload
-    ) {
-        Timber.i("Deleting existing file: $file")
-        runCatching { file?.delete() }
-        continueDownload(pendingFileDownload)
-    }
-
     private fun showDownloadManagerAppSettings() {
         try {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -2659,17 +2729,6 @@ class BrowserTabFragment :
             Timber.w(e, "Could not open DownloadManager settings")
             toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
         }
-    }
-
-    private fun createIntentToOpenFile(
-        context: Context,
-        file: File
-    ): Intent? {
-        val uri = FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
-        val mime = activity?.contentResolver?.getType(uri) ?: return null
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, mime)
-        return intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

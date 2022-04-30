@@ -38,18 +38,24 @@
     <string name="favoriteAddedMessage">Favorite added</string>
     <string name="bookmarkAddedMessage">Bookmark added</string>
     <string name="requestDesktopSiteMenuTitle">Desktop Site</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Remove Fireproofing</string>
+    <string name="requestMobileSiteMenuTitle">Mobile Site</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Print Page</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorite removed</string>
+    <string name="fireproofDeleteConfirmationMessage">Fireproofing removed</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privacy Protection enabled for %s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privacy Protection disabled for %s</string>
+    <string name="undoSnackbarAction">Undo</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Download Image</string>
     <string name="permissionRequiredToDownload">Downloading requires storage permission</string>
-    <string name="downloadComplete">Download complete</string>
-    <string name="downloadFailed">Failed to download</string>
-    <string name="downloadInProgress">Downloading</string>
 
     <!-- Sharing options -->
     <string name="options">Options</string>
     <string name="shareLink">Share Link</string>
-    <string name="shareMenuTitle">Share…</string>
+    <string name="shareMenuTitle">Share</string>
     <string name="copyUrl">Copy Link Address</string>
 
     <!-- Find in page -->
@@ -157,6 +163,17 @@
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
+    <string name="settingsHeadingMore">More from DuckDuckGo</string>
+    <string name="settingsLightTheme">Light</string>
+    <string name="settingsTheme">Theme</string>
+    <string name="settingsDarkTheme">Dark</string>
+    <string name="settingsSystemTheme">System Default</string>
+    <string name="settingsThemeDialogSave">Set Theme</string>
+    <string name="settingsTitleAppLinks">Open Links in Apps</string>
+    <string name="settingsTitleAppLinksDialog">Open links in apps</string>
+    <string name="settingsAppLinksAskEveryTime">Ask every time</string>
+    <string name="settingsAppLinksAlways">Always</string>
+    <string name="settingsAppLinksNever">Never</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
@@ -236,13 +253,28 @@
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
 
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Add Favorite</string>
+    <string name="widgetConfigurationTitleText">Choose Theme</string>
+    <string name="widgetConfigurationSystemThemeOption">System default</string>
+    <string name="widgetConfigurationLightThemeOption">Light</string>
+    <string name="widgetConfigurationDarkThemeOption">Dark</string>
+    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
+    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \" &#x2807;\" icon and select Add Favorite.]]></string>
+    <string name="daxFavoritesOnboardingCtaContentDescription">Visit your favorite sites in a flash! Go to a site you love. Then tap the browser menu icon and select Add Favorite.</string>
+    <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
+    <string name="favoritesWidgetLabel">Favorites</string>
+    <string name="searchWidgetLabel">Search</string>
+
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Add to Home</string>
+    <string name="addToHome">Add to Home Screen</string>
     <string name="shortcutAddedText">Success! %s has been added to your home screen.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Help us improve the app!</string>
-    <string name="surveyCtaDescription">Take our short, anonymous survey and share your feedback.</string>
+    <string name="surveyCtaDescription">Take our short survey and share your feedback.</string>
     <string name="surveyCtaLaunchButton">Take the Survey</string>
     <string name="surveyCtaDismissButton">No thanks</string>
     <string name="surveyActivityTitle">User Survey</string>
@@ -286,8 +318,6 @@
     <string name="noThanks">No Thanks</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">File downloading</string>
-    <string name="notificationChannelFileDownloaded">File downloaded</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
@@ -419,7 +449,7 @@
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: Every time you browse with me, a creepy ad loses its wings. 👍]]></string>
-    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
+    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never save your search history. Ever. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
@@ -433,7 +463,7 @@
     <string name="daxMainNetworkOwnedCtaText">Heads up! Since %s owns %s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %s knows about you overall by blocking their trackers on lots of other sites.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continue</string>
+    <string name="downloadConfirmationContinue">Save to Downloads</string>
     <string name="downloadConfirmationSaveFileTitle">Save %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Keep both</string>
     <string name="downloadConfirmationReplaceOldFileText">Replace</string>
@@ -459,7 +489,7 @@
     <string name="dialogSaveAction">Save</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Unprotected Sites</string>
+    <string name="whitelistActivityTitle">Unprotected Sites</string>
     <string name="enablePrivacyProtection">Enable Privacy Protection</string>
     <string name="disablePrivacyProtection">Disable Privacy Protection</string>
     <string name="whitelistEntryOverflowContentDescription">More options for unprotected site %s</string>
@@ -475,8 +505,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Fireproof Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof! Visit Settings to manage.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Fireproof This Site</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof!</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
     <string name="fireproofWebsiteEmptyListHint">No Fireproof websites</string>
@@ -487,7 +517,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Ask When Signing In</string>
+    <string name="fireproofWebsiteToggleText">Ask When Signing In</string>
     <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>
@@ -553,6 +583,12 @@
     <string name="settingTitleOpenLinksInAssociatedApps">Open Links in Associated Apps</string>
     <string name="settingSubtitleOpenLinksInAssociatedApps">Disable to prevent links from automatically opening in other installed apps.</string>
     <string name="appLinkDialogTitle">Open in another app?</string>
+    <string name="appLinkSnackBarAction">Open in app</string>
+    <string name="appLinkMultipleSnackBarAction">Choose app</string>
+    <string name="appLinkSnackBarMessage">You can open this link in %s.</string>
+    <string name="appLinkMultipleSnackBarMessage">You can open this link in other apps.</string>
+    <string name="appLinkIntentChooserTitle">Open with</string>
+    <string name="appLinkMenuItemTitle">Open in App</string>
 
     <!-- Email Autofill -->
     <string name="aliasToClipboardMessage">New address copied to your clipboard</string>
@@ -570,26 +606,28 @@
 
     <!-- Waitlist Notification -->
     <string name="notificationChannelEmailWaitlist">Email waitlist</string>
-    <string name="waitlistNotificationTitle">Your Email Protection Invitation is Here!</string>
-    <string name="waitlistNotificationDescription">You joined the waitlist and asked us to notify you when it\'s your turn to try our Email Protection feature. Tap to view your invitation.</string>
+    <string name="waitlistNotificationTitle">Email Protection is ready!</string>
+    <string name="waitlistNotificationDescription">Open your invite</string>
 
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
-    <string name="waitlistNotificationDialogNoThanks">NO THANKS</string>
-    <string name="waitlistNotificationDialogNotifyMe">NOTIFY ME</string>
+    <string name="waitlistNotificationDialogNoThanks">No Thanks</string>
+    <string name="waitlistNotificationDialogNotifyMe">Notify Me</string>
 
     <!-- Email Protection -->
     <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
     <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
-    <string name="emailProtectionFooterDescription"><![CDATA[We do not save your emails. <b><a href="">Learn more</a></b>.]]></string>
+    <string name="emailProtectionFooterDescription">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
     <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
     <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
     <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
     <string name="emailProtectionWaitlistCta">Join the Private Waitlist</string>
     <string name="emailProtectionGetStartedCta">Get Started</string>
+    <string name="emailNotSupported">Device not supported</string>
+    <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address, without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address, without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
@@ -598,7 +636,7 @@
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider. <a href=""><b>Learn more</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
@@ -606,4 +644,41 @@
         <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us at <a href="mailto:support@duck.com">support@duck.com</a>.]]>
     </string>
     <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
+
+    <!-- Bookmark folders -->
+    <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
+    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
+    <string name="locationLabel">Location</string>
+    <string name="folderLocationTitle">Select Location</string>
+    <string name="addFolder">Add Folder</string>
+    <string name="editFolder">Edit Folder</string>
+    <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
+    <string name="bookmarkFolderEmpty">Empty</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage">
+        <item quantity="one">%s%s and %d item?</item>
+        <item quantity="other">%s%s and %d items?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Accessibility</string>
+    <string name="accessibilityActivityTitle">Accessibility</string>
+    <string name="accessibilityFontSizeTitle">Text size</string>
+    <string name="accessibilityFontSizeHint">Drag the slider until you can read this comfortably. Websites you view in DuckDuckGo will adjust to it.</string>
+    <string name="accessibilityForceZoomTitle">Enforce manual page zoom</string>
+    <string name="accessibilityForceZoomSubtitle">Pinch and zoom on any site, even those that would otherwise prevent it</string>
+    <string name="accessibilityTextSizeOverrideTitle">Manage text size</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Text on websites you view in DuckDuckGo will adjust to match the setting below</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyDuckduckgo">Privacy Policy</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded">%s widget added to home screen</string>
+    <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
 </resources>

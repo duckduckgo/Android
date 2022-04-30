@@ -48,6 +48,6 @@ class BasicJourneyTest {
         onView(withId(R.id.browserMenu)).perform(click())
 
         // check that the forward arrow is visible
-        onView(withId(R.id.forwardPopupMenuItem)).check(matches(isDisplayed()))
+        onView(withId(R.id.forwardMenuItem)).check(matches(isDisplayed()))
     }
 }

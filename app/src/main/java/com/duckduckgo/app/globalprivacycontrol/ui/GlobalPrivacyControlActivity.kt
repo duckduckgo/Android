@@ -25,14 +25,17 @@ import android.text.style.ClickableSpan
 import android.text.style.URLSpan
 import android.view.View
 import android.widget.CompoundButton.OnCheckedChangeListener
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGlobalPrivacyControlBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
+@InjectWith(ActivityScope::class)
 class GlobalPrivacyControlActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityGlobalPrivacyControlBinding by viewBinding()

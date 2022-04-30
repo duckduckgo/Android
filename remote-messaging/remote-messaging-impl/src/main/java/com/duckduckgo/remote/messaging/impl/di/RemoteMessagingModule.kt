@@ -30,6 +30,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.*
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
 import com.duckduckgo.remote.messaging.impl.matchers.AndroidAppAttributeMatcher
+import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.DeviceAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.UserAttributeMatcher
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
@@ -50,7 +51,7 @@ import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
-class DomainModule {
+object DomainModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -64,7 +65,7 @@ class DomainModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class NetworkModule {
+object NetworkModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -82,7 +83,7 @@ class NetworkModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class DataSourceModule {
+object DataSourceModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -129,37 +130,40 @@ class DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        deviceAttributeMatcher: DeviceAttributeMatcher,
-        androidAppAttributeMatcher: AndroidAppAttributeMatcher,
+        @DeviceAttrMatcher deviceAttributeMatcher: AttributeMatcher,
+        @AndroidAppAttrMatcher androidAppAttributeMatcher: AttributeMatcher,
         remoteMessagingRepository: RemoteMessagingRepository,
-        userAttributeMatcher: UserAttributeMatcher
+        @UserAttrMatcher userAttributeMatcher: AttributeMatcher
     ): RemoteMessagingConfigMatcher {
         return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @AndroidAppAttrMatcher
     fun providesAndroidAppAttributeMatcher(
         appProperties: AppProperties,
         appBuildConfig: AppBuildConfig
-    ): AndroidAppAttributeMatcher {
+    ): AttributeMatcher {
         return AndroidAppAttributeMatcher(appProperties, appBuildConfig)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @DeviceAttrMatcher
     fun providesDeviceAttributeMatcher(
         appBuildConfig: AppBuildConfig,
         appProperties: AppProperties
-    ): DeviceAttributeMatcher {
+    ): AttributeMatcher {
         return DeviceAttributeMatcher(appBuildConfig, appProperties)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
+    @UserAttrMatcher
     fun providesUserAttributeMatcher(
         userBrowserProperties: UserBrowserProperties
-    ): UserAttributeMatcher {
+    ): AttributeMatcher {
         return UserAttributeMatcher(userBrowserProperties)
     }
 

@@ -17,9 +17,11 @@
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import junit.framework.TestCase.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
@@ -40,7 +42,9 @@ class AmpLinksPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchAmpLinksThenReturnFalse() {
-        assertFalse(testee.store("test", EMPTY_JSON_STRING))
+        PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+            Assert.assertFalse(testee.store(it, EMPTY_JSON_STRING))
+        }
     }
 
     @Test
@@ -103,7 +107,7 @@ class AmpLinksPluginTest {
     }
 
     companion object {
-        private const val FEATURE_NAME = "ampLinks"
+        private val FEATURE_NAME = PrivacyFeatureName.AmpLinksFeatureName
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

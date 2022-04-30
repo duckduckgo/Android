@@ -35,37 +35,29 @@
             android:layout_marginTop="32dp"
             app:srcCompat="@drawable/contact_us" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/statusTitle"
+            style="@style/TextAppearance.DuckDuckGo.Headline2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
-            android:paddingTop="24dp"
-            android:text="@string/emailProtectionStatusTitleJoin"
-            android:textAlignment="center"
             android:textColor="?attr/settingsItemTextColor"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textAlignment="center"
+            android:text="@string/emailProtectionStatusTitleJoin" />
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/emailPrivacyDescription"
+            style="@style/TextAppearance.DuckDuckGo.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:textAlignment="center"
+            android:layout_marginTop="16dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:fontFamily="sans-serif"
-            android:lineSpacingExtra="4sp"
-            android:maxWidth="500dp"
-            android:paddingTop="8dp"
-            android:text="@string/emailProtectionDescriptionJoin"
-            android:textAlignment="center"
             android:textColor="?attr/settingsMinorTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            android:text="@string/emailProtectionDescriptionJoin" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -76,55 +68,51 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/waitListButton"
-                style="@style/EmailButton.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="55dp"
-                android:minWidth="500dp"
+                style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/emailProtectionWaitlistCta" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/getStartedButton"
-                style="@style/EmailButton.Primary"
-                android:layout_width="wrap_content"
-                android:layout_height="55dp"
-                android:minWidth="500dp"
+                style="@style/Widget.DuckDuckGo.Button.Primary.Lowercase"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/emailProtectionGetStartedCta" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/inviteCodeButton"
-                style="@style/EmailButton.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="55dp"
-                android:minWidth="500dp"
+                style="@style/Widget.DuckDuckGo.Button.Secondary"
+                android:layout_marginBottom="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/emailProtectionInviteCodeCta" />
 
-            <com.google.android.material.button.MaterialButton
+            <Button
                 android:id="@+id/duckAddressButton"
-                style="@style/EmailButton.Secondary"
-                android:layout_width="wrap_content"
-                android:layout_height="55dp"
-                android:minWidth="500dp"
+                style="@style/Widget.DuckDuckGo.Button.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:text="@string/emailProtectionDuckAddressCta" />
         </LinearLayout>
 
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/footerDescription"
+            style="@style/TextAppearance.DuckDuckGo.Caption"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
             android:layout_marginBottom="35dp"
-            android:fontFamily="sans-serif"
             android:gravity="bottom|center_horizontal"
-            android:lineSpacingExtra="4sp"
-            android:text="@string/emailProtectionFooterDescription"
             android:textColor="?attr/settingsMinorTextColor"
-            android:textSize="14sp"
-            android:textStyle="normal" />
+            android:text="@string/emailProtectionFooterDescription" />
 
     </LinearLayout>
 

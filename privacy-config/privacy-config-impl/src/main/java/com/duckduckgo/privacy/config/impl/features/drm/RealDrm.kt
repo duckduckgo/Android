@@ -50,7 +50,7 @@ class RealDrm @Inject constructor(
     }
 
     private fun shouldEnableDrmForUri(uri: Uri): Boolean {
-        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName(), defaultValue = true) ?: false
+        val isFeatureEnabled = featureToggle.isFeatureEnabled(PrivacyFeatureName.DrmFeatureName, defaultValue = true)
         return isFeatureEnabled && domainsThatAllowDrm(uri.baseHost)
     }
 

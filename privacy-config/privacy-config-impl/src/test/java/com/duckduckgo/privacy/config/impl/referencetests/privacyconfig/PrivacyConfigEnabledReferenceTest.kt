@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl.referencetests.privacyconfig
 import androidx.room.Room
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
@@ -94,7 +95,7 @@ class PrivacyConfigEnabledReferenceTest(private val testCase: TestCase) {
 
         verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(
             PrivacyFeatureToggles(
-                testCase.featureName,
+                privacyFeatureValueOf(testCase.featureName)!!,
                 testCase.expectFeatureEnabled
             )
         )

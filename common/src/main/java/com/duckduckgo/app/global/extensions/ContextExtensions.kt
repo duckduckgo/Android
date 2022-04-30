@@ -20,7 +20,9 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
 import android.os.Build.VERSION_CODES.R
+import android.provider.Settings
 import androidx.annotation.RequiresApi
+import timber.log.Timber
 import java.util.*
 
 @RequiresApi(R)
@@ -34,4 +36,21 @@ fun Context.historicalExitReasonsByProcessName(
         .filter { it.processName == name }
         .take(n)
         .map { "[${Date(it.timestamp)} - Reason: ${it.reason}: ${it.description}" }
+}
+
+fun Context.isPrivateDnsActive(): Boolean {
+    var dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
+    if (dnsMode == null) dnsMode = "off"
+    return "off" != dnsMode
+}
+
+fun Context.getPrivateDnsServerName(): String? {
+    val dnsMode = Settings.Global.getString(contentResolver, "private_dns_mode")
+    return if ("hostname" == dnsMode) Settings.Global.getString(contentResolver, "private_dns_specifier") else null
+}
+
+fun Context.isAirplaneModeOn(): Boolean {
+    val airplaneMode = Settings.Global.getString(contentResolver, "airplane_mode_on")
+    Timber.v("airplane_mode_on $airplaneMode")
+    return airplaneMode == "1"
 }

@@ -64,11 +64,11 @@ class DomainBasedTrackerDetector(
     ): RequestTrackerType {
 
         if (isLocalAddress) {
-            Timber.v("%s is a local address; not looking for trackers", packet.ip4Header.destinationAddress)
+            Timber.v("%s is a local address; not looking for trackers", packet.ipHeader.destinationAddress)
             tcb.trackerTypeDetermined = true
             tcb.isTracker = false
 
-            return RequestTrackerType.NotTracker(packet.ip4Header.destinationAddress.hostName)
+            return RequestTrackerType.NotTracker(packet.ipHeader.destinationAddress.hostName)
         }
 
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)

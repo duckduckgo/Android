@@ -22,15 +22,18 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.browser.databinding.ActivityBrokenSiteBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class BrokenSiteActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityBrokenSiteBinding by viewBinding()

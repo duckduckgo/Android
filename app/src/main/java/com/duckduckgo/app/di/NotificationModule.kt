@@ -22,12 +22,14 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.work.WorkManager
 import com.duckduckgo.app.email.db.EmailDataStore
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.*
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.ClearDataNotification
 import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,7 +40,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
-class NotificationModule {
+object NotificationModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -115,9 +117,10 @@ class NotificationModule {
         pixel: Pixel,
         manager: NotificationManagerCompat,
         factory: NotificationFactory,
-        notificationDao: NotificationDao
+        notificationDao: NotificationDao,
+        pluginPoint: PluginPoint<SchedulableNotificationPlugin>
     ): NotificationSender {
-        return AppNotificationSender(context, pixel, manager, factory, notificationDao)
+        return AppNotificationSender(context, pixel, manager, factory, notificationDao, pluginPoint)
     }
 
     @Provides

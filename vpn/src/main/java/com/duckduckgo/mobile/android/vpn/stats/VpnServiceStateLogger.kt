@@ -47,7 +47,7 @@ class VpnServiceStateLogger @Inject constructor(private val vpnDatabase: VpnData
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch(dispatcher) {
-            Timber.d("VpnServiceStateLogge, new state ENABLED")
+            Timber.d("VpnServiceStateLogger, new state ENABLED")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.ENABLED))
         }
     }
@@ -57,7 +57,7 @@ class VpnServiceStateLogger @Inject constructor(private val vpnDatabase: VpnData
         vpnStopReason: VpnStopReason
     ) {
         coroutineScope.launch(dispatcher) {
-            Timber.d("VpnServiceStateLogge, new state DISABLED, reason $vpnStopReason")
+            Timber.d("VpnServiceStateLogger, new state DISABLED, reason $vpnStopReason")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = VpnServiceState.DISABLED, stopReason = mapStopReason(vpnStopReason)))
         }
     }

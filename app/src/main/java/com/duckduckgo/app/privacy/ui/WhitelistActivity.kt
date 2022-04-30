@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
 import com.duckduckgo.app.browser.databinding.EditWhitelistBinding
@@ -32,10 +33,11 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.privacy.ui.WhitelistViewModel.Command.*
-import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class WhitelistActivity : DuckDuckGoActivity() {
 
     @Inject

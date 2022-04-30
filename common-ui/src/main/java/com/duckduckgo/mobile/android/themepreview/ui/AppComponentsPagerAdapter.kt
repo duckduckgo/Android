@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.themepreview.ui.component.buttons.ComponentInteractiveElementsFragment
+import com.duckduckgo.mobile.android.themepreview.ui.component.listitems.ComponentListItemsElementsFragment
 import com.duckduckgo.mobile.android.themepreview.ui.component.navigation.ComponentMessagingFragment
 import com.duckduckgo.mobile.android.themepreview.ui.palette.ColorPaletteFragment
 import com.duckduckgo.mobile.android.themepreview.ui.typography.TypographyFragment
@@ -38,6 +39,8 @@ class AppComponentsPagerAdapter(
         TYPOGRAPHY(R.string.tab_title_typography),
         INTERACTIVE_ELEMENTS(R.string.tab_title_component_interactive),
         MESSAGING(R.string.tab_title_component_messaging),
+        LIST_ITEMS(R.string.tab_title_component_list_items),
+
     }
 
     override fun getCount(): Int = MainFragments.values().size
@@ -56,6 +59,7 @@ class AppComponentsPagerAdapter(
             MainFragments.TYPOGRAPHY -> TypographyFragment()
             MainFragments.INTERACTIVE_ELEMENTS -> ComponentInteractiveElementsFragment()
             MainFragments.MESSAGING -> ComponentMessagingFragment()
+            MainFragments.LIST_ITEMS -> ComponentListItemsElementsFragment()
         }
     }
 }

@@ -55,7 +55,7 @@ private val mediumMapper: (JsonContent) -> Content = { jsonContent ->
     )
 }
 
-private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageSingleActionMapper: (JsonContent) -> Content = { jsonContent ->
     BigSingleAction(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -65,7 +65,7 @@ private val bigMessageSingleAcionMapper: (JsonContent) -> Content = { jsonConten
     )
 }
 
-private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent ->
+private val bigMessageTwoActionMapper: (JsonContent) -> Content = { jsonContent ->
     BigTwoActions(
         titleText = jsonContent.titleText.failIfEmpty(),
         descriptionText = jsonContent.descriptionText.failIfEmpty(),
@@ -80,8 +80,8 @@ private val bigMessageTwoAcionMapper: (JsonContent) -> Content = { jsonContent -
 private val messageMappers = mapOf(
     Pair(SMALL.jsonValue, smallMapper),
     Pair(MEDIUM.jsonValue, mediumMapper),
-    Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleAcionMapper),
-    Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoAcionMapper)
+    Pair(BIG_SINGLE_ACTION.jsonValue, bigMessageSingleActionMapper),
+    Pair(BIG_TWO_ACTION.jsonValue, bigMessageTwoActionMapper)
 )
 
 private val urlActionMapper: (JsonMessageAction) -> Action = {

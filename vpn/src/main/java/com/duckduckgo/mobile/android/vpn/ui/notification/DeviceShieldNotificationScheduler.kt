@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit
 
 @Module
 @ContributesTo(AppScope::class)
-class DeviceShieldNotificationSchedulerModule {
+object DeviceShieldNotificationSchedulerModule {
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(

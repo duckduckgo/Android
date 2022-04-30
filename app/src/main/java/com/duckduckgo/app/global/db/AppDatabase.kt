@@ -636,6 +636,8 @@ class MigrationsProvider(val context: Context) {
         }
 
         fun isReturningUser(): Boolean {
+            // This was used by the 2 retuning users experiments.
+            // First released in 5.103.0 and fully disabled in 5.114.0.
             val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
         }

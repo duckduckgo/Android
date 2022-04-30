@@ -38,7 +38,7 @@ import dagger.Provides
 
 @Module
 @ContributesTo(AppScope::class)
-class DeviceShieldAlertNotificationBuilderModule {
+object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
     fun providesDeviceShieldAlertNotificationBuilder(): DeviceShieldAlertNotificationBuilder {

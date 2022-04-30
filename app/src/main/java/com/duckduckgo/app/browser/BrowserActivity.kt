@@ -27,10 +27,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.Observer
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
@@ -43,6 +41,7 @@ import com.duckduckgo.app.browser.rating.ui.RateAppDialogFragment
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
@@ -66,7 +65,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -78,6 +77,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
+@InjectWith(ActivityScope::class)
 open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     @Inject
@@ -129,8 +129,6 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
-
-    private val tabsJob = ConflatedJob()
 
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -318,20 +316,19 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
                 if (it != null) selectTab(it)
             }
         )
-
-        tabsJob += lifecycleScope.launch {
-            viewModel.tabs
-                .flowWithLifecycle(lifecycle, STARTED).collect {
-                    clearStaleTabs(it)
-                    launch { viewModel.onTabsUpdated(it) }
-                }
-        }
+        viewModel.tabs.observe(
+            this,
+            Observer {
+                clearStaleTabs(it)
+                launch { viewModel.onTabsUpdated(it) }
+            }
+        )
     }
 
     private fun removeObservers() {
         viewModel.command.removeObservers(this)
         viewModel.selectedTab.removeObservers(this)
-        tabsJob.cancel()
+        viewModel.tabs.removeObservers(this)
     }
 
     private fun clearStaleTabs(updatedTabs: List<TabEntity>?) {
@@ -432,6 +429,10 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
 
     fun launchBookmarks() {
         startActivity(BookmarksActivity.intent(this))
+    }
+
+    fun launchDownloads() {
+        startActivity(DownloadsActivity.intent(this))
     }
 
     override fun onActivityResult(

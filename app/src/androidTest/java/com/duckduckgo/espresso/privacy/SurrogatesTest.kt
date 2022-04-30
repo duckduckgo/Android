@@ -53,7 +53,20 @@ class SurrogatesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreEnabledSurrogatesAreLoaded() {
-        onView(isRoot()).perform(waitForView(withId(R.id.pageLoadingIndicator)))
+        val waitTime = 16000L
+        IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+        IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
+
+        var webView: WebView? = null
+
+        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+
+        activityScenarioRule.scenario.onActivity {
+            webView = it.findViewById(R.id.browserWebView)
+        }
+
+        val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
+        IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         val results = onWebView()
             .perform(script(SCRIPT))
@@ -70,7 +83,7 @@ class SurrogatesTest {
 
     @Test @PrivacyTest
     fun whenProtectionsAreDisabledSurrogatesAreNotLoaded() {
-        val waitTime = 6000L
+        val waitTime = 16000L
         IdlingPolicies.setMasterPolicyTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
         IdlingPolicies.setIdlingResourceTimeout(waitTime * 10, TimeUnit.MILLISECONDS)
 
@@ -86,8 +99,8 @@ class SurrogatesTest {
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
         onView(withId(R.id.browserMenu)).perform(ViewActions.click())
-        onView(isRoot()).perform(waitForView(withId(R.id.whitelistPopupMenuItem)))
-        onView(withId(R.id.whitelistPopupMenuItem)).perform(ViewActions.click())
+        onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
+        onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
 
         val idlingResourceForScript: IdlingResource = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForScript)

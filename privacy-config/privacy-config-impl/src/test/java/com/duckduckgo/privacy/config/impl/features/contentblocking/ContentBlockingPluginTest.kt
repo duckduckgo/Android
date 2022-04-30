@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.contentblocking
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
@@ -40,7 +41,9 @@ class ContentBlockingPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchContentBlockingThenReturnFalse() {
-        assertFalse(testee.store("test", EMPTY_JSON_STRING))
+        PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+            assertFalse(testee.store(it, EMPTY_JSON_STRING))
+        }
     }
 
     @Test
@@ -76,7 +79,7 @@ class ContentBlockingPluginTest {
     }
 
     companion object {
-        private const val FEATURE_NAME = "contentBlocking"
+        private val FEATURE_NAME = PrivacyFeatureName.ContentBlockingFeatureName
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

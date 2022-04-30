@@ -33,7 +33,7 @@ class PrivacyFeatureTogglesPlugin @Inject constructor(private val privacyFeature
         defaultValue: Boolean
     ): Boolean? {
         return if (featureName is PrivacyFeatureName) {
-            privacyFeatureTogglesRepository.get(featureName.value, defaultValue)
+            privacyFeatureTogglesRepository.get(featureName, defaultValue)
         } else {
             null
         }

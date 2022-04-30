@@ -64,7 +64,7 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     fun whenIsAnExceptionAnFeatureEnableThenReturnCorrectValues() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.TrackerAllowlistFeatureName(), true
+                PrivacyFeatureName.TrackerAllowlistFeatureName, true
             )
         )
             .thenReturn(true)
@@ -79,7 +79,7 @@ class TrackerAllowlistReferenceTest(private val testCase: TestCase) {
     fun whenIsAnExceptionAnFeatureDisabledThenReturnCorrectValues() {
         whenever(
             mockFeatureToggle.isFeatureEnabled(
-                PrivacyFeatureName.TrackerAllowlistFeatureName(), true
+                PrivacyFeatureName.TrackerAllowlistFeatureName, true
             )
         )
             .thenReturn(false)

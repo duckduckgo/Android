@@ -22,6 +22,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -35,6 +36,8 @@ import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.macos_api.MacOsWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
@@ -98,6 +101,12 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
 
+    @Mock
+    private lateinit var mockEmailManager: EmailManager
+
+    @Mock
+    private lateinit var mockMacOsWaitlist: MacOsWaitlist
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -117,7 +126,9 @@ class SettingsViewModelTest {
             mockGpc,
             mockFeatureToggle,
             mockPixel,
-            mockAppBuildConfig
+            mockAppBuildConfig,
+            mockEmailManager,
+            mockMacOsWaitlist
         )
 
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
@@ -126,6 +137,7 @@ class SettingsViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
         whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+        whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
@@ -139,7 +151,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleDisabledAndGpcEnabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(false)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
         testee.start()
@@ -152,7 +164,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(false)
         testee.start()
 
@@ -164,7 +176,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
-        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName()), any())).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
         testee.start()
 
@@ -206,6 +218,19 @@ class SettingsViewModelTest {
             val value = expectMostRecentItem()
             val expectedStartString = "name (1)"
             assertTrue(value.version.startsWith(expectedStartString))
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenStartCalledThenEmailAddressSetCorrectly() = runTest {
+        whenever(mockEmailManager.getEmailAddress()).thenReturn("email")
+        testee.start()
+        testee.viewState().test {
+            val value = expectMostRecentItem()
+            val expectedEmail = "email"
+            assertEquals(expectedEmail, value.emailAddress)
 
             cancelAndConsumeRemainingEvents()
         }
@@ -654,6 +679,17 @@ class SettingsViewModelTest {
             testee.userRequestedToAddHomeScreenWidget()
 
             assertEquals(Command.LaunchAddHomeScreenWidget, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnMacOsSettingClickedThenEmitCommandLaunchMacOs() = runTest {
+        testee.commands().test {
+            testee.onMacOsSettingClicked()
+
+            assertEquals(Command.LaunchMacOs, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

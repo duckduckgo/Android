@@ -20,7 +20,6 @@ import android.content.Intent
 
 object WelcomePageView {
     sealed class Event {
-        object OnReturningUserClicked : Event()
         object OnPrimaryCtaClicked : Event()
         object OnDefaultBrowserSet : Event()
         object OnDefaultBrowserNotSet : Event()

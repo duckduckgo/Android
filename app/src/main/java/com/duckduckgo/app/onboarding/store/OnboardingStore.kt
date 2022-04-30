@@ -18,7 +18,4 @@ package com.duckduckgo.app.onboarding.store
 
 interface OnboardingStore {
     var onboardingDialogJourney: String?
-    var userMarkedAsReturningUser: Boolean
-    var countNewTabForReturningUser: Int
-    fun hasReachedThresholdToShowWidgetForReturningUser(): Boolean
 }

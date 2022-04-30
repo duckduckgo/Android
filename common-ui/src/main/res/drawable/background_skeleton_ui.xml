@@ -17,6 +17,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <solid android:color="@color/splitterGray"/>
+    <solid android:color="?splitterColor"/>
     <corners android:radius="12dp"/>
 </shape>

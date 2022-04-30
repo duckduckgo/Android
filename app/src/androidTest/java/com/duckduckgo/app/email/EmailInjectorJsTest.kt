@@ -23,6 +23,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName.AutofillFeatureName
 import org.mockito.kotlin.*
 import org.junit.Before
 import org.junit.Test
@@ -32,11 +35,16 @@ class EmailInjectorJsTest {
 
     private val mockEmailManager: EmailManager = mock()
     private val mockDispatcherProvider: DispatcherProvider = mock()
+    private val mockFeatureToggle: FeatureToggle = mock()
+    private val mockAutofill: Autofill = mock()
     lateinit var testee: EmailInjectorJs
 
     @Before
     fun setup() {
-        testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider)
+        testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, mockAutofill)
+
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
+        whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }
 
     @UiThreadTest
@@ -92,14 +100,72 @@ class EmailInjectorJsTest {
     @UiThreadTest
     @Test
     @SdkSuppress(minSdkVersion = 24)
+    fun whenInjectEmailAutofillJsAndUrlIsFromDuckDuckGoAndFeatureIsDisabledThenInjectJsCode() {
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
+
+        val jsToEvaluate = getJsToEvaluate()
+        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        testee.injectEmailAutofillJs(webView, "https://duckduckgo.com/email")
+
+        verify(webView).evaluateJavascript(jsToEvaluate, null)
+    }
+
+    @UiThreadTest
+    @Test
+    @SdkSuppress(minSdkVersion = 24)
+    fun whenInjectEmailAutofillJsAndUrlIsFromDuckDuckGoAndUrlIsInExceptionsThenInjectJsCode() {
+        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
+        whenever(mockAutofill.isAnException(any())).thenReturn(true)
+
+        val jsToEvaluate = getJsToEvaluate()
+        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        testee.injectEmailAutofillJs(webView, "https://duckduckgo.com/email")
+
+        verify(webView).evaluateJavascript(jsToEvaluate, null)
+    }
+
+    @UiThreadTest
+    @Test
+    @SdkSuppress(minSdkVersion = 24)
     fun whenInjectAddressThenInjectJsCodeReplacingTheAlias() {
         val address = "address"
         val jsToEvaluate = getAliasJsToEvaluate().replace("%s", address)
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
 
-        testee.injectAddressInEmailField(webView, address)
+        testee.injectAddressInEmailField(webView, address, "https://example.com")
 
         verify(webView).evaluateJavascript(jsToEvaluate, null)
+    }
+
+    @UiThreadTest
+    @Test
+    @SdkSuppress(minSdkVersion = 24)
+    fun whenInjectAddressAndFeatureIsDisabledThenJsCodeNotInjected() {
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
+
+        val address = "address"
+        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        testee.injectAddressInEmailField(webView, address, "https://example.com")
+
+        verify(webView, never()).evaluateJavascript(any(), any())
+    }
+
+    @UiThreadTest
+    @Test
+    @SdkSuppress(minSdkVersion = 24)
+    fun whenInjectAddressAndUrlIsAnExceptionThenJsCodeNotInjected() {
+        whenever(mockAutofill.isAnException(any())).thenReturn(true)
+
+        val address = "address"
+        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        testee.injectAddressInEmailField(webView, address, "https://example.com")
+
+        verify(webView, never()).evaluateJavascript(any(), any())
     }
 
     private fun getJsToEvaluate(): String {

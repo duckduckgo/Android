@@ -16,29 +16,22 @@
 
 package com.duckduckgo.mobile.android.ui.menu
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.os.Build.VERSION.SDK_INT
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.PopupWindow
 
-class PopupMenu(
+open class PopupMenu(
     layoutInflater: LayoutInflater,
     resourceId: Int,
-    view: View = inflate(layoutInflater, resourceId)
-) : PopupWindow(view, WRAP_CONTENT, WRAP_CONTENT, true) {
+    view: View = inflate(layoutInflater, resourceId),
+    width: Int = WRAP_CONTENT,
+    height: Int = WRAP_CONTENT
+) : PopupWindow(view, width, height, true) {
 
     init {
-        if (SDK_INT <= 22) {
-            // popupwindow gets stuck on the screen on API 22 (tested on 23) without a background
-            // color.  Adding it however garbles the elevation so we cannot have elevation here.
-            setBackgroundDrawable(ColorDrawable(Color.WHITE))
-        } else {
-            elevation = ELEVATION
-        }
+        elevation = ELEVATION
         animationStyle = android.R.style.Animation_Dialog
     }
 

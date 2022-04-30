@@ -158,7 +158,7 @@ class LocationPermissionsRepositoryTest {
     }
 
     @Test
-    fun whenPermissionEntitiesCountByDomainAndWebsitsMatchThenReturnCount() = runTest {
+    fun whenPermissionEntitiesCountByDomainAndWebsitesMatchThenReturnCount() = runTest {
         val query = "%example%"
         givenPermissionStored("example.com")
 

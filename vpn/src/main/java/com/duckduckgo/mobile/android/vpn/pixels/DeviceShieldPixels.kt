@@ -268,11 +268,11 @@ interface DeviceShieldPixels {
      */
     fun didShowVpnConflictDialog()
 
-    fun didChooseToDismissVpnConflicDialog()
+    fun didChooseToDismissVpnConflictDialog()
 
-    fun didChooseToOpenSettingsFromVpnConflicDialog()
+    fun didChooseToOpenSettingsFromVpnConflictDialog()
 
-    fun didChooseToContinueFromVpnConflicDialog()
+    fun didChooseToContinueFromVpnConflictDialog()
 
     /**
      * Will fire when the waitlist dialog is showed to the user
@@ -305,7 +305,7 @@ interface DeviceShieldPixels {
     fun sendUnknownPacketProtocol(protocol: Int)
 
     /**
-     * Will fire when the VPN detected bad health, restarted and fixex the bad health
+     * Will fire when the VPN detected bad health, restarted and fixed the bad health
      */
     fun badHealthResolvedByRestart(data: Map<String, String>)
 
@@ -323,6 +323,34 @@ interface DeviceShieldPixels {
      * Will fire when the VPN Process is restarted as a result of bad health mitigation
      */
     fun didRestartVpnProcessOnBadHealth()
+
+    /** Will fire when Beta instructions CTA is pressed */
+    fun didOpenBetaInstructions()
+
+    /**
+     * This fun will fire two pixels
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun didShowExclusionListActivity()
+
+    /**
+     * Will fire when the user wants to open the Exclusion List Activity from the Manage Recent Apps Protection Screen
+     */
+    fun didOpenExclusionListActivityFromManageAppsProtectionScreen()
+
+    /**
+     * Will fire when the user opens the Company Trackers Screen
+     */
+    fun didOpenCompanyTrackersScreen()
+
+    /** Will fire when the user launches the Recent App Settings Screen */
+    fun didOpenManageRecentAppSettings()
+
+    fun reportLoopbackDnsError()
+    fun reportAnylocalDnsError()
+    fun reportGeneralDnsError()
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -502,10 +530,12 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun privacyReportArticleDisplayed() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_PRIVACY_REPORT_ARTICLE_DAILY)
     }
 
     override fun privacyReportOnboardingFAQDisplayed() {
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_ONBOARDING_FAQ_DAILY)
     }
 
     override fun vpnEstablishTunInterfaceError() {
@@ -603,19 +633,19 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToDismissVpnConflicDialog() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
+    override fun didChooseToDismissVpnConflictDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISMISS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToOpenSettingsFromVpnConflicDialog() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+    override fun didChooseToOpenSettingsFromVpnConflictDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
     }
 
-    override fun didChooseToContinueFromVpnConflicDialog() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
-        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_VPN_CONFLICT_DIALOG)
+    override fun didChooseToContinueFromVpnConflictDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CONTINUE_VPN_CONFLICT_DIALOG)
     }
 
     override fun didShowWaitlistDialog() {
@@ -663,6 +693,53 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didRestartVpnProcessOnBadHealth() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_RESTART_VPN_PROCESS_ON_BAD_HEALTH)
+    }
+
+    override fun didOpenBetaInstructions() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_BETA_INSTRUCTIONS)
+    }
+
+    override fun didShowExclusionListActivity() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_EXCLUSION_LIST_ACTIVITY)
+    }
+
+    override fun didOpenExclusionListActivityFromManageAppsProtectionScreen() {
+        tryToFireUniquePixel(
+            DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_UNIQUE,
+            tag = FIRST_OPEN_ENTRY_POINT_TAG
+        )
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_OPEN_EXCLUSION_LIST_ACTIVITY_FROM_MANAGE_APPS_PROTECTION)
+    }
+
+    override fun didOpenCompanyTrackersScreen() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun didOpenManageRecentAppSettings() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun reportLoopbackDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR)
+    }
+
+    override fun reportAnylocalDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_ERROR)
+    }
+
+    override fun reportGeneralDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
     }
 
     private fun suddenKill() {
@@ -727,6 +804,7 @@ class RealDeviceShieldPixels @Inject constructor(
 
     companion object {
         private const val FIRST_ENABLE_ENTRY_POINT_TAG = "FIRST_ENABLE_ENTRY_POINT_TAG"
+        private const val FIRST_OPEN_ENTRY_POINT_TAG = "FIRST_OPEN_ENTRY_POINT_TAG"
 
         @VisibleForTesting
         const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"

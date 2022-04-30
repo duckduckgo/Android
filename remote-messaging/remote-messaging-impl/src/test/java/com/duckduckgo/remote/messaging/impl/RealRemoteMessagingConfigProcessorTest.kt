@@ -17,10 +17,12 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.app.CoroutineTestRule
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
+import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -29,24 +31,37 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
 
 @ExperimentalCoroutinesApi
 class RealRemoteMessagingConfigProcessorTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
 
-    private val remoteMessagingConfigJsonMapper = mock<RemoteMessagingConfigJsonMapper>()
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = mock<RemoteMessagingConfigMatcher>()
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(
+        mock<AttributeMatcher>(),
+        mock<AttributeMatcher>(),
+        mock<RemoteMessagingRepository>(),
+        mock<AttributeMatcher>(),
+    )
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository, remoteMessagingRepository, remoteMessagingConfigMatcher
     )
+
+    @Before
+    fun setup() {
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
+    }
 
     @Test
     fun whenNewVersionThenEvaluate() = runTest {

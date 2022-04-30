@@ -27,13 +27,14 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.model.AppHealthState
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.BAD_HEALTH
 import com.duckduckgo.mobile.android.vpn.model.HealthEventType.GOOD_HEALTH
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
@@ -51,19 +52,16 @@ import javax.inject.Inject
     scope = AppScope::class,
     boundType = AppHealthCallback::class
 )
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = BadHealthMitigationFeature::class
-)
 @SingleInstanceIn(AppScope::class)
 class AppBadHealthStateHandler @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val appHealthDatabase: AppHealthDatabase,
+    private val appTpConfig: AppTpFeatureConfig,
     private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : AppHealthCallback, BadHealthMitigationFeature {
+) : AppHealthCallback {
 
     private var debounceJob = ConflatedJob()
 
@@ -82,14 +80,8 @@ class AppBadHealthStateHandler @Inject constructor(
             preferences.edit { putString("restartBoundary", value) }
         }
 
-    override var isEnabled: Boolean
-        get() = preferences.getBoolean("isEnabled", true)
-        set(value) {
-            preferences.edit { putBoolean("isEnabled", value) }
-        }
-
     override suspend fun onAppHealthUpdate(appHealthData: AppHealthData): Boolean {
-        if (!isEnabled) {
+        if (!appTpConfig.isEnabled(AppTpSetting.BadHealthMitigation)) {
             Timber.d("Feature is disabled, skipping mitigation")
             return false
         }

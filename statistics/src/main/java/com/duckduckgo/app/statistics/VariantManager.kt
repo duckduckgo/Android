@@ -19,9 +19,8 @@ package com.duckduckgo.app.statistics
 import androidx.annotation.WorkerThread
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.VariantManager.Companion.referrerVariant
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersContinueWithoutPrivacyTips
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.ReturningUsersSkipTutorial
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import timber.log.Timber
 import java.util.*
 
@@ -31,11 +30,6 @@ interface VariantManager {
     // variant-dependant features listed here
     sealed class VariantFeature {
         object FireproofExperiment : VariantFeature()
-
-        object ReturningUsersContinueWithoutPrivacyTips : VariantFeature()
-        object ReturningUsersSkipTutorial : VariantFeature()
-
-        object TrackingParameterRemoval : VariantFeature()
     }
 
     companion object {
@@ -54,15 +48,6 @@ interface VariantManager {
             // Fireproof experiment
             Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
-
-            // Returning users - second experiment
-            Variant(key = "zd", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "zg", weight = 0.0, features = listOf(ReturningUsersContinueWithoutPrivacyTips), filterBy = { isEnglishLocale() }),
-            Variant(key = "zh", weight = 0.0, features = listOf(ReturningUsersSkipTutorial), filterBy = { isEnglishLocale() }),
-
-            // Tracking parameter removal - initial rollout to 25%
-            Variant(key = "my", weight = 0.25, features = listOf(VariantFeature.TrackingParameterRemoval), filterBy = { noFilter() }),
-            Variant(key = "me", weight = 0.75, features = emptyList(), filterBy = { noFilter() })
         )
 
         val REFERRER_VARIANTS = listOf(
@@ -110,7 +95,8 @@ interface VariantManager {
 
 class ExperimentationVariantManager(
     private val store: StatisticsDataStore,
-    private val indexRandomizer: IndexRandomizer
+    private val indexRandomizer: IndexRandomizer,
+    private val appBuildConfig: AppBuildConfig,
 ) : VariantManager {
 
     @Synchronized
@@ -142,7 +128,7 @@ class ExperimentationVariantManager(
 
     private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
         var newVariant = generateVariant(activeVariants)
-        val compliesWithFilters = newVariant.filterBy()
+        val compliesWithFilters = newVariant.filterBy(appBuildConfig)
 
         if (!compliesWithFilters) {
             newVariant = DEFAULT_VARIANT
@@ -194,11 +180,6 @@ class ExperimentationVariantManager(
 
 fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
-fun VariantManager.returningUsersContinueWithoutPrivacyTips() = this.getVariant().hasFeature(ReturningUsersContinueWithoutPrivacyTips)
-fun VariantManager.returningUsersSkipTutorial() = this.getVariant().hasFeature(ReturningUsersSkipTutorial)
-
-fun VariantManager.isTrackingParameterRemovalEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.TrackingParameterRemoval)
-
 /**
  * A variant which can be used for experimentation.
  * @param weight Relative weight. These are normalised to all other variants, so they don't have to add up to any specific number.
@@ -208,7 +189,7 @@ data class Variant(
     val key: String,
     override val weight: Double = 0.0,
     val features: List<VariantManager.VariantFeature> = emptyList(),
-    val filterBy: () -> Boolean
+    val filterBy: (config: AppBuildConfig) -> Boolean
 ) : Probabilistic {
 
     fun hasFeature(feature: VariantManager.VariantFeature) = features.contains(feature)

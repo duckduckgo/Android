@@ -71,26 +71,22 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistSuccesfullyThenNotificationDialogIsShown() = runTest {
+    fun whenUserJoinsWaitlistSuccessfullyThenNotificationDialogIsShown() = runTest {
         val success = WaitlistResponse("token", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
         val expectedWorkRequest = OneTimeWorkRequestBuilder<AppTPWaitlistWorker>().build()
         whenever(waitlistBuilder.waitlistRequestWork(false)).thenReturn(expectedWorkRequest)
 
-        viewModel.commands.test {
-            viewModel.joinTheWaitlist()
+        viewModel.joinTheWaitlist()
 
-            verify(manager).joinWaitlist(any(), any())
-            verify(workManager).enqueue(expectedWorkRequest)
-            verify(deviceShieldPixels).didShowWaitlistDialog()
-
-            assert(awaitItem() is AppTPWaitlistViewModel.Command.ShowNotificationDialog)
-        }
+        verify(manager).joinWaitlist(any(), any())
+        verify(manager).notifyOnJoinedWaitlist()
+        verify(workManager).enqueue(expectedWorkRequest)
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageisShown() = runTest {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTokenThenErrorMessageIsShown() = runTest {
         val success = WaitlistResponse("", 1221321321)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -101,7 +97,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageisShown() = runTest {
+    fun whenUserJoinsWaitlistResponseDoesntHaveTimestampThenErrorMessageIsShown() = runTest {
         val success = WaitlistResponse("token", null)
         whenever(service.joinWaitlist()).thenReturn(success)
 
@@ -161,7 +157,7 @@ class AppTPWaitlistViewModelTest {
     }
 
     @Test
-    fun whenDialogdismissedThenWaitlistStateIsJoinedQueue() = runTest {
+    fun whenDialogDismissedThenWaitlistStateIsJoinedQueue() = runTest {
         val waitlistState = WaitlistState.JoinedWaitlist(false)
         whenever(repository.getState()).thenReturn(waitlistState)
         viewModel.viewState.test {

@@ -22,28 +22,33 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.icon.ui.ChangeIconActivity
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
-import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CHANGE_ICON_FEATURE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.EMAIL_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.WEBSITE
+import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.model.NotificationSpec
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.notification.model.WebsiteNotificationSpecification
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_CANCELLED
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @Inject
@@ -64,6 +69,9 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     @Inject
     lateinit var taskStackBuilderFactory: TaskStackBuilderFactory
 
+    @Inject
+    lateinit var schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -81,6 +89,18 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
             CHANGE_ICON_FEATURE -> onCustomizeIconLaunched(pixelSuffix)
             EMAIL_WAITLIST_CODE -> onEmailWaitlistCodeReceived(pixelSuffix)
             APPTP_WAITLIST_CODE -> onAppTPWaitlistCodeReceived(pixelSuffix)
+            else -> {
+                schedulableNotificationPluginPoint.getPlugins().forEach {
+                    when (intent.type) {
+                        it.getSchedulableNotification().launchIntent -> {
+                            it.onNotificationLaunched()
+                        }
+                        it.getSchedulableNotification().cancelIntent -> {
+                            it.onNotificationCancelled()
+                        }
+                    }
+                }
+            }
         }
 
         if (intent.getBooleanExtra(NOTIFICATION_AUTO_CANCEL, true)) {
@@ -96,7 +116,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onAppTPWaitlistCodeReceived(pixelSuffix: String) {
@@ -105,7 +125,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onWebsiteNotification(
@@ -117,7 +137,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(newIntent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onCustomizeIconLaunched(pixelSuffix: String) {
@@ -125,7 +145,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onAppLaunched(pixelSuffix: String) {
@@ -133,7 +153,7 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onClearDataLaunched(pixelSuffix: String) {
@@ -142,11 +162,15 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
         taskStackBuilderFactory.createTaskBuilder()
             .addNextIntentWithParentStack(intent)
             .startActivities()
-        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
+        onLaunched(pixelSuffix)
     }
 
     private fun onCancelled(pixelSuffix: String) {
         pixel.fire("${NOTIFICATION_CANCELLED.pixelName}_$pixelSuffix")
+    }
+
+    private fun onLaunched(pixelSuffix: String) {
+        pixel.fire("${NOTIFICATION_LAUNCHED.pixelName}_$pixelSuffix")
     }
 
     private fun clearNotification(notificationId: Int) {

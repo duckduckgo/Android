@@ -20,24 +20,27 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.URLSpan
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentEmailProtectionSignInBinding
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.waitlist.email.WaitlistNotificationDialog
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@InjectWith(FragmentScope::class)
 class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_email_protection_sign_in) {
 
     private val viewModel by bindViewModel<EmailProtectionSignInViewModel>()
@@ -56,12 +59,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         }
     }
 
-    private val privacyGuaranteeSpan = object : DuckDuckGoClickableSpan() {
-        override fun onClick(widget: View) {
-            viewModel.readPrivacyGuarantees()
-        }
-    }
-
     override fun configureViewModelObservers() {
         viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { render(it) }.launchIn(lifecycleScope)
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { executeCommand(it) }.launchIn(lifecycleScope)
@@ -69,7 +66,6 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     override fun configureUi() {
         configureUiEventHandlers()
-        configureClickableLink()
     }
 
     private fun configureUiEventHandlers() {
@@ -115,21 +111,23 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
     }
 
     private fun renderInBeta() {
-        binding.headerImage.setImageResource(R.drawable.contact_us)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_gift_large)
         binding.waitListButton.gone()
         binding.inviteCodeButton.gone()
         binding.getStartedButton.show()
         binding.duckAddressButton.show()
+        binding.footerDescription.gone()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleInBeta)
         setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionInBeta, listOf(readBlogSpan))
     }
 
     private fun renderJoinedQueue(notify: Boolean) {
-        binding.headerImage.setImageResource(R.drawable.we_hatched)
+        binding.headerImage.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_list)
         binding.waitListButton.gone()
         binding.inviteCodeButton.show()
         binding.getStartedButton.gone()
         binding.duckAddressButton.show()
+        binding.footerDescription.gone()
         binding.statusTitle.text = getString(R.string.emailProtectionStatusTitleJoined)
         if (notify) {
             setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoinedWithNotification, listOf(readBlogSpan))
@@ -144,6 +142,7 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
 
     private fun renderNotJoinedQueue() {
         binding.headerImage.setImageResource(R.drawable.contact_us)
+        binding.footerDescription.show()
         binding.waitListButton.show()
         binding.inviteCodeButton.show()
         binding.getStartedButton.gone()
@@ -153,12 +152,8 @@ class EmailProtectionSignInFragment : EmailProtectionFragment(R.layout.fragment_
         setClickableSpan(binding.emailPrivacyDescription, R.string.emailProtectionDescriptionJoin, listOf(readBlogSpan))
     }
 
-    private fun configureClickableLink() {
-        setClickableSpan(binding.footerDescription, R.string.emailProtectionFooterDescription, listOf(privacyGuaranteeSpan))
-    }
-
     private fun setClickableSpan(
-        view: MaterialTextView,
+        view: TextView,
         stringId: Int,
         span: List<DuckDuckGoClickableSpan>
     ) {

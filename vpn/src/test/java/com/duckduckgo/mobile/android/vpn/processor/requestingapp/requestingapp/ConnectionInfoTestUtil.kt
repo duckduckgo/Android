@@ -17,7 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp.requestingapp
 
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.ConnectionInfo
-import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.TransportProtocol
 import java.net.InetAddress
 
 internal fun aConnectionInfo(
@@ -30,4 +30,4 @@ internal fun aConnectionInfo(
 
 internal fun anInternalIpAddress(): String = "192.168.0.1"
 internal fun anExternalIpAddress(): String = "52.142.124.215"
-private fun aProtocol(): Int = Packet.IP4Header.TransportProtocol.TCP.number
+private fun aProtocol(): Int = TransportProtocol.TCP.number

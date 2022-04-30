@@ -18,6 +18,8 @@ package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface AppLinksHandler {
@@ -34,6 +36,7 @@ interface AppLinksHandler {
     fun isUserQuery(): Boolean
 }
 
+@ContributesBinding(AppScope::class)
 class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
     var previousUrl: String? = null

@@ -23,18 +23,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.Observer
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
@@ -46,6 +45,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
+import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -55,6 +55,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
+@InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -109,8 +110,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setupToolbar(toolbar)
         configureRecycler()
         configureObservers()
-
-        viewModel.start()
     }
 
     private fun extractIntentExtras() {
@@ -145,17 +144,20 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        lifecycleScope.launch {
-            viewModel.viewState()
-                .flowWithLifecycle(lifecycle, STARTED)
-                .collect {
-                    render(it.tabs)
-                    if (it.deletableTabs.isNotEmpty()) {
-                        onDeletableTab(it.deletableTabs.last())
-                    }
+        viewModel.tabs.observe(
+            this,
+            Observer<List<TabEntity>> {
+                render(it)
+            }
+        )
+        viewModel.deletableTabs.observe(
+            this,
+            {
+                if (it.isNotEmpty()) {
+                    onDeletableTab(it.last())
                 }
-        }
-
+            }
+        )
         viewModel.command.observe(
             this,
             Observer {
@@ -195,6 +197,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.fire -> onFire()
             R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
             R.id.closeAllTabs -> closeAllTabs()
+            R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
         }
         return super.onOptionsItemSelected(item)
@@ -215,6 +218,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onNewTabRequested() {
+        clearObserversEarlyToStopViewUpdates()
         launch { viewModel.onNewTabRequested() }
     }
 
@@ -261,10 +265,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun closeAllTabs() {
         launch {
-            viewModel.viewState().value.tabs.forEach {
+            viewModel.tabs.value?.forEach {
                 viewModel.onTabDeleted(it)
             }
         }
+    }
+
+    private fun showDownloads() {
+        startActivity(DownloadsActivity.intent(this))
     }
 
     private fun showSettings() {
@@ -272,16 +280,23 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun finish() {
+        clearObserversEarlyToStopViewUpdates()
         super.finish()
         overridePendingTransition(R.anim.slide_from_bottom, R.anim.tab_anim_fade_out)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        viewModel.deletableTabs.removeObservers(this)
         // we don't want to purge during device rotation
         if (isFinishing) {
             launch { viewModel.purgeDeletableTabs() }
         }
+    }
+
+    private fun clearObserversEarlyToStopViewUpdates() {
+        viewModel.tabs.removeObservers(this)
+        viewModel.deletableTabs.removeObservers(this)
     }
 
     companion object {

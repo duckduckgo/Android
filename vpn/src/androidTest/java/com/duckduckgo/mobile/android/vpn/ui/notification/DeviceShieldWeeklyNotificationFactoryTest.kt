@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.runBlocking
@@ -47,7 +48,7 @@ class DeviceShieldWeeklyNotificationFactoryTest {
             .allowMainThreadQueries()
             .build()
         vpnTrackerDao = db.vpnTrackerDao()
-        appTrackerBlockingStatsRepository = AppTrackerBlockingStatsRepository(db)
+        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
 
         factory =
             DeviceShieldNotificationFactory(InstrumentationRegistry.getInstrumentation().targetContext.resources, appTrackerBlockingStatsRepository)

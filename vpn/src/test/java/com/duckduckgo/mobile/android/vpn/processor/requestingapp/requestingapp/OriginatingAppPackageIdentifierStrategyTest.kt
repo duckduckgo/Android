@@ -22,7 +22,7 @@ import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppP
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.junit.Test
-import xyz.hexene.localvpn.Packet
+import xyz.hexene.localvpn.TransportProtocol
 import java.net.InetAddress
 
 class OriginatingAppPackageIdentifierStrategyTest {
@@ -48,5 +48,5 @@ class OriginatingAppPackageIdentifierStrategyTest {
     private fun aConnectionInfo(): ConnectionInfo = ConnectionInfo(anAddress(), aPort(), anAddress(), aPort(), aProtocol())
     private fun anAddress(): InetAddress = InetAddress.getByName("192.168.0.1")
     private fun aPort(): Int = 80
-    private fun aProtocol(): Int = Packet.IP4Header.TransportProtocol.TCP.number
+    private fun aProtocol(): Int = TransportProtocol.TCP.number
 }

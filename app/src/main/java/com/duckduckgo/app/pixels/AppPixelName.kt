@@ -39,10 +39,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
-    ONBOARDING_DAX_PRIMARY_CTA_PRESSED("m_onboarding_dax_primary_cta_pressed"),
-    ONBOARDING_DAX_NEW_USER_CTA_PRESSED("m_onboarding_dax_new_user_cta_pressed"),
-    ONBOARDING_DAX_RETURNING_USER_CTA_PRESSED("m_onboarding_dax_returning_user_cta_pressed"),
-
     ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
     ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
     ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
@@ -109,12 +105,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_SHARE("mlp_s"),
     LONG_PRESS_COPY_URL("mlp_c"),
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
-
-    DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
-
-    DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
-    DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
-    DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),
 
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
@@ -201,6 +191,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_REPORT_BROKEN_SITE_PRESSED("m_nav_rbs_p"),
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
+    MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
 
     COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
     COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
@@ -214,6 +205,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
     FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
     FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+    FIREPROOF_REMOVE_WEBSITE_UNDO("m_remove_fireproofing_snackbar_undo"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
@@ -263,5 +255,5 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
 
-    WEBVIEW_FEATURE_SUPPORTED("m_webview_feature_supported")
+    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error")
 }

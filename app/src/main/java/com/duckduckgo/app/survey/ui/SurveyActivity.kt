@@ -23,6 +23,7 @@ import android.os.Bundle
 import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -33,9 +34,11 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class SurveyActivity : DuckDuckGoActivity() {
 
     private val viewModel: SurveyViewModel by bindViewModel()

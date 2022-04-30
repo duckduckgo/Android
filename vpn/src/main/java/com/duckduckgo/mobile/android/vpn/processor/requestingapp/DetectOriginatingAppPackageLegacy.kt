@@ -17,12 +17,12 @@
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.content.pm.PackageManager
+import com.duckduckgo.mobile.android.vpn.ProtocolVersion.TCP
+import com.duckduckgo.mobile.android.vpn.ProtocolVersion.UDP
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.Found
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.DetectOriginatingAppPackageLegacy.NetworkFileSearchResult.NotFound
 import kotlinx.coroutines.*
 import timber.log.Timber
-import xyz.hexene.localvpn.Packet.IP4Header.TransportProtocol.TCP
-import xyz.hexene.localvpn.Packet.IP4Header.TransportProtocol.UDP
 import java.io.File
 import java.util.concurrent.Executors
 import java.util.regex.Pattern

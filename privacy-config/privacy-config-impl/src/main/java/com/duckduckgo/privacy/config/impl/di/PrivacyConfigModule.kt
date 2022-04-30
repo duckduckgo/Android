@@ -21,13 +21,11 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePluginPoint
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -36,6 +34,8 @@ import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesSharedPreferences
 import com.duckduckgo.privacy.config.store.RealPrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.RealPrivacyFeatureTogglesRepository
+import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
+import com.duckduckgo.privacy.config.store.features.autofill.RealAutofillRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.ContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.contentblocking.RealContentBlockingRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -76,7 +76,7 @@ abstract class PrivacyFeaturesBindingModule {
 
 @Module
 @ContributesTo(AppScope::class)
-class NetworkModule {
+object NetworkModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
@@ -90,17 +90,11 @@ class NetworkModule {
 
         return retrofit.create(PrivacyConfigService::class.java)
     }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePrivacyFeaturePluginPoint(customConfigs: DaggerSet<PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
-        return PrivacyFeaturePluginPoint(customConfigs)
-    }
 }
 
 @Module
 @ContributesTo(AppScope::class)
-class DatabaseModule {
+object DatabaseModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
@@ -215,5 +209,15 @@ class DatabaseModule {
         dispatcherProvider: DispatcherProvider
     ): TrackingParametersRepository {
         return RealTrackingParametersRepository(database, coroutineScope, dispatcherProvider)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideAutofillRepository(
+        database: PrivacyConfigDatabase,
+        @AppCoroutineScope coroutineScope: CoroutineScope,
+        dispatcherProvider: DispatcherProvider
+    ): AutofillRepository {
+        return RealAutofillRepository(database, coroutineScope, dispatcherProvider)
     }
 }

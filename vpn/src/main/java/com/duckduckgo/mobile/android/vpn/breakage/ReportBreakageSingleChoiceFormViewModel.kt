@@ -19,19 +19,20 @@ package com.duckduckgo.mobile.android.vpn.breakage
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ReportBreakageSingleChoiceFormViewModel(private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()) : ViewModel() {
+@ContributesViewModel(ActivityScope::class)
+class ReportBreakageSingleChoiceFormViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
 
     private var selectedChoice: Choice? = null
 
@@ -75,18 +76,5 @@ class ReportBreakageSingleChoiceFormViewModel(private val dispatcherProvider: Di
             Choice(R.string.atp_ReportBreakageChoiceProblemCreatingAccount),
             Choice(R.string.atp_ReportBreakageChoiceNoLogging),
         )
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class ReportBreakageSingleChoiceFormViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ReportBreakageSingleChoiceFormViewModel::class.java) ->
-                    ReportBreakageSingleChoiceFormViewModel() as T
-                else -> null
-            }
-        }
     }
 }

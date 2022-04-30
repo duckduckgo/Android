@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.global.rating
 
-import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -39,7 +38,6 @@ class InitialPromptTypeDeciderTest {
     private val mockSearchCountDao: SearchCountDao = mock()
     private val mockInitialPromptDecider: ShowPromptDecider = mock()
     private val mockSecondaryPromptDecider: ShowPromptDecider = mock()
-    private val mockOnboardingStore: OnboardingStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
@@ -57,7 +55,6 @@ class InitialPromptTypeDeciderTest {
         whenever(mockPlayStoreUtils.isPlayStoreInstalled()).thenReturn(true)
         whenever(mockPlayStoreUtils.installedFromPlayStore()).thenReturn(true)
         whenever(mockSearchCountDao.getSearchesMade()).thenReturn(Long.MAX_VALUE)
-        whenever(mockOnboardingStore.userMarkedAsReturningUser).thenReturn(false)
         whenever(mockAppBuildConfig.isDebug).thenReturn(true)
     }
 

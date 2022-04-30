@@ -216,19 +216,19 @@ class RealGpcTest {
     }
 
     private fun givenFeatureAndGpcAreEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true))
             .thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }
 
     private fun givenFeatureIsEnabledButGpcIsNot() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true))
             .thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(false)
     }
 
     private fun givenFeatureIsNotEnabledButGpcIsEnabled() {
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName(), true))
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName, true))
             .thenReturn(false)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
     }

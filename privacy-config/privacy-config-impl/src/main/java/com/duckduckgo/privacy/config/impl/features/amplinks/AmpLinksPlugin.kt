@@ -17,8 +17,10 @@
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,8 +34,10 @@ class AmpLinksPlugin @Inject constructor(
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
-    override fun store(name: String, jsonString: String): Boolean {
-        if (name == featureName.value) {
+    override fun store(name: FeatureName, jsonString: String): Boolean {
+        @Suppress("NAME_SHADOWING")
+        val name = privacyFeatureValueOf(name.value)
+        if (name == featureName) {
             val moshi = Moshi.Builder().build()
             val jsonAdapter: JsonAdapter<AmpLinksFeature> =
                 moshi.adapter(AmpLinksFeature::class.java)
@@ -64,5 +68,5 @@ class AmpLinksPlugin @Inject constructor(
         return false
     }
 
-    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AmpLinksFeatureName()
+    override val featureName: PrivacyFeatureName = PrivacyFeatureName.AmpLinksFeatureName
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="voiceSearchIconContentDescription">Voice search</string>
+    <string name="voiceSearchListening">Speak Now</string>
+    <string name="voiceSearchListeningFooter">Audio is processed on-device. It\'s not stored or shared with anyone, including DuckDuckGo.</string>
+    <string name="voiceSearchNegativeAction">Cancel</string>
+    <string name="voiceSearchPermissionRationaleDescription">DuckDuckGo never listens to what you say. Audio is processed on-device. It isn’t stored or shared with anyone.</string>
+    <string name="voiceSearchPermissionRationaleTitle">Microphone Access Required for Private Voice Search</string>
+    <string name="voiceSearchPermissionRationalePositiveAction">OK</string>
+    <string name="voiceSearchPermissionRejectedDialogMessage">To use Voice Search in DuckDuckGo you need to enable Microphone access in the system settings.</string>
+    <string name="voiceSearchPermissionRejectedDialogPositiveAction">Settings</string>
+    <string name="voiceSearchPermissionRejectedDialogTitle">Microphone Access Required</string>
+    <string name="voiceSearchTitle">Voice search</string>
+</resources>

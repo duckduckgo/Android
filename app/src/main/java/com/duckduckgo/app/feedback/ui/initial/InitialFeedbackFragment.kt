@@ -18,15 +18,18 @@ package com.duckduckgo.app.feedback.ui.initial
 
 import android.os.Bundle
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
 import com.duckduckgo.app.feedback.ui.initial.InitialFeedbackFragmentViewModel.Command.*
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
 
     interface InitialFeedbackListener {

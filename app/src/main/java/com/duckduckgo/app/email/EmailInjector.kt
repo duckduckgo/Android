@@ -23,6 +23,9 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.email.EmailJavascriptInterface.Companion.JAVASCRIPT_INTERFACE_NAME
 import com.duckduckgo.app.global.DispatcherProvider
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import java.io.BufferedReader
 
 interface EmailInjector {
@@ -38,14 +41,17 @@ interface EmailInjector {
 
     fun injectAddressInEmailField(
         webView: WebView,
-        alias: String?
+        alias: String?,
+        url: String?
     )
 }
 
 class EmailInjectorJs(
     private val emailManager: EmailManager,
     private val urlDetector: DuckDuckGoUrlDetector,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
+    private val featureToggle: FeatureToggle,
+    private val autofill: Autofill,
 ) : EmailInjector {
     private val javaScriptInjector = JavaScriptInjector()
 
@@ -53,8 +59,9 @@ class EmailInjectorJs(
         webView: WebView,
         onTooltipShown: () -> Unit
     ) {
+        // We always add the interface irrespectively if the feature is enabled or not
         webView.addJavascriptInterface(
-            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, onTooltipShown),
+            EmailJavascriptInterface(emailManager, webView, urlDetector, dispatcherProvider, featureToggle, autofill, onTooltipShown),
             JAVASCRIPT_INTERFACE_NAME
         )
     }
@@ -64,18 +71,27 @@ class EmailInjectorJs(
         webView: WebView,
         url: String?
     ) {
-        if (isDuckDuckGoUrl(url) || emailManager.isSignedIn()) {
-            webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
+        url?.let {
+            if (isDuckDuckGoUrl(url) || (isFeatureEnabled() && !autofill.isAnException(url) && emailManager.isSignedIn())) {
+                webView.evaluateJavascript("javascript:${javaScriptInjector.getFunctionsJS()}", null)
+            }
         }
     }
 
     @UiThread
     override fun injectAddressInEmailField(
         webView: WebView,
-        alias: String?
+        alias: String?,
+        url: String?
     ) {
-        webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+        url?.let {
+            if (isFeatureEnabled() && !autofill.isAnException(url)) {
+                webView.evaluateJavascript("javascript:${javaScriptInjector.getAliasFunctions(webView.context, alias)}", null)
+            }
+        }
     }
+
+    private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName, defaultValue = true)
 
     private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
 

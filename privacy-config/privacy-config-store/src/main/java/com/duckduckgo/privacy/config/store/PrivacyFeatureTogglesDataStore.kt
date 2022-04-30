@@ -19,12 +19,13 @@ package com.duckduckgo.privacy.config.store
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 
 interface PrivacyFeatureTogglesDataStore {
     fun get(
-        featureName: String,
+        featureName: PrivacyFeatureName,
         defaultValue: Boolean
-    ): Boolean?
+    ): Boolean
 
     fun insert(toggle: PrivacyFeatureToggles)
     fun deleteAll()
@@ -37,18 +38,14 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
         get() = context.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
 
     override fun get(
-        featureName: String,
+        featureName: PrivacyFeatureName,
         defaultValue: Boolean
-    ): Boolean? {
-        return if (preferences.contains(featureName)) {
-            preferences.getBoolean(featureName, defaultValue)
-        } else {
-            null
-        }
+    ): Boolean {
+        return preferences.getBoolean(featureName.value, defaultValue)
     }
 
     override fun insert(toggle: PrivacyFeatureToggles) {
-        preferences.edit { putBoolean(toggle.featureName, toggle.enabled) }
+        preferences.edit { putBoolean(toggle.featureName.value, toggle.enabled) }
     }
 
     override fun deleteAll() {
@@ -61,6 +58,6 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
 }
 
 data class PrivacyFeatureToggles(
-    val featureName: String,
+    val featureName: PrivacyFeatureName,
     val enabled: Boolean
 )

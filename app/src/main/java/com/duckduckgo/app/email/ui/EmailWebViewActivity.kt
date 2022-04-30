@@ -22,14 +22,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class EmailWebViewActivity : DuckDuckGoActivity() {
 
     @Inject

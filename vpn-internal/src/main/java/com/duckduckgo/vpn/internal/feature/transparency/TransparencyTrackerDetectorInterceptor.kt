@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetectorInterceptor
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
-import dagger.SingleInstanceIn
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -37,12 +37,15 @@ class TransparencyTrackerDetectorInterceptor @Inject constructor() : VpnTrackerD
         hostname: String,
         packageId: String
     ): RequestTrackerType? {
-        return if (enable.get()) {
-            Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
-            RequestTrackerType.NotTracker(hostname)
-        } else {
-            Timber.v("Transparency mode: Not intercepting for $packageId / $hostname")
-            null
+        return when {
+            enable.get() -> {
+                Timber.v("Transparency mode: Not Tracker returned for $packageId / $hostname")
+                RequestTrackerType.NotTracker(hostname)
+            }
+            else -> {
+                Timber.v("Transparency mode: Not intercepting for $packageId / $hostname")
+                null
+            }
         }
     }
 }

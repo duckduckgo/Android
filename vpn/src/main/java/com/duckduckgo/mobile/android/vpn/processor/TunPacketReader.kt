@@ -18,8 +18,13 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import android.os.Process
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
+import com.duckduckgo.mobile.android.vpn.processor.packet.isIP4
+import com.duckduckgo.mobile.android.vpn.processor.packet.isIP6
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -36,6 +41,7 @@ class TunPacketReader @AssistedInject constructor(
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : Runnable {
 
     private var running = false
@@ -77,7 +83,15 @@ class TunPacketReader @AssistedInject constructor(
     private fun executeReadLoop(vpnInput: FileChannel) {
         bufferToNetwork = byteBuffer()
 
-        val inPacketLength = vpnInput.read(bufferToNetwork)
+        val inPacketLength = try {
+            vpnInput.read(bufferToNetwork)
+        } catch (t: Throwable) {
+            healthMetricCounter.onTunReadIOException()
+            // buffer clean up and re-throw on purpose
+            ByteBufferPool.release(bufferToNetwork)
+            throw t
+        }
+
         if (inPacketLength == 0) {
             ByteBufferPool.release(bufferToNetwork)
             return
@@ -93,8 +107,13 @@ class TunPacketReader @AssistedInject constructor(
 
         bufferToNetwork.flip()
         val packet = Packet(bufferToNetwork)
-        if (packet.ip4Header.version.toInt() == 4) {
-            healthMetricCounter.onTunIpv4PacketReceived()
+        if (packet.isIP4() || isIP6AndInternalBuild(packet)) {
+            if (packet.isIP4()) {
+                healthMetricCounter.onTunIpv4PacketReceived()
+            }
+            if (packet.isIP6()) {
+                healthMetricCounter.onTunIpv6PacketReceived()
+            }
 
             if (packet.isUDP) {
                 queues.udpDeviceToNetwork.offer(packet)
@@ -104,13 +123,21 @@ class TunPacketReader @AssistedInject constructor(
                 healthMetricCounter.onWrittenToDeviceToNetworkQueue()
             } else {
                 healthMetricCounter.onTunUnknownPacketReceived()
-                deviceShieldPixels.sendUnknownPacketProtocol(packet.ip4Header.protocolNum.toInt())
+                deviceShieldPixels.sendUnknownPacketProtocol(packet.ipHeader.protocol.number)
                 ByteBufferPool.release(bufferToNetwork)
             }
         } else {
-            healthMetricCounter.onTunIpv6PacketReceived()
+            // this is temporary until we remove the isIP6AndInternalBuild() to make IP6 available in production builds
+            if (packet.isIP6()) {
+                Timber.d("Dropping ipv6 packet to ${packet.connectionInfo()}")
+                healthMetricCounter.onTunIpv6PacketReceived()
+            }
             ByteBufferPool.release(bufferToNetwork)
         }
+    }
+
+    private fun isIP6AndInternalBuild(packet: Packet): Boolean {
+        return packet.isIP6() && appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)
     }
 
     private fun byteBuffer(): ByteBuffer {

@@ -17,6 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
@@ -41,7 +42,9 @@ class TrackerAllowlistPluginTest {
 
     @Test
     fun whenFeatureNameDoesNotMatchTrackerAllowlistThenReturnFalse() {
-        assertFalse(testee.store("test", EMPTY_JSON_STRING))
+        PrivacyFeatureName.values().filter { it != FEATURE_NAME }.forEach {
+            assertFalse(testee.store(it, EMPTY_JSON_STRING))
+        }
     }
 
     @Test
@@ -86,7 +89,7 @@ class TrackerAllowlistPluginTest {
     }
 
     companion object {
-        private const val FEATURE_NAME = "trackerAllowlist"
+        private val FEATURE_NAME = PrivacyFeatureName.TrackerAllowlistFeatureName
         private const val EMPTY_JSON_STRING = "{}"
     }
 }

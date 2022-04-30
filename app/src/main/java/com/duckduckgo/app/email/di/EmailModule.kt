@@ -35,6 +35,8 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.email.AppEmailWaitlistCodeFetcher
 import com.duckduckgo.app.waitlist.email.EmailWaitlistCodeFetcher
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.Autofill
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -59,9 +61,11 @@ class EmailModule {
     fun providesEmailInjector(
         emailManager: EmailManager,
         duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-        dispatcherProvider: DispatcherProvider
+        dispatcherProvider: DispatcherProvider,
+        featureToggle: FeatureToggle,
+        autofill: Autofill
     ): EmailInjector {
-        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider)
+        return EmailInjectorJs(emailManager, duckDuckGoUrlDetector, dispatcherProvider, featureToggle, autofill)
     }
 
     @Provides

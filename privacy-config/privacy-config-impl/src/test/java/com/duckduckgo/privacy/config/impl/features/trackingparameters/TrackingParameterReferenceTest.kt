@@ -52,7 +52,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         mockTrackingParameters()
         testee = RealTrackingParameters(mockRepository, mockFeatureToggle, mockUnprotectedTemporary, mockUserWhiteListRepository)
         whenever(mockUnprotectedTemporary.isAnException(any())).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName(), true)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName, true)).thenReturn(true)
     }
 
     companion object {

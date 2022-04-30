@@ -151,22 +151,4 @@
         app:layout_constraintStart_toStartOf="@id/cardView"
         app:layout_constraintTop_toBottomOf="@id/cardView" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/returningUserCta"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_marginBottom="20dp"
-        android:letterSpacing="0.0"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:textAllCaps="false"
-        android:textColor="@color/brownishGrayTwo"
-        android:visibility="gone"
-        app:backgroundTint="@color/white"
-        app:cornerRadius="22dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/cardView"
-        app:layout_constraintStart_toStartOf="@id/cardView" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
