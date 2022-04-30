@@ -81,7 +81,7 @@ class FileChooserIntentBuilder @Inject constructor() {
 
         acceptTypes
             .filter { it.isNotBlank() }
-            .forEach { acceptedMimeTypes.add(it.toLowerCase()) }
+            .forEach { acceptedMimeTypes.add(it.lowercase()) }
 
         if (acceptedMimeTypes.isNotEmpty()) {
             Timber.d("Selectable file types limited to $acceptedMimeTypes")

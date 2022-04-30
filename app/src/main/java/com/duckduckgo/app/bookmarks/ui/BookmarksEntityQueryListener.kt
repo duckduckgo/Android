@@ -41,9 +41,9 @@ class BookmarksEntityQueryListener(
         query: String,
         bookmarks: List<SavedSite.Bookmark>
     ): List<BookmarksAdapter.BookmarkItem> {
-        val lowercaseQuery = query.toLowerCase()
+        val lowercaseQuery = query.lowercase()
         return bookmarks.filter {
-            val lowercaseTitle = it.title.toLowerCase()
+            val lowercaseTitle = it.title.lowercase()
             lowercaseTitle.contains(lowercaseQuery) || it.url.contains(lowercaseQuery)
         }.map { BookmarksAdapter.BookmarkItem(it) }
     }
@@ -52,9 +52,9 @@ class BookmarksEntityQueryListener(
         query: String,
         bookmarkFolders: List<BookmarkFolder>
     ): List<BookmarkFoldersAdapter.BookmarkFolderItem> {
-        val lowercaseQuery = query.toLowerCase()
+        val lowercaseQuery = query.lowercase()
         return bookmarkFolders.filter {
-            val lowercaseTitle = it.name.toLowerCase()
+            val lowercaseTitle = it.name.lowercase()
             lowercaseTitle.contains(lowercaseQuery)
         }.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
     }

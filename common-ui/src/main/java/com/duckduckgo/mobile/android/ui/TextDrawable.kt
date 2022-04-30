@@ -294,7 +294,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         radius = builder.radius
 
         // text and color
-        text = if (builder.toUpperCase) builder.text.toUpperCase() else builder.text
+        text = if (builder.toUpperCase) builder.text.uppercase() else builder.text
         color = builder.color
 
         // text paint settings
