@@ -19,5 +19,5 @@
     style="@style/FireproofWebsiteSwitch"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:text="@string/fireproofWebsiteToogleText"
+    android:text="@string/fireproofWebsiteToggleText"
     android:theme="@style/SettingsSwitchTheme" />

@@ -58,7 +58,7 @@ class TrackerFeedAdapter @Inject constructor(
             is TrackerFeedViewHolder -> holder.bind(
                 trackerFeedItems[position] as TrackerFeedItem.TrackerFeedData,
                 onAppClick,
-                position == trackerFeedItems.size,
+                position == trackerFeedItems.size - 1,
             )
             is TrackerSkeletonViewHolder -> holder.bind()
             is TrackerFeedHeaderViewHolder -> holder.bind(trackerFeedItems[position] as TrackerFeedItem.TrackerFeedItemHeader)
@@ -214,7 +214,7 @@ class TrackerFeedAdapter @Inject constructor(
                     .into(trackingAppIcon)
 
                 with(trackerBadgesView) {
-                    // click through recyvlerview
+                    // click through recyclerview
                     suppressLayout(false)
                     (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
                     suppressLayout(true)

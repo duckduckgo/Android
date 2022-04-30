@@ -79,7 +79,7 @@ class AppTpFeatureConfigImpl @Inject constructor(
         coroutineScope.launch {
             // Remote configs will not override any value that has isManualOverride = true
             // But this is only for INTERNAL builds, because we have internal settings
-            // In any other build that is not internal isManualOverride is alwyas false
+            // In any other build that is not internal isManualOverride is always false
             togglesDao.insert(toggle.copy(isManualOverride = appBuildConfig.flavor == BuildFlavor.INTERNAL && toggle.isManualOverride))
         }
     }

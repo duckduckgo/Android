@@ -32,6 +32,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -73,6 +74,7 @@ class BrowserWebViewClientTest {
     private val specialUrlDetector: SpecialUrlDetector = mock()
     private val requestInterceptor: RequestInterceptor = mock()
     private val listener: WebViewClientListener = mock()
+    private val cookieManagerProvider: CookieManagerProvider = mock()
     private val cookieManager: CookieManager = mock()
     private val loginDetector: DOMLoginDetector = mock()
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore = mock()
@@ -99,7 +101,7 @@ class BrowserWebViewClientTest {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager,
+            cookieManagerProvider,
             loginDetector,
             dosDetector,
             gpc,
@@ -112,6 +114,7 @@ class BrowserWebViewClientTest {
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
+        whenever(cookieManagerProvider.get()).thenReturn(cookieManager)
     }
 
     @UiThreadTest

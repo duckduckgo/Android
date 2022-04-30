@@ -194,7 +194,7 @@ class RemoteMessagingConfigJsonMapperTest {
     }
 
     @Test
-    fun whenJsonMatchingAttributesMalformedThenParsedAsUnknwonIntoConfig() = runTest {
+    fun whenJsonMatchingAttributesMalformedThenParsedAsUnknownIntoConfig() = runTest {
         val result = getConfigFromJson("json/remote_messaging_config_malformed.json")
 
         val testee = RemoteMessagingConfigJsonMapper(appBuildConfig)

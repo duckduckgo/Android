@@ -44,7 +44,7 @@ data class WebViewHttpAuthCredentials(
 )
 
 // Methods are marked to run in the UiThread because it is the thread of webview
-// if necessary the method impls will change thread to access the http auth dao
+// if necessary, the method impls will change thread to access the http auth dao
 interface WebViewHttpAuthStore {
     @UiThread
     fun setHttpAuthUsernamePassword(

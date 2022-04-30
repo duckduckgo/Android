@@ -80,7 +80,7 @@ class SingleLineListItem : LinearLayout {
         binding.itemContainer.setOnClickListener { onClick() }
     }
 
-    /** Sets the item oveflow menu click listener */
+    /** Sets the item overflow menu click listener */
     fun setOverflowClickListener(onClick: (View) -> Unit) {
         binding.overflowMenu.setOnClickListener { onClick(binding.overflowMenu) }
     }

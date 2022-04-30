@@ -22,8 +22,8 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
@@ -101,13 +101,13 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
                         trackerBucket.value
                             .sortedByDescending { it.trackerCompanySignal.tracker.timestamp }
                             .first().trackerCompanySignal.tracker.timestamp
-                    val trackeCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
+                    val trackerCompanyPrevalence = trackerBucket.value.first().trackerCompanySignal.trackerEntity.score
                     trackingCompanyInfo.add(
                         TrackingCompanyInfo(
                             companyName = trackerCompanyName,
                             companyDisplayName = trackerCompanyDisplayName,
                             timestamp = timestamp,
-                            companyPrevalence = trackeCompanyPrevalence
+                            companyPrevalence = trackerCompanyPrevalence
                         )
                     )
                     totalTrackerCount += trackerBucket.value.size
@@ -165,12 +165,4 @@ class DeviceShieldActivityFeedViewModel @Inject constructor(
         val companyPrevalence: Int
     )
 
-    data class TimeWindow(
-        val value: Long,
-        val unit: TimeUnit
-    ) {
-        fun asString(): String {
-            return DatabaseDateFormatter.timestamp(LocalDateTime.now().minusSeconds(unit.toSeconds(value)))
-        }
-    }
 }

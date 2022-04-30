@@ -58,7 +58,7 @@
                 tools:text="Uber"/>
 
             <TextView
-                android:id="@+id/app_trackd_ago"
+                android:id="@+id/app_tracked_ago"
                 style="@style/TextAppearance.DuckDuckGo.Body2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

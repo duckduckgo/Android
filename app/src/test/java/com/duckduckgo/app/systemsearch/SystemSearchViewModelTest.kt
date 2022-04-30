@@ -293,7 +293,7 @@ class SystemSearchViewModelTest {
     fun whenQuickAccessItemClickedThenLaunchBrowser() {
         val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
 
-        testee.onQuickAccesItemClicked(quickAccessItem)
+        testee.onQuickAccessItemClicked(quickAccessItem)
 
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(quickAccessItem.favorite.url), commandCaptor.lastValue)
@@ -303,7 +303,7 @@ class SystemSearchViewModelTest {
     fun whenQuickAccessItemClickedThenPixelSent() {
         val quickAccessItem = QuickAccessFavorite(Favorite(1, "title", "http://example.com", 0))
 
-        testee.onQuickAccesItemClicked(quickAccessItem)
+        testee.onQuickAccessItemClicked(quickAccessItem)
 
         verify(mockPixel).fire(FAVORITE_SYSTEM_SEARCH_ITEM_PRESSED)
     }

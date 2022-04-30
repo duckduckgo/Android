@@ -55,18 +55,24 @@
     <string name="favoriteAddedMessage">Favoritt lagt til</string>
     <string name="bookmarkAddedMessage">Bokmerke lagt til</string>
     <string name="requestDesktopSiteMenuTitle">Skrivebordnettsted</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Fjern brannsikring</string>
+    <string name="requestMobileSiteMenuTitle">Mobilversjon</string>
+    <string name="downloadsMenuTitle">Nedlastinger</string>
+    <string name="printMenuTitle">Skriv ut siden</string>
+    <string name="favoriteDeleteConfirmationMessage">Favoritt er fjernet</string>
+    <string name="fireproofDeleteConfirmationMessage">Brannsikring fjernet</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Personvern aktivert for %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Personvern deaktivert for %1$s</string>
+    <string name="undoSnackbarAction">Angre</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Last ned bilde</string>
     <string name="permissionRequiredToDownload">Nedlasting krever lagringstillatelse</string>
-    <string name="downloadComplete">Nedlastingen er fullført</string>
-    <string name="downloadFailed">Nedlastingen feilet</string>
-    <string name="downloadInProgress">Laster ned</string>
 
     <!-- Sharing options -->
     <string name="options">Alternativer</string>
     <string name="shareLink">Del lenke</string>
-    <string name="shareMenuTitle">Del …</string>
+    <string name="shareMenuTitle">Del</string>
     <string name="copyUrl">Kopier lenke</string>
 
     <!-- Find in page -->
@@ -278,7 +284,7 @@
     <string name="searchWidgetLabel">Søk</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Legg til på startsiden</string>
+    <string name="addToHome">Legg til på startskjermen</string>
     <string name="shortcutAddedText">%1$s er lagt til på startskjermen.</string>
 
     <!-- User Survey -->
@@ -327,8 +333,6 @@
     <string name="noThanks">Nei takk</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Filen lastes ned</string>
-    <string name="notificationChannelFileDownloaded">Filen er lastet ned</string>
     <string name="notificationChannelTutorials">Veiledninger</string>
 
     <!-- Clear Notification -->
@@ -500,7 +504,7 @@
     <string name="dialogSaveAction">Lagre</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ubeskyttede nettsteder</string>
+    <string name="whitelistActivityTitle">Ubeskyttede nettsteder</string>
     <string name="enablePrivacyProtection">Aktiver personvernbeskyttelse</string>
     <string name="disablePrivacyProtection">Deaktiver personvernbeskyttelse</string>
     <string name="whitelistEntryOverflowContentDescription">Flere alternativer for det ubeskyttede nettstedet %1$s</string>
@@ -516,8 +520,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Brannsikre nettsteder</string>
     <string name="settingsFireproofWebsites">Brannsikre nettsteder</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Brannsikre nettsteder</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nå brannsikkert! Gå til Innstillinger for å endre.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Brannsikre denne siden</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; er nå brannsikkert!</string>
     <string name="fireproofWebsiteSnackbarAction">Angre</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Er du sikker på at du vil slette &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Ingen brannsikre nettsteder</string>
@@ -528,7 +532,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brannsikre</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ikke nå</string>
     <string name="fireproofWebsiteItemsSectionTitle">Nettsteder</string>
-    <string name="fireproofWebsiteToogleText">Spør ved innlogging</string>
+    <string name="fireproofWebsiteToggleText">Spør ved innlogging</string>
     <string name="disableLoginDetectionDialogTitle">Vil du deaktivere påminnelser om brannsikring når du logger inn på nettsteder?</string>
     <string name="disableLoginDetectionDialogDescription">Du kan når som helst endre dette under Innstillinger.</string>
     <string name="disableLoginDetectionDialogPositive">DEAKTIVER</string>
@@ -688,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Personvernerklæring</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nedlastingen mislyktes. Sjekk internettforbindelsen.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget er lagt til på startskjermen</string>

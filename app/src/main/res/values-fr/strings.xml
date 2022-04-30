@@ -55,18 +55,24 @@
     <string name="favoriteAddedMessage">Favori ajouté</string>
     <string name="bookmarkAddedMessage">Signet ajouté</string>
     <string name="requestDesktopSiteMenuTitle">Site en version bureau</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Désactiver le mode coupe-feu</string>
+    <string name="requestMobileSiteMenuTitle">Version mobile</string>
+    <string name="downloadsMenuTitle">Téléchargements</string>
+    <string name="printMenuTitle">Imprimer la page</string>
+    <string name="favoriteDeleteConfirmationMessage">Favori supprimé</string>
+    <string name="fireproofDeleteConfirmationMessage">Mode coupe-feu désactivé</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Protection de la confidentialité activée pour %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Protection de la confidentialité désactivée pour %1$s</string>
+    <string name="undoSnackbarAction">Annuler</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Télécharger l\'image</string>
     <string name="permissionRequiredToDownload">Le téléchargement nécessite une autorisation de stockage</string>
-    <string name="downloadComplete">Téléchargement terminé</string>
-    <string name="downloadFailed">Échec du téléchargement</string>
-    <string name="downloadInProgress">Téléchargement en cours</string>
 
     <!-- Sharing options -->
     <string name="options">Options</string>
     <string name="shareLink">Partager le lien</string>
-    <string name="shareMenuTitle">Partager…</string>
+    <string name="shareMenuTitle">Partager</string>
     <string name="copyUrl">Copier l\'adresse du lien</string>
 
     <!-- Find in page -->
@@ -327,8 +333,6 @@
     <string name="noThanks">Non merci</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Téléchargement du fichier</string>
-    <string name="notificationChannelFileDownloaded">Fichier téléchargé</string>
     <string name="notificationChannelTutorials">Tutoriels</string>
 
     <!-- Clear Notification -->
@@ -500,7 +504,7 @@
     <string name="dialogSaveAction">Enregistrer</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Sites non protégés</string>
+    <string name="whitelistActivityTitle">Sites non protégés</string>
     <string name="enablePrivacyProtection">Activer la protection de la confidentialité</string>
     <string name="disablePrivacyProtection">Désactiver la protection de la confidentialité</string>
     <string name="whitelistEntryOverflowContentDescription">Plus d\'options pour le site non protégé %1$s</string>
@@ -516,8 +520,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Sites coupe-feu</string>
     <string name="settingsFireproofWebsites">Sites coupe-feu</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Site coupe-feu</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; est maintenant en mode coupe-feu ! Accédez aux paramètres pour le gérer.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Activer le mode coupe-feu pour ce site</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; est maintenant en mode coupe-feu !</string>
     <string name="fireproofWebsiteSnackbarAction">Annuler</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%1$s&lt;/b&gt; ?</string>
     <string name="fireproofWebsiteEmptyListHint">Aucun site Web coupe-feu</string>
@@ -528,7 +532,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Mode coupe-feu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sites Web</string>
-    <string name="fireproofWebsiteToogleText">Choisir à la connexion</string>
+    <string name="fireproofWebsiteToggleText">Choisir à la connexion</string>
     <string name="disableLoginDetectionDialogTitle">Désactiver le rappel du mode coupe-feu lors de la connexion aux sites ?</string>
     <string name="disableLoginDetectionDialogDescription">Vous pouvez modifier cette préférence à tout moment dans Paramètres.</string>
     <string name="disableLoginDetectionDialogPositive">DÉSACTIVER</string>
@@ -688,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Politique de confidentialité</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Échec du téléchargement. Vérifiez la connexion Internet.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget ajouté à l\'écran d\'accueil</string>
