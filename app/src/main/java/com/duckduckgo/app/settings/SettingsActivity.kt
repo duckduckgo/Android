@@ -36,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
@@ -331,12 +332,12 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldDisabled))
                 }
             }
         }

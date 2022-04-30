@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -102,7 +103,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
     }
 
     override fun getTheme(): Int {
-        return R.style.DaxDialogFragment
+        return CommonR.style.DaxDialogFragment
     }
 
     override fun onStart() {
@@ -184,7 +185,7 @@ class TypewriterDaxDialog : DialogFragment(R.layout.content_dax_dialog), DaxDial
         }
 
         context?.let {
-            val toolbarColor = if (toolbarDimmed) getColor(it, R.color.dimmed) else getColor(it, android.R.color.transparent)
+            val toolbarColor = if (toolbarDimmed) getColor(it, CommonR.color.dimmed) else getColor(it, android.R.color.transparent)
             with(binding) {
                 toolbarDialogLayout.setBackgroundColor(toolbarColor)
                 hiddenText.text = daxText.html(it)
