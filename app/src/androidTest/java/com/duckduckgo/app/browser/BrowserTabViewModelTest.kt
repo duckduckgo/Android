@@ -1439,7 +1439,7 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>() {
+        assertCommandIssued<Command.OpenInNewTab> {
             assertNull(sourceTabId)
         }
     }

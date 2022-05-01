@@ -88,7 +88,7 @@ class SurveyViewModel @Inject constructor(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        viewModelScope.launch() {
+        viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
                 surveyDao.update(survey)
             }
