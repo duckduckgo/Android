@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.global.R as CommonR
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
@@ -120,10 +121,10 @@ class DownloadsViewModelTest {
         )
 
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
-        whenever(context.getString(R.string.common_Today)).thenReturn("Today")
-        whenever(context.getString(R.string.common_Yesterday)).thenReturn("Yesterday")
-        whenever(context.getString(R.string.common_PastWeek)).thenReturn("Past Week")
-        whenever(context.getString(R.string.common_PastMonth)).thenReturn("Past Month")
+        whenever(context.getString(CommonR.string.common_Today)).thenReturn("Today")
+        whenever(context.getString(CommonR.string.common_Yesterday)).thenReturn("Yesterday")
+        whenever(context.getString(CommonR.string.common_PastWeek)).thenReturn("Past Week")
+        whenever(context.getString(CommonR.string.common_PastMonth)).thenReturn("Past Month")
 
         testee.downloads()
 
