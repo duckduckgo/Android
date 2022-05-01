@@ -19,7 +19,6 @@ package com.duckduckgo.mobile.android.vpn.apps
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
-import com.duckduckgo.mobile.android.vpn.apps.Command.LaunchFeedback
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor

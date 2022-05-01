@@ -20,7 +20,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
-class ComponentAdapter() : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBACK) {
+class ComponentAdapter : ListAdapter<Component, ComponentViewHolder>(DIFF_CALLBACK) {
 
     override fun getItemViewType(position: Int): Int = getItem(position).ordinal
 

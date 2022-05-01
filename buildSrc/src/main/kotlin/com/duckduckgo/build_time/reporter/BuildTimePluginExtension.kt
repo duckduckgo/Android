@@ -19,7 +19,6 @@ package com.duckduckgo.build_time.reporter
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.reporting.ReportingExtension
 import java.time.Duration
 
 enum class Output {
