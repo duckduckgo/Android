@@ -18,7 +18,6 @@ package com.duckduckgo.app.feedback.ui.negative.openended
 
 import android.os.Bundle
 import androidx.core.view.doOnNextLayout
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackOpenEndedFeedbackBinding
@@ -60,21 +59,20 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
 
     override fun configureViewModelObservers() {
         viewModel.command.observe(
-            this,
-            Observer { command ->
-                when (command) {
-                    is Command.Exit -> {
-                        listener?.userCancelled()
-                    }
-                    is Command.ExitAndSubmitNegativeFeedback -> {
-                        listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
-                    }
-                    is Command.ExitAndSubmitPositiveFeedback -> {
-                        listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
-                    }
+            this
+        ) { command ->
+            when (command) {
+                is Command.Exit -> {
+                    listener?.userCancelled()
+                }
+                is Command.ExitAndSubmitNegativeFeedback -> {
+                    listener?.userProvidedNegativeOpenEndedFeedback(command.mainReason, command.subReason, command.feedback)
+                }
+                is Command.ExitAndSubmitPositiveFeedback -> {
+                    listener?.userProvidedPositiveOpenEndedFeedback(command.feedback)
                 }
             }
-        )
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

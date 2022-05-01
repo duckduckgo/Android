@@ -88,7 +88,7 @@ class FireproofWebsiteAdapter(
                 val binding = ViewFireproofWebsiteToggleBinding.inflate(inflater, parent, false)
                 FireproofWebSiteViewHolder.FireproofWebsiteToggleViewHolder(
                     binding,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked ->
+                    { _, isChecked ->
                         viewModel.onUserToggleLoginDetection(
                             isChecked
                         )

@@ -23,7 +23,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.transaction
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFragmentWithToolbarBinding
@@ -66,17 +65,15 @@ class FeedbackActivity :
 
     private fun configureObservers() {
         viewModel.command.observe(
-            this,
-            Observer {
-                it?.let { command -> processCommand(command) }
-            }
-        )
+            this
+        ) {
+            it?.let { command -> processCommand(command) }
+        }
         viewModel.updateViewCommand.observe(
-            this,
-            Observer {
-                it?.let { viewState -> render(viewState) }
-            }
-        )
+            this
+        ) {
+            it?.let { viewState -> render(viewState) }
+        }
     }
 
     private fun processCommand(command: Command) {

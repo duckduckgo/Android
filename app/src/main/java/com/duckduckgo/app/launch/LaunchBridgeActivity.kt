@@ -17,7 +17,6 @@
 package com.duckduckgo.app.launch
 
 import android.os.Bundle
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -48,11 +47,10 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     private fun configureObservers() {
         viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+            this
+        ) {
+            processCommand(it)
+        }
     }
 
     private fun processCommand(it: LaunchViewModel.Command?) {

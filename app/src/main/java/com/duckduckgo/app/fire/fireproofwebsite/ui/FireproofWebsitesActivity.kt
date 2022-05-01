@@ -21,7 +21,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireproofWebsitesBinding
@@ -70,23 +69,21 @@ class FireproofWebsitesActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         viewModel.viewState.observe(
-            this,
-            Observer { viewState ->
-                viewState?.let {
-                    adapter.loginDetectionEnabled = it.loginDetectionEnabled
-                    adapter.fireproofWebsites = it.fireproofWebsitesEntities
-                }
+            this
+        ) { viewState ->
+            viewState?.let {
+                adapter.loginDetectionEnabled = it.loginDetectionEnabled
+                adapter.fireproofWebsites = it.fireproofWebsitesEntities
             }
-        )
+        }
 
         viewModel.command.observe(
-            this,
-            Observer {
-                when (it) {
-                    is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
-                }
+            this
+        ) {
+            when (it) {
+                is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
             }
-        )
+        }
     }
 
     @Suppress("deprecation")

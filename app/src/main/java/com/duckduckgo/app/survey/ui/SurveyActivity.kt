@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.webkit.*
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
@@ -84,11 +83,10 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun configureObservers() {
         viewModel.command.observe(
-            this,
-            Observer {
-                it?.let { command -> processCommand(command) }
-            }
-        )
+            this
+        ) {
+            it?.let { command -> processCommand(command) }
+        }
     }
 
     private fun processCommand(command: Command) {
