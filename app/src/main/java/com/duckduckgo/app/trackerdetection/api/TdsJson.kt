@@ -70,6 +70,6 @@ class ActionJsonAdapter {
 
     @FromJson
     fun fromJson(actionName: String): Action? {
-        return Action.values().firstOrNull { it.name == actionName.toUpperCase(Locale.ROOT) }
+        return Action.values().firstOrNull { it.name == actionName.uppercase(Locale.ROOT) }
     }
 }
