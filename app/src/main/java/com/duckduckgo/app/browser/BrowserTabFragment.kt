@@ -1563,8 +1563,8 @@ class BrowserTabFragment :
 
     private fun savedSiteAdded(savedSiteChangedViewState: SavedSiteChangedViewState) {
         val snackbarMessage = when (savedSiteChangedViewState.savedSite) {
-            is SavedSite.Bookmark -> R.string.bookmarkAddedMessage
-            is SavedSite.Favorite -> R.string.favoriteAddedMessage
+            is Bookmark -> R.string.bookmarkAddedMessage
+            is Favorite -> R.string.favoriteAddedMessage
         }
         browserLayout.makeSnackbarWithNoBottomInset(snackbarMessage, Snackbar.LENGTH_LONG)
             .setAction(R.string.edit) {

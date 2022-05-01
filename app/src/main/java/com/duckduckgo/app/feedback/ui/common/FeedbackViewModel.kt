@@ -55,7 +55,7 @@ class FeedbackViewModel @Inject constructor(
     val updateViewCommand: SingleLiveEvent<UpdateViewCommand> = SingleLiveEvent()
 
     init {
-        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = FragmentState.InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
+        updateViewCommand.postValue(UpdateViewCommand(fragmentViewState = InitialAppEnjoymentClarifier(NAVIGATION_FORWARDS)))
     }
 
     private val currentViewState: UpdateViewCommand
@@ -63,12 +63,12 @@ class FeedbackViewModel @Inject constructor(
 
     fun userSelectedNegativeFeedbackMainReason(mainReason: MainReason) {
         val newState = when (mainReason) {
-            MainReason.MISSING_BROWSING_FEATURES -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.WEBSITES_NOT_LOADING -> FragmentState.NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
-            MainReason.SEARCH_NOT_GOOD_ENOUGH -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.APP_IS_SLOW_OR_BUGGY -> FragmentState.NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
-            MainReason.OTHER -> FragmentState.NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.MISSING_BROWSING_FEATURES -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.WEBSITES_NOT_LOADING -> NegativeWebSitesBrokenFeedback(NAVIGATION_FORWARDS, mainReason)
+            MainReason.SEARCH_NOT_GOOD_ENOUGH -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.NOT_ENOUGH_CUSTOMIZATIONS -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.APP_IS_SLOW_OR_BUGGY -> NegativeFeedbackSubReason(NAVIGATION_FORWARDS, mainReason)
+            MainReason.OTHER -> NegativeOpenEndedFeedback(NAVIGATION_FORWARDS, mainReason)
         }
         updateViewCommand.value = currentViewState.copy(
             fragmentViewState = newState,

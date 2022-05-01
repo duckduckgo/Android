@@ -77,7 +77,7 @@ class VpnStateMonitorService : Service() {
     // check last state, if it was enabled then we store disabled state reason unknown
     private fun maybeUpdateVPNState() {
         val lastStateStats = vpnDatabase.vpnServiceStateDao().getLastStateStats()
-        if (lastStateStats?.state != VpnServiceState.DISABLED) {
+        if (lastStateStats?.state != DISABLED) {
             Timber.d("VpnStateMonitorService destroyed but VPN state stored as ${lastStateStats?.state}, inserting DISABLED")
             vpnDatabase.vpnServiceStateDao().insert(VpnServiceStateStats(state = DISABLED))
         }

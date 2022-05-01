@@ -42,13 +42,13 @@ class ResourceSurrogateLoaderTest {
     @Test
     fun whenLoading6SurrogatesThen6SurrogatesFound() {
         val surrogates = initialiseFile("surrogates_6")
-        Assert.assertEquals(6, surrogates.size)
+        assertEquals(6, surrogates.size)
     }
 
     @Test
     fun whenLoading1SurrogateThen1SurrogateFound() {
         val surrogates = initialiseFile("surrogates_1")
-        Assert.assertEquals(1, surrogates.size)
+        assertEquals(1, surrogates.size)
     }
 
     @Test

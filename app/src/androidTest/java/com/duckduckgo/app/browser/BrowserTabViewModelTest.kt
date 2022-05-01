@@ -1224,7 +1224,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(Mockito.any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
     }
 
     @Test
