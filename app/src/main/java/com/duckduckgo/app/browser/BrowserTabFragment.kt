@@ -554,42 +554,42 @@ class BrowserTabFragment :
     private fun configureObservers() {
         viewModel.autoCompleteViewState.observe(
             viewLifecycleOwner,
-            Observer<AutoCompleteViewState> {
+            Observer {
                 it?.let { renderer.renderAutocomplete(it) }
             }
         )
 
         viewModel.globalLayoutState.observe(
             viewLifecycleOwner,
-            Observer<GlobalLayoutViewState> {
+            Observer {
                 it?.let { renderer.renderGlobalViewState(it) }
             }
         )
 
         viewModel.browserViewState.observe(
             viewLifecycleOwner,
-            Observer<BrowserViewState> {
+            Observer {
                 it?.let { renderer.renderBrowserViewState(it) }
             }
         )
 
         viewModel.loadingViewState.observe(
             viewLifecycleOwner,
-            Observer<LoadingViewState> {
+            Observer {
                 it?.let { renderer.renderLoadingIndicator(it) }
             }
         )
 
         viewModel.omnibarViewState.observe(
             viewLifecycleOwner,
-            Observer<OmnibarViewState> {
+            Observer {
                 it?.let { renderer.renderOmnibar(it) }
             }
         )
 
         viewModel.findInPageViewState.observe(
             viewLifecycleOwner,
-            Observer<FindInPageViewState> {
+            Observer {
                 it?.let { renderer.renderFindInPageState(it) }
             }
         )
@@ -612,7 +612,7 @@ class BrowserTabFragment :
 
         viewModel.survey.observe(
             viewLifecycleOwner,
-            Observer<Survey> {
+            Observer {
                 it.let { viewModel.onSurveyChanged(it) }
             }
         )
@@ -670,7 +670,7 @@ class BrowserTabFragment :
     private fun addTabsObserver() {
         viewModel.tabs.observe(
             viewLifecycleOwner,
-            Observer<List<TabEntity>> {
+            Observer {
                 it?.let {
                     decorator.renderTabIcon(it)
                 }
