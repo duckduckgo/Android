@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 22,
-    "identityHash": "e6ae957909b7aea253e26d1f66652549",
+    "identityHash": "7b061eba6970e601ade4e1ed6e3cc982",
     "entities": [
       {
         "tableName": "vpn_state",
@@ -644,7 +644,7 @@
       },
       {
         "tableName": "vpn_feature_remover",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `isFeatureRemoved` INTEGER NOT NULL, `shouldRemoveFeature` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `isFeatureRemoved` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -655,12 +655,6 @@
           {
             "fieldPath": "isFeatureRemoved",
             "columnName": "isFeatureRemoved",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "shouldRemoveFeature",
-            "columnName": "shouldRemoveFeature",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -678,7 +672,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e6ae957909b7aea253e26d1f66652549')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7b061eba6970e601ade4e1ed6e3cc982')"
     ]
   }
 }

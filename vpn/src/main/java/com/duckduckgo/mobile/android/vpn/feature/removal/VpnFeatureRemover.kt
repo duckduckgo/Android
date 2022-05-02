@@ -23,6 +23,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -40,7 +41,7 @@ import javax.inject.Provider
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
-    fun shouldBeRemoved(): Boolean
+    fun isFeatureRemoved(): Boolean
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
@@ -65,14 +66,12 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     override fun manuallyRemoveFeature() {
-        if (shouldBeRemoved()){
-            appCoroutineScope.launch(dispatcherProvider.io()) {
-                disableNotifications()
-                disableNotificationReminders()
-                removeNotificationChannels()
-                deleteAllVpnTrackers()
-                removeVPNFeature()
-            }
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            removeVPNFeature()
+            disableNotifications()
+            disableNotificationReminders()
+            removeNotificationChannels()
+            deleteAllVpnTrackers()
         }
     }
 
@@ -87,8 +86,8 @@ class DefaultVpnFeatureRemover @Inject constructor(
         resetAppTPOnboarding()
     }
 
-    override fun shouldBeRemoved(): Boolean {
-        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().shouldRemoveFeature
+    override fun isFeatureRemoved(): Boolean {
+        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved
     }
 
     private fun disableNotifications() {
@@ -111,7 +110,6 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private suspend fun removeVPNFeature() {
-        vpnDatabase.vpnFeatureRemoverDao().setAsRemoved()
-        deviceShieldOnboarding.removeVPNFeature()
+        vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = true))
     }
 }

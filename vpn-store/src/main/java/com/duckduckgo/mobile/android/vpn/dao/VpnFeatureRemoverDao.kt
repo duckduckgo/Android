@@ -31,16 +31,12 @@ interface VpnFeatureRemoverDao {
     @Query("select * from vpn_feature_remover")
     fun getState(): VpnFeatureRemoverState
 
-    @Query("UPDATE vpn_feature_remover SET shouldRemoveFeature = true")
-    fun setForRemoval()
-
-    @Query("UPDATE vpn_feature_remover SET isFeatureRemoved = true AND shouldRemoveFeature = false")
+    @Query("UPDATE vpn_feature_remover SET isFeatureRemoved = true")
     fun setAsRemoved()
 }
 
 @Entity(tableName = "vpn_feature_remover")
 data class VpnFeatureRemoverState(
     @PrimaryKey val id: Long = 1,
-    val isFeatureRemoved: Boolean = true,
-    val shouldRemoveFeature: Boolean = false
+    val isFeatureRemoved: Boolean = false
 )

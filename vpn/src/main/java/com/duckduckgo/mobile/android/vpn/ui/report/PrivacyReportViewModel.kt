@@ -22,6 +22,7 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
@@ -35,6 +36,7 @@ import javax.inject.Inject
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
@@ -59,7 +61,7 @@ class PrivacyReportViewModel @Inject constructor(
     }
 
     private fun shouldShowCTA(): Boolean {
-        if (deviceShieldOnboarding.isVPNFeatureRemoved()) {
+        if (vpnFeatureRemover.isFeatureRemoved()) {
             return false
         } else {
             return deviceShieldOnboarding.didShowOnboarding()

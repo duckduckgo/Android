@@ -45,7 +45,6 @@ import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActiv
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
-import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemoverReceiver
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState

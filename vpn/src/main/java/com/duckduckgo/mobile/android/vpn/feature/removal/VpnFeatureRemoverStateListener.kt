@@ -20,7 +20,6 @@ import androidx.work.ExistingWorkPolicy.KEEP
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.model.VpnStoppingReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -34,7 +33,7 @@ import javax.inject.Inject
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class
 )
-class FeatureRemoverVpnStateListener @Inject constructor(
+class VpnFeatureRemoverStateListener @Inject constructor(
     private val workManager: WorkManager
 ) : VpnServiceCallbacks {
 
