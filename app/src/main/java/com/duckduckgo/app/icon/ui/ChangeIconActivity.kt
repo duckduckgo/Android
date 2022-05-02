@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityAppIconsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -52,7 +53,7 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun configureRecycler() {
         binding.appIconsList.layoutManager = GridLayoutManager(this, 4)
-        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, R.dimen.changeAppIconListPadding))
+        binding.appIconsList.addItemDecoration(ItemOffsetDecoration(this, CommonR.dimen.changeAppIconListPadding))
         binding.appIconsList.adapter = iconsAdapter
     }
 

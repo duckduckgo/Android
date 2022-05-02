@@ -28,6 +28,7 @@ import androidx.core.view.doOnDetach
 import androidx.core.view.isVisible
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.IncludeDaxDialogCtaBinding
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.cta.ui.CtaViewModel
@@ -164,7 +165,7 @@ class FireDialog(
     }
 
     private fun playAnimation() {
-        window?.navigationBarColor = ContextCompat.getColor(context, R.color.black)
+        window?.navigationBarColor = ContextCompat.getColor(context, CommonR.color.black)
         setCancelable(false)
         setCanceledOnTouchOutside(false)
         binding.fireAnimationView.show()

@@ -19,6 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -62,7 +63,7 @@ class PrivacyProtectionNotificationSpecification(
     override val closeButton: String? = null
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = R.color.cornflowerBlue
+    override val color: Int = CommonR.color.cornflowerBlue
 
     override val title: String = when {
         trackers < TRACKER_THRESHOLD && upgrades < UPGRADE_THRESHOLD -> context.getString(R.string.privacyProtectionNotificationDefaultTitle)

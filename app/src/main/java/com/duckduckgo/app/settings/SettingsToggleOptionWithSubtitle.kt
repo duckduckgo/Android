@@ -20,7 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.CompoundButton
 import android.widget.FrameLayout
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.SettingsToggleOptionWithSubtitleBinding
 import com.duckduckgo.app.global.view.childrenRecursiveSequence
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
@@ -34,7 +34,7 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
     constructor(
         context: Context,
         attrs: AttributeSet?
-    ) : this(context, attrs, R.style.SettingsItem)
+    ) : this(context, attrs, CommonR.style.SettingsItem)
 
     constructor(
         context: Context,
@@ -42,10 +42,10 @@ class SettingsToggleOptionWithSubtitle : FrameLayout {
         defStyle: Int
     ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsToggleOptionWithSubtitle)
-        title = attributes.getString(R.styleable.SettingsToggleOptionWithSubtitle_toggleTitle) ?: ""
-        subtitle = attributes.getString(R.styleable.SettingsToggleOptionWithSubtitle_toggleSubTitle) ?: ""
-        isChecked = attributes.getBoolean(R.styleable.SettingsToggleOptionWithSubtitle_isChecked, false)
+        val attributes = context.obtainStyledAttributes(attrs, CommonR.styleable.SettingsToggleOptionWithSubtitle)
+        title = attributes.getString(CommonR.styleable.SettingsToggleOptionWithSubtitle_toggleTitle) ?: ""
+        subtitle = attributes.getString(CommonR.styleable.SettingsToggleOptionWithSubtitle_toggleSubTitle) ?: ""
+        isChecked = attributes.getBoolean(CommonR.styleable.SettingsToggleOptionWithSubtitle_isChecked, false)
         attributes.recycle()
     }
 
