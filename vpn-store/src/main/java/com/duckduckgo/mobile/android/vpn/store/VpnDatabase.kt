@@ -107,8 +107,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
                         " (`id` INTEGER PRIMARY KEY NOT NULL DEFAULT 1, " +
-                        "`isFeatureRemoved` INTEGER NOT NULL DEFAULT 1, " +
-                        "`shouldRemoveFeature` INTEGER NOT NULL DEFAULT 0)"
+                        "`isFeatureRemoved` INTEGER NOT NULL DEFAULT 1)"
                 )
             }
         }
