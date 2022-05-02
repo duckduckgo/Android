@@ -35,13 +35,14 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Provider
 
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
-    fun isFeatureRemoved(): Boolean
+    suspend fun isFeatureRemoved(): Boolean
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
@@ -86,7 +87,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
         resetAppTPOnboarding()
     }
 
-    override fun isFeatureRemoved(): Boolean {
+    override suspend fun isFeatureRemoved(): Boolean {
         return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved
     }
 

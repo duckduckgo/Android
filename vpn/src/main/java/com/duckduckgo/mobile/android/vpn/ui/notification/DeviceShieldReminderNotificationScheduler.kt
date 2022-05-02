@@ -25,6 +25,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -35,6 +37,8 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -46,7 +50,9 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    private val vpnFeatureRemover: VpnFeatureRemover
+    private val vpnFeatureRemover: VpnFeatureRemover,
+    private val dispatchers: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -68,15 +74,18 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
-        if (vpnFeatureRemover.isFeatureRemoved()) {
-            Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
-        } else {
-            Timber.d("VPN Manually stopped, showing disabled notification")
-            showImmediateReminderNotification()
-            cancelUndesiredStopReminderAlarm()
-            scheduleReminderForTomorrow()
+        appCoroutineScope.launch(dispatchers.io()) {
+            if (vpnFeatureRemover.isFeatureRemoved()) {
+                Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
+            } else {
+                withContext(dispatchers.main()) {
+                    Timber.d("VPN Manually stopped, showing disabled notification")
+                    showImmediateReminderNotification()
+                    cancelUndesiredStopReminderAlarm()
+                    scheduleReminderForTomorrow()
+                }
+            }
         }
-
     }
 
     private fun onVPNRevoked() {
