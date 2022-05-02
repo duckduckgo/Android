@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
-class  DebugLoggingReceiver(
+class DebugLoggingReceiver(
     context: Context,
     receiver: (Intent) -> Unit
 ) : InternalFeatureReceiver(context, receiver) {
