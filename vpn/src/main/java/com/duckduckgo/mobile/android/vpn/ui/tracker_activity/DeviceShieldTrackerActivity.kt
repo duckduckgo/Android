@@ -136,7 +136,7 @@ class DeviceShieldTrackerActivity :
         }
 
         binding.ctaRemoveFeature.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.ShowRemoveFeatureConfirmationDialog)
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
         }
 
         binding.ctaShowAll.setOnClickListener {

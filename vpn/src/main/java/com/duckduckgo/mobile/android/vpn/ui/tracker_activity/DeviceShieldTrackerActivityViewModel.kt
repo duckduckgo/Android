@@ -131,6 +131,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
                 ViewEvent.RemoveFeature -> removeFeature()
+                ViewEvent.AskToRemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
                 ViewEvent.StartVpn -> launchVpn()
             }
         }
@@ -175,7 +176,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchMostRecentActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
         object StartVpn : ViewEvent()
-        object ShowRemoveFeatureConfirmationDialog : ViewEvent()
+        object AskToRemoveFeature : ViewEvent()
     }
 
     sealed class Command {
