@@ -178,13 +178,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     }
 
     private fun close() {
-        viewModel.onClose()
         finish()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.onStart()
     }
 
     override fun onActivityResult(

@@ -75,15 +75,8 @@ class VpnOnboardingViewModel @Inject constructor(
         )
     )
 
-    fun onStart() {
-        deviceShieldOnboardingStore.onboardingDidShow()
-    }
-
-    fun onClose() {
-        deviceShieldOnboardingStore.onboardingDidNotShow()
-    }
-
     fun onTurnAppTpOffOn() {
+        deviceShieldOnboardingStore.onboardingDidShow()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
