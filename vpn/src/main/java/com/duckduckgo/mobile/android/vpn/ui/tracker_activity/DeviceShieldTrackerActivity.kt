@@ -16,8 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.VpnService
 import android.os.Bundle
 import android.os.ResultReceiver
@@ -354,8 +356,16 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun removeFeature() {
-        quietlyToggleAppTpSwitch(false)
-        sendBroadcast(Intent(VpnFeatureRemoverReceiver.REMOVE_FEATURE))
+        val intent = Intent(VpnFeatureRemoverReceiver.REMOVE_FEATURE).setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+        val infos = packageManager.queryBroadcastReceivers(intent, 0)
+        for (info in infos) {
+            val cn = ComponentName(
+                info.activityInfo.packageName,
+                info.activityInfo.name
+            )
+            intent.component = cn
+            sendBroadcast(intent)
+        }
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

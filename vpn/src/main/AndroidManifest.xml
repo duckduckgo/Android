@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.mobile.android.vpn">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
-    <application android:largeHeap="true"
+    <application
+        android:largeHeap="true"
         android:theme="@style/AppTheme">
 
         <activity
@@ -24,11 +26,12 @@
         <activity
             android:name="dummy.ui.VpnDiagnosticsActivity"
             android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:process=":vpn" >
+            android:process=":vpn">
         </activity>
 
-        <activity android:name=".service.VpnPermissionRequesterActivity"
-                  android:screenOrientation="portrait"/>
+        <activity
+            android:name=".service.VpnPermissionRequesterActivity"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
@@ -104,7 +107,7 @@
             android:screenOrientation="portrait"/>
 
         <service
-            android:name=".service.state.VpnStateMonitorService" >
+            android:name=".service.state.VpnStateMonitorService">
         </service>
 
         <service
@@ -112,9 +115,10 @@
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="android.net.VpnService" />
+                <action android:name="android.net.VpnService"/>
             </intent-filter>
-            <meta-data android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
                 android:value="false"/>
         </service>
 
@@ -134,14 +138,14 @@
             android:enabled="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="com.duckduckgo.vpn.internaltesters.reminder" />
+                <action android:name="com.duckduckgo.vpn.internaltesters.reminder"/>
             </intent-filter>
         </receiver>
 
         <receiver
             android:name=".feature.removal.VpnFeatureRemoverReceiver">
             <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.vpn.feature-removal" />
+                <action android:name="com.duckduckgo.mobile.android.vpn.feature-removal"/>
             </intent-filter>
         </receiver>
 
@@ -150,25 +154,15 @@
             android:enabled="false"
             android:process=":vpn">
             <intent-filter android:priority="999">
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.REBOOT" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
-            android:enabled="false"
-            android:process=":vpn">
-            <intent-filter android:priority="999">
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.REBOOT"/>
             </intent-filter>
         </receiver>
 
 
         <receiver android:name="com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
 

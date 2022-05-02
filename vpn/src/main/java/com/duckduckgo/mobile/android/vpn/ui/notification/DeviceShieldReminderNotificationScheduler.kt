@@ -68,7 +68,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
-        if (deviceShieldOnboardingStore.isVPNFeatureRemoved()) {
+        if (deviceShieldOnboardingStore.isVPNFeatureRemoved() || deviceShieldOnboardingStore.shouldRemoveVpnFeature()) {
             Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
         } else {
             Timber.d("VPN Manually stopped, showing disabled notification")

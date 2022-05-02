@@ -71,7 +71,7 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnHeartBeatDao(): VpnHeartBeatDao
     abstract fun vpnPhoenixDao(): VpnPhoenixDao
     abstract fun vpnNotificationsDao(): VpnNotificationsDao
-    abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao
+    abstract fun vpnAppTrackerBlockingDao(): VpnAppTrackerBlockingDao 
     abstract fun vpnServiceStateDao(): VpnServiceStateStatsDao
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
 
