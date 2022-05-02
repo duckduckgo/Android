@@ -206,7 +206,7 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                timeSinceTrackerBlocked.text = "${item.displayTimestamp}"
+                timeSinceTrackerBlocked.text = item.displayTimestamp
 
                 Glide.with(trackingAppIcon.context.applicationContext)
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
