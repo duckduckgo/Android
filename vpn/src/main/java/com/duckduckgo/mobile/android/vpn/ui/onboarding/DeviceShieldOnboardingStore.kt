@@ -29,6 +29,9 @@ interface DeviceShieldOnboardingStore {
     fun enableVPNFeature()
     fun removeVPNFeature()
     fun isVPNFeatureRemoved(): Boolean
+    fun askRemoveVpnFeature()
+    fun forgetRemoveVpnFeature()
+    fun shouldRemoveVpnFeature(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -62,9 +65,23 @@ class DeviceShieldOnboardingImpl @Inject constructor(
         return preferences.getBoolean(KEY_VPN_FEATURE_REMOVED, false)
     }
 
+    override fun askRemoveVpnFeature() {
+        onboardingDidShow()
+        preferences.edit { putBoolean(KEY_SCHEDULE_VPN_FEATURE_REMOVED, true) }
+    }
+
+    override fun forgetRemoveVpnFeature() {
+        preferences.edit { putBoolean(KEY_SCHEDULE_VPN_FEATURE_REMOVED, false) }
+    }
+
+    override fun shouldRemoveVpnFeature(): Boolean {
+        return preferences.getBoolean(KEY_SCHEDULE_VPN_FEATURE_REMOVED, false)
+    }
+
     companion object {
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
         private const val KEY_VPN_FEATURE_REMOVED = "KEY_VPN_FEATURE_REMOVED"
+        private const val KEY_SCHEDULE_VPN_FEATURE_REMOVED = "KEY_SCHEDULE_VPN_FEATURE_REMOVED"
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
     }
 }

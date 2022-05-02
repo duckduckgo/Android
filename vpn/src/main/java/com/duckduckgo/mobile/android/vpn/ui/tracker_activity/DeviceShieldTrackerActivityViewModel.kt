@@ -136,7 +136,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         }
     }
 
-    private suspend fun launchVpn(){
+    private suspend fun launchVpn() {
         deviceShieldOnboardingStore.enableVPNFeature()
         deviceShieldPixels.enableFromSummaryTrackerActivity()
         command.send(Command.LaunchVPN)
@@ -144,6 +144,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+        deviceShieldOnboardingStore.askRemoveVpnFeature()
         viewModelScope.launch {
             command.send(Command.RemoveFeature)
             command.send(Command.CloseScreen)

@@ -350,12 +350,12 @@ class DeviceShieldTrackerActivity :
 
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
-        VpnFeatureRemoverReceiver.removeFeatureIntent().also { sendBroadcast(it) }
+        TrackerBlockingVpnService.stopService(this)
     }
 
     private fun removeFeature() {
         quietlyToggleAppTpSwitch(false)
-        VpnFeatureRemoverReceiver.removeFeatureIntent().also { sendBroadcast(it) }
+        sendBroadcast(Intent(VpnFeatureRemoverReceiver.REMOVE_FEATURE))
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

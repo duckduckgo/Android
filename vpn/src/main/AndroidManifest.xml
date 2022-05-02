@@ -139,6 +139,13 @@
         </receiver>
 
         <receiver
+            android:name=".feature.removal.VpnFeatureRemoverReceiver">
+            <intent-filter>
+                <action android:name="com.duckduckgo.mobile.android.vpn.feature-removal" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
             android:enabled="false"
             android:process=":vpn">
@@ -147,6 +154,17 @@
                 <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
+            android:enabled="false"
+            android:process=":vpn">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+            </intent-filter>
+        </receiver>
+
 
         <receiver android:name="com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver">
             <intent-filter>
