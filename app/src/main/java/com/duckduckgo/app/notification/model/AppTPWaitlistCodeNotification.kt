@@ -18,7 +18,8 @@ package com.duckduckgo.app.notification.model
 
 import android.content.Context
 import android.os.Bundle
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APPTP_WAITLIST_CODE
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -54,14 +55,14 @@ class AppTPWaitlistCodeNotification(
 class AppTPWaitlistCodeSpecification(context: Context) : NotificationSpec {
     override val channel = NotificationRegistrar.ChannelType.APP_TP_WAITLIST
     override val systemId = NotificationRegistrar.NotificationId.EmailWaitlist
-    override val name = context.getString(R.string.atp_WaitlistNotificationTitle)
-    override val icon = R.drawable.notification_logo
-    override val title: String = context.getString(R.string.atp_WaitlistNotificationTitle)
-    override val description: String = context.getString(R.string.atp_WaitlistNotificationDescription)
+    override val name = context.getString(VpnR.string.atp_WaitlistNotificationTitle)
+    override val icon = CommonR.drawable.notification_logo
+    override val title: String = context.getString(VpnR.string.atp_WaitlistNotificationTitle)
+    override val description: String = context.getString(VpnR.string.atp_WaitlistNotificationDescription)
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val pixelSuffix = "atpc"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = R.color.ic_launcher_red_background
+    override val color: Int = CommonR.color.ic_launcher_red_background
 }
