@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import androidx.annotation.VisibleForTesting
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +64,7 @@ class PrivacyReportViewModel @Inject constructor(
 
         }
     }
-
+    
     private suspend fun shouldShowCTA(): Boolean {
         if (vpnFeatureRemover.isFeatureRemoved()) {
             return false
