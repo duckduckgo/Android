@@ -53,6 +53,10 @@ include ':voice-search-api'
 include ':voice-search-impl'
 include ':voice-search-store'
 
+include ':secure-storage-api'
+include ':secure-storage-impl'
+include ':secure-storage-store'
+
 project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
 project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
 project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
@@ -86,6 +90,10 @@ project(':bandwidth-store').projectDir = new File('bandwidth/bandwidth-store')
 
 project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
 project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
+
+project(':secure-storage-api').projectDir = new File('secure-storage/secure-storage-api')
+project(':secure-storage-impl').projectDir = new File('secure-storage/secure-storage-impl')
+project(':secure-storage-store').projectDir = new File('secure-storage/secure-storage-store')
 
 rootProject.children.each { subproject ->
 
