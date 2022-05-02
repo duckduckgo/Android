@@ -29,6 +29,8 @@ import kotlin.reflect.KClass
  * }
  * ```
  */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class ContributesPluginPoint(
     /** The scope in which to include this contributed PluginPoint */
     val scope: KClass<*>,
