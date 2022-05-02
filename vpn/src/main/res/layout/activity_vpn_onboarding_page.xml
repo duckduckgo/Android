@@ -62,47 +62,12 @@
 
         </FrameLayout>
 
-        <LinearLayout
-            android:id="@+id/onboarding_active_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:gravity="center_vertical|center_horizontal"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/onboarding_page_header">
-
-            <ImageView
-                android:id="@+id/onboarding_active_indicator_one"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_inactive_dot" />
-
-            <ImageView
-                android:id="@+id/onboarding_active_indicator_two"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                android:src="@drawable/ic_inactive_dot" />
-
-            <ImageView
-                android:id="@+id/onboarding_active_indicator_three"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_inactive_dot" />
-
-        </LinearLayout>
-
         <TextView
             android:id="@+id/onboarding_page_title"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
-            android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="40dp"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
             android:text="@string/atp_OnboardingLastPageOneTitle"
@@ -114,6 +79,7 @@
         <TextView
             android:id="@+id/onboarding_page_text"
             android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
+            android:textColor="?secondaryTextColor"
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

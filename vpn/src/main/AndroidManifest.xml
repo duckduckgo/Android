@@ -31,12 +31,7 @@
                   android:screenOrientation="portrait"/>
 
         <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity"
-            android:screenOrientation="portrait"
-            />
-
-        <activity
-            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldEnabledActivity"
+            android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"
             android:screenOrientation="portrait"
             />
 

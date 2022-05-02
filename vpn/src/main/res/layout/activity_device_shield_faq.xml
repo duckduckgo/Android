@@ -32,7 +32,7 @@
         android:layout_height="match_parent"
         android:scrollbars="none"
         android:clipToPadding="false"
-        tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity">
+        tools:context="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity">
 
         <LinearLayout
             android:layout_width="match_parent"
