@@ -37,12 +37,10 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
+    private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
     private val vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider
-    private val vpnStore: VpnStore,
-    private val vpnStateMonitor: VpnStateMonitor
 ) : ViewModel(), LifecycleObserver {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow().combine(getReport()) { vpnState, trackersBlocked ->
@@ -72,7 +70,7 @@ class PrivacyReportViewModel @Inject constructor(
         if (isFeatureRemoved) {
             return false
         } else {
-            return deviceShieldOnboarding.didShowOnboarding()
+            return vpnStore.didShowOnboarding()
         }
     }
 
