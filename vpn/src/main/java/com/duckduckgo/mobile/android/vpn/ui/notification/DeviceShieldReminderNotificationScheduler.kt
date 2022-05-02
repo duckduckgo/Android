@@ -26,11 +26,14 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverDao
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiver
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -46,7 +49,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
-    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore
+    private val vpnFeatureRemover: VpnFeatureRemover
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -68,7 +71,7 @@ class DeviceShieldReminderNotificationScheduler @Inject constructor(
     }
 
     private fun onVPNManuallyStopped() {
-        if (deviceShieldOnboardingStore.isVPNFeatureRemoved() || deviceShieldOnboardingStore.shouldRemoveVpnFeature()) {
+        if (vpnFeatureRemover.shouldBeRemoved()) {
             Timber.d("VPN Manually stopped because user disabled the feature, nothing to do")
         } else {
             Timber.d("VPN Manually stopped, showing disabled notification")

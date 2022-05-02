@@ -136,7 +136,7 @@ class DeviceShieldTrackerActivity :
         }
 
         binding.ctaRemoveFeature.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.RemoveFeature)
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.ShowRemoveFeatureConfirmationDialog)
         }
 
         binding.ctaShowAll.setOnClickListener {
@@ -212,7 +212,6 @@ class DeviceShieldTrackerActivity :
     private fun processCommand(it: DeviceShieldTrackerActivityViewModel.Command?) {
         when (it) {
             is DeviceShieldTrackerActivityViewModel.Command.StopVPN -> stopDeviceShield()
-            is DeviceShieldTrackerActivityViewModel.Command.RemoveFeature -> removeFeature()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchVPN -> startVPN()
             is DeviceShieldTrackerActivityViewModel.Command.CheckVPNPermission -> checkVPNPermission()
             is DeviceShieldTrackerActivityViewModel.Command.RequestVPNPermission -> obtainVpnRequestPermission(it.vpnIntent)
@@ -352,19 +351,6 @@ class DeviceShieldTrackerActivity :
     private fun stopDeviceShield() {
         quietlyToggleAppTpSwitch(false)
         TrackerBlockingVpnService.stopService(this)
-    }
-
-    private fun removeFeature() {
-        val intent = Intent(VpnFeatureRemoverReceiver.REMOVE_FEATURE).setFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-        val infos = packageManager.queryBroadcastReceivers(intent, 0)
-        for (info in infos) {
-            val cn = ComponentName(
-                info.activityInfo.packageName,
-                info.activityInfo.name
-            )
-            intent.component = cn
-            sendBroadcast(intent)
-        }
     }
 
     private fun quietlyToggleAppTpSwitch(state: Boolean) {

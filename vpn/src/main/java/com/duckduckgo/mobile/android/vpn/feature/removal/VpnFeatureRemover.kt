@@ -40,6 +40,7 @@ import javax.inject.Provider
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
+    fun shouldBeRemoved(): Boolean
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
@@ -64,12 +65,14 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     override fun manuallyRemoveFeature() {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            disableNotifications()
-            disableNotificationReminders()
-            removeNotificationChannels()
-            deleteAllVpnTrackers()
-            removeVPNFeature()
+        if (shouldBeRemoved()){
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                disableNotifications()
+                disableNotificationReminders()
+                removeNotificationChannels()
+                deleteAllVpnTrackers()
+                removeVPNFeature()
+            }
         }
     }
 
@@ -82,6 +85,10 @@ class DefaultVpnFeatureRemover @Inject constructor(
     override fun scheduledRemoveFeature() {
         manuallyRemoveFeature()
         resetAppTPOnboarding()
+    }
+
+    override fun shouldBeRemoved(): Boolean {
+        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().shouldRemoveFeature
     }
 
     private fun disableNotifications() {
@@ -100,11 +107,11 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnDatabase.clearAllTables()
+        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
     }
 
     private suspend fun removeVPNFeature() {
+        vpnDatabase.vpnFeatureRemoverDao().setAsRemoved()
         deviceShieldOnboarding.removeVPNFeature()
     }
-
 }
