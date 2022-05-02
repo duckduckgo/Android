@@ -36,11 +36,11 @@ import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 
 interface TrackingProtectionAppsRepository {
+
     /** @return the list of installed apps and information about its excluded state */
-    suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>>
+    suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>>
 
     /** @return the list of installed apps currently excluded */
     suspend fun getExclusionAppsList(): List<String>
@@ -70,7 +70,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
 
     private var installedApps: Sequence<ApplicationInfo> = emptySequence()
 
-    override suspend fun getProtectedApps(): Flow<List<TrackingProtectionAppInfo>> {
+    override suspend fun getAppsAndProtectionInfo(): Flow<List<TrackingProtectionAppInfo>> {
         return appTrackerRepository.getAppExclusionListFlow()
             .combine(appTrackerRepository.getManualAppExclusionListFlow()) { ddgExclusionList, manualList ->
                 Timber.d("getProtectedApps flow")

@@ -40,7 +40,7 @@ import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -191,7 +191,7 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(DeviceShieldOnboardingActivity.intent(this))
+        startActivity(VpnOnboardingActivity.intent(this))
         finish()
     }
 

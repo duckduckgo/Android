@@ -347,6 +347,10 @@ interface DeviceShieldPixels {
     /** Will fire when the user launches the Recent App Settings Screen */
     fun didOpenManageRecentAppSettings()
 
+    fun reportLoopbackDnsError()
+    fun reportAnylocalDnsError()
+    fun reportGeneralDnsError()
+
     /**
      * Will fire when the user wants to remove the VPN feature all together
      */
@@ -729,6 +733,21 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun reportLoopbackDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR)
+    }
+
+    override fun reportAnylocalDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_ERROR)
+    }
+
+    override fun reportGeneralDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
     }
 
     override fun didShowRemoveTrackingProtectionFeatureDialog() {

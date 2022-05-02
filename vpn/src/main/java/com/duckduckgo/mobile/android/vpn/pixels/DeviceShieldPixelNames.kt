@@ -196,5 +196,12 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
     ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
+
+    ATP_REPORT_LOOPBACK_DNS_SET_ERROR("m_atp_report_loopback_dns_error_c"),
+    ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY("m_atp_report_loopback_dns_error_d"),
+    ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_ERROR("m_atp_report_anylocal_dns_error_c"),
+    ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY("m_atp_report_anylocal_dns_error_d"),
+    ATP_REPORT_DNS_SET_ERROR("m_atp_report_dns_error_c"),
+    ATP_REPORT_DNS_SET_ERROR_DAILY("m_atp_report_dns_error_d"),
     ;
 }

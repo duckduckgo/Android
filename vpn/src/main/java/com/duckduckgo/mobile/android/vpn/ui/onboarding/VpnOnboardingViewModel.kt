@@ -33,11 +33,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class DeviceShieldOnboardingViewModel @Inject constructor(
+class VpnOnboardingViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
     private val vpnDetector: VpnDetector,
@@ -69,19 +68,15 @@ class DeviceShieldOnboardingViewModel @Inject constructor(
         OnboardingPage(
             R.drawable.device_shield_onboarding_page_three_header,
             R.string.atp_OnboardingLastPageThreeTitle, R.string.atp_OnboardingLastPageThreeSubTitle
+        ),
+        OnboardingPage(
+            R.raw.device_shield_tracking_apps,
+            R.string.atp_EnabledTitle, R.string.atp_EnabledMessage
         )
     )
 
-    fun onStart() {
+    fun onTurnAppTpOffOn() {
         deviceShieldOnboardingStore.onboardingDidShow()
-    }
-
-    fun onClose() {
-        deviceShieldOnboardingStore.onboardingDidNotShow()
-    }
-
-    fun onTurnAppTpOn() {
-        deviceShieldOnboardingStore.enableVPNFeature()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {
@@ -90,7 +85,6 @@ class DeviceShieldOnboardingViewModel @Inject constructor(
     }
 
     fun onAppTpEnabled() {
-        Timber.i("App Tracking Protection, is now enabled")
         appCoroutineScope.launch(dispatcherProvider.io()) {
             deviceShieldPixels.enableFromOnboarding()
         }
