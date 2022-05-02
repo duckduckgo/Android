@@ -17,10 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
@@ -33,7 +31,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingSto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
@@ -64,9 +62,12 @@ class PrivacyReportViewModel @Inject constructor(
 
         }
     }
-    
+
     private suspend fun shouldShowCTA(): Boolean {
-        if (vpnFeatureRemover.isFeatureRemoved()) {
+        val isFeatureRemoved = withContext(dispatchers.io()) {
+            vpnFeatureRemover.isFeatureRemoved()
+        }
+        if (isFeatureRemoved) {
             return false
         } else {
             return deviceShieldOnboarding.didShowOnboarding()

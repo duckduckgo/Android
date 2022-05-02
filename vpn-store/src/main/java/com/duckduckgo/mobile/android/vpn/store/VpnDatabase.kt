@@ -70,7 +70,6 @@ abstract class VpnDatabase : RoomDatabase() {
     abstract fun vpnSystemAppsOverridesDao(): VpnAppTrackerSystemAppsOverridesDao
     abstract fun vpnFeatureRemoverDao(): VpnFeatureRemoverDao
 
-
     companion object {
 
         private val MIGRATION_18_TO_19: Migration = object : Migration(18, 19) {

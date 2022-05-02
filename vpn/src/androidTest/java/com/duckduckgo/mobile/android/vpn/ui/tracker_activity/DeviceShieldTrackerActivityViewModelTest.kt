@@ -37,7 +37,6 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -305,7 +304,6 @@ class DeviceShieldTrackerActivityViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
-
 
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)

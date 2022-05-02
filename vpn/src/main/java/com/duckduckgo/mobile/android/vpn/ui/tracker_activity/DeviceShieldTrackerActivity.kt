@@ -16,7 +16,6 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService

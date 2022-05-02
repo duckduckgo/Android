@@ -17,12 +17,11 @@
 package com.duckduckgo.mobile.android.vpn.dao
 
 import androidx.room.*
-import com.duckduckgo.mobile.android.vpn.model.VpnDataStats
 
 @Dao
 interface VpnFeatureRemoverDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(removerState: VpnFeatureRemoverState): Long
 
     @Query("select count(1) > 0 from vpn_feature_remover")
@@ -31,8 +30,8 @@ interface VpnFeatureRemoverDao {
     @Query("select * from vpn_feature_remover")
     fun getState(): VpnFeatureRemoverState
 
-    @Query("UPDATE vpn_feature_remover SET isFeatureRemoved = true")
-    fun setAsRemoved()
+    @Query("UPDATE vpn_feature_remover SET isFeatureRemoved = :removed")
+    fun setAsRemoved(removed: Boolean)
 }
 
 @Entity(tableName = "vpn_feature_remover")

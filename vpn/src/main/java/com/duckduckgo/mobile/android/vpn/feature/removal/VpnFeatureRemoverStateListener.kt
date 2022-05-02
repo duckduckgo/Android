@@ -22,6 +22,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -34,14 +35,23 @@ import javax.inject.Inject
     boundType = VpnServiceCallbacks::class
 )
 class VpnFeatureRemoverStateListener @Inject constructor(
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val vpnDatabase: VpnDatabase
 ) : VpnServiceCallbacks {
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         coroutineScope.launch() {
             Timber.d("FeatureRemoverVpnStateListener, new state ENABLED. Descheduling automatic feature removal")
-            workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
+            resetState()
         }
+    }
+
+    private suspend fun resetState() {
+        if (vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved) {
+            Timber.d("FeatureRemoverVpnStateListener, feature was removed, setting it back to not removed")
+            vpnDatabase.vpnFeatureRemoverDao().setAsRemoved(false)
+        }
+        workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
     }
 
     override fun onVpnStopped(
