@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.dao
+package com.duckduckgo.mobile.android.vpn.store
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
+import android.content.Context
+import androidx.room.RoomDatabase
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import javax.inject.Provider
 
-@Dao
-interface VpnPreferencesDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
-
-    @Query("select * from vpn_preferences where preference = :preference")
-    fun get(preference: String): VpnPreferences?
+class VpnDatabaseCallbackProvider constructor(
+    private val context: Context,
+    private val vpnDatabaseProvider: Provider<VpnDatabase>,
+) {
+    fun provideCallbacks(): RoomDatabase.Callback {
+        return VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
+    }
 }

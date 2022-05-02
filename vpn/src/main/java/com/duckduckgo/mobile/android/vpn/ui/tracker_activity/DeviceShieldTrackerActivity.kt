@@ -51,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
@@ -134,12 +135,13 @@ class DeviceShieldTrackerActivity :
         }
 
         binding.ctaRemoveFeature.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.RemoveFeature)
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
         }
 
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
+
     }
 
     override fun onActivityResult(
@@ -342,7 +344,8 @@ class DeviceShieldTrackerActivity :
     private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
-                viewModel.onVPNPermissionResult(RESULT_OK)
+                viewModel.onViewEvent(StartVpn)
+                // viewModel.onVPNPermissionResult(RESULT_OK)
             }
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
@@ -506,5 +509,4 @@ class DeviceShieldTrackerActivity :
             }
         }
     }
-
 }

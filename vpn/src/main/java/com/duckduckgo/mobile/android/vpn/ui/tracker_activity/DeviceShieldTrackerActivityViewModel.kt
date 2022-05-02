@@ -146,15 +146,22 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
-                ViewEvent.RemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.RemoveFeature -> removeFeature()
+                ViewEvent.AskToRemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.StartVpn -> launchVpn()
             }
         }
     }
 
+    private suspend fun launchVpn() {
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
+        command.send(Command.LaunchVPN)
+    }
+
     fun removeFeature() {
         deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
-        vpnFeatureRemover.manuallyRemoveFeature()
         viewModelScope.launch {
+            vpnFeatureRemover.manuallyRemoveFeature()
             command.send(Command.StopVPN)
             command.send(Command.CloseScreen)
         }
@@ -190,6 +197,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
         object RemoveFeature : ViewEvent()
+        object StartVpn : ViewEvent()
+        object AskToRemoveFeature : ViewEvent()
     }
 
     sealed class Command {

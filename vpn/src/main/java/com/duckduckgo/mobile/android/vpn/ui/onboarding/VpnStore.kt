@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@ interface VpnStore {
     fun onboardingDidShow()
     fun onboardingDidNotShow()
     fun didShowOnboarding(): Boolean
-
-    fun enableVPNFeature()
-    fun removeVPNFeature()
-    fun isVPNFeatureRemoved(): Boolean
-
     fun resetAppTPManuallyEnablesCounter()
     fun onAppTPManuallyEnabled()
     fun getAppTPManuallyEnables(): Int
@@ -62,19 +57,6 @@ class SharedPreferencesVpnStore @Inject constructor(
 
     override fun didShowOnboarding(): Boolean {
         return preferences.getBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false)
-    }
-
-    override fun enableVPNFeature() {
-        onboardingDidShow()
-        preferences.edit { putBoolean(KEY_VPN_FEATURE_REMOVED, false) }
-    }
-
-    override fun removeVPNFeature() {
-        preferences.edit { putBoolean(KEY_VPN_FEATURE_REMOVED, true) }
-    }
-
-    override fun isVPNFeatureRemoved(): Boolean {
-        return preferences.getBoolean(KEY_VPN_FEATURE_REMOVED, false)
     }
 
     override fun resetAppTPManuallyEnablesCounter() {
@@ -110,8 +92,6 @@ class SharedPreferencesVpnStore @Inject constructor(
         private const val DEVICE_SHIELD_ONBOARDING_STORE_PREFS = "com.duckduckgo.android.atp.onboarding.store"
 
         private const val KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED = "KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED"
-        private const val KEY_VPN_FEATURE_REMOVED = "KEY_VPN_FEATURE_REMOVED"
-
         private const val KEY_DEVICE_SHIELD_MANUALLY_ENABLED = "KEY_DEVICE_SHIELD_MANUALLY_ENABLED"
         private const val KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED = "KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED"
 

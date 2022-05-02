@@ -18,12 +18,22 @@ package com.duckduckgo.mobile.android.vpn.trackers
 
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabaseCallback
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import javax.inject.Provider
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AppTrackerRepositoryTest {
+
+    @ExperimentalCoroutinesApi
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
 
     private lateinit var appTrackerRepository: RealAppTrackerRepository
     private lateinit var vpnDatabase: VpnDatabase
@@ -31,11 +41,12 @@ class AppTrackerRepositoryTest {
     @Before
     fun setup() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
+
         vpnDatabase = Room.inMemoryDatabaseBuilder(
             context,
             VpnDatabase::class.java
         ).allowMainThreadQueries().build().apply {
-            VpnDatabase.prepopulateAppTrackerBlockingList(context, this)
+            VpnDatabaseCallback(context, Provider { this }, coroutineRule.testDispatcherProvider).prepopulateAppTrackerBlockingList()
         }
 
         appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())

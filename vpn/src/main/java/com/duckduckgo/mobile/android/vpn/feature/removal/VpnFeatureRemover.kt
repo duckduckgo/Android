@@ -23,6 +23,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -40,12 +41,13 @@ import javax.inject.Provider
 interface VpnFeatureRemover {
     fun manuallyRemoveFeature()
     fun scheduledRemoveFeature()
+    suspend fun isFeatureRemoved(): Boolean
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
 @ContributesMultibinding(scope = AppScope::class, boundType = WorkerInjectorPlugin::class)
 class DefaultVpnFeatureRemover @Inject constructor(
-    private val deviceShieldOnboarding: VpnStore,
+    private val vpnStore: VpnStore,
     private val notificationManager: NotificationManagerCompat,
     private val vpnDatabase: VpnDatabase,
     // we use the Provider to avoid a cycle dependency
@@ -65,11 +67,11 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     override fun manuallyRemoveFeature() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
+            removeVPNFeature()
             disableNotifications()
             disableNotificationReminders()
             removeNotificationChannels()
             deleteAllVpnTrackers()
-            removeVPNFeature()
         }
     }
 
@@ -84,6 +86,10 @@ class DefaultVpnFeatureRemover @Inject constructor(
         resetAppTPOnboarding()
     }
 
+    override suspend fun isFeatureRemoved(): Boolean {
+        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved
+    }
+
     private fun disableNotifications() {
         notificationManager.cancel(TrackerBlockingVpnService.VPN_REMINDER_NOTIFICATION_ID)
         notificationManager.cancel(VPN_DAILY_NOTIFICATION_ID)
@@ -96,15 +102,14 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     private fun resetAppTPOnboarding() {
-        deviceShieldOnboarding.onboardingDidNotShow()
+        vpnStore.onboardingDidNotShow()
     }
 
     private fun deleteAllVpnTrackers() {
-        vpnDatabase.clearAllTables()
+        vpnDatabase.vpnTrackerDao().deleteAllTrackers()
     }
 
-    private fun removeVPNFeature() {
-        deviceShieldOnboarding.removeVPNFeature()
+    private suspend fun removeVPNFeature() {
+        vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = true))
     }
-
 }

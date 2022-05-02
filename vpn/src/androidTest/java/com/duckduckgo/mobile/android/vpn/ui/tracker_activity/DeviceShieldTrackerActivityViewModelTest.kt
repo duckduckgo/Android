@@ -37,6 +37,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNK
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -74,8 +75,8 @@ class DeviceShieldTrackerActivityViewModelTest {
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
-    private val featureRemover = mock<VpnFeatureRemover>()
     private val workManager = mock<WorkManager>()
+    private val vpnFeatureRemover = mock<VpnFeatureRemover>()
     private val vpnStore = mock<VpnStore>()
 
     @Before
@@ -100,7 +101,7 @@ class DeviceShieldTrackerActivityViewModelTest {
             appTrackerBlockingStatsRepository,
             vpnStateMonitor,
             vpnDetector,
-            featureRemover,
+            vpnFeatureRemover,
             vpnStore,
             CoroutineTestRule().testDispatcherProvider
         )
@@ -336,6 +337,32 @@ class DeviceShieldTrackerActivityViewModelTest {
 
             verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserWantsToRemoveFeatureThenDalogIsShown() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.AskToRemoveFeature)
+
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserAcceptsToRemoveFeatureThenFeatureIsRemovedAndVpnAndScreenClosed() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.RemoveFeature)
+
+            verify(deviceShieldPixels).didChooseToRemoveTrackingProtectionFeature()
+            verify(vpnFeatureRemover).manuallyRemoveFeature()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.CloseScreen, awaitItem())
+
             cancelAndConsumeRemainingEvents()
         }
     }

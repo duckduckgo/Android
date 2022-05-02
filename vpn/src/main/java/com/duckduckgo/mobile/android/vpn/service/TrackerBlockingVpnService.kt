@@ -262,10 +262,21 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             configureMeteredConnection()
 
             // Set DNS
-            getDns().forEach {
-                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || it is Inet4Address) {
-                    Timber.v("Adding DNS $it")
-                    addDnsServer(it)
+            getDns().forEach { addr ->
+                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || addr is Inet4Address) {
+                    Timber.v("Adding DNS $addr")
+                    runCatching {
+                        addDnsServer(addr)
+                    }.onFailure { t ->
+                        Timber.e(t, "Error setting DNS $addr")
+                        if (addr.isLoopbackAddress) {
+                            deviceShieldPixels.reportLoopbackDnsError()
+                        } else if (addr.isAnyLocalAddress) {
+                            deviceShieldPixels.reportAnylocalDnsError()
+                        } else {
+                            deviceShieldPixels.reportGeneralDnsError()
+                        }
+                    }
                 }
             }
 
