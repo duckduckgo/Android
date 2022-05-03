@@ -104,11 +104,12 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onVPNPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                sendCommand(Command.LaunchVPN)
                 if (shouldPromoteAlwaysOn()) {
                     sendCommand(Command.ShowAlwaysOnPromotionDialog)
                 }
-                vpnStore.onAppTPManuallyEnabled()
+                viewModelScope.launch {
+                    launchVpn()
+                }
                 return
             }
             else -> {
@@ -155,6 +156,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     private suspend fun launchVpn() {
         deviceShieldPixels.enableFromSummaryTrackerActivity()
+        vpnStore.onAppTPManuallyEnabled()
         command.send(Command.LaunchVPN)
     }
 
