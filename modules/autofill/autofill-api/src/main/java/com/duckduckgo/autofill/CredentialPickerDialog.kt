@@ -27,9 +27,23 @@ interface CredentialAutofillPickerDialog {
     }
 }
 
-interface CredentialAutofillPickerDialogFactory {
-    fun create(
+interface CredentialSavePickerDialog {
+    fun asDialogFragment(): DialogFragment
+
+    companion object {
+        const val TAG = "CredentialSavePickerDialog"
+        const val RESULT_KEY_CREDENTIAL_RESULT_SAVE = "CredentialSavePickerDialogResultSave"
+    }
+}
+
+interface CredentialAutofillDialogFactory {
+    fun credentialAutofillPickerDialog(
         url: String,
         credentials: List<Credentials>
     ): CredentialAutofillPickerDialog
+
+    fun credentialAutofillSavingDialog(
+        url: String,
+        credentials: Credentials
+    ): CredentialSavePickerDialog
 }

@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill
+package com.duckduckgo.autofill.jsbridge.request
 
-import android.webkit.WebView
+data class AutofillStoreFormDataRequest(
+    val credentials: AutofillStoreFormDataCredentialsRequest
+)
 
-interface BrowserAutofill {
-
-    fun isEnabled(): Boolean
-
-    fun addJsInterface(webView: WebView, callback: Callback)
-
-    fun injectCredentials(credentials: Credentials)
-}
-
-interface Callback {
-    fun onCredentialsAvailableToInject(credentials: List<Credentials>)
-    fun onCredentialsAvailableToSave(currentUrl: String, credentials: Credentials)
-}
+data class AutofillStoreFormDataCredentialsRequest(
+    val username: String,
+    val password: String
+)

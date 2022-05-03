@@ -20,24 +20,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
+import com.duckduckgo.autofill.CredentialSavePickerDialog
+import com.duckduckgo.autofill.CredentialSavePickerDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_SAVE
 import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.ui.credential.CredentialsAdapter
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
-
-    private lateinit var recyclerView: RecyclerView
+class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,11 +45,11 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
             val d = it as BottomSheetDialog
             val sheet: FrameLayout = d.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
 
-            d.findViewById<TextView>(R.id.shareCredentialsTitle)?.text = "login form detected"
+            d.findViewById<TextView>(R.id.shareCredentialsTitle)?.text = "Save Login?"
             BottomSheetBehavior.from(sheet).setPeekHeight(600.toPx(), true)
         }
 
-        return inflater.inflate(R.layout.content_autofill_credentials_tooltip, container, false)
+        return inflater.inflate(R.layout.content_autofill_save_credentials_tooltip, container, false)
     }
 
     override fun onViewCreated(
@@ -61,20 +58,22 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.availableCredentialsRecycler)
-        recyclerView.adapter =
-            CredentialsAdapter(getAvailableCredentials()) { selectedCredentials ->
-                val result =
-                    Bundle().also {
-                        it.putString("url", getOriginalUrl())
-                        it.putParcelable("creds", selectedCredentials)
-                    }
-                parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_PICKER, result)
-                dismiss()
+        view.findViewById<Button>(R.id.saveLoginButton).setOnClickListener {
+
+            val result = Bundle().also {
+                it.putParcelable("creds", getCredentialsToSave())
             }
+            parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
+            dismiss()
+        }
+
+        view.findViewById<Button>(R.id.cancelButton).setOnClickListener {
+            dismiss()
+        }
+
     }
 
-    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<Credentials>("creds")!!
+    private fun getCredentialsToSave() = arguments?.getParcelable<Credentials>("creds")!!
 
     private fun getOriginalUrl() = arguments?.getString("url")!!
 
@@ -86,16 +85,14 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
 
         fun instance(
             url: String,
-            credentials: List<Credentials>
-        ): CredentialAutofillPickerDialogFragment {
+            credentials: Credentials
+        ): CredentialAutofillSavingDialogFragment {
 
-            val cr = ArrayList<Credentials>(credentials)
-
-            val fragment = CredentialAutofillPickerDialogFragment()
+            val fragment = CredentialAutofillSavingDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString("url", url)
-                    it.putParcelableArrayList("creds", cr)
+                    it.putParcelable("creds", credentials)
                 }
             return fragment
         }

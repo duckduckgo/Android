@@ -109,12 +109,12 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadCommand
-import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -130,7 +130,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -176,7 +175,8 @@ class BrowserTabViewModel @Inject constructor(
     private val downloadCallback: DownloadCallback,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
-    private val settingsDataStore: SettingsDataStore
+    private val settingsDataStore: SettingsDataStore,
+    private val autofillStore: AutofillStore,
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
 
@@ -424,22 +424,6 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         class InjectCredentials(val url: String, val credentials: Credentials) : Command()
-
-        sealed class DownloadCommand : Command() {
-            class ScanMediaFiles(val file: File) : DownloadCommand()
-            class ShowDownloadFailedNotification(
-                val message: String,
-                val reason: DownloadFailReason
-            ) : DownloadCommand()
-
-            class ShowDownloadFinishedNotification(
-                val file: File,
-                val mimeType: String?
-            ) : DownloadCommand()
-
-            object ShowDownloadInProgressNotification : DownloadCommand()
-        }
-
         class EditWithSelectedQuery(val query: String) : Command()
 
     }
@@ -2633,6 +2617,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun shareCredentialsWithPage(originalUrl: String, credentials: Credentials) {
         command.postValue(InjectCredentials(originalUrl, credentials))
+    }
+
+    fun saveCredentials(url: String, credentials: Credentials) {
+        autofillStore.saveCredentials(url, credentials)
     }
 
     fun onConfigurationChanged() {

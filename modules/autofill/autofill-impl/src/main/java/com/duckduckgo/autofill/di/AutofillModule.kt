@@ -20,12 +20,12 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.BrowserAutofill
-import com.duckduckgo.autofill.CredentialAutofillPickerDialogFactory
+import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.InlineBrowserAutofill
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.autofill.ui.CredentialAutofillPickerDialogAndroidFactory
+import com.duckduckgo.autofill.ui.CredentialAutofillDialogAndroidFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
@@ -70,7 +70,7 @@ class AutofillModule {
     }
 
     @Provides
-    fun providesFactory(): CredentialAutofillPickerDialogFactory {
-        return CredentialAutofillPickerDialogAndroidFactory()
+    fun providesFactory(): CredentialAutofillDialogFactory {
+        return CredentialAutofillDialogAndroidFactory()
     }
 }

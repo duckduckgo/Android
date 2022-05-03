@@ -21,7 +21,9 @@ import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
 import android.content.*
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.*
@@ -30,10 +32,7 @@ import android.text.Editable
 import android.view.*
 import android.view.View.*
 import android.view.inputmethod.EditorInfo
-import android.webkit.ValueCallback
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.webkit.WebView.FindListener
 import android.webkit.WebView.HitTestResult
 import android.webkit.WebView.HitTestResult.*
@@ -50,19 +49,20 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.view.*
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.commitNow
-import androidx.fragment.app.transaction
+import androidx.fragment.app.*
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.app.bookmarks.model.SavedSite
+import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
+import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
@@ -72,60 +72,70 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
+import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.mobile.android.ui.view.KeyboardAwareEditText
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
+import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.browser.ui.HttpAuthenticationDialogFragment
+import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
+import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
-import com.duckduckgo.app.global.view.DaxDialog
-import com.duckduckgo.app.global.view.DaxDialogListener
-import com.duckduckgo.app.global.view.NonDismissibleBehavior
-import com.duckduckgo.app.global.view.TextChangedWatcher
-import com.duckduckgo.app.global.view.disableAnimation
-import com.duckduckgo.app.global.view.enableAnimation
-import com.duckduckgo.app.global.view.html
-import com.duckduckgo.app.global.view.isDifferent
-import com.duckduckgo.app.global.view.isImmersiveModeEnabled
-import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
-import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.ui.SiteLocationPermissionDialog
 import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.privacy.renderer.icon
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autofill.*
+import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
+import com.duckduckgo.autofill.CredentialSavePickerDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_SAVE
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.*
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.duckduckgo.mobile.android.ui.view.*
+import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_browser_tab.*
@@ -139,21 +149,14 @@ import kotlinx.android.synthetic.main.include_omnibar_toolbar.view.*
 import kotlinx.android.synthetic.main.include_quick_access_items.*
 import kotlinx.android.synthetic.main.popup_window_browser_menu.view.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.cancellable
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import android.content.pm.ApplicationInfo
-import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
-import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
-import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
-import android.content.pm.ResolveInfo
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResultListener
 import android.webkit.URLUtil
-import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
-import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
@@ -166,34 +169,16 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
-import com.duckduckgo.app.downloads.DownloadsFileActions
-import com.duckduckgo.app.browser.menu.BrowserPopupMenu
-import com.duckduckgo.app.browser.remotemessage.asMessage
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
-import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.utils.ConflatedJob
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
-import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.TAG
-import com.duckduckgo.autofill.CredentialAutofillPickerDialogFactory
 import com.duckduckgo.autofill.Credentials
-import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.voice.api.VoiceSearchLauncher
-import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
-import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
-import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import kotlinx.coroutines.flow.cancellable
 import javax.inject.Provider
 
 @InjectWith(FragmentScope::class)
@@ -315,7 +300,7 @@ class BrowserTabFragment :
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
 
     @Inject
-    lateinit var credentialAutofillPickerDialogFactory: CredentialAutofillPickerDialogFactory
+    lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
@@ -393,6 +378,16 @@ class BrowserTabFragment :
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
             viewModel.onOmnibarInputStateChanged(omnibarTextInput.text.toString(), omnibarTextInput.hasFocus(), true)
+        }
+    }
+
+    private val autofillCallback = object : Callback {
+        override fun onCredentialsAvailableToInject(credentials: List<Credentials>) {
+            showAutofillDialogChooseCredentials(credentials)
+        }
+
+        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: Credentials) {
+            showAutofillDialogSaveCredentials(currentUrl, credentials)
         }
     }
 
@@ -875,21 +870,11 @@ class BrowserTabFragment :
             is Command.CopyAliasToClipboard -> copyAliasToClipboard(it.alias)
             is Command.InjectEmailAddress -> injectEmailAddress(it.address)
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
-            is Command.InjectCredentials -> injectCredentials(it.url, it.credentials)
+            is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
-        }
-    }
-
-    private fun injectCredentials(url: String, credentials: Credentials) {
-        webView?.let {
-            if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
-                return
-            }
-            browserAutofill.injectCredentials(credentials)
         }
     }
 
@@ -1507,28 +1492,53 @@ class BrowserTabFragment :
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
-            browserAutofill.addJsInterface(
-                it,
-                object : Callback {
-                    override fun onCredentialsAvailable(credentials: List<Credentials>) {
-                        Timber.e("onCredentialsAvailable. %d creds to choose from", credentials.size)
-                        val url = webView?.url ?: return
-                        val dialog = credentialAutofillPickerDialogFactory.create(url, credentials).asDialogFragment()
-                        showDialogHidingPrevious(dialog, TAG)
-                    }
-                }
-            )
-
-            setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-                val selectedCredentials = result.getParcelable<Credentials>("cred") ?: return@setFragmentResultListener
-                val originalUrl = result.getString("url") ?: return@setFragmentResultListener
-                viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
-            }
+            configureWebViewForAutofill(it)
         }
 
         if (appBuildConfig.isDebug) {
             WebView.setWebContentsDebuggingEnabled(true)
         }
+    }
+
+    private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+        browserAutofill.addJsInterface(it, autofillCallback)
+
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
+            val selectedCredentials = result.getParcelable<Credentials>("creds") ?: return@setFragmentResultListener
+            val originalUrl = result.getString("url") ?: return@setFragmentResultListener
+            viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
+        }
+
+        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
+            val selectedCredentials = result.getParcelable<Credentials>("creds") ?: return@setFragmentResultListener
+            val originalUrl = result.getString("url") ?: return@setFragmentResultListener
+            viewModel.saveCredentials(originalUrl, selectedCredentials)
+        }
+    }
+
+    private fun injectAutofillCredentials(url: String, credentials: Credentials) {
+        webView?.let {
+            if (it.url != url) {
+                Timber.w("WebView url has changed since autofill request; bailing")
+                return
+            }
+            browserAutofill.injectCredentials(credentials)
+        }
+    }
+
+    private fun showAutofillDialogChooseCredentials(credentials: List<Credentials>) {
+        Timber.e("onCredentialsAvailable. %d creds to choose from", credentials.size)
+        val url = webView?.url ?: return
+        val dialog = credentialAutofillDialogFactory.credentialAutofillPickerDialog(url, credentials).asDialogFragment()
+        showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
+    }
+
+    private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: Credentials) {
+        val url = webView?.url ?: return
+        if (url != currentUrl) return
+
+        val dialog = credentialAutofillDialogFactory.credentialAutofillSavingDialog(url, credentials).asDialogFragment()
+        showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {

@@ -19,15 +19,23 @@ package com.duckduckgo.autofill.jsbridge.request
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 class AutofillRequestParser @Inject constructor(val moshi: Moshi) {
 
-    suspend fun parseRequest(requestString: String): AutofillDataRequest {
+    private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
+    private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
+
+    suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
         return withContext(Dispatchers.Default) {
-            val adapter = moshi.adapter(AutofillDataRequest::class.java)
-            return@withContext adapter.fromJson(requestString) ?: throw IllegalArgumentException("Failed to parse autofill request")
+            autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
+
+    suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
+        return withContext(Dispatchers.Default) {
+            autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
+        }
+    }
+
 }
