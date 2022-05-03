@@ -32,5 +32,5 @@ interface VpnFeatureRemoverDao {
 @Entity(tableName = "vpn_feature_remover")
 data class VpnFeatureRemoverState(
     @PrimaryKey val id: Long = 1,
-    val isFeatureRemoved: Boolean = false
+    val isFeatureRemoved: Boolean
 )
