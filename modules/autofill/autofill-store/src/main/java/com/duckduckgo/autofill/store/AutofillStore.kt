@@ -36,13 +36,6 @@ class MockAutofillStore : AutofillStore {
 
     private val data: MutableMap<String, List<Credentials>> = mutableMapOf()
 
-    init {
-        Timber.i("Initialising MockAutofillStore %s", this)
-
-        // hacky (temporary) - for testing (hardcode a login)
-        saveCredentials("https://trello.com/login", Credentials("foo", "bar"))
-    }
-
     override fun getCredentials(rawUrl: String): List<Credentials> {
         val url = rawUrl.extractOriginFromUrl()
         return data[url] ?: emptyList()

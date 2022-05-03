@@ -133,24 +133,19 @@ class NetworkFileDownloader @Inject constructor(
             setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
-
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager? ?: return
-
-        try {
+        (context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?)?.let { manager ->
             val downloadId = manager.enqueue(request)
-            val downloadItem = DownloadItem(
-                id = 0,
-                downloadId = downloadId,
-                downloadStatus = STARTED,
-                fileName = guessedFileName,
-                contentLength = 0,
-                filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
-                createdAt = DatabaseDateFormatter.timestamp()
+            callback.onStart(
+                DownloadItem(
+                    id = 0,
+                    downloadId = downloadId,
+                    downloadStatus = STARTED,
+                    fileName = guessedFileName,
+                    contentLength = 0,
+                    filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
+                    createdAt = DatabaseDateFormatter.timestamp()
+                )
             )
-            callback.onStart(downloadItem)
-        } catch (e: IllegalArgumentException) {
-            Timber.e(e, "Failed when trying to enqueue the download.")
-            callback.onError(pendingDownload.url, DownloadFailReason.Other)
         }
     }
 
