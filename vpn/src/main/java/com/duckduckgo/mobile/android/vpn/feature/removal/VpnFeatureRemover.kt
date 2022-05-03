@@ -67,7 +67,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     override fun manuallyRemoveFeature() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            removeVPNFeature()
+            removeVpnFeature()
             disableNotifications()
             disableNotificationReminders()
             removeNotificationChannels()
