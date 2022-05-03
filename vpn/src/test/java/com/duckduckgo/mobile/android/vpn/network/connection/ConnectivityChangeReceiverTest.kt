@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import kotlinx.coroutines.test.TestScope
 import org.junit.Before
@@ -32,12 +33,16 @@ class ConnectivityChangeReceiverTest {
 
     private val appTpFeatureConfig: AppTpFeatureConfig = mock()
     private val context: Context = mock()
+    private val vpnPreferences: VpnPreferences = object : VpnPreferences {
+        override var isPrivateDnsEnabled: Boolean = false
+        override var activeNetworkType: String? = null
+    }
 
     private lateinit var receiver: ConnectivityChangeReceiver
 
     @Before
     fun setup() {
-        receiver = ConnectivityChangeReceiver(appTpFeatureConfig, context, TestScope())
+        receiver = ConnectivityChangeReceiver(appTpFeatureConfig, vpnPreferences, context, TestScope())
     }
 
     @Test
