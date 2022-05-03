@@ -51,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
@@ -226,6 +227,7 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
+            is DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings -> openVPNSettings()
         }
     }
 
@@ -314,8 +316,7 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPromoteAlwaysOnGoToVPNSettings() {
-        deviceShieldPixels.didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
-        openVPNSettings()
+        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
     }
 
     private fun openVPNSettings() {
@@ -325,13 +326,11 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPromoteAlwaysOnRemindLater() {
-        deviceShieldPixels.didChooseToDismissPromoteAlwaysOnDialog()
-        viewModel.onAppTPToggleSwitched(true)
+        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnRemindLater)
     }
 
     override fun onPromoteAlwaysOnForget() {
-        deviceShieldPixels.didChooseToForgetPromoteAlwaysOnDialog()
-        viewModel.onForgetPromoteAlwaysOnDialog()
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
     }
 
     private fun launchBetaInstructions() {

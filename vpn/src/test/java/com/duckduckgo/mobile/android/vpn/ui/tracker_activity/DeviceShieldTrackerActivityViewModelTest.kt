@@ -321,6 +321,33 @@ class DeviceShieldTrackerActivityViewModelTest {
         }
     }
 
+    @Test
+    fun whenPromoteAlwaysOnOpenSettingsSelectedThenCommandIsSent() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnOpenSettings)
+
+            verify(deviceShieldPixels).didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPromoteAlwaysOnRemindLaterThenPixelIsSent() {
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnRemindLater)
+
+        verify(deviceShieldPixels).didChooseToDismissPromoteAlwaysOnDialog()
+    }
+
+    @Test
+    fun whenPromoteAlwaysOnForgetThenPixelIsSent() {
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
+
+        verify(deviceShieldPixels).didChooseToForgetPromoteAlwaysOnDialog()
+        verify(vpnStore).onForgetPromoteAlwaysOn()
+    }
+
     private fun createInMemoryDb(): VpnDatabase {
         AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
         return Room.inMemoryDatabaseBuilder(

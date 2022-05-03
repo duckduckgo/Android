@@ -59,11 +59,11 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override fun resetAppTPManuallyEnablesCounter() {
-        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) }
+        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, 0) }
     }
 
     override fun onAppTPManuallyEnabled() {
-        preferences.edit { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
+        preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
         Timber.d("onAppTPManuallyEnabled ${getAppTPManuallyEnables()} times")
     }
 
@@ -72,7 +72,7 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override fun onForgetPromoteAlwaysOn() {
-        preferences.edit { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
+        preferences.edit(commit = true) { putBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, false) }
     }
 
     override fun userAllowsShowPromoteAlwaysOn(): Boolean {
@@ -84,7 +84,7 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, true)
+        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
     }
 
     companion object {
