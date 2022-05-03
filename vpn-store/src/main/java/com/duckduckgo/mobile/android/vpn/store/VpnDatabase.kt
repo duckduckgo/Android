@@ -51,7 +51,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverridePackage::class,
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
-        VpnFeatureRemoverState::class
+        VpnFeatureRemoverState::class,
     ]
 )
 
