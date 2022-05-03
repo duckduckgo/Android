@@ -32,7 +32,7 @@ interface DeviceShieldOnboardingStore {
 class DeviceShieldOnboardingImpl @Inject constructor(
     context: Context
 ) : DeviceShieldOnboardingStore {
-    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_MULTI_PROCESS)
+    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_PRIVATE)
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
