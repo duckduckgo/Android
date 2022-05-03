@@ -31,110 +31,15 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Provider
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal class VpnRetentionStudyDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
     private val dispatcherProvider: DispatcherProvider,
-) : RoomDatabase.Callback() {
+) : VpnDatabaseCallback(context, vpnDatabase, dispatcherProvider) {
 
-    override fun onCreate(db: SupportSQLiteDatabase) {
-        super.onCreate(db)
-        ioThread {
-            prepopulateUUID()
-            prepopulateAppTrackerBlockingList()
-            prepopulateAppTrackerExclusionList()
-            prepopulateAppTrackerExceptionRules()
-        }
+    override fun getBlocklistJsonResource(): Int {
+        Timber.d("We are in the Retention Study, using the reduced blocklist")
+        return R.raw.reduced_app_trackers_blocklist
     }
 
-    override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateUUID()
-            prepopulateAppTrackerBlockingList()
-            prepopulateAppTrackerExclusionList()
-            prepopulateAppTrackerExceptionRules()
-        }
-    }
-
-    override fun onOpen(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateTrackerEntities()
-        }
-    }
-
-    private fun prepopulateUUID() {
-        val uuid = UUID.randomUUID().toString()
-        vpnDatabase.get().vpnStateDao().insert(VpnState(uuid = uuid))
-        Timber.w("VPNDatabase: UUID pre-populated as $uuid")
-    }
-
-    private fun prepopulateTrackerEntities() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
-            .use { it.readText() }
-            .also {
-                val blocklist = getFullAppTrackerBlockingList(it)
-                with(vpnDatabase.get().vpnAppTrackerBlockingDao()) {
-                    if (!hasTrackerEntities()) {
-                        insertTrackerEntities(blocklist.entities)
-                    }
-                }
-            }
-    }
-
-    @VisibleForTesting
-    internal fun prepopulateAppTrackerBlockingList() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
-            .use { it.readText() }
-            .also {
-                val blocklist = getFullAppTrackerBlockingList(it)
-                with(vpnDatabase.get().vpnAppTrackerBlockingDao()) {
-                    insertTrackerBlocklist(blocklist.trackers)
-                    insertAppPackages(blocklist.packages)
-                    insertTrackerEntities(blocklist.entities)
-                }
-            }
-    }
-
-    private fun prepopulateAppTrackerExclusionList() {
-        context.resources.openRawResource(R.raw.app_tracker_app_exclusion_list).bufferedReader()
-            .use { it.readText() }
-            .also {
-                val excludedAppPackages = parseAppTrackerExclusionList(it)
-                vpnDatabase.get().vpnAppTrackerBlockingDao().insertExclusionList(excludedAppPackages)
-            }
-    }
-
-    private fun prepopulateAppTrackerExceptionRules() {
-        context.resources.openRawResource(R.raw.app_tracker_exception_rules).bufferedReader()
-            .use { it.readText() }
-            .also { json ->
-                val rules = parseJsonAppTrackerExceptionRules(json)
-                vpnDatabase.get().vpnAppTrackerBlockingDao().insertTrackerExceptionRules(rules)
-            }
-    }
-
-    private fun getFullAppTrackerBlockingList(json: String): AppTrackerBlocklist {
-        return AppTrackerJsonParser.parseAppTrackerJson(Moshi.Builder().build(), json)
-    }
-
-    private fun parseAppTrackerExclusionList(json: String): List<AppTrackerExcludedPackage> {
-        val moshi = Moshi.Builder().build()
-        val adapter: JsonAdapter<JsonAppTrackerExclusionList> = moshi.adapter(JsonAppTrackerExclusionList::class.java)
-        return adapter.fromJson(json)?.rules.orEmpty().map {
-            AppTrackerExcludedPackage(it)
-        }
-    }
-
-    private fun parseJsonAppTrackerExceptionRules(json: String): List<AppTrackerExceptionRule> {
-        val moshi = Moshi.Builder().build()
-        val adapter: JsonAdapter<JsonAppTrackerExceptionRules> = moshi.adapter(JsonAppTrackerExceptionRules::class.java)
-        return adapter.fromJson(json)?.rules.orEmpty()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun ioThread(f: () -> Unit) {
-        // At most 1 thread will be doing IO
-        dispatcherProvider.io().limitedParallelism(1).asExecutor().execute(f)
-    }
 }

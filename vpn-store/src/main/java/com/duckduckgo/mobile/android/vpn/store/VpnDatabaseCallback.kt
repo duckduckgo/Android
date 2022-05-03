@@ -32,11 +32,16 @@ import java.util.*
 import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class VpnDatabaseCallback(
+internal open class VpnDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
     private val dispatcherProvider: DispatcherProvider
 ) : RoomDatabase.Callback() {
+
+    open fun getBlocklistJsonResource(): Int {
+        Timber.d("We are not in the Retention Study, using the full blocklist")
+        return R.raw.full_app_trackers_blocklist
+    }
 
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
@@ -70,7 +75,7 @@ internal class VpnDatabaseCallback(
     }
 
     private fun prepopulateTrackerEntities() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+        context.resources.openRawResource(getBlocklistJsonResource()).bufferedReader()
             .use { it.readText() }
             .also {
                 val blocklist = getFullAppTrackerBlockingList(it)
@@ -84,7 +89,7 @@ internal class VpnDatabaseCallback(
 
     @VisibleForTesting
     internal fun prepopulateAppTrackerBlockingList() {
-        context.resources.openRawResource(R.raw.full_app_trackers_blocklist).bufferedReader()
+        context.resources.openRawResource(getBlocklistJsonResource()).bufferedReader()
             .use { it.readText() }
             .also {
                 val blocklist = getFullAppTrackerBlockingList(it)
