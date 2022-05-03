@@ -47,7 +47,7 @@ class VpnFeatureRemoverStateListener @Inject constructor(
     }
 
     private suspend fun resetState() {
-        if (vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved) {
+        if (vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved) {
             Timber.d("FeatureRemoverVpnStateListener, feature was removed, setting it back to not removed")
             vpnDatabase.vpnFeatureRemoverDao().setAsRemoved(false)
         }
