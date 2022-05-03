@@ -87,7 +87,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     override suspend fun isFeatureRemoved(): Boolean {
-        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved
+        return vpnDatabase.vpnFeatureRemoverDao().getState()?.isFeatureRemoved ?: false
     }
 
     private fun disableNotifications() {

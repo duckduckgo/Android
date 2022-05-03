@@ -138,13 +138,6 @@
         </receiver>
 
         <receiver
-            android:name=".feature.removal.VpnFeatureRemoverReceiver">
-            <intent-filter>
-                <action android:name="com.duckduckgo.mobile.android.vpn.feature-removal"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver
             android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
             android:enabled="false"
             android:process=":vpn">

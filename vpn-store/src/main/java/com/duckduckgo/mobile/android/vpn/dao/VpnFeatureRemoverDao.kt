@@ -24,14 +24,9 @@ interface VpnFeatureRemoverDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(removerState: VpnFeatureRemoverState): Long
 
-    @Query("select count(1) > 0 from vpn_feature_remover")
-    fun exists(): Boolean
-
     @Query("select * from vpn_feature_remover")
-    fun getState(): VpnFeatureRemoverState
+    fun getState(): VpnFeatureRemoverState?
 
-    @Query("UPDATE vpn_feature_remover SET isFeatureRemoved = :removed")
-    fun setAsRemoved(removed: Boolean)
 }
 
 @Entity(tableName = "vpn_feature_remover")
