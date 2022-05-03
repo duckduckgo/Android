@@ -142,8 +142,8 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     fun removeFeature() {
-        deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
         viewModelScope.launch {
+            deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
             vpnFeatureRemover.manuallyRemoveFeature()
             command.send(Command.StopVPN)
             command.send(Command.CloseScreen)
