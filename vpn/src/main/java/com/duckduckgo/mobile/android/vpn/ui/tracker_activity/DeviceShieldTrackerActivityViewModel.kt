@@ -119,9 +119,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     internal fun launchExcludedApps() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            sendCommand(Command.LaunchManageAppsProtection)
-        }
+        sendCommand(Command.LaunchManageAppsProtection)
     }
 
     internal fun onAppTpManuallyDisabled() {
@@ -132,42 +130,37 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     }
 
     internal fun onViewEvent(viewEvent: ViewEvent) {
-        viewModelScope.launch {
             when (viewEvent) {
-                ViewEvent.LaunchAppTrackersFAQ -> command.send(Command.LaunchAppTrackersFAQ)
+                ViewEvent.LaunchAppTrackersFAQ -> sendCommand(Command.LaunchAppTrackersFAQ)
                 ViewEvent.LaunchBetaInstructions -> {
                     deviceShieldPixels.didOpenBetaInstructions()
-                    command.send(Command.LaunchBetaInstructions)
+                    sendCommand(Command.LaunchBetaInstructions)
                 }
-                ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
+                ViewEvent.LaunchDeviceShieldFAQ -> sendCommand(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
-                ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
+                ViewEvent.LaunchMostRecentActivity -> sendCommand(Command.LaunchMostRecentActivity)
                 ViewEvent.RemoveFeature -> removeFeature()
-                ViewEvent.AskToRemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.AskToRemoveFeature -> sendCommand(Command.ShowRemoveFeatureConfirmationDialog)
                 ViewEvent.StartVpn -> launchVpn()
             }
-        }
+
     }
 
     private fun launchVpn() {
-        viewModelScope.launch {
-            if (shouldPromoteAlwaysOn()) {
-                sendCommand(Command.ShowAlwaysOnPromotionDialog)
-            }
-            command.send(Command.LaunchVPN)
+        if (shouldPromoteAlwaysOn()) {
+            sendCommand(Command.ShowAlwaysOnPromotionDialog)
         }
+        sendCommand(Command.LaunchVPN)
 
         deviceShieldPixels.enableFromSummaryTrackerActivity()
         vpnStore.onAppTPManuallyEnabled()
     }
 
     fun removeFeature() {
-        viewModelScope.launch {
-            deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
-            vpnFeatureRemover.manuallyRemoveFeature()
-            command.send(Command.StopVPN)
-            command.send(Command.CloseScreen)
-        }
+        deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+        vpnFeatureRemover.manuallyRemoveFeature()
+        sendCommand(Command.StopVPN)
+        sendCommand(Command.CloseScreen)
     }
 
     fun onForgetPromoteAlwaysOnDialog() {

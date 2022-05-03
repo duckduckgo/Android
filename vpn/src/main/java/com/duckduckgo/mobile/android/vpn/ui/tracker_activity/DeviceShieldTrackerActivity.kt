@@ -372,7 +372,6 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun startVPN() {
-        deviceShieldPixels.enableFromSummaryTrackerActivity()
         quietlyToggleAppTpSwitch(true)
         TrackerBlockingVpnService.startService(this)
     }
