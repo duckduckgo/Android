@@ -67,7 +67,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     override fun manuallyRemoveFeature() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            removeVPNFeature()
+            removeVpnFeature()
             disableNotifications()
             disableNotificationReminders()
             removeNotificationChannels()
@@ -87,7 +87,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     }
 
     override suspend fun isFeatureRemoved(): Boolean {
-        return vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved
+        return vpnDatabase.vpnFeatureRemoverDao().getState()?.isFeatureRemoved ?: false
     }
 
     private fun disableNotifications() {
@@ -109,7 +109,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
         vpnDatabase.vpnTrackerDao().deleteAllTrackers()
     }
 
-    private suspend fun removeVPNFeature() {
+    private suspend fun removeVpnFeature() {
         vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = true))
     }
 }

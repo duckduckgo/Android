@@ -51,7 +51,7 @@ import org.threeten.bp.format.DateTimeFormatter
         AppTrackerSystemAppOverridePackage::class,
         AppTrackerSystemAppOverrideListMetadata::class,
         AppTrackerEntity::class,
-        VpnFeatureRemoverState::class
+        VpnFeatureRemoverState::class,
     ]
 )
 
@@ -105,8 +105,8 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
-                        " (`id` INTEGER PRIMARY KEY NOT NULL DEFAULT 1, " +
-                        "`isFeatureRemoved` INTEGER NOT NULL DEFAULT 0)"
+                        " (`id` INTEGER PRIMARY KEY NOT NULL, " +
+                        "`isFeatureRemoved` INTEGER)"
                 )
             }
         }
@@ -116,7 +116,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_18_TO_19,
                 MIGRATION_19_TO_20,
                 MIGRATION_20_TO_21,
-                MIGRATION_21_TO_22
+                MIGRATION_21_TO_22,
             )
     }
 }

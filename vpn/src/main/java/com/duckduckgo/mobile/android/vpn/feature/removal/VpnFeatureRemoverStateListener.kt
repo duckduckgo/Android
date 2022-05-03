@@ -20,6 +20,7 @@ import androidx.work.ExistingWorkPolicy.KEEP
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -47,9 +48,9 @@ class VpnFeatureRemoverStateListener @Inject constructor(
     }
 
     private suspend fun resetState() {
-        if (vpnDatabase.vpnFeatureRemoverDao().exists() && vpnDatabase.vpnFeatureRemoverDao().getState().isFeatureRemoved) {
+        vpnDatabase.vpnFeatureRemoverDao().getState()?.let {
             Timber.d("FeatureRemoverVpnStateListener, feature was removed, setting it back to not removed")
-            vpnDatabase.vpnFeatureRemoverDao().setAsRemoved(false)
+            vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = false))
         }
         workManager.cancelAllWorkByTag(VpnFeatureRemoverWorker.WORKER_VPN_FEATURE_REMOVER_TAG)
     }

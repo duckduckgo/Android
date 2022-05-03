@@ -32,7 +32,6 @@ interface VpnStore {
     fun getAppTPManuallyEnables(): Int
     fun onForgetPromoteAlwaysOn()
     fun userAllowsShowPromoteAlwaysOn(): Boolean
-
     fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
 
