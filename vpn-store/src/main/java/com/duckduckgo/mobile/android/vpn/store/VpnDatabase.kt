@@ -105,7 +105,7 @@ abstract class VpnDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE IF NOT EXISTS `vpn_feature_remover`" +
-                        " (`id` INTEGER PRIMARY KEY NOT NULL DEFAULT 1, " +
+                        " (`id` INTEGER PRIMARY KEY NOT NULL, " +
                         "`isFeatureRemoved` INTEGER NOT NULL)"
                 )
             }
