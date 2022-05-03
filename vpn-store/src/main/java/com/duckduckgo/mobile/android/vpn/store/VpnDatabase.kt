@@ -116,7 +116,7 @@ abstract class VpnDatabase : RoomDatabase() {
                 MIGRATION_18_TO_19,
                 MIGRATION_19_TO_20,
                 MIGRATION_20_TO_21,
-                MIGRATION_21_TO_22
+                MIGRATION_21_TO_22,
             )
     }
 }
