@@ -109,7 +109,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
         vpnDatabase.vpnTrackerDao().deleteAllTrackers()
     }
 
-    private suspend fun removeVPNFeature() {
+    private suspend fun removeVpnFeature() {
         vpnDatabase.vpnFeatureRemoverDao().insert(VpnFeatureRemoverState(isFeatureRemoved = true))
     }
 }
