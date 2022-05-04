@@ -26,7 +26,6 @@ import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.Contin
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.ContinueVpnConflictDialog
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.DismissVpnConflictDialog
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.EnableVPN
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.FinishVpnOnboarding
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.IntroPageBecameVisible
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LearnMore
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Action.LeaveVpnIntro
@@ -41,6 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -59,6 +59,7 @@ class VpnPagesViewModelTest {
     private val pixel = mock<Pixel>()
     private val vpnPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
+    private val vpnStore = mock<DeviceShieldOnboardingStore>()
 
     private lateinit var testee: VpnPagesViewModel
 
@@ -67,7 +68,8 @@ class VpnPagesViewModelTest {
         testee = VpnPagesViewModel(
             pixel,
             vpnPixels,
-            vpnDetector
+            vpnDetector,
+            vpnStore
         )
     }
 
@@ -104,18 +106,6 @@ class VpnPagesViewModelTest {
             Assert.assertEquals(Command.CheckVPNPermission, awaitItem())
         }
     }
-
-    @Test
-    fun whenFinishVpnOnboardingThenPixelIsFiredAndCommandIsSent() = runTest {
-        testee.onAction(FinishVpnOnboarding)
-
-        verify(pixel).fire(AppPixelName.ONBOARDING_VPN_PERMISSION_CONTINUED)
-
-        testee.commands().test {
-            Assert.assertEquals(Command.ContinueToVpnExplanation, awaitItem())
-        }
-    }
-
     @Test
     fun whenLeaveVpnIntroThenPixelIsFiredAndCommandIsSent() = runTest {
         testee.onAction(LeaveVpnIntro)
@@ -170,9 +160,12 @@ class VpnPagesViewModelTest {
         testee.onAction(ContinueVpnConflictDialog)
 
         verify(vpnPixels).didChooseToContinueFromVpnConflictDialog()
+        verify(pixel).fire(AppPixelName.ONBOARDING_VPN_PERMISSION_CONTINUED)
+        verify(vpnStore).onboardingDidShow()
+        verify(vpnPixels).enableFromDaxOnboarding()
 
         testee.commands().test {
-            Assert.assertEquals(Command.CheckVPNPermission, awaitItem())
+            Assert.assertEquals(Command.StartVpn, awaitItem())
         }
     }
 
@@ -180,6 +173,8 @@ class VpnPagesViewModelTest {
     fun whenVpnPermissionGrantedThenPixelIsFiredAndCommandIsSent() = runTest {
         testee.onAction(VpnPermissionGranted)
 
+        verify(pixel).fire(AppPixelName.ONBOARDING_VPN_PERMISSION_CONTINUED)
+        verify(vpnStore).onboardingDidShow()
         verify(vpnPixels).enableFromDaxOnboarding()
 
         testee.commands().test {

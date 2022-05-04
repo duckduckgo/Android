@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -105,6 +106,7 @@ class SurveyViewModel @Inject constructor(
     private object SurveyParams {
         const val ATB = "atb"
         const val ATB_VARIANT = "var"
+        const val ATP_COHORT = "var"
         const val DAYS_INSTALLED = "delta"
         const val ANDROID_VERSION = "av"
         const val APP_VERSION = "ddgv"

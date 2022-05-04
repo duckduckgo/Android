@@ -33,7 +33,6 @@ interface OnboardingPageBuilder {
         object DefaultBrowserBlueprint : OnboardingPageBlueprint()
         object WelcomeBlueprint : OnboardingPageBlueprint()
         object VpnIntroBlueprint : OnboardingPageBlueprint()
-
         object VpnPermissionBlueprint : OnboardingPageBlueprint()
     }
 }
@@ -41,7 +40,6 @@ interface OnboardingPageBuilder {
 class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildWelcomePage() = WelcomePage()
-
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
     override fun buildVpnIntro() = VpnIntroPage()
     override fun buildVpnPermission() = VpnPermissionPage()
