@@ -58,6 +58,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -421,6 +422,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         class EditWithSelectedQuery(val query: String) : Command()
+        class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -765,6 +767,22 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         pixel.fire(pixelName, params)
+    }
+
+    fun onUserLongPressedBack() {
+        val navigationHistory = webNavigationState?.navigationHistory ?: return
+
+        // we don't want the current page, so drop the first entry
+        val stack = navigationHistory.drop(1)
+
+        Timber.i("Navigation history size: ${stack.size}")
+        stack.forEach { (title: String?, url: String) ->
+            Timber.i("Nav stack: $title $url")
+        }
+
+        if (stack.isNotEmpty()) {
+            command.value = ShowBackNavigationHistory(stack)
+        }
     }
 
     fun onUserSubmittedQuery(
