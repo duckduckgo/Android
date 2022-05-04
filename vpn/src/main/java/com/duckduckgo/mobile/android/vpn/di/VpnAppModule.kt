@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
 import androidx.room.Room
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
@@ -46,9 +47,10 @@ object VpnAppModule {
     @Provides
     fun provideVpnDatabaseCallbackProvider(
         context: Context,
-        vpnDatabase: Provider<VpnDatabase>
+        vpnDatabase: Provider<VpnDatabase>,
+        variantManager: VariantManager
     ): VpnDatabaseCallbackProvider {
-        return VpnDatabaseCallbackProvider(context, vpnDatabase)
+        return VpnDatabaseCallbackProvider(context, vpnDatabase, variantManager)
     }
 
     /**

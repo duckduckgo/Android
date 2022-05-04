@@ -17,16 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.store
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.trackers.*
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asExecutor
 import timber.log.Timber
 import java.util.*
 import javax.inject.Provider

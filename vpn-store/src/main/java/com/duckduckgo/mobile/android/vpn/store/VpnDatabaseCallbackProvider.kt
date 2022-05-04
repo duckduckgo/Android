@@ -29,10 +29,10 @@ class VpnDatabaseCallbackProvider constructor(
     private val variantManager: VariantManager
 ) {
     fun provideCallbacks(): RoomDatabase.Callback {
-        return if (variantManager.isVPNRetentionStudyEnabled()){
-            VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
-        } else {
+        return if (variantManager.isVPNRetentionStudyEnabled()) {
             VpnRetentionStudyDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
+        } else {
+            VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
         }
     }
 }
