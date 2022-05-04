@@ -23,6 +23,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
@@ -239,6 +240,15 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         val transaction = supportFragmentManager.beginTransaction()
         fragments.forEach { transaction.remove(it) }
         transaction.commit()
+    }
+
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        return if (keyCode == KeyEvent.KEYCODE_BACK) {
+            currentTab?.onLongPressBackButton()
+            true
+        } else {
+            super.onKeyLongPress(keyCode, event)
+        }
     }
 
     private fun launchNewSearchOrQuery(intent: Intent?) {
