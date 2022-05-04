@@ -93,6 +93,11 @@ include ':app'
     include ":$it-internal"; project(":$it-internal").projectDir = new File("$it-internal")
 }
 
+"autoconsent".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+}
+
 rootProject.children.each { subproject ->
 
     if (subproject.name == "vpn") {
