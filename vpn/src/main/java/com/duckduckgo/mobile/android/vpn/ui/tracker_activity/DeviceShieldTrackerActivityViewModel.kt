@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -43,6 +44,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
     private val vpnStateMonitor: VpnStateMonitor,
     private val vpnDetector: VpnDetector,
+    private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -69,7 +71,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
-            enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
+            enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
     }
 
@@ -87,7 +89,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onVPNPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                sendCommand(Command.LaunchVPN)
+                viewModelScope.launch {
+                    launchVpn()
+                }
                 return
             }
             else -> {
@@ -125,7 +129,24 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
+                ViewEvent.RemoveFeature -> removeFeature()
+                ViewEvent.AskToRemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.StartVpn -> launchVpn()
             }
+        }
+    }
+
+    private suspend fun launchVpn() {
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
+        command.send(Command.LaunchVPN)
+    }
+
+    fun removeFeature() {
+        viewModelScope.launch {
+            deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+            vpnFeatureRemover.manuallyRemoveFeature()
+            command.send(Command.StopVPN)
+            command.send(Command.CloseScreen)
         }
     }
 
@@ -153,6 +174,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : ViewEvent()
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
+        object RemoveFeature : ViewEvent()
+        object StartVpn : ViewEvent()
+        object AskToRemoveFeature : ViewEvent()
     }
 
     sealed class Command {
@@ -166,9 +190,11 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
-        object ShowDisableConfirmationDialog : Command()
+        object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
+        object ShowRemoveFeatureConfirmationDialog : Command()
+        object CloseScreen : Command()
     }
 }
 
