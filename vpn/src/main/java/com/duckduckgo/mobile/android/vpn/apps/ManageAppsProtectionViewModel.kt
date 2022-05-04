@@ -48,6 +48,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -97,12 +98,11 @@ class ManageAppsProtectionViewModel @Inject constructor(
         report: Boolean
     ) {
         recordManualChange(packageName)
+        deviceShieldPixels.didDisableAppProtectionFromApps()
         viewModelScope.launch {
-
             excludedApps.manuallyExcludedApp(packageName)
-
+            pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
-                pixel.didSubmitManuallyDisableAppProtectionDialog()
                 command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             } else {
                 pixel.didSkipManuallyDisableAppProtectionDialog()
@@ -114,6 +114,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         packageName: String
     ) {
         recordManualChange(packageName)
+        deviceShieldPixels.didEnableAppProtectionFromApps()
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }

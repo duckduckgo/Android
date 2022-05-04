@@ -362,6 +362,19 @@ interface DeviceShieldPixels {
     /** Will fire when the VPN is stopped */
     fun didStopVpn(uptime: Long)
 
+    /** Will fire when the user enables protection for a specific app from the detail screen */
+    fun didEnableAppProtectionFromDetail()
+
+    /** Will fire when the user disables  protection for a specific app from the detail screen */
+    fun didDisableAppProtectionFromDetail()
+
+    /** Will fire when the user enables protection for a specific app from the apps protection screen */
+    fun didEnableAppProtectionFromApps()
+
+    /** Will fire when the user disables  protection for a specific app from the apps protection screen */
+    fun didDisableAppProtectionFromApps()
+
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -759,6 +772,22 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didStopVpn(uptime: Long) {
         firePixel(DeviceShieldPixelNames.ATP_DISABLE, mapOf("uptime" to uptime.toString()))
+    }
+
+    override fun didEnableAppProtectionFromDetail() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
+    }
+
+    override fun didDisableAppProtectionFromDetail() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL)
+    }
+
+    override fun didEnableAppProtectionFromApps() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
+    }
+
+    override fun didDisableAppProtectionFromApps() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
     }
 
     private fun suddenKill() {

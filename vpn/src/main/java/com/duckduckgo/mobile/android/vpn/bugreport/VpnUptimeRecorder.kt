@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import dagger.SingleInstanceIn
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
@@ -41,6 +42,7 @@ class VpnUptimeRecorder @Inject constructor(val pixels: DeviceShieldPixels) : Vp
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason
     ) {
+        Timber.d("VpnUptimeRecorder: ${getVpnUpTime()}")
         pixels.didStopVpn(getVpnUpTime())
         vpnStartTime.set(0)
     }
