@@ -35,11 +35,11 @@ class DeviceShieldOnboardingImpl @Inject constructor(
     private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_PRIVATE)
 
     override fun onboardingDidShow() {
-        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
+        preferences.edit(commit = true) { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
     }
 
     override fun onboardingDidNotShow() {
-        preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false) }
+        preferences.edit(commit = true) { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, false) }
     }
 
     override fun didShowOnboarding(): Boolean {

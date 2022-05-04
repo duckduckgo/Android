@@ -36,6 +36,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DISABLE_UPON_APP_LAUNCH("m_atp_ev_disabled_on_launch_c"),
     ATP_DISABLE_UPON_APP_LAUNCH_DAILY("m_atp_ev_disabled_on_launch_d"),
     ATP_ENABLE_DAILY("m_atp_ev_enabled_d"),
+    ATP_DISABLE("m_atp_ev_disabled_c"),
     ATP_DISABLE_DAILY("m_atp_ev_disabled_d"),
     ATP_LAST_DAY_ENABLE_COUNT_DAILY("m_atp_ev_enabled_count_d"),
     ATP_LAST_DAY_DISABLE_COUNT_DAILY("m_atp_ev_disabled_count_d"),
