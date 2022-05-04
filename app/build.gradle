@@ -125,29 +125,6 @@ fulladleModuleConfig {
     variant.set("playDebug")
 }
 
-fladle {
-    configs {
-        privacyTests {
-            async.set(false)
-            variant.set("playDebug")
-            flankVersion.set("21.+")
-            useOrchestrator.set(true)
-            environmentVariables.set([
-                    "clearPackageData": "true"
-            ])
-            testTargets.set([
-                    "annotation com.duckduckgo.espresso.PrivacyTest"
-            ])
-            devices.set([
-                    ["model": "redfin", "version": "30"]
-            ])
-            localResultsDir.set("fladleResults")
-            flakyTestAttempts.set(2)
-            testShards.set(1)
-        }
-    }
-}
-
 dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
