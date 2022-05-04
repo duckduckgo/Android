@@ -77,7 +77,7 @@ class SurveyViewModel @Inject constructor(
             .appendQueryParameter(SurveyParams.MANUFACTURER, Build.MANUFACTURER)
             .appendQueryParameter(SurveyParams.MODEL, Build.MODEL)
 
-        if (variantManager.isVPNRetentionStudyEnabled()){
+        if (variantManager.isVPNRetentionStudyEnabled()) {
             urlBuilder.appendQueryParameter(SurveyParams.ATP_COHORT, atpCohortManager.getCohort())
         }
 

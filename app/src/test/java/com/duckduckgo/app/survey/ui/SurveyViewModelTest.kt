@@ -24,7 +24,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -82,7 +81,13 @@ class SurveyViewModelTest {
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "mj" })
 
         testee = SurveyViewModel(
-            mockSurveyDao, mockStatisticsStore, mockAppInstallStore, mockAppBuildConfig, mockVariantManager, mockAppTpCohortManager, coroutineTestRule.testDispatcherProvider
+            mockSurveyDao,
+            mockStatisticsStore,
+            mockAppInstallStore,
+            mockAppBuildConfig,
+            mockVariantManager,
+            mockAppTpCohortManager,
+            coroutineTestRule.testDispatcherProvider
         )
         testee.command.observeForever(mockCommandObserver)
     }

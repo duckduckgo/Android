@@ -20,7 +20,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
@@ -239,36 +238,36 @@ class SurveyDownloaderTest {
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
             SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, null,emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null,emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, null,emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, null, null,listOf(SurveyUrlParameter.EmailCohortParam.parameter))
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, null, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAtp(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, null, null,listOf(SurveyUrlParameter.AtpCohortParam.parameter))
+            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, null, null, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAppTPWaitlist(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, true, true, null,emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, true, true, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }

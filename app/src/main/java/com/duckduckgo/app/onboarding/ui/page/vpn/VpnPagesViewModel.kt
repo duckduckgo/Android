@@ -40,7 +40,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -76,8 +75,8 @@ class VpnPagesViewModel @Inject constructor(
             OpenSettingVpnConflictDialog -> onOpenVpnSettings()
             ContinueVpnConflictDialog -> onContinueVpnConflictDialog()
             VpnPermissionGranted -> onVpnPermissionGranted()
-            is VpnPermissionDenied -> onVpnPermissionDenied(action.intent)
-            is VpnPermissionResult -> onVPNPermissionResult(action.resultCode)
+            is VpnPermissionDenied -> onVpnSystemPermissionDenied(action.intent)
+            is VpnPermissionResult -> onVPNSystemPermissionResult(action.resultCode)
         }
     }
 
@@ -144,7 +143,7 @@ class VpnPagesViewModel @Inject constructor(
         }
     }
 
-    private fun enableVpn(){
+    private fun enableVpn() {
         pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_CONTINUED)
         vpnStore.onboardingDidShow()
         vpnPixels.enableFromDaxOnboarding()
@@ -155,17 +154,16 @@ class VpnPagesViewModel @Inject constructor(
         sendCommand(Command.OpenVpnFAQ)
     }
 
-    private fun onVpnPermissionDenied(intent: Intent) {
+    private fun onVpnSystemPermissionDenied(intent: Intent) {
         lastVpnRequestTime = System.currentTimeMillis()
         pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_LAUNCHED)
         sendCommand(RequestVpnPermission(intent))
     }
 
-    private fun onVPNPermissionResult(resultCode: Int) {
+    private fun onVPNSystemPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                pixel.fire(AppPixelName.ONBOARDING_VPN_PERMISSION_GRANTED)
-                sendCommand(Command.StartVpn)
+                onAction(VpnPermissionGranted)
                 return
             }
             else -> {

@@ -21,7 +21,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
