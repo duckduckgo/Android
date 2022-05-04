@@ -374,7 +374,6 @@ interface DeviceShieldPixels {
     /** Will fire when the user disables  protection for a specific app from the apps protection screen */
     fun didDisableAppProtectionFromApps()
 
-
 }
 
 @ContributesBinding(AppScope::class)
