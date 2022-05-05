@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service.state
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -38,6 +39,7 @@ class AlwaysOnMonitor @Inject constructor(
     private val vpnService: Provider<TrackerBlockingVpnService>
 ) : VpnServiceCallbacks {
 
+    @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         // this works for 85% of our users as of April 2022
         if (appBuildConfig.sdkInt >= 29) {
