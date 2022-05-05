@@ -31,7 +31,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.verifyNoInteractions
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -112,7 +111,7 @@ class ManageAppsProtectionViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName)
 
-        verifyNoInteractions(deviceShieldPixels)
+        verify(deviceShieldPixels).didEnableAppProtectionFromApps()
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 

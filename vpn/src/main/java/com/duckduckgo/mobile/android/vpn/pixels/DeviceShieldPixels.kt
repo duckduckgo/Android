@@ -451,7 +451,12 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun enableFromOnboarding() {
-        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_DAX_ONBOARDING)
+        tryToFireUniquePixel(
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+        )
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
     }
 
     override fun enableFromDaxOnboarding() {
@@ -802,7 +807,7 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didEnableAppProtectionFromApps() {
-        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
+        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_ALL)
     }
 
     override fun didDisableAppProtectionFromApps() {
