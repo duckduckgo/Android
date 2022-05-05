@@ -20,9 +20,10 @@ import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.store.PrivacyConfig
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -168,7 +169,7 @@ class RealPrivacyConfigPersisterTest {
         var count = 0
 
         override fun store(
-            name: PrivacyFeatureName,
+            name: FeatureName,
             jsonString: String
         ): Boolean {
             count++
@@ -176,7 +177,7 @@ class RealPrivacyConfigPersisterTest {
         }
 
         override val featureName: PrivacyFeatureName =
-            PrivacyFeatureName.ContentBlockingFeatureName
+            PrivacyFeatureName.GpcFeatureName
     }
 
     companion object {

@@ -37,6 +37,7 @@ import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsEmbeddedDataPersister
 import com.duckduckgo.app.httpsupgrade.store.HttpsFalsePositivesDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Https
@@ -85,6 +86,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     private lateinit var https: Https
     private lateinit var testee: HttpsUpgrader
 
+    private var mockPixel: Pixel = mock()
     private var mockFeatureToggle: FeatureToggle = mock()
     private val mockHttpsRepository: HttpsRepository = mock()
     private val mockUnprotectedTemporaryRepository: UnprotectedTemporaryRepository = mock()
@@ -199,6 +201,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
             binaryDataStore,
             embeddedDataPersister,
             httpsDataPersister,
+            mockPixel
         )
     }
 

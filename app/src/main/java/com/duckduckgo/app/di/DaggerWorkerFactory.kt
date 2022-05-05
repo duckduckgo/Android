@@ -20,11 +20,12 @@ import android.content.Context
 import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPluginPoint
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import timber.log.Timber
 
 class DaggerWorkerFactory(
-    private val workerInjectorPluginPoint: WorkerInjectorPluginPoint,
+    private val workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
 ) : WorkerFactory() {
 
     override fun createWorker(

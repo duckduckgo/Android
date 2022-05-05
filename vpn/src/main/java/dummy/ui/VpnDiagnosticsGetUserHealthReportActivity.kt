@@ -21,10 +21,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnDiagnosticsGetUserHealthReportBinding
 
+@InjectWith(ActivityScope::class)
 class VpnDiagnosticsGetUserHealthReportActivity : DuckDuckGoActivity() {
 
     val binding by viewBinding<ActivityVpnDiagnosticsGetUserHealthReportBinding>()

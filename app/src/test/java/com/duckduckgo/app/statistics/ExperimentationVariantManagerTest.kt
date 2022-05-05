@@ -19,6 +19,7 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -30,6 +31,7 @@ class ExperimentationVariantManagerTest {
 
     private val mockStore: StatisticsDataStore = mock()
     private val mockRandomizer: IndexRandomizer = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
     private val activeVariants = mutableListOf<Variant>()
 
     @Before
@@ -37,7 +39,7 @@ class ExperimentationVariantManagerTest {
         // mock randomizer always returns the first active variant
         whenever(mockRandomizer.random(any())).thenReturn(0)
 
-        testee = ExperimentationVariantManager(mockStore, mockRandomizer)
+        testee = ExperimentationVariantManager(mockStore, mockRandomizer, appBuildConfig)
     }
 
     @Test
@@ -117,6 +119,26 @@ class ExperimentationVariantManagerTest {
         testee.getVariant(activeVariants)
 
         verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+    }
+
+    @Test
+    fun whenVariantDoesNotComplyWithFiltersUsingAppBuildConfigThenDefaultVariantIsPersisted() {
+        whenever(appBuildConfig.sdkInt).thenReturn(10)
+        activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 11 }))
+
+        testee.getVariant(activeVariants)
+
+        verify(mockStore).variant = VariantManager.DEFAULT_VARIANT.key
+    }
+
+    @Test
+    fun whenVariantDoesComplyWithFiltersUsingAppBuildConfigThenDefaultVariantIsPersisted() {
+        whenever(appBuildConfig.sdkInt).thenReturn(10)
+        activeVariants.add(Variant("foo", 100.0, filterBy = { config -> config.sdkInt == 10 }))
+
+        testee.getVariant(activeVariants)
+
+        verify(mockStore).variant = "foo"
     }
 
     @Test

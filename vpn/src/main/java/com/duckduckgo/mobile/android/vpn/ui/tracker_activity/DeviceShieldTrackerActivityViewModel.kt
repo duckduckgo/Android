@@ -16,23 +16,20 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dummy.ui.VpnPreferences
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -40,15 +37,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(ActivityScope::class)
 class DeviceShieldTrackerActivityViewModel @Inject constructor(
-    private val applicationContext: Context,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnPreferences: VpnPreferences,
     private val appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository,
-    private val vpnDetector: VpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
+    private val vpnDetector: VpnDetector,
+    private val vpnFeatureRemover: VpnFeatureRemover,
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
@@ -75,7 +71,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         when {
             enabled && vpnDetector.isVpnDetected() -> sendCommand(Command.ShowVpnConflictDialog)
             enabled == true -> sendCommand(Command.CheckVPNPermission)
-            enabled == false -> sendCommand(Command.ShowDisableConfirmationDialog)
+            enabled == false -> sendCommand(Command.ShowDisableVpnConfirmationDialog)
         }
     }
 
@@ -93,7 +89,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onVPNPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                sendCommand(Command.LaunchVPN)
+                viewModelScope.launch {
+                    launchVpn()
+                }
                 return
             }
             else -> {
@@ -109,8 +107,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
 
     internal fun launchExcludedApps() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val vpnState = vpnStateMonitor.getState().state
-            sendCommand(Command.LaunchExcludedApps(vpnState == VpnRunningState.ENABLED))
+            sendCommand(Command.LaunchManageAppsProtection)
         }
     }
 
@@ -132,12 +129,26 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
                 ViewEvent.LaunchDeviceShieldFAQ -> command.send(Command.LaunchDeviceShieldFAQ)
                 ViewEvent.LaunchExcludedApps -> launchExcludedApps()
                 ViewEvent.LaunchMostRecentActivity -> command.send(Command.LaunchMostRecentActivity)
+                ViewEvent.RemoveFeature -> removeFeature()
+                ViewEvent.AskToRemoveFeature -> command.send(Command.ShowRemoveFeatureConfirmationDialog)
+                ViewEvent.StartVpn -> launchVpn()
             }
         }
     }
 
-    internal fun isCustomDnsServerSet(): Boolean = vpnPreferences.isCustomDnsServerSet()
-    internal fun useCustomDnsServer(enabled: Boolean) = vpnPreferences.useCustomDnsServer(enabled)
+    private suspend fun launchVpn() {
+        deviceShieldPixels.enableFromSummaryTrackerActivity()
+        command.send(Command.LaunchVPN)
+    }
+
+    fun removeFeature() {
+        viewModelScope.launch {
+            deviceShieldPixels.didChooseToRemoveTrackingProtectionFeature()
+            vpnFeatureRemover.manuallyRemoveFeature()
+            command.send(Command.StopVPN)
+            command.send(Command.CloseScreen)
+        }
+    }
 
     internal data class TrackerActivityViewState(
         val trackerCountInfo: TrackerCountInfo,
@@ -163,6 +174,9 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object LaunchAppTrackersFAQ : ViewEvent()
         object LaunchBetaInstructions : ViewEvent()
         object LaunchMostRecentActivity : ViewEvent()
+        object RemoveFeature : ViewEvent()
+        object StartVpn : ViewEvent()
+        object AskToRemoveFeature : ViewEvent()
     }
 
     sealed class Command {
@@ -171,30 +185,16 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object CheckVPNPermission : Command()
         object VPNPermissionNotGranted : Command()
         data class RequestVPNPermission(val vpnIntent: Intent) : Command()
-        data class LaunchExcludedApps(val shouldListBeEnabled: Boolean) : Command()
+        object LaunchManageAppsProtection : Command()
         object LaunchDeviceShieldFAQ : Command()
         object LaunchAppTrackersFAQ : Command()
         object LaunchBetaInstructions : Command()
         object LaunchMostRecentActivity : Command()
-        object ShowDisableConfirmationDialog : Command()
+        object ShowDisableVpnConfirmationDialog : Command()
         object ShowVpnConflictDialog : Command()
         object ShowVpnAlwaysOnConflictDialog : Command()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class PastWeekTrackerActivityViewModelFactory @Inject constructor(
-    private val viewModelProvider: Provider<DeviceShieldTrackerActivityViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(DeviceShieldTrackerActivityViewModel::class.java) -> (
-                    (viewModelProvider.get()) as T
-                    )
-                else -> null
-            }
-        }
+        object ShowRemoveFeatureConfirmationDialog : Command()
+        object CloseScreen : Command()
     }
 }
 

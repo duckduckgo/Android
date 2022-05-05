@@ -32,9 +32,11 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
@@ -57,11 +59,17 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.macos_api.MacWaitlistState
+import com.duckduckgo.macos_api.MacWaitlistState.InBeta
+import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
+import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
+import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
@@ -69,6 +77,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class SettingsActivity :
     DuckDuckGoActivity(),
     SettingsAutomaticallyClearWhatFragment.Listener,
@@ -167,6 +176,7 @@ class SettingsActivity :
         with(viewsMore) {
             emailSetting.setOnClickListener { viewModel.onEmailProtectionSettingClicked() }
             deviceShieldSetting.setOnClickListener { viewModel.onAppTPSettingClicked() }
+            macOsSetting.setOnClickListener { viewModel.onMacOsSettingClicked() }
         }
     }
 
@@ -205,6 +215,7 @@ class SettingsActivity :
                     updateAppLinkBehavior(it.appLinksSettingType)
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
+                    updateMacOsSettings(it.macOsWaitlistState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -283,7 +294,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
-            is Command.LaunchAccessibilitySettigns -> launchAccessibilitySettings()
+            is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
             is Command.LaunchAppIcon -> launchAppIconChange()
@@ -299,6 +310,7 @@ class SettingsActivity :
             is Command.ShowClearWhatDialog -> launchAutomaticallyClearWhatDialog(it.option)
             is Command.ShowClearWhenDialog -> launchAutomaticallyClearWhenDialog(it.option)
             is Command.LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
+            is Command.LaunchMacOs -> launchMacOsScreen()
             null -> TODO()
         }
     }
@@ -320,13 +332,23 @@ class SettingsActivity :
     ) {
         with(viewsMore) {
             if (waitlistState != WaitlistState.InBeta) {
-                deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldNeverEnabled))
+                deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldNeverEnabled))
             } else {
                 if (appTPEnabled) {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldEnabled))
+                    deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldEnabled))
                 } else {
-                    deviceShieldSetting.setSubtitle(getString(R.string.atp_SettingsDeviceShieldDisabled))
+                    deviceShieldSetting.setSubtitle(getString(VpnR.string.atp_SettingsDeviceShieldDisabled))
                 }
+            }
+        }
+    }
+
+    private fun updateMacOsSettings(waitlistState: MacWaitlistState) {
+        with(viewsMore) {
+            when (waitlistState) {
+                InBeta -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_ready))
+                JoinedWaitlist -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description_list))
+                NotJoinedQueue -> macOsSetting.setSubtitle(getString(R.string.macos_settings_description))
             }
         }
     }
@@ -394,17 +416,22 @@ class SettingsActivity :
         startActivity(EmailProtectionActivity.intent(this), options)
     }
 
+    private fun launchMacOsScreen() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(MacOsWaitlistActivity.intent(this), options)
+    }
+
     private fun launchAppTPTrackersScreen() {
         startActivity(DeviceShieldTrackerActivity.intent(this))
     }
 
     private fun launchAppTPOnboardingScreen() {
-        startActivity(DeviceShieldOnboardingActivity.intent(this))
+        startActivity(VpnOnboardingActivity.intent(this))
     }
 
     private val appTPWaitlistActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            startActivity(DeviceShieldOnboardingActivity.intent(this))
+            startActivity(VpnOnboardingActivity.intent(this))
         }
     }
 

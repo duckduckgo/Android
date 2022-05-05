@@ -55,18 +55,24 @@
     <string name="favoriteAddedMessage">Preferito aggiunto</string>
     <string name="bookmarkAddedMessage">Segnalibro aggiunto</string>
     <string name="requestDesktopSiteMenuTitle">Sito desktop</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Rimuovi protezione</string>
+    <string name="requestMobileSiteMenuTitle">Sito per dispositivi mobili</string>
+    <string name="downloadsMenuTitle">Download</string>
+    <string name="printMenuTitle">Stampa pagina</string>
+    <string name="favoriteDeleteConfirmationMessage">Preferito rimosso</string>
+    <string name="fireproofDeleteConfirmationMessage">Protezione rimossa</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Tutela della privacy attivata per %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Tutela della privacy disattivata per %1$s</string>
+    <string name="undoSnackbarAction">Annulla</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Scarica immagine</string>
     <string name="permissionRequiredToDownload">Il download richiede l\'autorizzazione di archiviazione</string>
-    <string name="downloadComplete">Download completato</string>
-    <string name="downloadFailed">Download non riuscito</string>
-    <string name="downloadInProgress">Download in corso</string>
 
     <!-- Sharing options -->
     <string name="options">Opzioni</string>
     <string name="shareLink">Condividi link</string>
-    <string name="shareMenuTitle">Condividi…</string>
+    <string name="shareMenuTitle">Condividi</string>
     <string name="copyUrl">Copia l\'indirizzo del link</string>
 
     <!-- Find in page -->
@@ -278,7 +284,7 @@
     <string name="searchWidgetLabel">Ricerca</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Aggiungi alla Home</string>
+    <string name="addToHome">Aggiungi alla Schermata Home</string>
     <string name="shortcutAddedText">Azione completa. %1$s è stato aggiunto alla schermata principale.</string>
 
     <!-- User Survey -->
@@ -312,7 +318,7 @@
     <string name="appEnjoymentDialogTitle">Ti piace DuckDuckGo?</string>
     <string name="appEnjoymentDialogMessage">Ci piacerebbe sapere cosa ne pensi.</string>
     <string name="appEnjoymentDialogPositiveButton">Mi piace</string>
-    <string name="appEnjoymentDialogNegativeButton">Deve essere migliorato</string>
+    <string name="appEnjoymentDialogNegativeButton">Deve essere migliorata</string>
 
     <string name="rateAppDialogTitle">Valuta l\'app</string>
     <string name="rateAppDialogMessage">Il tuo feedback ci interessa. Condividi il tuo parere positivo con una recensione.</string>
@@ -327,8 +333,6 @@
     <string name="noThanks">No, grazie</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Download del file in corso</string>
-    <string name="notificationChannelFileDownloaded">Il file è stato scaricato</string>
     <string name="notificationChannelTutorials">Tutorial</string>
 
     <!-- Clear Notification -->
@@ -462,7 +466,7 @@
     <string name="daxEndCtaText"><![CDATA[Ben fatto!<br/><br/>Ricorda: quando navighi con me, gli annunci inquietanti non possono seguirti. 👍]]></string>
     <string name="daxSerpCtaText">Le tue ricerche su DuckDuckGo sono anonime e non salvo mai la cronologia delle ricerche. Mai. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
+        <item quantity="one"><![CDATA[ e <b>%1$d altro</b> stava tentando di tracciare la tua attività qui. <br/><br/>L\'ho bloccato!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
         <item quantity="other"><![CDATA[ e <b>altri %1$d</b> stavano tentando di tracciare la tua attività qui. <br/><br/>Li ho bloccati!<br/><br/> ☝️Controlla la barra degli indirizzi per vedere chi sta cercando di tracciare la tua attività quando visiti un nuovo sito.️]]></item>
     </plurals>
     <plurals name="daxTrackersBlockedCtaZeroText">
@@ -500,7 +504,7 @@
     <string name="dialogSaveAction">Salva</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Siti non protetti</string>
+    <string name="whitelistActivityTitle">Siti non protetti</string>
     <string name="enablePrivacyProtection">Attiva la tutela della privacy</string>
     <string name="disablePrivacyProtection">Disattiva la tutela della privacy</string>
     <string name="whitelistEntryOverflowContentDescription">Altre opzioni per il sito non protetto %1$s</string>
@@ -516,8 +520,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Siti protetti</string>
     <string name="settingsFireproofWebsites">Siti protetti</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Sito protetto</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; è adesso protetto! Visita Impostazioni per la gestione.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Attiva protezione per questo sito</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ora è a prova di fuoco!</string>
     <string name="fireproofWebsiteSnackbarAction">Annulla</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sei sicuro di voler eliminare &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Nessun sito protetto</string>
@@ -528,7 +532,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Proteggi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Non adesso</string>
     <string name="fireproofWebsiteItemsSectionTitle">Siti Web</string>
-    <string name="fireproofWebsiteToogleText">Chiedi al momento dell\'accesso</string>
+    <string name="fireproofWebsiteToggleText">Chiedi al momento dell\'accesso</string>
     <string name="disableLoginDetectionDialogTitle">Disabilitare il promemoria per la protezione quando si accede ai siti?</string>
     <string name="disableLoginDetectionDialogDescription">Puoi modificare questa preferenza in qualsiasi momento nella sezione Impostazioni.</string>
     <string name="disableLoginDetectionDialogPositive">DISABILITA</string>
@@ -610,7 +614,7 @@
     <string name="newEmailAliasMenuTitle">Crea indirizzo Duck</string>
 
     <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Rimuovi protezioni e-mail?</string>
+    <string name="emailSignOutDialogTitle">Rimuovere protezioni e-mail?</string>
     <string name="emailSignOutDialogText">Nota: la rimozione delle protezioni e-mail da questo dispositivo non eliminerà il tuo indirizzo Duck.</string>
     <string name="emailSignOutDialogCancel">Annulla</string>
     <string name="emailSignOutDialogDisable">Rimuovi</string>
@@ -688,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Normativa sulla privacy</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Download non riuscito. Controlla la connessione a Internet.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Aggiungi %1$s widget alla schermata iniziale</string>

@@ -20,12 +20,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.Observer
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAddWidgetInstructionsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.Close
 import com.duckduckgo.app.widget.ui.AddWidgetInstructionsViewModel.Command.ShowHome
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
+@InjectWith(ActivityScope::class)
 class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityAddWidgetInstructionsBinding by viewBinding()

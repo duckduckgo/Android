@@ -18,8 +18,8 @@ package com.duckduckgo.mobile.android.vpn.processor
 
 import android.os.ParcelFileDescriptor
 import android.os.Process
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.feature.isIpv6SupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
@@ -41,7 +41,7 @@ class TunPacketReader @AssistedInject constructor(
     private val queues: VpnQueues,
     private val healthMetricCounter: HealthMetricCounter,
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val featureToggle: FeatureToggle,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
 ) : Runnable {
 
     private var running = false
@@ -83,7 +83,15 @@ class TunPacketReader @AssistedInject constructor(
     private fun executeReadLoop(vpnInput: FileChannel) {
         bufferToNetwork = byteBuffer()
 
-        val inPacketLength = vpnInput.read(bufferToNetwork)
+        val inPacketLength = try {
+            vpnInput.read(bufferToNetwork)
+        } catch (t: Throwable) {
+            healthMetricCounter.onTunReadIOException()
+            // buffer clean up and re-throw on purpose
+            ByteBufferPool.release(bufferToNetwork)
+            throw t
+        }
+
         if (inPacketLength == 0) {
             ByteBufferPool.release(bufferToNetwork)
             return
@@ -129,7 +137,7 @@ class TunPacketReader @AssistedInject constructor(
     }
 
     private fun isIP6AndInternalBuild(packet: Packet): Boolean {
-        return packet.isIP6() && featureToggle.isIpv6SupportEnabled()
+        return packet.isIP6() && appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support)
     }
 
     private fun byteBuffer(): ByteBuffer {

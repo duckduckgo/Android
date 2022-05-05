@@ -26,8 +26,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.extensions.isPrivateDnsActive
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.feature.toggles.api.FeatureToggle
-import com.duckduckgo.mobile.android.vpn.feature.isPrivateDnsSupportEnabled
+import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
+import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
@@ -38,7 +38,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -58,7 +58,7 @@ import javax.inject.Inject
 class NetworkTypeCollector @Inject constructor(
     private val context: Context,
     private val vpnPreferences: VpnPreferences,
-    private val featureToggle: FeatureToggle,
+    private val appTpFeatureConfig: AppTpFeatureConfig,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnStateCollectorPlugin, VpnServiceCallbacks {
 
@@ -110,21 +110,17 @@ class NetworkTypeCollector @Inject constructor(
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            if (featureToggle.isPrivateDnsSupportEnabled()) {
+            vpnPreferences.isPrivateDnsEnabled = if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && context.isPrivateDnsActive()) {
                 Timber.v(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
                     context.getPrivateDnsServerName(),
                     runCatching { InetAddress.getAllByName(context.getPrivateDnsServerName()) }.getOrNull()?.map { it.hostAddress }
                 )
-
-                vpnPreferences.privateDns = if (context.isPrivateDnsActive()) {
-                    context.getPrivateDnsServerName()
-                } else {
-                    null
-                }
+                true
             } else {
-                Timber.d("Private DNS support is disabled...skip")
+                Timber.v("Private DNS support is disabled or not set")
+                false
             }
         }
     }
@@ -209,7 +205,17 @@ class NetworkTypeCollector @Inject constructor(
     private fun getNetworkInfoJsonObject(): JSONObject {
         updateSecondsSinceLastSwitch()
         // redact the lastSwitchTimestampMillis from the report
-        val info = currentNetworkInfo?.let { adapter.toJson(adapter.fromJson(it)?.copy(lastSwitchTimestampMillis = -999)) } ?: return JSONObject()
+        val info = currentNetworkInfo?.let {
+            // Redact some values (set to -999) as they could be static values
+            val temp = adapter.fromJson(it)
+            adapter.toJson(
+                temp?.copy(
+                    lastSwitchTimestampMillis = -999,
+                    currentNetwork = temp.currentNetwork.copy(netId = -999),
+                    previousNetwork = temp.previousNetwork?.copy(netId = -999)
+                )
+            )
+        } ?: return JSONObject()
 
         return JSONObject(info)
     }

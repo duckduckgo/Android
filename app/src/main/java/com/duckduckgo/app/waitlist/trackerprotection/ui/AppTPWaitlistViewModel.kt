@@ -20,15 +20,14 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.duckduckgo.mobile.android.vpn.waitlist.api.AppTrackingProtectionWaitlistService
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,9 +35,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
-class AppTPWaitlistViewModel(
+@ContributesViewModel(ActivityScope::class)
+class AppTPWaitlistViewModel @Inject constructor(
     private val waitlistManager: AppTPWaitlistManager,
     private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
     private val waitlistService: AppTrackingProtectionWaitlistService,
@@ -135,34 +134,6 @@ class AppTPWaitlistViewModel(
         if (resultCode == Activity.RESULT_OK) {
             viewModelScope.launch {
                 viewStateFlow.emit(ViewState(WaitlistState.CodeRedeemed))
-            }
-        }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTPWaitlistViewModelFactory @Inject constructor(
-    private val waitlistManager: Provider<AppTPWaitlistManager>,
-    private val atpWaitlistStateRepository: Provider<AtpWaitlistStateRepository>,
-    private val waitlistService: Provider<AppTrackingProtectionWaitlistService>,
-    private val workManager: Provider<WorkManager>,
-    private val workRequestBuilder: Provider<AppTPWaitlistWorkRequestBuilder>,
-    private val deviceShieldPixels: Provider<DeviceShieldPixels>,
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(AppTPWaitlistViewModel::class.java) -> (
-                    AppTPWaitlistViewModel(
-                        waitlistManager.get(),
-                        atpWaitlistStateRepository.get(),
-                        waitlistService.get(),
-                        workManager.get(),
-                        workRequestBuilder.get(),
-                        deviceShieldPixels.get(),
-                    ) as T
-                    )
-                else -> null
             }
         }
     }

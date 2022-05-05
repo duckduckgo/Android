@@ -29,7 +29,7 @@ import dagger.Provides
 import dagger.SingleInstanceIn
 
 @Module(includes = [DaoModule::class])
-class DatabaseModule {
+object DatabaseModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)

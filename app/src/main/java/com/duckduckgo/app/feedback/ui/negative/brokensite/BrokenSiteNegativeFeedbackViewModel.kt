@@ -17,13 +17,13 @@
 package com.duckduckgo.app.feedback.ui.negative.brokensite
 
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
-class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
+@ContributesViewModel(FragmentScope::class)
+class BrokenSiteNegativeFeedbackViewModel @Inject constructor() : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -41,17 +41,5 @@ class BrokenSiteNegativeFeedbackViewModel : ViewModel() {
         ) : Command()
 
         object Exit : Command()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class BrokenSiteNegativeFeedbackViewModelFactory @Inject constructor() : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(BrokenSiteNegativeFeedbackViewModel::class.java) -> (BrokenSiteNegativeFeedbackViewModel() as T)
-                else -> null
-            }
-        }
     }
 }

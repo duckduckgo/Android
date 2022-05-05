@@ -23,18 +23,22 @@ import android.app.NotificationManager.IMPORTANCE_NONE
 import android.content.Context
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.O
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.notification.model.Channel
+import com.duckduckgo.app.notification.model.SchedulableNotificationPlugin
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.impl.FileDownloadNotificationChannelType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -48,14 +52,9 @@ class NotificationRegistrar @Inject constructor(
     private val manager: NotificationManager,
     private val compatManager: NotificationManagerCompat,
     private val settingsDataStore: SettingsDataStore,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    private val schedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin>
 ) : LifecycleObserver {
-
-    data class Channel(
-        val id: String,
-        @StringRes val name: Int,
-        val priority: Int
-    )
 
     object NotificationId {
         const val ClearData = 100
@@ -66,16 +65,8 @@ class NotificationRegistrar @Inject constructor(
     }
 
     object ChannelType {
-        val FILE_DOWNLOADING = Channel(
-            "com.duckduckgo.downloading",
-            R.string.notificationChannelFileDownloading,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
-        val FILE_DOWNLOADED = Channel(
-            "com.duckduckgo.downloaded",
-            R.string.notificationChannelFileDownloaded,
-            NotificationManagerCompat.IMPORTANCE_LOW
-        )
+        val FILE_DOWNLOADING = FileDownloadNotificationChannelType.FILE_DOWNLOADING
+        val FILE_DOWNLOADED = FileDownloadNotificationChannelType.FILE_DOWNLOADED
         val TUTORIALS = Channel(
             "com.duckduckgo.tutorials",
             R.string.notificationChannelTutorials,
@@ -88,9 +79,10 @@ class NotificationRegistrar @Inject constructor(
         )
         val APP_TP_WAITLIST = Channel(
             "com.duckduckgo.apptp",
-            R.string.atp_WaitlistActivityWaitlistTitle,
+            VpnR.string.atp_WaitlistActivityWaitlistTitle,
             NotificationManagerCompat.IMPORTANCE_HIGH
         )
+        // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -113,7 +105,8 @@ class NotificationRegistrar @Inject constructor(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
         ChannelType.TUTORIALS,
-        ChannelType.EMAIL_WAITLIST
+        ChannelType.EMAIL_WAITLIST,
+        ChannelType.APP_TP_WAITLIST
     )
 
     private fun registerApp() {
@@ -129,7 +122,11 @@ class NotificationRegistrar @Inject constructor(
         val notificationChannels = channels.map {
             NotificationChannel(it.id, context.getString(it.name), it.priority)
         }
-        manager.createNotificationChannels(notificationChannels)
+        val pluginChannels = schedulableNotificationPluginPoint.getPlugins().map {
+            val channel = it.getSpecification().channel
+            NotificationChannel(channel.id, context.getString(channel.name), channel.priority)
+        }
+        manager.createNotificationChannels(notificationChannels + pluginChannels)
     }
 
     @VisibleForTesting

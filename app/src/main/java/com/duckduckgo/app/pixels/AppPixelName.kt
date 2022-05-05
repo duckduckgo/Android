@@ -106,12 +106,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     LONG_PRESS_COPY_URL("mlp_c"),
     LONG_PRESS_OPEN_IMAGE_IN_BACKGROUND_TAB("mlp_ibt"),
 
-    DOWNLOAD_FILE_DEFAULT_GUESSED_NAME("m_df_dgn"),
-
-    DOWNLOAD_REQUEST_STARTED("m_download_request_started"),
-    DOWNLOAD_REQUEST_SUCCEEDED("m_download_request_succeeded"),
-    DOWNLOAD_REQUEST_FAILED("m_download_request_failed"),
-
     SETTINGS_OPENED("ms"),
     SETTINGS_THEME_OPENED("ms_t_o"),
     SETTINGS_THEME_TOGGLED_LIGHT("ms_tl"),
@@ -197,6 +191,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_REPORT_BROKEN_SITE_PRESSED("m_nav_rbs_p"),
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
+    MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
 
     COOKIE_DATABASE_EXCEPTION_OPEN_ERROR("m_cdb_e_oe"),
     COOKIE_DATABASE_EXCEPTION_DELETE_ERROR("m_cdb_e_de"),
@@ -210,6 +205,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
     FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
     FIREPROOF_WEBSITE_UNDO("m_fw_u"),
+    FIREPROOF_REMOVE_WEBSITE_UNDO("m_remove_fireproofing_snackbar_undo"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
@@ -257,5 +253,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SHOWN("m_remote_message_shown"),
     REMOTE_MESSAGE_SHOWN_UNIQUE("m_remote_message_shown_unique"),
     REMOTE_MESSAGE_PRIMARY_ACTION_CLICKED("m_remote_message_primary_action_clicked"),
-    REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked")
+    REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
+
+    CREATE_BLOOM_FILTER_ERROR("m_create_bloom_filter_error")
 }

@@ -16,25 +16,20 @@
 
 package com.duckduckgo.vpn.internal.feature.transparency
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.RequestTrackerType
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 
 class TransparencyTrackerDetectorInterceptorTest {
-
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: TransparencyTrackerDetectorInterceptor
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        testee = TransparencyTrackerDetectorInterceptor(mockAppBuildConfig)
+        testee = TransparencyTrackerDetectorInterceptor()
     }
 
     @Test
@@ -51,26 +46,9 @@ class TransparencyTrackerDetectorInterceptorTest {
         assertNull(trackerType)
     }
 
-    @Test
-    fun returnNotTrackersNullWhenDDGAppAndAndroid12() {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(31)
-
-        val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
-        assertEquals(trackerType, RequestTrackerType.NotTracker(HOSTNAME))
-    }
-
-    @Test
-    fun returnNullWhenDDGAppAndAndroid11() {
-        whenever(mockAppBuildConfig.sdkInt).thenReturn(30)
-
-        val trackerType = testee.interceptTrackerRequest(HOSTNAME, DDG_PACKAGE_ID)
-        assertNull(trackerType)
-    }
-
     companion object {
         private const val HOSTNAME = "hostname"
         private const val SOME_PACKAGE_ID = "some.package.name"
-        private const val DDG_PACKAGE_ID = "com.duckduckgo.mobile"
     }
 
 }

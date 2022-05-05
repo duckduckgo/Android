@@ -55,18 +55,24 @@
     <string name="favoriteAddedMessage">Mėgstamas pridėtas</string>
     <string name="bookmarkAddedMessage">Žymė pridėta</string>
     <string name="requestDesktopSiteMenuTitle">Darbalaukio svetainė</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Šalinti apsaugą</string>
+    <string name="requestMobileSiteMenuTitle">Mobilioji svetainė</string>
+    <string name="downloadsMenuTitle">Atsisiuntimai</string>
+    <string name="printMenuTitle">Spausdinti puslapį</string>
+    <string name="favoriteDeleteConfirmationMessage">Mėgstamas pašalintas</string>
+    <string name="fireproofDeleteConfirmationMessage">Apsauga pašalinta</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Privatumo apsauga įjungta dėl %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Privatumo apsauga išjungta dėl %1$s</string>
+    <string name="undoSnackbarAction">Anuliuoti</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Atsisiųsti paveikslėlį</string>
     <string name="permissionRequiredToDownload">Norint atsisiųsti reikia leidimo išsaugoti</string>
-    <string name="downloadComplete">Atsisiuntimas baigtas</string>
-    <string name="downloadFailed">Atsisiųsti nepavyko</string>
-    <string name="downloadInProgress">Atsisiunčiama</string>
 
     <!-- Sharing options -->
     <string name="options">Parinktys</string>
     <string name="shareLink">Bendrinti nuorodą</string>
-    <string name="shareMenuTitle">Bendrinti…</string>
+    <string name="shareMenuTitle">Bendrinti</string>
     <string name="copyUrl">Kopijuoti nuorodos adresą</string>
 
     <!-- Find in page -->
@@ -286,7 +292,7 @@
     <string name="searchWidgetLabel">Paieška</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Pridėti prie pradžios puslapio</string>
+    <string name="addToHome">Pridėti prie pagrindinio ekrano</string>
     <string name="shortcutAddedText">Pavyko! %1$s pridėtas prie jūsų pagrindinio ekrano.</string>
 
     <!-- User Survey -->
@@ -335,8 +341,6 @@
     <string name="noThanks">Ne, dėkoju</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Failas atsisiunčiamas</string>
-    <string name="notificationChannelFileDownloaded">Failas atsiųstas</string>
     <string name="notificationChannelTutorials">Mokymo priemonės</string>
 
     <!-- Clear Notification -->
@@ -512,7 +516,7 @@
     <string name="dialogSaveAction">Išsaugoti</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Neapsaugotos svetainės</string>
+    <string name="whitelistActivityTitle">Neapsaugotos svetainės</string>
     <string name="enablePrivacyProtection">Įjungti privatumo apsaugą</string>
     <string name="disablePrivacyProtection">Išjungti privatumo apsaugą</string>
     <string name="whitelistEntryOverflowContentDescription">Daugiau neapsaugotos svetainės %1$s parinkčių</string>
@@ -528,8 +532,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
     <string name="settingsFireproofWebsites">Apsaugoti svetaines</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti svetainę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota! Apsilankykite „Nustatymai“ ir sužinokite daugiau.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti šią svetainę</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota!</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteEmptyListHint">Apsaugotų svetainių nėra</string>
@@ -540,7 +544,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Parinktis „Fireproof“</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne dabar</string>
     <string name="fireproofWebsiteItemsSectionTitle">Svetainės</string>
-    <string name="fireproofWebsiteToogleText">Klausti prisijungiant</string>
+    <string name="fireproofWebsiteToggleText">Klausti prisijungiant</string>
     <string name="disableLoginDetectionDialogTitle">Išjungti apsaugos priminimą prisijungiant prie svetainių?</string>
     <string name="disableLoginDetectionDialogDescription">Šią nuostatą galite bet kada pakeisti nustatymuose.</string>
     <string name="disableLoginDetectionDialogPositive">IŠJUNGTI</string>
@@ -704,9 +708,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Privatumo politika</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Nepavyko atsisiųsti. Patikrinkite interneto ryšį.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>

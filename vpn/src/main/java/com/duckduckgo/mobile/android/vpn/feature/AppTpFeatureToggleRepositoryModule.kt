@@ -26,7 +26,7 @@ import dagger.SingleInstanceIn
 
 @ContributesTo(AppScope::class)
 @Module
-class AppTpFeatureToggleRepositoryModule {
+object AppTpFeatureToggleRepositoryModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideAppTpFeatureToggleRepository(context: Context): AppTpFeatureToggleRepository {

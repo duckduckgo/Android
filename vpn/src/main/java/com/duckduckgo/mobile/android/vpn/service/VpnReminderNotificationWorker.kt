@@ -29,7 +29,7 @@ import dagger.multibindings.IntoSet
 
 @Module
 @ContributesTo(AppScope::class)
-class VpnServiceHeartbeatMonitorModule {
+object VpnServiceHeartbeatMonitorModule {
 
     @Provides
     @IntoSet

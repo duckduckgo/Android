@@ -49,13 +49,13 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
-import com.duckduckgo.app.browser.downloader.DownloadFailReason
-import com.duckduckgo.app.browser.downloader.FileDownloader
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
@@ -117,6 +117,9 @@ import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
+import com.duckduckgo.downloads.api.DownloadCallback
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc
@@ -127,6 +130,8 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import org.mockito.kotlin.*
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
@@ -301,7 +306,16 @@ class BrowserTabViewModelTest {
     private lateinit var mockTrackingParameters: TrackingParameters
 
     @Mock
+    private lateinit var mockDownloadCallback: DownloadCallback
+
+    @Mock
     private lateinit var mockRemoteMessagingRepository: RemoteMessagingRepository
+
+    @Mock
+    private lateinit var voiceSearchAvailability: VoiceSearchAvailability
+
+    @Mock
+    private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -443,7 +457,10 @@ class BrowserTabViewModelTest {
             variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
-            trackingParameters = mockTrackingParameters
+            downloadCallback = mockDownloadCallback,
+            trackingParameters = mockTrackingParameters,
+            voiceSearchAvailability = voiceSearchAvailability,
+            voiceSearchPixelLogger = voiceSearchPixelLogger
         )
 
         testee.loadData("abc", null, false, false)
@@ -572,22 +589,22 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsEnabled() {
-        loadUrl("www.example.com", isBrowserShowing = true)
-        assertTrue(browserViewState().canAddBookmarks)
+        loadUrl("https://www.example.com", isBrowserShowing = true)
+        assertTrue(browserViewState().canSaveSite)
         assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
     fun whenBrowsingAndNoUrlThenAddBookmarkFavoriteButtonsDisabled() {
         loadUrl(null, isBrowserShowing = true)
-        assertFalse(browserViewState().canAddBookmarks)
+        assertFalse(browserViewState().canSaveSite)
         assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
     @Test
     fun whenNotBrowsingAndUrlPresentThenAddBookmarkFavoriteButtonsDisabled() {
-        loadUrl("www.example.com", isBrowserShowing = false)
-        assertFalse(browserViewState().canAddBookmarks)
+        loadUrl("https://www.example.com", isBrowserShowing = false)
+        assertFalse(browserViewState().canSaveSite)
         assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
@@ -1309,7 +1326,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteThenDesktopModeStateUpdated() {
         loadUrl("http://example.com")
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED)
         assertTrue(browserViewState().isDesktopBrowsingMode)
@@ -1318,7 +1336,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsMobileSiteThenMobileModeStateUpdated() {
         loadUrl("http://example.com")
-        testee.onDesktopSiteModeToggled(false)
+        setDesktopBrowsingMode(true)
+        testee.onChangeBrowserModeClicked()
         verify(mockPixel).fire(AppPixelName.MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED)
         assertFalse(browserViewState().isDesktopBrowsingMode)
     }
@@ -1527,7 +1546,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteWhenOnMobileSpecificSiteThenUrlModified() {
         loadUrl("http://m.example.com")
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue as Navigate
         assertEquals("http://example.com", ultimateCommand.url)
@@ -1536,7 +1556,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsDesktopSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
         loadUrl("http://example.com")
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -1545,7 +1566,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsMobileSiteWhenOnMobileSpecificSiteThenUrlNotModified() {
         loadUrl("http://m.example.com")
-        testee.onDesktopSiteModeToggled(false)
+        setDesktopBrowsingMode(true)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -1554,7 +1576,8 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserSelectsMobileSiteWhenNotOnMobileSpecificSiteThenUrlNotModified() {
         loadUrl("http://example.com")
-        testee.onDesktopSiteModeToggled(false)
+        setDesktopBrowsingMode(true)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
         assertTrue(ultimateCommand == Command.Refresh)
@@ -1599,23 +1622,43 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesNonWhitelistedSiteThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenSiteAddedToWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
         loadUrl("http://www.example.com/home.html")
-        testee.onWhitelistSelected()
+        testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
         verify(mockCommandObserver).onChanged(Command.Refresh)
     }
 
     @Test
-    fun whenUserTogglesWhitelsitedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
+    fun whenPrivacyProtectionMenuClickedAndSiteNotInWhiteListThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(false)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        assertCommandIssued<ShowPrivacyProtectionDisabledConfirmation> {
+            assertEquals("www.example.com", this.domain)
+        }
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenSiteRemovedFromWhitelistAndPixelSentAndPageRefreshed() = runTest {
         whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
         loadUrl("http://www.example.com/home.html")
-        testee.onWhitelistSelected()
+        testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
         verify(mockCommandObserver).onChanged(Command.Refresh)
+    }
+
+    @Test
+    fun whenPrivacyProtectionMenuClickedForWhiteListedSiteThenShowDisabledConfirmationMessage() = runTest {
+        whenever(mockUserWhitelistDao.contains("www.example.com")).thenReturn(true)
+        loadUrl("http://www.example.com/home.html")
+        testee.onPrivacyProtectionMenuClicked()
+        assertCommandIssued<ShowPrivacyProtectionEnabledConfirmation> {
+            assertEquals("www.example.com", this.domain)
+        }
     }
 
     @Test
@@ -1812,7 +1855,7 @@ class BrowserTabViewModelTest {
         assertFalse(browserViewState().canReportSite)
         assertFalse(browserViewState().canChangeBrowsingMode)
         assertFalse(browserViewState().canFireproofSite)
-        assertFalse(findInPageViewState().canFindInPage)
+        assertFalse(browserViewState().canFindInPage)
     }
 
     @Test
@@ -2314,6 +2357,16 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserRemovesFireproofWebsiteFromOptionMenuThenShowConfirmationIsIssued() {
+        givenFireproofWebsiteDomain("mobile.example.com")
+        loadUrl("http://mobile.example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            assertEquals("mobile.example.com", this.fireproofWebsiteEntity.domain)
+        }
+    }
+
+    @Test
     fun whenUserClicksOnFireproofWebsiteSnackbarUndoActionThenFireproofWebsiteIsRemoved() {
         loadUrl("http://example.com/", isBrowserShowing = true)
         testee.onFireproofWebsiteMenuClicked()
@@ -2332,6 +2385,29 @@ class BrowserTabViewModelTest {
             testee.onFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
         }
         verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_UNDO)
+    }
+
+    @Test
+    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenFireproofWebsiteIsAddedBack() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            testee.onRemoveFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        assertTrue(browserViewState().canFireproofSite)
+        assertTrue(browserViewState().isFireproofWebsite)
+    }
+
+    @Test
+    fun whenUserClicksOnRemoveFireproofingSnackbarUndoActionThenPixelSent() {
+        givenFireproofWebsiteDomain("example.com")
+        loadUrl("http://example.com/", isBrowserShowing = true)
+        testee.onFireproofWebsiteMenuClicked()
+        assertCommandIssued<Command.DeleteFireproofConfirmation> {
+            testee.onRemoveFireproofWebsiteSnackbarUndoClicked(this.fireproofWebsiteEntity)
+        }
+        verify(mockPixel).fire(AppPixelName.FIREPROOF_REMOVE_WEBSITE_UNDO)
     }
 
     @Test
@@ -2411,7 +2487,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesBackThenCannotAddBookmarkOrFavorite() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
-        assertFalse(browserViewState().canAddBookmarks)
+        assertFalse(browserViewState().canSaveSite)
         assertFalse(browserViewState().addFavorite.isEnabled())
     }
 
@@ -2440,7 +2516,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesBackThenCannotWhitelist() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
-        assertFalse(browserViewState().canWhitelist)
+        assertFalse(browserViewState().canChangePrivacyProtection)
     }
 
     @Test
@@ -2454,7 +2530,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesBackThenCannotFindInPage() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
-        assertFalse(findInPageViewState().canFindInPage)
+        assertFalse(browserViewState().canFindInPage)
     }
 
     @Test
@@ -2469,7 +2545,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
-        assertTrue(browserViewState().canAddBookmarks)
+        assertTrue(browserViewState().canSaveSite)
         assertTrue(browserViewState().addFavorite.isEnabled())
     }
 
@@ -2478,7 +2554,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
-        assertTrue(browserViewState().canWhitelist)
+        assertTrue(browserViewState().canChangePrivacyProtection)
     }
 
     @Test
@@ -2510,7 +2586,7 @@ class BrowserTabViewModelTest {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         testee.onUserPressedBack()
         testee.onUserPressedForward()
-        assertTrue(findInPageViewState().canFindInPage)
+        assertTrue(browserViewState().canFindInPage)
     }
 
     @Test
@@ -2648,7 +2724,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShoulbBeEnabled() = runTest {
+    fun whenUserGrantsSystemLocationPermissionThenSettingsLocationPermissionShouldBeEnabled() = runTest {
         val domain = "https://www.example.com/"
         givenDeviceLocationSharingIsEnabled(true)
         givenLocationPermissionIsEnabled(true)
@@ -3183,8 +3259,8 @@ class BrowserTabViewModelTest {
     fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsValidThenAddHeaderToUrl() {
         givenUrlCanUseGpc()
         loadUrl("http://m.example.com")
-
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
@@ -3195,8 +3271,8 @@ class BrowserTabViewModelTest {
     fun whenOnDesktopSiteModeToggledIfGpcIsEnabledAndUrlIsNotValidThenDoNotAddHeaderToUrl() {
         givenUrlCannotUseGpc("example.com")
         loadUrl("http://m.example.com")
-
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
@@ -3207,8 +3283,8 @@ class BrowserTabViewModelTest {
     fun whenOnDesktopSiteModeToggledIfGpcIsDisabledThenDoNotAddHeaderToUrl() {
         givenGpcIsDisabled()
         loadUrl("http://m.example.com")
-
-        testee.onDesktopSiteModeToggled(true)
+        setDesktopBrowsingMode(false)
+        testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
 
         val command = commandCaptor.lastValue as Navigate
@@ -3562,7 +3638,7 @@ class BrowserTabViewModelTest {
     fun whenLoadUrlAndUrlIsInContentBlockingExceptionsListThenIsWhitelistedIsTrue() {
         whenever(mockContentBlocking.isAnException("example.com")).thenReturn(true)
         loadUrl("https://example.com")
-        assertTrue(browserViewState().isWhitelisted)
+        assertTrue(browserViewState().isPrivacyProtectionEnabled)
     }
 
     @Test
@@ -3722,52 +3798,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenDownloadIsCalledThenDownloadRequestStartedPixelFired() {
+    fun whenDownloadIsCalledThenDownloadRequestedForUrl() = runTest {
         val pendingFileDownload = buildPendingDownload(url = "http://www.example.com/download.pdf", contentDisposition = null, mimeType = null)
 
         testee.download(pendingFileDownload)
 
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-    }
-
-    @Test
-    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestSucceededPixelsFired() {
-        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
-        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
-            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFinishedDataUri(
-                file = File("image.jpg"),
-                mimeType = null
-            )
-        }
-
-        testee.download(pendingFileDownload)
-
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_SUCCEEDED)
-    }
-
-    @Test
-    fun whenDownloadIsCalledForDataAndFinishedThenDownloadRequestStartedAndDownloadRequestFailedPixelsFired() {
-        val pendingFileDownload = buildPendingDownload(url = "data://image.jpg", contentDisposition = null, mimeType = null)
-        whenever(mockFileDownloader.download(eq(pendingFileDownload), any())).then {
-            (it.getArgument(1) as FileDownloader.FileDownloadListener).downloadFailed(
-                message = "message",
-                downloadFailReason = DownloadFailReason.ConnectionRefused
-            )
-        }
-
-        testee.download(pendingFileDownload)
-
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_STARTED)
-        verify(mockPixel).fire(AppPixelName.DOWNLOAD_REQUEST_FAILED)
+        verify(mockFileDownloader).download(pendingFileDownload, mockDownloadCallback)
     }
 
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String?,
         mimeType: String?
-    ): FileDownloader.PendingFileDownload {
-        return FileDownloader.PendingFileDownload(
+    ): PendingFileDownload {
+        return PendingFileDownload(
             url = url,
             contentDisposition = contentDisposition,
             mimeType = mimeType,
@@ -3938,6 +3982,58 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenConfigurationChangesThenForceRenderingMenu() {
+        val oldForceRenderingTicker = browserViewState().forceRenderingTicker
+
+        testee.onConfigurationChanged()
+
+        assertTrue(oldForceRenderingTicker != browserViewState().forceRenderingTicker)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserSubmittedQueryThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserNavigatesHomeThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+
+        testee.onUserPressedBack()
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndUserLoadedUrlThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        loadUrl("https://test.com")
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenShouldShowVoiceSearchAndOmnibarInputStateChangedThenUpdateOmnibarViewStateToShowVoiceSearchTrue() {
+        whenever(voiceSearchAvailability.shouldShowVoiceSearch(anyBoolean(), anyString())).thenReturn(true)
+
+        testee.onOmnibarInputStateChanged("www.fb.com", true, hasQueryChanged = false)
+
+        assertTrue(omnibarViewState().showVoiceSearch)
+    }
+
+    @Test
+    fun whenInitializedAndVoiceSearchNotSupportedThenDontLogVoiceSearch() {
+        verify(voiceSearchPixelLogger, never()).log()
+    }
+
+    @Test
     fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
         assertFalse(testee.linkOpenedInNewTab())
         testee.onMessageReceived()
@@ -4085,6 +4181,10 @@ class BrowserTabViewModelTest {
 
     private fun setBrowserShowing(isBrowsing: Boolean) {
         testee.browserViewState.value = browserViewState().copy(browserShowing = isBrowsing)
+    }
+
+    private fun setDesktopBrowsingMode(desktopBrowsingMode: Boolean) {
+        testee.browserViewState.value = browserViewState().copy(isDesktopBrowsingMode = desktopBrowsingMode)
     }
 
     private fun setCta(cta: Cta) {

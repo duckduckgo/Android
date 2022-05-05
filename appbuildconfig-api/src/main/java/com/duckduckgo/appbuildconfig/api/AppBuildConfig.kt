@@ -37,3 +37,9 @@ enum class BuildFlavor {
     FDROID,
     PLAY
 }
+
+/**
+ * Convenience extension function
+ * @return `true` when the current build flavor is INTERNAL, `false` otherwise
+ */
+fun AppBuildConfig.isInternalBuild(): Boolean = flavor == BuildFlavor.INTERNAL

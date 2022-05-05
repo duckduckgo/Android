@@ -23,7 +23,9 @@
             android:theme="@style/AppTheme"
             android:name=".themepreview.ui.AppComponentsActivity"
             android:exported="true" />
-
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

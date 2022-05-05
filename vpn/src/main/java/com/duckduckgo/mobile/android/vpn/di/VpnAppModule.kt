@@ -19,24 +19,36 @@ package com.duckduckgo.mobile.android.vpn.di
 import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
+import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.remote_config.*
 import com.duckduckgo.mobile.android.vpn.store.AppHealthDatabase
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabaseCallbackProvider
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.mobile.android.vpn.trackers.RealAppTrackerRepository
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import javax.inject.Provider
 
 @Module
 @ContributesTo(AppScope::class)
-class VpnAppModule {
+object VpnAppModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun providesConnectivityManager(context: Context): ConnectivityManager {
         return context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
+
+    @Provides
+    fun provideVpnDatabaseCallbackProvider(
+        context: Context,
+        vpnDatabase: Provider<VpnDatabase>
+    ): VpnDatabaseCallbackProvider {
+        return VpnDatabaseCallbackProvider(context, vpnDatabase)
     }
 
     /**
@@ -45,14 +57,28 @@ class VpnAppModule {
      */
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun bindVpnDatabase(context: Context): VpnDatabase {
-        return VpnDatabase.getInstance(context)
+    fun bindVpnDatabase(
+        context: Context,
+        vpnDatabaseCallbackProvider: VpnDatabaseCallbackProvider
+    ): VpnDatabase {
+        return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
+            .enableMultiInstanceInvalidation()
+            .fallbackToDestructiveMigrationFrom(*IntRange(1, 17).toList().toIntArray())
+            .addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray())
+            .addCallback(vpnDatabaseCallbackProvider.provideCallbacks())
+            .build()
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun provideAppHealthDatabase(context: Context): AppHealthDatabase {
         return AppHealthDatabase.create(context)
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideVpnRemoveConfigDatabase(context: Context): VpnRemoteConfigDatabase {
+        return VpnRemoteConfigDatabase.create(context)
     }
 
     @Provides

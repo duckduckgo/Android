@@ -22,7 +22,7 @@ import java.text.NumberFormat
 import javax.inject.Named
 
 @Module
-class FormatterModule {
+object FormatterModule {
 
     @Provides
     @Named("numberFormatterWithSeparator")

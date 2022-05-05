@@ -30,6 +30,7 @@ import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
@@ -55,7 +56,7 @@ class BrowserWebViewClient(
     private val requestInterceptor: RequestInterceptor,
     private val offlinePixelCountDataStore: OfflinePixelCountDataStore,
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
-    private val cookieManager: CookieManager,
+    private val cookieManagerProvider: CookieManagerProvider,
     private val loginDetector: DOMLoginDetector,
     private val dosDetector: DosDetector,
     private val gpc: Gpc,
@@ -286,7 +287,7 @@ class BrowserWebViewClient(
 
     private fun flushCookies() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            cookieManager.flush()
+            cookieManagerProvider.get().flush()
         }
     }
 

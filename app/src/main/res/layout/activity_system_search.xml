@@ -86,7 +86,7 @@
                         android:textSize="16sp"
                         android:textStyle="normal"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/clearTextButton"
+                        app:layout_constraintEnd_toStartOf="@id/voiceSearchButton"
                         app:layout_constraintStart_toEndOf="@id/logo"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="https://duckduckgo.com/?q=areallylongexampleexample">
@@ -94,6 +94,17 @@
                         <requestFocus />
 
                     </androidx.appcompat.widget.AppCompatEditText>
+
+                    <com.duckduckgo.mobile.android.ui.view.IconButton
+                        android:id="@+id/voiceSearchButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/voiceSearchIconContentDescription"
+                        android:padding="@dimen/keyline_2"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/clearTextButton"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_microphone"/>
 
                     <ImageView
                         android:id="@+id/clearTextButton"

@@ -19,30 +19,28 @@ package com.duckduckgo.app.privacy.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
-import com.duckduckgo.app.global.plugins.view_model.ViewModelFactoryPlugin
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.UNKNOWN
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.ContentBlocking
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Provider
 
+@ContributesViewModel(ActivityScope::class)
 class ScorecardViewModel @Inject constructor(
     private val tabRepository: TabRepository,
     private val userWhitelistDao: UserWhitelistDao,
     private val contentBlocking: ContentBlocking,
-    private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
+    private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
     data class ViewState(
@@ -93,19 +91,5 @@ class ScorecardViewModel @Inject constructor(
             showEnhancedGrade = grade != improvedGrade,
             isSiteInTempAllowedList = isSiteAContentBlockingException
         )
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class ScorecardViewModelFactory @Inject constructor(
-    private val viewModel: Provider<ScorecardViewModel>
-) : ViewModelFactoryPlugin {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T? {
-        with(modelClass) {
-            return when {
-                isAssignableFrom(ScorecardViewModel::class.java) -> viewModel.get() as T
-                else -> null
-            }
-        }
     }
 }

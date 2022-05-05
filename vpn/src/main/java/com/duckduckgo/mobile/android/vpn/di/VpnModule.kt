@@ -40,7 +40,7 @@ import javax.inject.Named
 
 @Module
 @ContributesTo(VpnScope::class)
-class VpnModule {
+object VpnModule {
 
     @Provides
     @SingleInstanceIn(VpnScope::class)
