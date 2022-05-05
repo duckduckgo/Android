@@ -769,9 +769,9 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didOpenManageRecentAppSettings() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
     }
 
     override fun reportLoopbackDnsError() {

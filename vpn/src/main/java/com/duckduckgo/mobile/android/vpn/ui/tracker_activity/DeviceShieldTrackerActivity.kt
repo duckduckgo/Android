@@ -302,15 +302,6 @@ class DeviceShieldTrackerActivity :
         openVPNSettings()
     }
 
-    override fun onVpnConflictDialogContinue() {
-        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
-        checkVPNPermission()
-    }
-
-    override fun OnRemoveFeatureDialogCancel() {
-        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
-    }
-
     override fun onPromoteAlwaysOnGoToVPNSettings() {
         viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
     }
@@ -321,16 +312,25 @@ class DeviceShieldTrackerActivity :
         startActivity(intent)
     }
 
+    override fun onVpnConflictDialogContinue() {
+        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
+        checkVPNPermission()
+    }
+
+    override fun OnRemoveFeatureDialogCancel() {
+        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+    }
+
+    override fun onRemoveFeature() {
+        viewModel.removeFeature()
+    }
+
     override fun onPromoteAlwaysOnRemindLater() {
         viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnRemindLater)
     }
 
     override fun onPromoteAlwaysOnForget() {
         viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
-    }
-
-    override fun onRemoveFeature() {
-        viewModel.removeFeature()
     }
 
     private fun launchBetaInstructions() {

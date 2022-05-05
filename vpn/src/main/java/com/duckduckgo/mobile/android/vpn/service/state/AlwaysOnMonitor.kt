@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.service.state
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -24,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -38,15 +40,20 @@ class AlwaysOnMonitor @Inject constructor(
     private val vpnService: Provider<TrackerBlockingVpnService>
 ) : VpnServiceCallbacks {
 
+    @SuppressLint("NewApi") // IDE doesn't get we use appBuildConfig
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         // this works for 85% of our users as of April 2022
         if (appBuildConfig.sdkInt >= 29) {
             try {
                 val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
                 Timber.i("AlwaysOnMonitor, Always On Enabled: $isAlwaysOnEnabled")
-                vpnStore.setAlwaysOn(isAlwaysOnEnabled)
+                coroutineScope.launch {
+                    vpnStore.setAlwaysOn(isAlwaysOnEnabled)
+                }
             } catch (e: Exception) {
-                vpnStore.setAlwaysOn(false)
+                coroutineScope.launch {
+                    vpnStore.setAlwaysOn(false)
+                }
             }
         }
     }
