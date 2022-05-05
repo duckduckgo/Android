@@ -16,8 +16,11 @@
 
 package com.duckduckgo.app.email.ui
 
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.di.scopes.FragmentScope
 
+@InjectWith(FragmentScope::class)
 class EmailProtectionNotSupportedFragment : EmailProtectionFragment(R.layout.fragment_email_protection_not_supported) {
     companion object {
         fun instance(): EmailProtectionNotSupportedFragment {

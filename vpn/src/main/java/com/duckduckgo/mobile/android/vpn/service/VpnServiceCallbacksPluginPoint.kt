@@ -16,40 +16,12 @@
 
 package com.duckduckgo.mobile.android.vpn.service
 
-import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.di.DaggerSet
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.Multibinds
 
-private class VpnServiceCallbacksPluginPoint(
-    private val plugins: DaggerSet<VpnServiceCallbacks>
-) : PluginPoint<VpnServiceCallbacks> {
-    override fun getPlugins(): Collection<VpnServiceCallbacks> {
-        // not that it matters but sorting adds predictability here
-        return plugins.sortedBy { it.javaClass.simpleName }
-    }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class VpnServiceCallbacksProviderModule {
-    @Multibinds
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun provideVpnServiceCallbacksPlugins(): DaggerSet<VpnServiceCallbacks>
-
-    @Module
-    @ContributesTo(VpnScope::class)
-    object VpnServiceCallbacksProviderModuleExt {
-        @Provides
-        @SingleInstanceIn(VpnScope::class)
-        fun bindVpnServiceCallbacksPluginPoint(
-            plugins: DaggerSet<VpnServiceCallbacks>
-        ): PluginPoint<VpnServiceCallbacks> {
-            return VpnServiceCallbacksPluginPoint(plugins)
-        }
-    }
-}
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = VpnServiceCallbacks::class
+)
+@Suppress("unused")
+interface VpnServiceCallbacksPluginPoint

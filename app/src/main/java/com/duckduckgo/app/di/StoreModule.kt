@@ -60,7 +60,7 @@ abstract class StoreModule {
     abstract fun bindTermsOfServiceStore(termsOfServiceStore: TermsOfServiceRawStore): TermsOfServiceStore
 
     @Binds
-    abstract fun bindTabReposistory(tabRepository: TabDataRepository): TabRepository
+    abstract fun bindTabRepository(tabRepository: TabDataRepository): TabRepository
 
     @Binds
     abstract fun bindAppInstallStore(store: AppInstallSharedPreferences): AppInstallStore

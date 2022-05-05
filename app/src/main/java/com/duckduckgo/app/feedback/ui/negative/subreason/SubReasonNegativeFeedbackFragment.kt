@@ -19,6 +19,7 @@ package com.duckduckgo.app.feedback.ui.negative.subreason
 import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeDisambiguationSubReasonBinding
 import com.duckduckgo.app.feedback.ui.common.FeedbackFragment
@@ -28,9 +29,11 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.*
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay
 import com.duckduckgo.app.feedback.ui.negative.FeedbackTypeDisplay.FeedbackTypeSubReasonDisplay
 import com.duckduckgo.app.feedback.ui.negative.displayText
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import timber.log.Timber
 
+@InjectWith(FragmentScope::class)
 class SubReasonNegativeFeedbackFragment : FeedbackFragment(R.layout.content_feedback_negative_disambiguation_sub_reason) {
 
     private lateinit var recyclerAdapter: SubReasonAdapter

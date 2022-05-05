@@ -19,7 +19,7 @@ package com.duckduckgo.app.fire
 import android.database.DatabaseErrorHandler
 import android.database.DefaultDatabaseErrorHandler
 import android.database.sqlite.SQLiteDatabase
-import android.webkit.CookieManager
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.ExceptionPixel
@@ -34,10 +34,10 @@ interface CookieRemover {
     suspend fun removeCookies(): Boolean
 }
 
-class CookieManagerRemover(private val cookieManager: CookieManager) : CookieRemover {
+class CookieManagerRemover(private val cookieManagerProvider: CookieManagerProvider) : CookieRemover {
     override suspend fun removeCookies(): Boolean {
         suspendCoroutine<Unit> { continuation ->
-            cookieManager.removeAllCookies {
+            cookieManagerProvider.get().removeAllCookies {
                 Timber.v("All cookies removed; restoring DDG cookies")
                 continuation.resume(Unit)
             }

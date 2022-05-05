@@ -21,13 +21,11 @@ import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.AppUrl
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.plugins.PrivacyFeaturePluginPoint
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -91,12 +89,6 @@ object NetworkModule {
             .build()
 
         return retrofit.create(PrivacyConfigService::class.java)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePrivacyFeaturePluginPoint(customConfigs: DaggerSet<PrivacyFeaturePlugin>): PluginPoint<PrivacyFeaturePlugin> {
-        return PrivacyFeaturePluginPoint(customConfigs)
     }
 }
 

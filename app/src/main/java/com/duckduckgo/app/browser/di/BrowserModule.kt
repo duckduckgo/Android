@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.di
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.webkit.CookieManager
 import androidx.lifecycle.LifecycleObserver
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
@@ -27,6 +26,8 @@ import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
+import com.duckduckgo.app.browser.cookies.CookieManagerProvider
+import com.duckduckgo.app.browser.cookies.DefaultCookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
@@ -76,6 +77,11 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.impl.AndroidFileDownloader
+import com.duckduckgo.downloads.impl.DataUriDownloader
+import com.duckduckgo.downloads.impl.DownloadFileService
+import com.duckduckgo.downloads.impl.NetworkFileDownloader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -110,7 +116,7 @@ class BrowserModule {
         requestInterceptor: RequestInterceptor,
         offlinePixelCountDataStore: OfflinePixelCountDataStore,
         uncaughtExceptionRepository: UncaughtExceptionRepository,
-        cookieManager: CookieManager,
+        cookieManagerProvider: CookieManagerProvider,
         loginDetector: DOMLoginDetector,
         dosDetector: DosDetector,
         gpc: Gpc,
@@ -129,7 +135,7 @@ class BrowserModule {
             requestInterceptor,
             offlinePixelCountDataStore,
             uncaughtExceptionRepository,
-            cookieManager,
+            cookieManagerProvider,
             loginDetector,
             dosDetector,
             gpc,
@@ -147,7 +153,7 @@ class BrowserModule {
         webViewHttpAuthStore: WebViewHttpAuthStore,
         trustedCertificateStore: TrustedCertificateStore,
         requestInterceptor: RequestInterceptor,
-        cookieManager: CookieManager,
+        cookieManagerProvider: CookieManagerProvider,
         gpc: Gpc,
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -158,7 +164,7 @@ class BrowserModule {
             webViewHttpAuthStore,
             trustedCertificateStore,
             requestInterceptor,
-            cookieManager,
+            cookieManagerProvider,
             gpc,
             thirdPartyCookieManager,
             appCoroutineScope,
@@ -249,11 +255,11 @@ class BrowserModule {
 
     @Provides
     fun cookieManager(
-        cookieManager: CookieManager,
+        cookieManagerProvider: CookieManagerProvider,
         removeCookies: RemoveCookies,
         dispatcherProvider: DispatcherProvider
     ): DuckDuckGoCookieManager {
-        return WebViewCookieManager(cookieManager, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
+        return WebViewCookieManager(cookieManagerProvider, AppUrl.Url.COOKIES, removeCookies, dispatcherProvider)
     }
 
     @Provides
@@ -291,15 +297,15 @@ class BrowserModule {
 
     @Provides
     fun cookieManagerRemover(
-        cookieManager: CookieManager
+        cookieManagerProvider: CookieManagerProvider
     ): CookieManagerRemover {
-        return CookieManagerRemover(cookieManager)
+        return CookieManagerRemover(cookieManagerProvider)
     }
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun webViewCookieManager(): CookieManager {
-        return CookieManager.getInstance()
+    fun webViewCookieManagerProvider(): CookieManagerProvider {
+        return DefaultCookieManagerProvider()
     }
 
     @SingleInstanceIn(AppScope::class)
@@ -356,7 +362,9 @@ class BrowserModule {
     }
 
     @Provides
-    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(DownloadFileService::class.java)
+    fun downloadFileService(@Named("api") retrofit: Retrofit): DownloadFileService = retrofit.create(
+        DownloadFileService::class.java
+    )
 
     @Provides
     fun fileDownloader(
@@ -388,10 +396,10 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun thirdPartyCookieManager(
-        cookieManager: CookieManager,
+        cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManager, authCookiesAllowedDomainsRepository)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
     }
 
     @Provides

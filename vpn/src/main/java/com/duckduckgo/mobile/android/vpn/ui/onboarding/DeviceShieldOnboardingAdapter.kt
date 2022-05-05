@@ -23,11 +23,15 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieCompositionFactory
+import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
 
-class DeviceShieldOnboardingAdapter(val pages: List<DeviceShieldOnboardingViewModel.OnboardingPage>) : RecyclerView.Adapter<PageViewHolder>() {
+class DeviceShieldOnboardingAdapter(
+    private val pages: List<VpnOnboardingViewModel.OnboardingPage>,
+    private val clickListener: () -> Unit
+) : RecyclerView.Adapter<PageViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -40,26 +44,23 @@ class DeviceShieldOnboardingAdapter(val pages: List<DeviceShieldOnboardingViewMo
         holder: PageViewHolder,
         position: Int
     ) {
-        holder.bind(pages[position], position)
+        holder.bind(pages[position], position, clickListener)
     }
 }
 
 class PageViewHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.activity_device_shield_onboarding_page, parent, false)
+        LayoutInflater.from(parent.context).inflate(R.layout.activity_vpn_onboarding_page, parent, false)
     ) {
     private val pageTitle: TextView = itemView.findViewById(R.id.onboarding_page_title)
     private val pageText: TextView = itemView.findViewById(R.id.onboarding_page_text)
     private val onboardingHeader: ImageView = itemView.findViewById(R.id.onboarding_page_image)
     private val onboardingAnimation: LottieAnimationView = itemView.findViewById(R.id.onboarding_page_animation)
-    private val indicatorOne: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_one)
-    private val indicatorTwo: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_two)
-    private val indicatorThree: ImageView = itemView.findViewById(R.id.onboarding_active_indicator_three)
-    private val indicators: List<ImageView> = listOf(indicatorOne, indicatorTwo, indicatorThree)
 
     fun bind(
-        page: DeviceShieldOnboardingViewModel.OnboardingPage,
-        position: Int
+        page: VpnOnboardingViewModel.OnboardingPage,
+        position: Int,
+        clickListener: () -> Unit
     ) {
         pageTitle.setText(page.title)
         pageText.setText(page.text)
@@ -73,13 +74,14 @@ class PageViewHolder(parent: ViewGroup) :
             }
             2 -> {
                 showHeaderView(page.imageHeader)
+                pageText.addClickableLink("learn_more_link", pageText.context.getText(page.text)) {
+                    clickListener()
+                }
+            }
+            3 -> {
+                showAnimationView(page.imageHeader)
             }
         }
-
-        indicators.forEach { indicatorImage ->
-            indicatorImage.setImageResource(R.drawable.ic_inactive_dot)
-        }
-        indicators[position].setImageResource(R.drawable.ic_active_dot)
     }
 
     private fun showAnimationView(animation: Int) {

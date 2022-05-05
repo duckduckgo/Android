@@ -21,10 +21,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(FragmentScope::class)
 class ShareOpenEndedNegativeFeedbackViewModel @Inject constructor() : ViewModel() {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()

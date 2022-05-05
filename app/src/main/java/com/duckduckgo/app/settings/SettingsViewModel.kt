@@ -36,7 +36,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class SettingsViewModel @Inject constructor(
     private val appContext: Context,
     private val themingDataStore: ThemingDataStore,
@@ -110,7 +110,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
-        object LaunchAccessibilitySettigns : Command()
+        object LaunchAccessibilitySettings : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
         object LaunchAppIcon : Command()
@@ -216,7 +216,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAccessibilitySettingClicked() {
-        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettigns) }
+        viewModelScope.launch { command.send(Command.LaunchAccessibilitySettings) }
     }
 
     fun userRequestedToChangeTheme() {

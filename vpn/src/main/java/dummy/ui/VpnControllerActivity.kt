@@ -22,8 +22,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.mobile.android.vpn.R
@@ -32,7 +32,8 @@ import com.duckduckgo.app.global.formatters.time.model.TimePassed
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.app.global.formatters.time.model.dateOfPreviousMidnight
-import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.DataTransfer
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.stats.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
@@ -43,8 +44,8 @@ import kotlinx.coroutines.*
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
-import timber.log.Timber
 
+@InjectWith(ActivityScope::class)
 class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
 
     private lateinit var lastAppTrackerDomainTextView: TextView
@@ -88,8 +89,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         configureUiHandlers()
 
         subscribeForViewUpdates()
-
-        reconfigureTimber(viewModel.getDebugLoggingPreference())
     }
 
     private fun subscribeForViewUpdates() {
@@ -180,17 +179,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
                 uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT
             )
                 .show()
-        }
-    }
-
-    private fun reconfigureTimber(debugLoggingEnabled: Boolean) {
-        if (debugLoggingEnabled) {
-            Timber.uprootAll()
-            Timber.plant(Timber.DebugTree())
-            Timber.w("Logging Started")
-        } else {
-            Timber.w("Logging Ended")
-            Timber.uprootAll()
         }
     }
 
@@ -316,17 +304,9 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         }
     }
 
-    private sealed class VpnPermissionStatus {
-        object Granted : VpnPermissionStatus()
-        data class Denied(val intent: Intent) : VpnPermissionStatus()
-    }
-
     companion object {
         fun intent(context: Context): Intent {
             return Intent(context, VpnControllerActivity::class.java)
         }
-
-        private const val RC_REQUEST_VPN_PERMISSION = 100
-        val FEEDBACK_URL = "https://form.asana.com?k=j2t0mHOc9nMVTDqg5OHPJw&d=137249556945".toUri()
     }
 }

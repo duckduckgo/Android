@@ -27,6 +27,7 @@ import com.duckduckgo.app.httpsupgrade.HttpsUpgraderImpl
 import com.duckduckgo.app.httpsupgrade.api.HttpsFalsePositivesJsonAdapter
 import com.duckduckgo.app.httpsupgrade.store.HttpsDataPersister
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
 import com.duckduckgo.privacy.config.api.Https
@@ -50,6 +51,7 @@ class HttpsEmbeddedDataIntegrationTest {
     private var mockUserAllowlistDao: UserWhitelistDao = mock()
     private var mockFeatureToggle: FeatureToggle = mock()
     private var mockHttps: Https = mock()
+    private var mockPixel: Pixel = mock()
 
     @Before
     fun before() {
@@ -72,7 +74,7 @@ class HttpsEmbeddedDataIntegrationTest {
 
         val embeddedDataPersister = PlayHttpsEmbeddedDataPersister(persister, binaryDataStore, httpsBloomSpecDao, context, moshi)
 
-        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister)
+        val factory = HttpsBloomFilterFactoryImpl(httpsBloomSpecDao, binaryDataStore, embeddedDataPersister, persister, mockPixel)
         httpsUpgrader = HttpsUpgraderImpl(factory, httpsFalsePositivesDao, mockUserAllowlistDao, mockFeatureToggle, mockHttps)
         httpsUpgrader.reloadData()
     }

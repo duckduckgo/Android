@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity
 import com.duckduckgo.app.global.DispatcherProvider
@@ -42,10 +43,12 @@ import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_LAUNCHED
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import dagger.android.AndroidInjection
 import timber.log.Timber
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class NotificationHandlerService : IntentService("NotificationHandlerService") {
 
     @Inject

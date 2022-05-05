@@ -16,6 +16,10 @@
 
 package com.duckduckgo.app.browser.useragent
 
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
+
+@ContributesPluginPoint(AppScope::class)
 interface UserAgentInterceptor {
     fun intercept(userAgent: String): String
 }

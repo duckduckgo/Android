@@ -55,18 +55,24 @@
     <string name="favoriteAddedMessage">Favorit wurde hinzugefügt</string>
     <string name="bookmarkAddedMessage">Lesezeichen hinzugefügt</string>
     <string name="requestDesktopSiteMenuTitle">Desktop-Seite</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Feuerfest-Einstellung deaktivieren</string>
+    <string name="requestMobileSiteMenuTitle">Mobile Website</string>
+    <string name="downloadsMenuTitle">Downloads</string>
+    <string name="printMenuTitle">Seite drucken</string>
+    <string name="favoriteDeleteConfirmationMessage">Favorit wurde entfernt</string>
+    <string name="fireproofDeleteConfirmationMessage">Feuerfest-Einstellung deaktiviert</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Datenschutz aktiviert für %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Datenschutz deaktiviert für %1$s</string>
+    <string name="undoSnackbarAction">Rückgängig machen</string>
 
     <!-- Downloading files -->
     <string name="downloadImage">Bild herunterladen</string>
     <string name="permissionRequiredToDownload">Zum Herunterladen muss eine Speichererlaubnis erteilt werden</string>
-    <string name="downloadComplete">Download abgeschlossen</string>
-    <string name="downloadFailed">Download fehlgeschlagen</string>
-    <string name="downloadInProgress">Wird heruntergeladen</string>
 
     <!-- Sharing options -->
     <string name="options">Optionen</string>
     <string name="shareLink">Link teilen</string>
-    <string name="shareMenuTitle">Teilen…</string>
+    <string name="shareMenuTitle">Teilen</string>
     <string name="copyUrl">Link-Adresse kopieren</string>
 
     <!-- Find in page -->
@@ -278,7 +284,7 @@
     <string name="searchWidgetLabel">Suche</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Zur Startseite hinzufügen</string>
+    <string name="addToHome">Zum Startbildschirm hinzufügen</string>
     <string name="shortcutAddedText">%1$s wurde erfolgreich zu deinem Startbildschirm hinzugefügt.</string>
 
     <!-- User Survey -->
@@ -327,8 +333,6 @@
     <string name="noThanks">Nein, danke</string>
 
     <!-- Notification Channel Names -->
-    <string name="notificationChannelFileDownloading">Datei wird heruntergeladen</string>
-    <string name="notificationChannelFileDownloaded">Datei erfolgreich heruntergeladen</string>
     <string name="notificationChannelTutorials">Tutorials</string>
 
     <!-- Clear Notification -->
@@ -500,7 +504,7 @@
     <string name="dialogSaveAction">Speichern</string>
 
     <!-- Whitelist -->
-    <string name="whitelisetActivityTitle">Ungeschützte Websites</string>
+    <string name="whitelistActivityTitle">Ungeschützte Websites</string>
     <string name="enablePrivacyProtection">Datenschutz aktivieren</string>
     <string name="disablePrivacyProtection">Datenschutz deaktivieren</string>
     <string name="whitelistEntryOverflowContentDescription">Weitere Optionen für die ungeschützte Website %1$s</string>
@@ -516,8 +520,8 @@
     <!-- Fireproof websites -->
     <string name="fireproofWebsitesActivityTitle">Feuerfeste Seiten</string>
     <string name="settingsFireproofWebsites">Feuerfeste Seiten</string>
-    <string name="fireproofWebsiteMenuTitleAdd">Feuerfeste Seite</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ist jetzt feuerfest! Gehe auf Einstellungen, um das zu verwalten.</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Diese Website feuerfest machen</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ist jetzt feuerfest!</string>
     <string name="fireproofWebsiteSnackbarAction">Rückgängig machen</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Möchten Sie &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
     <string name="fireproofWebsiteEmptyListHint">Keine feuerfesten Websites</string>
@@ -528,7 +532,7 @@
     <string name="fireproofWebsiteLoginDialogPositive">Feuerfest machen</string>
     <string name="fireproofWebsiteLoginDialogNegative">Jetzt nicht</string>
     <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToogleText">Beim Anmelden fragen</string>
+    <string name="fireproofWebsiteToggleText">Beim Anmelden fragen</string>
     <string name="disableLoginDetectionDialogTitle">Erinnerung zur Feuerfest-Einstellung bei der Anmeldung auf Websites deaktivieren?</string>
     <string name="disableLoginDetectionDialogDescription">Diese Auswahl kann in den Einstellungen jederzeit rückgängig gemacht werden.</string>
     <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
@@ -688,9 +692,6 @@
 
     <!-- Privacy Policy -->
     <string name="settingsPrivacyPolicyDuckduckgo">Datenschutzrichtlinie</string>
-
-    <!-- Downloads -->
-    <string name="downloadsErrorMessage">Download fehlgeschlagen. Internetverbindung überprüfen.</string>
 
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widget „%1$s“ zum Startbildschirm hinzugefügt</string>

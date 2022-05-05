@@ -28,8 +28,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
 import kotlinx.android.synthetic.main.include_dax_dialog_cta.*
@@ -40,6 +43,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
+@InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment() {
 
     @Inject
@@ -146,8 +150,8 @@ class WelcomePage : OnboardingPageFragment() {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
             dialogTextCta.textInDialog = ctaText.html(it)
-            dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
-            cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
+            dialogTextCta.setTextColor(ContextCompat.getColor(it, CommonR.color.grayishBrown))
+            cardView.backgroundTintList = ContextCompat.getColorStateList(it, CommonR.color.white)
         }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }

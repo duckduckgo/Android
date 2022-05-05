@@ -24,14 +24,16 @@ import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.Command
-import com.duckduckgo.mobile.android.vpn.apps.ExcludedAppsViewModel
+import com.duckduckgo.mobile.android.vpn.apps.ManageAppsProtectionViewModel
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.ViewState
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
@@ -42,12 +44,12 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class TrackingProtectionExclusionListActivity :
     DuckDuckGoActivity(),
     ManuallyEnableAppProtectionDialog.ManuallyEnableAppsProtectionDialogListener,
@@ -63,7 +65,7 @@ class TrackingProtectionExclusionListActivity :
 
     private val binding: ActivityTrackingProtectionExclusionListBinding by viewBinding()
 
-    private val viewModel: ExcludedAppsViewModel by bindViewModel()
+    private val viewModel: ManageAppsProtectionViewModel by bindViewModel()
 
     lateinit var adapter: TrackingProtectionAppsAdapter
 
@@ -224,24 +226,16 @@ class TrackingProtectionExclusionListActivity :
         return true
     }
 
-    override fun onAppProtectionEnabled(
-        packageName: String,
-        excludingReason: Int
-    ) {
-        viewModel.onAppProtectionEnabled(packageName, excludingReason, needsPixel = true)
+    override fun onAppProtectionEnabled(packageName: String) {
+        viewModel.onAppProtectionEnabled(packageName)
     }
 
     override fun onDialogSkipped(position: Int) {
         adapter.notifyItemChanged(position)
     }
 
-    override fun onAppProtectionDisabled(
-        answer: Int,
-        appName: String,
-        packageName: String,
-        skippedReport: Boolean
-    ) {
-        viewModel.onAppProtectionDisabled(answer, appName = appName, packageName = packageName, skippedReport = skippedReport)
+    override fun onAppProtectionDisabled(appName: String, packageName: String, report: Boolean) {
+        viewModel.onAppProtectionDisabled(appName = appName, packageName = packageName, report = report)
     }
 
     private fun launchFeedback() {
@@ -253,7 +247,7 @@ class TrackingProtectionExclusionListActivity :
         private const val KEY_LIST_ENABLED = "KEY_LIST_ENABLED"
         fun intent(
             context: Context,
-            isRunning: Boolean
+            isRunning: Boolean = true
         ): Intent {
             val intent = Intent(context, TrackingProtectionExclusionListActivity::class.java)
             intent.putExtra(KEY_LIST_ENABLED, isRunning)

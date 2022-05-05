@@ -24,21 +24,23 @@ import android.os.ResultReceiver
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.CompoundButton
 import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.mobile.android.ui.view.InfoPanel
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
+import com.duckduckgo.mobile.android.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity
+import com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageContract
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityDeviceShieldActivityBinding
@@ -49,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
 import dummy.ui.VpnDiagnosticsActivity
@@ -60,11 +63,13 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@InjectWith(ActivityScope::class)
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
-    AppTPVpnConflictDialog.Listener {
+    AppTPVpnConflictDialog.Listener,
+    VpnRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
@@ -74,14 +79,7 @@ class DeviceShieldTrackerActivity :
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
-    private lateinit var trackerBlockedCountView: PastWeekTrackerActivityContentView
-
-    private lateinit var trackingAppsCountView: PastWeekTrackerActivityContentView
-    private lateinit var ctaTrackerFaq: View
-    private lateinit var deviceShieldEnabledLabel: InfoPanel
-    private lateinit var deviceShieldDisabledLabel: InfoPanel
     private lateinit var deviceShieldSwitch: SwitchCompat
-    private lateinit var ctaShowAll: View
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -119,17 +117,6 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun bindViews() {
-        trackerBlockedCountView = binding.trackersBlockedCount
-        trackingAppsCountView = binding.trackingAppsCount
-        ctaTrackerFaq = binding.ctaTrackerFaq
-        deviceShieldEnabledLabel = binding.deviceShieldTrackerLabelEnabled
-        deviceShieldDisabledLabel = binding.deviceShieldTrackerLabelDisabled
-        ctaShowAll = binding.ctaShowAll
-
-        binding.ctaExcludedApps.setOnClickListener {
-            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
-        }
-
         binding.ctaTrackerFaq.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchDeviceShieldFAQ)
         }
@@ -142,9 +129,18 @@ class DeviceShieldTrackerActivity :
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchAppTrackersFAQ)
         }
 
-        ctaShowAll.setOnClickListener {
+        binding.ctaManageProtection.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
+        }
+
+        binding.ctaRemoveFeature.setOnClickListener {
+            viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.AskToRemoveFeature)
+        }
+
+        binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
+
     }
 
     override fun onActivityResult(
@@ -160,9 +156,9 @@ class DeviceShieldTrackerActivity :
 
     override fun onTrackerListShowed(totalTrackers: Int) {
         if (totalTrackers >= MIN_ROWS_FOR_ALL_ACTIVITY) {
-            ctaShowAll.show()
+            binding.ctaShowAll.show()
         } else {
-            ctaShowAll.gone()
+            binding.ctaShowAll.gone()
         }
     }
 
@@ -220,18 +216,20 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.LaunchAppTrackersFAQ -> launchAppTrackersFAQ()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchBetaInstructions -> launchBetaInstructions()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchDeviceShieldFAQ -> launchDeviceShieldFAQ()
-            is DeviceShieldTrackerActivityViewModel.Command.LaunchExcludedApps -> launchExcludedApps(it.shouldListBeEnabled)
+            is DeviceShieldTrackerActivityViewModel.Command.LaunchManageAppsProtection -> launchManageAppsProtection()
             is DeviceShieldTrackerActivityViewModel.Command.LaunchMostRecentActivity -> launchMostRecentActivity()
-            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog -> launchDisableConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
+            is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
+            is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
         }
     }
 
-    private fun launchExcludedApps(shouldListBeEnabled: Boolean) {
-        deviceShieldPixels.didOpenExclusionListActivityFromTrackersScreen()
-        startActivity(TrackingProtectionExclusionListActivity.intent(this, shouldListBeEnabled))
+    private fun launchManageAppsProtection() {
+        deviceShieldPixels.didOpenManageRecentAppSettings()
+        startActivity(ManageRecentAppsProtectionActivity.intent(this))
     }
 
     private fun launchDeviceShieldFAQ() {
@@ -245,6 +243,15 @@ class DeviceShieldTrackerActivity :
         dialog.show(
             supportFragmentManager,
             AppTPDisableConfirmationDialog.TAG_APPTP_DISABLE_DIALOG
+        )
+    }
+
+    private fun launchRemoveFeatureConfirmationDialog() {
+        deviceShieldPixels.didShowRemoveTrackingProtectionFeatureDialog()
+        val dialog = VpnRemoveFeatureConfirmationDialog.instance(this)
+        dialog.show(
+            supportFragmentManager,
+            VpnRemoveFeatureConfirmationDialog.TAG_VPN_REMOVE_FEATURE_DIALOG
         )
     }
 
@@ -274,11 +281,11 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onDismissConflictDialog() {
-        deviceShieldPixels.didChooseToDismissVpnConflicDialog()
+        deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
     override fun onOpenSettings() {
-        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflicDialog()
+        deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
 
         val intent = Intent(Settings.ACTION_VPN_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -286,8 +293,16 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onContinue() {
-        deviceShieldPixels.didChooseToContinueFromVpnConflicDialog()
+        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
+    }
+
+    override fun onCancel() {
+        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+    }
+
+    override fun onRemoveFeature() {
+        viewModel.removeFeature()
     }
 
     private fun launchBetaInstructions() {
@@ -300,8 +315,7 @@ class DeviceShieldTrackerActivity :
     private fun checkVPNPermission() {
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
-                deviceShieldPixels.enableFromSummaryTrackerActivity()
-                startVPN()
+                viewModel.onViewEvent(StartVpn)
             }
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)
@@ -354,29 +368,29 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun updateCounts(trackerCountInfo: DeviceShieldTrackerActivityViewModel.TrackerCountInfo) {
-        trackerBlockedCountView.count = trackerCountInfo.stringTrackerCount()
-        trackerBlockedCountView.footer =
+        binding.trackersBlockedCount.count = trackerCountInfo.stringTrackerCount()
+        binding.trackersBlockedCount.footer =
             resources.getQuantityString(R.plurals.atp_ActivityPastWeekTrackerCount, trackerCountInfo.trackers.value)
 
-        trackingAppsCountView.count = trackerCountInfo.stringAppsCount()
-        trackingAppsCountView.footer =
+        binding.trackingAppsCount.count = trackerCountInfo.stringAppsCount()
+        binding.trackingAppsCount.footer =
             resources.getQuantityString(R.plurals.atp_ActivityPastWeekAppCount, trackerCountInfo.apps.value)
     }
 
     private fun updateRunningState(runningState: VpnState) {
         if (runningState.state == VpnRunningState.ENABLED) {
             Timber.d("updateRunningState enabled")
-            deviceShieldDisabledLabel.gone()
+            binding.deviceShieldTrackerLabelDisabled.gone()
 
-            deviceShieldEnabledLabel.apply {
+            binding.deviceShieldTrackerLabelEnabled.apply {
                 setClickableLink(
-                    REPORT_ISSUES_ANNOTATION,
+                    APPTP_SETTINGS_ANNOTATION,
                     getText(R.string.atp_ActivityEnabledLabel)
-                ) { launchFeedback() }
+                ) { launchManageAppsProtection() }
                 show()
             }
         } else {
-            deviceShieldEnabledLabel.gone()
+            binding.deviceShieldTrackerLabelEnabled.gone()
 
             val disabledLabel = if (runningState.stopReason == REVOKED) {
                 Timber.d("updateRunningState revoked")
@@ -385,7 +399,7 @@ class DeviceShieldTrackerActivity :
                 Timber.d("updateRunningState disabled")
                 R.string.atp_ActivityDisabledLabel
             }
-            deviceShieldDisabledLabel.apply {
+            binding.deviceShieldTrackerLabelDisabled.apply {
                 setClickableLink(
                     REPORT_ISSUES_ANNOTATION,
                     getText(disabledLabel)
@@ -405,13 +419,8 @@ class DeviceShieldTrackerActivity :
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.customDnsServer)?.let {
-            it.isChecked = viewModel.isCustomDnsServerSet()
-            it.isEnabled = !TrackerBlockingVpnService.isServiceRunning(this)
-        }
         menu.findItem(R.id.diagnosticsScreen).isVisible = appBuildConfig.isDebug
         menu.findItem(R.id.dataScreen).isVisible = appBuildConfig.isDebug
-        menu.findItem(R.id.customDnsServer).isVisible = appBuildConfig.isDebug
 
         vpnCachedState?.let { vpnState ->
             deviceShieldSwitch.quietlySetIsChecked(vpnState.state == VpnRunningState.ENABLED, enableAppTPSwitchListener)
@@ -429,11 +438,6 @@ class DeviceShieldTrackerActivity :
             R.id.diagnosticsScreen -> {
                 startActivity(VpnDiagnosticsActivity.intent(this)); true
             }
-            R.id.customDnsServer -> {
-                val enabled = !item.isChecked
-                viewModel.useCustomDnsServer(enabled)
-                true
-            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -444,6 +448,11 @@ class DeviceShieldTrackerActivity :
     }
 
     private fun launchFeedback() {
+        deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
+        reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
+    }
+
+    private fun launchAppSettings() {
         deviceShieldPixels.didSubmitReportIssuesFromTrackerActivity()
         reportBreakage.launch(ReportBreakageScreen.ListOfInstalledApps)
     }
@@ -459,7 +468,6 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 6
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
-        private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
 
         fun intent(
             context: Context,

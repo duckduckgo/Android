@@ -79,7 +79,7 @@ class UriSubdomainRemoverTest {
     }
 
     @Test
-    fun whenRemovingASubdomainWhenUnknownTldThenReturnsNonExistantTld() {
+    fun whenRemovingASubdomainWhenUnknownTldThenReturnsNonExistentTld() {
         val converted = Uri.parse("https://foo.example.nonexistent").removeSubdomain()
         assertEquals("https://example.nonexistent", converted)
     }

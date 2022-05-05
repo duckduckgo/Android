@@ -29,11 +29,11 @@ import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.isMobileSite
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.config.api.AmpLinks
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(ActivityScope::class)
 class BrokenSiteViewModel @Inject constructor(
     private val pixel: Pixel,
     private val brokenSiteSender: BrokenSiteSender,
@@ -126,7 +126,10 @@ class BrokenSiteViewModel @Inject constructor(
     }
 
     @VisibleForTesting
-    fun getBrokenSite(urlString: String, webViewVersion: String): BrokenSite {
+    fun getBrokenSite(
+        urlString: String,
+        webViewVersion: String
+    ): BrokenSite {
         val category = categories[viewValue.indexSelected]
         return BrokenSite(
             category = category.key,

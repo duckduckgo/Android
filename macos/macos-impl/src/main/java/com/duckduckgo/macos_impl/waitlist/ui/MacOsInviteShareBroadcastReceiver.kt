@@ -19,11 +19,14 @@ package com.duckduckgo.macos_impl.waitlist.ui
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.macos_impl.MacOsPixelNames.MACOS_WAITLIST_SHARE_SHARED
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
+@InjectWith(ReceiverScope::class)
 class MacOsInviteShareBroadcastReceiver : BroadcastReceiver() {
 
     @Inject

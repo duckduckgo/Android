@@ -21,11 +21,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
@@ -38,6 +40,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.website
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -231,7 +234,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
             }
         }
 
@@ -241,9 +244,8 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
         ) {
             val popupMenu = PopupMenu(layoutInflater, R.layout.popup_window_edit_delete_menu)
             val view = popupMenu.contentView
-            popupMenu.apply {
-                onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
-            }
+            view.findViewById<TextView>(R.id.edit).gone()
+            popupMenu.onMenuItemClicked(view.findViewById(R.id.delete)) { deleteEntity(entity) }
             popupMenu.show(binding.root, anchor)
         }
 

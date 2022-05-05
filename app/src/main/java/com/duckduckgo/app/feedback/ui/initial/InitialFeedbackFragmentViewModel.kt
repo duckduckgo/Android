@@ -20,10 +20,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.feedback.ui.common.ViewState
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
-@ContributesViewModel(AppScope::class)
+@ContributesViewModel(FragmentScope::class)
 class InitialFeedbackFragmentViewModel @Inject constructor() : ViewModel() {
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()

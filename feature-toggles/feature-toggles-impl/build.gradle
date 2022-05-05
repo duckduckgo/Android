@@ -23,6 +23,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
 
     implementation project(path: ':di')
     implementation project(path: ':common')

@@ -61,7 +61,7 @@ data class TrackingProtectionAppInfo(
     val category: AppCategory = AppCategory.Undefined,
     val isExcluded: Boolean = false,
     val knownProblem: Int,
-    val userModifed: Boolean
+    val userModified: Boolean
 ) {
     companion object {
         const val NO_ISSUES = 0

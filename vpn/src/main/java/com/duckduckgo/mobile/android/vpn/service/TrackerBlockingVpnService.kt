@@ -24,9 +24,12 @@ import android.net.VpnService
 import android.os.*
 import android.system.OsConstants.AF_INET6
 import androidx.core.content.ContextCompat
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.extensions.getPrivateDnsServerName
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
@@ -44,7 +47,7 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldEnabledNoti
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationFactory
 import com.duckduckgo.mobile.android.vpn.ui.notification.OngoingNotificationPressedHandler
 import dagger.android.AndroidInjection
-import dummy.ui.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.Inet4Address
@@ -55,6 +58,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
+@InjectWith(VpnScope::class)
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
 
     @Inject
@@ -256,15 +260,22 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
             setMtu(16_384)
             configureMeteredConnection()
 
-            if (vpnPreferences.isCustomDnsServerSet()) {
-                addDnsServer("1.1.1.1").also { Timber.i("Using custom DNS server (1.1.1.1)") }
-            }
-
             // Set DNS
-            getDns().forEach {
-                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || it is Inet4Address) {
-                    Timber.v("Adding DNS $it")
-                    addDnsServer(it)
+            getDns().forEach { addr ->
+                if (appTpFeatureConfig.isEnabled(AppTpSetting.Ipv6Support) || addr is Inet4Address) {
+                    Timber.v("Adding DNS $addr")
+                    runCatching {
+                        addDnsServer(addr)
+                    }.onFailure { t ->
+                        Timber.e(t, "Error setting DNS $addr")
+                        if (addr.isLoopbackAddress) {
+                            deviceShieldPixels.reportLoopbackDnsError()
+                        } else if (addr.isAnyLocalAddress) {
+                            deviceShieldPixels.reportAnylocalDnsError()
+                        } else {
+                            deviceShieldPixels.reportGeneralDnsError()
+                        }
+                    }
                 }
             }
 
@@ -312,12 +323,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         }
 
         // Android Private DNS (added by the user)
-        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport)) {
-            vpnPreferences.privateDns?.let { privateDnsName ->
-                runCatching {
-                    InetAddress.getAllByName(privateDnsName)
-                }.getOrNull()?.run { dns.addAll(this) }
-            }
+        if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled) {
+            runCatching {
+                InetAddress.getAllByName(applicationContext.getPrivateDnsServerName())
+            }.getOrNull()?.run { dns.addAll(this) }
         }
 
         // This is purely internal, never to go to production

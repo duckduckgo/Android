@@ -19,11 +19,14 @@ package com.duckduckgo.app.browser.rating.ui
 import android.app.Dialog
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.dialog.BackKeyListener
 import com.duckduckgo.app.global.rating.PromptCount
 import com.duckduckgo.app.pixels.AppPixelName.*
+import com.duckduckgo.di.scopes.FragmentScope
 
+@InjectWith(FragmentScope::class)
 class GiveFeedbackDialogFragment : EnjoymentDialog() {
 
     interface Listener {

@@ -45,6 +45,15 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }
 
+    fun determineHealthVpnConnectivity(connectivityEvents: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("vpn-no-connectivity-events", rawMetrics)
+
+        rawMetrics["events"] = Metric(connectivityEvents.toString(), badHealthIf { connectivityEvents >= 2 }, isCritical = true)
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
     fun determineHealthSocketChannelReadExceptions(readExceptions: Long): HealthState {
         val rawMetrics = mutableMapOf<String, Metric>()
         val metricSummary = RawMetricsSubmission("socket-readExceptions", rawMetrics)
@@ -68,6 +77,15 @@ class HealthClassifier @Inject constructor(val applicationContext: Context) {
         val metricSummary = RawMetricsSubmission("socket-connectExceptions", rawMetrics)
 
         rawMetrics["numberExceptions"] = Metric(connectExceptions.toString(), badHealthIf { connectExceptions >= 20 })
+
+        return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
+    }
+
+    fun determineHealthTunReadExceptions(numberExceptions: Long): HealthState {
+        val rawMetrics = mutableMapOf<String, Metric>()
+        val metricSummary = RawMetricsSubmission("tun-ioReadExceptions", rawMetrics)
+
+        rawMetrics["numberExceptions"] = Metric(numberExceptions.toString(), badHealthIf { numberExceptions >= 1 })
 
         return if (metricSummary.isInBadHealth()) BadHealth(metricSummary) else GoodHealth(metricSummary)
     }

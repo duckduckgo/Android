@@ -23,14 +23,17 @@ import android.content.Intent
 import android.os.Bundle
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityFireAnimationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.settings.clear.FireAnimation
+import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
+@InjectWith(ActivityScope::class)
 class FireAnimationActivity : DuckDuckGoActivity() {
 
     private val binding: ActivityFireAnimationBinding by viewBinding()

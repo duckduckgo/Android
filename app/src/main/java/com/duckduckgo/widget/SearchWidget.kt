@@ -47,6 +47,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
     @Inject
     lateinit var widgetCapabilities: AppWidgetCapabilities
 
+    @Inject
+    lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+
     override fun onReceive(
         context: Context,
         intent: Intent?
@@ -106,6 +109,8 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget) : AppWidgetP
         val views = RemoteViews(context.packageName, layoutId)
         views.setViewVisibility(R.id.searchInputBox, if (shouldShowHint) View.VISIBLE else View.INVISIBLE)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
+
+        voiceSearchWidgetConfigurator.configureVoiceSearch(context, views, false)
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 

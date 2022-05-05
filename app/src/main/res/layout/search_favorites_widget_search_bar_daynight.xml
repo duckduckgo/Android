@@ -33,6 +33,12 @@
         android:textColor="@color/searchWidgetSearchBarHintColor" />
 
     <ImageView
+        android:id="@+id/voiceSearch"
+        style="@style/SearchWidgetSearchIcon"
+        android:src="@drawable/ic_microphone_widget_daynight"
+        android:visibility="gone"/>
+
+    <ImageView
         android:id="@+id/search"
         style="@style/SearchWidgetSearchIcon"
         android:src="@drawable/ic_loupe_24dp_daynight" />
