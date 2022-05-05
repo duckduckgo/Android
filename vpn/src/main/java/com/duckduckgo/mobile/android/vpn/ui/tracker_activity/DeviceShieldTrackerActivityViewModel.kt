@@ -104,9 +104,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     fun onVPNPermissionResult(resultCode: Int) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                viewModelScope.launch {
-                    launchVpn()
-                }
+                launchVpn()
                 return
             }
             else -> {
