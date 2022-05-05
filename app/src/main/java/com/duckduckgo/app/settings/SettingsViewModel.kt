@@ -32,6 +32,7 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelName
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_ANIMATION
@@ -268,14 +269,22 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onAppTPSettingClicked() {
-        if (atpRepository.getState() == WaitlistState.InBeta) {
+        if (variantManager.isVPNRetentionStudyEnabled()) {
             if (vpnStore.didShowOnboarding()) {
                 viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
             } else {
                 viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
             }
         } else {
-            viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
+            if (atpRepository.getState() == WaitlistState.InBeta) {
+                if (vpnStore.didShowOnboarding()) {
+                    viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
+                } else {
+                    viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }
+                }
+            } else {
+                viewModelScope.launch { command.send(Command.LaunchAppTPWaitlist) }
+            }
         }
     }
 
