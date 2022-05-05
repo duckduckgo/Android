@@ -186,7 +186,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_UNIQUE("m_atp_imp_manage_recent_app_settings_activity_u"),
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY("m_atp_imp_manage_recent_app_settings_activity_d"),
-    ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_("m_atp_imp_manage_recent_app_settings_activity_c"),
+    ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY("m_atp_ev_exclusion_list_activity_open_apps_u"),
 
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_UNIQUE("m_atp_imp_remove_tracking_protection_feature_dialog_u"),
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_DAILY("m_atp_imp_remove_tracking_protection_feature_dialog_d"),
