@@ -16,11 +16,11 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.duckduckgo.app">
+    package="com.duckduckgo.app.test">
 
     <instrumentation
         android:name="androidx.test.runner.AndroidJUnitRunner"
-        android:targetPackage="com.duckduckgo.app"
+        android:targetPackage="com.duckduckgo.app.test"
         android:label="Test for common"
         />
 

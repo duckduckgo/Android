@@ -25,7 +25,7 @@ import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.brokensite.BrokenSiteData
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityPrivacyDashboardBinding
 import com.duckduckgo.app.browser.databinding.ContentPrivacyDashboardBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -221,7 +221,7 @@ class PrivacyDashboardActivity : DuckDuckGoActivity() {
         enabled: Boolean,
         isSiteIntTempAllowedList: Boolean
     ) {
-        val backgroundColor = if (enabled && !isSiteIntTempAllowedList) R.color.midGreen else R.color.warmerGray
+        val backgroundColor = if (enabled && !isSiteIntTempAllowedList) CommonR.color.midGreen else CommonR.color.warmerGray
         contentPrivacyDashboard.privacyToggleContainer.setBackgroundColor(ContextCompat.getColor(this, backgroundColor))
         contentPrivacyDashboard.privacyToggle.quietlySetIsChecked(enabled && !isSiteIntTempAllowedList, privacyToggleListener)
         contentPrivacyDashboard.privacyToggle.isEnabled = !isSiteIntTempAllowedList
