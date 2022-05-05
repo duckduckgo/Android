@@ -18,8 +18,13 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.content.Context
 import androidx.core.content.edit
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,7 +37,7 @@ interface VpnStore {
     fun getAppTPManuallyEnables(): Int
     fun onForgetPromoteAlwaysOn()
     fun userAllowsShowPromoteAlwaysOn(): Boolean
-    fun setAlwaysOn(enabled: Boolean)
+    suspend fun setAlwaysOn(enabled: Boolean)
     fun isAlwaysOnEnabled(): Boolean
 
     companion object {
@@ -42,9 +47,12 @@ interface VpnStore {
 
 @ContributesBinding(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
-    context: Context
+    context: Context,
+    vpnDatabase: VpnDatabase,
+    private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
     private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_MULTI_PROCESS)
+    private val vpnDatabasePreferences = vpnDatabase.vpnPreferencesDao()
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
@@ -79,12 +87,15 @@ class SharedPreferencesVpnStore @Inject constructor(
         return preferences.getBoolean(KEY_PROMOTE_ALWAYS_ON_DIALOG_ALLOWED, true)
     }
 
-    override fun setAlwaysOn(enabled: Boolean) {
-        preferences.edit(commit = true) { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
+    override suspend fun setAlwaysOn(enabled: Boolean) = withContext(dispatcherProvider.io()) {
+        vpnDatabasePreferences.insert(VpnPreferences(KEY_ALWAYS_ON_MODE_ENABLED, enabled))
     }
 
     override fun isAlwaysOnEnabled(): Boolean {
-        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
+        // This is awful I know, but we've done it in other places
+        return runBlocking(dispatcherProvider.io()) {
+            vpnDatabasePreferences.getPreference(KEY_ALWAYS_ON_MODE_ENABLED)?.value ?: false
+        }
     }
 
     companion object {

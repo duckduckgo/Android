@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
@@ -46,9 +47,13 @@ class AlwaysOnMonitor @Inject constructor(
             try {
                 val isAlwaysOnEnabled = vpnService.get().isAlwaysOn
                 Timber.i("AlwaysOnMonitor, Always On Enabled: $isAlwaysOnEnabled")
-                vpnStore.setAlwaysOn(isAlwaysOnEnabled)
+                coroutineScope.launch {
+                    vpnStore.setAlwaysOn(isAlwaysOnEnabled)
+                }
             } catch (e: Exception) {
-                vpnStore.setAlwaysOn(false)
+                coroutineScope.launch {
+                    vpnStore.setAlwaysOn(false)
+                }
             }
         }
     }
