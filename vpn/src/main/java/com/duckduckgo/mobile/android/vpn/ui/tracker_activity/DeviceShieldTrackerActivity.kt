@@ -311,10 +311,6 @@ class DeviceShieldTrackerActivity :
         deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
     }
 
-    override fun onRemoveFeature() {
-        viewModel.removeFeature()
-    }
-
     override fun onPromoteAlwaysOnGoToVPNSettings() {
         viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
     }
@@ -331,10 +327,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onPromoteAlwaysOnForget() {
         viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
-    }
-
-    override fun onCancel() {
-        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
     }
 
     override fun onRemoveFeature() {

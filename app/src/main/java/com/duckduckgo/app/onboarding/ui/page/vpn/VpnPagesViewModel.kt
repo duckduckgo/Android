@@ -40,7 +40,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -53,7 +53,7 @@ class VpnPagesViewModel @Inject constructor(
     private val pixel: Pixel,
     private val vpnPixels: DeviceShieldPixels,
     private val vpnDetector: VpnDetector,
-    private val vpnStore: DeviceShieldOnboardingStore
+    private val vpnStore: VpnStore
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)

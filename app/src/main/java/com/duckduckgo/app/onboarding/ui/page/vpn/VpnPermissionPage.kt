@@ -181,18 +181,6 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
         onContinuePressed()
     }
 
-    override fun onDismissConflictDialog() {
-        viewModel.onAction(DismissVpnConflictDialog)
-    }
-
-    override fun onOpenSettings() {
-        viewModel.onAction(OpenSettingVpnConflictDialog)
-    }
-
-    override fun onContinue() {
-        viewModel.onAction(ContinueVpnConflictDialog)
-    }
-
     @Suppress("DEPRECATION")
     private fun obtainVpnRequestPermission(intent: Intent) {
         startActivityForResult(intent, REQUEST_ASK_VPN_PERMISSION)
@@ -200,5 +188,17 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+    }
+
+    override fun onVpnConflictDialogDismiss() {
+        viewModel.onAction(DismissVpnConflictDialog)
+    }
+
+    override fun onVpnConflictDialogGoToSettings() {
+        viewModel.onAction(OpenSettingVpnConflictDialog)
+    }
+
+    override fun onVpnConflictDialogContinue() {
+        viewModel.onAction(ContinueVpnConflictDialog)
     }
 }

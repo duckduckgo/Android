@@ -101,12 +101,6 @@
     <!-- App Tracking Protection Privacy Report -->
     <string name="atp_PrivacyReportEnabledTooltip">App Tracking Protection is enabled and blocking trackers across your whole device</string>
 
-    <!-- Settings -->
-    <string name="atp_SettingsTitle">App Tracking Protection</string>
-    <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
-    <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
-    <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
-
     <!-- App Tracking Protection Onboarding -->
     <string name="atp_OnboardingLogoDescription">Enable App Tracking Protection</string>
     <string name="atp_OnboardingLastPageOneTitle">One easy step for better app privacy!</string>
