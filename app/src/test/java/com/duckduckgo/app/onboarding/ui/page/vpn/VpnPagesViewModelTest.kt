@@ -40,7 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -59,7 +59,7 @@ class VpnPagesViewModelTest {
     private val pixel = mock<Pixel>()
     private val vpnPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
-    private val vpnStore = mock<DeviceShieldOnboardingStore>()
+    private val vpnStore = mock<VpnStore>()
 
     private lateinit var testee: VpnPagesViewModel
 
