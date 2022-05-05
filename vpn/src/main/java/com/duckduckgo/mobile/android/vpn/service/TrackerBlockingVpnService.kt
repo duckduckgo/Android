@@ -236,6 +236,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         Intent(applicationContext, VpnStateMonitorService::class.java).also {
             bindService(it, vpnStateServiceConnection, Context.BIND_AUTO_CREATE)
         }
+
     }
 
     private suspend fun establishVpnInterface() {

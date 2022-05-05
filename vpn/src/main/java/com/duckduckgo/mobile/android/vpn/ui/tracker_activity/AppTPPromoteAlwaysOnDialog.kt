@@ -23,11 +23,12 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.vpn.R
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class VpnRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
+class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun OnRemoveFeatureDialogCancel()
-        fun onRemoveFeature()
+        fun onPromoteAlwaysOnGoToVPNSettings()
+        fun onPromoteAlwaysOnRemindLater()
+        fun onPromoteAlwaysOnForget()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,10 +38,11 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_remove_feature_confirm_disable, null)
+        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_promote_always_on, null)
 
-        val cancelCta = rootView.findViewById<Button>(R.id.vpnFeatureRemoveDialogCancel)
-        val removeCta = rootView.findViewById<Button>(R.id.vpnFeatureRemoveDialogRemove)
+        val goToSettings = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogSettings)
+        val remindLater = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogLater)
+        val forget = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogForget)
 
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
@@ -50,30 +52,36 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
 
         isCancelable = false
 
-        configureListeners(cancelCta, removeCta)
+        configureListeners(goToSettings, remindLater, forget)
 
         return alertDialog.create()
     }
 
     private fun configureListeners(
-        cancelCta: Button,
-        removeCta: Button
+        goToSettings: Button,
+        remindLater: Button,
+        forget: Button
     ) {
-        cancelCta.setOnClickListener {
+        goToSettings.setOnClickListener {
             dismiss()
-            listener.OnRemoveFeatureDialogCancel()
+            listener.onPromoteAlwaysOnGoToVPNSettings()
         }
-        removeCta.setOnClickListener {
+        remindLater.setOnClickListener {
             dismiss()
-            listener.onRemoveFeature()
+            listener.onPromoteAlwaysOnRemindLater()
+        }
+        forget.setOnClickListener {
+            dismiss()
+            listener.onPromoteAlwaysOnForget()
         }
     }
+
     companion object {
 
-        const val TAG_VPN_REMOVE_FEATURE_DIALOG = "VpnRemoveFeatureDialog"
+        const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
 
-        fun instance(listener: Listener): VpnRemoveFeatureConfirmationDialog {
-            return VpnRemoveFeatureConfirmationDialog(listener)
+        fun instance(listener: Listener): AppTPPromoteAlwaysOnDialog {
+            return AppTPPromoteAlwaysOnDialog(listener)
         }
     }
 }
