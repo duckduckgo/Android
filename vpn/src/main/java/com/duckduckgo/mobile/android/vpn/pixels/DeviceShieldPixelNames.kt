@@ -206,6 +206,16 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_REPORT_DNS_SET_ERROR("m_atp_report_dns_error_c"),
     ATP_REPORT_DNS_SET_ERROR_DAILY("m_atp_report_dns_error_d"),
 
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_UNIQUE("m_atp_imp_promote_always_on_dialog_u"),
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_imp_promote_always_on_dialog_d"),
+    ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG("m_atp_imp_promote_always_on_dialog_c"),
+    ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_settings_promote_always_on_d"),
+    ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_settings_promote_always_on_c"),
+    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_remind_later_promote_always_on_d"),
+    ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_remind_later_promote_always_on_c"),
+    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_forget_later_promote_always_on_d"),
+    ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_forget_later_promote_always_on_c"),
+
     ATP_DID_ENABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_enable_app_protection_all_c"),
     ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_enable_app_protection_detail_c"),
     ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_disable_app_protection_all_c"),

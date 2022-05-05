@@ -36,7 +36,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutDuckDuckGoActivity
 import com.duckduckgo.app.accessibility.AccessibilityActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionActivity

@@ -38,7 +38,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class VpnOnboardingViewModel @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
-    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
+    private val vpnStore: VpnStore,
     private val vpnDetector: VpnDetector,
     private val vpnStateMonitor: VpnStateMonitor,
     private val appCoroutineScope: CoroutineScope,
@@ -75,15 +75,8 @@ class VpnOnboardingViewModel @Inject constructor(
         )
     )
 
-    fun onStart() {
-        deviceShieldOnboardingStore.onboardingDidShow()
-    }
-
-    fun onClose() {
-        deviceShieldOnboardingStore.onboardingDidNotShow()
-    }
-
     fun onTurnAppTpOffOn() {
+        vpnStore.onboardingDidShow()
         if (vpnDetector.isVpnDetected()) {
             sendCommand(Command.ShowVpnConflictDialog)
         } else {

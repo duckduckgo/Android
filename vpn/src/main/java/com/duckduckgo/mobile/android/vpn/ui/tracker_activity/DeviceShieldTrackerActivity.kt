@@ -51,6 +51,7 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent.StartVpn
 import com.google.android.material.snackbar.Snackbar
 import dummy.ui.VpnControllerActivity
@@ -69,6 +70,7 @@ class DeviceShieldTrackerActivity :
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener,
     AppTPDisableConfirmationDialog.Listener,
     AppTPVpnConflictDialog.Listener,
+    AppTPPromoteAlwaysOnDialog.Listener,
     VpnRemoveFeatureConfirmationDialog.Listener {
 
     @Inject
@@ -221,9 +223,11 @@ class DeviceShieldTrackerActivity :
             is DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog -> launchDisableConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnConflictDialog -> launchVPNConflictDialog(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowVpnAlwaysOnConflictDialog -> launchVPNConflictDialog(true)
+            is DeviceShieldTrackerActivityViewModel.Command.ShowAlwaysOnPromotionDialog -> launchAlwaysOnPromotionDialog()
             is DeviceShieldTrackerActivityViewModel.Command.VPNPermissionNotGranted -> quietlyToggleAppTpSwitch(false)
             is DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog -> launchRemoveFeatureConfirmationDialog()
             is DeviceShieldTrackerActivityViewModel.Command.CloseScreen -> finish()
+            is DeviceShieldTrackerActivityViewModel.Command.OpenVpnSettings -> openVPNSettings()
         }
     }
 
@@ -265,6 +269,15 @@ class DeviceShieldTrackerActivity :
         )
     }
 
+    private fun launchAlwaysOnPromotionDialog() {
+        deviceShieldPixels.didShowDisableTrackingProtectionDialog()
+        val dialog = AppTPPromoteAlwaysOnDialog.instance(this)
+        dialog.show(
+            supportFragmentManager,
+            AppTPPromoteAlwaysOnDialog.TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG
+        )
+    }
+
     override fun onOpenAppProtection() {
         deviceShieldPixels.didChooseToDisableOneAppFromDialog()
         viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchExcludedApps)
@@ -280,21 +293,44 @@ class DeviceShieldTrackerActivity :
         deviceShieldPixels.didChooseToCancelTrackingProtectionDialog()
     }
 
-    override fun onDismissConflictDialog() {
+    override fun onVpnConflictDialogDismiss() {
         deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
-    override fun onOpenSettings() {
+    override fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
+        openVPNSettings()
+    }
 
+    override fun onVpnConflictDialogContinue() {
+        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
+        checkVPNPermission()
+    }
+
+    override fun OnRemoveFeatureDialogCancel() {
+        deviceShieldPixels.didChooseToCancelRemoveTrakcingProtectionDialog()
+    }
+
+    override fun onRemoveFeature() {
+        viewModel.removeFeature()
+    }
+
+    override fun onPromoteAlwaysOnGoToVPNSettings() {
+        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
+    }
+
+    private fun openVPNSettings() {
         val intent = Intent(Settings.ACTION_VPN_SETTINGS)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
 
-    override fun onContinue() {
-        deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
-        checkVPNPermission()
+    override fun onPromoteAlwaysOnRemindLater() {
+        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnRemindLater)
+    }
+
+    override fun onPromoteAlwaysOnForget() {
+        viewModel.onViewEvent(ViewEvent.PromoteAlwaysOnForget)
     }
 
     override fun onCancel() {
