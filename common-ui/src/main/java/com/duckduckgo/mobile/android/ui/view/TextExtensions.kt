@@ -44,6 +44,14 @@ fun Context.getColorFromAttr(
     return typedValue.data
 }
 
+fun Context.defaultSelectableItemBackground(
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(android.R.attr.selectableItemBackground, typedValue, resolveRefs)
+    return typedValue.resourceId
+}
+
 fun TextView.addClickableLink(
     annotation: String,
     textSequence: CharSequence,

@@ -186,7 +186,22 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY("m_atp_imp_manage_recent_app_settings_activity_d"),
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_("m_atp_imp_manage_recent_app_settings_activity_c"),
 
+    ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_UNIQUE("m_atp_imp_remove_tracking_protection_feature_dialog_u"),
+    ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_DAILY("m_atp_imp_remove_tracking_protection_feature_dialog_d"),
+    ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG("m_atp_imp_remove_tracking_protection_feature_dialog_c"),
+    ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_remove_tracking_protection_feature_d"),
+    ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_remove_tracking_protection_feature_c"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cance_tracking_protection_feature_d"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cance_tracking_protection_feature_c"),
+
     ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
     ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
+
+    ATP_REPORT_LOOPBACK_DNS_SET_ERROR("m_atp_report_loopback_dns_error_c"),
+    ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY("m_atp_report_loopback_dns_error_d"),
+    ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_ERROR("m_atp_report_anylocal_dns_error_c"),
+    ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY("m_atp_report_anylocal_dns_error_d"),
+    ATP_REPORT_DNS_SET_ERROR("m_atp_report_dns_error_c"),
+    ATP_REPORT_DNS_SET_ERROR_DAILY("m_atp_report_dns_error_d"),
     ;
 }

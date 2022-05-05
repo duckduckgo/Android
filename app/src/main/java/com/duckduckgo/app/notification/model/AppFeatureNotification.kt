@@ -19,7 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import androidx.annotation.StringRes
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.APP_LAUNCH
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -57,11 +57,11 @@ class AppFeatureNotificationSpecification(
     override val channel = NotificationRegistrar.ChannelType.TUTORIALS
     override val systemId = NotificationRegistrar.NotificationId.AppFeature
     override val name = "AppFeature"
-    override val icon = R.drawable.notification_logo
+    override val icon = CommonR.drawable.notification_logo
     override val launchButton: String? = null
     override val closeButton: String? = null
     override val autoCancel = true
     override val title: String = context.getString(titleRes)
     override val description: String = context.getString(descriptionRes)
-    override val color: Int = R.color.ic_launcher_red_background
+    override val color: Int = CommonR.color.ic_launcher_red_background
 }

@@ -21,9 +21,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.network.VpnDetector
@@ -33,20 +34,16 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.E
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivityViewModel.ViewEvent
 import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -60,74 +57,37 @@ class DeviceShieldTrackerActivityViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    private lateinit var db: VpnDatabase
-    private lateinit var appTrackerBlockingStatsRepository: AppTrackerBlockingStatsRepository
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
+    private val defaultTracker = VpnTracker(
+        trackerCompanyId = 1,
+        company = "Google LLC",
+        companyDisplayName = "Google",
+        trackingApp = TrackingApp("app.foo.com", "Foo app"),
+        domain = "doubleclick.net"
+    )
+
     private lateinit var viewModel: DeviceShieldTrackerActivityViewModel
-    private lateinit var defaultTracker: VpnTracker
 
-    @Mock private lateinit var appBuildConfig: AppBuildConfig
-
+    private val appTrackerBlockingStatsRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
     private val vpnDetector = mock<VpnDetector>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
+    private val workManager = mock<WorkManager>()
+    private val vpnFeatureRemover = mock<VpnFeatureRemover>()
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
-
-        whenever(appBuildConfig.isDebug).thenReturn(true)
-
-        db = createInMemoryDb()
-
-        defaultTracker = VpnTracker(
-            trackerCompanyId = 1,
-            company = "Google LLC",
-            companyDisplayName = "Google",
-            trackingApp = TrackingApp("app.foo.com", "Foo app"),
-            domain = "doubleclick.net"
-        )
-
-        appTrackerBlockingStatsRepository = RealAppTrackerBlockingStatsRepository(db)
         viewModel = DeviceShieldTrackerActivityViewModel(
             deviceShieldPixels,
             appTrackerBlockingStatsRepository,
             vpnStateMonitor,
             vpnDetector,
-            CoroutineTestRule().testDispatcherProvider
+            vpnFeatureRemover,
+            coroutineRule.testDispatcherProvider
         )
-    }
-
-    @Test
-    fun whenGetTrackingAppCountThenReturnTrackingCount() = runBlocking {
-        val tracker = VpnTracker(
-            trackerCompanyId = 1,
-            company = "Google LLC",
-            companyDisplayName = "Google",
-            trackingApp = TrackingApp("app.foo.com", "Foo app"),
-            domain = "doubleclick.net"
-        )
-
-        db.vpnTrackerDao().insert(defaultTracker)
-        db.vpnTrackerDao().insert(
-            defaultTracker.copy(
-                trackingApp = TrackingApp("app.bar.com", "bar app")
-            )
-        )
-        db.vpnTrackerDao().insert(tracker.copy(domain = "facebook.com"))
-
-        val count = viewModel.getTrackingAppsCount().take(1).toList()
-        assertEquals(TrackingAppCount(2), count.first())
-    }
-
-    @Test
-    fun whenGetTrackerCountThenReturnTrackingCount() = runBlocking {
-        db.vpnTrackerDao().insert(defaultTracker)
-        db.vpnTrackerDao().insert(defaultTracker)
-        db.vpnTrackerDao().insert(defaultTracker.copy(domain = "facebook.com"))
-        db.vpnTrackerDao().insert(defaultTracker.copy(trackingApp = TrackingApp("app.bar.com", "Bar app")))
-
-        val count = viewModel.getBlockedTrackersCount().take(1).toList()
-        assertEquals(TrackerCount(4), count.first())
     }
 
     @Test
@@ -201,7 +161,7 @@ class DeviceShieldTrackerActivityViewModelTest {
         whenever(vpnDetector.isVpnDetected()).thenReturn(false)
         viewModel.commands().test {
             viewModel.onAppTPToggleSwitched(false)
-            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableConfirmationDialog, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowDisableVpnConfirmationDialog, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
     }
@@ -269,6 +229,31 @@ class DeviceShieldTrackerActivityViewModelTest {
 
             verify(deviceShieldPixels).disableFromSummaryTrackerActivity()
             assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserWantsToRemoveFeatureThenDalogIsShown() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.AskToRemoveFeature)
+
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.ShowRemoveFeatureConfirmationDialog, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserAcceptsToRemoveFeatureThenFeatureIsRemovedAndVpnAndScreenClosed() = runBlocking {
+        viewModel.commands().test {
+            viewModel.onViewEvent(ViewEvent.RemoveFeature)
+
+            verify(deviceShieldPixels).didChooseToRemoveTrackingProtectionFeature()
+            verify(vpnFeatureRemover).manuallyRemoveFeature()
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.StopVPN, awaitItem())
+            assertEquals(DeviceShieldTrackerActivityViewModel.Command.CloseScreen, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

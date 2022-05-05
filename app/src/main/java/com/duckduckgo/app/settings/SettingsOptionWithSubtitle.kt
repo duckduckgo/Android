@@ -24,7 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.SettingsOptionWithSubtitleBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
@@ -36,7 +36,7 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
     constructor(
         context: Context,
         attrs: AttributeSet?
-    ) : this(context, attrs, R.style.SettingsItem)
+    ) : this(context, attrs, CommonR.style.SettingsItem)
 
     constructor(
         context: Context,
@@ -44,9 +44,9 @@ class SettingsOptionWithSubtitle : ConstraintLayout {
         defStyle: Int
     ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsOptionWithSubtitle)
-        setTitle(attributes.getString(R.styleable.SettingsOptionWithSubtitle_title) ?: "")
-        setSubtitle(attributes.getString(R.styleable.SettingsOptionWithSubtitle_subtitle) ?: "")
+        val attributes = context.obtainStyledAttributes(attrs, CommonR.styleable.SettingsOptionWithSubtitle)
+        setTitle(attributes.getString(CommonR.styleable.SettingsOptionWithSubtitle_title) ?: "")
+        setSubtitle(attributes.getString(CommonR.styleable.SettingsOptionWithSubtitle_subtitle) ?: "")
         attributes.recycle()
     }
 
