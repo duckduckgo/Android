@@ -28,6 +28,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistBinding
 import com.duckduckgo.app.browser.webview.WebViewActivity
 import com.duckduckgo.app.email.ui.EmailProtectionSignInFragment
@@ -40,7 +41,7 @@ import com.duckduckgo.mobile.android.ui.view.addClickableSpan
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingActivity
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -114,13 +115,13 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
 
     private fun renderInBeta() {
         binding.headerImage.setImageResource(R.drawable.ic_apptp_icon)
-        binding.statusTitle.text = getString(R.string.atp_WaitlistStatusInBeta)
+        binding.statusTitle.text = getString(VpnR.string.atp_WaitlistStatusInBeta)
         binding.waitListButton.gone()
         binding.getStartedButton.show()
         binding.inviteCodeButton.gone()
         binding.footerInviteCodeButton.gone()
         binding.footerDescription.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(VpnR.string.atp_WaitlistInBetaDescription)) {
             viewModel.learnMore()
         }
     }
@@ -132,15 +133,15 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.getStartedButton.gone()
         binding.footerDescription.gone()
         binding.footerInviteCodeButton.show()
-        binding.statusTitle.text = getString(R.string.atp_WaitlistStatusJoined)
+        binding.statusTitle.text = getString(VpnR.string.atp_WaitlistStatusJoined)
         if (notify) {
             binding.appTPDescription.addClickableSpan(
-                getText(R.string.atp_WaitlistJoinedWithNotification),
+                getText(VpnR.string.atp_WaitlistJoinedWithNotification),
                 listOf(Pair("beta_link", readBlogSpan))
             )
         } else {
             binding.appTPDescription.addClickableSpan(
-                getText(R.string.atp_WaitlistJoinedWithoutNotification),
+                getText(VpnR.string.atp_WaitlistJoinedWithoutNotification),
                 listOf(Pair("notify_me_link", getNotificationSpan), Pair("beta_link", readBlogSpan))
             )
         }
@@ -152,27 +153,27 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
         binding.getStartedButton.gone()
         binding.inviteCodeButton.show()
         binding.footerInviteCodeButton.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(VpnR.string.atp_WaitlistDescription)) {
             viewModel.learnMore()
         }
     }
 
     private fun renderCodeRedeemed() {
-        binding.statusTitle.text = getString(R.string.atp_WaitlistRedeemedCodeStatus)
+        binding.statusTitle.text = getString(VpnR.string.atp_WaitlistRedeemedCodeStatus)
         binding.headerImage.setImageResource(R.drawable.ic_dragon)
         binding.waitListButton.gone()
         binding.getStartedButton.show()
         binding.inviteCodeButton.gone()
         binding.footerInviteCodeButton.gone()
         binding.footerDescription.gone()
-        binding.appTPDescription.addClickableLink("beta_link", getText(R.string.atp_WaitlistInBetaDescription)) {
+        binding.appTPDescription.addClickableLink("beta_link", getText(VpnR.string.atp_WaitlistInBetaDescription)) {
             viewModel.learnMore()
         }
     }
 
     private fun renderErrorMessage() {
         binding.waitListButton.isEnabled = true
-        Toast.makeText(this, R.string.atp_WaitlistErrorJoining, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, VpnR.string.atp_WaitlistErrorJoining, Toast.LENGTH_LONG).show()
     }
 
     private fun showNotificationDialog() {
@@ -191,12 +192,12 @@ class AppTPWaitlistActivity : DuckDuckGoActivity() {
     }
 
     private fun showOnboarding() {
-        startActivity(DeviceShieldOnboardingActivity.intent(this))
+        startActivity(VpnOnboardingActivity.intent(this))
         finish()
     }
 
     private fun openWebsite() {
-        startActivity(WebViewActivity.intent(this, getString(R.string.atp_WaitlistBetaBlogPost), getString(R.string.atp_WaitlistActivityTitle)))
+        startActivity(WebViewActivity.intent(this, getString(VpnR.string.atp_WaitlistBetaBlogPost), getString(VpnR.string.atp_WaitlistActivityTitle)))
     }
 
     companion object {

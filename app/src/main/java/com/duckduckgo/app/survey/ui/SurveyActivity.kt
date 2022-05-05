@@ -23,7 +23,7 @@ import android.os.Bundle
 import android.webkit.*
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ActivityUserSurveyBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.view.gone
@@ -57,7 +57,7 @@ class SurveyActivity : DuckDuckGoActivity() {
         configureListeners()
 
         webView.settings.javaScriptEnabled = true
-        webView.setBackgroundColor(ContextCompat.getColor(this, R.color.cornflowerBlue))
+        webView.setBackgroundColor(ContextCompat.getColor(this, CommonR.color.cornflowerBlue))
         webView.webViewClient = SurveyWebViewClient()
 
         configureObservers()
