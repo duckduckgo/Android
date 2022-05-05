@@ -15,11 +15,12 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.DuckDuckGo.SettingsOption"
-    android:id="@+id/item_container"
-    android:padding="@dimen/keyline_4">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             style="@style/Widget.DuckDuckGo.SettingsOption"
+             android:background="?selectableItemBackground"
+             android:id="@+id/item_container"
+             android:padding="@dimen/keyline_4">
 
     <TextView
         android:id="@+id/title"
@@ -28,7 +29,6 @@
         android:maxLines="1"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
-        android:textColor="?attr/listItemTitleColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -211,7 +211,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Button.Primary">
-        <item name="android:background">@drawable/background_blue_button_rounded_corners</item>
+        <item name="android:background">@drawable/background_blue_button_primary</item>
         <item name="android:textAllCaps">true</item>
     </style>
 
@@ -227,6 +227,11 @@
     <style name="Widget.DuckDuckGo.Button.Borderless">
         <item name="android:textColor">@color/cornflowerBlue</item>
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Button.Rounded">
+        <item name="android:background">@drawable/background_blue_button_rounded</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="Widget.DuckDuckGo.IconButton">
@@ -256,6 +261,13 @@
         <item name="android:layout_marginStart">@dimen/keyline_4</item>
         <item name="android:layout_marginEnd">@dimen/keyline_4</item>
         <item name="android:layout_marginBottom">@dimen/keyline_1</item>
+    </style>
+
+    <!-- Dialogs -->
+    <style name="Widget.DuckDuckGo.Dialog"/>
+    <style name="Widget.DuckDuckGo.Dialog.Title">
+        <item name="android:textAppearance">@style/TextAppearance.DuckDuckGo.Headline2</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
 </resources>
