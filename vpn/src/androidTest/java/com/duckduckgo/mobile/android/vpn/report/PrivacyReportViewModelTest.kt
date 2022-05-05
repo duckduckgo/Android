@@ -22,11 +22,13 @@ import androidx.core.content.edit
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -53,12 +55,17 @@ class PrivacyReportViewModelTest {
     @Suppress("unused")
     var instantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     private lateinit var repository: AppTrackerBlockingStatsRepository
     private lateinit var vpnPreferences: VpnPreferences
     private lateinit var db: VpnDatabase
     private lateinit var vpnTrackerDao: VpnTrackerDao
     private val onboardingStore = mock<DeviceShieldOnboardingStore>()
     private val vpnStateMonitor = mock<VpnStateMonitor>()
+    private val vpnFeatureRemover = mock<VpnFeatureRemover>()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -74,7 +81,7 @@ class PrivacyReportViewModelTest {
         context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
         vpnPreferences = VpnPreferences(context)
 
-        testee = PrivacyReportViewModel(repository, onboardingStore, vpnStateMonitor)
+        testee = PrivacyReportViewModel(repository, onboardingStore, vpnFeatureRemover, vpnStateMonitor, coroutineRule.testDispatcherProvider)
     }
 
     private fun prepareDb() {

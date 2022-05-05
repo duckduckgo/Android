@@ -46,10 +46,9 @@ object DeviceShieldNotificationSchedulerModule {
     fun provideDeviceShieldNotificationScheduler(
         @VpnCoroutineScope coroutineScope: CoroutineScope,
         workManager: WorkManager,
-        vpnDatabase: VpnDatabase,
-        deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+        vpnDatabase: VpnDatabase
     ): LifecycleObserver {
-        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase, deviceShieldAlertNotificationBuilder)
+        return DeviceShieldNotificationScheduler(coroutineScope, workManager, vpnDatabase)
     }
 
     @Provides
@@ -80,8 +79,7 @@ object DeviceShieldNotificationSchedulerModule {
 class DeviceShieldNotificationScheduler(
     private val coroutineScope: CoroutineScope,
     private val workManager: WorkManager,
-    private val vpnDatabase: VpnDatabase,
-    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+    private val vpnDatabase: VpnDatabase
 ) : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)

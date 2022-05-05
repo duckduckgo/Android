@@ -198,7 +198,7 @@
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <string name="atp_ActivityManageProtection">Manage Protection for Your Apps</string>
+    <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
     <plurals name="atp_ActivityTrackersCompanyBlocked">
         <item quantity="one">"%d tracking attempt"</item>
         <item quantity="other">%d tracking attempts"</item>
@@ -229,6 +229,9 @@
     <string name="atp_ActivityEnabledLabel">This feature is in beta. <annotation type="app_settings_link">Having problems with an app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityAbout">About</string>
+    <string name="atp_ActivityPrivacy">Privacy</string>
+    <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -361,4 +364,11 @@
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Recent Apps</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">No recent apps yet</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Disable and Delete Data?</string>
+    <string name="atp_RemoveFeatureDialogMessage">App Tracking Protection will be disabled and any settings and history of tracking attempts will be deleted. You can enable it again at any time in Settings.</string>
+    <string name="atp_RemoveFeatureDialogCancel">Cancel</string>
+    <string name="atp_RemoveFeatureDialogRemove">Disable</string>
+
 </resources>
