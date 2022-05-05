@@ -359,6 +359,18 @@ interface DeviceShieldPixels {
     fun didChooseToRemoveTrackingProtectionFeature()
 
     fun didChooseToCancelRemoveTrakcingProtectionDialog()
+
+    /**
+     * Will fire when the user is interacting with the Promote Always On Dialog
+     */
+    fun didShowPromoteAlwaysOnDialog()
+
+    fun didChooseToDismissPromoteAlwaysOnDialog()
+
+    fun didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
+
+    fun didChooseToForgetPromoteAlwaysOnDialog()
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -764,6 +776,27 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didChooseToCancelRemoveTrakcingProtectionDialog() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didShowPromoteAlwaysOnDialog() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToDismissPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToOpenSettingsFromPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToForgetPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     private fun suddenKill() {
