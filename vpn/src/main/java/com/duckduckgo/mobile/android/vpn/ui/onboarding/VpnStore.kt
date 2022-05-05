@@ -80,7 +80,7 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override fun setAlwaysOn(enabled: Boolean) {
-        preferences.edit { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
+        preferences.edit(commit = true) { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
     }
 
     override fun isAlwaysOnEnabled(): Boolean {
