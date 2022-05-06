@@ -18,25 +18,46 @@ package com.duckduckgo.app.browser.history
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.ImageView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ItemNavigationHistoryPopupRowBinding
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import kotlinx.coroutines.launch
 
-class NavigationHistoryAdapter : RecyclerView.Adapter<NavigationViewHolder>() {
+class NavigationHistoryAdapter(
+    private val lifecycleOwner: LifecycleOwner,
+    private val faviconManager: FaviconManager,
+    private val tabId: String,
+    private val listener: NavigationHistoryListener
+) : RecyclerView.Adapter<NavigationViewHolder>() {
+
+    interface NavigationHistoryListener {
+        fun historicalPageSelected(stackIndex: Int)
+    }
 
     private var navigationHistory: List<NavigationHistoryEntry> = emptyList()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NavigationViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): NavigationViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val itemView = inflater.inflate(R.layout.item_navigation_history_popup_row, parent, false)
-        return NavigationViewHolder(itemView)
+        val binding = ItemNavigationHistoryPopupRowBinding.inflate(inflater, parent, false)
+        return NavigationViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: NavigationViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: NavigationViewHolder,
+        position: Int
+    ) {
         val entry = navigationHistory[position]
-        holder.bindItem(entry)
+
+        with(holder.binding.title) { text = entry.title }
+        loadFavicon(entry, holder.binding.favicon)
+        holder.binding.root.setOnClickListener { listener.historicalPageSelected(position) }
     }
 
     override fun getItemCount(): Int {
@@ -48,15 +69,21 @@ class NavigationHistoryAdapter : RecyclerView.Adapter<NavigationViewHolder>() {
         this.navigationHistory = navigationHistory
         notifyDataSetChanged()
     }
-}
 
-class NavigationViewHolder(val itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-    private val titleView: TextView = itemView.findViewById(R.id.title)
-
-    fun bindItem(entry: NavigationHistoryEntry) {
-        titleView.text = entry.title
+    private fun loadFavicon(
+        historyEntry: NavigationHistoryEntry,
+        view: ImageView
+    ) {
+        lifecycleOwner.lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalOrFallback(url = historyEntry.url, tabId = tabId, view = view)
+        }
     }
 }
 
-data class NavigationHistoryEntry(val title: String?, val url: String)
+data class NavigationViewHolder(val binding: ItemNavigationHistoryPopupRowBinding) :
+    RecyclerView.ViewHolder(binding.root)
+
+data class NavigationHistoryEntry(
+    val title: String?,
+    val url: String
+)

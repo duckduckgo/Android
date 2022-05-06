@@ -22,17 +22,23 @@
     android:layout_height="match_parent"
     android:paddingTop="20dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/historyRecycler"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#F0F"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+    <androidx.cardview.widget.CardView
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:itemCount="4"
-        tools:listitem="@layout/navigation_history_row" />
+        android:layout_width="match_parent"
+        app:cardBackgroundColor="?attr/daxDialogBackgroundColor"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/historyRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="4"
+            tools:listitem="@layout/item_navigation_history_popup_row" />
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
