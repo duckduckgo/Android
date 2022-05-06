@@ -66,4 +66,10 @@ class FireproofWebsiteRepository @Inject constructor(
             fireproofWebsiteDao.fireproofWebsitesCountByDomain(domain)
         }
     }
+
+    suspend fun removeAllFireproofWebsites() {
+        withContext(dispatchers.io()) {
+            fireproofWebsiteDao.deleteAll()
+        }
+    }
 }

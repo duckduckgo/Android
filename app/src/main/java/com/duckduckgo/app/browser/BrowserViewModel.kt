@@ -30,8 +30,6 @@ import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
-import com.duckduckgo.app.global.events.db.UserEventKey
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -57,8 +55,7 @@ class BrowserViewModel @Inject constructor(
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
     private val appEnjoymentUserEventRecorder: AppEnjoymentUserEventRecorder,
     private val dispatchers: DispatcherProvider,
-    private val pixel: Pixel,
-    private val userEventsStore: UserEventsStore
+    private val pixel: Pixel
 ) : AppEnjoymentDialogFragment.Listener,
     RateAppDialogFragment.Listener,
     GiveFeedbackDialogFragment.Listener,
@@ -231,12 +228,6 @@ class BrowserViewModel @Inject constructor(
         launch(dispatchers.io()) {
             tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
             pixel.fire(AppPixelName.SHORTCUT_OPENED)
-        }
-    }
-
-    fun promotedFireButtonCancelled() {
-        launch(dispatchers.io()) {
-            userEventsStore.registerUserEvent(UserEventKey.PROMOTED_FIRE_BUTTON_CANCELLED)
         }
     }
 }
