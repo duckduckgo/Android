@@ -157,6 +157,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
@@ -167,6 +168,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter
+import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.remotemessage.asMessage
@@ -865,6 +867,7 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
+            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
         }
     }
 
@@ -1980,11 +1983,19 @@ class BrowserTabFragment :
 
     private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {
         activity?.let { context ->
-            BottomSheetDialog(context).also {
+            BottomSheetDialog(context, com.duckduckgo.mobile.android.R.style.NavigationHistoryDialog).also {
                 it.setContentView(R.layout.navigation_history_popup_view)
 
                 it.findViewById<RecyclerView>(R.id.historyRecycler)?.also { recycler ->
-                    NavigationHistoryAdapter().also { adapter ->
+                    NavigationHistoryAdapter(
+                        viewLifecycleOwner, faviconManager, tabId,
+                        object : NavigationHistoryListener {
+                            override fun historicalPageSelected(stackIndex: Int) {
+                                it.dismiss()
+                                viewModel.historicalPageSelected(stackIndex)
+                            }
+                        }
+                    ).also { adapter ->
                         recycler.adapter = adapter
                         adapter.updateNavigationHistory(history.history)
                     }
@@ -1993,7 +2004,11 @@ class BrowserTabFragment :
                 it.show()
             }
         }
+    }
 
+    private fun navigateBackHistoryStack(index: Int) {
+        val stepsToMove = (index + 1) * -1
+        webView?.goBackOrForward(stepsToMove)
     }
 
     fun onLongPressBackButton() {
