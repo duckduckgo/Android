@@ -380,7 +380,6 @@ class BrowserModule {
         pixel: Pixel,
         fireproofWebsiteRepository: FireproofWebsiteRepository,
         appSettingsPreferencesStore: SettingsDataStore,
-        variantManager: VariantManager,
         dispatchers: DispatcherProvider
     ): FireproofDialogsEventHandler {
         return BrowserTabFireproofDialogsEventHandler(
@@ -388,7 +387,6 @@ class BrowserModule {
             pixel,
             fireproofWebsiteRepository,
             appSettingsPreferencesStore,
-            variantManager,
             dispatchers
         )
     }

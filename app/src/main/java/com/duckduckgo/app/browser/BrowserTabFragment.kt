@@ -394,6 +394,8 @@ class BrowserTabFragment :
 
     private var loginDetectionDialog: AlertDialog? = null
 
+    private var automaticFireproofDialog: AlertDialog? = null
+
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
     private val pulseAnimation: PulseAnimation = PulseAnimation(this)
@@ -848,6 +850,7 @@ class BrowserTabFragment :
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
@@ -1152,6 +1155,30 @@ class BrowserTabFragment :
                 }.setOnCancelListener {
                     viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
+
+            viewModel.onFireproofLoginDialogShown()
+        }
+    }
+
+    private fun askToAutomateFireproofWebsite(
+        context: Context,
+        fireproofWebsite: FireproofWebsiteEntity
+    ) {
+        val isShowing = automaticFireproofDialog?.isShowing
+
+        if (isShowing != true) {
+            automaticFireproofDialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.automaticFireproofWebsiteLoginDialogTitle))
+                .setMessage(R.string.automaticFireproofWebsiteLoginDialogDescription)
+                .setPositiveButton(R.string.automaticFireproofWebsiteLoginDialogFirstOption) { _, _ ->
+                    viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNegativeButton(R.string.automaticFireproofWebsiteLoginDialogSecondOption) { _, _ ->
+                    viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNeutralButton(R.string.automaticFireproofWebsiteLoginDialogThirdOption) { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.onUserDismissedAutomaticFireproofLoginDialog()
+                }.setOnCancelListener { it.dismiss() }
+                .show()
 
             viewModel.onFireproofLoginDialogShown()
         }
@@ -1784,6 +1811,7 @@ class BrowserTabFragment :
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
+        automaticFireproofDialog?.dismiss()
         emailAutofillTooltipDialog?.dismiss()
         destroyWebView()
         super.onDestroy()

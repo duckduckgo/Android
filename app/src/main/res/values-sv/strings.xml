@@ -264,6 +264,7 @@
     <string name="dialogSave">Spara</string>
     <string name="delete">Ta bort</string>
     <string name="edit">Redigera</string>
+    <string name="remove">Ta bort</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>

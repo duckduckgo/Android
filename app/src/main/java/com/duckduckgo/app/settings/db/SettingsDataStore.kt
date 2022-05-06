@@ -49,6 +49,7 @@ interface SettingsDataStore {
     var globalPrivacyControlEnabled: Boolean
     var appLinksEnabled: Boolean
     var showAppLinksPrompt: Boolean
+    var showAutomaticFireproofDialog: Boolean
 
     /**
      * This will be checked upon app startup and used to decide whether it should perform a clear or not.
@@ -163,6 +164,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(SHOW_APP_LINKS_PROMPT, true)
         set(enabled) = preferences.edit { putBoolean(SHOW_APP_LINKS_PROMPT, enabled) }
 
+    override var showAutomaticFireproofDialog: Boolean
+        get() = preferences.getBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, true)
+        set(enabled) = preferences.edit { putBoolean(SHOW_AUTOMATIC_FIREPROOF_DIALOG, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -225,6 +230,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_DO_NOT_SELL_ENABLED = "KEY_DO_NOT_SELL_ENABLED"
         const val APP_LINKS_ENABLED = "APP_LINKS_ENABLED"
         const val SHOW_APP_LINKS_PROMPT = "SHOW_APP_LINKS_PROMPT"
+        const val SHOW_AUTOMATIC_FIREPROOF_DIALOG = "SHOW_AUTOMATIC_FIREPROOF_DIALOG"
     }
 
     private class FireAnimationPrefsMapper {

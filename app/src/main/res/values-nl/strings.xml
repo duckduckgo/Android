@@ -264,6 +264,7 @@
     <string name="dialogSave">Opslaan</string>
     <string name="delete">Verwijderen</string>
     <string name="edit">Bewerken</string>
+    <string name="remove">Verwijderen</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo doorzoeken</string>
