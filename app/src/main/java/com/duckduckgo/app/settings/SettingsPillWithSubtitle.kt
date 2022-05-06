@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.recursiveEnable
 import com.duckduckgo.app.browser.databinding.SettingsPillWithSubtitleBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -35,7 +36,7 @@ class SettingsPillWithSubtitle : LinearLayout {
     constructor(
         context: Context,
         attrs: AttributeSet?
-    ) : this(context, attrs, R.style.SettingsItem)
+    ) : this(context, attrs, CommonR.style.SettingsItem)
 
     constructor(
         context: Context,
@@ -43,10 +44,10 @@ class SettingsPillWithSubtitle : LinearLayout {
         defStyle: Int
     ) : super(context, attrs, defStyle) {
 
-        val attributes = context.obtainStyledAttributes(attrs, R.styleable.SettingsPillWithSubtitle)
-        setTitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillTitle) ?: "")
-        setSubtitle(attributes.getString(R.styleable.SettingsPillWithSubtitle_pillSubtitle) ?: "")
-        setPill(attributes.getResourceId(R.styleable.SettingsPillWithSubtitle_pillDrawable, R.drawable.ic_beta_pill))
+        val attributes = context.obtainStyledAttributes(attrs, CommonR.styleable.SettingsPillWithSubtitle)
+        setTitle(attributes.getString(CommonR.styleable.SettingsPillWithSubtitle_pillTitle) ?: "")
+        setSubtitle(attributes.getString(CommonR.styleable.SettingsPillWithSubtitle_pillSubtitle) ?: "")
+        setPill(attributes.getResourceId(CommonR.styleable.SettingsPillWithSubtitle_pillDrawable, R.drawable.ic_beta_pill))
         attributes.recycle()
     }
 

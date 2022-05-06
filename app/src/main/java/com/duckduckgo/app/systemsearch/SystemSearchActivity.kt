@@ -36,6 +36,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.EditSavedSiteDialogFragment
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.app.browser.databinding.ActivitySystemSearchBinding
 import com.duckduckgo.app.browser.databinding.IncludeQuickAccessItemsBinding
@@ -313,7 +314,7 @@ class SystemSearchActivity : DuckDuckGoActivity() {
             refreshOnboardingToggleText(viewState.expanded)
         } else {
             systemSearchOnboarding.onboarding.visibility = View.GONE
-            binding.results.elevation = resources.getDimension(R.dimen.systemSearchResultsElevation)
+            binding.results.elevation = resources.getDimension(CommonR.dimen.systemSearchResultsElevation)
         }
     }
 

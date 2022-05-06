@@ -40,7 +40,7 @@ import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
@@ -96,7 +96,7 @@ class SettingsViewModelTest {
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
-    private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboardingStore
+    private lateinit var mockDeviceShieldOnboarding: VpnStore
 
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
