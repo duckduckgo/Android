@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.filechooser
 import android.content.Intent
 import android.net.Uri
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class FileChooserIntentBuilder @Inject constructor() {
@@ -81,7 +82,7 @@ class FileChooserIntentBuilder @Inject constructor() {
 
         acceptTypes
             .filter { it.isNotBlank() }
-            .forEach { acceptedMimeTypes.add(it.toLowerCase()) }
+            .forEach { acceptedMimeTypes.add(it.lowercase(Locale.getDefault())) }
 
         if (acceptedMimeTypes.isNotEmpty()) {
             Timber.d("Selectable file types limited to $acceptedMimeTypes")
