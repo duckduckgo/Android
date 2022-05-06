@@ -274,7 +274,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
     @Test
     fun whenUserEnabledAutomaticFireproofLoginDialogThenPixelSent() = runTest {
-        testee.onUserEnabledAutomaticFireproofLoginDialog("twitter.com")
+        testee.onUserEnabledAutomaticFireproofing("twitter.com")
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_ALWAYS,
@@ -284,14 +284,14 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
     @Test
     fun whenUserEnabledAutomaticFireproofLoginDialogThenSetAutomaticFireproofSettingToAlways() = runTest {
-        testee.onUserEnabledAutomaticFireproofLoginDialog("twitter.com")
+        testee.onUserEnabledAutomaticFireproofing("twitter.com")
 
         verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.ALWAYS
     }
 
     @Test
     fun whenUserFireproofSiteInAutomaticFireproofLoginDialogThenPixelSent() = runTest {
-        testee.onUserFireproofSiteAutomaticFireproofLoginDialog("twitter.com")
+        testee.onUserRequestedAskEveryTime("twitter.com")
 
         verify(mockPixel).fire(
             pixel = AppPixelName.FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE,
@@ -301,7 +301,7 @@ class BrowserTabFireproofDialogsEventHandlerTest {
 
     @Test
     fun whenUserFireproofSiteInAutomaticFireproofLoginDialogThenSetAutomaticFireproofSettingToAskEveryTime() = runTest {
-        testee.onUserFireproofSiteAutomaticFireproofLoginDialog("twitter.com")
+        testee.onUserRequestedAskEveryTime("twitter.com")
 
         verify(mockAppSettingsPreferencesStore).automaticFireproofSetting = AutomaticFireproofSetting.ASK_EVERY_TIME
     }

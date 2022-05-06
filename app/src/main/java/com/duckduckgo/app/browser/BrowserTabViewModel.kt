@@ -1847,13 +1847,13 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onUserFireproofSiteInAutomaticFireproofLoginDialog(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
-            fireproofDialogsEventHandler.onUserFireproofSiteAutomaticFireproofLoginDialog(domain)
+            fireproofDialogsEventHandler.onUserRequestedAskEveryTime(domain)
         }
     }
 
     fun onUserEnabledAutomaticFireproofLoginDialog(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
-            fireproofDialogsEventHandler.onUserEnabledAutomaticFireproofLoginDialog(domain)
+            fireproofDialogsEventHandler.onUserEnabledAutomaticFireproofing(domain)
         }
     }
 
