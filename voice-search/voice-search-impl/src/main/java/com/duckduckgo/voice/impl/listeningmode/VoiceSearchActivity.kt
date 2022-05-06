@@ -29,6 +29,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
+import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
 import com.duckduckgo.voice.impl.listeningmode.VoiceSearchViewModel.Command
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Action.INDICATOR_CLICKED
 import com.duckduckgo.voice.impl.listeningmode.ui.VoiceRecognizingIndicator.Model
@@ -39,7 +40,6 @@ import com.duckduckgo.voice.impl.R
 import com.duckduckgo.voice.impl.databinding.ActivityVoiceSearchBinding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.util.Locale
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -153,9 +153,5 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateText(result: String) {
         binding.speechResults.text = "\"${result.capitalizeFirstLetter()}\""
-    }
-
-    private fun String.capitalizeFirstLetter() = this.replaceFirstChar {
-        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
     }
 }
