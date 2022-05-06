@@ -104,6 +104,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -312,6 +313,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
 
+    @Mock
+    private lateinit var mockSettingsDataStore: SettingsDataStore
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -376,6 +380,7 @@ class BrowserTabViewModelTest {
         whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
         whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -452,7 +457,8 @@ class BrowserTabViewModelTest {
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
-            voiceSearchPixelLogger = voiceSearchPixelLogger
+            voiceSearchPixelLogger = voiceSearchPixelLogger,
+            settingsDataStore = mockSettingsDataStore
         )
 
         testee.loadData("abc", null, false, false)
@@ -2442,11 +2448,18 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedThenAskToFireproofWebsite() {
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAskEveryTimeThenAskToFireproofWebsite() {
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
         }
+    }
+
+    @Test
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAlwaysThenDoNotAskToFireproofWebsite() {
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
+        loginEventLiveData.value = givenLoginDetected("example.com")
+        assertCommandNotIssued<Command.AskToFireproofWebsite>()
     }
 
     @Test

@@ -20,7 +20,7 @@ import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -31,6 +31,7 @@ import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPre
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -48,8 +49,9 @@ class FireproofWebsitesViewModel @Inject constructor(
     )
 
     sealed class Command {
-        class ConfirmDeleteFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
-        class SelectLoginDetectorSetting(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
+        class ConfirmRemoveFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
+        class ConfirmRemoveAllFireproofWebsites(val removedWebsitesEntities: List<FireproofWebsiteEntity>) : Command()
+        class ShowAutomaticFireproofSettingSelectionDialog(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
     }
 
     private val _viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -78,7 +80,7 @@ class FireproofWebsitesViewModel @Inject constructor(
     }
 
     fun onDeleteRequested(entity: FireproofWebsiteEntity) {
-        command.value = ConfirmDeleteFireproofWebsite(entity)
+        command.value = ConfirmRemoveFireproofWebsite(entity)
     }
 
     fun onSnackBarUndoFireproof(entity: FireproofWebsiteEntity) {
@@ -88,27 +90,52 @@ class FireproofWebsitesViewModel @Inject constructor(
         }
     }
 
-    fun delete(entity: FireproofWebsiteEntity) {
+    fun remove(entity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatcherProvider.io()) {
             fireproofWebsiteRepository.removeFireproofWebsite(entity)
             pixel.fire(FIREPROOF_WEBSITE_DELETED)
         }
     }
 
-    fun onUserToggleLoginDetection(enabled: Boolean) {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            val pixelName = if (enabled) FIREPROOF_LOGIN_TOGGLE_ENABLED else FIREPROOF_LOGIN_TOGGLE_DISABLED
-            pixel.fire(pixelName)
+    fun onAutomaticFireproofSettingChanged(newAutomaticFireproofSetting: AutomaticFireproofSetting) {
+        Timber.i("User changed automatic fireproof setting, is now: ${newAutomaticFireproofSetting.name}")
 
-            if (enabled) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (newAutomaticFireproofSetting != AutomaticFireproofSetting.NEVER) {
                 userEventsStore.registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
             }
         }
-        val automaticFireproofSetting = when (enabled) {
-            false -> AutomaticFireproofSetting.NEVER
-            else -> AutomaticFireproofSetting.ASK_EVERY_TIME
+
+        settingsDataStore.automaticFireproofSetting = newAutomaticFireproofSetting
+        val pixelName =
+            when (newAutomaticFireproofSetting) {
+                AutomaticFireproofSetting.ASK_EVERY_TIME -> FIREPROOF_SETTING_SELECTION_ASK_EVERYTIME
+                AutomaticFireproofSetting.ALWAYS -> FIREPROOF_SETTING_SELECTION_ALWAYS
+                AutomaticFireproofSetting.NEVER -> FIREPROOF_SETTING_SELECTION_NEVER
+            }
+        _viewState.value = _viewState.value?.copy(automaticFireproofSetting = newAutomaticFireproofSetting)
+
+        pixel.fire(pixelName)
+    }
+
+    fun removeAllRequested() {
+        val removedWebsites = fireproofWebsites.value ?: emptyList()
+        command.value = Command.ConfirmRemoveAllFireproofWebsites(removedWebsites)
+    }
+
+    fun removeAllWebsites() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+
+            fireproofWebsiteRepository.removeAllFireproofWebsites()
+            pixel.fire(FIREPROOF_WEBSITE_ALL_DELETED)
         }
-        settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
-        _viewState.value = _viewState.value?.copy(automaticFireproofSetting = automaticFireproofSetting)
+    }
+
+    fun onSnackBarUndoRemoveAllWebsites(removedWebsitesEntities: List<FireproofWebsiteEntity>) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            removedWebsitesEntities.forEach { fireproofWebsiteEntity ->
+                onSnackBarUndoFireproof(fireproofWebsiteEntity)
+            }
+        }
     }
 }
