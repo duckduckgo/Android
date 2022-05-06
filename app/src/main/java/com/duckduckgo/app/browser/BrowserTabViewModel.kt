@@ -98,9 +98,9 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -170,12 +170,12 @@ class BrowserTabViewModel @Inject constructor(
     private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
-    private val variantManager: VariantManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadCallback,
     private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
+    private val settingsDataStore: SettingsDataStore
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -347,6 +347,7 @@ class BrowserTabViewModel @Inject constructor(
         class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
+        class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -540,12 +541,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    if (variantManager.isFireproofExperimentEnabled()) {
-                        if (appSettingsPreferencesStore.appLoginDetection) {
-                            onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
-                        }
-                    } else {
-                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    val showAutomaticFireproofDialog =
+                        settingsDataStore.automaticFireproofSetting == ASK_EVERY_TIME && settingsDataStore.showAutomaticFireproofDialog
+                    when {
+                        showAutomaticFireproofDialog ->
+                            command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                        settingsDataStore.automaticFireproofSetting == ALWAYS ->
+                            fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                        else ->
+                            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
                     }
                 }
             }
@@ -1858,6 +1862,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onUserDismissedAutomaticFireproofLoginDialog() {
+        viewModelScope.launch {
+            fireproofDialogsEventHandler.onUserDismissedAutomaticFireproofLoginDialog()
+        }
+    }
+
+    fun onUserFireproofSiteInAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserRequestedAskEveryTime(domain)
+        }
+    }
+
+    fun onUserEnabledAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserEnabledAutomaticFireproofing(domain)
+        }
+    }
+
     fun onRemoveFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.fireproofWebsite(fireproofWebsiteEntity.domain)
@@ -2249,7 +2271,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxFireproofCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2330,17 +2352,6 @@ class BrowserTabViewModel @Inject constructor(
                 is HomePanelCta -> refreshCta()
                 else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
-        }
-    }
-
-    fun userSelectedFireproofSetting(isAutoFireproofingEnabled: Boolean) {
-        appSettingsPreferencesStore.appLoginDetection = isAutoFireproofingEnabled
-
-        val cta = currentCtaViewState().cta ?: return
-
-        viewModelScope.launch {
-            ctaViewModel.onUserClickFireproofExperimentButton(isAutoFireproofingEnabled, cta)
-            refreshCta()
         }
     }
 

@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2020 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,10 +15,11 @@
   ~ limitations under the License.
   -->
 
-<androidx.appcompat.widget.SwitchCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fireproofWebsiteToggle"
-    style="@style/FireproofWebsiteSwitch"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:text="@string/fireproofWebsiteToggleText"
-    android:theme="@style/SettingsSwitchTheme" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/removeAll"
+        android:title="@string/removeAll"
+        app:showAsAction="never" />
+</menu>

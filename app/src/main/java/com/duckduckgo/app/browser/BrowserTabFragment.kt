@@ -175,7 +175,6 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -399,6 +398,8 @@ class BrowserTabFragment :
     private var appLinksSnackBar: Snackbar? = null
 
     private var loginDetectionDialog: AlertDialog? = null
+
+    private var automaticFireproofDialog: AlertDialog? = null
 
     private var emailAutofillTooltipDialog: EmailAutofillTooltipFragment? = null
 
@@ -854,6 +855,7 @@ class BrowserTabFragment :
             is Command.AskDomainPermission -> askSiteLocationPermission(it.domain)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
             is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
@@ -1160,6 +1162,30 @@ class BrowserTabFragment :
                 }.setOnCancelListener {
                     viewModel.onUserDismissedFireproofLoginDialog()
                 }.show()
+
+            viewModel.onFireproofLoginDialogShown()
+        }
+    }
+
+    private fun askToAutomateFireproofWebsite(
+        context: Context,
+        fireproofWebsite: FireproofWebsiteEntity
+    ) {
+        val isShowing = automaticFireproofDialog?.isShowing
+
+        if (isShowing != true) {
+            automaticFireproofDialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.automaticFireproofWebsiteLoginDialogTitle))
+                .setMessage(R.string.automaticFireproofWebsiteLoginDialogDescription)
+                .setPositiveButton(R.string.automaticFireproofWebsiteLoginDialogFirstOption) { _, _ ->
+                    viewModel.onUserEnabledAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNegativeButton(R.string.automaticFireproofWebsiteLoginDialogSecondOption) { _, _ ->
+                    viewModel.onUserFireproofSiteInAutomaticFireproofLoginDialog(fireproofWebsite.domain)
+                }.setNeutralButton(R.string.automaticFireproofWebsiteLoginDialogThirdOption) { dialog, _ ->
+                    dialog.dismiss()
+                    viewModel.onUserDismissedAutomaticFireproofLoginDialog()
+                }.setOnCancelListener { it.dismiss() }
+                .show()
 
             viewModel.onFireproofLoginDialogShown()
         }
@@ -1605,31 +1631,12 @@ class BrowserTabFragment :
     }
 
     private fun fireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
-        val snackbar = rootView.makeSnackbarWithNoBottomInset(
+        rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG
-        )
-
-        snackbar.setAction(R.string.fireproofWebsiteSnackbarAction) {
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
-        }
-
-        if (variantManager.isFireproofExperimentEnabled()) {
-            snackbar.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                override fun onShown(transientBottomBar: Snackbar?) {
-                    super.onShown(transientBottomBar)
-                    pixel.fire(AppPixelName.FIREPROOF_SNACKBAR_SHOWN)
-                }
-
-                override fun onDismissed(
-                    transientBottomBar: Snackbar?,
-                    event: Int
-                ) {
-                    super.onDismissed(transientBottomBar, event)
-                }
-            })
-        }
-        snackbar.show()
+        }.show()
     }
 
     private fun removeFireproofWebsiteConfirmation(entity: FireproofWebsiteEntity) {
@@ -1811,6 +1818,7 @@ class BrowserTabFragment :
         supervisorJob.cancel()
         popupMenu.dismiss()
         loginDetectionDialog?.dismiss()
+        automaticFireproofDialog?.dismiss()
         emailAutofillTooltipDialog?.dismiss()
         destroyWebView()
         super.onDestroy()
@@ -2622,10 +2630,6 @@ class BrowserTabFragment :
             configuration.showCta(daxCtaContainer)
             newTabLayout.setOnClickListener { daxCtaContainer.dialogTextCta.finishAnimation() }
 
-            if (configuration is DaxBubbleCta.DaxFireproofCta) {
-                configureFireproofButtons()
-            }
-
             viewModel.onCtaShown()
         }
 
@@ -2683,22 +2687,6 @@ class BrowserTabFragment :
 
         private fun hideHomeCta() {
             ctaContainer.gone()
-        }
-
-        private fun configureFireproofButtons() {
-            daxCtaContainer.fireproofButtons.show()
-
-            daxCtaContainer.fireproofButtons.fireproofKeepMeSignedIn.setOnClickListener {
-                daxCtaContainer.fireproofButtons.gone()
-                daxCtaContainer.dialogTextCta.cancelAnimation()
-                viewModel.userSelectedFireproofSetting(true)
-            }
-
-            daxCtaContainer.fireproofButtons.fireproofBurnEverything.setOnClickListener {
-                daxCtaContainer.fireproofButtons.gone()
-                daxCtaContainer.dialogTextCta.cancelAnimation()
-                viewModel.userSelectedFireproofSetting(false)
-            }
         }
 
         fun renderHomeCta() {
