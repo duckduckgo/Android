@@ -23,10 +23,8 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -41,6 +39,10 @@ interface AppTrackerRecorder {
 @ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnServiceCallbacks::class,
+)
+@ContributesBinding(
+    scope = VpnScope::class,
+    boundType = AppTrackerRecorder::class,
 )
 @SingleInstanceIn(VpnScope::class)
 class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : VpnServiceCallbacks, AppTrackerRecorder {
@@ -96,13 +98,4 @@ class BatchedAppTrackerRecorder @Inject constructor(vpnDatabase: VpnDatabase) : 
     companion object {
         private const val PERIODIC_INSERTION_FREQUENCY_MS: Long = 1_000
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class AppTrackerRecorderModule {
-
-    @Binds
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun providesAppTrackerRecorder(batchedAppTrackerRecorder: BatchedAppTrackerRecorder): AppTrackerRecorder
 }

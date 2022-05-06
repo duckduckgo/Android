@@ -27,9 +27,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class AppTPVpnConflictDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun onDismissConflictDialog()
-        fun onOpenSettings()
-        fun onContinue()
+        fun onVpnConflictDialogDismiss()
+        fun onVpnConflictDialogGoToSettings()
+        fun onVpnConflictDialogContinue()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,11 +100,11 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         endCta.setText(R.string.atp_VpnConflictDialogGotIt)
         endCta.setOnClickListener {
             dismiss()
-            listener.onContinue()
+            listener.onVpnConflictDialogContinue()
         }
         startCta.setOnClickListener {
             dismiss()
-            listener.onDismissConflictDialog()
+            listener.onVpnConflictDialogDismiss()
         }
     }
 
@@ -133,11 +133,11 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
         endCta.setText(R.string.atp_VpnConflictDialogOpenSettings)
         endCta.setOnClickListener {
             dismiss()
-            listener.onOpenSettings()
+            listener.onVpnConflictDialogGoToSettings()
         }
         startCta.setOnClickListener {
             dismiss()
-            listener.onDismissConflictDialog()
+            listener.onVpnConflictDialogDismiss()
         }
     }
 

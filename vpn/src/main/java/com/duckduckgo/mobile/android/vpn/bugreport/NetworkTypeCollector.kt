@@ -32,12 +32,8 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
-import dagger.Binds
-import dagger.Module
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -53,6 +49,10 @@ import javax.inject.Inject
 @ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnStateCollectorPlugin::class
+)
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnServiceCallbacks::class
 )
 @SingleInstanceIn(VpnScope::class)
 class NetworkTypeCollector @Inject constructor(
@@ -259,13 +259,4 @@ class NetworkTypeCollector @Inject constructor(
         private const val FILENAME = "network.type.collector.file.v1"
         private const val NETWORK_INFO_KEY = "network.info.key"
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class NetworkTypeCollectorModule {
-    @Binds
-    @IntoSet
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun NetworkTypeCollector.bind(): VpnServiceCallbacks
 }

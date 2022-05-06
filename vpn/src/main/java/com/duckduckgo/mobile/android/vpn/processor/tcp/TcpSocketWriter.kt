@@ -23,11 +23,8 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.Pendin
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -55,6 +52,10 @@ interface TcpSocketWriter {
 @ContributesBinding(
     scope = VpnScope::class,
     boundType = TcpSocketWriter::class
+)
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnMemoryCollectorPlugin::class
 )
 class RealTcpSocketWriter @Inject constructor(
     @TcpNetworkSelector private val selector: Selector,
@@ -205,12 +206,4 @@ class RealTcpSocketWriter @Inject constructor(
         removalList.forEach { writeQueue.remove(it) }
         Timber.v("Cleaned up evicted TCBs. Removed %d", removalList.size)
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class TcpSocketWriterModule {
-    @Binds
-    @IntoSet
-    abstract fun bindTcpSocketWriterMemoryCollector(tcpSocketWriter: TcpSocketWriter): VpnMemoryCollectorPlugin
 }

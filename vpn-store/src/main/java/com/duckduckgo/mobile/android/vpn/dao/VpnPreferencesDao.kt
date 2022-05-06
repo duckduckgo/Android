@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2021 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,16 @@
 
 package com.duckduckgo.mobile.android.vpn.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
 
 @Dao
 interface VpnPreferencesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(state: VpnPreferences)
+    fun insert(pref: VpnPreferences)
 
-    @Query("select * from vpn_preferences where preference = :preference")
-    fun get(preference: String): VpnPreferences?
+    @Query("select * from vpn_prefs where preference = :name")
+    fun getPreference(name: String): VpnPreferences?
+
 }

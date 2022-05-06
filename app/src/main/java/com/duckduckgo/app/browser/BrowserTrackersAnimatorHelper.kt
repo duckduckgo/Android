@@ -39,6 +39,7 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.mobile.android.R as CommonR
 
 interface TrackersAnimatorListener {
     fun onAnimationFinished()
@@ -197,7 +198,7 @@ class BrowserTrackersAnimatorHelper {
     private fun createTextView(context: Context): AppCompatTextView {
         val textView = AppCompatTextView(context)
         textView.gravity = Gravity.CENTER
-        TextViewCompat.setTextAppearance(textView, R.style.UnknownTrackerText)
+        TextViewCompat.setTextAppearance(textView, CommonR.style.UnknownTrackerText)
         textView.layoutParams = getParams()
 
         return textView

@@ -1899,8 +1899,13 @@ class BrowserTabFragment :
         startActivityForResult(intent, REQUEST_CODE_CHOOSE_FILE)
     }
 
+    private fun minSdk29(): Boolean {
+        return appBuildConfig.sdkInt >= Build.VERSION_CODES.Q
+    }
+
     private fun hasWriteStoragePermission(): Boolean {
-        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return minSdk29() ||
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestWriteStoragePermission() {
