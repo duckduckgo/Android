@@ -47,10 +47,10 @@ class RealRemoteMessagingConfigProcessorTest {
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
     private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(
-        mock(),
-        mock(),
-        mock(),
-        mock(),
+        deviceAttributeMatcher = mock(),
+        androidAppAttributeMatcher = mock(),
+        remoteMessagingRepository = mock(),
+        userAttributeMatcher = mock()
     )
 
     private val testee = RealRemoteMessagingConfigProcessor(
