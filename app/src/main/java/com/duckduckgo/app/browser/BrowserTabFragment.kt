@@ -180,7 +180,6 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.remote.messaging.api.RemoteMessage
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
@@ -1168,7 +1167,7 @@ class BrowserTabFragment :
         val isShowing = automaticFireproofDialog?.isShowing
 
         if (isShowing != true) {
-            automaticFireproofDialog = MaterialAlertDialogBuilder(context)
+            automaticFireproofDialog = AlertDialog.Builder(context)
                 .setTitle(getString(R.string.automaticFireproofWebsiteLoginDialogTitle))
                 .setMessage(R.string.automaticFireproofWebsiteLoginDialogDescription)
                 .setPositiveButton(R.string.automaticFireproofWebsiteLoginDialogFirstOption) { _, _ ->

@@ -264,6 +264,7 @@
     <string name="dialogSave">Lagre</string>
     <string name="delete">Slett</string>
     <string name="edit">Rediger</string>
+    <string name="remove">Fjern</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søk på DuckDuckGo</string>

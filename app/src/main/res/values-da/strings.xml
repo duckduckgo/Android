@@ -264,6 +264,7 @@
     <string name="dialogSave">Gem</string>
     <string name="delete">Slet</string>
     <string name="edit">Rediger</string>
+    <string name="remove">Fjern</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Søg på DuckDuckGo</string>

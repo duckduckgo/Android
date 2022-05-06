@@ -264,6 +264,7 @@
     <string name="dialogSave">Αποθήκευση</string>
     <string name="delete">Διαγραφή</string>
     <string name="edit">Επεξεργασία</string>
+    <string name="remove">Αφαίρεση</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Αναζήτηση DuckDuckGo</string>

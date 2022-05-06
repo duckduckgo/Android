@@ -272,6 +272,7 @@
     <string name="dialogSave">Сохранить</string>
     <string name="delete">Удалить</string>
     <string name="edit">Редактировать</string>
+    <string name="remove">Удалить</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Найти через DuckDuckGo</string>

@@ -264,6 +264,7 @@
     <string name="dialogSave">Mentés</string>
     <string name="delete">Törlés</string>
     <string name="edit">Szerkesztés</string>
+    <string name="remove">Eltávolítás</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>

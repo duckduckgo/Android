@@ -264,6 +264,7 @@
     <string name="dialogSave">Speichern</string>
     <string name="delete">Löschen</string>
     <string name="edit">Bearbeiten</string>
+    <string name="remove">Entfernen</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>

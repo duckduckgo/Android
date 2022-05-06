@@ -272,6 +272,7 @@
     <string name="dialogSave">Uložiť</string>
     <string name="delete">Vymazať</string>
     <string name="edit">Upraviť</string>
+    <string name="remove">Odstrániť</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>

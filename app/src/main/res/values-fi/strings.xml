@@ -264,6 +264,7 @@
     <string name="dialogSave">Tallenna</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
+    <string name="remove">Poista</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>

@@ -272,6 +272,7 @@
     <string name="dialogSave">Uložit</string>
     <string name="delete">Smazat</string>
     <string name="edit">Upravit</string>
+    <string name="remove">Odstranit</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hledat DuckDuckGo</string>

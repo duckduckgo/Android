@@ -20,6 +20,8 @@ import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.core.text.HtmlCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -59,6 +61,21 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         observeViewModel()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_fireproof_websites_activity, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.removeAll -> {
+                viewModel.removeAllRequested()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun setupFireproofWebsiteRecycler() {
         adapter = FireproofWebsiteAdapter(viewModel, this, faviconManager)
         binding.recycler.adapter = adapter
@@ -74,7 +91,8 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
 
         viewModel.command.observe(this) {
             when (it) {
-                is FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite -> confirmDeleteWebsite(it.entity)
+                is FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite -> confirmRemoveWebsite(it.entity)
+                is FireproofWebsitesViewModel.Command.ConfirmRemoveAllFireproofWebsites -> confirmRemoveAllWebsites(it.removedWebsitesEntities)
                 is FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog ->
                     showAutomaticFireproofSettingSelectionDialog(it.automaticFireproofSetting)
             }
@@ -87,15 +105,27 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
     }
 
     @Suppress("deprecation")
-    private fun confirmDeleteWebsite(entity: FireproofWebsiteEntity) {
+    private fun confirmRemoveWebsite(entity: FireproofWebsiteEntity) {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemovalConfirmation, entity.website()), HtmlCompat.FROM_HTML_MODE_LEGACY)
-        viewModel.delete(entity)
+        viewModel.remove(entity)
         Snackbar.make(
             binding.root,
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onSnackBarUndoFireproof(entity)
+        }.show()
+    }
+
+    private fun confirmRemoveAllWebsites(removedWebsitesEntities: List<FireproofWebsiteEntity>) {
+        val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemoveAllConfirmation), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        viewModel.removeAllWebsites()
+        Snackbar.make(
+            binding.root,
+            message,
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.fireproofWebsiteSnackbarAction) {
+            viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsitesEntities)
         }.show()
     }
 
