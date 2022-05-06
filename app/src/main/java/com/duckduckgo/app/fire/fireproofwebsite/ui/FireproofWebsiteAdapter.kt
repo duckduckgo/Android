@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewFireproofTitleBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewFireproofWebsiteEmptyHintBinding
@@ -208,7 +209,7 @@ sealed class FireproofWebSiteViewHolder(itemView: View) : RecyclerView.ViewHolde
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
             }
         }
 

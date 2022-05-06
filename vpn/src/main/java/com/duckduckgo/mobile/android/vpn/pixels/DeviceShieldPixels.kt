@@ -347,6 +347,30 @@ interface DeviceShieldPixels {
     /** Will fire when the user launches the Recent App Settings Screen */
     fun didOpenManageRecentAppSettings()
 
+    fun reportLoopbackDnsError()
+    fun reportAnylocalDnsError()
+    fun reportGeneralDnsError()
+
+    /**
+     * Will fire when the user wants to remove the VPN feature all together
+     */
+    fun didShowRemoveTrackingProtectionFeatureDialog()
+
+    fun didChooseToRemoveTrackingProtectionFeature()
+
+    fun didChooseToCancelRemoveTrakcingProtectionDialog()
+
+    /**
+     * Will fire when the user is interacting with the Promote Always On Dialog
+     */
+    fun didShowPromoteAlwaysOnDialog()
+
+    fun didChooseToDismissPromoteAlwaysOnDialog()
+
+    fun didChooseToOpenSettingsFromPromoteAlwaysOnDialog()
+
+    fun didChooseToForgetPromoteAlwaysOnDialog()
+
 }
 
 @ContributesBinding(AppScope::class)
@@ -721,6 +745,58 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+    }
+
+    override fun reportLoopbackDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_LOOPBACK_DNS_SET_ERROR)
+    }
+
+    override fun reportAnylocalDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_ANY_LOCAL_ADDR_DNS_SET_ERROR)
+    }
+
+    override fun reportGeneralDnsError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
+    }
+
+    override fun didShowRemoveTrackingProtectionFeatureDialog() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG)
+    }
+
+    override fun didChooseToRemoveTrackingProtectionFeature() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didChooseToCancelRemoveTrakcingProtectionDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG)
+    }
+
+    override fun didShowPromoteAlwaysOnDialog() {
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToDismissPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToOpenSettingsFromPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_OPEN_SETTINGS_PROMOTE_ALWAYS_ON_DIALOG)
+    }
+
+    override fun didChooseToForgetPromoteAlwaysOnDialog() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
     private fun suddenKill() {

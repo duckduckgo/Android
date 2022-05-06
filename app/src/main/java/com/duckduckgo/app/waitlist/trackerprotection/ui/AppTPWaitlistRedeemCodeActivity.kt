@@ -26,7 +26,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.browser.databinding.ActivityAppTpWaitlistRedeemCodeBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -102,14 +102,14 @@ class AppTPWaitlistRedeemCodeActivity : DuckDuckGoActivity() {
     }
 
     private fun renderInvalidCode() {
-        binding.redeemCode.error = getString(R.string.atp_WaitlistRedeemCodeError)
+        binding.redeemCode.error = getString(VpnR.string.atp_WaitlistRedeemCodeError)
         binding.redeemButton.isEnabled = true
     }
 
     private fun renderGeneralError() {
         binding.redeemCode.error = null
         binding.redeemButton.isEnabled = true
-        Snackbar.make(binding.root, R.string.atp_WaitlistErrorJoining, Snackbar.LENGTH_LONG).show()
+        Snackbar.make(binding.root, VpnR.string.atp_WaitlistErrorJoining, Snackbar.LENGTH_LONG).show()
     }
 
     private fun renderRedeemed() {

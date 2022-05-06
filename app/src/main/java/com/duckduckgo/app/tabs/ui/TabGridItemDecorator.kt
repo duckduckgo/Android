@@ -24,7 +24,7 @@ import android.util.TypedValue
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.ui.view.toPx
 
 class TabGridItemDecorator(
@@ -38,7 +38,7 @@ class TabGridItemDecorator(
         strokeWidth = BORDER_WIDTH
 
         val typedValue = TypedValue()
-        context.theme.resolveAttribute(R.attr.normalTextColor, typedValue, true)
+        context.theme.resolveAttribute(CommonR.attr.normalTextColor, typedValue, true)
         color = ContextCompat.getColor(context, typedValue.resourceId)
     }
 
