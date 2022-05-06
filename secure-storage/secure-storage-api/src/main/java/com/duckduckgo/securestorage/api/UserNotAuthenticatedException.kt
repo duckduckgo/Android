@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
+package com.duckduckgo.securestorage.api
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+import java.lang.RuntimeException
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-dependencies {
-    implementation KotlinX.coroutines.core
-}
+data class UserNotAuthenticatedException(override val message: String?) : RuntimeException()

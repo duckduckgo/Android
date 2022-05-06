@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
+package com.duckduckgo.securestorage.api
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+sealed class Result {
+    data class Success(val expiryInMillis: Long) : Result()
+    data class Error(val reason: String) : Result()
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+data class WebsiteLoginCredentials(
+    val details: WebsiteLoginDetails,
+    val password: String?
+)
 
-dependencies {
-    implementation KotlinX.coroutines.core
-}
+data class WebsiteLoginDetails(
+    val domain: String?,
+    val username: String?,
+    val id: Int? = null
+)
