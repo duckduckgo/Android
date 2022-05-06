@@ -31,6 +31,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 interface EmailManager {
+    val appCoroutineScope: CoroutineScope
+
     fun signedInFlow(): StateFlow<Boolean>
     fun getAlias(): String?
     fun isSignedIn(): Boolean
@@ -43,6 +45,7 @@ interface EmailManager {
     fun signOut()
     fun getEmailAddress(): String?
     fun getUserData(): String
+    fun getDeviceCapabilities(): String
     fun waitlistState(): AppEmailManager.WaitlistState
     fun joinWaitlist(
         timestamp: Int,
@@ -63,7 +66,7 @@ class AppEmailManager(
     private val emailService: EmailService,
     private val emailDataStore: EmailDataStore,
     private val dispatcherProvider: DispatcherProvider,
-    private val appCoroutineScope: CoroutineScope
+    override val appCoroutineScope: CoroutineScope
 ) : EmailManager {
 
     private val isSignedInStateFlow = MutableStateFlow(isSignedIn())
@@ -107,6 +110,14 @@ class AppEmailManager(
             put(TOKEN, emailDataStore.emailToken)
             put(USERNAME, emailDataStore.emailUsername)
             put(NEXT_ALIAS, emailDataStore.nextAlias?.replace(DUCK_EMAIL_DOMAIN, ""))
+        }.toString()
+    }
+
+    override fun getDeviceCapabilities(): String {
+        return JSONObject().apply {
+            put("addUserData", true)
+            put("getUserData", true)
+            put("removeUserData", true)
         }.toString()
     }
 

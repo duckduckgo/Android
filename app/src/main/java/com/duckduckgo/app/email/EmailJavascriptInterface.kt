@@ -23,6 +23,9 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class EmailJavascriptInterface(
@@ -34,6 +37,20 @@ class EmailJavascriptInterface(
     private val autofill: Autofill,
     private val showNativeTooltip: () -> Unit
 ) {
+
+    init {
+        emailManager.signedInFlow().onEach { isSignedIn ->
+            if (!isSignedIn && isUrlFromDuckDuckGoEmail()) {
+                notifyWebappSignOut()
+            }
+        }.launchIn(emailManager.appCoroutineScope)
+    }
+
+    private fun notifyWebappSignOut() {
+        emailManager.appCoroutineScope.launch(dispatcherProvider.main()) {
+            webView.evaluateJavascript("window.postMessage({ emailProtectionSignedOut: true }, window.origin);", null)
+        }
+    }
 
     private fun getUrl(): String? {
         return runBlocking(dispatcherProvider.main()) {
@@ -67,6 +84,15 @@ class EmailJavascriptInterface(
     }
 
     @JavascriptInterface
+    fun getDeviceCapabilities(): String {
+        return if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.getDeviceCapabilities()
+        } else {
+            ""
+        }
+    }
+
+    @JavascriptInterface
     fun storeCredentials(
         token: String,
         username: String,
@@ -74,6 +100,13 @@ class EmailJavascriptInterface(
     ) {
         if (isUrlFromDuckDuckGoEmail()) {
             emailManager.storeCredentials(token, username, cohort)
+        }
+    }
+
+    @JavascriptInterface
+    fun removeCredentials() {
+        if (isUrlFromDuckDuckGoEmail()) {
+            emailManager.signOut()
         }
     }
 
