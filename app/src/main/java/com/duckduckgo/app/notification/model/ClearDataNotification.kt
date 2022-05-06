@@ -19,6 +19,7 @@ package com.duckduckgo.app.notification.model
 import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CANCEL
 import com.duckduckgo.app.notification.NotificationHandlerService.NotificationEvent.CLEAR_DATA_LAUNCH
 import com.duckduckgo.app.notification.NotificationRegistrar
@@ -69,5 +70,5 @@ class ClearDataSpecification(context: Context) : NotificationSpec {
     override val pixelSuffix = "cd"
     override val autoCancel = true
     override val bundle: Bundle = Bundle()
-    override val color: Int = R.color.cornflowerBlue
+    override val color: Int = CommonR.color.cornflowerBlue
 }

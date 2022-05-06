@@ -114,8 +114,9 @@
     <string name="atp_OnboardingLastPageTwoTitle">How does it work?</string>
     <string name="atp_OnboardingLastPageTwoSubTitle">App Tracking Protection <b>detects and blocks app trackers from other companies</b>, like when Facebook attempts to track you in a health app.\n\n<b>It\'s free</b>, and you can enjoy your apps as you normally would. Working in the background, it helps <b>protect you night and day.</b></string>
     <string name="atp_OnboardingLastPageThreeTitle">Who sees your data?</string>
-    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server.</b></string>
+    <string name="atp_OnboardingLastPageThreeSubTitle"><b>App Tracking Protection is not a VPN.</b> However, your device will recognize it as one. This is because it uses a local VPN connection to work.\n\nApp Tracking Protection is different.<b> It never routes app data through an external server. </b><annotation type="learn_more_link">Learn more</annotation></string>
     <string name="atp_FAQCta">App Tracking Protection FAQ</string>
+    <string name="atp_OnboardingContinue">Continue</string>
 
     <!--  App Tracking Protection Enabled Activity -->
     <string name="atp_EnabledTitle">Hooray! You’re all set up.</string>
@@ -197,7 +198,7 @@
     <string name="atp_ActivityAppTrackersFAQ">What Are App Trackers?</string>
     <string name="atp_ActivityReportProblem">Report a problem With an App</string>
     <string name="atp_ActivityBetaInstructions">Beta Instructions</string>
-    <string name="atp_ActivityManageProtection">Manage Protection for Your Apps</string>
+    <string name="atp_ActivityManageProtection">Having Problems With An App?</string>
     <plurals name="atp_ActivityTrackersCompanyBlocked">
         <item quantity="one">"%d tracking attempt"</item>
         <item quantity="other">%d tracking attempts"</item>
@@ -228,6 +229,9 @@
     <string name="atp_ActivityEnabledLabel">This feature is in beta. <annotation type="app_settings_link">Having problems with an app?</annotation></string>
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
+    <string name="atp_ActivityAbout">About</string>
+    <string name="atp_ActivityPrivacy">Privacy</string>
+    <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
 
     <!--  App Tracking Protection FAQ -->
     <string name="atp_FAQActivityTitle">FAQ</string>
@@ -360,4 +364,18 @@
     <string name="atp_ManageRecentAppsProtectionActivityTitle">Recent Apps</string>
     <string name="atp_ManageRecentAppsProtectionShowAll">Show All Apps</string>
     <string name="atp_ManageRecentAppsProtectionEmpty">No recent apps yet</string>
+
+    <!--  App Tracking Protection Remove Feature Dialog -->
+    <string name="atp_RemoveFeatureDialogTitle">Disable and Delete Data?</string>
+    <string name="atp_RemoveFeatureDialogMessage">App Tracking Protection will be disabled and any settings and history of tracking attempts will be deleted. You can enable it again at any time in Settings.</string>
+    <string name="atp_RemoveFeatureDialogCancel">Cancel</string>
+    <string name="atp_RemoveFeatureDialogRemove">Disable</string>
+
+    <!--  App Tracking Protection Promote Always On -->
+    <string name="atp_PromoteAlwaysOnDialogTitle">Set to Always On?</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">To prevent Android from periodically disabling App Tracking Protection:\n\nGo to Settings\nTap ⚙️ next to DuckDuckGo\nTurn on “Always-on VPN</string>
+    <string name="atp_PromoteAlwaysOnDialogSettings">Go to Settings</string>
+    <string name="atp_PromoteAlwaysOnDialogLater">Remind me Later</string>
+    <string name="atp_PromoteAlwaysOnDialogForget">No Thanks</string>
+
 </resources>
