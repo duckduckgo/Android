@@ -50,7 +50,7 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     sealed class Command {
         class ConfirmRemoveFireproofWebsite(val entity: FireproofWebsiteEntity) : Command()
-        class ConfirmRemoveAllFireproofWebsites() : Command()
+        class ConfirmRemoveAllFireproofWebsites(val removedWebsitesEntities: List<FireproofWebsiteEntity>) : Command()
         class ShowAutomaticFireproofSettingSelectionDialog(val automaticFireproofSetting: AutomaticFireproofSetting) : Command()
     }
 
@@ -60,7 +60,6 @@ class FireproofWebsitesViewModel @Inject constructor(
 
     private val fireproofWebsites: LiveData<List<FireproofWebsiteEntity>> = fireproofWebsiteRepository.getFireproofWebsites()
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> { onPreservedCookiesEntitiesChanged(it!!) }
-    private var removedWebsitesEntities: List<FireproofWebsiteEntity> = emptyList()
 
     init {
         _viewState.value = ViewState(
@@ -120,11 +119,11 @@ class FireproofWebsitesViewModel @Inject constructor(
     }
 
     fun removeAllRequested() {
-        command.value = Command.ConfirmRemoveAllFireproofWebsites()
+        val removedWebsites = fireproofWebsites.value ?: emptyList()
+        command.value = Command.ConfirmRemoveAllFireproofWebsites(removedWebsites)
     }
 
     fun removeAllWebsites() {
-        removedWebsitesEntities = fireproofWebsites.value ?: emptyList()
         viewModelScope.launch(dispatcherProvider.io()) {
 
             fireproofWebsiteRepository.removeAllFireproofWebsites()
@@ -132,7 +131,7 @@ class FireproofWebsitesViewModel @Inject constructor(
         }
     }
 
-    fun onSnackBarUndoRemoveAllWebsites() {
+    fun onSnackBarUndoRemoveAllWebsites(removedWebsitesEntities: List<FireproofWebsiteEntity>) {
         viewModelScope.launch(dispatcherProvider.io()) {
             removedWebsitesEntities.forEach { fireproofWebsiteEntity ->
                 onSnackBarUndoFireproof(fireproofWebsiteEntity)

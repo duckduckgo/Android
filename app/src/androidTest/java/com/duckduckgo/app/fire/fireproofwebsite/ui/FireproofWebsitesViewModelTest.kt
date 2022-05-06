@@ -207,9 +207,11 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
-    fun whenUserUndosRemoveAllFireproofSitesThenSitesAreAddedBack() {
-        givenFireproofWebsiteDomain("domain.com")
-        viewModel.onSnackBarUndoRemoveAllWebsites()
+    fun whenUserUndoesRemoveAllFireproofSitesThenSitesAreAddedBack() {
+        val removedWebsites: List<FireproofWebsiteEntity> = listOf(
+            FireproofWebsiteEntity(domain = "domain.com"),
+            FireproofWebsiteEntity(domain = "domain2.com"))
+        viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsites)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())

@@ -92,7 +92,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         viewModel.command.observe(this) {
             when (it) {
                 is FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite -> confirmRemoveWebsite(it.entity)
-                is FireproofWebsitesViewModel.Command.ConfirmRemoveAllFireproofWebsites -> confirmRemoveAllWebsites()
+                is FireproofWebsitesViewModel.Command.ConfirmRemoveAllFireproofWebsites -> confirmRemoveAllWebsites(it.removedWebsitesEntities)
                 is FireproofWebsitesViewModel.Command.ShowAutomaticFireproofSettingSelectionDialog ->
                     showAutomaticFireproofSettingSelectionDialog(it.automaticFireproofSetting)
             }
@@ -117,7 +117,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         }.show()
     }
 
-    private fun confirmRemoveAllWebsites() {
+    private fun confirmRemoveAllWebsites(removedWebsitesEntities: List<FireproofWebsiteEntity>) {
         val message = HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteRemoveAllConfirmation), HtmlCompat.FROM_HTML_MODE_LEGACY)
         viewModel.removeAllWebsites()
         Snackbar.make(
@@ -125,7 +125,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
             message,
             Snackbar.LENGTH_LONG
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
-            viewModel.onSnackBarUndoRemoveAllWebsites()
+            viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsitesEntities)
         }.show()
     }
 
