@@ -39,7 +39,7 @@ class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
     private val vpnStore: VpnStore,
     private val vpnFeatureRemover: VpnFeatureRemover,
-    private val vpnStateMonitor: VpnStateMonitor,
+    vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider
 ) : ViewModel(), LifecycleObserver {
 

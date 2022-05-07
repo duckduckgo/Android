@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -59,21 +58,15 @@ class ChangeIconActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
 
-        viewModel.viewState.observe(
-            this,
-            Observer<ChangeIconViewModel.ViewState> { viewState ->
-                viewState?.let {
-                    render(it)
-                }
+        viewModel.viewState.observe(this) { viewState ->
+            viewState?.let {
+                render(it)
             }
-        )
+        }
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.command.observe(this) {
+            processCommand(it)
+        }
 
         viewModel.start()
     }

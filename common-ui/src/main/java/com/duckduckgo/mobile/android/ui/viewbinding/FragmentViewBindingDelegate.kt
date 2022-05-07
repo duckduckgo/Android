@@ -32,7 +32,7 @@ inline fun <reified T : ViewBinding> Fragment.viewBinding() =
 
 class FragmentViewBindingDelegate<T : ViewBinding>(
     bindingClass: Class<T>,
-    private val fragment: Fragment
+    fragment: Fragment
 ) : ReadOnlyProperty<Fragment, T> {
 
     // LazyThreadSafetyMode.NONE because it will never be initialised from ore than one thread

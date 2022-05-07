@@ -113,9 +113,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { viewState ->
-                viewState.let {
-                    renderViewState(it)
-                }
+                renderViewState(viewState)
             }
             .launchIn(lifecycleScope)
 

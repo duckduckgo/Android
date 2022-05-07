@@ -183,7 +183,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         searchMenuItem?.isVisible = itemsAvailable(viewState)
     }
 
-    private fun itemsAvailable(viewState: DownloadsViewModel.ViewState): Boolean {
+    private fun itemsAvailable(viewState: ViewState): Boolean {
         // The empty view is part of the list.
         return viewState.filteredItems.size > 1
     }

@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class EmailProtectionSignOutFragment() : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
+class EmailProtectionSignOutFragment : EmailProtectionFragment(R.layout.fragment_email_protection_sign_out) {
 
     private val viewModel by bindViewModel<EmailProtectionSignOutViewModel>()
 

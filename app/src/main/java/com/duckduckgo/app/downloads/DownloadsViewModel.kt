@@ -53,7 +53,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    private val applicationContext: Context
+    applicationContext: Context
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
