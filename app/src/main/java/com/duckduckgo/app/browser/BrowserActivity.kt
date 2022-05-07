@@ -142,9 +142,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
-        viewModel.viewState.observe(
-            this
-        ) {
+        viewModel.viewState.observe(this) {
             renderer.renderBrowserViewState(it)
         }
         viewModel.awaitClearDataFinishedNotification()
@@ -302,19 +300,13 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             processCommand(it)
         }
-        viewModel.selectedTab.observe(
-            this
-        ) {
+        viewModel.selectedTab.observe(this) {
             if (it != null) selectTab(it)
         }
-        viewModel.tabs.observe(
-            this
-        ) {
+        viewModel.tabs.observe(this) {
             clearStaleTabs(it)
             launch { viewModel.onTabsUpdated(it) }
         }

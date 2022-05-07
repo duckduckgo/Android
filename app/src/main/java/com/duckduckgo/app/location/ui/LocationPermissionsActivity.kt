@@ -68,9 +68,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this
-        ) { viewState ->
+        viewModel.viewState.observe(this) { viewState ->
             viewState?.let {
                 if (!it.systemLocationPermissionGranted) {
                     binding.recycler.gone()
@@ -84,9 +82,7 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
             }
         }
 
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             when (it) {
                 is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
                 is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)

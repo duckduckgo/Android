@@ -54,9 +54,7 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureCommandObserver() {
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             when (it) {
                 ShowHome -> showHome()
                 Close -> close()

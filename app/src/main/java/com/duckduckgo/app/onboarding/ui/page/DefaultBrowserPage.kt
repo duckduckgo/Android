@@ -119,9 +119,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            viewLifecycleOwner
-        ) { viewState ->
+        viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
             viewState?.let {
                 when (it) {
                     is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
@@ -140,9 +138,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             }
         }
 
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             when (it) {
                 is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
                 is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()

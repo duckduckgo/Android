@@ -143,21 +143,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(
-            this
-        ) {
+        viewModel.tabs.observe(this) {
             render(it)
         }
-        viewModel.deletableTabs.observe(
-            this
-        ) {
+        viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
                 onDeletableTab(it.last())
             }
         }
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             processCommand(it)
         }
     }

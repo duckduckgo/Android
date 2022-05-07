@@ -111,9 +111,9 @@ class LocationPermissionsAdapter(
             }
             TOGGLE_TYPE -> {
                 val binding = ViewLocationPermissionsToggleBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(
-                    binding
-                ) { _, isChecked -> viewModel.onLocationPermissionToggled(isChecked) }
+                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(binding) { _, isChecked ->
+                    viewModel.onLocationPermissionToggled(isChecked)
+                }
             }
             DIVIDER_TYPE -> {
                 val binding = ViewLocationPermissionsDividerBinding.inflate(inflater, parent, false)

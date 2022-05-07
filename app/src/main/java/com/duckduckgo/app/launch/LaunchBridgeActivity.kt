@@ -46,9 +46,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             processCommand(it)
         }
     }

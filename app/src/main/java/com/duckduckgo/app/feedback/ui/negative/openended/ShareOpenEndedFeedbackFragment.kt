@@ -58,9 +58,7 @@ class ShareOpenEndedFeedbackFragment : FeedbackFragment(R.layout.content_feedbac
     private var subReason: SubReason? = null
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this
-        ) { command ->
+        viewModel.command.observe(this) { command ->
             when (command) {
                 is Command.Exit -> {
                     listener?.userCancelled()

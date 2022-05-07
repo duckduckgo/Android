@@ -64,14 +64,10 @@ class FeedbackActivity :
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             it?.let { command -> processCommand(command) }
         }
-        viewModel.updateViewCommand.observe(
-            this
-        ) {
+        viewModel.updateViewCommand.observe(this) {
             it?.let { viewState -> render(viewState) }
         }
     }

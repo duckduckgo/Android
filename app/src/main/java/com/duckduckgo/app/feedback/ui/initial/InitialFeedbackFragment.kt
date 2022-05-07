@@ -60,9 +60,7 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this
-        ) {
+        viewModel.command.observe(this) {
             when (it) {
                 PositiveFeedbackSelected -> listener?.userSelectedPositiveFeedback()
                 NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()

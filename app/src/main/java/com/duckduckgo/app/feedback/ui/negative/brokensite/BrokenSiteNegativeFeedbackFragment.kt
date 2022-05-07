@@ -45,9 +45,7 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
         get() = activity as BrokenSiteFeedbackListener
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this
-        ) { command ->
+        viewModel.command.observe(this) { command ->
             when (command) {
                 is BrokenSiteNegativeFeedbackViewModel.Command.Exit -> {
                     listener?.userCancelled()
