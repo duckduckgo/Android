@@ -30,7 +30,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.view.ViewCompat.requestApplyInsets
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -120,41 +119,35 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            viewLifecycleOwner,
-            Observer { viewState ->
-                viewState?.let {
-                    when (it) {
-                        is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
-                            setUiForSettings()
-                            hideInstructionsCard()
-                        }
-                        is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
-                            setUiForDialog()
-                            if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
-                        }
-                        is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
-                            hideInstructionsCard()
-                            onContinuePressed()
-                        }
-                    }
-                }
-            }
-        )
-
-        viewModel.command.observe(
-            this,
-            Observer {
+        viewModel.viewState.observe(viewLifecycleOwner) { viewState ->
+            viewState?.let {
                 when (it) {
-                    is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
-                    is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
-                    is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
+                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserSettingsUI -> {
+                        setUiForSettings()
+                        hideInstructionsCard()
+                    }
+                    is DefaultBrowserPageViewModel.ViewState.DefaultBrowserDialogUI -> {
+                        setUiForDialog()
+                        if (it.showInstructionsCard) showInstructionsCard() else hideInstructionsCard()
+                    }
+                    is DefaultBrowserPageViewModel.ViewState.ContinueToBrowser -> {
                         hideInstructionsCard()
                         onContinuePressed()
                     }
                 }
             }
-        )
+        }
+
+        viewModel.command.observe(this) {
+            when (it) {
+                is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
+                is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
+                is DefaultBrowserPageViewModel.Command.ContinueToBrowser -> {
+                    hideInstructionsCard()
+                    onContinuePressed()
+                }
+            }
+        }
     }
 
     private fun setUiForDialog() {

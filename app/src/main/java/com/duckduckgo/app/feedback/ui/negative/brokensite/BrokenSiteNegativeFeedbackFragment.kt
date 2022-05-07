@@ -17,7 +17,6 @@
 package com.duckduckgo.app.feedback.ui.negative.brokensite
 
 import androidx.core.view.doOnNextLayout
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackNegativeBrokenSiteFeedbackBinding
@@ -46,19 +45,16 @@ class BrokenSiteNegativeFeedbackFragment : FeedbackFragment(R.layout.content_fee
         get() = activity as BrokenSiteFeedbackListener
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this,
-            Observer { command ->
-                when (command) {
-                    is BrokenSiteNegativeFeedbackViewModel.Command.Exit -> {
-                        listener?.userCancelled()
-                    }
-                    is BrokenSiteNegativeFeedbackViewModel.Command.ExitAndSubmitFeedback -> {
-                        listener?.onProvidedBrokenSiteFeedback(command.feedback, command.brokenSite)
-                    }
+        viewModel.command.observe(this) { command ->
+            when (command) {
+                is BrokenSiteNegativeFeedbackViewModel.Command.Exit -> {
+                    listener?.userCancelled()
+                }
+                is BrokenSiteNegativeFeedbackViewModel.Command.ExitAndSubmitFeedback -> {
+                    listener?.onProvidedBrokenSiteFeedback(command.feedback, command.brokenSite)
                 }
             }
-        )
+        }
     }
 
     override fun configureListeners() {

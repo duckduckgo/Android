@@ -108,7 +108,7 @@ class TrackerFeedAdapter @Inject constructor(
         diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
     }
 
-    private class TrackerEmptyFeedViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    private class TrackerEmptyFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         companion object {
             fun create(parent: ViewGroup): TrackerEmptyFeedViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -118,7 +118,7 @@ class TrackerFeedAdapter @Inject constructor(
         }
     }
 
-    private class TrackerSkeletonViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    private class TrackerSkeletonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         companion object {
             fun create(parent: ViewGroup): TrackerSkeletonViewHolder {
                 val inflater = LayoutInflater.from(parent.context)
@@ -206,7 +206,7 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                timeSinceTrackerBlocked.text = "${item.displayTimestamp}"
+                timeSinceTrackerBlocked.text = item.displayTimestamp
 
                 Glide.with(trackingAppIcon.context.applicationContext)
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))

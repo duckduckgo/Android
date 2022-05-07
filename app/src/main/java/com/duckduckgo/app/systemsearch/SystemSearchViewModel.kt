@@ -40,7 +40,6 @@ import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
@@ -157,12 +156,10 @@ class SystemSearchViewModel @Inject constructor(
     private fun buildResultsObservable(query: String): Observable<SystemSearchResult>? {
         return Observable.zip(
             autoComplete.autoComplete(query),
-            Observable.just(deviceAppLookup.query(query)),
-            BiFunction<AutoCompleteResult, List<DeviceApp>, SystemSearchResult>
-            { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
-                SystemSearchResult(autocompleteResult, appsResult)
-            }
-        )
+            Observable.just(deviceAppLookup.query(query))
+        ) { autocompleteResult: AutoCompleteResult, appsResult: List<DeviceApp> ->
+            SystemSearchResult(autocompleteResult, appsResult)
+        }
     }
 
     fun userTappedOnboardingToggle() {

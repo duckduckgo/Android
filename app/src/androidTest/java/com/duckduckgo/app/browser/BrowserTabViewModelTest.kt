@@ -158,7 +158,6 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -1220,7 +1219,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(Mockito.any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
     }
 
     @Test
@@ -1435,7 +1434,7 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>() {
+        assertCommandIssued<Command.OpenInNewTab> {
             assertNull(sourceTabId)
         }
     }

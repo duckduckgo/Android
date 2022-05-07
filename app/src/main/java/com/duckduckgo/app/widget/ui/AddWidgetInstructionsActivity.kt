@@ -19,7 +19,6 @@ package com.duckduckgo.app.widget.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.databinding.ActivityAddWidgetInstructionsBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
@@ -55,15 +54,12 @@ class AddWidgetInstructionsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureCommandObserver() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                when (it) {
-                    ShowHome -> showHome()
-                    Close -> close()
-                }
+        viewModel.command.observe(this) {
+            when (it) {
+                ShowHome -> showHome()
+                Close -> close()
             }
-        )
+        }
     }
 
     override fun onBackPressed() {
