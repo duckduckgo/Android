@@ -16,13 +16,6 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <!-- Fireproof CTA Experiment -->
-    <string name="daxFireproofCtaText"><![CDATA[Your data is toast!<br/><br/>Want me to \"Fireproof\" sites when you sign in? That way, you won\'t be signed out when you burn your data.<br/><br/>You can always change this later in settings.]]></string>
-    <string name="daxFireproofKeepMeSignedInButton">Keep Me Signed In To Sites</string>
-    <string name="daxFireproofBurnEverythingButton">Burn Everything</string>
-    <string name="daxFireproofSettingsToggle">Fireproof Sites When Signing In</string>
-    <string name="daxFireproofSettingsInfo">The Fire Button erases data such as cookies, which keep you signed in to sites. You can Fireproof sites to keep these cookies and stay signed in. This retains some data that sites keep about you. We still block third-party trackers found on Fireproof sites.</string>
-
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
     <string name="macos_settings_description_list">You\'re on the list!</string>
@@ -49,4 +42,17 @@
 
     <!-- Tabs -->
     <string name="downloadsMenuItemTitle">Downloads</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Fireproofing sites will keep you signed in after using the Fire Button. You can always change this later in Settings. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Fireproof this site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Not now</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
+
+    <!-- Dialogs -->
+    <string name="removeAll">Remove All</string>
 </resources>

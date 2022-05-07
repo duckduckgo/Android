@@ -54,7 +54,7 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
         val telephonyCountry = telephonyManager.networkCountryIso
         val deviceCountry =
             if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
-        deviceCountry.toLowerCase()
+        deviceCountry.lowercase(Locale.getDefault())
     }
 
     private val telephonyManager by lazy {

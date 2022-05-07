@@ -21,6 +21,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemPrivacyPracticeBinding
+import com.duckduckgo.app.global.extensions.capitalizeFirstLetter
+import kotlin.collections.ArrayList
 
 class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.PracticeViewHolder>() {
 
@@ -47,7 +49,7 @@ class PrivacyPracticesAdapter : RecyclerView.Adapter<PrivacyPracticesAdapter.Pra
         val descriptionResource = if (term.first == GOOD) R.string.practicesIconContentGood else R.string.practicesIconContentBad
         holder.binding.icon.contentDescription = holder.binding.icon.context.getText(descriptionResource)
         holder.binding.icon.setImageResource(if (term.first == GOOD) R.drawable.icon_success else R.drawable.icon_fail)
-        holder.binding.description.text = term.second.capitalize()
+        holder.binding.description.text = term.second.capitalizeFirstLetter()
     }
 
     override fun getItemCount(): Int {

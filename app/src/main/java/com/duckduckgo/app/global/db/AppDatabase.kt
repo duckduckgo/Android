@@ -48,6 +48,8 @@ import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.privacy.db.*
 import com.duckduckgo.app.privacy.model.PrivacyProtectionCountsEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
+import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper
 import com.duckduckgo.app.statistics.model.PixelEntity
 import com.duckduckgo.app.statistics.model.QueryParamsTypeConverter
 import com.duckduckgo.app.statistics.store.PendingPixelDao
@@ -64,7 +66,7 @@ import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.app.usage.search.SearchCountEntity
 
 @Database(
-    exportSchema = true, version = 42,
+    exportSchema = true, version = 43,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -144,7 +146,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Suppress("PropertyName")
-class MigrationsProvider(val context: Context) {
+class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDataStore) {
 
     val MIGRATION_1_TO_2: Migration = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
@@ -552,6 +554,14 @@ class MigrationsProvider(val context: Context) {
         }
     }
 
+    val MIGRATION_42_TO_43: Migration = object : Migration(42, 43) {
+        val oldSettingsDataStore = OldSettingsDataStore()
+
+        override fun migrate(database: SupportSQLiteDatabase) {
+            oldSettingsDataStore.updateFireproofSettingType()
+        }
+    }
+
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -618,7 +628,8 @@ class MigrationsProvider(val context: Context) {
             MIGRATION_38_TO_39,
             MIGRATION_39_TO_40,
             MIGRATION_40_TO_41,
-            MIGRATION_41_TO_42
+            MIGRATION_41_TO_42,
+            MIGRATION_42_TO_43
         )
 
     @Deprecated(
@@ -640,6 +651,16 @@ class MigrationsProvider(val context: Context) {
             // First released in 5.103.0 and fully disabled in 5.114.0.
             val preferences = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
             return preferences.getBoolean("HIDE_TIPS_FOR_RETURNING_USER", false)
+        }
+    }
+
+    private inner class OldSettingsDataStore {
+
+        private val loginDetectorPrefsMapper = LoginDetectorPrefsMapper()
+
+        fun updateFireproofSettingType() {
+            val automaticFireproofSetting = loginDetectorPrefsMapper.mapToAutomaticFireproofSetting(settingsDataStore.appLoginDetection)
+            settingsDataStore.automaticFireproofSetting = automaticFireproofSetting
         }
     }
 }
