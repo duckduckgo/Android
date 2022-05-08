@@ -28,7 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
  * - _d -> when the pixel is a first-in-day pixel
  * - _c -> when the pixel is a every-occurrence pixel
  */
-enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelName {
+enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
     ATP_ENABLE_UPON_SEARCH_DAILY("m_atp_ev_enabled_on_search_d"),
     ATP_DISABLE_UPON_SEARCH_DAILY("m_atp_ev_disabled_on_search_d"),
     ATP_ENABLE_UPON_APP_LAUNCH("m_atp_ev_enabled_on_launch_c"),
@@ -194,8 +194,10 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cance_tracking_protection_feature_d"),
     ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cance_tracking_protection_feature_c"),
 
-    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
-    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c", enqueue = true),
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR_DAILY("m_atp_report_no_device_connectivity_d", enqueue = true),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c", enqueue = true),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR_DAILY("m_atp_report_no_vpn_connectivity_d", enqueue = true),
 
     ATP_REPORT_LOOPBACK_DNS_SET_ERROR("m_atp_report_loopback_dns_error_c"),
     ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY("m_atp_report_loopback_dns_error_d"),
