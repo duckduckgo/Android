@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -383,7 +384,7 @@ class RealDeviceShieldPixels @Inject constructor(
 ) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(DS_PIXELS_PREF_FILE)
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)

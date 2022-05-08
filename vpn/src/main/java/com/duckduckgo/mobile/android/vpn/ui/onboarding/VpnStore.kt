@@ -22,6 +22,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -51,7 +52,7 @@ class SharedPreferencesVpnStore @Inject constructor(
     vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
-    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_MULTI_PROCESS)
+    private val preferences = context.getHarmonySharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS)
     private val vpnDatabasePreferences = vpnDatabase.vpnPreferencesDao()
 
     override fun onboardingDidShow() {

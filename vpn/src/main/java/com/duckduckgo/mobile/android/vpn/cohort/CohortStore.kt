@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
+import com.frybits.harmony.getHarmonySharedPreferences
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
@@ -59,7 +60,7 @@ class RealCohortStore @Inject constructor(
 
     @VisibleForTesting
     val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(FILENAME)
 
     override fun getCohortStoredLocalDate(): LocalDate? {
         return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {

@@ -62,6 +62,9 @@ dependencies {
 
     implementation "androidx.viewpager2:viewpager2:_"
 
+    // multi-process shared preferences
+    implementation "com.frybits.harmony:harmony:_"
+
     // Security crypto
     implementation AndroidX.security.crypto
 
