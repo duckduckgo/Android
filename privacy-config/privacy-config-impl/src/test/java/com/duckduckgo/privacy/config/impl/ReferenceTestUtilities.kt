@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
