@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.impl
 import com.duckduckgo.app.FileUtilities
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.impl.features.contentblocking.ContentBlockingPlugin
 import com.duckduckgo.privacy.config.impl.features.drm.DrmPlugin
 import com.duckduckgo.privacy.config.impl.features.gpc.GpcPlugin
@@ -27,6 +28,7 @@ import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllow
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
@@ -59,7 +61,7 @@ class ReferenceTestUtilities(
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
     var privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
-    var versionHandler: VersionHandler = mock()
+    var versionHandler: VersionHandler = RealVersionHandler(mock())
     var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestScope(), dispatcherProvider)
     var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestScope(), dispatcherProvider)
     var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestScope(), dispatcherProvider)
