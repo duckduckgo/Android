@@ -16,13 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
-import com.frybits.harmony.getHarmonySharedPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -379,12 +376,11 @@ interface DeviceShieldPixels {
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
-    private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
-    private val preferences: SharedPreferences
-        get() = context.getHarmonySharedPreferences(DS_PIXELS_PREF_FILE)
+    private val preferences = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true)
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
@@ -891,7 +887,6 @@ class RealDeviceShieldPixels @Inject constructor(
         private const val FIRST_ENABLE_ENTRY_POINT_TAG = "FIRST_ENABLE_ENTRY_POINT_TAG"
         private const val FIRST_OPEN_ENTRY_POINT_TAG = "FIRST_OPEN_ENTRY_POINT_TAG"
 
-        @VisibleForTesting
-        const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
+        private const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
     }
 }
