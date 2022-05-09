@@ -25,7 +25,7 @@ import junit.framework.TestCase.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -58,7 +58,7 @@ class TrackingParametersPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingParametersAndIsEnabledThenStoreFeatureEnabled() {
-        whenever(mockVersionHandler.isSupportedVersion(anyString())).thenReturn(true)
+        whenever(mockVersionHandler.isSupportedVersion(anyInt())).thenReturn(true)
 
         val jsonString = FileUtilities.loadText(TrackingParametersPluginTest::class.java.classLoader!!, "json/tracking_parameters.json")
 
@@ -69,7 +69,7 @@ class TrackingParametersPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingParametersAndIsNotEnabledThenStoreFeatureDisabled() {
-        whenever(mockVersionHandler.isSupportedVersion(anyString())).thenReturn(true)
+        whenever(mockVersionHandler.isSupportedVersion(anyInt())).thenReturn(true)
 
         val jsonString = FileUtilities.loadText(
             TrackingParametersPluginTest::class.java.classLoader!!,
@@ -83,7 +83,7 @@ class TrackingParametersPluginTest {
 
     @Test
     fun whenFeatureNameMatchesTrackingParametersAndIsNotSupportedVersionThenStoreFeatureDisabled() {
-        whenever(mockVersionHandler.isSupportedVersion(anyString())).thenReturn(false)
+        whenever(mockVersionHandler.isSupportedVersion(anyInt())).thenReturn(false)
 
         val jsonString = FileUtilities.loadText(
             TrackingParametersPluginTest::class.java.classLoader!!,

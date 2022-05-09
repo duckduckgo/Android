@@ -725,7 +725,7 @@
         ]
       },
       "state": "enabled",
-      "minSupportedVersion": "5.119.0"
+      "minSupportedVersion": "51230000"
     },
     "userAgentRotation": {
       "settings": {
