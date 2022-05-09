@@ -29,6 +29,8 @@ import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
+import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
+import com.duckduckgo.mobile.android.vpn.prefs.RealVpnPreferences
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -78,8 +80,8 @@ class PrivacyReportViewModelTest {
 
         repository = RealAppTrackerBlockingStatsRepository(db)
 
-        context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
-        vpnPreferences = VpnPreferences(context)
+        context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE).edit { clear() }
+        vpnPreferences = RealVpnPreferences(context)
 
         testee = PrivacyReportViewModel(repository, vpnStore, vpnFeatureRemover, vpnStateMonitor, coroutineRule.testDispatcherProvider)
     }

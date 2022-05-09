@@ -51,7 +51,6 @@ import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Health monitor will periodically obtain the current health metrics across AppTP, and raise an
@@ -90,7 +89,7 @@ class AppTPHealthMonitor @Inject constructor(
 
         private val TUN_READ_ALERT_SAMPLES: Int = (4.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
         private val NO_NETWORK_CONNECTIVITY_SAMPLES: Int = (1.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
-        private val TUN_READ_IO_SAMPLES: Int = (45.seconds.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
+        private val TUN_READ_IO_SAMPLES: Int = (1.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
         private val DEFAULT_ALERT_SAMPLES: Int = (2.minutes.inWholeMilliseconds / MONITORING_FREQUENCY_MS).toInt()
     }
 

@@ -371,6 +371,8 @@ interface DeviceShieldPixels {
 
     fun didChooseToForgetPromoteAlwaysOnDialog()
 
+    fun reportVpnConnectivityError()
+    fun reportDeviceConnectivityError()
 }
 
 @ContributesBinding(AppScope::class)
@@ -799,6 +801,16 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG)
     }
 
+    override fun reportVpnConnectivityError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_VPN_CONNECTIVITY_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_VPN_CONNECTIVITY_ERROR)
+    }
+
+    override fun reportDeviceConnectivityError() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR)
+    }
+
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
@@ -807,34 +819,45 @@ class RealDeviceShieldPixels @Inject constructor(
         p: DeviceShieldPixelNames,
         payload: Map<String, String> = emptyMap()
     ) {
-        firePixel(p.pixelName, payload)
+        firePixel(p.pixelName, payload, p.enqueue)
     }
 
     private fun firePixel(
         pixelName: String,
-        payload: Map<String, String> = emptyMap()
+        payload: Map<String, String> = emptyMap(),
+        enqueue: Boolean = false,
     ) {
-        pixel.fire(pixelName, payload)
+        if (enqueue) {
+            pixel.enqueueFire(pixelName, payload)
+        } else {
+            pixel.fire(pixelName, payload)
+        }
     }
 
     private fun tryToFireDailyPixel(
         pixel: DeviceShieldPixelNames,
         payload: Map<String, String> = emptyMap()
     ) {
-        tryToFireDailyPixel(pixel.pixelName, payload)
+        tryToFireDailyPixel(pixel.pixelName, payload, pixel.enqueue)
     }
 
     private fun tryToFireDailyPixel(
         pixelName: String,
-        payload: Map<String, String> = emptyMap()
+        payload: Map<String, String> = emptyMap(),
+        enqueue: Boolean = false,
     ) {
         val now = getUtcIsoLocalDate()
         val timestamp = preferences.getString(pixelName.appendTimestampSuffix(), null)
 
         // check if pixel was already sent in the current day
         if (timestamp == null || now > timestamp) {
-            this.pixel.fire(pixelName, payload)
-                .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            if (enqueue) {
+                this.pixel.enqueueFire(pixelName, payload)
+                    .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            } else {
+                this.pixel.fire(pixelName, payload)
+                    .also { preferences.edit { putString(pixelName.appendTimestampSuffix(), now) } }
+            }
         }
     }
 
@@ -847,7 +870,11 @@ class RealDeviceShieldPixels @Inject constructor(
 
         if (didExecuteAlready) return
 
-        this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        if (pixel.enqueue) {
+            this.pixel.enqueueFire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        } else {
+            this.pixel.fire(pixel, payload).also { preferences.edit { putBoolean(tag ?: pixel.pixelName, true) } }
+        }
     }
 
     private fun String.appendTimestampSuffix(): String {

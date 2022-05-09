@@ -22,9 +22,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
+import com.duckduckgo.mobile.android.vpn.prefs.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldAlertNotificationBuilder
 import com.squareup.anvil.annotations.ContributesBinding
-import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,14 +58,14 @@ class AndroidVpnReminderReceiverManager @Inject constructor(
     }
 
     private fun wasReminderNotificationShown(context: Context): Boolean {
-        return prefs(context).getBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
+        return prefs(context).getBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, false)
     }
 
     private fun notificationWasShown(context: Context) {
-        prefs(context).edit { putBoolean(VpnPreferences.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
+        prefs(context).edit { putBoolean(PREFS_KEY_REMINDER_NOTIFICATION_SHOWN, true) }
     }
 
     private fun prefs(context: Context): SharedPreferences {
-        return context.getSharedPreferences(VpnPreferences.PREFS_FILENAME, Context.MODE_PRIVATE)
+        return context.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
     }
 }
