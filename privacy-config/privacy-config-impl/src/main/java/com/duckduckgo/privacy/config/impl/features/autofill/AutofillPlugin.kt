@@ -21,6 +21,7 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.AutofillExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -33,7 +34,8 @@ import com.squareup.moshi.Moshi
 @ContributesMultibinding(AppScope::class)
 class AutofillPlugin @Inject constructor(
     private val autofillRepository: AutofillRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val versionHandler: VersionHandler
 ) : PrivacyFeaturePlugin {
 
     override fun store(
@@ -53,7 +55,7 @@ class AutofillPlugin @Inject constructor(
                 autofillExceptions.add(AutofillExceptionEntity(it.domain, it.reason))
             }
             autofillRepository.updateAll(autofillExceptions)
-            val isEnabled = httpsFeature?.state == "enabled"
+            val isEnabled = httpsFeature?.state == "enabled" && versionHandler.isSupportedVersion(httpsFeature.minSupportedVersion)
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true
         }

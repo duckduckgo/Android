@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.config.impl.features.https
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.https.HttpsRepository
@@ -27,16 +29,18 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.mockito.kotlin.whenever
 
 class HttpsPluginTest {
     lateinit var testee: HttpsPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockHttpsRepository: HttpsRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = HttpsPlugin(mockHttpsRepository, mockFeatureTogglesRepository)
+        testee = HttpsPlugin(mockHttpsRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
     }
 
     @Test
@@ -63,6 +67,28 @@ class HttpsPluginTest {
     @Test
     fun whenFeatureNameMatchesHttpsAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https_disabled.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesHttpsAndIsSupportedVersionThenStoreFeatureEnabled() {
+        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
+
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https_min_supported_version.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesHttpsAndIsNotSupportedVersionThenStoreFeatureDisabled() {
+        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
+
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https_min_supported_version.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.config.impl.features.drm
 
 import com.duckduckgo.app.FileUtilities
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.drm.DrmRepository
@@ -27,16 +29,18 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyList
+import org.mockito.kotlin.whenever
 
 class DrmPluginTest {
     lateinit var testee: DrmPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockDrmRepository: DrmRepository = mock()
+    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = DrmPlugin(mockDrmRepository, mockFeatureTogglesRepository)
+        testee = DrmPlugin(mockDrmRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
     }
 
     @Test
@@ -63,6 +67,28 @@ class DrmPluginTest {
     @Test
     fun whenFeatureNameMatchesEmeAndIsNotEnabledThenStoreFeatureDisabled() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm_disabled.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesEmeAndIsSupportedVersionThenStoreFeatureEnabled() {
+        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
+
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm_min_supported_version.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesEmeAndIsNotSupportedVersionThenStoreFeatureDisabled() {
+        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
+
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/drm_min_supported_version.json")
 
         testee.store(FEATURE_NAME, jsonString)
 

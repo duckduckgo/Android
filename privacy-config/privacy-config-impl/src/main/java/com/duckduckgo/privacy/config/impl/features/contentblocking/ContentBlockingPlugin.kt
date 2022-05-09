@@ -21,6 +21,7 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -33,7 +34,8 @@ import com.squareup.moshi.Moshi
 @ContributesMultibinding(AppScope::class)
 class ContentBlockingPlugin @Inject constructor(
     private val contentBlockingRepository: ContentBlockingRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val versionHandler: VersionHandler
 ) : PrivacyFeaturePlugin {
 
     override fun store(
@@ -53,7 +55,8 @@ class ContentBlockingPlugin @Inject constructor(
                 contentBlockingExceptions.add(ContentBlockingExceptionEntity(it.domain, it.reason))
             }
             contentBlockingRepository.updateAll(contentBlockingExceptions)
-            val isEnabled = contentBlockingFeature?.state == "enabled"
+            val isEnabled = contentBlockingFeature?.state == "enabled" &&
+                versionHandler.isSupportedVersion(contentBlockingFeature.minSupportedVersion)
             privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
             return true
         }

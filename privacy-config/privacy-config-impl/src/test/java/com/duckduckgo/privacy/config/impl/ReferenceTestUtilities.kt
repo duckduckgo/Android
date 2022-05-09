@@ -27,6 +27,7 @@ import com.duckduckgo.privacy.config.impl.features.trackerallowlist.TrackerAllow
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
+import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
 import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -58,6 +59,7 @@ class ReferenceTestUtilities(
 
     var privacyRepository: PrivacyConfigRepository = RealPrivacyConfigRepository(db)
     var privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
+    var versionHandler: VersionHandler = mock()
     var unprotectedTemporaryRepository: UnprotectedTemporaryRepository = RealUnprotectedTemporaryRepository(db, TestScope(), dispatcherProvider)
     var contentBlockingRepository: ContentBlockingRepository = RealContentBlockingRepository(db, TestScope(), dispatcherProvider)
     var httpsRepository: HttpsRepository = RealHttpsRepository(db, TestScope(), dispatcherProvider)
@@ -68,11 +70,11 @@ class ReferenceTestUtilities(
     // Add your plugin to this list in order for it to be tested against some basic reference tests
     private fun getPrivacyFeaturePlugins(): List<PrivacyFeaturePlugin> {
         return listOf(
-            HttpsPlugin(httpsRepository, privacyFeatureTogglesRepository),
-            ContentBlockingPlugin(contentBlockingRepository, privacyFeatureTogglesRepository),
-            DrmPlugin(drmRepository, privacyFeatureTogglesRepository),
-            GpcPlugin(gpcRepository, privacyFeatureTogglesRepository),
-            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository)
+            HttpsPlugin(httpsRepository, privacyFeatureTogglesRepository, versionHandler),
+            ContentBlockingPlugin(contentBlockingRepository, privacyFeatureTogglesRepository, versionHandler),
+            DrmPlugin(drmRepository, privacyFeatureTogglesRepository, versionHandler),
+            GpcPlugin(gpcRepository, privacyFeatureTogglesRepository, versionHandler),
+            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository, versionHandler),
         )
     }
 

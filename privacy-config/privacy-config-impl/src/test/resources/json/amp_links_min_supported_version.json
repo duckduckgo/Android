@@ -1,5 +1,6 @@
 {
   "state": "enabled",
+  "minSupportedVersion": "1234",
   "exceptions": [
     {
       "domain": "example.com",
@@ -7,8 +8,11 @@
     }
   ],
   "settings": {
-    "parameters": [
-      "parameter"
+    "linkFormats": [
+      "linkFormat"
+    ],
+    "keywords": [
+      "keyword"
     ]
   }
 }
