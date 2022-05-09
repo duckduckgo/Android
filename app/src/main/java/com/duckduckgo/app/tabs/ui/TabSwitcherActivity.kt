@@ -23,7 +23,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -144,26 +143,17 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(
-            this,
-            Observer<List<TabEntity>> {
-                render(it)
+        viewModel.tabs.observe(this) {
+            render(it)
+        }
+        viewModel.deletableTabs.observe(this) {
+            if (it.isNotEmpty()) {
+                onDeletableTab(it.last())
             }
-        )
-        viewModel.deletableTabs.observe(
-            this,
-            {
-                if (it.isNotEmpty()) {
-                    onDeletableTab(it.last())
-                }
-            }
-        )
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        }
+        viewModel.command.observe(this) {
+            processCommand(it)
+        }
     }
 
     private fun render(tabs: List<TabEntity>) {

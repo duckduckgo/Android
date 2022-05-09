@@ -29,7 +29,6 @@ import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -42,8 +41,6 @@ import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -104,9 +101,6 @@ class CtaViewModelTest {
     private lateinit var mockAppInstallStore: AppInstallStore
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Mock
@@ -117,9 +111,6 @@ class CtaViewModelTest {
 
     @Mock
     private lateinit var mockUserStageStore: UserStageStore
-
-    @Mock
-    private lateinit var mockUserEventsStore: UserEventsStore
 
     @Mock
     private lateinit var mockTabRepository: TabRepository
@@ -161,12 +152,8 @@ class CtaViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager,
-            userEventsStore = mockUserEventsStore,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
-
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @After
@@ -498,34 +485,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenFireproofCtaShown() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        givenAtLeastOneDaxDialogCtaShown()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxFireproofCta)
-    }
-
-    @Test
-    fun whenRefreshCtaOnHomeTabAndFireproofCtaWasShownThenEndCtaShown() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-
-        givenDaxOnboardingActive()
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_FIREPROOF)).thenReturn(true)
-        givenAtLeastOneDaxDialogCtaShown()
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false)
-        assertTrue(value is DaxBubbleCta.DaxEndCta)
-    }
-
-    @Test
     fun whenRefreshCtaOnHomeTabAndIntroCtaWasShownThenEndCtaShown() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
-
         givenDaxOnboardingActive()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         givenAtLeastOneDaxDialogCtaShown()

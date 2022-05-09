@@ -17,7 +17,6 @@
 package com.duckduckgo.app.feedback.ui.initial
 
 import android.os.Bundle
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackBinding
@@ -61,16 +60,13 @@ class InitialFeedbackFragment : FeedbackFragment(R.layout.content_feedback) {
     }
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                when (it) {
-                    PositiveFeedbackSelected -> listener?.userSelectedPositiveFeedback()
-                    NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()
-                    UserCancelled -> listener?.userCancelled()
-                }
+        viewModel.command.observe(this) {
+            when (it) {
+                PositiveFeedbackSelected -> listener?.userSelectedPositiveFeedback()
+                NegativeFeedbackSelected -> listener?.userSelectedNegativeFeedback()
+                UserCancelled -> listener?.userCancelled()
             }
-        )
+        }
     }
 
     override fun configureListeners() {

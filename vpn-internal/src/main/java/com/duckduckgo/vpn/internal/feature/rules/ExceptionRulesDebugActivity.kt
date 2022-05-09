@@ -70,7 +70,7 @@ class ExceptionRulesDebugActivity : DuckDuckGoActivity(), RuleTrackerView.RuleTr
             }
             .onStart { startRefreshTicker() }
             .flowOn(Dispatchers.IO)
-            .onEach { it ->
+            .onEach {
                 val (rules, appTrackers) = it
 
                 // clean up the screen

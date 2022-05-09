@@ -186,7 +186,7 @@ class BookmarksViewModelTest {
     fun whenFavoritesChangedThenObserverNotified() = runTest {
         whenever(favoritesRepository.favorites()).thenReturn(
             flow {
-                emit(emptyList<SavedSite.Favorite>())
+                emit(emptyList())
                 emit(listOf(favorite))
             }
         )

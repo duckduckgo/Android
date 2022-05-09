@@ -86,7 +86,7 @@ class AppTPCompanyTrackersViewModelTest {
 
     private fun someTrackers(): List<VpnTrackerCompanySignal> {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val domain: String = "example.com"
+        val domain = "example.com"
         val trackerCompanyId: Int = -1
         val timestamp: String = DatabaseDateFormatter.bucketByHour()
 

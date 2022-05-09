@@ -30,7 +30,6 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverDao
 import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationWorker
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderReceiverManager
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import org.mockito.kotlin.any
@@ -145,7 +144,7 @@ class DeviceShieldReminderNotificationSchedulerTest {
         enqueueDailyReminderNotificationWorker()
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
 
-        testee.onVpnStopped(TestScope(), VpnStopReason.SELF_STOP)
+        testee.onVpnStopped(TestScope(), SELF_STOP)
 
         assertWorkersAreEnqueued(VpnReminderNotificationWorker.WORKER_VPN_REMINDER_DAILY_TAG)
     }

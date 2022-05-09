@@ -110,7 +110,7 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                 .replace(" ", "_")
                 .replace(".", "")
                 .replace(",", "")
-                .toLowerCase(Locale.ROOT)
+                .lowercase(Locale.ROOT)
             val resource = context.resources.getIdentifier(drawable, "drawable", context.packageName)
             return if (resource != 0) resource else null
         }

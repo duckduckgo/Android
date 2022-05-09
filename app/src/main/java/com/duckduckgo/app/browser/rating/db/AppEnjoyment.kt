@@ -72,7 +72,7 @@ enum class AppEnjoymentEventType(val value: Int) {
     USER_DECLINED_TO_SAY_WHETHER_ENJOYING(TYPE_DECLINED_TO_PARTICIPATE);
 
     companion object {
-        private val map = AppEnjoymentEventType.values().associateBy(AppEnjoymentEventType::value)
+        private val map = values().associateBy(AppEnjoymentEventType::value)
         fun fromValue(value: Int) = map[value]
     }
 }

@@ -39,4 +39,7 @@ interface FireproofWebsiteDao {
 
     @Delete
     fun delete(fireproofWebsiteEntity: FireproofWebsiteEntity): Int
+
+    @Query("delete from fireproofWebsites")
+    fun deleteAll()
 }

@@ -67,11 +67,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val listItem = view.findViewById<SingleLineListItem>(R.id.singleLineListItemWithImage)
             listItem.setOverflowClickListener {
-                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
             val listItemWithoutImage = view.findViewById<SingleLineListItem>(R.id.singleLineListItemWithoutImage)
             listItemWithoutImage.setOverflowClickListener {
-                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
         }
     }
@@ -82,11 +82,11 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         override fun bind(component: Component) {
             val twoLineListItemWithImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithImage)
             twoLineListItemWithImage.setOverflowClickListener {
-                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
             val twoLineListItemWithoutImage = view.findViewById<TwoLineListItem>(R.id.twoLineListItemWithoutImage)
             twoLineListItemWithoutImage.setOverflowClickListener {
-                Snackbar.make(view, "${component.name}", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(view, component.name, Snackbar.LENGTH_SHORT).show()
             }
         }
     }

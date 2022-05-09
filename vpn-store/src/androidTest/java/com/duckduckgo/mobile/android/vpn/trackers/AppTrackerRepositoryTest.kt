@@ -26,7 +26,6 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppTrackerRepositoryTest {
@@ -46,7 +45,7 @@ class AppTrackerRepositoryTest {
             context,
             VpnDatabase::class.java
         ).allowMainThreadQueries().build().apply {
-            VpnDatabaseCallback(context, Provider { this }, coroutineRule.testDispatcherProvider).prepopulateAppTrackerBlockingList()
+            VpnDatabaseCallback(context, { this }, coroutineRule.testDispatcherProvider).prepopulateAppTrackerBlockingList()
         }
 
         appTrackerRepository = RealAppTrackerRepository(vpnDatabase.vpnAppTrackerBlockingDao(), vpnDatabase.vpnSystemAppsOverridesDao())

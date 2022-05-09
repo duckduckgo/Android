@@ -142,7 +142,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
     }
 
     @Test
-    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking<Unit> {
+    fun whenReferenceTestRunsItReturnsTheExpectedResult() = runBlocking {
         val expectedHttps = testCase.expectURL.toUri().isHttps
         val initialUrlHttps = testCase.requestURL.toUri().isHttps
 

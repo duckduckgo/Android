@@ -23,7 +23,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityLocationPermissionsBinding
@@ -69,32 +68,26 @@ class LocationPermissionsActivity : DuckDuckGoActivity(), SiteLocationPermission
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this,
-            Observer { viewState ->
-                viewState?.let {
-                    if (!it.systemLocationPermissionGranted) {
-                        binding.recycler.gone()
-                        binding.locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
-                        binding.locationPermissionsNoSystemPermission.show()
-                    } else {
-                        binding.recycler.show()
-                        binding.locationPermissionsNoSystemPermission.gone()
-                        adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
-                    }
+        viewModel.viewState.observe(this) { viewState ->
+            viewState?.let {
+                if (!it.systemLocationPermissionGranted) {
+                    binding.recycler.gone()
+                    binding.locationPermissionsNoSystemPermission.text = getString(R.string.preciseLocationNoSystemPermission).html(this)
+                    binding.locationPermissionsNoSystemPermission.show()
+                } else {
+                    binding.recycler.show()
+                    binding.locationPermissionsNoSystemPermission.gone()
+                    adapter.updatePermissions(it.locationPermissionEnabled, it.locationPermissionEntities)
                 }
             }
-        )
+        }
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                when (it) {
-                    is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
-                    is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
-                }
+        viewModel.command.observe(this) {
+            when (it) {
+                is LocationPermissionsViewModel.Command.ConfirmDeleteLocationPermission -> confirmDeleteWebsite(it.entity)
+                is LocationPermissionsViewModel.Command.EditLocationPermissions -> editSiteLocationPermission(it.entity)
             }
-        )
+        }
     }
 
     private fun loadSystemPermission() {

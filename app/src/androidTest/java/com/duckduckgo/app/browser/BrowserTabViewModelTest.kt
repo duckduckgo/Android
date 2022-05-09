@@ -104,8 +104,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -159,7 +158,6 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -288,9 +286,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppLinksHandler: AppLinksHandler
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
@@ -316,6 +311,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+
+    @Mock
+    private lateinit var mockSettingsDataStore: SettingsDataStore
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -381,6 +379,7 @@ class BrowserTabViewModelTest {
         whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
         whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -396,8 +395,6 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager,
-            userEventsStore = mockUserEventsStore,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
@@ -454,19 +451,17 @@ class BrowserTabViewModelTest {
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-            variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
-            voiceSearchPixelLogger = voiceSearchPixelLogger
+            voiceSearchPixelLogger = voiceSearchPixelLogger,
+            settingsDataStore = mockSettingsDataStore
         )
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
-
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @ExperimentalCoroutinesApi
@@ -1224,7 +1219,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(Mockito.any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
     }
 
     @Test
@@ -1439,7 +1434,7 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>() {
+        assertCommandIssued<Command.OpenInNewTab> {
             assertNull(sourceTabId)
         }
     }
@@ -2452,9 +2447,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedThenAskToFireproofWebsite() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
-
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAskEveryTimeThenAskToFireproofWebsite() {
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
@@ -2462,25 +2455,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionEnabledThenFireproofWebsite() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-        whenever(mockSettingsStore.appLoginDetection).thenReturn(true)
-
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAlwaysThenDoNotAskToFireproofWebsite() {
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
         loginEventLiveData.value = givenLoginDetected("example.com")
-
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
-        verify(fireproofDialogsEventHandler).onUserConfirmedFireproofDialog("example.com")
-    }
-
-    @Test
-    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionDisabledThenDoNothing() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-        whenever(mockSettingsStore.appLoginDetection).thenReturn(false)
-
-        loginEventLiveData.value = givenLoginDetected("example.com")
-
-        assertCommandNotIssued<Command.AskToFireproofWebsite>()
-        verify(fireproofDialogsEventHandler, never()).onUserConfirmedFireproofDialog("example.com")
     }
 
     @Test

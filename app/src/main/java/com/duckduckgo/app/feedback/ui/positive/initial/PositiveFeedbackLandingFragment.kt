@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.feedback.ui.positive.initial
 
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentFeedbackPositiveLandingBinding
@@ -46,23 +45,20 @@ class PositiveFeedbackLandingFragment : FeedbackFragment(R.layout.content_feedba
     lateinit var playStoreUtils: PlayStoreUtils
 
     override fun configureViewModelObservers() {
-        viewModel.command.observe(
-            this,
-            Observer { command ->
-                when (command) {
-                    Command.LaunchPlayStore -> {
-                        launchPlayStore()
-                        listener?.userSelectedToRateApp()
-                    }
-                    Command.Exit -> {
-                        listener?.userGavePositiveFeedbackNoDetails()
-                    }
-                    Command.LaunchShareFeedbackPage -> {
-                        listener?.userSelectedToGiveFeedback()
-                    }
+        viewModel.command.observe(this) { command ->
+            when (command) {
+                Command.LaunchPlayStore -> {
+                    launchPlayStore()
+                    listener?.userSelectedToRateApp()
+                }
+                Command.Exit -> {
+                    listener?.userGavePositiveFeedbackNoDetails()
+                }
+                Command.LaunchShareFeedbackPage -> {
+                    listener?.userSelectedToGiveFeedback()
                 }
             }
-        )
+        }
     }
 
     override fun configureListeners() {

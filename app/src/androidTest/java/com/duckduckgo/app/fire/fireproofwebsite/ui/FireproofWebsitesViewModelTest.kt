@@ -27,14 +27,15 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
-import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmDeleteFireproofWebsite
+import com.duckduckgo.app.fire.fireproofwebsite.ui.FireproofWebsitesViewModel.Command.ConfirmRemoveFireproofWebsite
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_LOGIN_TOGGLE_ENABLED
+import com.duckduckgo.app.pixels.AppPixelName.FIREPROOF_SETTING_SELECTION_ALWAYS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import dagger.Lazy
@@ -46,6 +47,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.doReturn
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class FireproofWebsitesViewModelTest {
@@ -76,7 +78,9 @@ class FireproofWebsitesViewModelTest {
 
     private val mockPixel: Pixel = mock()
 
-    private val mockSettingsDataStore: SettingsDataStore = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock {
+        on { it.automaticFireproofSetting } doReturn AutomaticFireproofSetting.ASK_EVERY_TIME
+    }
 
     private val mockFaviconManager: FaviconManager = mock()
 
@@ -110,7 +114,7 @@ class FireproofWebsitesViewModelTest {
 
     @Test
     fun whenViewModelCreateThenInitialisedWithDefaultViewState() {
-        val defaultViewState = FireproofWebsitesViewModel.ViewState(false, emptyList())
+        val defaultViewState = FireproofWebsitesViewModel.ViewState(AutomaticFireproofSetting.ASK_EVERY_TIME, emptyList())
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertEquals(defaultViewState, viewStateCaptor.value)
     }
@@ -120,7 +124,7 @@ class FireproofWebsitesViewModelTest {
         val fireproofWebsiteEntity = FireproofWebsiteEntity("domain.com")
         viewModel.onDeleteRequested(fireproofWebsiteEntity)
 
-        assertCommandIssued<ConfirmDeleteFireproofWebsite> {
+        assertCommandIssued<ConfirmRemoveFireproofWebsite> {
             assertEquals(fireproofWebsiteEntity, this.entity)
         }
     }
@@ -129,7 +133,18 @@ class FireproofWebsitesViewModelTest {
     fun whenUserConfirmsToDeleteThenEntityRemovedAndViewStateUpdated() {
         givenFireproofWebsiteDomain("domain.com")
 
-        viewModel.delete(FireproofWebsiteEntity("domain.com"))
+        viewModel.remove(FireproofWebsiteEntity("domain.com"))
+
+        verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
+        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
+    }
+
+    @Test
+    fun whenUserConfirmsToRemoveAllThenEntitiesRemovedAndViewStateUpdated() {
+        fireproofWebsiteDao.insert(FireproofWebsiteEntity("domain.com"))
+        fireproofWebsiteDao.insert(FireproofWebsiteEntity("domain2.com"))
+
+        viewModel.removeAllWebsites()
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isEmpty())
@@ -139,7 +154,7 @@ class FireproofWebsitesViewModelTest {
     fun whenUserConfirmsToDeleteThenPixelSent() {
         givenFireproofWebsiteDomain("domain.com")
 
-        viewModel.delete(FireproofWebsiteEntity("domain.com"))
+        viewModel.remove(FireproofWebsiteEntity("domain.com"))
 
         verify(mockPixel).fire(AppPixelName.FIREPROOF_WEBSITE_DELETED)
     }
@@ -153,40 +168,51 @@ class FireproofWebsitesViewModelTest {
     }
 
     @Test
-    fun whenUserTogglesLoginDetectionThenFirePixel() {
-        viewModel.onUserToggleLoginDetection(true)
+    fun whenUserChangesAutomaticFireproofSettingThenFirePixel() {
+        viewModel.onAutomaticFireproofSettingChanged(AutomaticFireproofSetting.ALWAYS)
 
-        verify(mockPixel).fire(FIREPROOF_LOGIN_TOGGLE_ENABLED)
+        verify(mockPixel).fire(FIREPROOF_SETTING_SELECTION_ALWAYS)
     }
 
     @Test
-    fun whenUserTogglesLoginDetectionThenUpdateViewState() {
-        viewModel.onUserToggleLoginDetection(true)
+    fun whenUserChangesAutomaticFireproofSettingThenUpdateViewState() {
+        viewModel.onAutomaticFireproofSettingChanged(AutomaticFireproofSetting.ALWAYS)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
-        assertTrue(viewStateCaptor.value.loginDetectionEnabled)
+        assertTrue(viewStateCaptor.value.automaticFireproofSetting == AutomaticFireproofSetting.ALWAYS)
     }
 
     @Test
-    fun whenUserEnablesLoginDetectionThenRegisterEvent() = runTest {
-        viewModel.onUserToggleLoginDetection(true)
+    fun whenUserEnablesAutomaticFireproofSettingThenRegisterEvent() = runTest {
+        viewModel.onAutomaticFireproofSettingChanged(AutomaticFireproofSetting.ALWAYS)
 
         verify(mockUserEventsStore).registerUserEvent(UserEventKey.USER_ENABLED_FIREPROOF_LOGIN)
     }
 
     @Test
-    fun whenUserTogglesLoginDetectionThenUpdateSettingsDataStore() {
-        viewModel.onUserToggleLoginDetection(true)
+    fun whenUserChangesAutomaticFireproofSettingThenUpdateSettingsDataStore() {
+        viewModel.onAutomaticFireproofSettingChanged(AutomaticFireproofSetting.ALWAYS)
 
-        verify(mockSettingsDataStore).appLoginDetection = true
+        verify(mockSettingsDataStore).automaticFireproofSetting = AutomaticFireproofSetting.ALWAYS
     }
 
     @Test
     fun whenUserUndosDeleteFireproofThenSiteIsAddedBack() {
-
         val entity = FireproofWebsiteEntity("domain.com")
 
         viewModel.onSnackBarUndoFireproof(entity)
+
+        verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
+        assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
+    }
+
+    @Test
+    fun whenUserUndoesRemoveAllFireproofSitesThenSitesAreAddedBack() {
+        val removedWebsites: List<FireproofWebsiteEntity> = listOf(
+            FireproofWebsiteEntity(domain = "domain.com"),
+            FireproofWebsiteEntity(domain = "domain2.com")
+        )
+        viewModel.onSnackBarUndoRemoveAllWebsites(removedWebsites)
 
         verify(mockViewStateObserver, atLeastOnce()).onChanged(viewStateCaptor.capture())
         assertTrue(viewStateCaptor.value.fireproofWebsitesEntities.isNotEmpty())
