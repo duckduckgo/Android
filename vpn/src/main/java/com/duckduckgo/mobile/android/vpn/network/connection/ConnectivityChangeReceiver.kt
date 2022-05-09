@@ -51,7 +51,7 @@ class ConnectivityChangeReceiver @Inject constructor(
 
             val oldNetworkType = vpnPreferences.activeNetworkType
 
-            if (oldNetworkType == networkType.toString()) {
+            if (oldNetworkType?.lowercase() == networkType.toString().lowercase()) {
                 Timber.d("Network type didn't change, skip")
                 return
             }
