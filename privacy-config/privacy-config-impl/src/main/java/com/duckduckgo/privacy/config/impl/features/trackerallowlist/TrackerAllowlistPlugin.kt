@@ -21,7 +21,6 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
@@ -34,8 +33,7 @@ import com.squareup.moshi.Moshi
 @ContributesMultibinding(AppScope::class)
 class TrackerAllowlistPlugin @Inject constructor(
     private val trackerAllowlistRepository: TrackerAllowlistRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
-    private val versionHandler: VersionHandler
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(
@@ -56,9 +54,8 @@ class TrackerAllowlistPlugin @Inject constructor(
                 exceptions.add(TrackerAllowlistEntity(entry.key, entry.value.rules))
             }
             trackerAllowlistRepository.updateAll(exceptions)
-            val isEnabled = trackerAllowlistFeature?.state == "enabled" &&
-                versionHandler.isSupportedVersion(trackerAllowlistFeature.minSupportedVersion)
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            val isEnabled = trackerAllowlistFeature?.state == "enabled"
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, trackerAllowlistFeature?.minSupportedVersion))
             return true
         }
         return false

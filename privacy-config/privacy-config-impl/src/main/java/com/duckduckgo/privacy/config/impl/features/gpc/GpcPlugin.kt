@@ -21,7 +21,6 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 import com.duckduckgo.privacy.config.store.GpcHeaderEnabledSiteEntity
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
@@ -35,8 +34,7 @@ import com.squareup.moshi.Moshi
 @ContributesMultibinding(AppScope::class)
 class GpcPlugin @Inject constructor(
     private val gpcRepository: GpcRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
-    private val versionHandler: VersionHandler
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(
@@ -60,8 +58,8 @@ class GpcPlugin @Inject constructor(
                 gpcHeaders.add(GpcHeaderEnabledSiteEntity(it))
             }
             gpcRepository.updateAll(gpcExceptions, gpcHeaders)
-            val isEnabled = gpcFeature?.state == "enabled" && versionHandler.isSupportedVersion(gpcFeature.minSupportedVersion)
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            val isEnabled = gpcFeature?.state == "enabled"
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, gpcFeature?.minSupportedVersion))
             return true
         }
         return false

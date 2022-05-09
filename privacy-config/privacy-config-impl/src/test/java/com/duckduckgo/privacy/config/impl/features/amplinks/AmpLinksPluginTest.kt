@@ -17,9 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.amplinks
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import junit.framework.TestCase.*
@@ -29,7 +27,6 @@ import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class AmpLinksPluginTest {
 
@@ -37,11 +34,10 @@ class AmpLinksPluginTest {
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockAmpLinksRepository: AmpLinksRepository = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = AmpLinksPlugin(mockAmpLinksRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
+        testee = AmpLinksPlugin(mockAmpLinksRepository, mockFeatureTogglesRepository)
     }
 
     @Test
@@ -62,7 +58,7 @@ class AmpLinksPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -74,29 +70,16 @@ class AmpLinksPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesAmpLinksAndIsSupportedVersionThenStoreFeatureEnabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
-
+    fun whenFeatureNameMatchesAmpLinksAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(AmpLinksPluginTest::class.java.classLoader!!, "json/amp_links_min_supported_version.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
-    }
-
-    @Test
-    fun whenFeatureNameMatchesAmpLinksAndIsNotSupportedVersionThenStoreFeatureDisabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
-
-        val jsonString = FileUtilities.loadText(AmpLinksPluginTest::class.java.classLoader!!, "json/amp_links_min_supported_version.json")
-
-        testee.store(FEATURE_NAME, jsonString)
-
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

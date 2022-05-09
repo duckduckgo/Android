@@ -21,7 +21,6 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,8 +31,7 @@ import com.squareup.moshi.Moshi
 @ContributesMultibinding(AppScope::class)
 class AmpLinksPlugin @Inject constructor(
     private val ampLinksRepository: AmpLinksRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
-    private val versionHandler: VersionHandler
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(name: FeatureName, jsonString: String): Boolean {
@@ -63,8 +61,8 @@ class AmpLinksPlugin @Inject constructor(
             }
 
             ampLinksRepository.updateAll(exceptions, ampLinkFormats, ampKeywords)
-            val isEnabled = ampLinksFeature?.state == "enabled" && versionHandler.isSupportedVersion(ampLinksFeature.minSupportedVersion)
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            val isEnabled = ampLinksFeature?.state == "enabled"
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, ampLinksFeature?.minSupportedVersion))
             return true
         }
         return false

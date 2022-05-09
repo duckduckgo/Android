@@ -21,7 +21,6 @@ import com.duckduckgo.feature.toggles.api.FeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
-import com.duckduckgo.privacy.config.impl.version.VersionHandler
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,8 +31,7 @@ import javax.inject.Inject
 @ContributesMultibinding(AppScope::class)
 class TrackingParametersPlugin @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
-    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
-    private val versionHandler: VersionHandler
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository
 ) : PrivacyFeaturePlugin {
 
     override fun store(name: FeatureName, jsonString: String): Boolean {
@@ -58,9 +56,8 @@ class TrackingParametersPlugin @Inject constructor(
             }
 
             trackingParametersRepository.updateAll(exceptions, parameters)
-            val isEnabled = trackingParametersFeature?.state == "enabled" &&
-                versionHandler.isSupportedVersion(trackingParametersFeature.minSupportedVersion)
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            val isEnabled = trackingParametersFeature?.state == "enabled"
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, trackingParametersFeature?.minSupportedVersion))
             return true
         }
         return false

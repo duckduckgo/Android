@@ -17,9 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
 import junit.framework.TestCase.*
@@ -29,7 +27,6 @@ import org.junit.Test
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class TrackingParametersPluginTest {
 
@@ -37,11 +34,10 @@ class TrackingParametersPluginTest {
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockTrackingParametersRepository: TrackingParametersRepository = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = TrackingParametersPlugin(mockTrackingParametersRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
+        testee = TrackingParametersPlugin(mockTrackingParametersRepository, mockFeatureTogglesRepository)
     }
 
     @Test
@@ -62,7 +58,7 @@ class TrackingParametersPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -74,13 +70,11 @@ class TrackingParametersPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackingParametersAndIsSupportedVersionThenStoreFeatureEnabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
-
+    fun whenFeatureNameMatchesTrackingParametersAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(
             TrackingParametersPluginTest::class.java.classLoader!!,
             "json/tracking_parameters_min_supported_version.json"
@@ -88,21 +82,7 @@ class TrackingParametersPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
-    }
-
-    @Test
-    fun whenFeatureNameMatchesTrackingParametersAndIsNotSupportedVersionThenStoreFeatureDisabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
-
-        val jsonString = FileUtilities.loadText(
-            TrackingParametersPluginTest::class.java.classLoader!!,
-            "json/tracking_parameters_min_supported_version.json"
-        )
-
-        testee.store(FEATURE_NAME, jsonString)
-
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

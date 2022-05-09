@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.config.store
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
@@ -50,7 +49,7 @@ class RealPrivacyFeatureTogglesRepositoryTest {
 
     @Test
     fun whenInsertThenInsertCalled() {
-        val privacyFeatureToggle = PrivacyFeatureToggles(PrivacyFeatureName.GpcFeatureName, true)
+        val privacyFeatureToggle = PrivacyFeatureToggles(PrivacyFeatureName.GpcFeatureName, true, null)
         testee.insert(privacyFeatureToggle)
 
         verify(mockPrivacyFeatureTogglesDataStore).insert(privacyFeatureToggle)

@@ -17,9 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.trackerallowlist
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.TrackerAllowlistEntity
@@ -30,18 +28,16 @@ import org.mockito.kotlin.verify
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.whenever
 
 class TrackerAllowlistPluginTest {
     lateinit var testee: TrackerAllowlistPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockAllowlistRepository: TrackerAllowlistRepository = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = TrackerAllowlistPlugin(mockAllowlistRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
+        testee = TrackerAllowlistPlugin(mockAllowlistRepository, mockFeatureTogglesRepository)
     }
 
     @Test
@@ -62,7 +58,7 @@ class TrackerAllowlistPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -71,29 +67,16 @@ class TrackerAllowlistPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesTrackerAllowlistAndIsSupportedVersionThenStoreFeatureEnabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
-
+    fun whenFeatureNameMatchesTrackerAllowlistAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist_min_supported_version.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
-    }
-
-    @Test
-    fun whenFeatureNameMatchesTrackerAllowlistAndIsNotSupportedVersionThenStoreFeatureDisabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
-
-        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist_min_supported_version.json")
-
-        testee.store(FEATURE_NAME, jsonString)
-
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

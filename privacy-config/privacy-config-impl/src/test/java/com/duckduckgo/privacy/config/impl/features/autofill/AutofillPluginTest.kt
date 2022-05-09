@@ -17,9 +17,7 @@
 package com.duckduckgo.privacy.config.impl.features.autofill
 
 import com.duckduckgo.app.FileUtilities
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
-import com.duckduckgo.privacy.config.impl.version.RealVersionHandler
 import com.duckduckgo.privacy.config.store.PrivacyFeatureToggles
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.features.autofill.AutofillRepository
@@ -29,18 +27,16 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class AutofillPluginTest {
     lateinit var testee: AutofillPlugin
 
     private val mockFeatureTogglesRepository: PrivacyFeatureTogglesRepository = mock()
     private val mockAutofillRepository: AutofillRepository = mock()
-    private val mockAppBuildConfig: AppBuildConfig = mock()
 
     @Before
     fun before() {
-        testee = AutofillPlugin(mockAutofillRepository, mockFeatureTogglesRepository, RealVersionHandler(mockAppBuildConfig))
+        testee = AutofillPlugin(mockAutofillRepository, mockFeatureTogglesRepository)
     }
 
     @Test
@@ -61,7 +57,7 @@ class AutofillPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -70,29 +66,16 @@ class AutofillPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
     }
 
     @Test
-    fun whenFeatureNameMatchesHttpsAndIsSupportedVersionThenStoreFeatureEnabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(5678)
-
+    fun whenFeatureNameMatchesHttpsAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
         val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_min_supported_version.json")
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
-    }
-
-    @Test
-    fun whenFeatureNameMatchesHttpsAndIsNotSupportedVersionThenStoreFeatureDisabled() {
-        whenever(mockAppBuildConfig.versionCode).thenReturn(123)
-
-        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/autofill_min_supported_version.json")
-
-        testee.store(FEATURE_NAME, jsonString)
-
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

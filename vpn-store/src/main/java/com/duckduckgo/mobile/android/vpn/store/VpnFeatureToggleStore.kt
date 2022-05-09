@@ -29,6 +29,8 @@ interface VpnFeatureToggleStore {
         defaultValue: Boolean
     ): Boolean
 
+    fun getMinSupportedVersion(featureName: AppTpFeatureName): Int
+
     fun insert(toggle: VpnFeatureToggles)
 }
 
@@ -44,16 +46,27 @@ internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeat
         return preferences.getBoolean(featureName.value, defaultValue)
     }
 
+    override fun getMinSupportedVersion(featureName: AppTpFeatureName): Int {
+        return preferences.getInt(featureName.value + MIN_SUPPORTED_VERSION, 0)
+    }
+
     override fun insert(toggle: VpnFeatureToggles) {
-        preferences.edit { putBoolean(toggle.featureName.value, toggle.enabled) }
+        preferences.edit {
+            putBoolean(toggle.featureName.value, toggle.enabled)
+            toggle.minSupportedVersion?.let {
+                putInt(toggle.featureName.value + MIN_SUPPORTED_VERSION, it)
+            }
+        }
     }
 
     companion object {
         const val FILENAME = "com.duckduckgo.vpn.atp.config.store.toggles"
+        const val MIN_SUPPORTED_VERSION = "MinSupportedVersion"
     }
 }
 
 data class VpnFeatureToggles(
     val featureName: AppTpFeatureName,
     val enabled: Boolean,
+    val minSupportedVersion: Int?
 )
