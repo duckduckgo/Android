@@ -72,7 +72,7 @@ class ReferenceTestUtilities(
             ContentBlockingPlugin(contentBlockingRepository, privacyFeatureTogglesRepository),
             DrmPlugin(drmRepository, privacyFeatureTogglesRepository),
             GpcPlugin(gpcRepository, privacyFeatureTogglesRepository),
-            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository),
+            TrackerAllowlistPlugin(trackerAllowlistRepository, privacyFeatureTogglesRepository)
         )
     }
 
