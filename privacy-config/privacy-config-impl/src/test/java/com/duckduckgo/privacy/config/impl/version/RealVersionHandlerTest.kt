@@ -16,7 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.version
 
-import android.content.Context
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -31,10 +30,9 @@ class RealVersionHandlerTest {
 
     @Before
     fun setup() {
-        val mockContext: Context = mock()
         val mockAppBuildConfig: AppBuildConfig = mock()
 
-        testee = RealVersionHandler(mockContext, mockAppBuildConfig)
+        testee = RealVersionHandler(mockAppBuildConfig)
 
         whenever(mockAppBuildConfig.versionCode).thenReturn(1234)
     }
