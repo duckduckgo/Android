@@ -16,7 +16,6 @@
 
 package com.duckduckgo.privacy.config.impl.version
 
-import android.content.Context
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -27,7 +26,7 @@ interface VersionHandler {
 }
 
 @ContributesBinding(AppScope::class)
-class RealVersionHandler @Inject constructor(val context: Context, val appBuildConfig: AppBuildConfig) : VersionHandler {
+class RealVersionHandler @Inject constructor(val appBuildConfig: AppBuildConfig) : VersionHandler {
 
     override fun isSupportedVersion(minSupportedVersion: Int?): Boolean {
         if (minSupportedVersion == null) return true
