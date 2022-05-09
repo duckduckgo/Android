@@ -1,6 +1,5 @@
 {
   "state": "disabled",
-  "minSupportedVersion": "123",
   "exceptions": [
     {
       "domain": "example.com",
