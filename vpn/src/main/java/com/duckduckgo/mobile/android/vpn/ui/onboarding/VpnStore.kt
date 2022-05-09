@@ -16,11 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
-import android.content.Context
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.frybits.harmony.getHarmonySharedPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,10 +43,10 @@ interface VpnStore {
 
 @ContributesBinding(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
-    context: Context,
+    sharedPreferencesProvider: VpnSharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
-    private val preferences = context.getHarmonySharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS)
+    private val preferences = sharedPreferencesProvider.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, multiprocess = true)
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
