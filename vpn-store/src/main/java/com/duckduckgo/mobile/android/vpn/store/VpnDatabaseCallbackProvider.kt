@@ -19,20 +19,13 @@ package com.duckduckgo.mobile.android.vpn.store
 import android.content.Context
 import androidx.room.RoomDatabase
 import com.duckduckgo.app.global.DefaultDispatcherProvider
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import javax.inject.Provider
 
 class VpnDatabaseCallbackProvider constructor(
     private val context: Context,
-    private val vpnDatabaseProvider: Provider<VpnDatabase>,
-    private val variantManager: VariantManager
+    private val vpnDatabaseProvider: Provider<VpnDatabase>
 ) {
     fun provideCallbacks(): RoomDatabase.Callback {
-        return if (variantManager.isVPNRetentionStudyEnabled()) {
-            VpnRetentionStudyDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
-        } else {
-            VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
-        }
+        return VpnDatabaseCallback(context, vpnDatabaseProvider, DefaultDispatcherProvider())
     }
 }
