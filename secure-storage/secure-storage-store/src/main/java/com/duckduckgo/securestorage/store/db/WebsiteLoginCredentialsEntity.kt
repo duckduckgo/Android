@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
-}
+package com.duckduckgo.securestorage.store.db
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-android {
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-    }
-}
-
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.room.ktx
-    implementation AndroidX.security.crypto
-
-    kapt AndroidX.room.compiler
-}
+@Entity(tableName = "website_login_credentials")
+data class WebsiteLoginCredentialsEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val domain: String?,
+    val username: String?,
+    val password: String?,
+)

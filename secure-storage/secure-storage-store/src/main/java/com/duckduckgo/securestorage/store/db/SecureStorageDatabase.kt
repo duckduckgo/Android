@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
+package com.duckduckgo.securestorage.store.db
+
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+
+@Database(entities = [WebsiteLoginCredentialsEntity::class], version = 1)
+abstract class SecureStorageDatabase : RoomDatabase() {
+    abstract fun websiteLoginCredentialsDao(): WebsiteLoginCredentialsDao
 }
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
-
-android {
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-    }
-}
-
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.room.ktx
-    implementation AndroidX.security.crypto
-
-    kapt AndroidX.room.compiler
-}
+val ALL_MIGRATIONS = emptyArray<Migration>()
