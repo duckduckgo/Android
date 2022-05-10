@@ -42,24 +42,20 @@ object SecureStorageModule {
         RealSecureStorageKeyStore(context)
 
     @Provides
-    fun providesSupportFactory(keyManager: SecureStorageKeyManager): SupportFactory {
-        return SupportFactory(keyManager.l1Key)
-    }
-
-    @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageDatabase(
         context: Context,
-        factory: SupportFactory
+        keyManager: SecureStorageKeyManager
     ): SecureStorageDatabase {
         return Room.databaseBuilder(
             context,
             SecureStorageDatabase::class.java,
             "secure_storage_database_encrypted.db"
-        ).openHelperFactory(factory)
+        ).openHelperFactory(SupportFactory(keyManager.l1Key))
             .addMigrations(*ALL_MIGRATIONS)
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
+            .allowMainThreadQueries()
             .build()
     }
 
