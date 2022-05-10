@@ -55,12 +55,6 @@ interface SecureStorageKeyStore {
 class RealSecureStorageKeyStore constructor(
     private val context: Context
 ) : SecureStorageKeyStore {
-    companion object {
-        const val FILENAME = "com.duckduckgo.securestorage.store"
-        const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
-        const val KEY_L1KEY = "KEY_L1KEY"
-        const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
-    }
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
@@ -116,4 +110,11 @@ class RealSecureStorageKeyStore constructor(
     }
 
     override fun canUseEncryption(): Boolean = encryptedPreferences != null
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.securestorage.store"
+        const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
+        const val KEY_L1KEY = "KEY_L1KEY"
+        const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
+    }
 }
