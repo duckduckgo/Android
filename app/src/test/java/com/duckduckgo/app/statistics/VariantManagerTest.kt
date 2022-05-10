@@ -43,6 +43,20 @@ class VariantManagerTest {
     }
 
     @Test
+    fun retentionStudyControlGroupHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "na" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun retentionStudyVariantGroupHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "nn" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {
