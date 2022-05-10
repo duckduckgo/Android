@@ -32,9 +32,6 @@ import javax.inject.Inject
 class RealSecureStorage @Inject constructor(
     private val secureStorageRepository: SecureStorageRepository
 ) : SecureStorage {
-    companion object {
-        private const val DEFAULT_EXPIRY_IN_MILLIS = 30 * 60 * 1000
-    }
 
     override fun canAccessSecureStorage(): Boolean = true
 
@@ -113,4 +110,8 @@ class RealSecureStorage @Inject constructor(
             username = username,
             id = id
         )
+
+    companion object {
+        private const val DEFAULT_EXPIRY_IN_MILLIS = 30 * 60 * 1000
+    }
 }
