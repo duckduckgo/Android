@@ -59,7 +59,7 @@ interface SecureStorage {
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow emitting a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
-    suspend fun getWebsiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>>
+    suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>>
 
     /**
      * This method returns all [WebsiteLoginDetails] stored in the [SecureStorage].
@@ -67,7 +67,7 @@ interface SecureStorage {
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow containing a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
-    suspend fun getAllWebsiteLoginDetails(): Flow<List<WebsiteLoginDetails>>
+    suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>>
 
     /**
      * This method returns the [WebsiteLoginCredentials] with the [id] stored in the [SecureStorage].
@@ -88,7 +88,7 @@ interface SecureStorage {
      * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
      */
     @Throws(UserNotAuthenticatedException::class)
-    suspend fun getWebsiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
 
     /**
      * This method returns all the [WebsiteLoginCredentials] stored in the [SecureStorage].
@@ -99,7 +99,7 @@ interface SecureStorage {
      * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
      */
     @Throws(UserNotAuthenticatedException::class)
-    suspend fun getAllWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
 
     /**
      * This method updates an existing [WebsiteLoginCredentials] in the [SecureStorage].
