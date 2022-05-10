@@ -98,7 +98,7 @@ class EnqueuedPixelWorkerTest {
     }
 
     @Test
-    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
+    fun whenOnStartAndLaunchByFireActionFollowedByAppStartThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
@@ -108,12 +108,31 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
         verify(pixel).fire(
-            AppPixelName.APP_LAUNCH,
+            AppPixelName.APP_LAUNCH_LEGACY,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
 
+        verify(pixel, times(0)).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+        )
+    }
+
+    @Test
+    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchAfterGracePeriodThenSendOneAppLaunchPixel() {
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+
+        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
+        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
+
+        Thread.sleep(10500)
+
+        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
+
         verify(pixel).fire(
-            AppPixelName.APP_LAUNCH_LEGACY,
+            AppPixelName.APP_LAUNCH,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
     }
