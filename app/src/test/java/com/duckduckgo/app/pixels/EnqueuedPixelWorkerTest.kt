@@ -74,6 +74,7 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
+        verify(pixel, never()).fire(AppPixelName.APP_LAUNCH_LEGACY)
         verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
     }
 
@@ -84,6 +85,11 @@ class EnqueuedPixelWorkerTest {
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH_LEGACY,
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+        )
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
@@ -103,6 +109,11 @@ class EnqueuedPixelWorkerTest {
 
         verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
+            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
+        )
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH_LEGACY,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
     }

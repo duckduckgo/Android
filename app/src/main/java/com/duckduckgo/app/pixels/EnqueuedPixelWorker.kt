@@ -54,6 +54,10 @@ class EnqueuedPixelWorker @Inject constructor(
         event: Lifecycle.Event
     ) {
         if (event == Lifecycle.Event.ON_CREATE) {
+            pixel.get().fire(
+                pixel = AppPixelName.APP_LAUNCH,
+                parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
+            )
             scheduleWorker(workManager)
             launchedByFireAction = isLaunchByFireAction()
         } else if (event == Lifecycle.Event.ON_START) {
@@ -65,7 +69,7 @@ class EnqueuedPixelWorker @Inject constructor(
             }
             Timber.i("Sending app launch pixel")
             pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
+                pixel = AppPixelName.APP_LAUNCH_LEGACY,
                 parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
             )
         }
