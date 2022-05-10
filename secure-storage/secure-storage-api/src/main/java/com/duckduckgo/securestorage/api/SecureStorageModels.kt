@@ -16,16 +16,42 @@
 
 package com.duckduckgo.securestorage.api
 
+/**
+ * Public sealed class representing the result of secure storage user authentication.
+ */
 sealed class Result {
+    /**
+     * Data class representing a success in secure storage authentication.
+     * [expiryInMillis] is the system time in millis to when the authentication is set to expire.
+     */
     data class Success(val expiryInMillis: Long) : Result()
+
+    /**
+     * Data class representing any error in secure storage authentication.
+     * [reason] provides more details on why the error occurred.
+     */
     data class Error(val reason: String) : Result()
 }
 
+/**
+ * Public data class that wraps all data related to a website login.
+ *
+ * [details] contains all l1 encrypted attributes
+ * [password] plain text password. All succeeding l2 and above attributes should be added here directly.
+ */
 data class WebsiteLoginCredentials(
     val details: WebsiteLoginDetails,
     val password: String?
 )
 
+/**
+ * Public data class that wraps all data that should only be covered with l1 encryption.
+ * All attributes is in plain text. Also, all should not require user authentication to be decrypted.
+ *
+ * [domain] url/name associated to a website login.
+ * [username] used to populate the username fields in a login
+ * [id] database id associated to the website login
+ */
 data class WebsiteLoginDetails(
     val domain: String?,
     val username: String?,
