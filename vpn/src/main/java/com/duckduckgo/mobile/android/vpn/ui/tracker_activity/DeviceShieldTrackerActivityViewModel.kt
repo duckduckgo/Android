@@ -152,6 +152,7 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
     private fun launchVpn() {
         sendCommand(Command.LaunchVPN)
         if (shouldPromoteAlwaysOn()) {
+            deviceShieldPixels.didShowPromoteAlwaysOnDialog()
             sendCommand(Command.ShowAlwaysOnPromotionDialog)
         }
 
