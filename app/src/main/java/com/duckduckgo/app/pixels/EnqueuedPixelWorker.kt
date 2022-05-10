@@ -56,7 +56,7 @@ class EnqueuedPixelWorker @Inject constructor(
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleWorker(workManager)
             launchedByFireAction = isLaunchByFireAction()
-            if (!launchedByFireAction){
+            if (!launchedByFireAction) {
                 Timber.i("Sending app launch pixel")
                 pixel.get().fire(
                     pixel = AppPixelName.APP_LAUNCH,
