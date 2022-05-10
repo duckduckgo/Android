@@ -47,14 +47,14 @@ internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeat
     }
 
     override fun getMinSupportedVersion(featureName: AppTpFeatureName): Int {
-        return preferences.getInt(featureName.value + MIN_SUPPORTED_VERSION, 0)
+        return preferences.getInt("${featureName.value}$MIN_SUPPORTED_VERSION", 0)
     }
 
     override fun insert(toggle: VpnFeatureToggles) {
         preferences.edit {
             putBoolean(toggle.featureName.value, toggle.enabled)
             toggle.minSupportedVersion?.let {
-                putInt(toggle.featureName.value + MIN_SUPPORTED_VERSION, it)
+                putInt("${toggle.featureName.value}$MIN_SUPPORTED_VERSION", it)
             }
         }
     }
