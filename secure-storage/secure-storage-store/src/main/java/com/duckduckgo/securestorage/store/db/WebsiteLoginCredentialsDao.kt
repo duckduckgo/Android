@@ -34,10 +34,10 @@ interface WebsiteLoginCredentialsDao {
     fun update(loginCredentials: WebsiteLoginCredentialsEntity)
 
     @Query("select * from website_login_credentials")
-    fun getWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
+    fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
     @Query("select * from website_login_credentials where domain = :domain")
-    fun getWebsiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
+    fun websiteLoginCredentialsByDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     @Query("select * from website_login_credentials where id = :id")
     fun getWebsiteLoginCredentialsById(id: Int): WebsiteLoginCredentialsEntity

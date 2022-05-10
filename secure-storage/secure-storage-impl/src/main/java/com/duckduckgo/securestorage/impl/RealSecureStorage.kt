@@ -53,15 +53,15 @@ class RealSecureStorage @Inject constructor(
         secureStorageRepository.addWebsiteLoginCredential(websiteLoginCredentials.toDataEntity())
     }
 
-    override suspend fun getWebsiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> =
-        secureStorageRepository.getWebsiteLoginCredentialsForDomain(domain).map { list ->
+    override suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>> =
+        secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
             list.map {
                 it.toDetails()
             }
         }
 
-    override suspend fun getAllWebsiteLoginDetails(): Flow<List<WebsiteLoginDetails>> =
-        secureStorageRepository.getAllWebsiteLoginCredentials().map { list ->
+    override suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>> =
+        secureStorageRepository.websiteLoginCredentials().map { list ->
             list.map {
                 it.toDetails()
             }
@@ -70,17 +70,17 @@ class RealSecureStorage @Inject constructor(
     override suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentials =
         secureStorageRepository.getWebsiteLoginCredentialsForId(id).toCredentials()
 
-    override suspend fun getWebsiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>> =
+    override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>> =
         // TODO (karl) Integrate L2 encryption
-        secureStorageRepository.getWebsiteLoginCredentialsForDomain(domain).map { list ->
+        secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
             list.map {
                 it.toCredentials()
             }
         }
 
-    override suspend fun getAllWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>> =
+    override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>> =
         // TODO (karl) Integrate L2 encryption
-        secureStorageRepository.getAllWebsiteLoginCredentials().map { list ->
+        secureStorageRepository.websiteLoginCredentials().map { list ->
             list.map {
                 it.toCredentials()
             }
