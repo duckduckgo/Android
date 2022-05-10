@@ -24,7 +24,7 @@ import com.duckduckgo.remote.messaging.impl.models.RangeIntMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.matches
 
 class UserAttributeMatcher(
-    val userBrowserProperties: UserBrowserProperties
+    private val userBrowserProperties: UserBrowserProperties
 ) : AttributeMatcher {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {

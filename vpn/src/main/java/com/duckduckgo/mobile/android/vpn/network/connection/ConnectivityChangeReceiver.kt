@@ -25,6 +25,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
+import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -37,6 +38,7 @@ import javax.inject.Inject
 @ContributesMultibinding(VpnScope::class)
 class ConnectivityChangeReceiver @Inject constructor(
     private val vpnConfig: AppTpFeatureConfig,
+    private val vpnPreferences: VpnPreferences,
     private val context: Context,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : VpnServiceCallbacks {
@@ -46,6 +48,16 @@ class ConnectivityChangeReceiver @Inject constructor(
             // Filter VPN connectivity changes
             val networkType = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, ConnectivityManager.TYPE_DUMMY)
             if (networkType == ConnectivityManager.TYPE_VPN) return
+
+            val oldNetworkType = vpnPreferences.activeNetworkType
+
+            if (oldNetworkType?.lowercase() == networkType.toString().lowercase()) {
+                Timber.d("Network type didn't change, skip")
+                return
+            }
+
+            vpnPreferences.activeNetworkType = networkType.toString()
+            Timber.d("Connectivity change to $networkType, reconfiguring VPN")
 
             coroutineScope.launch {
                 TrackerBlockingVpnService.restartVpnService(context)
