@@ -28,11 +28,8 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import com.duckduckgo.di.scopes.AppScope
 
-import com.duckduckgo.mobile.android.vpn.store.R
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
@@ -53,7 +50,6 @@ class AppTrackerListUpdateWorker(
     CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
-    lateinit var variantManager: VariantManager
 
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
@@ -85,24 +81,12 @@ class AppTrackerListUpdateWorker(
                     return Result.success()
                 }
 
-                val trackerBlocklist = if (variantManager.isVPNRetentionStudyEnabled()) {
-                    Timber.d(
-                        "This install is part of the AppTP retention study, we use a reduce app tracker blocklist, " +
-                            "rest of entities will be updated eTag: ${blocklist.etag.value}"
-                    )
-                    val jsonString = applicationContext.resources.openRawResource(R.raw.reduced_app_trackers_blocklist).bufferedReader()
-                        .use { it.readText() }
-
-                    getReducedAppTrackerBlockingList(jsonString)
-                } else {
-                    Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
-                    blocklist.blocklist
-                }
+                Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
 
                 vpnDatabase
                     .vpnAppTrackerBlockingDao()
                     .updateTrackerBlocklist(
-                        trackerBlocklist,
+                        blocklist.blocklist,
                         blocklist.appPackages,
                         AppTrackerMetadata(eTag = blocklist.etag.value),
                         blocklist.entities
@@ -181,15 +165,13 @@ class AppTrackerListUpdateWorkerPlugin
 @Inject
 constructor(
     private val appTrackerListDownloader: AppTrackerListDownloader,
-    private val vpnDatabase: VpnDatabase,
-    private val variantManager: VariantManager
+    private val vpnDatabase: VpnDatabase
 ) : WorkerInjectorPlugin {
     override fun inject(worker: ListenableWorker): Boolean {
         if (worker is AppTrackerListUpdateWorker) {
             Timber.v("Injecting dependencies for AppTrackerListUpdateWorker")
             worker.appTrackerListDownloader = appTrackerListDownloader
             worker.vpnDatabase = vpnDatabase
-            worker.variantManager = variantManager
             return true
         }
 
