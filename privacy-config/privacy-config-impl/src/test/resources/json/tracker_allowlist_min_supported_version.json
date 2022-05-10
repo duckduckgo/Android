@@ -1,6 +1,6 @@
 {
   "state": "enabled",
-  "minSupportedVersion": "1234",
+  "minSupportedVersion": 1234,
   "settings": {
     "allowlistedTrackers": {
       "allowlist-tracker-1.com": {
