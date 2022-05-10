@@ -51,7 +51,7 @@ class VariantManagerTest {
 
     @Test
     fun retentionStudyVariantGroupHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "nn" }
+        val variant = variants.first { it.key == "nb" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
     }
