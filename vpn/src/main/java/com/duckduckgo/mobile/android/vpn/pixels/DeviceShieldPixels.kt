@@ -886,7 +886,7 @@ class RealDeviceShieldPixels @Inject constructor(
         }
     }
 
-    private fun  tryToFireDailyPixel(
+    private fun tryToFireDailyPixel(
         pixel: DeviceShieldPixelNames,
         payload: Map<String, String> = emptyMap()
     ) {

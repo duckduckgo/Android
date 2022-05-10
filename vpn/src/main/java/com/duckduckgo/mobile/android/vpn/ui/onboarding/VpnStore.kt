@@ -41,7 +41,7 @@ interface VpnStore {
     fun isAlwaysOnEnabled(): Boolean
 
     companion object {
-        const val ALWAYS_ON_PROMOTION_DELTA = 2
+        const val ALWAYS_ON_PROMOTION_DELTA = 3
     }
 }
 
