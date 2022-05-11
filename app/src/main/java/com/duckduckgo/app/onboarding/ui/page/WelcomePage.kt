@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.global.view.html
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
@@ -152,8 +153,8 @@ class WelcomePage : OnboardingPageFragment() {
             ctaText = it.getString(R.string.onboardingDaxText)
             hiddenTextCta.text = ctaText.html(it)
             dialogTextCta.textInDialog = ctaText.html(it)
-            dialogTextCta.setTextColor(ContextCompat.getColor(it, R.color.grayishBrown))
-            cardView.backgroundTintList = ContextCompat.getColorStateList(it, R.color.white)
+            dialogTextCta.setTextColor(ContextCompat.getColor(it, CommonR.color.grayishBrown))
+            cardView.backgroundTintList = ContextCompat.getColorStateList(it, CommonR.color.white)
         }
         triangle.setImageResource(R.drawable.ic_triangle_bubble_white)
     }

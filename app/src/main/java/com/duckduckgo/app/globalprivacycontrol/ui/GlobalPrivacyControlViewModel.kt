@@ -32,7 +32,7 @@ import javax.inject.Inject
 @ContributesViewModel(ActivityScope::class)
 class GlobalPrivacyControlViewModel @Inject constructor(
     private val pixel: Pixel,
-    private val featureToggle: FeatureToggle,
+    featureToggle: FeatureToggle,
     private val gpc: Gpc
 ) : ViewModel() {
 

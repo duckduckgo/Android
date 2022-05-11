@@ -32,13 +32,10 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
-import dagger.Binds
-import dagger.Module
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -53,6 +50,10 @@ import javax.inject.Inject
 @ContributesMultibinding(
     scope = VpnScope::class,
     boundType = VpnStateCollectorPlugin::class
+)
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnServiceCallbacks::class
 )
 @SingleInstanceIn(VpnScope::class)
 class NetworkTypeCollector @Inject constructor(
@@ -110,7 +111,8 @@ class NetworkTypeCollector @Inject constructor(
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            vpnPreferences.isPrivateDnsEnabled = if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && context.isPrivateDnsActive()) {
+            // check for Android Private DNS setting
+            val privateDns = if (context.isPrivateDnsActive()) {
                 Timber.v(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
@@ -119,8 +121,19 @@ class NetworkTypeCollector @Inject constructor(
                 )
                 true
             } else {
-                Timber.v("Private DNS support is disabled or not set")
+                Timber.v("Private DNS disabled")
                 false
+            }
+
+            // Check if VPN reconfiguration is needed
+            if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled != privateDns) {
+                Timber.v("Private DNS changed, reconfiguring VPN")
+                coroutineScope.launch {
+                    vpnPreferences.isPrivateDnsEnabled = privateDns
+                    TrackerBlockingVpnService.restartVpnService(context)
+                }
+            } else {
+                Timber.v("Nothing change in Network config, skip reconfiguration")
             }
         }
     }
@@ -259,13 +272,4 @@ class NetworkTypeCollector @Inject constructor(
         private const val FILENAME = "network.type.collector.file.v1"
         private const val NETWORK_INFO_KEY = "network.info.key"
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class NetworkTypeCollectorModule {
-    @Binds
-    @IntoSet
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun NetworkTypeCollector.bind(): VpnServiceCallbacks
 }

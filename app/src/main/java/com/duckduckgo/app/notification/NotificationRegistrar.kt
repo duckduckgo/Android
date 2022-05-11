@@ -29,6 +29,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.vpn.R as VpnR
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.notification.model.Channel
@@ -78,7 +79,7 @@ class NotificationRegistrar @Inject constructor(
         )
         val APP_TP_WAITLIST = Channel(
             "com.duckduckgo.apptp",
-            R.string.atp_WaitlistActivityWaitlistTitle,
+            VpnR.string.atp_WaitlistActivityWaitlistTitle,
             NotificationManagerCompat.IMPORTANCE_HIGH
         )
         // Do not add new channels here, instead follow https://app.asana.com/0/1125189844152671/1201842645469204

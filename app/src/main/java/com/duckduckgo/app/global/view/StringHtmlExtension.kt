@@ -27,9 +27,9 @@ import androidx.core.content.ContextCompat
 @Suppress("deprecation")
 fun String.html(context: Context): Spanned {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        return fromHtml(this, FROM_HTML_MODE_COMPACT, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
+        return fromHtml(this, FROM_HTML_MODE_COMPACT, { htmlDrawable(context, it.toInt()) }, null)
     }
-    return fromHtml(this, ImageGetter { htmlDrawable(context, it.toInt()) }, null)
+    return fromHtml(this, { htmlDrawable(context, it.toInt()) }, null)
 }
 
 private fun htmlDrawable(

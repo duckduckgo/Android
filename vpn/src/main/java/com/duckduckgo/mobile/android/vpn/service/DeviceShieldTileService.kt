@@ -28,6 +28,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.QuickSettingsScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import dagger.android.AndroidInjection
@@ -48,6 +50,7 @@ class DeviceShieldTileService : TileService() {
 
     @Inject lateinit var deviceShieldPixels: DeviceShieldPixels
     @Inject lateinit var repository: AtpWaitlistStateRepository
+    @Inject lateinit var vpnStore: VpnStore
 
     private var deviceShieldStatePollingJob = ConflatedJob()
     private val serviceScope = CoroutineScope(Dispatchers.IO)
@@ -72,11 +75,28 @@ class DeviceShieldTileService : TileService() {
         } else {
             deviceShieldPixels.enableFromQuickSettingsTile()
             if (hasVpnPermission()) {
-                startDeviceShield()
+                if (shouldPromoteAlwaysOn()) {
+                    launchActivity(DeviceShieldTrackerActivity::class.java)
+                } else {
+                    startDeviceShield()
+                }
             } else {
                 launchActivity(VpnPermissionRequesterActivity::class.java)
             }
         }
+    }
+
+    private fun shouldPromoteAlwaysOn(): Boolean {
+        val shouldPromoteAlwaysOn =
+            vpnStore.getAppTPManuallyEnables() >= VpnStore.ALWAYS_ON_PROMOTION_DELTA &&
+                vpnStore.userAllowsShowPromoteAlwaysOn() &&
+                !vpnStore.isAlwaysOnEnabled()
+
+        if (shouldPromoteAlwaysOn) {
+            vpnStore.resetAppTPManuallyEnablesCounter()
+        }
+
+        return shouldPromoteAlwaysOn
     }
 
     private fun launchActivity(activityClass: Class<*>) {
@@ -119,6 +139,7 @@ class DeviceShieldTileService : TileService() {
     }
 
     private fun startDeviceShield() {
+        vpnStore.onAppTPManuallyEnabled()
         TrackerBlockingVpnService.startService(this)
     }
 }

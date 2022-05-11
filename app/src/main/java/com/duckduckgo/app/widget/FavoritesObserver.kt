@@ -27,13 +27,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 import dagger.SingleInstanceIn
 
 @SingleInstanceIn(AppScope::class)
 class FavoritesObserver @Inject constructor(
-    private val context: Context,
+    context: Context,
     private val favoritesRepository: FavoritesRepository,
     private val appCoroutineScope: CoroutineScope
 ) : LifecycleObserver {

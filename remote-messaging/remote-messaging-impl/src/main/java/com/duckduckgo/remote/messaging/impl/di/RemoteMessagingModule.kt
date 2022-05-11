@@ -23,6 +23,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.remote.messaging.impl.RealRemoteMessagingConfigDownloader
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
 import com.duckduckgo.di.scopes.AppScope
@@ -44,6 +45,7 @@ import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import dagger.multibindings.IntoSet
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -54,7 +56,6 @@ import javax.inject.Named
 object DomainModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigDownloader(
         remoteConfig: RemoteMessagingService,
         remoteMessagingConfigProcessor: RemoteMessagingConfigProcessor
@@ -102,7 +103,6 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingRepository(
         remoteMessagingConfigRepository: RemoteMessagingConfigRepository,
         remoteMessagesDao: RemoteMessagesDao,
@@ -130,17 +130,14 @@ object DataSourceModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigMatcher(
-        @DeviceAttrMatcher deviceAttributeMatcher: AttributeMatcher,
-        @AndroidAppAttrMatcher androidAppAttributeMatcher: AttributeMatcher,
+        matchers: DaggerSet<AttributeMatcher>,
         remoteMessagingRepository: RemoteMessagingRepository,
-        @UserAttrMatcher userAttributeMatcher: AttributeMatcher
     ): RemoteMessagingConfigMatcher {
-        return RemoteMessagingConfigMatcher(deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher)
+        return RemoteMessagingConfigMatcher(matchers, remoteMessagingRepository)
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    @AndroidAppAttrMatcher
+    @IntoSet
     fun providesAndroidAppAttributeMatcher(
         appProperties: AppProperties,
         appBuildConfig: AppBuildConfig
@@ -149,8 +146,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    @DeviceAttrMatcher
+    @IntoSet
     fun providesDeviceAttributeMatcher(
         appBuildConfig: AppBuildConfig,
         appProperties: AppProperties
@@ -159,8 +155,7 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    @UserAttrMatcher
+    @IntoSet
     fun providesUserAttributeMatcher(
         userBrowserProperties: UserBrowserProperties
     ): AttributeMatcher {
@@ -168,7 +163,6 @@ object DataSourceModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
     fun providesRemoteMessagingConfigRepository(database: RemoteMessagingDatabase): RemoteMessagingConfigRepository {
         return LocalRemoteMessagingConfigRepository(database)
     }

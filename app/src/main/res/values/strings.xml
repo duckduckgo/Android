@@ -249,6 +249,7 @@
     <string name="dialogSave">Save</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
@@ -449,7 +450,7 @@
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: Every time you browse with me, a creepy ad loses its wings. 👍]]></string>
-    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never store your search history. Ever. 🙌</string>
+    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never save your search history. Ever. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
@@ -506,18 +507,19 @@
     <string name="fireproofWebsitesActivityTitle">Fireproof Sites</string>
     <string name="settingsFireproofWebsites">Fireproof Sites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Fireproof This Site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b>%s&lt;/b> is now Fireproof</string>
     <string name="fireproofWebsiteSnackbarAction">Undo</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Are you sure you want to delete &lt;b>%s&lt;/b>?</string>
-    <string name="fireproofWebsiteEmptyListHint">No Fireproof websites</string>
     <string name="fireproofWebsiteFeatureDescription">Websites rely on cookies to keep you signed in. When you Fireproof a site, cookies won\'t be erased and you\'ll stay signed in, even after using the Fire Button. We still block third-party trackers found on Fireproof websites.</string>
     <string name="fireproofWebsiteOverflowContentDescription">More options for fireproof website %s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Would you like to Fireproof %s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Fireproofing this site will keep you signed in after using the Fire Button.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToggleText">Ask When Signing In</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Fireproof Sites</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Ask every time</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Always</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Never</string>
     <string name="disableLoginDetectionDialogTitle">Disable Fireproof reminder when signing in to sites?</string>
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>

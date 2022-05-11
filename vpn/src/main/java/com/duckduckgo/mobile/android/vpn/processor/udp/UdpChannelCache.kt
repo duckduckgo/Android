@@ -19,15 +19,16 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.util.LruCache
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import javax.inject.Inject
 
 @SingleInstanceIn(VpnScope::class)
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnMemoryCollectorPlugin::class
+)
 class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcessor.ChannelDetails>(500), VpnMemoryCollectorPlugin {
     override fun entryRemoved(
         evicted: Boolean,
@@ -46,12 +47,4 @@ class UdpChannelCache @Inject constructor() : LruCache<String, UdpPacketProcesso
             this["udpChannelCacheSize"] = size().toString()
         }
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class UdpChannelCacheModule {
-    @Binds
-    @IntoSet
-    abstract fun bindUdpChannelCacheMemoryCollector(udpChannelCache: UdpChannelCache): VpnMemoryCollectorPlugin
 }

@@ -268,6 +268,7 @@
     <string name="dialogSave">Salvare</string>
     <string name="delete">Ștergere</string>
     <string name="edit">Editare</string>
+    <string name="remove">Elimină</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
@@ -538,7 +539,9 @@
     <string name="fireproofWebsiteLoginDialogPositive">Ștergerea activității și istoricului din browser</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
     <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
-    <string name="fireproofWebsiteToggleText">Întreabă la conectare</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Întreabă de fiecare dată</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Întotdeauna</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Niciodată</string>
     <string name="disableLoginDetectionDialogTitle">Dezactivezi dialogul de confirmare pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
     <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
     <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>

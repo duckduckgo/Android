@@ -48,7 +48,7 @@ enum class WidgetTheme {
     }
 }
 
-class SearchAndFavoritesWidget() : AppWidgetProvider() {
+class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     companion object {
         const val ACTION_FAVORITE = "com.duckduckgo.widget.actionFavorite"

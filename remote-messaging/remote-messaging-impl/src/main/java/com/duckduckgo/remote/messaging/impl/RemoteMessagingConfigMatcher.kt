@@ -18,8 +18,6 @@ package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
-import com.duckduckgo.remote.messaging.impl.di.DeviceAttrMatcher
-import com.duckduckgo.remote.messaging.impl.di.UserAttrMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.impl.matchers.EvaluationResult
 import com.duckduckgo.remote.messaging.impl.matchers.toResult
@@ -29,12 +27,9 @@ import com.duckduckgo.remote.messaging.impl.models.MatchingAttribute.Unknown
 import timber.log.Timber
 
 class RemoteMessagingConfigMatcher(
-    @DeviceAttrMatcher val deviceAttributeMatcher: AttributeMatcher,
-    @DeviceAttrMatcher val androidAppAttributeMatcher: AttributeMatcher,
-    val remoteMessagingRepository: RemoteMessagingRepository,
-    @UserAttrMatcher val userAttributeMatcher: AttributeMatcher
+    private val matchers: Set<AttributeMatcher>,
+    private val remoteMessagingRepository: RemoteMessagingRepository,
 ) {
-    private val matchers = listOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher)
 
     suspend fun evaluate(remoteConfig: RemoteConfig): RemoteMessage? {
         val rules = remoteConfig.rules

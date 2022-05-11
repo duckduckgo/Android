@@ -101,17 +101,13 @@
                 android:visibility="gone"
                 android:text="@string/atp_ManageRecentAppsProtectionEmpty" />
 
-            <TextView
+            <com.duckduckgo.mobile.android.ui.view.SettingsOption
                 android:id="@+id/manageRecentAppsShowAll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/keyline_4"
-                android:paddingBottom="@dimen/keyline_4"
-                android:paddingStart="72dp"
+                android:paddingStart="56dp"
                 android:text="@string/atp_ManageRecentAppsProtectionShowAll"
-                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"
-                android:background="?selectableItemBackground"
-                android:textColor="?attr/listItemTitleColor"/>
+                android:textAppearance="@style/TextAppearance.DuckDuckGo.Body1"/>
 
         </LinearLayout>
 

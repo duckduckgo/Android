@@ -39,10 +39,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
 
-    ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
-    ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
-    ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
-
     PRIVACY_DASHBOARD_OPENED("mp"),
     PRIVACY_DASHBOARD_SCORECARD("mp_c"),
     PRIVACY_DASHBOARD_ENCRYPTION("mp_e"),
@@ -202,6 +198,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_WEBSITE_LOGIN_ADDED("m_fw_l_a"),
     FIREPROOF_WEBSITE_LOGIN_DISMISS("m_fw_l_d"),
     FIREPROOF_WEBSITE_DELETED("m_fw_d"),
+    FIREPROOF_WEBSITE_ALL_DELETED("m_fireproof_website_all_deleted"),
     FIREPROOF_LOGIN_TOGGLE_ENABLED("m_fw_d_e"),
     FIREPROOF_LOGIN_TOGGLE_DISABLED("m_fw_d_d"),
     FIREPROOF_WEBSITE_UNDO("m_fw_u"),
@@ -209,7 +206,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FIREPROOF_LOGIN_DISABLE_DIALOG_SHOWN("m_fw_dd_s"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_DISABLE("m_fw_dd_d"),
     FIREPROOF_LOGIN_DISABLE_DIALOG_CANCEL("m_fw_dd_c"),
-    FIREPROOF_SNACKBAR_SHOWN("m_fireproof_snackbar_shown"),
+    FIREPROOF_SETTING_SELECTION_ALWAYS("m_fireproof_setting_selection_always"),
+    FIREPROOF_SETTING_SELECTION_NEVER("m_fireproof_setting_selection_never"),
+    FIREPROOF_SETTING_SELECTION_ASK_EVERYTIME("m_fireproof_setting_selection_ask_every_time"),
+    FIREPROOF_AUTOMATIC_DIALOG_ALWAYS("m_fireproof_automatic_dialog_always"),
+    FIREPROOF_AUTOMATIC_DIALOG_FIREPROOF_SITE("m_fireproof_automatic_dialog_fireproof_site"),
+    FIREPROOF_AUTOMATIC_DIALOG_NOT_NOW("m_fireproof_automatic_dialog_not_now"),
 
     SHORTCUT_ADDED("m_sho_a"),
     SHORTCUT_OPENED("m_sho_o"),

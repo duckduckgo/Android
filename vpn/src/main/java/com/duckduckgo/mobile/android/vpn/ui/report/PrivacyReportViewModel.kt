@@ -20,26 +20,31 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastHour
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.vpn.feature.removal.VpnFeatureRemover
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ContributesViewModel(FragmentScope::class)
 class PrivacyReportViewModel @Inject constructor(
     private val repository: AppTrackerBlockingStatsRepository,
-    private val deviceShieldOnboarding: DeviceShieldOnboardingStore,
-    private val vpnStateMonitor: VpnStateMonitor
+    private val vpnStore: VpnStore,
+    private val vpnFeatureRemover: VpnFeatureRemover,
+    vpnStateMonitor: VpnStateMonitor,
+    private val dispatchers: DispatcherProvider
 ) : ViewModel(), LifecycleObserver {
 
     val viewStateFlow = vpnStateMonitor.getStateFlow().combine(getReport()) { vpnState, trackersBlocked ->
-        PrivacyReportView.ViewState(vpnState, trackersBlocked, deviceShieldOnboarding.didShowOnboarding())
+        PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())
     }
 
     @VisibleForTesting
@@ -58,11 +63,22 @@ class PrivacyReportViewModel @Inject constructor(
         }
     }
 
+    private suspend fun shouldShowCTA(): Boolean {
+        val isFeatureRemoved = withContext(dispatchers.io()) {
+            vpnFeatureRemover.isFeatureRemoved()
+        }
+        if (isFeatureRemoved) {
+            return false
+        } else {
+            return vpnStore.didShowOnboarding()
+        }
+    }
+
     object PrivacyReportView {
         data class ViewState(
             val vpnState: VpnState,
             val trackersBlocked: TrackersBlocked,
-            val onboardingComplete: Boolean
+            val isFeatureEnabled: Boolean
         )
 
         data class TrackersBlocked(

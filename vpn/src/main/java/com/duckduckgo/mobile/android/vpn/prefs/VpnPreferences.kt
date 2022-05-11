@@ -18,38 +18,37 @@ package com.duckduckgo.mobile.android.vpn.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
+import com.duckduckgo.di.scopes.VpnScope
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-class VpnPreferences @Inject constructor(
-    private val applicationContext: Context,
-) {
-
+interface VpnPreferences {
     var isPrivateDnsEnabled: Boolean
+    var activeNetworkType: String?
+}
+
+@ContributesBinding(VpnScope::class)
+class RealVpnPreferences @Inject constructor(
+    private val applicationContext: Context,
+) : VpnPreferences {
+
+    override var isPrivateDnsEnabled: Boolean
         get() = preferences.getBoolean(PRIVATE_DNS_ENABLED, false)
-        set(value) = preferences.edit { putBoolean(PRIVATE_DNS_ENABLED, value) }
+        set(value) = preferences.edit(commit = true) { putBoolean(PRIVATE_DNS_ENABLED, value) }
 
-    fun isPrivateDnsKey(key: String) = key == PRIVATE_DNS_ENABLED
-
-    fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
-        preferences.registerOnSharedPreferenceChangeListener(listener)
-    }
-
-    fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
-        preferences.unregisterOnSharedPreferenceChangeListener(listener)
-    }
+    override var activeNetworkType: String?
+        get() = preferences.getString(VPN_ACTIVE_NETWORK_NAME, null)
+        set(value) = preferences.edit(commit = true) { putString(VPN_ACTIVE_NETWORK_NAME, value) }
 
     private val preferences: SharedPreferences
         get() = applicationContext.getSharedPreferences(PREFS_FILENAME, Context.MODE_PRIVATE)
-
-    companion object {
-
-        @VisibleForTesting
-        const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.prefs"
-
-        private const val PRIVATE_DNS_ENABLED = "private_dns_enabled"
-        const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"
-    }
 }
+
+@VisibleForTesting
+const val PREFS_FILENAME = "com.duckduckgo.mobile.android.vpn.prefs"
+
+private const val PRIVATE_DNS_ENABLED = "private_dns_enabled"
+private const val VPN_ACTIVE_NETWORK_NAME = "vpn_active_network_name"
+const val PREFS_KEY_REMINDER_NOTIFICATION_SHOWN = "PREFS_KEY_REMINDER_NOTIFICATION_SHOWN"

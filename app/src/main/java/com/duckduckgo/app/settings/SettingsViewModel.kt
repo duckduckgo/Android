@@ -43,7 +43,7 @@ import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import com.duckduckgo.privacy.config.api.Gpc
@@ -70,7 +70,7 @@ class SettingsViewModel @Inject constructor(
     private val variantManager: VariantManager,
     private val fireAnimationLoader: FireAnimationLoader,
     private val atpRepository: AtpWaitlistStateRepository,
-    private val deviceShieldOnboardingStore: DeviceShieldOnboardingStore,
+    private val vpnStore: VpnStore,
     private val gpc: Gpc,
     private val featureToggle: FeatureToggle,
     private val pixel: Pixel,
@@ -269,7 +269,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onAppTPSettingClicked() {
         if (atpRepository.getState() == WaitlistState.InBeta) {
-            if (deviceShieldOnboardingStore.didShowOnboarding()) {
+            if (vpnStore.didShowOnboarding()) {
                 viewModelScope.launch { command.send(Command.LaunchAppTPTrackersScreen) }
             } else {
                 viewModelScope.launch { command.send(Command.LaunchAppTPOnboarding) }

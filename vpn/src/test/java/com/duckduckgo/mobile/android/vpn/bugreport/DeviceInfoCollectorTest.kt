@@ -42,8 +42,6 @@ class DeviceInfoCollectorTest {
         MockitoAnnotations.openMocks(this)
 
         whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.PLAY)
-        whenever(appBuildConfig.manufacturer).thenReturn("manufacturer")
-        whenever(appBuildConfig.model).thenReturn("model")
         whenever(appBuildConfig.sdkInt).thenReturn(30)
 
         deviceInfoCollector = DeviceInfoCollector(appBuildConfig)
@@ -55,10 +53,8 @@ class DeviceInfoCollectorTest {
 
         assertEquals("deviceInfo", deviceInfoCollector.collectorName)
 
-        assertEquals(4, state.length())
+        assertEquals(2, state.length())
         assertEquals("PLAY", state.get("buildFlavor"))
-        assertEquals("manufacturer", state.get("manufacturer"))
-        assertEquals("model", state.get("model"))
         assertEquals(30, state.get("os"))
     }
 }

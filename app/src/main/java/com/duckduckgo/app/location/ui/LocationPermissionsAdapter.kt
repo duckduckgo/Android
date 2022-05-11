@@ -27,6 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDescriptionBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsDividerBinding
 import com.duckduckgo.app.browser.databinding.ViewLocationPermissionsEmptyHintBinding
@@ -110,10 +111,9 @@ class LocationPermissionsAdapter(
             }
             TOGGLE_TYPE -> {
                 val binding = ViewLocationPermissionsToggleBinding.inflate(inflater, parent, false)
-                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(
-                    binding,
-                    CompoundButton.OnCheckedChangeListener { _, isChecked -> viewModel.onLocationPermissionToggled(isChecked) }
-                )
+                LocationPermissionsViewHolder.LocationPermissionsToggleViewHolder(binding) { _, isChecked ->
+                    viewModel.onLocationPermissionToggled(isChecked)
+                }
             }
             DIVIDER_TYPE -> {
                 val binding = ViewLocationPermissionsDividerBinding.inflate(inflater, parent, false)
@@ -272,7 +272,7 @@ sealed class LocationPermissionsViewHolder(itemView: View) : RecyclerView.ViewHo
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(R.id.image))
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
             }
         }
 

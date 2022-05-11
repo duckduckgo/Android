@@ -26,7 +26,7 @@ import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.global.baseHost
 import okio.ByteString.Companion.encodeUtf8
 import java.io.File
@@ -75,10 +75,10 @@ fun generateDefaultDrawable(
         private val baseHost: String = domain.toUri().baseHost ?: ""
 
         private val letter
-            get() = baseHost.firstOrNull()?.toString()?.toUpperCase(Locale.getDefault()) ?: ""
+            get() = baseHost.firstOrNull()?.toString()?.uppercase(Locale.getDefault()) ?: ""
 
-        private val faviconDefaultCornerRadius = context.resources.getDimension(R.dimen.savedSiteGridItemCornerRadiusFavicon)
-        private val faviconDefaultSize = context.resources.getDimension(R.dimen.savedSiteGridItemFavicon)
+        private val faviconDefaultCornerRadius = context.resources.getDimension(CommonR.dimen.savedSiteGridItemCornerRadiusFavicon)
+        private val faviconDefaultSize = context.resources.getDimension(CommonR.dimen.savedSiteGridItemFavicon)
 
         private val palette = listOf(
             "#94B3AF",
@@ -104,7 +104,7 @@ fun generateDefaultDrawable(
         }
 
         private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = getColor(context, R.color.white)
+            color = getColor(context, CommonR.color.white)
             typeface = Typeface.SANS_SERIF
         }
 

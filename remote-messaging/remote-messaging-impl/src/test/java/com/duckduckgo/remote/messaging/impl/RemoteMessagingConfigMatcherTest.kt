@@ -44,7 +44,8 @@ class RemoteMessagingConfigMatcherTest {
     private val remoteMessagingRepository: RemoteMessagingRepository = mock()
 
     private val testee = RemoteMessagingConfigMatcher(
-        deviceAttributeMatcher, androidAppAttributeMatcher, remoteMessagingRepository, userAttributeMatcher
+        setOf(deviceAttributeMatcher, androidAppAttributeMatcher, userAttributeMatcher),
+        remoteMessagingRepository
     )
 
     @Test
