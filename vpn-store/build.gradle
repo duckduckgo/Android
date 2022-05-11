@@ -60,6 +60,8 @@ dependencies {
     kapt AndroidX.room.compiler
     testImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.room.testing
+    // multi-process shared preferences
+    implementation "com.frybits.harmony:harmony:_"
 
     testImplementation "junit:junit:_"
     testImplementation project(path: ':common-test')
