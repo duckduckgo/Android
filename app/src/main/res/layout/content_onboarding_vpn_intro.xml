@@ -44,6 +44,7 @@
     <TextView
         android:id="@+id/onboarding_page_title"
         android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline2"
+        android:textSize="21sp"
         android:textColor="@color/almostBlackDark"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,14 +59,14 @@
 
     <TextView
         android:id="@+id/onboarding_page_text"
-        android:textAppearance="@style/TextAppearance.DuckDuckGo.Body2"
-        android:textColor="@color/gray70"
+        android:textSize="16sp"
+        android:textColor="@color/gray90"
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
-        android:paddingStart="40dp"
-        android:paddingEnd="40dp"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
         android:drawablePadding="@dimen/keyline_2"
         android:drawableTop="@drawable/ic_beta_pill"
         android:text="@string/atp_daxOnboardingIntroMessage"

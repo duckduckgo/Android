@@ -68,17 +68,13 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
 
     private fun registerAlertChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, "App Tracking Protection Alerts", NotificationManager.IMPORTANCE_DEFAULT)
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun registerStatusChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(VPN_STATUS_CHANNEL_ID, "App Tracking Status Channel", NotificationManager.IMPORTANCE_MIN)
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            if  (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null){
+                val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+                channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
+                notificationManager.createNotificationChannel(channel)
+                notificationManager.isNotificationPolicyAccessGranted
+            }
         }
     }
 
@@ -110,7 +106,8 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(onNotificationTapPendingIntent)
             .setCustomContentView(notificationLayout)
-            .setPriority(NotificationCompat.DEFAULT_ALL)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setSilent(silent)
             .addAction(
                 NotificationCompat.Action(
@@ -149,7 +146,8 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setContentIntent(onNotificationTapPendingIntent)
             .setCustomContentView(notificationLayout)
-            .setPriority(NotificationCompat.DEFAULT_ALL)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setSilent(true)
             .addAction(
                 NotificationCompat.Action(
@@ -159,7 +157,6 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
                 )
             )
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
-            .setChannelId(VPN_ALERTS_CHANNEL_ID)
             .build()
     }
 
@@ -168,7 +165,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
         deviceShieldNotification: DeviceShieldNotificationFactory.DeviceShieldNotification,
         onNotificationPressedCallback: ResultReceiver
     ): Notification {
-        registerStatusChannel(context)
+        registerAlertChannel(context)
 
         val notificationLayout = RemoteViews(context.packageName, R.layout.notification_device_shield_report)
 
@@ -215,15 +212,18 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
             .setSilent(true)
             .setCustomContentView(content)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setCategory(NotificationCompat.CATEGORY_STATUS)
             .addAction(NotificationActionReportIssue.reportIssueNotificationAction(context))
-            .setChannelId(VPN_ALERTS_CHANNEL_ID)
             .build()
     }
 
     companion object {
 
-        const val VPN_ALERTS_CHANNEL_ID = "DeviceShieldAlertChannel"
-        const val VPN_STATUS_CHANNEL_ID = "AppTpStatusChannel"
+        const val VPN_ALERTS_CHANNEL_ID = "com.duckduckgo.mobile.android.vpn.notification.alerts"
+        private const val VPN_ALERTS_CHANNEL_NAME = "App Tracking Protection Alerts"
+        private const val VPN_ALERTS_CHANNEL_DESCRIPTION = "Alerts from App Tracking Protection"
+
         private const val TRACKER_COMPANY_GOOGLE = "Google"
         private const val TRACKER_COMPANY_FACEBOOK = "Facebook"
         private const val TRACKER_COMPANY_AMAZON = "Amazon"
