@@ -18,9 +18,9 @@ package com.duckduckgo.mobile.android.vpn.ui.notification
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -80,10 +80,9 @@ class DeviceShieldNotificationScheduler(
     private val coroutineScope: CoroutineScope,
     private val workManager: WorkManager,
     private val vpnDatabase: VpnDatabase
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleUsageNotification() {
+    override fun onCreate(owner: LifecycleOwner) {
         scheduleDailyNotification()
         scheduleWeeklyNotification()
     }

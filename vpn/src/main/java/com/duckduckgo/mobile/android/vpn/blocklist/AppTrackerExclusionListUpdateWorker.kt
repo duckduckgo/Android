@@ -17,9 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -120,10 +119,9 @@ class AppTrackerExclusionListUpdateWorker(
 @ContributesMultibinding(AppScope::class)
 class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleBlocklistUpdateWork() {
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Scheduling tracker exclusion list update worker")
         val workerRequest = PeriodicWorkRequestBuilder<AppTrackerExclusionListUpdateWorker>(6, TimeUnit.HOURS)
             .addTag(APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG)
