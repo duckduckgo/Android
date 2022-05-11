@@ -58,7 +58,7 @@ class TrackerAllowlistPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -67,7 +67,16 @@ class TrackerAllowlistPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesTrackerAllowlistAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/tracker_allowlist_min_supported_version.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

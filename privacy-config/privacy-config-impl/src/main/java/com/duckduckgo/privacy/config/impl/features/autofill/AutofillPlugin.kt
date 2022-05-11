@@ -54,7 +54,7 @@ class AutofillPlugin @Inject constructor(
             }
             autofillRepository.updateAll(autofillExceptions)
             val isEnabled = httpsFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, httpsFeature?.minSupportedVersion))
             return true
         }
         return false

@@ -55,7 +55,7 @@ class TrackerAllowlistPlugin @Inject constructor(
             }
             trackerAllowlistRepository.updateAll(exceptions)
             val isEnabled = trackerAllowlistFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, trackerAllowlistFeature?.minSupportedVersion))
             return true
         }
         return false
