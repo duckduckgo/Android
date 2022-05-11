@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
+import android.app.AlertDialog
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
@@ -142,7 +144,6 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
-
     }
 
     override fun onActivityResult(
@@ -372,6 +373,25 @@ class DeviceShieldTrackerActivity :
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
         TrackerBlockingVpnService.startService(this)
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (notificationManager.areNotificationsEnabled()) {
+            showNotificationsDisabled()
+        }
+    }
+
+    private fun showNotificationsDisabled() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Android Notifications are not enabled")
+        builder.setMessage("You can enable them in device settings")
+
+        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
+
+        }
+
+        builder.setNeutralButton("Maybe") { dialog, which ->
+            dialog.dismiss()
+        }
+        builder.show()
     }
 
     private fun stopDeviceShield() {

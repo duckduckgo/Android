@@ -232,7 +232,6 @@ class DeviceShieldTrackerActivityViewModel @Inject constructor(
         object ShowAlwaysOnPromotionDialog : Command()
         object ShowRemoveFeatureConfirmationDialog : Command()
         object CloseScreen : Command()
-
         object OpenVpnSettings : Command()
     }
 }
