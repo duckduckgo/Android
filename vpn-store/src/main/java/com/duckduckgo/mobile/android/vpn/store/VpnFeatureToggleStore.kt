@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
+import com.frybits.harmony.getHarmonySharedPreferences
 
 interface VpnFeatureToggleStore {
     fun deleteAll()
@@ -34,7 +35,7 @@ interface VpnFeatureToggleStore {
 
 internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggleStore {
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(FILENAME)
 
     override fun deleteAll() {
         preferences.edit().clear().apply()

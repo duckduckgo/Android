@@ -36,6 +36,7 @@ import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.frybits.harmony.getHarmonySharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -67,7 +68,7 @@ class NetworkTypeCollector @Inject constructor(
     private val adapter = Moshi.Builder().build().adapter(NetworkInfo::class.java)
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(FILENAME)
 
     private var currentNetworkInfo: String?
         get() = preferences.getString(NETWORK_INFO_KEY, null)
