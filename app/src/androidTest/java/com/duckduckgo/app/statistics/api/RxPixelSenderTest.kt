@@ -17,6 +17,7 @@
 package com.duckduckgo.app.statistics.api
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.InstantSchedulersRule
@@ -66,6 +67,7 @@ class RxPixelSenderTest {
     private lateinit var db: AppDatabase
     private lateinit var pendingPixelDao: PendingPixelDao
     private lateinit var testee: RxPixelSender
+    private val mockLifecycleOwner: LifecycleOwner = mock()
 
     @Before
     fun before() {
@@ -207,7 +209,7 @@ class RxPixelSenderTest {
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.onAppForegrounded()
+        testee.onStart(mockLifecycleOwner)
 
         verify(api).fire(
             pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
@@ -226,7 +228,7 @@ class RxPixelSenderTest {
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.onAppForegrounded()
+        testee.onStart(mockLifecycleOwner)
 
         val pixels = pendingPixelDao.pixels().test().assertNoErrors().values().last()
         assertTrue(pixels.isEmpty())
@@ -244,7 +246,7 @@ class RxPixelSenderTest {
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.onAppForegrounded()
+        testee.onStart(mockLifecycleOwner)
 
         val testObserver = pendingPixelDao.pixels().test()
         val pixels = testObserver.assertNoErrors().values().last()
@@ -263,7 +265,7 @@ class RxPixelSenderTest {
         pendingPixelDao.insert(pixelEntity, times = 5)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
-        testee.onAppForegrounded()
+        testee.onStart(mockLifecycleOwner)
 
         verify(api, times(5)).fire(
             pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams
