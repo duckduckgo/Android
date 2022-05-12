@@ -20,7 +20,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_LAUNCH_LEGACY("ml"),
-    APP_LAUNCH("m_app_launch_c"),
+    APP_LAUNCH("m_app_launch"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),

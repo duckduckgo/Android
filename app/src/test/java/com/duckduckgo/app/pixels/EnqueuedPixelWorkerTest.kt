@@ -42,7 +42,8 @@ class EnqueuedPixelWorkerTest {
             workManager,
             { pixel },
             unsentForgetAllPixelStore,
-            webViewVersionProvider
+            webViewVersionProvider,
+            100
         )
     }
 
@@ -127,7 +128,7 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
-        Thread.sleep(10500)
+        Thread.sleep(150)
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
 

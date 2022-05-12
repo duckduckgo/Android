@@ -44,7 +44,8 @@ class EnqueuedPixelWorker @Inject constructor(
     private val workManager: WorkManager,
     private val pixel: Provider<Pixel>,
     private val unsentForgetAllPixelStore: UnsentForgetAllPixelStore,
-    private val webViewVersionProvider: WebViewVersionProvider
+    private val webViewVersionProvider: WebViewVersionProvider,
+    private val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
 ) : LifecycleEventObserver {
 
     private var launchedByFireAction: Boolean = false
@@ -115,7 +116,6 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     companion object {
-        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
         private const val WORKER_SEND_ENQUEUED_PIXELS = "com.duckduckgo.pixels.enqueued.worker"
 
         private fun scheduleWorker(workManager: WorkManager) {
