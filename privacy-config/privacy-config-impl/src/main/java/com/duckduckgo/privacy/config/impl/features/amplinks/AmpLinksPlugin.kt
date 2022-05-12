@@ -62,7 +62,7 @@ class AmpLinksPlugin @Inject constructor(
 
             ampLinksRepository.updateAll(exceptions, ampLinkFormats, ampKeywords)
             val isEnabled = ampLinksFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, ampLinksFeature?.minSupportedVersion))
             return true
         }
         return false

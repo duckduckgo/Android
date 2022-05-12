@@ -4011,6 +4011,20 @@ class BrowserTabViewModelTest {
         verify(voiceSearchPixelLogger, never()).log()
     }
 
+    @Test
+    fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
+        assertFalse(testee.linkOpenedInNewTab())
+        testee.onMessageReceived()
+        assertTrue(testee.linkOpenedInNewTab())
+    }
+
+    @Test
+    fun whenPageChangedThenSetLinkOpenedInNewTabToFalse() {
+        testee.onMessageReceived()
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.linkOpenedInNewTab())
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)

@@ -54,7 +54,7 @@ class DrmPlugin @Inject constructor(
             }
             drmRepository.updateAll(drmExceptions)
             val isEnabled = drmFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, drmFeature?.minSupportedVersion))
             return true
         }
         return false
