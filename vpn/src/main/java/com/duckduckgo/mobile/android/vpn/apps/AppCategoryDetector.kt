@@ -30,6 +30,8 @@ class RealAppCategoryDetector @Inject constructor(context: Context) : AppCategor
     private val packageManager = context.packageManager
 
     override fun getAppCategory(packageName: String): AppCategory {
-        return packageManager.getApplicationInfo(packageName, 0).parseAppCategory()
+        return runCatching {
+            packageManager.getApplicationInfo(packageName, 0).parseAppCategory()
+        }.getOrElse { AppCategory.Undefined }
     }
 }
