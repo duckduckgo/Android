@@ -57,12 +57,6 @@ internal class VpnDatabaseCallback(
         }
     }
 
-    override fun onOpen(db: SupportSQLiteDatabase) {
-        ioThread {
-            prepopulateTrackerEntities()
-        }
-    }
-
     private fun prepopulateUUID() {
         val uuid = UUID.randomUUID().toString()
         vpnDatabase.get().vpnStateDao().insert(VpnState(uuid = uuid))
