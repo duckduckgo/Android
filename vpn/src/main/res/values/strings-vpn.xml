@@ -231,7 +231,7 @@
     <string name="atp_ActivityDisabledLabel"><b>App Tracking Protection is disabled</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityRevokedLabel"><b>A VPN app on your device disabled App Tracking Protection.</b>\nDid App Tracking Protection cause a problem with your apps? <annotation type="report_issues_link">Report Issues</annotation></string>
     <string name="atp_ActivityAbout">About</string>
-    <string name="atp_ActivityPrivacy">Privacy</string>
+    <string name="atp_ActivityManage">Manage</string>
     <string name="atp_ActivityRemoveFeature">Disable and Delete Data</string>
 
     <!--  App Tracking Protection FAQ -->

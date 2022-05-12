@@ -373,25 +373,6 @@ class DeviceShieldTrackerActivity :
     private fun startVPN() {
         quietlyToggleAppTpSwitch(true)
         TrackerBlockingVpnService.startService(this)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (notificationManager.areNotificationsEnabled()) {
-            showNotificationsDisabled()
-        }
-    }
-
-    private fun showNotificationsDisabled() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Android Notifications are not enabled")
-        builder.setMessage("You can enable them in device settings")
-
-        builder.setPositiveButton(android.R.string.yes) { dialog, which ->
-
-        }
-
-        builder.setNeutralButton("Maybe") { dialog, which ->
-            dialog.dismiss()
-        }
-        builder.show()
     }
 
     private fun stopDeviceShield() {
