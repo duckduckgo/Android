@@ -42,8 +42,7 @@ class EnqueuedPixelWorkerTest {
             workManager,
             { pixel },
             unsentForgetAllPixelStore,
-            webViewVersionProvider,
-            100
+            webViewVersionProvider
         )
     }
 
@@ -120,19 +119,16 @@ class EnqueuedPixelWorkerTest {
     }
 
     @Test
-    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchAfterGracePeriodThenSendOneAppLaunchPixel() {
+    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchAfterGracePeriodThenSendsTwoAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
+        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis() - EnqueuedPixelWorker.APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD - 100)
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
-
-        Thread.sleep(150)
-
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
 
-        verify(pixel).fire(
+        verify(pixel, times(2)).fire(
             AppPixelName.APP_LAUNCH,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
