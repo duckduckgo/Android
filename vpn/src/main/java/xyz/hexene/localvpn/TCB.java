@@ -84,6 +84,7 @@ public class TCB {
                                 evicted.closeChannel();
                             });
 
+    @Nullable
     public static TCB getTCB(String ipAndPort) {
         synchronized (tcbCache) {
             return tcbCache.get(ipAndPort);
