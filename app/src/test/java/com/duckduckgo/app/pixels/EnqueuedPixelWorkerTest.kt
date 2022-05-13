@@ -121,7 +121,10 @@ class EnqueuedPixelWorkerTest {
     @Test
     fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchAfterGracePeriodThenSendsTwoAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis() - EnqueuedPixelWorker.APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD - 100)
+        whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(
+            System.currentTimeMillis()
+                - EnqueuedPixelWorker.APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD - 100
+        )
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
 
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
