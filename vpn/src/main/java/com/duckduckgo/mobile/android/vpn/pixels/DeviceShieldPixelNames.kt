@@ -193,8 +193,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG("m_atp_imp_remove_tracking_protection_feature_dialog_c"),
     ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_remove_tracking_protection_feature_d"),
     ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_remove_tracking_protection_feature_c"),
-    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cance_tracking_protection_feature_d"),
-    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cance_tracking_protection_feature_c"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cancel_tracking_protection_feature_d"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cancel_tracking_protection_feature_c"),
 
     ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c", enqueue = true),
     ATP_REPORT_DEVICE_CONNECTIVITY_ERROR_DAILY("m_atp_report_no_device_connectivity_d", enqueue = true),
