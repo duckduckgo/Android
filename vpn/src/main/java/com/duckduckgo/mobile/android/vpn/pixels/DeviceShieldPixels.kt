@@ -377,9 +377,6 @@ interface DeviceShieldPixels {
 
     fun didChooseToCancelRemoveTrakcingProtectionDialog()
 
-    /** Will fire when the VPN is stopped */
-    fun didStopVpn(uptime: Long)
-
     /** Will fire when the user enables protection for a specific app from the detail screen */
     fun didEnableAppProtectionFromDetail()
 
@@ -794,10 +791,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportGeneralDnsError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
-    }
-
-    override fun didStopVpn(uptime: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_DISABLE, mapOf("uptime" to uptime.toString()))
     }
 
     override fun didEnableAppProtectionFromDetail() {
