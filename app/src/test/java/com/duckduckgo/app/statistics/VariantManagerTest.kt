@@ -57,13 +57,6 @@ class VariantManagerTest {
     }
 
     @Test
-    fun retentionStudyVariantPreAndroid12HasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "nc" }
-        assertEqualsDouble(1.0, variant.weight)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {

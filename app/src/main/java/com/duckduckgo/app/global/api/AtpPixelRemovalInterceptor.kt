@@ -54,7 +54,7 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
         private const val PIXEL_PREFIX = "m_atp_"
 
         // list here the pixels that except from this interceptor
-        private val PIXEL_EXCEPTIONS = listOf(
+        val PIXEL_EXCEPTIONS = listOf(
             "m_atp_imp_beta_instructions_d",
             "m_atp_imp_beta_instructions_c",
             "m_atp_imp_article_d",
