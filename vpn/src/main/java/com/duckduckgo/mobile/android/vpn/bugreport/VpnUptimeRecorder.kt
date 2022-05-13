@@ -43,7 +43,7 @@ class VpnUptimeRecorder @Inject constructor(val pixels: DeviceShieldPixels) : Vp
         vpnStopReason: VpnStopReason
     ) {
         Timber.d("VpnUptimeRecorder: vpn was up for ${getVpnUpTime()} ms")
-        pixels.didStopVpn(getVpnUpTime())
+        pixels.reportVpnUptime(getVpnUpTime())
         vpnStartTime.set(0)
     }
 
