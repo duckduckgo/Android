@@ -49,7 +49,7 @@ interface ConnectionInitializer {
             ByteBufferPool.release(packet.backingBuffer)
         }
 
-        fun tcb(): TCB {
+        fun tcb(): TCB? {
             return TCB.getTCB(key())
         }
     }
