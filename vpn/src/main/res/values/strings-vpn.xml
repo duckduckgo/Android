@@ -374,7 +374,7 @@
 
     <!--  App Tracking Protection Promote Always On -->
     <string name="atp_PromoteAlwaysOnDialogTitle">Set to Always On?</string>
-    <string name="atp_PromoteAlwaysOnDialogMessage">To prevent Android from periodically disabling App Tracking Protection:\n\nGo to Settings\nTap ⚙️ next to DuckDuckGo\nTurn on “Always-on VPN</string>
+    <string name="atp_PromoteAlwaysOnDialogMessage">To prevent Android from periodically disabling App Tracking Protection:\n\nGo to Android Settings\nOpen VPN Settings for DuckDuckGo\nTurn on “Always-on VPN</string>
     <string name="atp_PromoteAlwaysOnDialogSettings">Go to Settings</string>
     <string name="atp_PromoteAlwaysOnDialogLater">Remind me Later</string>
     <string name="atp_PromoteAlwaysOnDialogForget">No Thanks</string>

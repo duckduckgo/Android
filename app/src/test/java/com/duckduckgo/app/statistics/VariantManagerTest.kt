@@ -50,10 +50,17 @@ class VariantManagerTest {
     }
 
     @Test
-    fun retentionStudyVariantGroupHasExpectedWeightAndNoFeatures() {
+    fun retentionStudyVariantGroupWithFeatureHasExpectedWeightAndNoFeatures() {
         val variant = variants.first { it.key == "nb" }
         assertEqualsDouble(1.0, variant.weight)
         assertEquals(1, variant.features.size)
+    }
+
+    @Test
+    fun retentionStudyVariantPreAndroid12HasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "nc" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
     }
 
     @Test
