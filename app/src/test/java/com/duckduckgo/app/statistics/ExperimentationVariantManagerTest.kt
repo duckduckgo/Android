@@ -142,17 +142,6 @@ class ExperimentationVariantManagerTest {
     }
 
     @Test
-    fun whenVariantDoesNotComplyWithFiltersUsingAppBuildConfigSdkIntFilterThenDefaultVariantIsPersisted() {
-        whenever(appBuildConfig.sdkInt).thenReturn(12)
-        activeVariants.add(Variant("foo", 1.0, filterBy = { config -> config.sdkInt < 12 }))
-        activeVariants.add(Variant("bar", 1.0, filterBy = { true }))
-
-        testee.getVariant(activeVariants)
-
-        verify(mockStore).variant = "bar"
-    }
-
-    @Test
     fun whenVariantDoesComplyWithFiltersThenNewVariantKeyIsAllocatedAndPersisted() {
         activeVariants.add(Variant("foo", 100.0, filterBy = { true }))
 
