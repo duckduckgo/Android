@@ -373,7 +373,7 @@ interface DeviceShieldPixels {
     fun reportDeviceConnectivityError()
 
     /** Will fire when the VPN is stopped */
-    fun didStopVpn(uptime: Long)
+    fun reportVpnUptime(uptime: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -815,8 +815,8 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
     }
 
-    override fun didStopVpn(uptime: Long) {
-        firePixel(DeviceShieldPixelNames.ATP_DISABLE, mapOf("uptime" to uptime.toString()))
+    override fun reportVpnUptime(uptime: Long) {
+        firePixel(DeviceShieldPixelNames.ATP_UPTIME, mapOf("uptime" to uptime.toString()))
     }
 
     private fun firePixel(
