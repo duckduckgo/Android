@@ -41,7 +41,7 @@ class TcpStateFlow {
                 ESTABLISHED -> handlePacketInEstablished(connectionKey, currentState, packetType)
                 LAST_ACK -> handlePacketInLastAck(packetType, connectionKey, currentState)
                 FIN_WAIT_1 -> handlePacketInFinWait1(connectionKey, currentState, packetType)
-                FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, packetType)
+                FIN_WAIT_2 -> handlePacketInFinWait2(connectionKey, currentState, packetType)
                 CLOSING -> handlePacketInClosing(connectionKey, currentState, packetType)
                 TIME_WAIT -> handlePacketInTimeWait(connectionKey, packetType)
                 CLOSED -> handlePacketInClosed(connectionKey, packetType)
@@ -142,7 +142,7 @@ class TcpStateFlow {
             eventList.addAll(
                 when {
                     packetType.isRst -> {
-                        Timber.w("Received RESET while in TIME_WAIT. Closing connection")
+                        Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")
                         listOf(CloseConnection)
                     }
                     packetType.isFin -> {
@@ -166,6 +166,7 @@ class TcpStateFlow {
 
         private fun handlePacketInFinWait2(
             connectionKey: String,
+            currentState: TcbState,
             packetType: PacketType
         ): List<Event> {
             val eventList = mutableListOf<Event>()
@@ -176,7 +177,7 @@ class TcpStateFlow {
                         listOf(SendAck, MoveServerToState(CLOSING), MoveClientToState(TIME_WAIT), DelayedCloseConnection)
                     }
                     packetType.isRst -> {
-                        Timber.w("%s - Received RESET while in FIN_WAIT_2. Closing connection", connectionKey)
+                        Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")
                         listOf(CloseConnection)
                     }
                     packetType.hasData -> {
@@ -184,7 +185,7 @@ class TcpStateFlow {
                     }
 
                     else -> {
-                        Timber.w("%s - Received packet while in FIN_WAIT_2 - ignoring", connectionKey)
+                        Timber.w("Received packet while in $currentState - ignoring $connectionKey")
                         emptyList()
                     }
                 }
@@ -208,7 +209,7 @@ class TcpStateFlow {
             eventList.addAll(
                 when {
                     packetType.isRst -> {
-                        Timber.w("Received RESET while in CLOSING. Closing connection")
+                        Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")
                         listOf(CloseConnection)
                     }
                     packetType.isAck -> {
@@ -228,19 +229,19 @@ class TcpStateFlow {
         ): List<Event> {
             val events = when {
                 packetType.isRst -> {
-                    Timber.d("Received RESET while in LISTEN. Nothing to do. %s", connectionKey)
+                    Timber.d("Received RESET while in $currentState. Nothing to do. $connectionKey",)
                     listOf(CloseConnection)
                 }
                 packetType.isSyn -> {
                     if (currentState.clientState == SYN_SENT) {
-                        Timber.d("Opening a connection when SYN already sent; duplicate SYN can be ignored. %s", connectionKey)
+                        Timber.d("Opening a connection when SYN already sent; duplicate SYN can be ignored. $connectionKey")
                         return emptyList()
                     }
                     listOf(OpenConnection)
                 }
                 packetType.hasData -> listOf(SendAck)
                 else -> {
-                    Timber.w("%s - Received packet in LISTEN state, but not a SYN or RST.", connectionKey)
+                    Timber.w("Received packet in $currentState state, but not a SYN or RST. $connectionKey")
                     listOf(SendReset)
                 }
             }
@@ -261,7 +262,7 @@ class TcpStateFlow {
 
             val events = when {
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in SYN_RECEIVED. Closing connection")
+                    Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")
                     listOf(CloseConnection)
                 }
                 packetType.isAck -> {
@@ -297,7 +298,7 @@ class TcpStateFlow {
                     }
                 }
                 packetType.isRst -> {
-                    Timber.w("Received RESET while in ESTABLISHED. Closing connection")
+                    Timber.w("Received RESET while in $currentState. Closing connection $connectionKey")
                     listOf(CloseConnection)
                 }
                 packetType.isAck -> listOf(ProcessPacket)
