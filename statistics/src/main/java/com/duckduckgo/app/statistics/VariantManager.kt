@@ -51,8 +51,10 @@ interface VariantManager {
             Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
             // AppTP Retention study experiment
-            Variant(key = "na", weight = 1.0, features = emptyList(), filterBy = { config -> config.sdkInt < 12 &&  isEnglishLocale() }),
-            Variant(key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudy), filterBy = {  config -> config.sdkInt < 12 &&  isEnglishLocale() }
+            Variant(key = "na", weight = 1.0, features = emptyList(), filterBy = { config -> config.sdkInt < 12 && isEnglishLocale() }),
+            Variant(
+                key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudy),
+                filterBy = { config -> config.sdkInt < 12 && isEnglishLocale() }
             ),
         )
 
