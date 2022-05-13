@@ -52,7 +52,12 @@ interface VariantManager {
 
             // AppTP Retention study experiment
             Variant(key = "na", weight = 1.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudy), filterBy = { config -> config.sdkInt < 12 && isEnglishLocale() }),
+            Variant(
+                key = "nb",
+                weight = 1.0,
+                features = listOf(VariantFeature.VpnRetentionStudy),
+                filterBy = { config -> config.sdkInt < 12 && isEnglishLocale() }
+            ),
             Variant(key = "nc", weight = 1.0, features = emptyList(), filterBy = { config -> config.sdkInt < 12 && isEnglishLocale() }),
         )
 
@@ -92,7 +97,6 @@ interface VariantManager {
             val locale = Locale.getDefault()
             return locale != null && serpRegionToggleTargetCountries.contains(locale.country)
         }
-
     }
 
     fun getVariant(activeVariants: List<Variant> = ACTIVE_VARIANTS): Variant

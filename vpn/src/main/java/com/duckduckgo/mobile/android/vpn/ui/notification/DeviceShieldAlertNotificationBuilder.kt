@@ -69,7 +69,7 @@ class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificatio
     private fun registerAlertChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            if  (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null){
+            if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
                 val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
                 channel.description = VPN_ALERTS_CHANNEL_DESCRIPTION
                 notificationManager.createNotificationChannel(channel)
