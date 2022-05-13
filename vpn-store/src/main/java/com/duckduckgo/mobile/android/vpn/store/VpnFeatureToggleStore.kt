@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureName
+import com.frybits.harmony.getHarmonySharedPreferences
 
 interface VpnFeatureToggleStore {
     fun deleteAll()
@@ -29,12 +30,14 @@ interface VpnFeatureToggleStore {
         defaultValue: Boolean
     ): Boolean
 
+    fun getMinSupportedVersion(featureName: AppTpFeatureName): Int
+
     fun insert(toggle: VpnFeatureToggles)
 }
 
 internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeatureToggleStore {
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(FILENAME)
 
     override fun deleteAll() {
         preferences.edit().clear().apply()
@@ -44,16 +47,27 @@ internal class RealVpnFeatureToggleStore(private val context: Context) : VpnFeat
         return preferences.getBoolean(featureName.value, defaultValue)
     }
 
+    override fun getMinSupportedVersion(featureName: AppTpFeatureName): Int {
+        return preferences.getInt("${featureName.value}$MIN_SUPPORTED_VERSION", 0)
+    }
+
     override fun insert(toggle: VpnFeatureToggles) {
-        preferences.edit { putBoolean(toggle.featureName.value, toggle.enabled) }
+        preferences.edit {
+            putBoolean(toggle.featureName.value, toggle.enabled)
+            toggle.minSupportedVersion?.let {
+                putInt("${toggle.featureName.value}$MIN_SUPPORTED_VERSION", it)
+            }
+        }
     }
 
     companion object {
         const val FILENAME = "com.duckduckgo.vpn.atp.config.store.toggles"
+        const val MIN_SUPPORTED_VERSION = "MinSupportedVersion"
     }
 }
 
 data class VpnFeatureToggles(
     val featureName: AppTpFeatureName,
     val enabled: Boolean,
+    val minSupportedVersion: Int?
 )

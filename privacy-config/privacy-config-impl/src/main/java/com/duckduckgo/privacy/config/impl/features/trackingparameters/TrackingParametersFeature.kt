@@ -20,6 +20,7 @@ import com.duckduckgo.privacy.config.api.TrackingParameterException
 
 data class TrackingParametersFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val settings: TrackingParametersSettings,
     val exceptions: List<TrackingParameterException>
 )

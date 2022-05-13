@@ -1,0 +1,15 @@
+{
+  "state": "enabled",
+  "minSupportedVersion": 1234,
+  "exceptions": [
+    {
+      "domain": "example.com",
+      "reason": "reason"
+    }
+  ],
+  "settings": {
+    "parameters": [
+      "parameter"
+    ]
+  }
+}

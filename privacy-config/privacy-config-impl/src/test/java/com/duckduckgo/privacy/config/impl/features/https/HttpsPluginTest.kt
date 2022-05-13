@@ -57,7 +57,7 @@ class HttpsPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -66,7 +66,16 @@ class HttpsPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesHttpsAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        val jsonString = FileUtilities.loadText(javaClass.classLoader!!, "json/https_min_supported_version.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

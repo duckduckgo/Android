@@ -96,7 +96,8 @@ class PrivacyConfigEnabledReferenceTest(private val testCase: TestCase) {
         verify(referenceTestUtilities.privacyFeatureTogglesRepository).insert(
             PrivacyFeatureToggles(
                 privacyFeatureValueOf(testCase.featureName)!!,
-                testCase.expectFeatureEnabled
+                testCase.expectFeatureEnabled,
+                null
             )
         )
     }

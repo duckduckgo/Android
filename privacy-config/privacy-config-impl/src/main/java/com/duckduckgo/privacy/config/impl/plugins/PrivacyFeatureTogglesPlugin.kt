@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.plugins
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.feature.toggles.api.FeatureName
@@ -25,15 +26,18 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
 @ContributesMultibinding(AppScope::class)
-class PrivacyFeatureTogglesPlugin @Inject constructor(private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository) :
-    FeatureTogglesPlugin {
+class PrivacyFeatureTogglesPlugin @Inject constructor(
+    private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,
+    private val appBuildConfig: AppBuildConfig
+) : FeatureTogglesPlugin {
 
     override fun isEnabled(
         featureName: FeatureName,
         defaultValue: Boolean
     ): Boolean? {
         return if (featureName is PrivacyFeatureName) {
-            privacyFeatureTogglesRepository.get(featureName, defaultValue)
+            privacyFeatureTogglesRepository.get(featureName, defaultValue) &&
+                appBuildConfig.versionCode >= privacyFeatureTogglesRepository.getMinSupportedVersion(featureName)
         } else {
             null
         }
