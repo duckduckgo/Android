@@ -61,7 +61,10 @@ class DeviceShieldNotificationsDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
