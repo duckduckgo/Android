@@ -16,8 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
+import com.duckduckgo.app.statistics.Variant
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -25,7 +28,13 @@ import org.mockito.kotlin.whenever
 class WaitlistStateRepositoryTest {
 
     private val dataStore: AppTrackingProtectionWaitlistDataStore = mock()
-    private val testee = WaitlistStateRepository(dataStore)
+    private val variantManager: VariantManager = mock()
+    private val testee = WaitlistStateRepository(dataStore, variantManager)
+
+    @Before
+    fun setup() {
+        whenever(variantManager.getVariant()).thenReturn(Variant("ab", filterBy = { true }))
+    }
 
     @Test
     fun whenGettingStateAndUserInBetaTheReturnInBeta() {
@@ -69,5 +78,12 @@ class WaitlistStateRepositoryTest {
         whenever(dataStore.waitlistTimestamp).thenReturn(1639343328)
 
         assertFalse(testee.joinedAfterCuttingDate())
+    }
+
+    @Test
+    fun whenInviteCodeIsNullAndUserIsInAppTpRetentionStudyThenStateIsInBeta() {
+        whenever(variantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+
+        assertEquals(WaitlistState.InBeta, testee.getState())
     }
 }

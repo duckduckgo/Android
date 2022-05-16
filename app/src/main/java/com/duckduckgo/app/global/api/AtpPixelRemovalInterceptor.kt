@@ -54,7 +54,7 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
         private const val PIXEL_PREFIX = "m_atp_"
 
         // list here the pixels that except from this interceptor
-        private val PIXEL_EXCEPTIONS = listOf(
+        val PIXEL_EXCEPTIONS = listOf(
             "m_atp_imp_beta_instructions_d",
             "m_atp_imp_beta_instructions_c",
             "m_atp_imp_article_d",
@@ -77,6 +77,30 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
             "m_atp_imp_manage_recent_app_settings_activity_u",
             "m_atp_imp_manage_recent_app_settings_activity_d",
             "m_atp_imp_manage_recent_app_settings_activity_c",
+            "m_atp_ev_selected_remove_tracking_protection_feature_d",
+            "m_atp_ev_selected_remove_tracking_protection_feature_c",
+            "m_atp_ev_selected_cancel_tracking_protection_feature_d",
+            "m_atp_ev_selected_cancel_tracking_protection_feature_c",
+            "m_atp_ev_uptime_c",
+            "m_atp_ev_enabled_tracker_activity_u",
+            "m_atp_ev_enabled_tracker_activity_d",
+            "m_atp_ev_enabled_tracker_activity_c",
+            "m_atp_ev_disabled_quick_settings_d",
+            "m_atp_ev_disabled_quick_settings_c",
+            "m_atp_ev_disabled_tracker_activity_d",
+            "m_atp_ev_disabled_tracker_activity_c",
+            "m_atp_imp_promote_always_on_dialog_u",
+            "m_atp_imp_promote_always_on_dialog_d",
+            "m_atp_imp_promote_always_on_dialog_c",
+            "m_atp_ev_selected_settings_promote_always_on_d",
+            "m_atp_ev_selected_settings_promote_always_on_c",
+            "m_atp_ev_selected_remind_later_promote_always_on_d",
+            "m_atp_ev_selected_remind_later_promote_always_on_c",
+            "m_atp_ev_selected_forget_later_promote_always_on_d",
+            "m_atp_ev_selected_forget_later_promote_always_on_c",
+            "m_atp_ev_enabled_dax_onboarding_u",
+            "m_atp_ev_enabled_dax_onboarding_d",
+            "m_atp_ev_enabled_dax_onboarding_c",
         )
     }
 

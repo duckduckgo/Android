@@ -32,16 +32,19 @@ class DeviceShieldEnabledNotificationBuilder {
 
     companion object {
 
-        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "TrackerProtectionVPN"
+        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.mobile.android.vpn.notification.ongoing"
+        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME = "App Tracking Protection Status"
+        private const val VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION = "Ongoing state of App Tracking Protection"
 
         private fun registerOngoingNotificationChannel(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channel =
                     NotificationChannel(
                         VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID,
-                        "Tracker Protection Running",
-                        NotificationManager.IMPORTANCE_MIN
+                        VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME,
+                        NotificationManager.IMPORTANCE_LOW
                     )
+                channel.description = VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
@@ -70,8 +73,9 @@ class DeviceShieldEnabledNotificationBuilder {
                 .setContentIntent(vpnShowDashboardPendingIntent)
                 .setCustomContentView(notificationLayout)
                 .setOngoing(true)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
         }
 
@@ -98,11 +102,12 @@ class DeviceShieldEnabledNotificationBuilder {
                 .setStyle(NotificationCompat.DecoratedCustomViewStyle())
                 .setContentIntent(vpnShowDashboardPendingIntent)
                 .setCustomContentView(notificationLayout)
-                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setSilent(true)
                 .setOngoing(true)
                 .addAction(NotificationActionReportIssue.mangeRecentAppsNotificationAction(context))
                 .setChannelId(VPN_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .build()
         }
     }

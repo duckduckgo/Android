@@ -24,6 +24,7 @@
     <dimen name="keyline_3">12dp</dimen>
     <dimen name="keyline_4">16dp</dimen>
     <dimen name="keyline_5">24dp</dimen>
+    <dimen name="keyline_6">48dp</dimen>
 
     <!-- App Components -->
 

@@ -20,10 +20,16 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.VpnIntroBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.VpnPermissionBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomeBlueprint
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnIntroPage
+import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPermissionPage
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 
 interface OnboardingPageManager {
     fun pageCount(): Int
@@ -34,7 +40,8 @@ interface OnboardingPageManager {
 class OnboardingPageManagerWithTrackerBlocking(
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
     private val onboardingPageBuilder: OnboardingPageBuilder,
-    private val defaultWebBrowserCapability: DefaultBrowserDetector
+    private val defaultWebBrowserCapability: DefaultBrowserDetector,
+    private val variantManager: VariantManager
 ) : OnboardingPageManager {
 
     private val pages = mutableListOf<OnboardingPageBlueprint>()
@@ -49,12 +56,19 @@ class OnboardingPageManagerWithTrackerBlocking(
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint))
         }
+
+        if (shouldShowVpnPages()) {
+            pages.add((VpnIntroBlueprint))
+            pages.add((VpnPermissionBlueprint))
+        }
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
             is WelcomeBlueprint -> buildWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
+            is VpnIntroBlueprint -> buildVpnIntroPage()
+            is VpnPermissionBlueprint -> buildVpnPermissionPage()
             else -> null
         }
     }
@@ -65,11 +79,23 @@ class OnboardingPageManagerWithTrackerBlocking(
             !defaultRoleBrowserDialog.shouldShowDialog()
     }
 
+    private fun shouldShowVpnPages(): Boolean {
+        return variantManager.isVPNRetentionStudyEnabled()
+    }
+
     private fun buildDefaultBrowserPage(): DefaultBrowserPage {
         return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 
     private fun buildWelcomePage(): WelcomePage {
         return onboardingPageBuilder.buildWelcomePage()
+    }
+
+    private fun buildVpnIntroPage(): VpnIntroPage {
+        return onboardingPageBuilder.buildVpnIntro()
+    }
+
+    private fun buildVpnPermissionPage(): VpnPermissionPage {
+        return onboardingPageBuilder.buildVpnPermission()
     }
 }
