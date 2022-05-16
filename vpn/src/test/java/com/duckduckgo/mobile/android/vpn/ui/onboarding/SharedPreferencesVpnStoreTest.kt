@@ -43,7 +43,7 @@ class SharedPreferencesVpnStoreTest {
     fun setup() {
         val prefs = InMemorySharedPreferences()
         whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true))
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.android.atp.onboarding.store"), eq(true), eq(true))
         ).thenReturn(prefs)
 
         sharedPreferencesVpnStore = SharedPreferencesVpnStore(sharedPreferencesProvider, coroutineRule.testDispatcherProvider)
