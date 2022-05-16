@@ -2641,6 +2641,11 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
+    @VisibleForTesting
+    fun updateWebNavigation(webNavigationState: WebNavigationState) {
+        this.webNavigationState = webNavigationState
+    }
+
     companion object {
         private const val FIXED_PROGRESS = 50
 

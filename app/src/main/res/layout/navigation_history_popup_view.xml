@@ -14,13 +14,11 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="20dp">
+    android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
         app:layout_constraintBottom_toBottomOf="parent"
@@ -28,6 +26,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
+        app:contentPaddingTop="@dimen/keyline_3"
+        app:contentPaddingBottom="@dimen/keyline_3"
         app:cardBackgroundColor="?attr/daxDialogBackgroundColor"
         android:layout_height="match_parent">
 

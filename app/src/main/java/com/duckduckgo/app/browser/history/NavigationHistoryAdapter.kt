@@ -84,6 +84,6 @@ data class NavigationViewHolder(val binding: ItemNavigationHistoryPopupRowBindin
     RecyclerView.ViewHolder(binding.root)
 
 data class NavigationHistoryEntry(
-    val title: String?,
+    val title: String? = null,
     val url: String
 )

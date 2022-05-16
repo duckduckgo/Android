@@ -145,6 +145,7 @@ data class WebViewNavigationState(
         }
         return entryList
     }
+
 }
 
 @Suppress("DataClassPrivateConstructor")
