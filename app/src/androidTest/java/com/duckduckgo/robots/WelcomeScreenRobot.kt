@@ -16,5 +16,5 @@
 
 package com.duckduckgo.robots
 
-object WelcomeScreemRobot {
+object WelcomeScreenRobot {
 }
