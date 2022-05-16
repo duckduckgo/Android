@@ -35,7 +35,7 @@ import javax.inject.Provider
 internal class VpnDatabaseCallback(
     private val context: Context,
     private val vpnDatabase: Provider<VpnDatabase>,
-    private val dispatcherProvider: DispatcherProvider
+    private val dispatcherProvider: DispatcherProvider,
 ) : RoomDatabase.Callback() {
 
     override fun onCreate(db: SupportSQLiteDatabase) {

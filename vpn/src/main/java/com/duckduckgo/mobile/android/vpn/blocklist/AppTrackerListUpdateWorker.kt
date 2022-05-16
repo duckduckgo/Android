@@ -31,22 +31,16 @@ import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.duckduckgo.mobile.android.vpn.trackers.AppTracker
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
-import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerJsonParser
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
 import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.moshi.Moshi.Builder
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class AppTrackerListUpdateWorker(
-    context: Context,
-    workerParameters: WorkerParameters
-) :
+class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
     lateinit var vpnDatabase: VpnDatabase
@@ -99,10 +93,6 @@ class AppTrackerListUpdateWorker(
                 return Result.retry()
             }
         }
-    }
-
-    private fun getReducedAppTrackerBlockingList(json: String): List<AppTracker> {
-        return AppTrackerJsonParser.parseAppTrackerJson(Builder().build(), json).trackers
     }
 
     private fun updateTrackerExceptionRules(): Result {

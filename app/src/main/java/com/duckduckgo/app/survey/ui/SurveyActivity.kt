@@ -35,7 +35,6 @@ import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command.*
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -99,7 +98,6 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun loadSurvey(url: String) {
         binding.progress.show()
-        Timber.d("Loading Survey at $url")
         webView.loadUrl(url)
     }
 

@@ -29,7 +29,6 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object FireproofExperiment : VariantFeature()
         object VpnRetentionStudy : VariantFeature()
     }
 
@@ -45,10 +44,6 @@ interface VariantManager {
             // the future if we can filter by app version
             Variant(key = "sc", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
-
-            // Fireproof experiment
-            Variant(key = "mi", weight = 0.0, features = emptyList(), filterBy = { isEnglishLocale() }),
-            Variant(key = "mj", weight = 0.0, features = listOf(VariantFeature.FireproofExperiment), filterBy = { isEnglishLocale() }),
 
             // AppTP Retention study experiment
             Variant(key = "na", weight = 1.0, features = emptyList(), filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }),
@@ -185,8 +180,6 @@ class ExperimentationVariantManager(
         return activeVariants[randomizedIndex]
     }
 }
-
-fun VariantManager.isFireproofExperimentEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.FireproofExperiment)
 
 fun VariantManager.isVPNRetentionStudyEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudy)
 
