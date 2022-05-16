@@ -68,7 +68,7 @@ class TcpNetworkToDevice(
      */
     @Suppress("BlockingMethodInNonBlockingContext")
     fun networkToDeviceProcessing() {
-        val channelsReady = selector.select()
+        val channelsReady = selector.lock { selector.select() }
 
         if (channelsReady == 0) {
             Thread.sleep(10)
@@ -78,7 +78,7 @@ class TcpNetworkToDevice(
         val iterator = selector.selectedKeys().iterator()
         while (iterator.hasNext()) {
             val key = iterator.next()
-            iterator.remove()
+            selector.lock { iterator.remove() }
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
@@ -240,11 +240,15 @@ class TcpNetworkToDevice(
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
                 tcb.sequenceNumberToClient++
 
-                tcb.channel.register(selector, OP_NONE)
+                selector.lock {
+                    tcb.channel.register(selector, OP_NONE)
+                }
             } else {
                 Timber.v("Not finished connecting yet %s", tcb.ipAndPort)
                 ByteBufferPool.release(responseBuffer)
-                tcb.channel.register(selector, OP_CONNECT, tcb)
+                selector.lock {
+                    tcb.channel.register(selector, OP_CONNECT, tcb)
+                }
             }
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)

@@ -233,7 +233,9 @@ class TcpDeviceToNetwork(
                 WaitToConnect -> {
                     Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
                     selector.wakeup()
-                    tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
+                    selector.lock {
+                        tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
+                    }
                 }
                 else -> Timber.w("Unexpected action: %s", it)
             }
@@ -312,7 +314,9 @@ class TcpDeviceToNetwork(
                 tcb.acknowledgementNumberToClient = ackNumber
 
                 selector.wakeup()
-                tcb.channel.register(selector, OP_WRITE, tcb)
+                selector.lock {
+                    tcb.channel.register(selector, OP_WRITE, tcb)
+                }
 
                 val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)
