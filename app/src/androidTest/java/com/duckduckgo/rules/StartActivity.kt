@@ -16,3 +16,16 @@
 
 package com.duckduckgo.rules
 
+import android.content.Intent
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
+import com.duckduckgo.app.launch.LaunchBridgeActivity
+
+class StartActivity {
+
+    fun startActivity() {
+        val activityScenario: ActivityScenario<LaunchBridgeActivity>
+        val intent = Intent(ApplicationProvider.getApplicationContext(), LaunchBridgeActivity::class.java)
+        activityScenario = ActivityScenario.launch(intent)
+    }
+}
