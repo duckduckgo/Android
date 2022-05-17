@@ -100,7 +100,7 @@ class TcpDeviceToNetwork(
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
-    fun deviceToNetworkProcessing() {
+    private fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue()

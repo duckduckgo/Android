@@ -81,8 +81,7 @@ class TcpNetworkToDevice(
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
-    @Suppress("BlockingMethodInNonBlockingContext")
-    fun networkToDeviceProcessing() {
+    private fun networkToDeviceProcessing() {
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {
