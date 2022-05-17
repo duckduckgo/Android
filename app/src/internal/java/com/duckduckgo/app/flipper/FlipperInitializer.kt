@@ -25,7 +25,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.core.FlipperPlugin
 import com.facebook.flipper.plugins.databases.DatabasesFlipperPlugin
-import com.facebook.flipper.plugins.sharedpreferences.SharedPreferencesFlipperPlugin
 import com.facebook.soloader.SoLoader
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
@@ -51,7 +50,6 @@ class FlipperInitializer @Inject constructor(
 
             // Common device plugins
             addPlugin(DatabasesFlipperPlugin(context))
-            addPlugin(SharedPreferencesFlipperPlugin(context))
 
             start()
         }
