@@ -141,8 +141,8 @@ constructor(
     fun stop() {
         Timber.i("Stopping %s", this::class.simpleName)
 
-        pollJobDeviceToNetwork.shutdown()
-        pollJobNetworkToDevice.shutdown()
+        pollJobDeviceToNetwork.shutdownNow()
+        pollJobNetworkToDevice.shutdownNow()
         staleTcpConnectionCleanerJob.cancel()
     }
 
