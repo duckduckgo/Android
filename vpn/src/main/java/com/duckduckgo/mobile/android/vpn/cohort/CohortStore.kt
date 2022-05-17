@@ -55,7 +55,7 @@ class RealCohortStore @Inject constructor(
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    private val preferences = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true)
+    private val preferences = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
 
     override fun getCohortStoredLocalDate(): LocalDate? {
         return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {

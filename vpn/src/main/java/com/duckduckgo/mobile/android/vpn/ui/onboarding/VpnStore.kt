@@ -21,6 +21,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -42,11 +43,14 @@ interface VpnStore {
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
     sharedPreferencesProvider: VpnSharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
-    private val preferences = sharedPreferencesProvider.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, multiprocess = true)
+    private val preferences = sharedPreferencesProvider.getSharedPreferences(
+        DEVICE_SHIELD_ONBOARDING_STORE_PREFS, multiprocess = true, migrate = true
+    )
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }

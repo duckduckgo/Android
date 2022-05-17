@@ -35,7 +35,7 @@ class RealDeviceShieldPixelsTest {
     fun setup() {
         val prefs = InMemorySharedPreferences()
         whenever(
-            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true))
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true))
         ).thenReturn(prefs)
 
         deviceShieldPixels = RealDeviceShieldPixels(pixel, sharedPreferencesProvider)
