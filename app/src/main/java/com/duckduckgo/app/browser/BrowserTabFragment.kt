@@ -149,6 +149,8 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
@@ -167,6 +169,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.print.PrintDocumentAdapterWrapper
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -864,6 +867,24 @@ class BrowserTabFragment :
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
+            }
+            is Command.PrintLink -> launchPrint(it.url)
+            is Command.ShowPrintingConfirmation -> {
+                browserLayout.makeSnackbarWithNoBottomInset("Finished printing document", Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun launchPrint(url: String) {
+        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+            val jobName = url
+            webView?.createPrintDocumentAdapter(jobName)?.let { printAdapter ->
+                val wrapper = PrintDocumentAdapterWrapper(printAdapter, viewModel)
+                printManager.print(
+                    jobName,
+                    wrapper,
+                    PrintAttributes.Builder().build()
+                )
             }
         }
     }
@@ -2201,6 +2222,10 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
+                }
+                onMenuItemClicked(view.printPageMenuItem) {
+                    //TODO move to viewModel: pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+                    viewModel.onPrintSelected()
                 }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->

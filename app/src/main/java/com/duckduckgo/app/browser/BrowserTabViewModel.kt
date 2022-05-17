@@ -68,6 +68,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
+import com.duckduckgo.app.browser.print.PrintDocumentListener
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.remotemessage.asBrowserTabCommand
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -175,7 +176,7 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore
 ) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, PrintDocumentListener, ViewModel() {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -341,6 +342,8 @@ class BrowserTabViewModel @Inject constructor(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
+        class PrintLink(val url: String) : Command()
+        object ShowPrintingConfirmation : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
@@ -2110,6 +2113,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onPrintSelected() {
+        url?.let {
+            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
+        }
+    }
+
     fun determineShowBrowser() {
         val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
         browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
@@ -2622,6 +2631,10 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    override fun showPrintingFinishedMessage() {
+        command.value = ShowPrintingConfirmation
     }
 
     companion object {

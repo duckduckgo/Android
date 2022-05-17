@@ -45,6 +45,7 @@ class BrowserPopupMenu(
             backMenuItem.isEnabled = viewState.canGoBack
             forwardMenuItem.isEnabled = viewState.canGoForward
             refreshMenuItem.isEnabled = browserShowing
+            printPageMenuItem.isEnabled = browserShowing
 
             newTabMenuItem.isVisible = browserShowing
             sharePageMenuItem?.isVisible = viewState.canSharePage
