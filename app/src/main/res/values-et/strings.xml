@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,11 +106,12 @@
     <string name="closeTab">Sulge vaheleht</string>
     <string name="tabClosed">Vaheleht on suletud</string>
     <string name="tabClosedUndo">Võta tagasi</string>
+    <string name="downloadsMenuItemTitle">Allalaadimised</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Saidi privaatsuse kaitse</string>
-    <string name="privacyProtectionEnabled">SAIDI KAITSE ON LUBATUD</string>
-    <string name="privacyProtectionDisabled">SAIDI KAITSE ON KEELATUD</string>
+    <string name="privacyProtectionEnabled">Saidi kaitse on lubatud</string>
+    <string name="privacyProtectionDisabled">Saidi kaitse on keelatud</string>
     <string name="privacyDashboardActivityTitle">Privaatsuse juhtpaneel</string>
     <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">TÄIUSTATUD &lt;img src=\"%1$d\" /&gt; - &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Privaatsusaste</string>
@@ -265,6 +265,7 @@
     <string name="delete">Kustuta</string>
     <string name="edit">Redigeeri</string>
     <string name="remove">Eemaldage</string>
+    <string name="removeAll">Eemalda kõik</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo otsing</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidake meil rakendust täiustada!</string>
-    <string name="surveyCtaDescription">Vastake meie lühikesele anonüümsele küsitlusele ja jagage oma tagasisidet.</string>
+    <string name="surveyCtaDescription">Vasta meie lühikesele küsitlusele ja jaga oma tagasisidet.</string>
     <string name="surveyCtaLaunchButton">Vastake küsitlusele</string>
     <string name="surveyCtaDismissButton">Ei aitäh</string>
     <string name="surveyActivityTitle">Kasutajaküsitlus</string>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Tähelepanu! Kuna %1$s on %2$s omanik, ei saa ma takistada teda jälgimast sinu tegevust siin.&lt;br/&gt;&lt;br/&gt;Kuid sirvi koos minuga ja ma saan vähendada seda, mida %3$s sinust üldiselt teab, blokeerides tema jälgijad paljudel teistel lehtedel.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Jätka</string>
+    <string name="downloadConfirmationContinue">Salvesta allalaadimistesse</string>
     <string name="downloadConfirmationSaveFileTitle">Salvesta %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Jäta mõlemad alles</string>
     <string name="downloadConfirmationReplaceOldFileText">Asenda</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Tulekindlad veebisaidid</string>
     <string name="settingsFireproofWebsites">Tulekindlad veebisaidid</string>
     <string name="fireproofWebsiteMenuTitleAdd">Muuda see sait tulekindlaks</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nüüd tulekindel</string>
     <string name="fireproofWebsiteSnackbarAction">Võta tagasi</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Kas soovite kindlasti kustutada saidi &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Veebilehed kasutavad küpsiseid, et hoida sind sisse logitud. Kui teed lehe tulekindlaks, ei kustutata küpsiseid ja sa jääd sisse logituks isegi pärast tulenupu kasutamist. Me blokeerime endiselt kolmanda poole jälitajad, kelle me tulekindlatelt lehtedelt leiame.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tulekindel</string>
     <string name="fireproofWebsiteLoginDialogNegative">Mitte praegu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tulekindlad veebisaidid</string>
+    <string name="fireproofWebsiteEmptyListHint">Ükski veebisait ei ole veel tulekindel</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Tulekindlad veebisaidid sisselogimisel</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Tulekindlus eemaldati kõigilt saitidelt</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tulekindlus on eemaldatud</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Küsi iga kord</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Alati</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Mitte kunagi</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Seda eelistust saate seadetes igal ajal muuta.</string>
     <string name="disableLoginDetectionDialogPositive">KEELA</string>
     <string name="disableLoginDetectionDialogNegative">TÜHISTA</string>
-    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tulekindlus on eemaldatud</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Automaatselt tulekindlad veebisaidid sisselogimisel?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Saitide muutmine tulekindaks hoiab sind sisse logitud pärast tulenupu kasutamist. Seda saab sätete alt alati muuta. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Alati tulekindel</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Muuda see sait tulekindlaks</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Mitte praegu</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tulenupu animatsioon</string>
@@ -589,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href="">Loe edasi</a><u/>]]>
+        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Vidin %1$s lisati avakuvale</string>
     <string name="settingsAddHomeScreenWidget">Avakuva vidin</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Sirvi privaatselt meie Maci rakendusega</string>
+    <string name="macos_settings_description_list">Olete nimekirjas!</string>
+    <string name="macos_settings_description_ready">Macis allalaadimiseks saadaval</string>
+    <string name="macos_settings_title">DuckDuckGo töölauarakendus</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Allalaadimised</string>
+    <string name="downloadsActivityTitle">Allalaadimised</string>
+    <string name="downloadsActivityNoItemsDescription">Ühtegi faili pole veel alla laaditud</string>
+    <string name="downloadsShareTitle">Jaga…</string>
+    <string name="downloadsDownloadFinishedActionName">Avatud</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Faili pole enam olemas</string>
+    <string name="downloadsItemMenuShare">Jaga</string>
+    <string name="downloadsItemMenuDelete">Kustuta</string>
+    <string name="downloadsItemMenuCancel">Tühista</string>
+    <string name="downloadsActivityMenuDeleteAll">Kustuta kõik</string>
+    <string name="downloadsFileDeletedMessage">Kustutatud %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Kõik failid kustutatud</string>
+    <string name="downloadsMoreOptionsContentDescription">Lisavalikud %1$s jaoks</string>
+    <string name="downloadsUndoActionName">Võta tagasi</string>
+    <string name="downloadsStateInProgress">Pooleli…</string>
+
 </resources>

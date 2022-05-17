@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Sekmeyi kapat</string>
     <string name="tabClosed">Sekme kapatıldı</string>
     <string name="tabClosedUndo">Geri al</string>
+    <string name="downloadsMenuItemTitle">İndirilenler</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Gizlilik Koruması</string>
@@ -265,6 +265,7 @@
     <string name="delete">Sil</string>
     <string name="edit">Düzenle</string>
     <string name="remove">Kaldır</string>
+    <string name="removeAll">Tümünü Kaldır</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo\'da Ara</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Uygulamayı geliştirmemize yardımcı olun!</string>
-    <string name="surveyCtaDescription">Kısa ve anonim anketimize katılın ve görüşlerinizi paylaşın.</string>
+    <string name="surveyCtaDescription">Kısa anketimize katılın ve geri bildiriminizi paylaşın.</string>
     <string name="surveyCtaLaunchButton">Ankete katıl</string>
     <string name="surveyCtaDismissButton">Hayır teşekkürler</string>
     <string name="surveyActivityTitle">Kullanıcı Anketi</string>
@@ -464,7 +465,7 @@
     <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
     <string name="onboardingLetsDoItButton">Hadi başlayalım!</string>
     <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[İşte bu kadar!<br/><br/>Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[İşte bu kadar!\n\nUnutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo aramalarınız anonimdir ve arama geçmişiniz asla saklanmaz. Asla. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Devam et</string>
+    <string name="downloadConfirmationContinue">İndirilenlere Kaydet</string>
     <string name="downloadConfirmationSaveFileTitle">Kaydet %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Her ikisini de sakla</string>
     <string name="downloadConfirmationReplaceOldFileText">Üzerine kaydet</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Korumalı Siteler</string>
     <string name="settingsFireproofWebsites">Korumalı Siteler</string>
     <string name="fireproofWebsiteMenuTitleAdd">Bu Siteyi Korumalı Yap</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; artık Korumalı</string>
     <string name="fireproofWebsiteSnackbarAction">Geri al</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">&lt;b&gt;%1$s&lt;/b&gt; \'ı silmek istediğinizden emin misiniz?</string>
     <string name="fireproofWebsiteFeatureDescription">Web siteleri oturumunuzu açık tutmak için çerezler kullanır. Bir siteyi Yanmaya Dayanıklı hâle getirdiğinizde çerezler silinmez ve Yangın Düğmesi\'ni kullandıktan sonra bile oturumunuz açık kalır. Yanmaya Dayanıklı web sitelerinde bulunan üçüncü taraf izleyicileri yine engelleriz.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Yanmaya Dayanıklı yap</string>
     <string name="fireproofWebsiteLoginDialogNegative">Şimdi değil</string>
     <string name="fireproofWebsiteItemsSectionTitle">Korumalı Siteler</string>
+    <string name="fireproofWebsiteEmptyListHint">Henüz Korumalı site yok</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Oturum Açıldığında Web Sitelerini Korumalı Yap</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Koruma tüm siteler için kaldırıldı</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; için Koruma kaldırıldı</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Her seferinde sor</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Her zaman</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Hiçbir zaman</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Bu tercihi istediğiniz zaman Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="disableLoginDetectionDialogPositive">DEVRE DIŞI BIRAK</string>
     <string name="disableLoginDetectionDialogNegative">İPTAL</string>
-    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; için Koruma kaldırıldı</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Oturum açıldığında web siteleri otomatik olarak korumalı yapılsın mı?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Siteleri korumalı yaptığınızda, Yangın düğmesini kullandıktan sonra da oturumunuz açık kalır. Bunu daha sonra Ayarlar\'dan istediğiniz zaman değiştirebilirsiniz. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Her Zaman Korumalı Yap</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Bu siteyi korumalı yap</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Şimdi değil</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Yangın Düğmesi Animasyonu</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget ana ekrana eklendi</string>
     <string name="settingsAddHomeScreenWidget">Ana Ekran Widget\'ı</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
+    <string name="macos_settings_description_list">Listedesiniz!</string>
+    <string name="macos_settings_description_ready">Mac cihazlarda indirilebilir</string>
+    <string name="macos_settings_title">DuckDuckGo Masaüstü Uygulaması</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">İndirilenler</string>
+    <string name="downloadsActivityTitle">İndirilenler</string>
+    <string name="downloadsActivityNoItemsDescription">Henüz indirilen dosya yok</string>
+    <string name="downloadsShareTitle">Paylaş…</string>
+    <string name="downloadsDownloadFinishedActionName">Aç</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Dosya artık mevcut değil</string>
+    <string name="downloadsItemMenuShare">Paylaş</string>
+    <string name="downloadsItemMenuDelete">Sil</string>
+    <string name="downloadsItemMenuCancel">İptal</string>
+    <string name="downloadsActivityMenuDeleteAll">Tümünü Sil</string>
+    <string name="downloadsFileDeletedMessage">%1$s silindi</string>
+    <string name="downloadsAllFilesDeletedMessage">Tüm dosyalar silindi</string>
+    <string name="downloadsMoreOptionsContentDescription">%1$s için daha fazla seçenek</string>
+    <string name="downloadsUndoActionName">Geri al</string>
+    <string name="downloadsStateInProgress">Devam ediyor…</string>
+
 </resources>

@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Lap bezárása</string>
     <string name="tabClosed">Lap bezárva</string>
     <string name="tabClosedUndo">Visszavonás</string>
+    <string name="downloadsMenuItemTitle">Letöltések</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">A weboldal adatvédelme</string>
@@ -265,6 +265,7 @@
     <string name="delete">Törlés</string>
     <string name="edit">Szerkesztés</string>
     <string name="remove">Eltávolítás</string>
+    <string name="removeAll">Összes eltávolítása</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Keresés a DuckDuckGo alkalmazásban</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Segíts nekünk az alkalmazás javításában!</string>
-    <string name="surveyCtaDescription">Töltsd ki rövid, anonim kérdőívünket, és mondd el a véleményedet.</string>
+    <string name="surveyCtaDescription">Töltsd ki rövid kérdőívünket, és mondd el a véleményedet.</string>
     <string name="surveyCtaLaunchButton">Kérdőív kitöltése</string>
     <string name="surveyCtaDismissButton">Nem, köszönöm</string>
     <string name="surveyActivityTitle">Felhasználói kérdőív</string>
@@ -465,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Rajta, csináljuk!</string>
     <string name="daxIntroCtaText"><![CDATA[A következő lépésben látogassa meg az egyik kedvenc webhelyét! <br/><br/>Én blokkolom a nyomkövetőket, hogy ne tudjanak kémkedni. Ha lehet, a kapcsolat biztonságát is javítom. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Megvan, ez az!<br/><br/>Ne feledd: minden alkalommal, amikor velem végzed a böngészést, egy hátborzongató hirdetés elveszíti az erejét. 👍]]></string>
-    <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és én soha nem tárolom el a keresési előzményeket. Soha. 🙌</string>
+    <string name="daxSerpCtaText">A DuckDuckGo keresések névtelenek, és soha nem mentem a keresési előzményeket. Soha. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
         <item quantity="other"><![CDATA[ és <b>%1$d másik</b> itt próbált meg követni. <br/><br/>Blokkoltam őket!<br/><br/> ☝️Ellenőrizheted a címsort, hogy megtudd, ki próbál meg követni, amikor új webhelyre látogatsz.]]></item>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Figyelem! Mivel %1$s tulajdonában van a(z) %2$s, nem tudom megakadályozni, hogy lássák az itteni tevékenységedet.&lt;br/&gt;&lt;br/&gt;Ha azonban velem böngészel, a sok más weboldalon is használt nyomkövetőjük blokkolásával korlátozni tudom azt, amit %3$s tud rólad.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Folytatás</string>
+    <string name="downloadConfirmationContinue">Mentés a Letöltések közé</string>
     <string name="downloadConfirmationSaveFileTitle">%1$s mentése</string>
     <string name="downloadConfirmationKeepBothFilesText">Mindkettő megtartása</string>
     <string name="downloadConfirmationReplaceOldFileText">Lecserél</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Tűzálló weboldalak</string>
     <string name="settingsFireproofWebsites">Tűzálló weboldalak</string>
     <string name="fireproofWebsiteMenuTitleAdd">Weboldal tűzállóvá tétele</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">A(z) &lt;b&gt;%1$s&lt;/b&gt; most már tűzálló!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">A(z) &lt;b&gt;%1$s&lt;/b&gt; most már tűzálló</string>
     <string name="fireproofWebsiteSnackbarAction">Visszavonás</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Biztos, hogy törölni akarod a (z) &lt;b&gt;%1$s&lt;/b&gt; fájlt?</string>
     <string name="fireproofWebsiteFeatureDescription">A webhelyek sütik segítségével teszik lehetővé, hogy bejelentkezve maradhass. Ha tűzállóvá teszel egy weboldalt, a sütik nem törlődnek, és még a Fire gomb használata után is bejelentkezve maradsz. A tűzálló webhelyeken a külső felek nyomkövetőit azonban blokkoljuk.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Tűzálló</string>
     <string name="fireproofWebsiteLoginDialogNegative">Most nem</string>
     <string name="fireproofWebsiteItemsSectionTitle">Tűzálló weboldalak</string>
+    <string name="fireproofWebsiteEmptyListHint">Még nincsenek tűzálló weboldalak</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Tűzálló weboldalak bejelentkezéskor</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Az összes weboldal tűzállósága megszüntetve</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Tűzállóvá tétel törölve a következőhöz: &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Kérdezzen rá minden alkalommal</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Mindig</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Soha</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Ezt a beállítást bármikor megváltoztathatod a Beállításokban.</string>
     <string name="disableLoginDetectionDialogPositive">LETILT</string>
     <string name="disableLoginDetectionDialogNegative">MÉGSEM</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Tűzállóvá tétel törölve a következőhöz: &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Bejelentkezéskor automatikusan legyenek tűzállók a weboldalak?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Ha tűzállóvá teszel egy weboldalt, a Fire gomb használata után is bejelentkezve maradsz. Ezt a beállításokban később bármikor módosíthatod. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Mindig tűzálló</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Weboldal tűzállóvá tétele</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Most nem</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Tűz gomb animáció</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s minialkalmazás hozzáadva a kezdőképernyőhöz</string>
     <string name="settingsAddHomeScreenWidget">Kezdőképernyő-minialkalmazás</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Privát böngészés Maces alkalmazásunkkal</string>
+    <string name="macos_settings_description_list">Rajta vagy a listán!</string>
+    <string name="macos_settings_description_ready">Letölthető Macre</string>
+    <string name="macos_settings_title">DuckDuckGo asztali alkalmazás</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Letöltések</string>
+    <string name="downloadsActivityTitle">Letöltések</string>
+    <string name="downloadsActivityNoItemsDescription">Még nincsenek letöltött fájlok</string>
+    <string name="downloadsShareTitle">Megosztás vele…</string>
+    <string name="downloadsDownloadFinishedActionName">Megnyitás</string>
+    <string name="downloadsCannotOpenFileErrorMessage">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
+    <string name="downloadsFileNotFoundErrorMessage">A fájl már nem létezik</string>
+    <string name="downloadsItemMenuShare">Megosztás</string>
+    <string name="downloadsItemMenuDelete">Törlés</string>
+    <string name="downloadsItemMenuCancel">Mégsem</string>
+    <string name="downloadsActivityMenuDeleteAll">Összes törlése</string>
+    <string name="downloadsFileDeletedMessage">Törölve: %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Összes fájl törölve</string>
+    <string name="downloadsMoreOptionsContentDescription">További lehetőségek a következőhöz: %1$s</string>
+    <string name="downloadsUndoActionName">Visszavonás</string>
+    <string name="downloadsStateInProgress">Folyamatban…</string>
+
 </resources>
