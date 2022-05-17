@@ -25,8 +25,8 @@ import com.duckduckgo.remote.messaging.impl.models.StringMatchingAttribute
 import com.duckduckgo.remote.messaging.impl.models.matches
 
 class AndroidAppAttributeMatcher(
-    val appProperties: AppProperties,
-    val appBuildConfig: AppBuildConfig
+    private val appProperties: AppProperties,
+    private val appBuildConfig: AppBuildConfig
 ) : AttributeMatcher {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {

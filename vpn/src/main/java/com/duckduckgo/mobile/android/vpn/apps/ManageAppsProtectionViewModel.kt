@@ -97,12 +97,11 @@ class ManageAppsProtectionViewModel @Inject constructor(
         report: Boolean
     ) {
         recordManualChange(packageName)
+        pixel.didDisableAppProtectionFromApps()
         viewModelScope.launch {
-
             excludedApps.manuallyExcludedApp(packageName)
-
+            pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
-                pixel.didSubmitManuallyDisableAppProtectionDialog()
                 command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             } else {
                 pixel.didSkipManuallyDisableAppProtectionDialog()
@@ -114,6 +113,7 @@ class ManageAppsProtectionViewModel @Inject constructor(
         packageName: String
     ) {
         recordManualChange(packageName)
+        pixel.didEnableAppProtectionFromApps()
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }

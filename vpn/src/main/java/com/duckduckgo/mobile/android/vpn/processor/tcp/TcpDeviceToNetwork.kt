@@ -94,36 +94,30 @@ class TcpDeviceToNetwork(
         val destinationPort = packet.tcpHeader.destinationPort
         val sourcePort = packet.tcpHeader.sourcePort
 
-        val payloadBuffer = packet.backingBuffer ?: return
-        packet.backingBuffer = null
+        if (packet.backingBuffer == null) return
 
-        val responseBuffer = ByteBufferPool.acquire()
-        val connectionParams = TcpConnectionParams(destinationAddress.hostAddress, destinationPort, sourcePort, packet, responseBuffer)
-        val connectionKey = connectionParams.key()
+        val connectionParams = TcpConnectionParams(destinationAddress.hostAddress, destinationPort, sourcePort, packet, ByteBufferPool.acquire())
 
-        val totalPacketLength = payloadBuffer.limit()
+        packetPersister.persistDataSent(packet.backingBuffer.limit(), PACKET_TYPE_TCP)
 
-        packetPersister.persistDataSent(totalPacketLength, PACKET_TYPE_TCP)
-
-        val tcb = TCB.getTCB(connectionKey)
+        val tcb = TCB.getTCB(connectionParams.key())
 
         if (tcb == null) {
-            processPacketTcbNotInitialized(connectionKey, packet, totalPacketLength, connectionParams)
-            ByteBufferPool.release(payloadBuffer)
+            processPacketTcbNotInitialized(connectionParams)
         } else {
-            processPacketTcbExists(connectionKey, tcb, packet, totalPacketLength, connectionParams, responseBuffer, payloadBuffer)
+            processPacketTcbExists(connectionParams)
         }
     }
 
     private fun processPacketTcbNotInitialized(
-        connectionKey: String,
-        packet: Packet,
-        totalPacketLength: Int,
         connectionParams: TcpConnectionParams
     ) {
+        val packet = connectionParams.packet
+        val totalPacketLength = connectionParams.packet.backingBuffer.limit()
+
         Timber.v(
             "New packet. %s. TCB not initialized. %s. Packet length: %d.  Data length: %d",
-            connectionKey,
+            connectionParams.key(),
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
@@ -132,7 +126,7 @@ class TcpDeviceToNetwork(
             totalPacketLength,
             packet.tcpPayloadSize(true)
         )
-        TcpStateFlow.newPacket(connectionKey, TcbState(), packet.asPacketType(), -1).events.forEach {
+        TcpStateFlow.newPacket(connectionParams.key(), TcbState(), packet.asPacketType(), -1).events.forEach {
             when (it) {
                 OpenConnection -> openConnection(connectionParams)
                 SendAck -> {
@@ -151,23 +145,23 @@ class TcpDeviceToNetwork(
                         queues.networkToDevice.offer(connectionParams.responseBuffer)
                     }
                 }
-                else -> Timber.e("No connection open and won't open one to %s. Dropping packet. (action=%s)", connectionKey, it)
+                else -> Timber.e("No connection open and won't open one to %s. Dropping packet. (action=%s)", connectionParams.key(), it)
             }
         }
     }
 
     private fun processPacketTcbExists(
-        connectionKey: String,
-        tcb: TCB,
-        packet: Packet,
-        totalPacketLength: Int,
         connectionParams: TcpConnectionParams,
-        responseBuffer: ByteBuffer,
-        payloadBuffer: ByteBuffer
     ) {
+        val packet = connectionParams.packet
+        val payloadBuffer = connectionParams.packet.backingBuffer
+        val totalPacketLength = payloadBuffer.limit()
+        // TCB should always exist here
+        val tcb = requireNotNull(connectionParams.tcb())
+
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
-            connectionKey, tcb.tcbState,
+            connectionParams.key(), tcb.tcbState,
             TcpPacketProcessor.logPacketDetails(
                 packet,
                 packet.tcpHeader.sequenceNumber,
@@ -180,23 +174,24 @@ class TcpDeviceToNetwork(
             tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
         }
 
-        val action =
-            TcpStateFlow.newPacket(connectionKey, tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial)
+        val action = TcpStateFlow.newPacket(
+            connectionParams.key(), tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial
+        )
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
         Timber.v("payloadBuffer size: %s", payloadBuffer)
 
         action.events.forEach {
             when (it) {
                 is MoveState -> tcb.updateState(it)
-                ProcessPacket -> processPacket(tcb, packet, payloadBuffer, connectionParams)
+                ProcessPacket -> processPacket(connectionParams)
                 SendFin -> tcb.sendFinToClient(queues, packet, packet.tcpPayloadSize(true), triggeredByServerEndOfStream = false)
                 SendFinWithData -> tcb.sendFinToClient(queues, packet, 0, triggeredByServerEndOfStream = false)
-                CloseConnection -> closeConnection(tcb, responseBuffer, payloadBuffer)
-                SendReset -> tcbCloser.sendResetPacket(tcb, queues, packet, packet.tcpPayloadSize(true))
+                CloseConnection -> closeConnection(connectionParams)
+                SendReset -> tcbCloser.sendResetPacket(connectionParams, queues, packet.tcpPayloadSize(true), packet.tcpHeader.isFIN)
                 DelayedCloseConnection -> {
                     vpnCoroutineScope.launch {
                         delay(3_000)
-                        closeConnection(tcb, responseBuffer, payloadBuffer)
+                        closeConnection(connectionParams)
                     }
                 }
                 SendAck -> tcb.sendAck(queues, packet)
@@ -207,13 +202,12 @@ class TcpDeviceToNetwork(
     }
 
     private fun closeConnection(
-        tcb: TCB,
-        responseBuffer: ByteBuffer,
-        payloadBuffer: ByteBuffer,
+        connectionParams: TcpConnectionParams,
     ) {
-        tcbCloser.closeConnection(tcb)
-        ByteBufferPool.release(responseBuffer)
-        ByteBufferPool.release(payloadBuffer)
+        TCB.getTCB(connectionParams.key())?.let {
+            tcbCloser.closeConnection(it)
+        }
+        connectionParams.close()
     }
 
     private fun openConnection(params: TcpConnectionParams) {
@@ -259,11 +253,13 @@ class TcpDeviceToNetwork(
     }
 
     private fun processPacket(
-        tcb: TCB,
-        packet: Packet,
-        payloadBuffer: ByteBuffer,
         connectionParams: TcpConnectionParams
     ) {
+        val packet = connectionParams.packet
+        val payloadBuffer = packet.backingBuffer
+        // we should never get here with null TCB
+        val tcb = requireNotNull(connectionParams.tcb())
+
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
             if (payloadSize == 0) {
@@ -291,7 +287,7 @@ class TcpDeviceToNetwork(
             if (requestType is RequestTrackerType.Tracker) {
                 processTrackingRequestPacket(
                     isATrackerRetryRequest,
-                    tcb,
+                    connectionParams,
                     requestingApp,
                     packet,
                     payloadSize
@@ -323,9 +319,8 @@ class TcpDeviceToNetwork(
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
-                ByteBufferPool.release(payloadBuffer)
                 Timber.w(e, "Network write error for %s. Wrote %d; %d unwritten", tcb.ipAndPort, bytesWritten, bytesUnwritten)
-                tcbCloser.sendResetPacket(tcb, queues, packet, bytesWritten)
+                tcbCloser.sendResetPacket(connectionParams, queues, bytesWritten, packet.tcpHeader.isFIN)
                 return
             }
         }
@@ -333,11 +328,13 @@ class TcpDeviceToNetwork(
 
     private fun processTrackingRequestPacket(
         isATrackerRetryRequest: Boolean,
-        tcb: TCB,
+        connectionParams: TcpConnectionParams,
         requestingApp: OriginatingApp,
         packet: Packet,
         payloadSize: Int
     ) {
+        // we should never get here with null TCB
+        val tcb = requireNotNull(connectionParams.tcb())
         if (isATrackerRetryRequest) {
             tcb.enterGhostingMode()
             processPacketInGhostingMode(tcb)
@@ -345,7 +342,7 @@ class TcpDeviceToNetwork(
             Timber.i("Blocking tracker request. [%s] ---> [%s] %s", tcb.requestingAppPackage, tcb.trackerHostName, tcb.ipAndPort)
 
             recentAppTrackerCache.addTrackerForApp(requestingApp.packageId, tcb.hostName, tcb.ipAndPort, payloadSize)
-            tcbCloser.sendResetPacket(tcb, queues, packet, payloadSize)
+            tcbCloser.sendResetPacket(connectionParams, queues, payloadSize, packet.tcpHeader.isFIN)
         }
     }
 

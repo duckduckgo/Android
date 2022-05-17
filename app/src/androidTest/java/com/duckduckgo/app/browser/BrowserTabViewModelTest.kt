@@ -4014,6 +4014,19 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
+        assertFalse(testee.linkOpenedInNewTab())
+        testee.onMessageReceived()
+        assertTrue(testee.linkOpenedInNewTab())
+    }
+
+    @Test
+    fun whenPageChangedThenSetLinkOpenedInNewTabToFalse() {
+        testee.onMessageReceived()
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.linkOpenedInNewTab())
+    }
+    @Test
     fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
         setBrowserShowing(false)
         testee.onUserLongPressedBack()

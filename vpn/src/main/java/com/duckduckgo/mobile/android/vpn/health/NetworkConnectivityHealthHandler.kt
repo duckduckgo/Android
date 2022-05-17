@@ -19,12 +19,11 @@ package com.duckduckgo.mobile.android.vpn.health
 import android.content.Context
 import android.net.ConnectivityManager
 import com.duckduckgo.app.global.extensions.isAirplaneModeOn
-import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
 import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
-import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
@@ -45,7 +44,7 @@ private const val WWW_DUCKDUCKGO_COM = "www.duckduckgo.com"
 @ContributesMultibinding(VpnScope::class)
 class NetworkConnectivityHealthHandler @Inject constructor(
     private val context: Context,
-    private val pixel: Pixel,
+    private val pixel: DeviceShieldPixels,
     private val healthMetricCounter: HealthMetricCounter,
     private val appTpFeatureConfig: AppTpFeatureConfig,
     private val trackerBlockingVpnService: Provider<TrackerBlockingVpnService>,
@@ -56,11 +55,11 @@ class NetworkConnectivityHealthHandler @Inject constructor(
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         job += coroutineScope.launch {
             while (isActive) {
-                delay(10_000)
+                delay(15_000)
                 if (!hasVpnConnectivity() && !context.isAirplaneModeOn()) {
                     if (hasDeviceConnectivity()) {
                         Timber.d("Active VPN network does not have connectivity")
-                        pixel.enqueueFire(DeviceShieldPixelNames.ATP_REPORT_VPN_CONNECTIVITY_ERROR)
+                        pixel.reportVpnConnectivityError()
                         if (appTpFeatureConfig.isEnabled(AppTpSetting.ConnectivityChecks)) {
                             Timber.d("AppTpSetting.ConnectivityChecks is enabled, logging health event")
                             healthMetricCounter.onVpnConnectivityError()
@@ -69,7 +68,7 @@ class NetworkConnectivityHealthHandler @Inject constructor(
                         }
                     } else {
                         Timber.d("Device doesn't have connectivity either")
-                        pixel.enqueueFire(DeviceShieldPixelNames.ATP_REPORT_DEVICE_CONNECTIVITY_ERROR)
+                        pixel.reportDeviceConnectivityError()
                     }
                 }
             }

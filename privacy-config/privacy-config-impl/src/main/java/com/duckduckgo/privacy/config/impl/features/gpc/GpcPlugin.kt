@@ -59,7 +59,7 @@ class GpcPlugin @Inject constructor(
             }
             gpcRepository.updateAll(gpcExceptions, gpcHeaders)
             val isEnabled = gpcFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, gpcFeature?.minSupportedVersion))
             return true
         }
         return false

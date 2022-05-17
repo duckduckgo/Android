@@ -27,6 +27,8 @@ interface PrivacyFeatureTogglesDataStore {
         defaultValue: Boolean
     ): Boolean
 
+    fun getMinSupportedVersion(featureName: PrivacyFeatureName): Int
+
     fun insert(toggle: PrivacyFeatureToggles)
     fun deleteAll()
 }
@@ -44,8 +46,17 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
         return preferences.getBoolean(featureName.value, defaultValue)
     }
 
+    override fun getMinSupportedVersion(featureName: PrivacyFeatureName): Int {
+        return preferences.getInt("${featureName.value}$MIN_SUPPORTED_VERSION", 0)
+    }
+
     override fun insert(toggle: PrivacyFeatureToggles) {
-        preferences.edit { putBoolean(toggle.featureName.value, toggle.enabled) }
+        preferences.edit {
+            putBoolean(toggle.featureName.value, toggle.enabled)
+            toggle.minSupportedVersion?.let {
+                putInt("${toggle.featureName.value}$MIN_SUPPORTED_VERSION", it)
+            }
+        }
     }
 
     override fun deleteAll() {
@@ -54,10 +65,12 @@ class PrivacyFeatureTogglesSharedPreferences constructor(private val context: Co
 
     companion object {
         const val FILENAME = "com.duckduckgo.privacy.config.store.toggles"
+        const val MIN_SUPPORTED_VERSION = "MinSupportedVersion"
     }
 }
 
 data class PrivacyFeatureToggles(
     val featureName: PrivacyFeatureName,
-    val enabled: Boolean
+    val enabled: Boolean,
+    val minSupportedVersion: Int?
 )

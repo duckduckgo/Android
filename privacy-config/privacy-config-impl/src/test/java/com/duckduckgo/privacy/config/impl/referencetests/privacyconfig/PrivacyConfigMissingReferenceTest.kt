@@ -96,7 +96,7 @@ class PrivacyConfigMissingReferenceTest(private val testCase: TestCase) {
         testee.persistPrivacyConfig(referenceTestUtilities.getJsonPrivacyConfig("reference_tests/privacyconfig/$referenceJsonFile"))
 
         verify(referenceTestUtilities.privacyFeatureTogglesRepository, never())
-            .insert(PrivacyFeatureToggles(privacyFeatureValueOf(testCase.featureName)!!, true))
+            .insert(PrivacyFeatureToggles(privacyFeatureValueOf(testCase.featureName)!!, true, null))
     }
 
     private fun prepareDb() {

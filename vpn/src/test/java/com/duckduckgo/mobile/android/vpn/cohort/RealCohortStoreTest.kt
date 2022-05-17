@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,33 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import androidx.test.platform.app.InstrumentationRegistry
-import com.jakewharton.threetenabp.AndroidThreeTen
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.threeten.bp.LocalDate
 
 @ExperimentalCoroutinesApi
 class RealCohortStoreTest {
 
+    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
+
     private lateinit var cohortStore: CohortStore
 
     @Before
     fun setup() {
-        AndroidThreeTen.init(InstrumentationRegistry.getInstrumentation().targetContext)
-        cohortStore = RealCohortStore(InstrumentationRegistry.getInstrumentation().targetContext)
-        (cohortStore as RealCohortStore).preferences.edit().clear().apply()
+        val prefs = InMemorySharedPreferences()
+        whenever(
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.atp.cohort.prefs"), eq(true), eq(true))
+        ).thenReturn(prefs)
+
+        cohortStore = RealCohortStore(sharedPreferencesProvider)
     }
 
     @Test

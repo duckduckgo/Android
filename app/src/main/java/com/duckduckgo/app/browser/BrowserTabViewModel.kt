@@ -491,6 +491,7 @@ class BrowserTabViewModel @Inject constructor(
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
+    private var isLinkOpenedInNewTab = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1191,6 +1192,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         isProcessingTrackingLink = false
+        isLinkOpenedInNewTab = false
     }
 
     private fun cacheAppLink(url: String?) {
@@ -2639,6 +2641,14 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value = currentBrowserViewState().copy(
             forceRenderingTicker = System.currentTimeMillis()
         )
+    }
+
+    fun onMessageReceived() {
+        isLinkOpenedInNewTab = true
+    }
+
+    override fun linkOpenedInNewTab(): Boolean {
+        return isLinkOpenedInNewTab
     }
 
     @VisibleForTesting

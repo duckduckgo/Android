@@ -28,7 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
  * - _d -> when the pixel is a first-in-day pixel
  * - _c -> when the pixel is a every-occurrence pixel
  */
-enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelName {
+enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: Boolean = false) : Pixel.PixelName {
     ATP_ENABLE_UPON_SEARCH_DAILY("m_atp_ev_enabled_on_search_d"),
     ATP_DISABLE_UPON_SEARCH_DAILY("m_atp_ev_disabled_on_search_d"),
     ATP_ENABLE_UPON_APP_LAUNCH("m_atp_ev_enabled_on_launch_c"),
@@ -36,6 +36,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DISABLE_UPON_APP_LAUNCH("m_atp_ev_disabled_on_launch_c"),
     ATP_DISABLE_UPON_APP_LAUNCH_DAILY("m_atp_ev_disabled_on_launch_d"),
     ATP_ENABLE_DAILY("m_atp_ev_enabled_d"),
+    ATP_UPTIME("m_atp_ev_uptime_c"),
     ATP_DISABLE_DAILY("m_atp_ev_disabled_d"),
     ATP_LAST_DAY_ENABLE_COUNT_DAILY("m_atp_ev_enabled_count_d"),
     ATP_LAST_DAY_DISABLE_COUNT_DAILY("m_atp_ev_disabled_count_d"),
@@ -47,6 +48,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_ENABLE_FROM_ONBOARDING_UNIQUE("m_atp_ev_enabled_onboarding_u"),
     ATP_ENABLE_FROM_ONBOARDING_DAILY("m_atp_ev_enabled_onboarding_d"),
     ATP_ENABLE_FROM_ONBOARDING("m_atp_ev_enabled_onboarding_c"),
+    ATP_ENABLE_FROM_DAX_ONBOARDING("m_atp_ev_enabled_dax_onboarding_u"),
     ATP_ENABLE_FROM_SETTINGS_TILE_UNIQUE("m_atp_ev_enabled_quick_settings_u"),
     ATP_ENABLE_FROM_SETTINGS_TILE_DAILY("m_atp_ev_enabled_quick_settings_d"),
     ATP_ENABLE_FROM_SETTINGS_TILE("m_atp_ev_quick_enabled_settings_c"),
@@ -184,18 +186,20 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
 
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_UNIQUE("m_atp_imp_manage_recent_app_settings_activity_u"),
     ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY("m_atp_imp_manage_recent_app_settings_activity_d"),
-    ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_("m_atp_imp_manage_recent_app_settings_activity_c"),
+    ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY("m_atp_imp_manage_recent_app_settings_activity_c"),
 
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_UNIQUE("m_atp_imp_remove_tracking_protection_feature_dialog_u"),
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG_DAILY("m_atp_imp_remove_tracking_protection_feature_dialog_d"),
     ATP_DID_SHOW_REMOVE_TRACKING_PROTECTION_FEATURE_DIALOG("m_atp_imp_remove_tracking_protection_feature_dialog_c"),
     ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_remove_tracking_protection_feature_d"),
     ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_remove_tracking_protection_feature_c"),
-    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cance_tracking_protection_feature_d"),
-    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cance_tracking_protection_feature_c"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG_DAILY("m_atp_ev_selected_cancel_tracking_protection_feature_d"),
+    ATP_DID_CHOOSE_CANCEL_TRACKING_PROTECTION_DIALOG("m_atp_ev_selected_cancel_tracking_protection_feature_c"),
 
-    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c"),
-    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c"),
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR("m_atp_report_no_device_connectivity_c", enqueue = true),
+    ATP_REPORT_DEVICE_CONNECTIVITY_ERROR_DAILY("m_atp_report_no_device_connectivity_d", enqueue = true),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR("m_atp_report_no_vpn_connectivity_c", enqueue = true),
+    ATP_REPORT_VPN_CONNECTIVITY_ERROR_DAILY("m_atp_report_no_vpn_connectivity_d", enqueue = true),
 
     ATP_REPORT_LOOPBACK_DNS_SET_ERROR("m_atp_report_loopback_dns_error_c"),
     ATP_REPORT_LOOPBACK_DNS_SET_ERROR_DAILY("m_atp_report_loopback_dns_error_d"),
@@ -213,5 +217,10 @@ enum class DeviceShieldPixelNames(override val pixelName: String) : Pixel.PixelN
     ATP_DID_CHOOSE_REMIND_LATER_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_remind_later_promote_always_on_c"),
     ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG_DAILY("m_atp_ev_selected_forget_later_promote_always_on_d"),
     ATP_DID_CHOOSE_FORGET_PROMOTE_ALWAYS_ON_DIALOG("m_atp_ev_selected_forget_later_promote_always_on_c"),
+
+    ATP_DID_ENABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_enable_app_protection_all_c"),
+    ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_enable_app_protection_detail_c"),
+    ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL("m_atp_imp_disable_app_protection_all_c"),
+    ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL("m_atp_imp_disable_app_protection_detail_c"),
     ;
 }

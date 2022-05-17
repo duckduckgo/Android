@@ -35,6 +35,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import dagger.SingleInstanceIn
 import com.duckduckgo.mobile.android.vpn.prefs.VpnPreferences
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
+import com.frybits.harmony.getHarmonySharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ class NetworkTypeCollector @Inject constructor(
     private val adapter = Moshi.Builder().build().adapter(NetworkInfo::class.java)
 
     private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+        get() = context.getHarmonySharedPreferences(FILENAME)
 
     private var currentNetworkInfo: String?
         get() = preferences.getString(NETWORK_INFO_KEY, null)
@@ -110,7 +112,8 @@ class NetworkTypeCollector @Inject constructor(
         override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             super.onLinkPropertiesChanged(network, linkProperties)
 
-            vpnPreferences.isPrivateDnsEnabled = if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && context.isPrivateDnsActive()) {
+            // check for Android Private DNS setting
+            val privateDns = if (context.isPrivateDnsActive()) {
                 Timber.v(
                     "isPrivateDnsActive = %s, server = %s (%s)",
                     context.isPrivateDnsActive(),
@@ -119,8 +122,19 @@ class NetworkTypeCollector @Inject constructor(
                 )
                 true
             } else {
-                Timber.v("Private DNS support is disabled or not set")
+                Timber.v("Private DNS disabled")
                 false
+            }
+
+            // Check if VPN reconfiguration is needed
+            if (appTpFeatureConfig.isEnabled(AppTpSetting.PrivateDnsSupport) && vpnPreferences.isPrivateDnsEnabled != privateDns) {
+                Timber.v("Private DNS changed, reconfiguring VPN")
+                coroutineScope.launch {
+                    vpnPreferences.isPrivateDnsEnabled = privateDns
+                    TrackerBlockingVpnService.restartVpnService(context)
+                }
+            } else {
+                Timber.v("Nothing change in Network config, skip reconfiguration")
             }
         }
     }

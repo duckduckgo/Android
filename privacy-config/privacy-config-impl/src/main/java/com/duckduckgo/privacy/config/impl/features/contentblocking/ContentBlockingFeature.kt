@@ -20,5 +20,6 @@ import com.duckduckgo.privacy.config.store.ContentBlockingExceptionEntity
 
 data class ContentBlockingFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val exceptions: List<ContentBlockingExceptionEntity>
 )

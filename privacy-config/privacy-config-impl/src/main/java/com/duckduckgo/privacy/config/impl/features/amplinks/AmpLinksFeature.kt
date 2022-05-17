@@ -20,6 +20,7 @@ import com.duckduckgo.privacy.config.api.AmpLinkException
 
 data class AmpLinksFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val settings: AmpLinkSettings,
     val exceptions: List<AmpLinkException>
 )
