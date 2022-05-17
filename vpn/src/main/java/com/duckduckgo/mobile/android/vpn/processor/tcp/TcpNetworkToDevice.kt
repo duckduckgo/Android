@@ -46,6 +46,7 @@ import xyz.hexene.localvpn.TCB.TCBStatus.SYN_RECEIVED
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_SENT
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_CONNECT
 import java.nio.channels.Selector
@@ -60,7 +61,21 @@ class TcpNetworkToDevice(
     private val tcbCloser: TCBCloser,
     private val vpnCoroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter
-) {
+) : Runnable {
+
+    override fun run() {
+        while (!Thread.interrupted()) {
+            try {
+                networkToDeviceProcessing()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
+            } catch (e: InterruptedException) {
+                Timber.w(e, "Thread is interrupted")
+            }
+        }
+    }
 
     /**
      * Reads data from the network when the selector tells us it has a readable key.
@@ -68,7 +83,7 @@ class TcpNetworkToDevice(
      */
     @Suppress("BlockingMethodInNonBlockingContext")
     fun networkToDeviceProcessing() {
-        val channelsReady = selector.lock { selector.select() }
+        val channelsReady = selector.select()
 
         if (channelsReady == 0) {
             Thread.sleep(10)
@@ -78,7 +93,7 @@ class TcpNetworkToDevice(
         val iterator = selector.selectedKeys().iterator()
         while (iterator.hasNext()) {
             val key = iterator.next()
-            selector.lock { iterator.remove() }
+            iterator.remove()
 
             kotlin.runCatching {
                 if (key.isValid && key.isReadable) {
@@ -240,15 +255,11 @@ class TcpNetworkToDevice(
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
                 tcb.sequenceNumberToClient++
 
-                selector.lock {
-                    tcb.channel.register(selector, OP_NONE)
-                }
+                tcb.channel.register(selector, OP_NONE)
             } else {
                 Timber.v("Not finished connecting yet %s", tcb.ipAndPort)
                 ByteBufferPool.release(responseBuffer)
-                selector.lock {
-                    tcb.channel.register(selector, OP_CONNECT, tcb)
-                }
+                tcb.channel.register(selector, OP_CONNECT, tcb)
             }
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)

@@ -58,6 +58,7 @@ import xyz.hexene.localvpn.Packet.TCPHeader.SYN
 import xyz.hexene.localvpn.TCB
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
@@ -79,7 +80,21 @@ class TcpDeviceToNetwork(
     private val recentAppTrackerCache: RecentAppTrackerCache,
     private val vpnCoroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter
-) {
+) : Runnable {
+
+    override fun run() {
+        while (!Thread.interrupted()) {
+            try {
+                deviceToNetworkProcessing()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
+            } catch (e: InterruptedException) {
+                Timber.w(e, "Thread is interrupted")
+            }
+        }
+    }
 
     /**
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
@@ -233,9 +248,7 @@ class TcpDeviceToNetwork(
                 WaitToConnect -> {
                     Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
                     selector.wakeup()
-                    selector.lock {
-                        tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
-                    }
+                    tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
                 }
                 else -> Timber.w("Unexpected action: %s", it)
             }
@@ -314,9 +327,7 @@ class TcpDeviceToNetwork(
                 tcb.acknowledgementNumberToClient = ackNumber
 
                 selector.wakeup()
-                selector.lock {
-                    tcb.channel.register(selector, OP_WRITE, tcb)
-                }
+                tcb.channel.register(selector, OP_WRITE, tcb)
 
                 val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)

@@ -138,7 +138,6 @@ object VpnModule {
         return TlsContentTypeExtractor(tlsMessageDetector)
     }
 
-    @SingleInstanceIn(VpnScope::class)
     @Provides
     @TcpNetworkSelector
     fun provideTcpNetworkSelector(): Selector {

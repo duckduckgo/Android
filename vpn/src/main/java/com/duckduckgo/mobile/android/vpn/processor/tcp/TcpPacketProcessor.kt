@@ -37,9 +37,7 @@ import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.channels.CancelledKeyException
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors.newSingleThreadExecutor
@@ -84,8 +82,12 @@ constructor(
         ): TcpPacketProcessor
     }
 
-    private val pollJobDeviceToNetwork = ConflatedJob()
-    private val pollJobNetworkToDevice = ConflatedJob()
+    private val pollJobDeviceToNetwork = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
+    private val pollJobNetworkToDevice = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
     private val staleTcpConnectionCleanerJob = ConflatedJob()
 
     private val tcpNetworkToDevice =
@@ -120,15 +122,8 @@ constructor(
     override fun run() {
         Timber.i("Starting %s", this::class.simpleName)
 
-        pollJobDeviceToNetwork +=
-            vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
-                pollForDeviceToNetworkWork()
-            }
-
-        pollJobNetworkToDevice +=
-            vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
-                pollForNetworkToDeviceWork()
-            }
+        pollJobDeviceToNetwork.execute(tcpDeviceToNetwork)
+        pollJobNetworkToDevice.execute(tcpNetworkToDevice)
 
         staleTcpConnectionCleanerJob +=
             vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
@@ -146,37 +141,9 @@ constructor(
     fun stop() {
         Timber.i("Stopping %s", this::class.simpleName)
 
-        pollJobDeviceToNetwork.cancel()
-        pollJobNetworkToDevice.cancel()
+        pollJobDeviceToNetwork.shutdown()
+        pollJobNetworkToDevice.shutdown()
         staleTcpConnectionCleanerJob.cancel()
-    }
-
-    private fun pollForDeviceToNetworkWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobDeviceToNetwork.isActive) {
-            try {
-                tcpDeviceToNetwork.deviceToNetworkProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process TCP device-to-network packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process TCP device-to-network packet")
-            }
-        }
-    }
-
-    private fun pollForNetworkToDeviceWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobNetworkToDevice.isActive) {
-            try {
-                tcpNetworkToDevice.networkToDeviceProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process TCP network-to-device packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process TCP network-to-device packet")
-            }
-        }
     }
 
     data class PendingWriteData(
