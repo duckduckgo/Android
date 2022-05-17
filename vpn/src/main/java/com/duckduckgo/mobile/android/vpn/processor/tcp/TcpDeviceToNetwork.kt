@@ -172,7 +172,7 @@ class TcpDeviceToNetwork(
         val payloadBuffer = connectionParams.packet.backingBuffer
         val totalPacketLength = payloadBuffer.limit()
         // TCB should always exist here
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
@@ -273,7 +273,7 @@ class TcpDeviceToNetwork(
         val packet = connectionParams.packet
         val payloadBuffer = packet.backingBuffer
         // we should never get here with null TCB
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
@@ -349,7 +349,7 @@ class TcpDeviceToNetwork(
         payloadSize: Int
     ) {
         // we should never get here with null TCB
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
         if (isATrackerRetryRequest) {
             tcb.enterGhostingMode()
             processPacketInGhostingMode(tcb)

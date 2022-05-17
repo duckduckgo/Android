@@ -52,6 +52,15 @@ interface ConnectionInitializer {
         fun tcb(): TCB? {
             return TCB.getTCB(key())
         }
+
+        fun tcbOrClose(): TCB? {
+            val tcb = tcb()
+            if (tcb == null) {
+                Timber.w("null TCB")
+                close()
+            }
+            return tcb
+        }
     }
 }
 
