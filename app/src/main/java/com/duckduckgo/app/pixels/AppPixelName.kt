@@ -19,7 +19,8 @@ package com.duckduckgo.app.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
-    APP_LAUNCH("ml"),
+    APP_LAUNCH_LEGACY("ml"),
+    APP_LAUNCH("m_app_launch"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
@@ -38,6 +39,21 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
+
+    ONBOARDING_VPN_INTRO_SHOWN("m_onboarding_vpn_intro_shown"),
+    ONBOARDING_VPN_INTRO_CONTINUED("m_onboarding_vpn_intro_continued"),
+    ONBOARDING_VPN_INTRO_SKIPPED("m_onboarding_vpn_intro_skipped"),
+    ONBOARDING_VPN_PERMISSION_SHOWN("m_onboarding_vpn_permission_shown"),
+    ONBOARDING_VPN_PERMISSION_CONTINUED("m_onboarding_vpn_permission_continued"),
+    ONBOARDING_VPN_PERMISSION_LAUNCHED("m_onboarding_vpn_permission_launched"),
+    ONBOARDING_VPN_PERMISSION_GRANTED("m_onboarding_vpn_permission_granted"),
+    ONBOARDING_VPN_PERMISSION_DENIED("m_onboarding_vpn_permission_denied"),
+    ONBOARDING_VPN_PERMISSION_SKIPPED("m_onboarding_vpn_permission_skipped"),
+    ONBOARDING_VPN_PERMISSION_FAQ_LAUNCHED("m_onboarding_vpn_permission_faq_launched"),
+
+    ONBOARDING_FIREPROOF_CTA_SHOWN("m_fireproof_cta_shown"),
+    ONBOARDING_FIREPROOF_CTA_KEEP_ME_SIGNED_IN_BUTTON("m_fireproof_cta_keep_me_signed_in_button"),
+    ONBOARDING_FIREPROOF_CTA_BURN_EVERYTHING_BUTTON("m_fireproof_cta_burn_everything_button"),
 
     PRIVACY_DASHBOARD_OPENED("mp"),
     PRIVACY_DASHBOARD_SCORECARD("mp_c"),

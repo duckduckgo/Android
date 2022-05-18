@@ -16,12 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -82,6 +80,14 @@ interface DeviceShieldPixels {
      * count -> fire a pixel on every call
      */
     fun enableFromOnboarding()
+
+    /**
+     * This fun will fire three pixels
+     * unique -> fire only once ever no matter how many times we call this fun
+     * daily -> fire only once a day no matter how many times we call this fun
+     * count -> fire a pixel on every call
+     */
+    fun enableFromDaxOnboarding()
 
     /**
      * This fun will fire three pixels
@@ -352,15 +358,6 @@ interface DeviceShieldPixels {
     fun reportGeneralDnsError()
 
     /**
-     * Will fire when the user wants to remove the VPN feature all together
-     */
-    fun didShowRemoveTrackingProtectionFeatureDialog()
-
-    fun didChooseToRemoveTrackingProtectionFeature()
-
-    fun didChooseToCancelRemoveTrakcingProtectionDialog()
-
-    /**
      * Will fire when the user is interacting with the Promote Always On Dialog
      */
     fun didShowPromoteAlwaysOnDialog()
@@ -371,19 +368,42 @@ interface DeviceShieldPixels {
 
     fun didChooseToForgetPromoteAlwaysOnDialog()
 
+    /**
+     * Will fire when the user wants to remove the VPN feature all together
+     */
+    fun didShowRemoveTrackingProtectionFeatureDialog()
+
+    fun didChooseToRemoveTrackingProtectionFeature()
+
+    fun didChooseToCancelRemoveTrakcingProtectionDialog()
+
+    /** Will fire when the user enables protection for a specific app from the detail screen */
+    fun didEnableAppProtectionFromDetail()
+
+    /** Will fire when the user disables  protection for a specific app from the detail screen */
+    fun didDisableAppProtectionFromDetail()
+
+    /** Will fire when the user enables protection for a specific app from the apps protection screen */
+    fun didEnableAppProtectionFromApps()
+
+    /** Will fire when the user disables  protection for a specific app from the apps protection screen */
+    fun didDisableAppProtectionFromApps()
+
     fun reportVpnConnectivityError()
     fun reportDeviceConnectivityError()
+
+    /** Will fire when the VPN is stopped */
+    fun reportVpnUptime(uptime: Long)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
-    private val context: Context,
-    private val pixel: Pixel
+    private val pixel: Pixel,
+    vpnSharedPreferencesProvider: VpnSharedPreferencesProvider,
 ) : DeviceShieldPixels {
 
-    private val preferences: SharedPreferences
-        get() = context.getSharedPreferences(DS_PIXELS_PREF_FILE, Context.MODE_MULTI_PROCESS)
+    private val preferences = vpnSharedPreferencesProvider.getSharedPreferences(DS_PIXELS_PREF_FILE, multiprocess = true, migrate = true)
 
     override fun deviceShieldEnabledOnSearch() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_UPON_SEARCH_DAILY)
@@ -430,6 +450,15 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun enableFromOnboarding() {
+        tryToFireUniquePixel(
+            DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
+            tag = FIRST_ENABLE_ENTRY_POINT_TAG
+        )
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING)
+    }
+
+    override fun enableFromDaxOnboarding() {
         tryToFireUniquePixel(
             DeviceShieldPixelNames.ATP_ENABLE_FROM_ONBOARDING_UNIQUE,
             tag = FIRST_ENABLE_ENTRY_POINT_TAG
@@ -744,9 +773,9 @@ class RealDeviceShieldPixels @Inject constructor(
     }
 
     override fun didOpenManageRecentAppSettings() {
-        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_UNIQUE)
-        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY_DAILY)
-        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_COMPANY_TRACKERS_ACTIVITY)
+        tryToFireUniquePixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_UNIQUE)
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_DID_SHOW_MANAGE_RECENT_APP_SETTINGS_ACTIVITY)
     }
 
     override fun reportLoopbackDnsError() {
@@ -762,6 +791,22 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportGeneralDnsError() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
+    }
+
+    override fun didEnableAppProtectionFromDetail() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
+    }
+
+    override fun didDisableAppProtectionFromDetail() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL)
+    }
+
+    override fun didEnableAppProtectionFromApps() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_ALL)
+    }
+
+    override fun didDisableAppProtectionFromApps() {
+        firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
     }
 
     override fun didShowRemoveTrackingProtectionFeatureDialog() {
@@ -813,6 +858,10 @@ class RealDeviceShieldPixels @Inject constructor(
 
     private fun suddenKill() {
         firePixel(DeviceShieldPixelNames.ATP_KILLED)
+    }
+
+    override fun reportVpnUptime(uptime: Long) {
+        firePixel(DeviceShieldPixelNames.ATP_UPTIME, mapOf("uptime" to uptime.toString()))
     }
 
     private fun firePixel(
@@ -890,7 +939,6 @@ class RealDeviceShieldPixels @Inject constructor(
         private const val FIRST_ENABLE_ENTRY_POINT_TAG = "FIRST_ENABLE_ENTRY_POINT_TAG"
         private const val FIRST_OPEN_ENTRY_POINT_TAG = "FIRST_OPEN_ENTRY_POINT_TAG"
 
-        @VisibleForTesting
-        const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
+        private const val DS_PIXELS_PREF_FILE = "com.duckduckgo.mobile.android.device.shield.pixels"
     }
 }

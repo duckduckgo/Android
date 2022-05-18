@@ -20,6 +20,7 @@ import com.duckduckgo.privacy.config.store.AllowlistRuleEntity
 
 data class TrackerAllowlistFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val settings: TrackerAllowSettings
 )
 

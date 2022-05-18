@@ -16,9 +16,8 @@
 
 package com.duckduckgo.app.statistics.api
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.config.StatisticsLibraryConfig
@@ -31,7 +30,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-interface PixelSender : LifecycleObserver {
+interface PixelSender : DefaultLifecycleObserver {
     fun sendPixel(
         pixelName: String,
         parameters: Map<String, String>,
@@ -60,8 +59,7 @@ class RxPixelSender constructor(
         if (statisticsLibraryConfig?.shouldFirePixelsAsDev() == true) 1 else null
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onAppForegrounded() {
+    override fun onStart(owner: LifecycleOwner) {
         compositeDisposable.add(
             pendingPixelDao.pixels()
                 .flatMapIterable { it }
@@ -74,9 +72,7 @@ class RxPixelSender constructor(
         )
     }
 
-    @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded() {
+    override fun onStop(owner: LifecycleOwner) {
         compositeDisposable.clear()
     }
 

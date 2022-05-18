@@ -20,5 +20,6 @@ import com.duckduckgo.privacy.config.store.DrmExceptionEntity
 
 data class DrmFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val exceptions: List<DrmExceptionEntity>
 )

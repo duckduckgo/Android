@@ -16,6 +16,8 @@
 
 package com.duckduckgo.mobile.android.vpn.waitlist.store
 
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -30,7 +32,8 @@ interface AtpWaitlistStateRepository {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class WaitlistStateRepository @Inject constructor(
-    private val dataStore: AppTrackingProtectionWaitlistDataStore
+    private val dataStore: AppTrackingProtectionWaitlistDataStore,
+    private val variantManager: VariantManager,
 ) : AtpWaitlistStateRepository {
 
     override fun getState(): WaitlistState {
@@ -47,7 +50,9 @@ class WaitlistStateRepository @Inject constructor(
         return dataStore.waitlistTimestamp > CUTOFF_DATE
     }
 
-    private fun didJoinBeta(): Boolean = dataStore.inviteCode != null
+    private fun didJoinBeta(): Boolean {
+        return variantManager.isVPNRetentionStudyEnabled() || dataStore.inviteCode != null
+    }
 
     private fun didJoinWaitlist(): Boolean = dataStore.waitlistTimestamp != -1 && dataStore.waitlistToken != null
 

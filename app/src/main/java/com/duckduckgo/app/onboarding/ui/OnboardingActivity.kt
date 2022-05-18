@@ -49,10 +49,14 @@ class OnboardingActivity : DuckDuckGoActivity() {
         if (next < viewPager.adapter!!.count) {
             viewPager.setCurrentItem(next, true)
         } else {
-            viewModel.onOnboardingDone()
-            startActivity(BrowserActivity.intent(this@OnboardingActivity))
-            finish()
+            onOnboardingDone()
         }
+    }
+
+    fun onOnboardingDone() {
+        viewModel.onOnboardingDone()
+        startActivity(BrowserActivity.intent(this@OnboardingActivity))
+        finish()
     }
 
     private fun configurePager() {

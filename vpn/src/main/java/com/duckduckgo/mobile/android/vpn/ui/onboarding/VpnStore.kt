@@ -16,16 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
-import android.content.Context
 import androidx.core.content.edit
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.vpn.model.VpnPreferences
-import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.runBlocking
+import dagger.SingleInstanceIn
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 interface VpnStore {
@@ -41,18 +38,19 @@ interface VpnStore {
     fun isAlwaysOnEnabled(): Boolean
 
     companion object {
-        const val ALWAYS_ON_PROMOTION_DELTA = 5
+        const val ALWAYS_ON_PROMOTION_DELTA = 3
     }
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class SharedPreferencesVpnStore @Inject constructor(
-    context: Context,
-    vpnDatabase: VpnDatabase,
+    sharedPreferencesProvider: VpnSharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : VpnStore {
-    private val preferences = context.getSharedPreferences(DEVICE_SHIELD_ONBOARDING_STORE_PREFS, Context.MODE_MULTI_PROCESS)
-    private val vpnDatabasePreferences = vpnDatabase.vpnPreferencesDao()
+    private val preferences = sharedPreferencesProvider.getSharedPreferences(
+        DEVICE_SHIELD_ONBOARDING_STORE_PREFS, multiprocess = true, migrate = true
+    )
 
     override fun onboardingDidShow() {
         preferences.edit { putBoolean(KEY_DEVICE_SHIELD_ONBOARDING_LAUNCHED, true) }
@@ -72,7 +70,6 @@ class SharedPreferencesVpnStore @Inject constructor(
 
     override fun onAppTPManuallyEnabled() {
         preferences.edit(commit = true) { putInt(KEY_DEVICE_SHIELD_MANUALLY_ENABLED, getAppTPManuallyEnables() + 1) }
-        Timber.d("onAppTPManuallyEnabled ${getAppTPManuallyEnables()} times")
     }
 
     override fun getAppTPManuallyEnables(): Int {
@@ -88,14 +85,11 @@ class SharedPreferencesVpnStore @Inject constructor(
     }
 
     override suspend fun setAlwaysOn(enabled: Boolean) = withContext(dispatcherProvider.io()) {
-        vpnDatabasePreferences.insert(VpnPreferences(KEY_ALWAYS_ON_MODE_ENABLED, enabled))
+        preferences.edit(commit = true) { putBoolean(KEY_ALWAYS_ON_MODE_ENABLED, enabled) }
     }
 
     override fun isAlwaysOnEnabled(): Boolean {
-        // This is awful I know, but we've done it in other places
-        return runBlocking(dispatcherProvider.io()) {
-            vpnDatabasePreferences.getPreference(KEY_ALWAYS_ON_MODE_ENABLED)?.value ?: false
-        }
+        return preferences.getBoolean(KEY_ALWAYS_ON_MODE_ENABLED, false)
     }
 
     companion object {
