@@ -2620,7 +2620,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun saveCredentials(url: String, credentials: Credentials) {
-        autofillStore.saveCredentials(url, credentials)
+        viewModelScope.launch {
+            autofillStore.saveCredentials(url, credentials)
+        }
     }
 
     fun onConfigurationChanged() {

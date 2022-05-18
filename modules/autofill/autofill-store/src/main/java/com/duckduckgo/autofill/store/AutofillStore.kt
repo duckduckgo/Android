@@ -19,29 +19,77 @@ package com.duckduckgo.autofill.store
 import androidx.core.net.toUri
 import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.api.SecureStorage
+import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
+import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 interface AutofillStore {
 
-    fun getCredentials(rawUrl: String): List<Credentials>
+    suspend fun getCredentials(rawUrl: String): List<Credentials>
 
-    fun saveCredentials(rawUrl: String, credentials: Credentials)
+    suspend fun saveCredentials(rawUrl: String, credentials: Credentials)
+
+}
+
+private fun String.extractOriginFromUrl(): String {
+    val url = this.toUri()
+    val scheme = if (url.scheme != null) "${url.scheme}://" else ""
+
+    return String.format("%s%s", scheme, url.host).also {
+        Timber.i("Extracted origin from URL.\ninput=%s\noutput=%s\nhost=%s", this, it, url.host)
+    }
+}
+
+class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
+
+    override suspend fun getCredentials(rawUrl: String): List<Credentials> {
+        val url = rawUrl.extractOriginFromUrl()
+
+        val storedCredentials = secureStorage.getWebsiteLoginCredentialsForDomain(url).firstOrNull()
+        val credentialsToReturn = mutableListOf<Credentials>()
+
+        storedCredentials?.forEach {
+            val username = it.details.username ?: return@forEach
+            val password = it.password ?: return@forEach
+            credentialsToReturn.add(Credentials(username, password))
+        }
+
+        return credentialsToReturn
+    }
+
+    override suspend fun saveCredentials(rawUrl: String, credentials: Credentials) {
+        val url = rawUrl.extractOriginFromUrl()
+        Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
+
+        val loginDetails = WebsiteLoginDetails(domain = url, username = credentials.username)
+        val webSiteLoginCredentials = WebsiteLoginCredentials(loginDetails, password = credentials.password)
+
+        // todo this should be handled internally by secure storage
+        withContext(Dispatchers.IO) {
+            secureStorage.addWebsiteLoginCredential(webSiteLoginCredentials)
+        }
+    }
+
 }
 
 class MockAutofillStore : AutofillStore {
 
     private val data: MutableMap<String, List<Credentials>> = mutableMapOf()
 
-    override fun getCredentials(rawUrl: String): List<Credentials> {
+    override suspend fun getCredentials(rawUrl: String): List<Credentials> {
         val url = rawUrl.extractOriginFromUrl()
         return data[url] ?: emptyList()
     }
 
-    override fun saveCredentials(rawUrl: String, credentials: Credentials) {
+    override suspend fun saveCredentials(rawUrl: String, credentials: Credentials) {
         val url = rawUrl.extractOriginFromUrl()
         val updatedList = generateList(url, credentials)
         data[url] = updatedList
@@ -56,24 +104,21 @@ class MockAutofillStore : AutofillStore {
             list.add(newCredentials)
         }
     }
-
-    private fun String.extractOriginFromUrl(): String {
-        val url = this.toUri()
-        val scheme = if (url.scheme != null) "${url.scheme}://" else ""
-
-        return String.format("%s%s", scheme, url.host).also {
-            Timber.i("Extracted origin from URL.\ninput=%s\noutput=%s\nhost=%s", this, it, url.host)
-        }
-    }
 }
 
 @Module
 @ContributesTo(AppScope::class)
 class AutofillStoreModule {
 
+//    @Provides
+//    @SingleInstanceIn(AppScope::class)
+//    fun autofillStore(): AutofillStore {
+//        return MockAutofillStore()
+//    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun autofillStore(): AutofillStore {
-        return MockAutofillStore()
+    fun autofillStore(secureStorage: SecureStorage): AutofillStore {
+        return SecureStoreBackedAutofillStore(secureStorage)
     }
 }

@@ -1510,6 +1510,7 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
+            Timber.w("Fragment result received: %s %s", RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
             val selectedCredentials = result.getParcelable<Credentials>("creds") ?: return@setFragmentResultListener
             val originalUrl = result.getString("url") ?: return@setFragmentResultListener
             viewModel.saveCredentials(originalUrl, selectedCredentials)

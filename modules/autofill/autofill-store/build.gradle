@@ -38,10 +38,13 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
     implementation project(path: ':autofill-api')
+    implementation project(path: ':secure-storage-api')
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation KotlinX.coroutines.core
     implementation Google.android.material
+    implementation project(path: ':secure-storage-api')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
