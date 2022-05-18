@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.bugreport
 
 import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -25,10 +26,11 @@ import kotlinx.coroutines.CoroutineScope
 import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import dagger.SingleInstanceIn
+import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
-class VpnUptimeRecorder @Inject constructor() : VpnServiceCallbacks {
+class VpnUptimeRecorder @Inject constructor(val pixels: DeviceShieldPixels) : VpnServiceCallbacks {
 
     private val vpnStartTime = AtomicLong(0)
 
@@ -40,6 +42,8 @@ class VpnUptimeRecorder @Inject constructor() : VpnServiceCallbacks {
         coroutineScope: CoroutineScope,
         vpnStopReason: VpnStopReason
     ) {
+        Timber.d("VpnUptimeRecorder: vpn was up for ${getVpnUpTime()} ms")
+        pixels.reportVpnUptime(getVpnUpTime())
         vpnStartTime.set(0)
     }
 

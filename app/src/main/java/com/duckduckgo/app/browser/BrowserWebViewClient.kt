@@ -27,6 +27,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
@@ -185,11 +186,13 @@ class BrowserWebViewClient(
 
                         if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
                             webViewClientListener?.let { listener ->
-                                webView.loadUrl(urlType.cleanedUrl)
+                                loadCleanedUrl(listener, webView, urlType)
                                 return listener.handleAppLink(parameterStrippedType, isForMainFrame)
                             }
                         } else {
-                            webView.loadUrl(urlType.cleanedUrl)
+                            webViewClientListener?.let { listener ->
+                                loadCleanedUrl(listener, webView, urlType)
+                            }
                             return true
                         }
                     }
@@ -202,6 +205,20 @@ class BrowserWebViewClient(
                 throw e
             }
             return false
+        }
+    }
+
+    private fun loadCleanedUrl(
+        listener: WebViewClientListener,
+        webView: WebView,
+        urlType: TrackingParameterLink
+    ) {
+        if (listener.linkOpenedInNewTab()) {
+            webView.post {
+                webView.loadUrl(urlType.cleanedUrl)
+            }
+        } else {
+            webView.loadUrl(urlType.cleanedUrl)
         }
     }
 

@@ -20,6 +20,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.Tcp
 import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import timber.log.Timber
+import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.Packet.TCPHeader
 import xyz.hexene.localvpn.TCB
@@ -41,6 +42,24 @@ interface ConnectionInitializer {
 
         fun key(): String {
             return "$destinationAddress:$destinationPort:$sourcePort"
+        }
+
+        fun close() {
+            ByteBufferPool.release(responseBuffer)
+            ByteBufferPool.release(packet.backingBuffer)
+        }
+
+        fun tcb(): TCB? {
+            return TCB.getTCB(key())
+        }
+
+        fun tcbOrClose(): TCB? {
+            val tcb = tcb()
+            if (tcb == null) {
+                Timber.w("null TCB")
+                close()
+            }
+            return tcb
         }
     }
 }

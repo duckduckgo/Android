@@ -49,6 +49,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
@@ -59,6 +60,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -4023,6 +4025,69 @@ class BrowserTabViewModelTest {
         verify(voiceSearchPixelLogger, never()).log()
     }
 
+    @Test
+    fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
+        assertFalse(testee.linkOpenedInNewTab())
+        testee.onMessageReceived()
+        assertTrue(testee.linkOpenedInNewTab())
+    }
+
+    @Test
+    fun whenPageChangedThenSetLinkOpenedInNewTabToFalse() {
+        testee.onMessageReceived()
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.linkOpenedInNewTab())
+    }
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
+        setBrowserShowing(false)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserShowingThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 0)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnSingleStackEntryThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 1)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMultipleEntriesThenShowHistoryCommandSent() {
+        buildNavigationHistoryStack(stackSize = 10)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 9)
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMoreThanTenEntriesThenTruncatedToMostRecentOnly() {
+        buildNavigationHistoryStack(stackSize = 20)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
+        assertCommandIssued<ShowBackNavigationHistory> {
+            assertEquals(expectedStackSize, history.size)
+        }
+    }
+
+    private fun buildNavigationHistoryStack(stackSize: Int) {
+        val history = mutableListOf<NavigationHistoryEntry>()
+        for (i in 0 until stackSize) {
+            history.add(NavigationHistoryEntry(url = "$i.example.com"))
+        }
+
+        testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -4235,7 +4300,8 @@ class BrowserTabViewModelTest {
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
-        progress: Int? = null
+        progress: Int? = null,
+        navigationHistory: List<NavigationHistoryEntry> = emptyList()
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -4245,6 +4311,7 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
         whenever(nav.progress).thenReturn(progress)
+        whenever(nav.navigationHistory).thenReturn(navigationHistory)
         return nav
     }
 

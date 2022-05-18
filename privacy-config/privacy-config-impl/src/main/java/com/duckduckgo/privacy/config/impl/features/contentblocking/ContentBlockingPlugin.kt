@@ -54,7 +54,7 @@ class ContentBlockingPlugin @Inject constructor(
             }
             contentBlockingRepository.updateAll(contentBlockingExceptions)
             val isEnabled = contentBlockingFeature?.state == "enabled"
-            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled))
+            privacyFeatureTogglesRepository.insert(PrivacyFeatureToggles(name, isEnabled, contentBlockingFeature?.minSupportedVersion))
             return true
         }
         return false

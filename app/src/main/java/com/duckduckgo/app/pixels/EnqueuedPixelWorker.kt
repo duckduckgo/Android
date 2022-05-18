@@ -56,16 +56,23 @@ class EnqueuedPixelWorker @Inject constructor(
         if (event == Lifecycle.Event.ON_CREATE) {
             scheduleWorker(workManager)
             launchedByFireAction = isLaunchByFireAction()
+            if (!launchedByFireAction) {
+                Timber.i("Sending app launch pixel")
+                pixel.get().fire(
+                    pixel = AppPixelName.APP_LAUNCH,
+                    parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
+                )
+            }
         } else if (event == Lifecycle.Event.ON_START) {
             if (launchedByFireAction) {
                 // skip the next on_start if branch
-                Timber.i("Suppressing app launch pixel")
+                Timber.i("Suppressing legacy app launch pixel")
                 launchedByFireAction = false
                 return
             }
-            Timber.i("Sending app launch pixel")
+            Timber.i("Sending legacy app launch pixel")
             pixel.get().fire(
-                pixel = AppPixelName.APP_LAUNCH,
+                pixel = AppPixelName.APP_LAUNCH_LEGACY,
                 parameters = mapOf(WEBVIEW_VERSION to webViewVersionProvider.getMajorVersion())
             )
         }
@@ -108,7 +115,7 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     companion object {
-        private const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
+        const val APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD: Long = 10_000L
         private const val WORKER_SEND_ENQUEUED_PIXELS = "com.duckduckgo.pixels.enqueued.worker"
 
         private fun scheduleWorker(workManager: WorkManager) {

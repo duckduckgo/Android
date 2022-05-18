@@ -396,6 +396,16 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="NavigationHistoryDialog" parent="@style/Theme.Design.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomSheetStyle">@style/NavigationHistoryDialogStyle</item>
+    </style>
+
+    <style name="NavigationHistoryDialogStyle" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
     <style name="EmailTooltip" parent="@style/Theme.Design.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>

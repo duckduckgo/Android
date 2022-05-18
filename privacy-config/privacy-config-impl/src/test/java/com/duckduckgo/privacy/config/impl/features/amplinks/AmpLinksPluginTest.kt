@@ -58,7 +58,7 @@ class AmpLinksPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, null))
     }
 
     @Test
@@ -70,7 +70,16 @@ class AmpLinksPluginTest {
 
         testee.store(FEATURE_NAME, jsonString)
 
-        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false))
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, false, null))
+    }
+
+    @Test
+    fun whenFeatureNameMatchesAmpLinksAndHasMinSupportedVersionThenStoreMinSupportedVersion() {
+        val jsonString = FileUtilities.loadText(AmpLinksPluginTest::class.java.classLoader!!, "json/amp_links_min_supported_version.json")
+
+        testee.store(FEATURE_NAME, jsonString)
+
+        verify(mockFeatureTogglesRepository).insert(PrivacyFeatureToggles(FEATURE_NAME, true, 1234))
     }
 
     @Test

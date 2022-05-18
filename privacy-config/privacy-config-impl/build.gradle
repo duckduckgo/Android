@@ -32,6 +32,7 @@ dependencies {
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':app-store')
+    implementation project(path: ':appbuildconfig-api')
     api project(path: ':privacy-config-store')
 
     implementation Kotlin.stdlib.jdk7
