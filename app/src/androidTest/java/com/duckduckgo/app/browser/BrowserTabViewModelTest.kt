@@ -690,13 +690,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
     fun whenBlankInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
@@ -1683,7 +1683,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         loadUrl(null)
         testee.onShareSelected()
-        verify(mockCommandObserver, never()).onChanged(any())
+        assertCommandNotIssued<Command.ShareLink>()
     }
 
     @Test
@@ -1970,9 +1970,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val command = commandCaptor.firstValue
-        assertTrue(command is Command.GenerateWebViewPreviewImage)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
     }
 
     @Test
@@ -2202,7 +2200,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
     }
 
     @Test
@@ -3435,6 +3433,20 @@ class BrowserTabViewModelTest {
         emailStateFlow.emit(true)
 
         assertTrue(browserViewState().isEmailSignedIn)
+    }
+
+    @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(false)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
     }
 
     @Test
