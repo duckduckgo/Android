@@ -61,6 +61,7 @@ class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), Cred
         view.findViewById<Button>(R.id.saveLoginButton).setOnClickListener {
 
             val result = Bundle().also {
+                it.putString("url", getOriginalUrl())
                 it.putParcelable("creds", getCredentialsToSave())
             }
             parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
