@@ -2176,6 +2176,9 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
+                onMenuItemLongClicked(view.backMenuItem) {
+                    viewModel.onUserLongPressedBack()
+                }
                 onMenuItemClicked(view.refreshMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
