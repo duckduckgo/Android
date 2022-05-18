@@ -51,7 +51,15 @@ class DetectOriginatingAppPackageModern(
     }
 
     private fun getPackageIdForUid(uid: Int): String {
-        val packages = packageManager.getPackagesForUid(uid)
+        val packages: Array<String>?
+
+        try {
+            packages = packageManager.getPackagesForUid(uid)
+        } catch (e: SecurityException) {
+            Timber.e(e, "Failed to get package ID for UID: $uid due to security violation.")
+            return OriginatingAppPackageIdentifierStrategy.UNKNOWN
+        }
+
         if (packages.isNullOrEmpty()) {
             Timber.w("Failed to get package ID for UID: $uid")
             return OriginatingAppPackageIdentifierStrategy.UNKNOWN
