@@ -465,7 +465,7 @@
     <string name="onboardingDaxText"><![CDATA[Internett kan være ganske skummelt.<br/><br/>Men ikke bekymre deg! Søk og surfing privat er enklere enn du tror.]]></string>
     <string name="onboardingLetsDoItButton">La oss gjøre det!</string>
     <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine! <br/><br/>Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Dette går bra!\n\nHusk: Hver gang du surfer med meg, klippes vingene av en ekkel annonse. 👍]]></string>
+    <string name="daxEndCtaText"><![CDATA[Dette går bra!<br/><br/>Husk: Hver gang du surfer med meg, klippes vingene av en ekkel annonse. 👍]]></string>
     <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, og jeg lagrer aldri søkehistorikken din. Aldri. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ og <b>%1$d annen</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
