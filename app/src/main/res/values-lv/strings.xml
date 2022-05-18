@@ -605,7 +605,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]>
+        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href="">Uzzini vairāk</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
@@ -660,16 +660,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-pasta konfidencialitāte, vienkāršota.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju.<br /><a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju.<br /><a href=""><b>Uzzini vairāk</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Tu esi sarakstā!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=\"\"><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=\"\"><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=""><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=""><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=""><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Tu esi uzaicināts(-ta)!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/>nemainot e-pasta pakalpojumu sniedzēju.<br/><a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/>nemainot e-pasta pakalpojumu sniedzēju.<br/><a href=""><b>Uzzini vairāk</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personīgā Duck adrese</string>

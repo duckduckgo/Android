@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href=\"\">Daha Fazla Bilgi</a><u/>]]>
+        <![CDATA[DuckDuckGo birçok izleyiciyi otomatik olarak engeller. Küresel Gizlilik Kontrolü (GPC) ile, katılımcı web sitelerinden kişisel verilerinizin satışını veya diğer şirketlerle paylaşımını kısıtlamalarını da isteyebilirsiniz. <u><a href="">Daha Fazla Bilgi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Küresel Gizlilik Kontrolü (GPC)</string>
     <string name="globalPrivacyControlToggle">Küresel Gizlilik Kontrolü (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-posta gizliliğinin basitleştirilmiş hâli.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Listedesiniz!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=\"\"><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=\"\"><b>daha fazla bilgi edinin</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[<br/> E-posta Koruması hazır olduğunda size bildirim gönderilecektir. <a href=""><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Özellik hazır olduğunda davetiye burada gösterilecek. Bunun için <a href=""><b>bildirim almak</b></a> ister misiniz?<br/>E-posta Koruma hakkında<a href=""><b>daha fazla bilgi edinin</b></a>.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Davetlisiniz!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=\"\"><b>Daha fazla bilgi</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-posta sağlayıcınızı değiştirmeden e-posta izleyicileri engelleyin ve adresinizi gizleyin.<a href=""><b>Daha fazla bilgi</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Kişisel Duck Adresi</string>

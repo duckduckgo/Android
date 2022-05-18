@@ -605,7 +605,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]>
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -660,16 +660,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=\"\"><b>primești o notificare</b></a> când ajunge?<br/><a href=\"\"><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=""><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=""><b>primești o notificare</b></a> când ajunge?<br/><a href=""><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Ești invitat!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Adresa Duck personală</string>

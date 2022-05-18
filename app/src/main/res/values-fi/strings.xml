@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href=\"\">Lue lisää</a><u/>]]>
+        <![CDATA[DuckDuckGo estää monet seurannat automaattisesti. GPC:n (Global Privacy Control) avulla voit myös pyytää osallistuvia sivustoja rajoittamaan henkilötietojesi myyntiä tai jakamista muiden yritysten kanssa. <u><a href="">Lue lisää</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=\"\"><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=\"\"><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=""><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=""><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=""><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Sinut on kutsuttu!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Yksityinen Duck-osoite</string>

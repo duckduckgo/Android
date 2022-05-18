@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href=\"\">Loe edasi</a><u/>]]>
+        <![CDATA[DuckDuckGo blokeerib automaatselt paljud jälitajad. Üleilmse privaatsuskontrolli (GPC) abil saate paluda osalevatel veebisaitidel piirata teie isikuandmete müümist või jagamist teiste ettevõtetega. <u><a href="">Loe edasi</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
     <string name="globalPrivacyControlToggle">Üleilmne privaatsuskontroll (Global Privacy Control (GPC))</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-posti privaatsus, lihtsustatud.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress ilma meiliteenuse pakkujat vahetamata.<br/><b><a href=\"\">Lisateave</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress ilma meiliteenuse pakkujat vahetamata.<br/><b><a href="">Lisateave</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olete nimekirjas!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Saadame teile teate, kui<br/> E-posti kaitse on teie jaoks valmis. <a href=\"\"><b>Lisateave</b></a> .]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Teie kutse kuvatakse siin, kui oleme teie jaoks valmis. Kas soovite <a href=\"\"><b>saada teavitust</b></a> selle saabumise kohta?<br/><a href=\"\"><b>Lisateave</b></a> e-posti kaitse kohta.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Saadame teile teate, kui<br/> E-posti kaitse on teie jaoks valmis. <a href=""><b>Lisateave</b></a> .]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Teie kutse kuvatakse siin, kui oleme teie jaoks valmis. Kas soovite <a href=""><b>saada teavitust</b></a> selle saabumise kohta?<br/><a href=""><b>Lisateave</b></a> e-posti kaitse kohta.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Olete kutsutud!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress <br/>ilma meiliteenuse pakkujat vahetamata.<br/><b><a href=\"\">Lisateave</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokeeri meilijälgurid ja peida oma aadress <br/>ilma meiliteenuse pakkujat vahetamata.<br/><b><a href="">Lisateave</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Isiklik Ducki aadress</string>

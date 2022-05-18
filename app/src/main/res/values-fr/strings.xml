@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href=\"\">En savoir plus</a><u/>]]>
+        <![CDATA[DuckDuckGo bloque automatiquement de nombreux traqueurs. Grâce au Global Privacy Control (GPC), vous pouvez également demander aux sites web participants de limiter la vente ou le partage de vos données personnelles avec d\'autres entreprises. <u><a href="">En savoir plus</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">La confidentialité des e-mails, simplifiée.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie.<br/><a href=\"\"><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Vous êtes sur la liste !</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Nous vous contacterons lorsque la protection des e-mails sera disponible pour vous. <a href=\"\"><b>En savoir plus</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Votre invitation s\'affichera ici lorsque vous aurez accès à la fonctionnalité. Vous souhaitez <a href=\"\"><b>être prévenu(e)</b></a> de son lancement ?<br/><a href=\"\"><b>En savoir plus</b></a> sur la protection des e-mails.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Nous vous contacterons lorsque la protection des e-mails sera disponible pour vous. <a href=""><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Votre invitation s\'affichera ici lorsque vous aurez accès à la fonctionnalité. Vous souhaitez <a href=""><b>être prévenu(e)</b></a> de son lancement ?<br/><a href=""><b>En savoir plus</b></a> sur la protection des e-mails.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Vous êtes invité(e) !</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie.<br/><a href=\"\"><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Adresse Duck personnelle</string>

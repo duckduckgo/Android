@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href=\"\">Подробнее…</a><u/>]]>
+        <![CDATA[DuckDuckGo блокирует многие трекеры автоматически. Функция «Глобальный контроль конфиденциальности» (GPC) позволяет затребовать от участвующих в программе сайтов остановить передачу и продажу ваших личных данных другим компаниям. <u><a href="">Подробнее…</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Глобальный контроль конфиденциальности (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобальный контроль конфиденциальности (GPC)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Надежная защита почты и ничего лишнего.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Чтобы блокировать трекеры и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=\"\"><b>Подробнее</b></a>...]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Чтобы блокировать трекеры и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=""><b>Подробнее</b></a>...]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Теперь вы в списке!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Мы отправим вам уведомление, когда<br/> защита почты будет доступна и вам. <a href=\"\"><b>Подробнее</b></a>...]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Когда настанет время, ваше приглашение появится здесь. Хотите также <a href=\"\"><b>получить уведомление</b></a>?<br/><a href=\"\"><b>Подробнее</b></a> о защите почты...]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Мы отправим вам уведомление, когда<br/> защита почты будет доступна и вам. <a href=""><b>Подробнее</b></a>...]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Когда настанет время, ваше приглашение появится здесь. Хотите также <a href=""><b>получить уведомление</b></a>?<br/><a href=""><b>Подробнее</b></a> о защите почты...]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Приглашение</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Чтобы блокировать трекеры <br/>и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=\"\"><b>Подробнее</b></a>...]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Чтобы блокировать трекеры <br/>и скрывать свой адрес, вовсе не нужно менять почтовый сервис.<br/><a href=""><b>Подробнее</b></a>...]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Личный адрес на Duck</string>

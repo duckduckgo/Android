@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Глобален контрол на поверителността (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo блокира автоматично много тракери. С настройката \"Глобален контрол на поверителността\" (GPC) можете също да поискате от участващите уебсайтове да ограничат продажбата или споделянето на Вашите лични данни на/с други компании. <u><a href=\"\">Научете повече</a><u/>]]>
+        <![CDATA[DuckDuckGo блокира автоматично много тракери. С настройката \"Глобален контрол на поверителността\" (GPC) можете също да поискате от участващите уебсайтове да ограничат продажбата или споделянето на Вашите лични данни на/с други компании. <u><a href="">Научете повече</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Глобален контрол на поверителността (GPC)</string>
     <string name="globalPrivacyControlToggle">Глобален контрол на поверителността (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Поверителност на имейла с две думи.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик.<a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Вече сте в списъка!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=\"\"><b>Научете повече</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=\"\"><b>получите известие</b></a>, когато пристигне?<br/><a href=\"\"><b>Научете повече</b></a> за защитата на имейли.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=""><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=""><b>получите известие</b></a>, когато пристигне?<br/><a href=""><b>Научете повече</b></a> за защитата на имейли.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Получихте покана!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик.<a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Личен Duck адрес</string>

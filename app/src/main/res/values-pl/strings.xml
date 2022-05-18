@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatycznie blokuje wiele skryptów śledzących. Dzięki Globalnej kontroli prywatności (Global Privacy Control – GPC) możesz również poprosić uczestniczące witryny internetowe o zablokowanie sprzedaży lub udostępniania Twoich danych osobowych innym firmom. <u><a href=\"\">Dowiedz się więcej</a><u/>]]>
+        <![CDATA[DuckDuckGo automatycznie blokuje wiele skryptów śledzących. Dzięki Globalnej kontroli prywatności (Global Privacy Control – GPC) możesz również poprosić uczestniczące witryny internetowe o zablokowanie sprzedaży lub udostępniania Twoich danych osobowych innym firmom. <u><a href="">Dowiedz się więcej</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalna Kontrola Prywatności (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna Kontrola Prywatności (GPC)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Uproszczona prywatność poczty e-mail.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=""><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jesteś na liście!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Wyślemy Ci powiadomienie, gdy<br/> ochrona poczty e-mail będzie gotowa. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Twoje zaproszenie pojawi się tutaj, gdy będzie już gotowe. Chcesz <a href=\"\"><b>otrzymać powiadomienie</b></a>, gdy będzie gotowe?<br/><a href=\"\"><b>Dowiedz się więcej</b></a> o ochronie poczty e-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Wyślemy Ci powiadomienie, gdy<br/> ochrona poczty e-mail będzie gotowa. <a href=""><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Twoje zaproszenie pojawi się tutaj, gdy będzie już gotowe. Chcesz <a href=""><b>otrzymać powiadomienie</b></a>, gdy będzie gotowe?<br/><a href=""><b>Dowiedz się więcej</b></a> o ochronie poczty e-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Masz już zaproszenie!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=""><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobisty adres Duck</string>

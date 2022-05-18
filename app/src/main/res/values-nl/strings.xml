@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href=\"\">Meer informatie</a><u/>]]>
+        <![CDATA[Veel trackers worden automatisch geblokkeerd door DuckDuckGo. Met Global Privacy Control (GPC) kun je deelnemende websites ook vragen om je persoonsgegevens niet te verkopen aan of te delen met andere bedrijven. <u><a href="">Meer informatie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=\"\"><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=\"\"><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=""><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=""><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=""><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>

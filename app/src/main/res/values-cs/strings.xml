@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje mnoho trackerů. Pomocí Globální kontroly ochrany osobních údajů (GPC) můžete také požádat zúčastněné webové stránky, aby omezily prodej nebo sdílení vašich osobních údajů s jinými společnostmi. <u><a href=\"\">Více informací</a><u/>]]>
+        <![CDATA[DuckDuckGo automaticky blokuje mnoho trackerů. Pomocí Globální kontroly ochrany osobních údajů (GPC) můžete také požádat zúčastněné webové stránky, aby omezily prodej nebo sdílení vašich osobních údajů s jinými společnostmi. <u><a href="">Více informací</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globální kontrola ochrany osobních údajů (GPC)</string>
     <string name="globalPrivacyControlToggle">Globální kontrola ochrany osobních údajů (GPC)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailové soukromí, zjednodušené.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokování trackerů e-mailu a skrytí adresy bez změny e-mailového poskytovatele.<br/><a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokování trackerů e-mailu a skrytí adresy bez změny e-mailového poskytovatele.<br/><a href=""><b>Více informací</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Až pro vás bude služba ochrany<br/> e-mailů připravena, zašleme vám upozornění. <a href=\"\"><b>Více informací</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše pozvánka se tu objeví, až na vás budeme připraveni. Chcete <a href=\"\"><b>dostat upozornění,</b></a> až dorazí? <br/><a href=\"\"><b>Více informací</b></a> o ochraně e-mailů.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Až pro vás bude služba ochrany<br/> e-mailů připravena, zašleme vám upozornění. <a href=""><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše pozvánka se tu objeví, až na vás budeme připraveni. Chcete <a href=""><b>dostat upozornění,</b></a> až dorazí? <br/><a href=""><b>Více informací</b></a> o ochraně e-mailů.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Byli jste pozváni!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuj trackery e-mailů a skryj svou adresu<br/>bez změny e-mailového poskytovatele.<br/><a href=\"\"><b>Více informací</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuj trackery e-mailů a skryj svou adresu<br/>bez změny e-mailového poskytovatele.<br/><a href=""><b>Více informací</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobní adresa Duck</string>

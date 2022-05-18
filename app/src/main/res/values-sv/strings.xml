@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href=\"\">Läs mer</a><u/>]]>
+        <![CDATA[DuckDuckGo blockerar många spårare automatiskt. Med Global Privacy Control (GPC) kan du dessutom be deltagande webbplatser att begränsa försäljning eller delning av dina personuppgifter till andra företag. <u><a href="">Läs mer</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Enklare E-postintegritet.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du står på listan!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=\"\"><b>Mer information</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=\"\"><b>få ett meddelande</b></a> när den kommer?<br/><a href=\"\"><b>Mer information</b></a> om e-postskydd.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=""><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=""><b>få ett meddelande</b></a> när den kommer?<br/><a href=""><b>Mer information</b></a> om e-postskydd.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du är inbjuden!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personlig Duck-adress</string>

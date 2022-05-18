@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href=\"\">Saznajte više</a><u/>]]>
+        <![CDATA[DuckDuckGo automatski blokira mnoge alate za indeksiranje. S globalnom kontrolom privatnosti (GPC) također možete tražiti od web-mjesta koja sudjeluju u programu da ograniče prodaju ili dijeljenje vaših osobnih podataka drugim tvrtkama. <u><a href="">Saznajte više</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalna kontrola privatnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalna kontrola privatnosti (GPC)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Zaštita privatnosti e-pošte, na jednostavan način.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu bez promjene pružatelja usluga e-pošte. <br/><a href=\"\"><b>Saznaj više</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu bez promjene pružatelja usluga e-pošte. <br/><a href=""><b>Saznaj više</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Na popisu ste!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Poslat ćemo vam obavijest kada<br/>zaštita e-pošte bude spremna za vas. <a href=\"\"><b>Saznajte više</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaša pozivnica pojavit će se ovdje kad budemo spremni za vas. Želite li <a href=\"\"><b>dobiti obavijest</b></a> kad stigne?<br/><a href=\"\"><b>Saznajte više</b></a> o zaštiti e-pošte.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Poslat ćemo vam obavijest kada<br/>zaštita e-pošte bude spremna za vas. <a href=""><b>Saznajte više</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaša pozivnica pojavit će se ovdje kad budemo spremni za vas. Želite li <a href=""><b>dobiti obavijest</b></a> kad stigne?<br/><a href=""><b>Saznajte više</b></a> o zaštiti e-pošte.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Pozvani ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu <br/>bez promjene pružatelja usluga e-pošte.<br/> <a href=\"\"><b>Saznaj više</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu <br/>bez promjene pružatelja usluga e-pošte.<br/> <a href=""><b>Saznaj više</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobna Duck adresa</string>

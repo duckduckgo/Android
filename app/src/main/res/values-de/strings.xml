@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href=\"\">Mehr erfahren</a><u/>]]>
+        <![CDATA[DuckDuckGo blockiert viele Tracker automatisch. Mit Global Privacy Control (GPC) können Sie auch teilnehmende Websites bitten, das Verkaufen oder Teilen Ihrer personenbezogenen Daten mit anderen Unternehmen einzuschränken. <u><a href="">Mehr erfahren</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=\"\"><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=\"\"><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=""><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=""><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=""><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>

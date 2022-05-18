@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href=\"\">Več</a><u/>]]>
+        <![CDATA[DuckDuckGo samodejno blokira številne sledilce. Z globalnim nadzorom zasebnosti (GPC) lahko tudi od sodelujočih spletnih mest zahtevate, da omejijo prodajo ali skupno rabo vaših osebnih podatkov z drugimi podjetji. <u><a href="">Več</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globalni nadzor zasebnosti (GPC)</string>
     <string name="globalPrivacyControlToggle">Globalni nadzor zasebnosti (GPC)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=\"\"><b>Več</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=\"\"><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=\"\"><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=""><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=""><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=""><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Povabljeni ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osebni naslov Duck</string>

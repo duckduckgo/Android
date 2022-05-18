@@ -611,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href=\"\">Sužinoti daugiau</a><u/>]]>
+        <![CDATA[„DuckDuckGo“ automatiškai blokuoja daugelį stebėjimo priemonių. Pasirinkę visuotinę privatumo kontrolę (VPK), taip pat galite paprašyti dalyvaujančių svetainių apriboti jūsų asmeninių duomenų prekybą ir bendrinimą su kitomis įmonėmis. <u><a href="">Sužinoti daugiau</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Visuotinė privatumo kontrolė (VPK)</string>
     <string name="globalPrivacyControlToggle">Visuotinė privatumo kontrolė (VPK)</string>
@@ -666,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=\"\"><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=\"\"><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href="">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=""><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=""><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Esate pakviesti!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Asmeninis „Duck“ adresas</string>

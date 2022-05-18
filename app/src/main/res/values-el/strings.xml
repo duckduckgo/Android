@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[Το DuckDuckGo αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href=\"\">Μάθετε περισσότερα</a><u/>]]>
+        <![CDATA[Το DuckDuckGo αποκλείει αυτόματα πολλές εφαρμογές παρακολούθησης. Με τον Παγκόσμιο έλεγχο απορρήτου (GPC), μπορείτε επίσης να ζητήσετε από τους ιστότοπους που συμμετέχουν να περιορίσουν την πώληση ή την κοινοποίηση των προσωπικών δεδομένων σας σε άλλες εταιρείες. <u><a href="">Μάθετε περισσότερα</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
     <string name="globalPrivacyControlToggle">Παγκόσμιος έλεγχος απορρήτου (GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Ιδιωτικότητα email, απλοποιημένη.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Είστε στη λίστα!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Θα σας στείλουμε ειδοποίηση όταν<br/> θα είναι έτοιμη για σας η Προστασία email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Η πρόσκλησή σας θα εμφανιστεί εδώ όταν θα είναι έτοιμη για σας. Θέλετε να <a href=\"\"><b>λάβετε ειδοποίηση</b></a> μόλις φτάσει;<br/><a href=\"\"><b>Μάθετε περισσότερα</b></a> σχετικά με την Προστασία email.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Θα σας στείλουμε ειδοποίηση όταν<br/> θα είναι έτοιμη για σας η Προστασία email. <a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Η πρόσκλησή σας θα εμφανιστεί εδώ όταν θα είναι έτοιμη για σας. Θέλετε να <a href=""><b>λάβετε ειδοποίηση</b></a> μόλις φτάσει;<br/><a href=""><b>Μάθετε περισσότερα</b></a> σχετικά με την Προστασία email.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Έχετε προσκληθεί!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Προσωπική διεύθυνση Duck</string>

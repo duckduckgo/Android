@@ -599,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href=\"\">További részletek</a><u/>]]>
+        <![CDATA[A DuckDuckGo számos nyomkövetőt automatikusan blokkol. A Global Privacy Control (GPC, Globális Adatvédelmi Ellenőrzés) segítségével arra is megkérheted a részt vevő webhelyeket, hogy korlátozzák személyes adataid eladását vagy megosztását más vállalatokkal. <u><a href="">További részletek</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
     <string name="globalPrivacyControlToggle">Nemzetközi adatvédelmi szabályozás (Global Privacy Control, GPC)</string>
@@ -654,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mail adatvédelem, egyszerűsítve.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Rajta vagy a listán!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Értesítést küldünk, amikor<br/> az e-mail védelem készen áll számodra. <a href=\"\"><b>További részletek</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Meghívód itt jelenik meg, amikor készen állunk. Szeretnél <a href=\"\"><b>értesítést kapni</b></a>, amikor megérkezik?<br/><a href=\"\"><b>További tudnivalók</b></a> az e-mail védelemről.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Értesítést küldünk, amikor<br/> az e-mail védelem készen áll számodra. <a href=""><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Meghívód itt jelenik meg, amikor készen állunk. Szeretnél <a href=""><b>értesítést kapni</b></a>, amikor megérkezik?<br/><a href=""><b>További tudnivalók</b></a> az e-mail védelemről.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Meghívót kaptál!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/>anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=\"\"><b>További részletek</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Tiltsd le az e-mail nyomkövetőket, és rejtsd el a címedet<br/>anélkül, hogy e-mail-szolgáltatót váltanál.<br/><a href=""><b>További részletek</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Személyes Duck cím</string>
