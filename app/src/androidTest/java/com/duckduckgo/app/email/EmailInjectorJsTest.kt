@@ -199,7 +199,7 @@ class EmailInjectorJsTest {
     @SdkSuppress(minSdkVersion = 24)
     fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsDisabledAndEmailIsNotSignedInThenDoNotEvaluateJsCode() {
         whenever(mockEmailManager.isSignedIn()).thenReturn(false)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
+        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(false)
 
         val jsToEvaluate = getNotifySignOutJsToEvaluate()
         val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))

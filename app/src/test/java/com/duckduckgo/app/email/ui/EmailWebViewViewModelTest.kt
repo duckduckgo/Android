@@ -17,6 +17,7 @@
 package com.duckduckgo.app.email.ui
 
 import app.cash.turbine.test
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.email.ui.EmailWebViewViewModel.Command.EmailSignEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,12 +25,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class EmailWebViewViewModelTest {
+
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
 
     private val mockEmailManager: EmailManager = mock()
     private lateinit var testee: EmailWebViewViewModel
