@@ -88,6 +88,13 @@ class TrackingProtectionExclusionListActivity :
         observeViewModel()
 
         deviceShieldPixels.didShowExclusionListActivity()
+
+        lifecycle.addObserver(viewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -97,7 +104,8 @@ class TrackingProtectionExclusionListActivity :
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val restoreDefault = menu?.findItem(R.id.restoreDefaults)
-        restoreDefault?.isEnabled = viewModel.userMadeChanges()
+        // onPrepareOptionsMenu is called when overflow menu is being displayed, that's why this can be an imperative call
+        restoreDefault?.isEnabled = viewModel.canRestoreDefaults()
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -183,6 +191,7 @@ class TrackingProtectionExclusionListActivity :
                 command.position
             )
             is Command.LaunchFeedback -> reportBreakage.launch(command.reportBreakageScreen)
+            else -> { /* noop */ }
         }
     }
 
@@ -210,11 +219,6 @@ class TrackingProtectionExclusionListActivity :
             supportFragmentManager,
             ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE
         )
-    }
-
-    override fun onPause() {
-        viewModel.onLeavingScreen()
-        super.onPause()
     }
 
     override fun onBackPressed() {
