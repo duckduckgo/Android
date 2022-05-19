@@ -160,7 +160,6 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
 
     override fun onResume(owner: LifecycleOwner) {
-        super.onResume(owner)
         refreshSnapshot.refresh()
     }
 
