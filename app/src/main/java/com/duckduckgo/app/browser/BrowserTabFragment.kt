@@ -78,7 +78,6 @@ import com.duckduckgo.app.browser.favorites.QuickAccessDragTouchItemListener
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
-import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -98,12 +97,10 @@ import com.duckduckgo.app.browser.webview.enableDarkMode
 import com.duckduckgo.app.browser.webview.enableLightMode
 import com.duckduckgo.app.cta.ui.*
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.email.EmailAutofillTooltipFragment
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.model.orderedTrackingEntities
 import com.duckduckgo.app.global.view.*
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -161,6 +158,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
@@ -169,6 +168,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.history.NavigationHistorySheet
+import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.downloads.DownloadsFileActions
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
@@ -875,6 +879,8 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+            is ShowBackNavigationHistory -> showBackNavigationHistory(it)
+            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
         }
     }
 
@@ -2041,6 +2047,28 @@ class BrowserTabFragment :
         viewModel.onUserClickCtaSecondaryButton()
     }
 
+    private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {
+        activity?.let { context ->
+            NavigationHistorySheet(
+                context, viewLifecycleOwner, faviconManager, tabId, history,
+                object : NavigationHistorySheetListener {
+                    override fun historicalPageSelected(stackIndex: Int) {
+                        viewModel.historicalPageSelected(stackIndex)
+                    }
+                }
+            ).show()
+        }
+    }
+
+    private fun navigateBackHistoryStack(index: Int) {
+        val stepsToMove = (index + 1) * -1
+        webView?.goBackOrForward(stepsToMove)
+    }
+
+    fun onLongPressBackButton() {
+        viewModel.onUserLongPressedBack()
+    }
+
     private fun launchHideTipsDialog(
         context: Context,
         cta: Cta
@@ -2204,6 +2232,9 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.backMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
+                }
+                onMenuItemLongClicked(view.backMenuItem) {
+                    viewModel.onUserLongPressedBack()
                 }
                 onMenuItemClicked(view.refreshMenuItem) {
                     viewModel.onRefreshRequested()

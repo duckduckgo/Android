@@ -98,7 +98,6 @@ class DefaultVpnFeatureRemover @Inject constructor(
 
     private fun removeNotificationChannels() {
         notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_ALERTS_CHANNEL_ID)
-        notificationManager.deleteNotificationChannel(AndroidDeviceShieldAlertNotificationBuilder.VPN_STATUS_CHANNEL_ID)
     }
 
     private fun resetAppTPOnboarding() {

@@ -29,7 +29,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.core.view.ViewCompat.requestApplyInsets
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -78,6 +78,18 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         }
     }
 
+    internal fun applyStyle() {
+        activity?.window?.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+            statusBarColor = Color.WHITE
+        }
+        ViewCompat.requestApplyInsets(longDescriptionContainer)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         defaultCard = activity?.findViewById(R.id.defaultCard)
@@ -104,18 +116,6 @@ class DefaultBrowserPage : OnboardingPageFragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVED_STATE_LAUNCHED_DEFAULT, userTriedToSetDDGAsDefault)
-    }
-
-    private fun applyStyle() {
-        activity?.window?.apply {
-            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
-            statusBarColor = Color.WHITE
-        }
-        requestApplyInsets(longDescriptionContainer)
     }
 
     private fun observeViewModel() {

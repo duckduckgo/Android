@@ -28,7 +28,9 @@ import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.feature.*
 import com.duckduckgo.mobile.android.vpn.health.AppHealthMonitor
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
+import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.duckduckgo.vpn.internal.databinding.ActivityVpnInternalSettingsBinding
 import com.duckduckgo.vpn.internal.feature.bugreport.VpnBugReporter
 import com.duckduckgo.vpn.internal.feature.logs.DebugLoggingReceiver
@@ -38,6 +40,7 @@ import com.duckduckgo.vpn.internal.feature.rules.ExceptionRulesDebugActivity
 import com.duckduckgo.vpn.internal.feature.trackers.DeleteTrackersDebugReceiver
 import com.duckduckgo.vpn.internal.feature.transparency.TransparencyModeDebugReceiver
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,6 +58,9 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var vpnStateMonitor: VpnStateMonitor
+
+    @Inject
+    lateinit var appTrackerRepository: AppTrackerRepository
 
     private val binding: ActivityVpnInternalSettingsBinding by viewBinding()
     private var transparencyModeDebugReceiver: TransparencyModeDebugReceiver? = null
@@ -106,11 +112,53 @@ class VpnInternalSettingsActivity : DuckDuckGoActivity() {
         setupBadHealthMonitoring()
         setupConfigSection()
         setupUiElementsState()
+        setupAppProtectionSection()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         transparencyModeDebugReceiver?.let { it.unregister() }
+    }
+
+    private fun setupAppProtectionSection() {
+        appTrackerRepository.getAppExclusionListFlow()
+            .combine(appTrackerRepository.getManualAppExclusionListFlow()) { exclusionList, manualList ->
+                val mappedExclusionList = exclusionList.map { it.packageId }
+                val mappedManualExclusionList = manualList.map { it.packageId }
+
+                val canProtect = mappedManualExclusionList.isEmpty() ||
+                    !mappedManualExclusionList.zip(mappedExclusionList).all { (one, other) -> one == other }
+                val canRestoreDefaults = mappedManualExclusionList.isNotEmpty()
+
+                canProtect to canRestoreDefaults
+            }
+            .flowOn(Dispatchers.IO)
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach {
+                val canProtect = it.first
+                val canRestoreDefaults = it.second
+
+                binding.restoreDefaultAppProtections.isEnabled = canRestoreDefaults
+                binding.protectAllApps.isEnabled = canProtect
+            }
+            .flowOn(Dispatchers.Main)
+            .launchIn(lifecycleScope)
+
+        binding.protectAllApps.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                for (excludedPackage in appTrackerRepository.getAppExclusionList()) {
+                    appTrackerRepository.manuallyEnabledApp(excludedPackage.packageId)
+                }
+                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+            }
+        }
+
+        binding.restoreDefaultAppProtections.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                appTrackerRepository.restoreDefaultProtectedList()
+                TrackerBlockingVpnService.restartVpnService(this@VpnInternalSettingsActivity)
+            }
+        }
     }
 
     private fun setupUiElementsState() {

@@ -58,6 +58,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -108,8 +110,8 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.app.usage.search.SearchCountDao
-import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.autofill.store.AutofillStore
+import com.duckduckgo.autofill.Credentials
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -177,8 +179,14 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
-) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
+) : WebViewClientListener,
+    EditSavedSiteListener,
+    HttpAuthenticationListener,
+    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
+    UrlExtractionListener,
+    ViewModel(),
+    NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -425,7 +433,8 @@ class BrowserTabViewModel @Inject constructor(
 
         class InjectCredentials(val url: String, val credentials: Credentials) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
-
+        class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
+        class NavigateToHistory(val historyStackIndex: Int) : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -771,6 +780,19 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         pixel.fire(pixelName, params)
+    }
+
+    fun onUserLongPressedBack() {
+        val navigationHistory = webNavigationState?.navigationHistory ?: return
+
+        // we don't want the current page, so drop the first entry. Also don't want too many, so take only most recent ones.
+        val stack = navigationHistory
+            .drop(1)
+            .take(10)
+
+        if (stack.isNotEmpty()) {
+            command.value = ShowBackNavigationHistory(stack)
+        }
     }
 
     fun onUserSubmittedQuery(
@@ -2125,6 +2147,10 @@ class BrowserTabViewModel @Inject constructor(
         globalLayoutState.value = Browser(isNewTabState = false)
     }
 
+    override fun historicalPageSelected(stackIndex: Int) {
+        command.value = NavigateToHistory(stackIndex)
+    }
+
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
 
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -2637,6 +2663,11 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun linkOpenedInNewTab(): Boolean {
         return isLinkOpenedInNewTab
+    }
+
+    @VisibleForTesting
+    fun updateWebNavigation(webNavigationState: WebNavigationState) {
+        this.webNavigationState = webNavigationState
     }
 
     companion object {
