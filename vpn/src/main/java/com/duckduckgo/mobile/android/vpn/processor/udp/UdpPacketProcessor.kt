@@ -242,7 +242,7 @@ private inline fun udpRunnable(crossinline block: () -> Unit): Runnable {
                 Timber.w(e, "Failed to process UDP network-to-device packet")
             } catch (e: InterruptedException) {
                 Timber.v("Thread interrupted")
-                break
+                return@Runnable
             }
         }
     }
