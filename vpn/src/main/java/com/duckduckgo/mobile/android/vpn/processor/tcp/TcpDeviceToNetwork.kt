@@ -92,6 +92,7 @@ class TcpDeviceToNetwork(
                 Timber.w(e, "Failed to process TCP device-to-network packet")
             } catch (e: InterruptedException) {
                 Timber.w(e, "Thread is interrupted")
+                return
             }
         }
     }
