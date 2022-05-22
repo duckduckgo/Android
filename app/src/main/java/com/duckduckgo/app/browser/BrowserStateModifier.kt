@@ -34,7 +34,8 @@ class BrowserStateModifier {
             canChangeBrowsingMode = true,
             canFindInPage = true,
             addFavorite = HighlightableButton.Visible(),
-            addToHomeEnabled = true
+            addToHomeEnabled = true,
+            canPrintPage = true
         )
     }
 
@@ -51,7 +52,8 @@ class BrowserStateModifier {
             addFavorite = HighlightableButton.Visible(enabled = false),
             canChangeBrowsingMode = false,
             addToHomeEnabled = false,
-            canGoBack = false
+            canGoBack = false,
+            canPrintPage = false
         )
     }
 }

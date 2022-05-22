@@ -225,7 +225,8 @@ class BrowserTabViewModel @Inject constructor(
         val isEmailSignedIn: Boolean = false,
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
-        val forceRenderingTicker: Long = System.currentTimeMillis()
+        val forceRenderingTicker: Long = System.currentTimeMillis(),
+        val canPrintPage: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -1136,7 +1137,8 @@ class BrowserTabViewModel @Inject constructor(
             canChangeBrowsingMode = true,
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
-            showDaxIcon = shouldShowDaxIcon(url, true)
+            showDaxIcon = shouldShowDaxIcon(url, true),
+            canPrintPage = domain != null
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -1313,7 +1315,8 @@ class BrowserTabViewModel @Inject constructor(
             showSearchIcon = true,
             showClearButton = true,
             canFireproofSite = false,
-            showDaxIcon = false
+            showDaxIcon = false,
+            canPrintPage = false
         )
         Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }

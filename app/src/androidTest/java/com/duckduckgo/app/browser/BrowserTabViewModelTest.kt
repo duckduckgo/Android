@@ -2512,6 +2512,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserBrowsingPressesBackThenCannotPrintPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canPrintPage)
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCanGoForward() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
@@ -2565,6 +2572,14 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanPrint() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canPrintPage)
     }
 
     @Test

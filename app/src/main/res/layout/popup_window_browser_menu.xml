@@ -104,13 +104,6 @@
                 app:iconDrawable="@drawable/ic_share_16_1" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
-                    android:id="@+id/printPageMenuItem"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:labelText="@string/printMenuTitle"
-                    app:iconDrawable="@drawable/ic_print_16" />
-
-            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/addBookmarksMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -162,6 +155,13 @@
                 android:layout_height="wrap_content"
                 app:labelText="@string/findInPageMenuTitle"
                 app:iconDrawable="@drawable/ic_find_search_16" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                    android:id="@+id/printPageMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/printMenuTitle"
+                    app:iconDrawable="@drawable/ic_print_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
