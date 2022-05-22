@@ -16,15 +16,13 @@
 
 package com.duckduckgo.bandwidth.store
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Database(
-    exportSchema = true,
-    version = 2,
-    entities = [BandwidthEntity::class, BandwidthBucketEntity::class]
+@Entity(tableName = "bandwidth_buckets")
+data class BandwidthBucketEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val timestamp: Long,
+    val appBytes: Long,
+    val totalBytes: Long
 )
-
-abstract class BandwidthDatabase : RoomDatabase() {
-    abstract fun bandwidthDao(): BandwidthDao
-}

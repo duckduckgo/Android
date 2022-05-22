@@ -19,11 +19,21 @@ package com.duckduckgo.bandwidth.impl
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class BandwidthPixelName(override val pixelName: String) : Pixel.PixelName {
-    BANDWIDTH("m_bandwidth")
+    BANDWIDTH("m_bandwidth"),
+    APPTP_BANDWIDTH("m_apptp_bandwidth")
 }
 
 object BandwidthPixelParameter {
     const val PERIOD = "period"
     const val APP_BYTES = "app_bytes"
     const val TOTAL_BYTES = "total_bytes"
+}
+
+object AppTpBandwidthPixelParameter {
+    const val PERIOD = "period"
+    const val TOTAL_APP_KILOBYTES = "total_app_kilobytes"
+    const val TOTAL_DEVICE_KILOBYTES = "total_device_kilobytes"
+    const val TIMESTAMPS = "timestamps"
+    const val APP_KILOBYTES = "app_kilobytes"
+    const val DEVICE_KILOBYTES = "device_kilobytes"
 }
