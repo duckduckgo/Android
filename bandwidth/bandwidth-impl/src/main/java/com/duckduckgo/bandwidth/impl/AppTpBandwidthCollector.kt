@@ -45,9 +45,9 @@ class AppTpBandwidthCollector @Inject constructor(
 
     private var job = ConflatedJob()
 
-    private suspend fun storeBucket(bucket: BandwidthData) = withContext(dispatcherProvider.io()) {
-        Timber.v("AppTpBandwidthCollector - Storing bucket $bucket")
-        bandwidthRepository.insertBucket(bucket)
+    private suspend fun persistBucket(bucket: BandwidthData) = withContext(dispatcherProvider.io()) {
+        Timber.v("AppTpBandwidthCollector - Persisting bucket $bucket")
+        bandwidthRepository.persistBucket(bucket)
     }
 
     companion object {
@@ -65,7 +65,7 @@ class AppTpBandwidthCollector @Inject constructor(
         job += coroutineScope.launch {
             while (true) {
                 val currentBandwidthData = bandwidthRepository.getCurrentBandwidthData()
-                storeBucket(BandwidthData(appBytes = currentBandwidthData.appBytes, totalBytes = currentBandwidthData.totalBytes))
+                persistBucket(BandwidthData(appBytes = currentBandwidthData.appBytes, totalBytes = currentBandwidthData.totalBytes))
 
                 val buckets = bandwidthRepository.getBuckets()
                 if (buckets?.size == NUM_BUCKETS_PER_PERIOD) {
