@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Stäng flik</string>
     <string name="tabClosed">Fliken är stängd</string>
     <string name="tabClosedUndo">Återställ</string>
+    <string name="downloadsMenuItemTitle">Nerladdningar</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Webbplatsens integritetsskydd</string>
@@ -265,6 +265,7 @@
     <string name="delete">Ta bort</string>
     <string name="edit">Redigera</string>
     <string name="remove">Ta bort</string>
+    <string name="removeAll">Ta bort alla</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Sök DuckDuckGo</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hjälp oss förbättra appen!</string>
-    <string name="surveyCtaDescription">Delta i vår korta, anonyma undersökning och dela med dig av dina åsikter.</string>
+    <string name="surveyCtaDescription">Delta i vår korta undersökning och dela med dig av dina åsikter.</string>
     <string name="surveyCtaLaunchButton">Delta i undersökningen</string>
     <string name="surveyCtaDismissButton">Nej tack</string>
     <string name="surveyActivityTitle">Användarundersökning</string>
@@ -465,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Vi kör!</string>
     <string name="daxIntroCtaText"><![CDATA[Prova sedan att besöka en av dina favoritwebbplatser! <br/><br/>Jag blockerar trackers så att de inte kan spionera på dig. Jag ska också uppgradera säkerheten för din uppkoppling om det är möjligt. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Du klarar det här!<br/><br/>Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👍]]></string>
-    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma och jag lagrar aldrig din sökhistorik. Någonsin. 🙌</string>
+    <string name="daxSerpCtaText">Dina DuckDuckGo-sökningar är anonyma och jag sparar aldrig din sökhistorik. Någonsin. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ och <b>%1$d annan</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
         <item quantity="other"><![CDATA[ och <b>%1$d andra</b> försökte spåra dig här. <br/><br/>Jag blockerade dem!<br/><br/> ☝️Du kan kontrollera adressfältet för att se vem som försöker spåra dig när du besöker en ny webbplats.️]]></item>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Bra att veta! Eftersom %1$s äger %2$s kan jag inte hindra dem från att se din aktivitet här.&lt;br/&gt;&lt;br/&gt;Men om du surfar med hjälp av mig kan jag se till att %3$s får veta mindre om dig genom att blockera deras spårare på många andra webbplatser.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Fortsätt</string>
+    <string name="downloadConfirmationContinue">Spara till Nerladdningar</string>
     <string name="downloadConfirmationSaveFileTitle">Spara %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Behåll båda</string>
     <string name="downloadConfirmationReplaceOldFileText">Byt ut</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Brandsäkra webbplatser</string>
     <string name="settingsFireproofWebsites">Brandsäkra webbplatser</string>
     <string name="fireproofWebsiteMenuTitleAdd">Brandsäkra den här webbplatsen</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäkrad!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; är nu brandsäkrad</string>
     <string name="fireproofWebsiteSnackbarAction">Återställ</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Är du säker på att du vill ta bort &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Webbplatser använder kakor för att hålla dig inloggad. Om du brandsäkrar en webbplats kommer kakor inte att raderas och du förblir inloggad även efter att du har använt brännarknappen. Vi blockerar fortfarande tredje parters spårare som finns på brandsäkrade webbplatser.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Brandsäkra</string>
     <string name="fireproofWebsiteLoginDialogNegative">Inte nu</string>
     <string name="fireproofWebsiteItemsSectionTitle">Brandsäkra webbplatser</string>
+    <string name="fireproofWebsiteEmptyListHint">Inga brandsäkra webbplatser ännu</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Brandsäkra webbplatser vid inloggning</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Brandsäkring har tagits bort för alla webbplatser</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Fråga varje gång</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Alltid</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Aldrig</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Du kan när som helst ändra denna inställning i Inställningar.</string>
     <string name="disableLoginDetectionDialogPositive">INAKTIVERA</string>
     <string name="disableLoginDetectionDialogNegative">AVBRYT</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Brandsäkring har tagits bort för &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Brandsäkra webbplatser automatiskt vid inloggning?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Om du brandsäkrar webbplatser förblir du inloggad även efter att du har använt brännarknappen. Du kan alltid ändra det här senare i inställningarna. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Brandsäkra alltid</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Brandsäkra den här webbplatsen</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Inte nu</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation för brännarknapp</string>
@@ -644,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Enklare E-postintegritet.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du står på listan!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=\"\"><b>Mer information</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=\"\"><b>få ett meddelande</b></a> när den kommer?<br/><a href=\"\"><b>Mer information</b></a> om e-postskydd.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi skickar dig ett meddelande när<br/>e-postskydd är redo för dig. <a href=""><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Din inbjudan visas här när vi är redo att ta emot dig. Vill du <a href=""><b>få ett meddelande</b></a> när den kommer?<br/><a href=""><b>Mer information</b></a> om e-postskydd.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du är inbjuden!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=\"\"><b>Mer information</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blockera e-postspårare och dölj din adress utan att byta e-postleverantör. <a href=""><b>Mer information</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personlig Duck-adress</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widgeten %1$s har lagts till på startsidan</string>
     <string name="settingsAddHomeScreenWidget">Widget på startsidan</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Surfa privat med vår app för Mac</string>
+    <string name="macos_settings_description_list">Du står på listan!</string>
+    <string name="macos_settings_description_ready">Tillgänglig för nerladdning på Mac</string>
+    <string name="macos_settings_title">DuckDuckGo-appen för dator</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Nerladdningar</string>
+    <string name="downloadsActivityTitle">Nerladdningar</string>
+    <string name="downloadsActivityNoItemsDescription">Inga filer har laddats ner ännu</string>
+    <string name="downloadsShareTitle">Dela med …</string>
+    <string name="downloadsDownloadFinishedActionName">Öppna</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Filen finns inte längre</string>
+    <string name="downloadsItemMenuShare">Dela</string>
+    <string name="downloadsItemMenuDelete">Ta bort</string>
+    <string name="downloadsItemMenuCancel">Avbryt</string>
+    <string name="downloadsActivityMenuDeleteAll">Radera allt</string>
+    <string name="downloadsFileDeletedMessage">Raderade %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Alla filer raderade</string>
+    <string name="downloadsMoreOptionsContentDescription">Fler alternativ för %1$s</string>
+    <string name="downloadsUndoActionName">Återställ</string>
+    <string name="downloadsStateInProgress">Pågår …</string>
+
 </resources>

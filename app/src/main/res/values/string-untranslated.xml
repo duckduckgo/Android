@@ -16,49 +16,10 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <!-- MacOs Settings -->
-    <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_description_list">You\'re on the list!</string>
-    <string name="macos_settings_description_ready">Available for download on Mac</string>
-    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
-
-    <!-- Downloads -->
-    <string name="downloadsMenuItem">Downloads</string>
-    <string name="downloadsActivityTitle">Downloads</string>
-    <string name="downloadsActivityNoItemsDescription">No files downloaded yet</string>
-    <string name="downloadsShareTitle">Share with…</string>
-    <string name="downloadsDownloadFinishedActionName">Open</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
-    <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
-    <string name="downloadsItemMenuShare">Share</string>
-    <string name="downloadsItemMenuDelete">Delete</string>
-    <string name="downloadsItemMenuCancel">Cancel</string>
-    <string name="downloadsActivityMenuDeleteAll">Delete All</string>
-    <string name="downloadsFileDeletedMessage">Deleted %s</string>
-    <string name="downloadsAllFilesDeletedMessage">All files deleted</string>
-    <string name="downloadsMoreOptionsContentDescription">More options for %s</string>
-    <string name="downloadsUndoActionName">Undo</string>
-    <string name="downloadsStateInProgress">In progress…</string>
-
-    <!-- Tabs -->
-    <string name="downloadsMenuItemTitle">Downloads</string>
-
-    <!-- Fireproof websites -->
-    <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
-    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
-    <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
-    <string name="automaticFireproofWebsiteLoginDialogDescription">Fireproofing sites will keep you signed in after using the Fire Button. You can always change this later in Settings. </string>
-    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
-    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Fireproof this site</string>
-    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Not now</string>
-    <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
-
-    <!-- Dialogs -->
-    <string name="removeAll">Remove All</string>
-
     <!-- App Tracking Protection -->
     <string name="atp_SettingsTitle">App Tracking Protection</string>
     <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
     <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
     <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
+
 </resources>

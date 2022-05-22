@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Затваряне на раздел</string>
     <string name="tabClosed">Разделът е затворен</string>
     <string name="tabClosedUndo">Отмяна</string>
+    <string name="downloadsMenuItemTitle">Изтеглени файлове</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Защита на поверителността на сайта</string>
@@ -265,6 +265,7 @@
     <string name="delete">Изтриване</string>
     <string name="edit">Редактиране</string>
     <string name="remove">Премахване</string>
+    <string name="removeAll">Премахване на всички</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Търсене с DuckDuckGo</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Помогнете ни да подобрим приложението!</string>
-    <string name="surveyCtaDescription">Попълнете нашата кратка, анонимна анкета и споделете отзивите си.</string>
+    <string name="surveyCtaDescription">Попълнете нашата кратка анкета и споделете отзивите си.</string>
     <string name="surveyCtaLaunchButton">Попълнете анкетата</string>
     <string name="surveyCtaDismissButton">Не, благодаря</string>
     <string name="surveyActivityTitle">Потребителска анкета</string>
@@ -465,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Да го направим!</string>
     <string name="daxIntroCtaText"><![CDATA[Сега, отворете един от любимите си сайтове! <br/><br/>Ще блокирам тракерите, за да не ви шпионират. Също така ще надстроя сигурността на вашата връзка, ако е възможно. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Вече разбрахте!<br/><br/>Запомнете: Всеки път, когато сърфирате с мен, аз подрязвам крилцата на някоя досадна реклама. 👍]]></string>
-    <string name="daxSerpCtaText">Търсенията ви в DuckDuckGo са анонимни и никога не съхранявам историята на вашите търсения. Никога. 🙌</string>
+    <string name="daxSerpCtaText">Търсенето в DuckDuckGo е анонимно и никога не съхранявам историята на Вашите търсения. Никога. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ и още <b>%1$d друг</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
         <item quantity="other"><![CDATA[ и още <b>%1$d други</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Внимание! Тъй като %1$s притежава %2$s, той вижда какво правите тук а аз не мога да предотвратя това.&lt;br/&gt;&lt;br/&gt;Но ако сърфирайте с мен, като цяло мога да намаля информацията, която %3$s научава за вас, като блокирам неговите тракери на много други сайтове.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Продължи</string>
+    <string name="downloadConfirmationContinue">Запазване в Изтеглени файлове</string>
     <string name="downloadConfirmationSaveFileTitle">Запази %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Запазване на двете</string>
     <string name="downloadConfirmationReplaceOldFileText">Заместване</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Огнеустойчиви сайтове</string>
     <string name="settingsFireproofWebsites">Огнеустойчиви сайтове</string>
     <string name="fireproofWebsiteMenuTitleAdd">Направи този сайт огнеустойчив</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; вече е огнеустойчив!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; вече е огнеустойчив</string>
     <string name="fireproofWebsiteSnackbarAction">Отмяна</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Сигурни ли сте, че искате да изтриете &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Уеб сайтовете разчитат на бисквитки, за да поддържат сесията ви активна. Когато направите сайта огнеустойчив, бисквитките няма да бъдат изтрити и ще останете вписани, дори след като използвате огнения бутон. Ние все пак блокираме тракери на трети страни, които се намират на огнеустойчиви сайтове.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Направи огнеустойчив</string>
     <string name="fireproofWebsiteLoginDialogNegative">Не сега</string>
     <string name="fireproofWebsiteItemsSectionTitle">Огнеустойчиви сайтове</string>
+    <string name="fireproofWebsiteEmptyListHint">Все още няма огнеустойчиви уебсайтове</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Прави уебсайтовете огнеустойчиви при влизане</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Премахнати са всички уебсайтове от списъка с огнеустойчиви</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Премахната огнеустойчивост за &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Питай всеки път</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Винаги</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Никога</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Можете да промените това предпочитание по всяко време в настройките.</string>
     <string name="disableLoginDetectionDialogPositive">ЗАБРАНИ</string>
     <string name="disableLoginDetectionDialogNegative">ОТМЕНИ</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Премахната огнеустойчивост за &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Да се правят ли уебсайтовете огнеустойчиви автоматично при влизане?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Ако направите сайтовете огнеустойчиви, ще останете вписани, след като използвате огнения бутон. Можете винаги да промените това по-късно в Настройки. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Винаги прави огнеустойчиви</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Направи този сайт огнеустойчив</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Не сега</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Анимация на огнения бутон</string>
@@ -644,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Поверителност на имейла с две думи.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Вече сте в списъка!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=\"\"><b>Научете повече</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=\"\"><b>получите известие</b></a>, когато пристигне?<br/><a href=\"\"><b>Научете повече</b></a> за защитата на имейли.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=""><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=""><b>получите известие</b></a>, когато пристигне?<br/><a href=""><b>Научете повече</b></a> за защитата на имейли.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Получихте покана!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик. <a href=\"\"><b>Научете повече</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Личен Duck адрес</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Уиджетът %1$s е добавен към началния екран</string>
     <string name="settingsAddHomeScreenWidget">Уиджет на началния екран</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Сърфирайте поверително с нашето приложение за Mac</string>
+    <string name="macos_settings_description_list">Вече сте в списъка!</string>
+    <string name="macos_settings_description_ready">Налично за изтегляне на Mac</string>
+    <string name="macos_settings_title">Приложение DuckDuckGo за настолен компютър</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Изтеглени файлове</string>
+    <string name="downloadsActivityTitle">Изтеглени файлове</string>
+    <string name="downloadsActivityNoItemsDescription">Все още няма изтеглени файлове</string>
+    <string name="downloadsShareTitle">Споделяне с…</string>
+    <string name="downloadsDownloadFinishedActionName">Отваряне</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Файлът вече не съществува</string>
+    <string name="downloadsItemMenuShare">Споделяне</string>
+    <string name="downloadsItemMenuDelete">Изтриване</string>
+    <string name="downloadsItemMenuCancel">Отмени</string>
+    <string name="downloadsActivityMenuDeleteAll">Изтриване на всички</string>
+    <string name="downloadsFileDeletedMessage">Изтрито %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Всички файлове са изтрити</string>
+    <string name="downloadsMoreOptionsContentDescription">Още опции за %1$s</string>
+    <string name="downloadsUndoActionName">Отмяна</string>
+    <string name="downloadsStateInProgress">В процес на изпълнение…</string>
+
 </resources>
