@@ -22,13 +22,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter.CredentialsViewHolder
 import timber.log.Timber
 
-class CredentialsAdapter(
-    val credentials: List<Credentials>,
-    val onCredentialSelected: (credentials: Credentials) -> Unit
+class CredentialsPickerRecyclerAdapter(
+    val credentials: List<LoginCredentials>,
+    val onCredentialSelected: (credentials: LoginCredentials) -> Unit
 ) : Adapter<CredentialsViewHolder>() {
 
     override fun onCreateViewHolder(
@@ -54,8 +55,8 @@ class CredentialsAdapter(
     }
 
     override fun getItemCount(): Int = credentials.size
-}
 
-class CredentialsViewHolder(val root: View) : ViewHolder(root) {
-    val textView: TextView = root.findViewById(R.id.username)
+    class CredentialsViewHolder(val root: View) : ViewHolder(root) {
+        val textView: TextView = root.findViewById(R.id.username)
+    }
 }

@@ -124,7 +124,6 @@ import com.duckduckgo.autofill.*
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
 import com.duckduckgo.autofill.CredentialSavePickerDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_SAVE
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
@@ -176,8 +175,7 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.TAG
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -386,11 +384,11 @@ class BrowserTabFragment :
     }
 
     private val autofillCallback = object : Callback {
-        override fun onCredentialsAvailableToInject(credentials: List<Credentials>) {
+        override fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>) {
             showAutofillDialogChooseCredentials(credentials)
         }
 
-        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: Credentials) {
+        override fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
             showAutofillDialogSaveCredentials(currentUrl, credentials)
         }
     }
@@ -1510,20 +1508,20 @@ class BrowserTabFragment :
         browserAutofill.addJsInterface(it, autofillCallback)
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-            val selectedCredentials = result.getParcelable<Credentials>("creds") ?: return@setFragmentResultListener
+            val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
             val originalUrl = result.getString("url") ?: return@setFragmentResultListener
             viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
             Timber.w("Fragment result received: %s %s", RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
-            val selectedCredentials = result.getParcelable<Credentials>("creds") ?: return@setFragmentResultListener
+            val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
             val originalUrl = result.getString("url") ?: return@setFragmentResultListener
             viewModel.saveCredentials(originalUrl, selectedCredentials)
         }
     }
 
-    private fun injectAutofillCredentials(url: String, credentials: Credentials) {
+    private fun injectAutofillCredentials(url: String, credentials: LoginCredentials) {
         webView?.let {
             if (it.url != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
@@ -1533,19 +1531,19 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showAutofillDialogChooseCredentials(credentials: List<Credentials>) {
+    private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>) {
         Timber.e("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
-        val dialog = credentialAutofillDialogFactory.credentialAutofillPickerDialog(url, credentials).asDialogFragment()
-        showDialogHidingPrevious(dialog, CredentialAutofillPickerDialog.TAG)
+        val dialog = credentialAutofillDialogFactory.credentialAutofillPickerDialog(url, credentials)
+        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialAutofillPickerDialog.TAG)
     }
 
-    private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: Credentials) {
+    private fun showAutofillDialogSaveCredentials(currentUrl: String, credentials: LoginCredentials) {
         val url = webView?.url ?: return
         if (url != currentUrl) return
 
-        val dialog = credentialAutofillDialogFactory.credentialAutofillSavingDialog(url, credentials).asDialogFragment()
-        showDialogHidingPrevious(dialog, CredentialSavePickerDialog.TAG)
+        val dialog = credentialAutofillDialogFactory.credentialAutofillSavingDialog(url, credentials)
+        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialSavePickerDialog.TAG)
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {

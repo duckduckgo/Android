@@ -27,7 +27,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_SAVE
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -74,7 +74,7 @@ class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), Cred
 
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<Credentials>("creds")!!
+    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>("creds")!!
 
     private fun getOriginalUrl() = arguments?.getString("url")!!
 
@@ -86,7 +86,7 @@ class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), Cred
 
         fun instance(
             url: String,
-            credentials: Credentials
+            credentials: LoginCredentials
         ): CredentialAutofillSavingDialogFragment {
 
             val fragment = CredentialAutofillSavingDialogFragment()

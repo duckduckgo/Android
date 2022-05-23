@@ -20,6 +20,8 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.utils.ConflatedJob
+import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
@@ -56,6 +58,7 @@ class AutofillJavascriptInterface(
             }
 
             val credentials = autofillStore.getCredentials(url)
+            // .map { it.asJsCredentials() }
 
             withContext(Dispatchers.Main) {
                 callback?.onCredentialsAvailableToInject(credentials)
@@ -111,7 +114,8 @@ class AutofillJavascriptInterface(
             val currentUrl = currentUrl() ?: return@launch
 
             val request = requestParser.parseStoreFormDataRequest(data).credentials
-            val credentials = Credentials(request.username, request.password)
+            val jsCredentials = JavascriptCredentials(request.username, request.password)
+            val credentials = jsCredentials.asLoginCredentials(currentUrl)
 
             withContext(Dispatchers.Main) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
@@ -119,10 +123,27 @@ class AutofillJavascriptInterface(
         }
     }
 
-    fun injectCredentials(credentials: Credentials) {
+    fun injectCredentials(credentials: LoginCredentials) {
         getAutofillDataJob += coroutineScope.launch {
-            autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(credentials))
+            val jsCredentials = credentials.asJsCredentials()
+            autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
         }
+    }
+
+    private fun LoginCredentials.asJsCredentials(): JavascriptCredentials {
+        return JavascriptCredentials(
+            username = username,
+            password = password
+        )
+    }
+
+    private fun JavascriptCredentials.asLoginCredentials(url: String): LoginCredentials {
+        return LoginCredentials(
+            id = null,
+            domain = url,
+            username = username,
+            password = password
+        )
     }
 
     private suspend fun currentUrl(): String? {

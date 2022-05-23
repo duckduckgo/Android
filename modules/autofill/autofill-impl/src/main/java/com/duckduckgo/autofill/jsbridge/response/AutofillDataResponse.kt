@@ -22,7 +22,7 @@ data class AutofillDataResponse(
 ) {
 
     data class CredentialSuccessResponse(
-        val username: String = "",
+        val username: String? = "",
         val password: String? = null
     )
 }

@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill
 
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 
 interface CredentialAutofillPickerDialog {
     fun asDialogFragment(): DialogFragment
@@ -36,14 +37,18 @@ interface CredentialSavePickerDialog {
     }
 }
 
-interface CredentialAutofillDialogFactory {
-    fun credentialAutofillPickerDialog(
-        url: String,
-        credentials: List<Credentials>
-    ): CredentialAutofillPickerDialog
+interface CredentialManagementDialog {
+    fun asDialogFragment(): DialogFragment
 
-    fun credentialAutofillSavingDialog(
-        url: String,
-        credentials: Credentials
-    ): CredentialSavePickerDialog
+    companion object {
+        const val TAG = "CredentialManagementDialog"
+    }
+}
+
+interface CredentialAutofillDialogFactory {
+
+    fun credentialAutofillPickerDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog
+
+    fun credentialAutofillSavingDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog
+
 }

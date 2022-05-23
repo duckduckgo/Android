@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill
+package com.duckduckgo.autofill.domain.app
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Credentials(
-    val username: String,
-    val password: String
+data class LoginCredentials(
+    val id: Int? = null,
+    val domain: String?,
+    val username: String?,
+    val password: String?
 ) : Parcelable

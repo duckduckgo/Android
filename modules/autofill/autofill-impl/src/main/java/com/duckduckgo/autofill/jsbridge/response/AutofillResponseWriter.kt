@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.jsbridge.response
 
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.response.AutofillAvailableInputTypesResponse.AvailableInputSuccessResponse
 import com.duckduckgo.autofill.jsbridge.response.AutofillDataResponse.CredentialSuccessResponse
 import com.squareup.moshi.Moshi
@@ -26,7 +26,7 @@ class AutofillResponseWriter(val moshi: Moshi) {
     private val availableInputTypesAdapter = moshi.adapter(AutofillAvailableInputTypesResponse::class.java).indent("  ")
     private val autofillDataAdapter = moshi.adapter(AutofillDataResponse::class.java).indent("  ")
 
-    fun generateResponseGetAutofillData(credentials: Credentials): String {
+    fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
         val credentialsResponse = CredentialSuccessResponse(credentials.username, credentials.password)
         val topLevelResponse = AutofillDataResponse(success = credentialsResponse)
         return autofillDataAdapter.toJson(topLevelResponse)

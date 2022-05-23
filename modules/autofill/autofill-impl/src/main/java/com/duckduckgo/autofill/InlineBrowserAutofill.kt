@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill
 
 import android.webkit.WebView
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import timber.log.Timber
 
 class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInterface) : BrowserAutofill {
@@ -35,7 +36,7 @@ class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInt
         autofillInterface.callback = callback
     }
 
-    override fun injectCredentials(credentials: Credentials) {
+    override fun injectCredentials(credentials: LoginCredentials) {
         autofillInterface.injectCredentials(credentials)
     }
 }

@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill
+package com.duckduckgo.autofill.domain.javascript
 
-import android.webkit.WebView
-import com.duckduckgo.autofill.domain.app.LoginCredentials
-
-interface BrowserAutofill {
-
-    fun isEnabled(): Boolean
-
-    fun addJsInterface(webView: WebView, callback: Callback)
-
-    fun injectCredentials(credentials: LoginCredentials)
-}
-
-interface Callback {
-    fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>)
-    fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
-}
+data class JavascriptCredentials(
+    val username: String?,
+    val password: String?
+)

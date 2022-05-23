@@ -19,15 +19,15 @@ package com.duckduckgo.autofill.ui
 import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 
 class CredentialAutofillDialogAndroidFactory : CredentialAutofillDialogFactory {
 
-    override fun credentialAutofillPickerDialog(url: String, credentials: List<Credentials>): CredentialAutofillPickerDialog {
+    override fun credentialAutofillPickerDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog {
         return CredentialAutofillPickerDialogFragment.instance(url, credentials)
     }
 
-    override fun credentialAutofillSavingDialog(url: String, credentials: Credentials): CredentialSavePickerDialog {
+    override fun credentialAutofillSavingDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog {
         return CredentialAutofillSavingDialogFragment.instance(url, credentials)
     }
 }
