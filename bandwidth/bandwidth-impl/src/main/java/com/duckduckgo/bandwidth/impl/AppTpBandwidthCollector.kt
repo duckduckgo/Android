@@ -54,7 +54,7 @@ class AppTpBandwidthCollector @Inject constructor(
         private const val BUCKET_PERIOD_MINUTES: Long = 5
         private const val REPORTING_PERIOD_MINUTES: Long = 60
         private const val NUM_BUCKETS_PER_PERIOD: Int = (REPORTING_PERIOD_MINUTES / BUCKET_PERIOD_MINUTES).toInt() + 1
-        private const val KB = 1024.0
+        private const val KB = 1024
     }
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
@@ -86,21 +86,21 @@ class AppTpBandwidthCollector @Inject constructor(
         buckets: List<BandwidthData>
     ): Map<String, String> {
         val period = buckets[NUM_BUCKETS_PER_PERIOD - 1].timestamp - buckets[0].timestamp
-        val totalAppKiloBytes = String.format("%.3f", ((buckets[NUM_BUCKETS_PER_PERIOD - 1].appBytes - buckets[0].appBytes) / KB))
-        val totalDeviceKiloBytes = String.format("%.3f", ((buckets[NUM_BUCKETS_PER_PERIOD - 1].totalBytes - buckets[0].totalBytes) / KB))
+        val totalAppKiloBytes = (buckets[NUM_BUCKETS_PER_PERIOD - 1].appBytes - buckets[0].appBytes) / KB
+        val totalDeviceKiloBytes = (buckets[NUM_BUCKETS_PER_PERIOD - 1].totalBytes - buckets[0].totalBytes) / KB
 
-        val appKilobytes = arrayListOf<String>()
-        val deviceKilobytes = arrayListOf<String>()
+        val appKilobytes = arrayListOf<Long>()
+        val deviceKilobytes = arrayListOf<Long>()
 
         for (i in 0..buckets.size - 2) {
-            appKilobytes.add(String.format("%.3f", (buckets[i + 1].appBytes - buckets[i].appBytes) / KB))
-            deviceKilobytes.add(String.format("%.3f", (buckets[i + 1].totalBytes - buckets[i].totalBytes) / KB))
+            appKilobytes.add((buckets[i + 1].appBytes - buckets[i].appBytes) / KB)
+            deviceKilobytes.add((buckets[i + 1].totalBytes - buckets[i].totalBytes) / KB)
         }
 
         return mapOf(
             AppTpBandwidthPixelParameter.PERIOD to period.toString(),
-            AppTpBandwidthPixelParameter.TOTAL_APP_KILOBYTES to totalAppKiloBytes,
-            AppTpBandwidthPixelParameter.TOTAL_DEVICE_KILOBYTES to totalDeviceKiloBytes,
+            AppTpBandwidthPixelParameter.TOTAL_APP_KILOBYTES to totalAppKiloBytes.toString(),
+            AppTpBandwidthPixelParameter.TOTAL_DEVICE_KILOBYTES to totalDeviceKiloBytes.toString(),
             AppTpBandwidthPixelParameter.TIMESTAMPS to buckets.map { it.timestamp }.joinToString(","),
             AppTpBandwidthPixelParameter.APP_KILOBYTES to appKilobytes.joinToString(","),
             AppTpBandwidthPixelParameter.DEVICE_KILOBYTES to deviceKilobytes.joinToString(",")
