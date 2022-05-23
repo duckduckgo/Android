@@ -875,20 +875,6 @@ class BrowserTabFragment :
         }
     }
 
-    private fun launchPrint(url: String) {
-        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            val jobName = url
-            webView?.createPrintDocumentAdapter(jobName)?.let { printAdapter ->
-                val wrapper = PrintDocumentAdapterWrapper(printAdapter, viewModel)
-                printManager.print(
-                    jobName,
-                    wrapper,
-                    PrintAttributes.Builder().build()
-                )
-            }
-        }
-    }
-
     private fun extractUrlFromAmpLink(initialUrl: String) {
         context?.let {
             val client = urlExtractingWebViewClient.get()
@@ -2224,7 +2210,6 @@ class BrowserTabFragment :
                     viewModel.openAppLink()
                 }
                 onMenuItemClicked(view.printPageMenuItem) {
-                    //TODO move to viewModel: pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
                     viewModel.onPrintSelected()
                 }
             }
@@ -2748,6 +2733,20 @@ class BrowserTabFragment :
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Could not open DownloadManager settings")
             toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+        }
+    }
+
+    private fun launchPrint(url: String) {
+        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+            val jobName = url
+            webView?.createPrintDocumentAdapter(jobName)?.let { printAdapter ->
+                val wrapper = PrintDocumentAdapterWrapper(printAdapter, viewModel)
+                printManager.print(
+                    jobName,
+                    wrapper,
+                    PrintAttributes.Builder().build()
+                )
+            }
         }
     }
 

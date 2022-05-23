@@ -2118,6 +2118,7 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onPrintSelected() {
         url?.let {
+            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
             command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
         }
     }
