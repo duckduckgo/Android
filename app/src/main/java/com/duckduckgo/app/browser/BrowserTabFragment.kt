@@ -869,9 +869,6 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is Command.PrintLink -> launchPrint(it.url)
-            is Command.ShowPrintingConfirmation -> {
-                browserLayout.makeSnackbarWithNoBottomInset("Finished printing document", Snackbar.LENGTH_LONG).show()
-            }
         }
     }
 
@@ -2740,7 +2737,7 @@ class BrowserTabFragment :
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             val jobName = url
             webView?.createPrintDocumentAdapter(jobName)?.let { printAdapter ->
-                val wrapper = PrintDocumentAdapterWrapper(printAdapter, viewModel)
+                val wrapper = PrintDocumentAdapterWrapper(printAdapter)
                 printManager.print(
                     jobName,
                     wrapper,

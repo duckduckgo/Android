@@ -23,15 +23,11 @@ import android.print.PageRange
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 
-class PrintDocumentAdapterWrapper (
-    val delegate: PrintDocumentAdapter,
-    val listener: PrintDocumentListener
-) : PrintDocumentAdapter() {
+class PrintDocumentAdapterWrapper(private val delegate: PrintDocumentAdapter) : PrintDocumentAdapter() {
 
     override fun onFinish() {
         super.onFinish()
         delegate.onFinish()
-        listener.showPrintingFinishedMessage()
     }
 
     override fun onLayout(
