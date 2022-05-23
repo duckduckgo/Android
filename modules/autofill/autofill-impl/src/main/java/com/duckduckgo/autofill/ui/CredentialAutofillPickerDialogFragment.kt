@@ -27,9 +27,9 @@ import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.ui.credential.CredentialsAdapter
+import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -63,7 +63,7 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
 
         recyclerView = view.findViewById(R.id.availableCredentialsRecycler)
         recyclerView.adapter =
-            CredentialsAdapter(getAvailableCredentials()) { selectedCredentials ->
+            CredentialsPickerRecyclerAdapter(getAvailableCredentials()) { selectedCredentials ->
                 val result =
                     Bundle().also {
                         it.putString("url", getOriginalUrl())
@@ -74,7 +74,7 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
             }
     }
 
-    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<Credentials>("creds")!!
+    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>("creds")!!
 
     private fun getOriginalUrl() = arguments?.getString("url")!!
 
@@ -86,10 +86,10 @@ class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), Cred
 
         fun instance(
             url: String,
-            credentials: List<Credentials>
+            credentials: List<LoginCredentials>
         ): CredentialAutofillPickerDialogFragment {
 
-            val cr = ArrayList<Credentials>(credentials)
+            val cr = ArrayList<LoginCredentials>(credentials)
 
             val fragment = CredentialAutofillPickerDialogFragment()
             fragment.arguments =

@@ -58,6 +58,7 @@ class AutofillJavascriptInterface(
             }
 
             val credentials = autofillStore.getCredentials(url)
+            // .map { it.asJsCredentials() }
 
             withContext(Dispatchers.Main) {
                 callback?.onCredentialsAvailableToInject(credentials)

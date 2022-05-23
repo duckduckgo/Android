@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.store
 
 import androidx.core.net.toUri
-import com.duckduckgo.autofill.Credentials
+import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
@@ -33,39 +33,26 @@ import timber.log.Timber
 
 interface AutofillStore {
 
-    suspend fun getCredentials(rawUrl: String): List<Credentials>
+    suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
 
-    suspend fun saveCredentials(rawUrl: String, credentials: Credentials)
+    suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials)
 
-}
+    suspend fun getAllCredentials(): List<LoginCredentials>
 
-private fun String.extractOriginFromUrl(): String {
-    val url = this.toUri()
-    val scheme = if (url.scheme != null) "${url.scheme}://" else ""
-
-    return String.format("%s%s", scheme, url.host).also {
-        Timber.i("Extracted origin from URL.\ninput=%s\noutput=%s\nhost=%s", this, it, url.host)
-    }
 }
 
 class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
 
-    override suspend fun getCredentials(rawUrl: String): List<Credentials> {
+    override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         val url = rawUrl.extractOriginFromUrl()
 
-        val storedCredentials = secureStorage.getWebsiteLoginCredentialsForDomain(url).firstOrNull()
-        val credentialsToReturn = mutableListOf<Credentials>()
+        val storedCredentials = secureStorage.getWebsiteLoginCredentialsForDomain(url).firstOrNull() ?: emptyList()
+        Timber.v("Found %d credentials for %s", storedCredentials.size, url)
 
-        storedCredentials?.forEach {
-            val username = it.details.username ?: return@forEach
-            val password = it.password ?: return@forEach
-            credentialsToReturn.add(Credentials(username, password))
-        }
-
-        return credentialsToReturn
+        return storedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun saveCredentials(rawUrl: String, credentials: Credentials) {
+    override suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials) {
         val url = rawUrl.extractOriginFromUrl()
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
@@ -78,43 +65,34 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         }
     }
 
-}
-
-class MockAutofillStore : AutofillStore {
-
-    private val data: MutableMap<String, List<Credentials>> = mutableMapOf()
-
-    override suspend fun getCredentials(rawUrl: String): List<Credentials> {
-        val url = rawUrl.extractOriginFromUrl()
-        return data[url] ?: emptyList()
+    override suspend fun getAllCredentials(): List<LoginCredentials> = withContext(Dispatchers.IO) {
+        val savedCredentials = secureStorage.getAllWebsiteLoginCredentials().firstOrNull() ?: emptyList()
+        return@withContext savedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun saveCredentials(rawUrl: String, credentials: Credentials) {
-        val url = rawUrl.extractOriginFromUrl()
-        val updatedList = generateList(url, credentials)
-        data[url] = updatedList
+    private fun WebsiteLoginCredentials.toLoginCredentials(): LoginCredentials {
+        return LoginCredentials(
+            id = details.id,
+            domain = details.domain,
+            username = details.username,
+            password = password
+        )
     }
 
-    private fun generateList(rawUrl: String, newCredentials: Credentials): List<Credentials> {
-        val url = rawUrl.extractOriginFromUrl()
-        val existingCredentials = data[url] ?: return listOf(newCredentials)
+    private fun String.extractOriginFromUrl(): String {
+        val url = this.toUri()
+        val scheme = if (url.scheme != null) "${url.scheme}://" else ""
 
-        return mutableListOf<Credentials>().also { list ->
-            list.addAll(existingCredentials)
-            list.add(newCredentials)
+        return String.format("%s%s", scheme, url.host).also {
+            Timber.i("Extracted origin from URL.\ninput=%s\noutput=%s\nhost=%s", this, it, url.host)
         }
     }
+
 }
 
 @Module
 @ContributesTo(AppScope::class)
 class AutofillStoreModule {
-
-//    @Provides
-//    @SingleInstanceIn(AppScope::class)
-//    fun autofillStore(): AutofillStore {
-//        return MockAutofillStore()
-//    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
