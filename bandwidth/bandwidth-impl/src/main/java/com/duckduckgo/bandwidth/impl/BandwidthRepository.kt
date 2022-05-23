@@ -29,7 +29,7 @@ interface BandwidthRepository {
     fun persistBandwidthData(bandwidthData: BandwidthData)
     fun getStoredBandwidthData(): BandwidthData?
     fun persistBucket(bucket: BandwidthData)
-    fun getBuckets(): List<BandwidthData>?
+    fun getBuckets(): List<BandwidthData>
     fun deleteAllBuckets()
 }
 
@@ -76,8 +76,8 @@ class RealBandwidthRepository @Inject constructor(
         )
     }
 
-    override fun getBuckets(): List<BandwidthData>? {
-        return database.bandwidthDao().getBuckets()?.map {
+    override fun getBuckets(): List<BandwidthData> {
+        return database.bandwidthDao().getBuckets().map {
             BandwidthData(it.timestamp, it.appBytes, it.totalBytes)
         }
     }

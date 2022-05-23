@@ -34,7 +34,7 @@ interface BandwidthDao {
     fun insertBucket(bandwidthBucketEntity: BandwidthBucketEntity)
 
     @Query("SELECT * FROM bandwidth_buckets")
-    fun getBuckets(): List<BandwidthBucketEntity>?
+    fun getBuckets(): List<BandwidthBucketEntity>
 
     @Query("delete from bandwidth_buckets")
     fun deleteAllBuckets()

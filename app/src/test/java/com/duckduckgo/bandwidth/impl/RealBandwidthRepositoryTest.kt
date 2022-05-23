@@ -108,7 +108,7 @@ class RealBandwidthRepositoryTest {
 
         val buckets = testee.getBuckets()
 
-        val expectedBandwidthData = buckets!!.map { BandwidthData(it.timestamp, it.appBytes, it.totalBytes) }
+        val expectedBandwidthData = buckets.map { BandwidthData(it.timestamp, it.appBytes, it.totalBytes) }
 
         assertEquals(expectedBandwidthData[0], buckets[0])
         assertEquals(expectedBandwidthData[1], buckets[1])
