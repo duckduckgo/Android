@@ -55,7 +55,6 @@ object SecureStorageModule {
             .addMigrations(*ALL_MIGRATIONS)
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
-            .allowMainThreadQueries()
             .build()
     }
 
