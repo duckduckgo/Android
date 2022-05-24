@@ -73,11 +73,6 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassName) {
             addType(
                 TypeSpec.classBuilder(pluginPointClassName)
-                    .addAnnotation(
-                        AnnotationSpec.builder(singleInstanceAnnotationFqName.asClassName(module))
-                            .addMember("%T::class", scope.asClassName())
-                            .build()
-                    )
                     .addSuperinterface(pluginPointFqName.asClassName(module).parameterizedBy(pluginClassName))
                     .primaryConstructor(
                         PropertySpec
@@ -150,7 +145,6 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
         private val pluginPointFqName = FqName("com.duckduckgo.app.global.plugins.PluginPoint")
         private val kotlinCollectionFqName = FqName("kotlin.collections.Collection")
         private val daggerSetFqName = FqName("com.duckduckgo.di.DaggerSet")
