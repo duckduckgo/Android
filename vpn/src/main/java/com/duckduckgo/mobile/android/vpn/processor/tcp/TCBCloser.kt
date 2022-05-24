@@ -42,7 +42,7 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
         isFIN: Boolean,
     ) {
         val buffer = ByteBufferPool.acquire()
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         var responseAck = tcb.acknowledgementNumberToClient + payloadSize
         val responseSeq = tcb.acknowledgementNumberToServer

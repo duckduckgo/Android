@@ -58,6 +58,7 @@ import xyz.hexene.localvpn.Packet.TCPHeader.SYN
 import xyz.hexene.localvpn.TCB
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
@@ -79,13 +80,28 @@ class TcpDeviceToNetwork(
     private val recentAppTrackerCache: RecentAppTrackerCache,
     private val vpnCoroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter
-) {
+) : Runnable {
+
+    override fun run() {
+        while (!Thread.interrupted()) {
+            try {
+                deviceToNetworkProcessing()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process TCP device-to-network packet")
+            } catch (e: InterruptedException) {
+                Timber.w(e, "Thread is interrupted")
+                return
+            }
+        }
+    }
 
     /**
      * Reads from the device-to-network queue. For any packets in this queue, a new DatagramChannel is created and the packet is written.
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
-    fun deviceToNetworkProcessing() {
+    private fun deviceToNetworkProcessing() {
         val packet = queues.tcpDeviceToNetwork.take() ?: return
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue()
@@ -157,7 +173,7 @@ class TcpDeviceToNetwork(
         val payloadBuffer = connectionParams.packet.backingBuffer
         val totalPacketLength = payloadBuffer.limit()
         // TCB should always exist here
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         Timber.v(
             "New packet. %s. %s. %s. Packet length: %d.  Data length: %d",
@@ -258,7 +274,7 @@ class TcpDeviceToNetwork(
         val packet = connectionParams.packet
         val payloadBuffer = packet.backingBuffer
         // we should never get here with null TCB
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         synchronized(tcb) {
             val payloadSize = payloadBuffer.limit() - payloadBuffer.position()
@@ -334,7 +350,7 @@ class TcpDeviceToNetwork(
         payloadSize: Int
     ) {
         // we should never get here with null TCB
-        val tcb = requireNotNull(connectionParams.tcb())
+        val tcb = connectionParams.tcbOrClose() ?: return
         if (isATrackerRetryRequest) {
             tcb.enterGhostingMode()
             processPacketInGhostingMode(tcb)

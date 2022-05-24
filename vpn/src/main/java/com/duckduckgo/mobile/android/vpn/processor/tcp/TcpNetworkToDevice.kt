@@ -46,6 +46,7 @@ import xyz.hexene.localvpn.TCB.TCBStatus.SYN_RECEIVED
 import xyz.hexene.localvpn.TCB.TCBStatus.SYN_SENT
 import java.io.IOException
 import java.nio.ByteBuffer
+import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
 import java.nio.channels.SelectionKey.OP_CONNECT
 import java.nio.channels.Selector
@@ -60,14 +61,28 @@ class TcpNetworkToDevice(
     private val tcbCloser: TCBCloser,
     private val vpnCoroutineScope: CoroutineScope,
     private val healthMetricCounter: HealthMetricCounter
-) {
+) : Runnable {
+
+    override fun run() {
+        while (!Thread.interrupted()) {
+            try {
+                networkToDeviceProcessing()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process TCP network-to-device packet")
+            } catch (e: InterruptedException) {
+                Timber.w(e, "Thread is interrupted")
+                return
+            }
+        }
+    }
 
     /**
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
-    @Suppress("BlockingMethodInNonBlockingContext")
-    fun networkToDeviceProcessing() {
+    private fun networkToDeviceProcessing() {
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {

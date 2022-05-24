@@ -44,7 +44,7 @@ import java.nio.channels.CancelledKeyException
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
-import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newSingleThreadExecutor
 import java.util.concurrent.TimeUnit
 
 class UdpPacketProcessor @AssistedInject constructor(
@@ -63,66 +63,38 @@ class UdpPacketProcessor @AssistedInject constructor(
         fun build(networkChannelCreator: NetworkChannelCreator): UdpPacketProcessor
     }
 
-    private var pollJobDeviceToNetwork: Job? = null
-    private var pollJobNetworkToDevice: Job? = null
+    private val pollJobDeviceToNetwork = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
+    private val pollJobNetworkToDevice = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
 
     val selector: Selector = Selector.open()
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
-        if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
-        }
+        pollJobDeviceToNetwork.execute(
+            udpRunnable {
+                deviceToNetworkProcessing()
+            }
+        )
 
-        if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
-        }
+        pollJobNetworkToDevice.execute(
+            udpRunnable {
+                networkToDeviceProcessing()
+            }
+        )
     }
 
     fun stop() {
         Timber.i("Stopping ${this::class.simpleName}")
 
-        pollJobDeviceToNetwork?.cancel()
-        pollJobDeviceToNetwork = null
-
-        pollJobNetworkToDevice?.cancel()
-        pollJobNetworkToDevice = null
+        pollJobDeviceToNetwork.shutdownNow()
+        pollJobDeviceToNetwork.shutdownNow()
 
         channelCache.evictAll()
-    }
-
-    private fun pollForDeviceToNetworkWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        try {
-            while (pollJobDeviceToNetwork?.isActive == true) {
-                try {
-                    deviceToNetworkProcessing()
-                } catch (e: IOException) {
-                    Timber.w(e, "Failed to process UDP device-to-network packet")
-                } catch (e: CancelledKeyException) {
-                    Timber.w(e, "Failed to process UDP device-to-network packet")
-                }
-            }
-        } finally {
-            Timber.i("Evicting all from the channel cache")
-            channelCache.evictAll()
-        }
-    }
-
-    private suspend fun pollForNetworkToDeviceWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobNetworkToDevice?.isActive == true) {
-            try {
-                networkToDeviceProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process UDP network-to-device packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process UDP network-to-device packet")
-            }
-        }
     }
 
     /**
@@ -206,13 +178,12 @@ class UdpPacketProcessor @AssistedInject constructor(
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun networkToDeviceProcessing() {
+    private fun networkToDeviceProcessing() {
         val startTime = SystemClock.uptimeMillis()
         val channelsReady = selector.select(TimeUnit.SECONDS.toMillis(1))
 
         if (channelsReady == 0) {
-            delay(10)
+            Thread.sleep(10)
             return
         }
 
@@ -257,4 +228,22 @@ class UdpPacketProcessor @AssistedInject constructor(
         val datagramChannel: DatagramChannel,
         val originatingApp: OriginatingApp
     )
+}
+
+// convenience method to share the try-catch block
+private inline fun udpRunnable(crossinline block: () -> Unit): Runnable {
+    return java.lang.Runnable {
+        while (!Thread.interrupted()) {
+            try {
+                block()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process UDP network-to-device packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process UDP network-to-device packet")
+            } catch (e: InterruptedException) {
+                Timber.v("Thread interrupted")
+                return@Runnable
+            }
+        }
+    }
 }

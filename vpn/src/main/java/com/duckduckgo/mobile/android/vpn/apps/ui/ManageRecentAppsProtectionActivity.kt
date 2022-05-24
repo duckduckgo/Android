@@ -81,6 +81,13 @@ class ManageRecentAppsProtectionActivity :
 
         bindViews()
         observeViewModel()
+
+        lifecycle.addObserver(viewModel)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(viewModel)
     }
 
     private fun bindViews() {
@@ -176,11 +183,6 @@ class ManageRecentAppsProtectionActivity :
             supportFragmentManager,
             ManuallyEnableAppProtectionDialog.TAG_MANUALLY_EXCLUDE_APPS_ENABLE
         )
-    }
-
-    override fun onPause() {
-        viewModel.onLeavingScreen()
-        super.onPause()
     }
 
     override fun onBackPressed() {

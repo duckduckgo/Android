@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Fechar separador</string>
     <string name="tabClosed">Separador fechado</string>
     <string name="tabClosedUndo">Anular</string>
+    <string name="downloadsMenuItemTitle">Transferências</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Proteção de Privacidade do Site</string>
@@ -264,7 +264,8 @@
     <string name="dialogSave">Guardar</string>
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
-    <string name="remove">Eliminar</string>
+    <string name="remove">Remover</string>
+    <string name="removeAll">Remover tudo</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Pesquisar no DuckDuckGo</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ajude-nos a melhorar a aplicação!</string>
-    <string name="surveyCtaDescription">Responda ao nosso inquérito breve e anónimo e partilhe os seus comentários.</string>
+    <string name="surveyCtaDescription">Faça o nosso pequeno inquérito e partilhe o seu feedback.</string>
     <string name="surveyCtaLaunchButton">Responder ao inquérito</string>
     <string name="surveyCtaDismissButton">Não, obrigado</string>
     <string name="surveyActivityTitle">Inquérito aos utilizadores</string>
@@ -465,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Vamos lá!</string>
     <string name="daxIntroCtaText"><![CDATA[A seguir, experimente visitar um dos seus sites favoritos! <br/><br/>Irei bloquear os rastreadores para que eles não possam espiar o que faz. Também irei atualizar a segurança da sua ligação, se possível. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Você consegue!<br/><br/>Lembre-se: sempre que navega comigo, um anúncio estranho perde as suas asas. 👍]]></string>
-    <string name="daxSerpCtaText">A suas pesquisas no DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. 🙌</string>
+    <string name="daxSerpCtaText">As suas pesquisas DuckDuckGo são anónimas e eu nunca guardo o seu histórico de pesquisas. Nunca. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ e <b>mais %1$d</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
         <item quantity="other"><![CDATA[ e<b>%1$doutros</b> estavam a tentar rastreá-lo aqui.<br/><br/>Eu bloqueei-os!<br/><br/>☝️Pode verificar a barra de endereços para ver quem está a tentar rastreá-lo quando visita um novo site.]]></item>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Alerta! Desde que %1$s possui %2$s, não consigo impedi-los de ver a sua atividade. &lt;br/&gt;&lt;br/&gt;Mas navegue comigo e posso reduzir que %3$s saiba sobre si ao bloquear os seus rastreadores em muitos outros sites.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continuar</string>
+    <string name="downloadConfirmationContinue">Guardar em Transferências</string>
     <string name="downloadConfirmationSaveFileTitle">Guardar %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Manter os dois</string>
     <string name="downloadConfirmationReplaceOldFileText">Substituir</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Sites com barreira de segurança</string>
     <string name="settingsFireproofWebsites">Sites com barreira de segurança</string>
     <string name="fireproofWebsiteMenuTitleAdd">Coloque uma barreira de segurança neste site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já tem barreira de segurança!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; já tem Barreira de Segurança</string>
     <string name="fireproofWebsiteSnackbarAction">Anular</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Tem a certeza de que deseja eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Os websites confiam nos cookies para o manter ligado. Quando se utiliza uma barreira de segurança num site, os cookies não serão apagados e permanecerá ligado, mesmo depois de utilizar o botão de segurança. Ainda bloqueamos rastreadores de terceiros encontrados em sites com barreiras de segurança.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Barreira de segurança</string>
     <string name="fireproofWebsiteLoginDialogNegative">Agora não</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sites com barreira de segurança</string>
+    <string name="fireproofWebsiteEmptyListHint">Ainda sem sites com Barreira de segurança</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Sites com barreira de segurança ao entrar</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Barreiras de segurança removida para todos os sites</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Barreira de segurança removida para &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Pergunte todas as vezes</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Sempre</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nunca</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Pode alterar esta preferência nas definições em qualquer altura.</string>
     <string name="disableLoginDetectionDialogPositive">DESATIVAR</string>
     <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Barreira de segurança removida para &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Sites com barreira de segurança automaticamente ao entrar?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Os sites com barreira de segurança irão manter a sessão iniciada após a utilização do Botão de Proteção. Pode sempre alterar isto mais tarde nas Definições. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Sempre com barreira de segurança</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Coloque uma barreira de segurança neste site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Agora não</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animação do Botão de Fogo</string>
@@ -589,7 +599,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href=\"\">Saiba mais</a><u/>]]>
+        <![CDATA[DuckDuckGo bloqueia automaticamente muitos rastreadores. Com o Controlo de Privacidade Global (CPG), pode também solicitar aos websites participantes para restringir a venda ou a partilha dos seus dados pessoais com outras empresas. <u><a href="">Saiba mais</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Controlo Global de Privacidade (CGP)</string>
     <string name="globalPrivacyControlToggle">Controlo Global de Privacidade (CGP)</string>
@@ -644,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">A privacidade dos e-mails, simplificada.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço, sem mudar o fornecedor de correio eletrónico.<br/><a href=\"\"><b>Saiba mais</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço, sem mudar o fornecedor de correio eletrónico.<br/><a href=""><b>Saiba mais</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Já está na lista!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Enviaremos uma notificação quando a Proteção<br/> de E-mail estiver pronta para si. <a href=\"\"><b>Saiba mais</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[O seu convite aparecerá aqui quando estivermos prontos para si. Quer <a href=\"\"><b>receber uma notificação</b></a> quando chegar?<br/><a href=\"\"><b>Saiba mais</b></a> sobre a Proteção de E-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Enviaremos uma notificação quando a Proteção<br/> de E-mail estiver pronta para si. <a href=""><b>Saiba mais</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[O seu convite aparecerá aqui quando estivermos prontos para si. Quer <a href=""><b>receber uma notificação</b></a> quando chegar?<br/><a href=""><b>Saiba mais</b></a> sobre a Proteção de E-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Está convidado!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço,<br/>sem mudar o fornecedor de correio eletrónico.<br/><a href=\"\"><b>Saiba mais</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloqueie os rastreadores de correio eletrónico e oculte o seu endereço,<br/>sem mudar o fornecedor de correio eletrónico.<br/><a href=""><b>Saiba mais</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Endereço Duck pessoal</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget adicionado ao ecrã inicial</string>
     <string name="settingsAddHomeScreenWidget">Widget da página principal</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Navegue em privado com a nossa aplicação para Mac</string>
+    <string name="macos_settings_description_list">Já está na lista!</string>
+    <string name="macos_settings_description_ready">Disponível para descarregar no Mac</string>
+    <string name="macos_settings_title">Aplicação para desktop DuckDuckGo</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Transferências</string>
+    <string name="downloadsActivityTitle">Transferências</string>
+    <string name="downloadsActivityNoItemsDescription">Ainda não foram transferidos ficheiros</string>
+    <string name="downloadsShareTitle">Partilhar com...</string>
+    <string name="downloadsDownloadFinishedActionName">Abrir</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+    <string name="downloadsFileNotFoundErrorMessage">O ficheiro já não existe</string>
+    <string name="downloadsItemMenuShare">Partilhar</string>
+    <string name="downloadsItemMenuDelete">Eliminar</string>
+    <string name="downloadsItemMenuCancel">Cancelar</string>
+    <string name="downloadsActivityMenuDeleteAll">Eliminar tudo</string>
+    <string name="downloadsFileDeletedMessage">Eliminar %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Todos os ficheiros eliminados</string>
+    <string name="downloadsMoreOptionsContentDescription">Mais opções para %1$s</string>
+    <string name="downloadsUndoActionName">Anular</string>
+    <string name="downloadsStateInProgress">Em curso…</string>
+
 </resources>

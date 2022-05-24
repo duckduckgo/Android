@@ -95,6 +95,16 @@ class DetectOriginatingAppPackageModernTest {
         verify(packageManager).getPackagesForUid(-1)
     }
 
+    @Test
+    fun whenGetPackagesForUidThrowsSecurityExceptionThenReturnUnknown() {
+        val connection = aConnectionInfo(sourcePort = 40123)
+
+        whenever(packageManager.getPackagesForUid(any())).thenThrow(SecurityException())
+
+        val packageId = testee.resolvePackageId(connection)
+        assertEquals("unknown", packageId)
+    }
+
     private fun captureDestinationAddress() {
         verify(connectivityManager).getConnectionOwnerUid(any(), any(), addressCaptor.capture())
     }

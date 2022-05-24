@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Zatvoriť karta</string>
     <string name="tabClosed">Karta bola zatvorená</string>
     <string name="tabClosedUndo">Vrátenie späť</string>
+    <string name="downloadsMenuItemTitle">Stiahnuté</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrana súkromia stránky</string>
@@ -273,6 +273,7 @@
     <string name="delete">Vymazať</string>
     <string name="edit">Upraviť</string>
     <string name="remove">Odstrániť</string>
+    <string name="removeAll">Odstrániť všetky</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Vyhľadať v DuckDuckGo</string>
@@ -298,7 +299,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomôžte nám zdokonaliť aplikáciu!</string>
-    <string name="surveyCtaDescription">Vyplnením krátkeho anonymného prieskumu nám poskytnite spätnú väzbu.</string>
+    <string name="surveyCtaDescription">Vyplňte náš krátky prieskum a podeľte sa o spätnú väzbu.</string>
     <string name="surveyCtaLaunchButton">Zúčastniť sa prieskumu</string>
     <string name="surveyCtaDismissButton">Nie, ďakujem</string>
     <string name="surveyActivityTitle">Používateľský prieskum</string>
@@ -491,7 +492,7 @@
     <string name="daxMainNetworkOwnedCtaText">Hlavu hore! Keďže %1$s vlastní %2$s, nemôžem im zabrániť v tom, aby videli vašu aktivitu.&lt;br/&gt;&lt;br/&gt;Prehliadajte so mnou a môžem obmedziť to, čo o vás %3$s celkovo vie, zablokovaním ich sledovacích zariadení na mnohých ďalších stránkach.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Ďalej</string>
+    <string name="downloadConfirmationContinue">Uložiť do stiahnutých</string>
     <string name="downloadConfirmationSaveFileTitle">Ušetrite %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Nechať si oboje</string>
     <string name="downloadConfirmationReplaceOldFileText">Vymeniť</string>
@@ -534,7 +535,7 @@
     <string name="fireproofWebsitesActivityTitle">Zabezpečené stránky</string>
     <string name="settingsFireproofWebsites">Zabezpečené stránky</string>
     <string name="fireproofWebsiteMenuTitleAdd">Zabezpečiť túto lokalitu</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Stránka &lt;b&gt;%1$s&lt;/b&gt; je teraz zabezpečená!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">Stránka &lt;b&gt;%1$s&lt;/b&gt; je teraz zabezpečená</string>
     <string name="fireproofWebsiteSnackbarAction">Vrátenie späť</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Naozaj chcete odstrániť &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Webové stránky sa spoliehajú na súbory cookie, aby ste zostali prihlásení. Keď webovú stránku zabezpečíte funkciou ohňovzdornosti, súbory cookie nebudú zmazané a zostanete prihlásení aj po použití tlačidla Oheň. Stále budeme blokovať sledovacie zariadenia tretích strán, ktoré sa nachádzajú na webových stránkach zabezpečených funkciou ohňovzdornosti.</string>
@@ -544,6 +545,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpečiť funkciou ohňovzdornosti</string>
     <string name="fireproofWebsiteLoginDialogNegative">Teraz nie</string>
     <string name="fireproofWebsiteItemsSectionTitle">Zabezpečené stránky</string>
+    <string name="fireproofWebsiteEmptyListHint">Zatiaľ žiadne stránky so zakázanými cookie</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Zabezpečené webové stránky pri prihlásení</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Zakázanie cookie bolo odstránené pre všetky stránky</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Odstránilo sa zabezpečenie pre &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vždy sa opýtať</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vždy</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikdy</string>
@@ -551,7 +556,12 @@
     <string name="disableLoginDetectionDialogDescription">Tento výber môžete kedykoľvek zmeniť v Nastaveniach.</string>
     <string name="disableLoginDetectionDialogPositive">VYPNÚŤ</string>
     <string name="disableLoginDetectionDialogNegative">ZRUŠIŤ</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Odstránilo sa zabezpečenie pre &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Zabezpečiť webové stránky automaticky pri prihlásení?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Zabezpečenie stránok vás ponechá prihlásených po použitia tlačidla Oheň. Toto nastavenie môžete kedykoľvek zmeniť. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vždy zabezpečiť</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Zabezpečiť túto lokalitu</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Teraz nie</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animácia tlačidla ohňa</string>
@@ -601,7 +611,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href=\"\">Ďalšie informácie</a><u/>]]>
+        <![CDATA[DuckDuckGo automaticky blokuje množstvo trackerov. Vďaka Globálnej kontrole súkromia (GPC) môžete tiež požiadať partnerské webové lokality o obmedzenie predaja alebo zdieľania vašich osobných údajov s inými spoločnosťami. <u><a href="">Ďalšie informácie</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globálna kontrola súkromia (GPC)</string>
     <string name="globalPrivacyControlToggle">Globálna kontrola súkromia (GPC)</string>
@@ -656,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Zjednodušená ochrana súkromia v e‑mailoch.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na zozname!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Keď budete mať pripravenú ochranu e‑mailu,<br/>pošleme vám upozornenie. <b><a href=\"\">Zistite viac</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu sa zobrazí vaša pozvánka, keď budeme na vás pripravení. Chcete <a href=\"\"><b>dostať upozornenie</b></a>, keď dorazí?<br/><a href=\"\"><b>Zistite viac</b></a> o ochrane e‑mailu.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Keď budete mať pripravenú ochranu e‑mailu,<br/>pošleme vám upozornenie. <b><a href="">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu sa zobrazí vaša pozvánka, keď budeme na vás pripravení. Chcete <a href=""><b>dostať upozornenie</b></a>, keď dorazí?<br/><a href=""><b>Zistite viac</b></a> o ochrane e‑mailu.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Dostali ste pozvánku!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href=\"\">Zistite viac</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokujte nástroje na sledovanie e‑mailov bez zmeny poskytovateľa e‑mailu.<b><a href="">Zistite viac</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobná adresa Duck</string>
@@ -714,4 +724,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Miniaplikácia %1$s bola pridaná na úvodnú obrazovku</string>
     <string name="settingsAddHomeScreenWidget">Miniaplikácia úvodnej obrazovky</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Prezerajte súkromne stránky s našou aplikáciou pre Mac</string>
+    <string name="macos_settings_description_list">Ste na zozname!</string>
+    <string name="macos_settings_description_ready">K dispozícii na stiahnutie pre Mac</string>
+    <string name="macos_settings_title">Aplikácia DuckDuckGo pre počítač</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Stiahnuté</string>
+    <string name="downloadsActivityTitle">Stiahnuté</string>
+    <string name="downloadsActivityNoItemsDescription">Zatiaľ žiadne stiahnuté súbory</string>
+    <string name="downloadsShareTitle">Zdieľať s...</string>
+    <string name="downloadsDownloadFinishedActionName">Otvorené</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Súbor už neexistuje</string>
+    <string name="downloadsItemMenuShare">Zdieľať</string>
+    <string name="downloadsItemMenuDelete">Vymazať</string>
+    <string name="downloadsItemMenuCancel">Zrušiť</string>
+    <string name="downloadsActivityMenuDeleteAll">Odstrániť všetko</string>
+    <string name="downloadsFileDeletedMessage">Zmazané: %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Všetky súbory sa odstránili</string>
+    <string name="downloadsMoreOptionsContentDescription">Viac možností pre %1$s</string>
+    <string name="downloadsUndoActionName">Vrátenie späť</string>
+    <string name="downloadsStateInProgress">Prebieha…</string>
+
 </resources>
