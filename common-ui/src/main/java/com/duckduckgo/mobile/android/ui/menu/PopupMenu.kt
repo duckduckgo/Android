@@ -45,6 +45,17 @@ open class PopupMenu(
         }
     }
 
+    fun onMenuItemLongClicked(
+        menuView: View,
+        onClick: () -> Unit
+    ) {
+        menuView.setOnLongClickListener {
+            onClick()
+            dismiss()
+            true
+        }
+    }
+
     fun show(
         rootView: View,
         anchorView: View

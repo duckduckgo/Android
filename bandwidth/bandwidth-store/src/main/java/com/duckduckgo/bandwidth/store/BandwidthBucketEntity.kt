@@ -16,26 +16,13 @@
 
 package com.duckduckgo.bandwidth.store
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-@Dao
-interface BandwidthDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(bandwidthEntity: BandwidthEntity)
-
-    @Query("SELECT * FROM bandwidth")
-    fun getBandwidth(): BandwidthEntity?
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBucket(bandwidthBucketEntity: BandwidthBucketEntity)
-
-    @Query("SELECT * FROM bandwidth_buckets")
-    fun getBuckets(): List<BandwidthBucketEntity>
-
-    @Query("delete from bandwidth_buckets")
-    fun deleteAllBuckets()
-}
+@Entity(tableName = "bandwidth_buckets")
+data class BandwidthBucketEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val timestamp: Long,
+    val appBytes: Long,
+    val totalBytes: Long
+)
