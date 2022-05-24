@@ -2114,13 +2114,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onPrintSelected() {
-        url?.let {
-            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
-            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
-        }
-    }
-
     fun determineShowBrowser() {
         val showBrowser = currentBrowserViewState().browserShowing || !url.isNullOrBlank()
         browserViewState.value = currentBrowserViewState().copy(browserShowing = showBrowser)
@@ -2402,6 +2395,19 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+    }
+
+    fun onPrintSelected() {
+        url?.let {
+            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
+        }
+    }
+
+    fun printFromWebView() {
+        viewModelScope.launch(dispatchers.main()) {
+            onPrintSelected()
+        }
     }
 
     override fun openMessageInNewTab(message: Message) {

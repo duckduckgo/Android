@@ -170,6 +170,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterWrapper
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -308,6 +309,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var printInjector: PrintInjector
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -1486,6 +1490,7 @@ class BrowserTabFragment :
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
+            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
         }
 
         if (appBuildConfig.isDebug) {
@@ -2735,11 +2740,10 @@ class BrowserTabFragment :
 
     private fun launchPrint(url: String) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            val jobName = url
-            webView?.createPrintDocumentAdapter(jobName)?.let { printAdapter ->
+            webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
                 val wrapper = PrintDocumentAdapterWrapper(printAdapter)
                 printManager.print(
-                    jobName,
+                    url,
                     wrapper,
                     PrintAttributes.Builder().build()
                 )
