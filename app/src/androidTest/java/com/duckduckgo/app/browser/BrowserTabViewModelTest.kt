@@ -3613,6 +3613,28 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSelectsToPrintPageThenPrintLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageWithNullUrlThenPrintLinkCommandNotSent() {
+        loadUrl(null)
+        testee.onPrintSelected()
+        verify(mockCommandObserver, never()).onChanged(any())
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageThenPixelIsSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        verify(mockPixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED))
+    }
+
+    @Test
     fun whenSubmittedQueryAndNavigationStateIsNullThenResetHistoryCommandSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("nytimes.com", null)).thenReturn("nytimes.com")
         testee.onUserSubmittedQuery("nytimes.com")
