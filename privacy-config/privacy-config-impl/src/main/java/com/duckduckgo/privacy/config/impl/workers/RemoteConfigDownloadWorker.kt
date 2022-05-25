@@ -17,8 +17,7 @@
 package com.duckduckgo.privacy.config.impl.workers
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
@@ -63,17 +62,15 @@ class PrivacyConfigDownloadWorker(
 @SingleInstanceIn(AppScope::class)
 class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
-) : LifecycleEventObserver {
+) : DefaultLifecycleObserver {
 
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        if (event == Lifecycle.Event.ON_CREATE) {
-            Timber.v("Scheduling remote config worker")
-            val workerRequest = PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(1, TimeUnit.HOURS)
-                .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
-                .build()
-            workManager.enqueueUniquePeriodicWork(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
-        }
+    override fun onCreate(owner: LifecycleOwner) {
+        Timber.v("Scheduling remote config worker")
+        val workerRequest = PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(1, TimeUnit.HOURS)
+            .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+            .build()
+        workManager.enqueueUniquePeriodicWork(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
     }
 
     companion object {
