@@ -18,6 +18,8 @@ package com.duckduckgo.privacy.config.impl.observers
 
 import android.content.Context
 import android.content.res.Resources
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.FileUtilities.loadResource
@@ -42,6 +44,7 @@ class LocalPrivacyConfigObserverTest {
 
     private val mockPrivacyConfigPersister: PrivacyConfigPersister = mock()
     private val mockContext: Context = mock()
+    private val lifecycleOwner: LifecycleOwner = mock()
     lateinit var testee: LocalPrivacyConfigObserver
 
     @Before
@@ -60,7 +63,7 @@ class LocalPrivacyConfigObserverTest {
         runTest {
             givenLocalPrivacyConfigFileExists()
 
-            testee.storeLocalPrivacyConfig()
+            testee.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
 
             verify(mockPrivacyConfigPersister).persistPrivacyConfig(any())
         }
