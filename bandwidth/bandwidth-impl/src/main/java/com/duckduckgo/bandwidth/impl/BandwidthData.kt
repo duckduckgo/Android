@@ -16,8 +16,10 @@
 
 package com.duckduckgo.bandwidth.impl
 
+import java.util.concurrent.TimeUnit
+
 data class BandwidthData(
-    val timestamp: Long = System.currentTimeMillis(),
+    val timestamp: Long = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()),
     val appBytes: Long,
     val totalBytes: Long
 )

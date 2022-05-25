@@ -143,7 +143,7 @@ constructor(
                     excludedAppsRepository.manuallyEnabledApp(packageName)
                 } else {
                     deviceShieldPixels.didDisableAppProtectionFromDetail()
-                    excludedAppsRepository.manuallyExcludedApp(packageName)
+                    excludedAppsRepository.manuallyExcludeApp(packageName)
                 }
             }
             command.send(Command.RestartVpn)

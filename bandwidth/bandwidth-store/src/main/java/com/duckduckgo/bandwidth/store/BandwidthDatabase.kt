@@ -21,8 +21,8 @@ import androidx.room.RoomDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
-    entities = [BandwidthEntity::class]
+    version = 2,
+    entities = [BandwidthEntity::class, BandwidthBucketEntity::class]
 )
 
 abstract class BandwidthDatabase : RoomDatabase() {

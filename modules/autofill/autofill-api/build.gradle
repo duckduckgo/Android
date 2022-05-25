@@ -37,6 +37,8 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation KotlinX.coroutines.core
+    implementation AndroidX.lifecycle.runtimeKtx
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.6.0'

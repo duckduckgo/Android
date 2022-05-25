@@ -58,12 +58,10 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
-import com.duckduckgo.autofill.ui.AutofillSettingsActivity
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
-import com.duckduckgo.macos_api.MacWaitlistState.InBeta
-import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
+import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -97,6 +95,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -375,7 +376,7 @@ class SettingsActivity :
 
     private fun launchAutofillSettings() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
-        startActivity(AutofillSettingsActivity.intent(this), options)
+        startActivity(autofillSettingsActivityLauncher.intent(this), options)
     }
 
     private fun launchAccessibilitySettings() {

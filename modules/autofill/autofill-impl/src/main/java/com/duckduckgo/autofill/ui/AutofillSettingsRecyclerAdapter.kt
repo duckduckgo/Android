@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui.credential
+package com.duckduckgo.autofill.ui
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter.CredentialsViewHolder
 import timber.log.Timber
 
-class CredentialsPickerRecyclerAdapter(
-    val credentials: List<LoginCredentials>,
+class AutofillSettingsRecyclerAdapter(
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit
-) : Adapter<CredentialsViewHolder>() {
+) : Adapter<AutofillSettingsRecyclerAdapter.CredentialsViewHolder>() {
+
+    private var credentials = listOf<LoginCredentials>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -52,9 +52,14 @@ class CredentialsPickerRecyclerAdapter(
         }
     }
 
+    fun updateLogins(list: List<LoginCredentials>) {
+        credentials = list
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int = credentials.size
 
-    class CredentialsViewHolder(val root: View) : ViewHolder(root) {
+    class CredentialsViewHolder(val root: View) : RecyclerView.ViewHolder(root) {
         val textView: TextView = root.findViewById(R.id.username)
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.survey.api
+package com.duckduckgo.autofill.ui
 
-import retrofit2.Call
-import retrofit2.http.GET
+import android.content.Context
+import android.content.Intent
 
-interface SurveyService {
-
-    @GET("https://staticcdn.duckduckgo.com/survey/v2/survey-mobile.json")
-    fun survey(): Call<SurveyGroup?>
-
-    @GET("https://staticcdn.duckduckgo.com/survey/apptp/retention-survey-mobile.json")
-    fun surveyAppTp(): Call<SurveyGroup?>
+interface AutofillSettingsActivityLauncher {
+    fun intent(context: Context): Intent
 }
