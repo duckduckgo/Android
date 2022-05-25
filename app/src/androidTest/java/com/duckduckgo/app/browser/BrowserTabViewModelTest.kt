@@ -3635,13 +3635,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUserSelectsToPrintPageWithNullUrlThenPrintLinkCommandNotSent() {
-        loadUrl(null)
-        testee.onPrintSelected()
-        verify(mockCommandObserver, never()).onChanged(any())
-    }
-
-    @Test
     fun whenUserSelectsToPrintPageThenPixelIsSent() {
         loadUrl("foo.com")
         testee.onPrintSelected()
