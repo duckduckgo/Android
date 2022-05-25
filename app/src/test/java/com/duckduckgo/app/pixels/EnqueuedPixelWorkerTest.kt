@@ -74,7 +74,6 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
-        verify(pixel, never()).fire(AppPixelName.APP_LAUNCH_LEGACY)
         verify(pixel, never()).fire(AppPixelName.APP_LAUNCH)
     }
 
@@ -87,18 +86,13 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
         verify(pixel).fire(
-            AppPixelName.APP_LAUNCH_LEGACY,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
-        )
-
-        verify(pixel).fire(
             AppPixelName.APP_LAUNCH,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
     }
 
     @Test
-    fun whenOnStartAndLaunchByFireActionFollowedByAppStartThenSendOneAppLaunchPixel() {
+    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchThenSendOneAppLaunchPixel() {
         whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
         whenever(unsentForgetAllPixelStore.lastClearTimestamp).thenReturn(System.currentTimeMillis())
         whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
@@ -108,28 +102,6 @@ class EnqueuedPixelWorkerTest {
         enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
 
         verify(pixel).fire(
-            AppPixelName.APP_LAUNCH_LEGACY,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
-        )
-
-        verify(pixel, times(0)).fire(
-            AppPixelName.APP_LAUNCH,
-            mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
-        )
-    }
-
-    @Test
-    fun whenOnStartAndLaunchByFireActionFollowedByAppLaunchAfterGracePeriodThenSendsTwoAppLaunchPixel() {
-        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
-        whenever(unsentForgetAllPixelStore.lastClearTimestamp)
-            .thenReturn(System.currentTimeMillis() - EnqueuedPixelWorker.APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD - 100)
-        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
-
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_START)
-        enqueuedPixelWorker.onStateChanged(lifecycleOwner, Lifecycle.Event.ON_CREATE)
-
-        verify(pixel, times(2)).fire(
             AppPixelName.APP_LAUNCH,
             mapOf(Pixel.PixelParameter.WEBVIEW_VERSION to "91")
         )
