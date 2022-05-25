@@ -31,16 +31,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-interface AutofillStore {
-
-    suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
-
-    suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials)
-
-    suspend fun getAllCredentials(): List<LoginCredentials>
-
-}
-
 class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
