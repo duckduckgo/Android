@@ -62,7 +62,7 @@ class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun scheduleRemoteConfigDownload() {
         Timber.v("Scheduling remote config worker")
-        val workerRequest = PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(12, TimeUnit.HOURS)
+        val workerRequest = PeriodicWorkRequestBuilder<PrivacyConfigDownloadWorker>(1, TimeUnit.HOURS)
             .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
             .build()
