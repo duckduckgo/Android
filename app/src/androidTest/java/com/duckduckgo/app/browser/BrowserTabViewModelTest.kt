@@ -3633,7 +3633,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToPrintPageThenPixelIsSent() {
         loadUrl("foo.com")
         testee.onPrintSelected()
-        verify(mockPixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED))
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 
     @Test
