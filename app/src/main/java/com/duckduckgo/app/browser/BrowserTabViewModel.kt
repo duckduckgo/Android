@@ -431,6 +431,7 @@ class BrowserTabViewModel @Inject constructor(
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
+        object EmailSignEvent : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -575,6 +576,7 @@ class BrowserTabViewModel @Inject constructor(
 
         emailManager.signedInFlow().onEach { isSignedIn ->
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
+            command.value = EmailSignEvent
         }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()

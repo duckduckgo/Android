@@ -147,6 +147,20 @@ class EmailJavascriptInterfaceTest {
         assertEquals(0, counter)
     }
 
+    @Test
+    fun whenGetDeviceCapabilitiesAndUrlIsDuckDuckGoEmailThenReturnNonEmptyString() {
+        whenever(mockWebView.url).thenReturn(DUCKDUCKGO_EMAIL_URL)
+
+        assert(testee.getDeviceCapabilities().isNotBlank())
+    }
+
+    @Test
+    fun whenGetDeviceCapabilitiesAndUrlIsNotDuckDuckGoEmailThenReturnEmptyString() {
+        whenever(mockWebView.url).thenReturn(NON_EMAIL_URL)
+
+        assert(testee.getDeviceCapabilities().isBlank())
+    }
+
     companion object {
         const val DUCKDUCKGO_EMAIL_URL = "https://duckduckgo.com/email"
         const val NON_EMAIL_URL = "https://example.com"
