@@ -17,8 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.network.channels.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
@@ -84,7 +84,7 @@ class TcpConnectionInitializer @Inject constructor(
         Timber.d("Initializing connection $key")
 
         val pair = if (header.isSYN) {
-            val channel = networkChannelCreator.createSocketChannel()
+            val channel = networkChannelCreator.createSocketChannelAndConnect(InetSocketAddress(params.destinationAddress, params.destinationPort))
             val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
             val sequenceToServer = header.sequenceNumber
             val ackNumberToClient = header.sequenceNumber + 1
@@ -92,7 +92,6 @@ class TcpConnectionInitializer @Inject constructor(
 
             val tcb = TCB(key, sequenceNumberToClient, sequenceToServer, ackNumberToClient, ackNumberToServer, channel, params.packet)
             TCB.putTCB(params.key(), tcb)
-            channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
             Pair(tcb, channel)
         } else {
             Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
