@@ -103,7 +103,7 @@
     <string name="faviconContentDescription">Значок сайта</string>
     <string name="closeContentDescription">Закрыть</string>
     <string name="closeAllTabsMenuItem">Закрыть все вкладки</string>
-    <string name="closeTab">Закрыть вкладка</string>
+    <string name="closeTab">Закрыть вкладку</string>
     <string name="tabClosed">Вкладка закрыта</string>
     <string name="tabClosedUndo">Отменить</string>
     <string name="downloadsMenuItemTitle">Загрузки</string>
