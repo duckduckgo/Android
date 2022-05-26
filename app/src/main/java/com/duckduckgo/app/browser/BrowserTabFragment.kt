@@ -2009,7 +2009,13 @@ class BrowserTabFragment :
     }
 
     fun onLongPressBackButton() {
-        viewModel.onUserLongPressedBack()
+        /*
+         It is possible that this can be invoked before Fragment is attached
+         If viewModelFactory isn't initialized, ignore long press
+         */
+        if (this::viewModelFactory.isInitialized) {
+            viewModel.onUserLongPressedBack()
+        }
     }
 
     private fun launchHideTipsDialog(
