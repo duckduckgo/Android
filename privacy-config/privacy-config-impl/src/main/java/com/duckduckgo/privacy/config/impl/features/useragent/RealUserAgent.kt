@@ -30,7 +30,7 @@ import javax.inject.Inject
 class RealUserAgent @Inject constructor(
     private val userAgentRepository: UserAgentRepository,
     private val unprotectedTemporary: UnprotectedTemporary
-): UserAgent {
+) : UserAgent {
 
     override fun isAnApplicationException(url: String): Boolean {
         return userAgentRepository.omitApplicationExceptions.any { UriString.sameOrSubdomain(url, it.domain) }

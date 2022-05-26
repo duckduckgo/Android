@@ -38,11 +38,15 @@ abstract class UserAgentDao {
     @Query("select * from user_agent_exceptions where domain = :domain")
     abstract fun get(domain: String): UserAgentExceptionEntity
 
-    @Query("select * from user_agent_exceptions where omitApplication = 0 AND omitVersion = 0") abstract fun getDefaultExceptions(): List<UserAgentExceptionEntity>
+    @Query("select * from user_agent_exceptions where omitApplication = 0 AND omitVersion = 0")
+    abstract fun getDefaultExceptions(): List<UserAgentExceptionEntity>
 
-    @Query("select * from user_agent_exceptions where omitApplication = 1") abstract fun getApplicationExceptions(): List<UserAgentExceptionEntity>
+    @Query("select * from user_agent_exceptions where omitApplication = 1")
+    abstract fun getApplicationExceptions(): List<UserAgentExceptionEntity>
 
-    @Query("select * from user_agent_exceptions where omitVersion = 1") abstract fun getVersionExceptions(): List<UserAgentExceptionEntity>
+    @Query("select * from user_agent_exceptions where omitVersion = 1")
+    abstract fun getVersionExceptions(): List<UserAgentExceptionEntity>
 
-    @Query("delete from user_agent_exceptions") abstract fun deleteAll()
+    @Query("delete from user_agent_exceptions")
+    abstract fun deleteAll()
 }
