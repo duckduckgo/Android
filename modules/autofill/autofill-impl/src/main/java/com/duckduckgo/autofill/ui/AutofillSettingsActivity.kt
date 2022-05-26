@@ -16,6 +16,8 @@
 
 package com.duckduckgo.autofill.ui
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -30,6 +32,7 @@ import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -61,13 +64,46 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onCredentialsSelected(loginCredentials: LoginCredentials) {
+    private fun onCredentialsSelected(loginCredentials: LoginCredentials) {
         Timber.e("credentials selected: %s", loginCredentials)
     }
 
+    private fun onCopyUsername(loginCredentials: LoginCredentials) {
+        loginCredentials.username?.let {
+            it.copyToClipboard()
+            showCopiedToClipboardSnackbar("Username")
+        }
+    }
+
+    private fun onCopyPassword(loginCredentials: LoginCredentials) {
+        loginCredentials.password?.let {
+            it.copyToClipboard()
+            showCopiedToClipboardSnackbar("Password")
+        }
+    }
+
+    private fun String.copyToClipboard() {
+        clipboardManager().setPrimaryClip(ClipData.newPlainText("", this))
+    }
+
+    private fun showCopiedToClipboardSnackbar(type: String) {
+        Snackbar.make(binding.root, "$type copied to clipboard", Snackbar.LENGTH_SHORT).show()
+    }
+
     private fun configureRecyclerView() {
-        adapter = AutofillSettingsRecyclerAdapter(this, faviconManager) { onCredentialsSelected(it) }
+
+        adapter = AutofillSettingsRecyclerAdapter(
+            this, faviconManager,
+            onCredentialSelected = this::onCredentialsSelected,
+            onCopyUsername = this::onCopyUsername,
+            onCopyPassword = this::onCopyPassword,
+        )
+
         binding.logins.adapter = adapter
+    }
+
+    private fun clipboardManager(): ClipboardManager {
+        return getSystemService(ClipboardManager::class.java)
     }
 
     companion object {

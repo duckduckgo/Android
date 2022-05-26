@@ -31,7 +31,9 @@ import timber.log.Timber
 class AutofillSettingsRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
     val faviconManager: FaviconManager,
-    val onCredentialSelected: (credentials: LoginCredentials) -> Unit
+    val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
+    val onCopyUsername: (credentials: LoginCredentials) -> Unit,
+    val onCopyPassword: (credentials: LoginCredentials) -> Unit
 ) : Adapter<AutofillSettingsRecyclerAdapter.CredentialsViewHolder>() {
 
     private var credentials = listOf<LoginCredentials>()
@@ -54,10 +56,13 @@ class AutofillSettingsRecyclerAdapter(
             username.text = credentials.username
             domain.text = credentials.domain
 
-            root.setOnClickListener {
-                Timber.i("selected %s", credentials.username)
-                onCredentialSelected(credentials)
-            }
+//            root.setOnClickListener {
+//                Timber.i("selected %s", credentials.username)
+//                onCredentialSelected(credentials)
+//            }
+
+            root.setOnClickListener { onCopyUsername(credentials) }
+            root.setOnLongClickListener { onCopyPassword(credentials); true }
 
             updateFavicon(credentials)
         }
