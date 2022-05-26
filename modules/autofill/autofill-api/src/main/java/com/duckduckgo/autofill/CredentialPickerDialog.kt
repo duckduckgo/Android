@@ -47,8 +47,8 @@ interface CredentialManagementDialog {
 
 interface CredentialAutofillDialogFactory {
 
-    fun credentialAutofillPickerDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog
+    fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog
 
-    fun credentialAutofillSavingDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog
+    fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog
 
 }
