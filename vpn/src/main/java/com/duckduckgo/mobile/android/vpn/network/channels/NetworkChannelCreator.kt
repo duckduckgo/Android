@@ -60,9 +60,9 @@ class NetworkChannelCreatorImpl @Inject constructor(
     override fun createDatagramChannelAndConnect(inetSocketAddress: InetSocketAddress): DatagramChannel {
         return DatagramChannel.open().also { channel ->
             channel.configureBlocking(false)
-            channel.socket().let { socket ->
-                vpnService.protect(socket)
-                socket.broadcast = true
+            channel.socket().run {
+                vpnService.protect(this)
+                broadcast = true
             }
             try {
                 channel.connect(inetSocketAddress)
