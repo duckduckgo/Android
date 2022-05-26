@@ -28,5 +28,6 @@ class AutofillSettingsViewModel @Inject constructor(private val autofillStore: A
 
     suspend fun logins(): List<LoginCredentials> {
         return autofillStore.getAllCredentials()
+            .sortedBy { it.domain }
     }
 }

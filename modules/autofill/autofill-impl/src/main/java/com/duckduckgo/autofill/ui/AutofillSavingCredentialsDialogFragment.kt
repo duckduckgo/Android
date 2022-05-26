@@ -34,7 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
+class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), CredentialSavePickerDialog {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,9 +87,9 @@ class CredentialAutofillSavingDialogFragment : BottomSheetDialogFragment(), Cred
         fun instance(
             url: String,
             credentials: LoginCredentials
-        ): CredentialAutofillSavingDialogFragment {
+        ): AutofillSavingCredentialsDialogFragment {
 
-            val fragment = CredentialAutofillSavingDialogFragment()
+            val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
                     it.putString("url", url)
