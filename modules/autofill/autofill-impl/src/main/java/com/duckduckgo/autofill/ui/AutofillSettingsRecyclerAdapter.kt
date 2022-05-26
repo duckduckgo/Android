@@ -17,16 +17,20 @@
 package com.duckduckgo.autofill.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class AutofillSettingsRecyclerAdapter(
+    val lifecycleOwner: LifecycleOwner,
+    val faviconManager: FaviconManager,
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit
 ) : Adapter<AutofillSettingsRecyclerAdapter.CredentialsViewHolder>() {
 
@@ -36,8 +40,8 @@ class AutofillSettingsRecyclerAdapter(
         parent: ViewGroup,
         viewType: Int
     ): CredentialsViewHolder {
-        val root = LayoutInflater.from(parent.context).inflate(R.layout.item_row_autofill_credentials, parent, false)
-        return CredentialsViewHolder(root)
+        val binding = ItemRowAutofillCredentialsManagementScreenBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CredentialsViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -45,10 +49,30 @@ class AutofillSettingsRecyclerAdapter(
         position: Int
     ) {
         val credentials = credentials[position]
-        viewHolder.textView.text = credentials.username
-        viewHolder.root.setOnClickListener {
-            Timber.i("selected %s", credentials.username)
-            onCredentialSelected(credentials)
+
+        with(viewHolder.binding) {
+            username.text = credentials.username
+            domain.text = credentials.domain
+
+            root.setOnClickListener {
+                Timber.i("selected %s", credentials.username)
+                onCredentialSelected(credentials)
+            }
+
+            updateFavicon(credentials)
+        }
+
+    }
+
+    private fun ItemRowAutofillCredentialsManagementScreenBinding.updateFavicon(credentials: LoginCredentials) {
+        val domain = credentials.domain
+        if (domain == null) {
+            favicon.setImageBitmap(null)
+        } else {
+            lifecycleOwner.lifecycleScope.launch {
+                Timber.e("url for favicon is %s", domain)
+                faviconManager.loadToViewFromLocalOrFallback(url = domain, view = favicon)
+            }
         }
     }
 
@@ -59,7 +83,5 @@ class AutofillSettingsRecyclerAdapter(
 
     override fun getItemCount(): Int = credentials.size
 
-    class CredentialsViewHolder(val root: View) : RecyclerView.ViewHolder(root) {
-        val textView: TextView = root.findViewById(R.id.username)
-    }
+    class CredentialsViewHolder(val binding: ItemRowAutofillCredentialsManagementScreenBinding) : RecyclerView.ViewHolder(binding.root)
 }

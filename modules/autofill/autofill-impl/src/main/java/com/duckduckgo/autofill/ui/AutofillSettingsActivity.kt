@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
@@ -34,13 +35,18 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutofillSettingsActivity : DuckDuckGoActivity() {
 
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
+    private lateinit var adapter: AutofillSettingsRecyclerAdapter
+
     private val binding: ActivityAutofillSettingsBinding by viewBinding()
     private val viewModel: AutofillSettingsViewModel by bindViewModel()
-    private val adapter = AutofillSettingsRecyclerAdapter() { onCredentialsSelected(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +66,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureRecyclerView() {
+        adapter = AutofillSettingsRecyclerAdapter(this, faviconManager) { onCredentialsSelected(it) }
         binding.logins.adapter = adapter
     }
 

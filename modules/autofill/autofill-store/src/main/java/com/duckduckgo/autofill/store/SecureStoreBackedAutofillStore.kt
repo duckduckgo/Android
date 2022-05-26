@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.store
 
-import androidx.core.net.toUri
+import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -34,7 +34,8 @@ import timber.log.Timber
 class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
-        val url = rawUrl.extractOriginFromUrl()
+        Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
+        val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
 
         val storedCredentials = secureStorage.getWebsiteLoginCredentialsForDomain(url).firstOrNull() ?: emptyList()
         Timber.v("Found %d credentials for %s", storedCredentials.size, url)
@@ -43,7 +44,12 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
     }
 
     override suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials) {
-        val url = rawUrl.extractOriginFromUrl()
+        val url = rawUrl.extractSchemeAndDomain()
+        if (url == null) {
+            Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
+            return
+        }
+
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
         val loginDetails = WebsiteLoginDetails(domain = url, username = credentials.username)
@@ -67,15 +73,6 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
             username = details.username,
             password = password
         )
-    }
-
-    private fun String.extractOriginFromUrl(): String {
-        val url = this.toUri()
-        val scheme = if (url.scheme != null) "${url.scheme}://" else ""
-
-        return String.format("%s%s", scheme, url.host).also {
-            Timber.i("Extracted origin from URL.\ninput=%s\noutput=%s\nhost=%s", this, it, url.host)
-        }
     }
 
 }

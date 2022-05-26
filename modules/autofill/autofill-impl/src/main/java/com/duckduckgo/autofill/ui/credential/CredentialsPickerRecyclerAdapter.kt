@@ -17,27 +17,29 @@
 package com.duckduckgo.autofill.ui.credential
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsPickerBinding
 import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter.CredentialsViewHolder
 import timber.log.Timber
 
 class CredentialsPickerRecyclerAdapter(
-    val credentials: List<LoginCredentials>,
-    val onCredentialSelected: (credentials: LoginCredentials) -> Unit
+    val lifecycleOwner: LifecycleOwner,
+    val faviconManager: FaviconManager,
+    private val credentials: List<LoginCredentials>,
+    private val onCredentialSelected: (credentials: LoginCredentials) -> Unit
 ) : Adapter<CredentialsViewHolder>() {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): CredentialsViewHolder {
-        val root = LayoutInflater.from(parent.context).inflate(R.layout.item_row_autofill_credentials, parent, false)
-        return CredentialsViewHolder(root)
+        val binding = ItemRowAutofillCredentialsPickerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CredentialsViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -45,16 +47,18 @@ class CredentialsPickerRecyclerAdapter(
         position: Int
     ) {
         val credentials = credentials[position]
-        viewHolder.textView.text = credentials.username
-        viewHolder.root.setOnClickListener {
-            Timber.i("selected %s", credentials.username)
-            onCredentialSelected(credentials)
+        with(viewHolder.binding) {
+            useCredentialButton.text = credentials.username
+
+            useCredentialButton.setOnClickListener {
+                Timber.i("selected %s", credentials.username)
+                onCredentialSelected(credentials)
+            }
         }
+
     }
 
     override fun getItemCount(): Int = credentials.size
 
-    class CredentialsViewHolder(val root: View) : ViewHolder(root) {
-        val textView: TextView = root.findViewById(R.id.username)
-    }
+    class CredentialsViewHolder(val binding: ItemRowAutofillCredentialsPickerBinding) : ViewHolder(binding.root)
 }
