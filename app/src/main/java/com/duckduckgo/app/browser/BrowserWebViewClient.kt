@@ -160,9 +160,11 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                     if (isForMainFrame) {
-                        webViewClientListener?.startProcessingTrackingLink()
-                        Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
-                        webView.loadUrl(urlType.extractedUrl)
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                            loadUrl(listener, webView, urlType.extractedUrl)
+                        }
                         return true
                     }
                     false
@@ -186,12 +188,12 @@ class BrowserWebViewClient(
 
                         if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
                             webViewClientListener?.let { listener ->
-                                loadCleanedUrl(listener, webView, urlType)
+                                loadUrl(listener, webView, urlType.cleanedUrl)
                                 return listener.handleAppLink(parameterStrippedType, isForMainFrame)
                             }
                         } else {
                             webViewClientListener?.let { listener ->
-                                loadCleanedUrl(listener, webView, urlType)
+                                loadUrl(listener, webView, urlType.cleanedUrl)
                             }
                             return true
                         }
@@ -208,17 +210,17 @@ class BrowserWebViewClient(
         }
     }
 
-    private fun loadCleanedUrl(
+    private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
-        urlType: TrackingParameterLink
+        url: String
     ) {
         if (listener.linkOpenedInNewTab()) {
             webView.post {
-                webView.loadUrl(urlType.cleanedUrl)
+                webView.loadUrl(url)
             }
         } else {
-            webView.loadUrl(urlType.cleanedUrl)
+            webView.loadUrl(url)
         }
     }
 
