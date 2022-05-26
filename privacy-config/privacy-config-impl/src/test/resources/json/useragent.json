@@ -1,0 +1,47 @@
+{
+  "state": "enabled",
+  "exceptions": [
+    {
+      "domain": "default.com",
+      "reason": "Site reports browser not supported"
+    },
+    {
+      "domain": "duplicatedversion.com",
+      "reason": "Site reports browser not supported"
+    },
+    {
+      "domain": "duplicatedapplication.com",
+      "reason": "Site reports browser not supported"
+    }
+  ],
+  "settings": {
+    "omitApplicationSites": [
+      {
+        "domain": "application.com",
+        "reason": "Site reports browser not supported"
+      },
+      {
+        "domain": "duplicatedapplication.com",
+        "reason": "Site reports browser not supported"
+      },
+      {
+        "domain": "versionapplication.com",
+        "reason": "Site reports browser not supported"
+      }
+    ],
+    "omitVersionSites": [
+      {
+        "domain": "version.com",
+        "reason": "Site reports browser not supported"
+      },
+      {
+        "domain": "duplicatedversion.com",
+        "reason": "Site reports browser not supported"
+      },
+      {
+        "domain": "versionapplication.com",
+        "reason": "Site reports browser not supported"
+      }
+    ]
+  }
+}

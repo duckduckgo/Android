@@ -1,0 +1,23 @@
+{
+  "state": "disabled",
+  "exceptions": [
+    {
+      "domain": "cnn.com",
+      "reason": "Site reports browser not supported"
+    }
+  ],
+  "settings": {
+    "omitApplicationSites": [
+      {
+        "domain": "cvs.com",
+        "reason": "Site reports browser not supported"
+      }
+    ],
+    "omitVersionSites": [
+      {
+        "domain": "ing.nl",
+        "reason": "Site reports browser not supported"
+      }
+    ]
+  }
+}

@@ -24,6 +24,9 @@ import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.PrivacyFeatureName
+import com.duckduckgo.privacy.config.api.UserAgent
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -41,7 +44,9 @@ import javax.inject.Provider
 class UserAgentProvider constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
     device: DeviceInfo,
-    private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
+    private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
+    private val userAgent: UserAgent,
+    private val toggle: FeatureToggle
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -64,8 +69,14 @@ class UserAgentProvider constructor(
         isDesktop: Boolean = false
     ): String {
         val host = url?.toUri()?.host
-        val omitApplicationComponent = if (host != null) sitesThatOmitApplication.any { UriString.sameOrSubdomain(host, it) } else false
-        val omitVersionComponent = if (host != null) sitesThatOmitVersion.any { UriString.sameOrSubdomain(host, it) } else false
+        val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
+
+        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
+            return defaultUserAgent.get()
+        }
+
+        val omitApplicationComponent = if (host != null) userAgent.isAnApplicationException(host) else false
+        val omitVersionComponent = if (host != null) userAgent.isAVersionException(host) else false
         val shouldUseDesktopAgent =
             if (url != null && host != null) {
                 sitesThatShouldUseDesktopAgent.any { UriString.sameOrSubdomain(host, it.host) && !containsExcludedPath(url, it) }
@@ -127,27 +138,10 @@ class UserAgentProvider constructor(
 
     companion object {
         const val SPACE = " "
+        const val defaultUA = "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
-        val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
-
-        val sitesThatOmitApplication = listOf(
-            "cvs.com",
-            "chase.com",
-            "tirerack.com",
-            "sovietgames.su",
-            "thesun.co.uk",
-            "accounts.google.com",
-            "mail.google.com"
-        )
-
-        val sitesThatOmitVersion = listOf(
-            "ing.nl",
-            "chase.com",
-            "digid.nl",
-            "accounts.google.com",
-            "xfinity.com"
-        )
+        val fallbackDefaultUA = "$mobilePrefix $defaultUA"
 
         val sitesThatShouldUseDesktopAgent = listOf(
             DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))

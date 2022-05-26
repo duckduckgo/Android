@@ -28,4 +28,5 @@ enum class PrivacyFeatureName(override val value: String) : FeatureName {
     AmpLinksFeatureName("ampLinks"),
     TrackingParametersFeatureName("trackingParameters"),
     AutofillFeatureName("autofill"),
+    UserAgentFeatureName("customUserAgent"),
 }

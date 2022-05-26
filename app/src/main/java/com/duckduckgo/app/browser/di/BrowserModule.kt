@@ -82,9 +82,11 @@ import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.impl.NetworkFileDownloader
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UserAgent
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -237,9 +239,11 @@ class BrowserModule {
     fun userAgentProvider(
         @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
         deviceInfo: DeviceInfo,
-        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
+        userAgent: UserAgent,
+        toggle: FeatureToggle
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint)
+        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint, userAgent, toggle)
     }
 
     @Provides
