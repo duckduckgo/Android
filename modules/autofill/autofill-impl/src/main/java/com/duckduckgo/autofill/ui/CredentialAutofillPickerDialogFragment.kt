@@ -16,54 +16,81 @@
 
 package com.duckduckgo.autofill.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.lifecycleScope
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.autofill.impl.databinding.ContentAutofillCredentialsTooltipBinding
 import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@InjectWith(FragmentScope::class)
 class CredentialAutofillPickerDialogFragment : BottomSheetDialogFragment(), CredentialAutofillPickerDialog {
 
-    private lateinit var recyclerView: RecyclerView
+    @Inject
+    lateinit var faviconManager: FaviconManager
+
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        dialog?.setOnShowListener {
-            val d = it as BottomSheetDialog
-            val sheet: FrameLayout = d.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
+    ): View {
+        val binding = ContentAutofillCredentialsTooltipBinding.inflate(inflater, container, false)
+        configureViews(binding)
+        return binding.root
+    }
 
-            d.findViewById<TextView>(R.id.shareCredentialsTitle)?.text = "login form detected"
+    private fun configureViews(binding: ContentAutofillCredentialsTooltipBinding) {
+        dialog?.setOnShowListener {
+            val bottomSheetDialog = it as BottomSheetDialog
+            val sheet: FrameLayout = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
+
             BottomSheetBehavior.from(sheet).setPeekHeight(600.toPx(), true)
         }
 
-        return inflater.inflate(R.layout.content_autofill_credentials_tooltip, container, false)
+        configureSiteDetails(binding)
+
+        configureRecyclerView(binding)
     }
 
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun configureSiteDetails(binding: ContentAutofillCredentialsTooltipBinding) {
+        val originalUrl = getOriginalUrl()
+        val url = originalUrl.extractDomain() ?: originalUrl
 
-        recyclerView = view.findViewById(R.id.availableCredentialsRecycler)
-        recyclerView.adapter =
-            CredentialsPickerRecyclerAdapter(getAvailableCredentials()) { selectedCredentials ->
+        binding.siteName.text = url
+
+        lifecycleScope.launch {
+            faviconManager.loadToViewFromLocalOrFallback(url = url, view = binding.favicon)
+        }
+    }
+
+    private fun configureRecyclerView(binding: ContentAutofillCredentialsTooltipBinding) {
+        binding.availableCredentialsRecycler.adapter =
+            CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
                 val result =
                     Bundle().also {
                         it.putString("url", getOriginalUrl())
