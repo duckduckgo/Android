@@ -424,7 +424,7 @@ class BrowserWebViewClientTest {
     fun whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.ExtractedAmpLink(EXAMPLE_URL))
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
-        val mockWebView = mock<WebView>()
+        val mockWebView = getImmediatelyInvokedMockWebView()
         assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView).loadUrl(EXAMPLE_URL)
         verify(listener).startProcessingTrackingLink()
@@ -438,6 +438,12 @@ class BrowserWebViewClientTest {
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
         verify(mockWebView, never()).loadUrl(EXAMPLE_URL)
         verify(listener, never()).startProcessingTrackingLink()
+    }
+
+    @Test
+    fun whenAmpLinkDetectedAndIsForMainFrameAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() = runTest {
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+        whenAmpLinkDetectedAndIsForMainFrameThenReturnTrueAndLoadExtractedUrl()
     }
 
     @Test
