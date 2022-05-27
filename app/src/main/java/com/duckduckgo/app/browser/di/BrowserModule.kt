@@ -39,7 +39,6 @@ import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.browser.print.PrintInjectorJS
 import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -376,11 +375,6 @@ class BrowserModule {
         networkFileDownloader: NetworkFileDownloader
     ): FileDownloader {
         return AndroidFileDownloader(dataUriDownloader, networkFileDownloader)
-    }
-
-    @Provides
-    fun printInjector(): PrintInjector {
-        return PrintInjectorJS()
     }
 
     @Provides
