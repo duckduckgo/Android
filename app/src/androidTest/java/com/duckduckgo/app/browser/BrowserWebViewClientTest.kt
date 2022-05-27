@@ -529,6 +529,24 @@ class BrowserWebViewClientTest {
     }
 
     @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkThenReturnTrueAndLoadExtractedUrl() = runTest {
+        whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
+        val ampLink = SpecialUrlDetector.UrlType.ExtractedAmpLink(extractedUrl = EXAMPLE_URL)
+        whenever(specialUrlDetector.processUrl(anyString())).thenReturn(ampLink)
+        whenever(webResourceRequest.isForMainFrame).thenReturn(true)
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        assertTrue(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+        verify(mockWebView).loadUrl(EXAMPLE_URL)
+        verify(listener).startProcessingTrackingLink()
+    }
+
+    @Test
+    fun whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkAndIsOpenedInNewTabThenReturnTrueAndLoadExtractedUrl() = runTest {
+        whenever(listener.linkOpenedInNewTab()).thenReturn(true)
+        whenTrackingParametersDetectedAndIsForMainFrameAndIsExtractedAmpLinkThenReturnTrueAndLoadExtractedUrl()
+    }
+
+    @Test
     fun whenTrackingParametersDetectedAndIsForMainFrameAndIsAppLinkAndListenerIsNullThenReturnFalse() = runTest {
         whenever(specialUrlDetector.determineType(any<Uri>())).thenReturn(SpecialUrlDetector.UrlType.TrackingParameterLink(EXAMPLE_URL))
         val appLink = SpecialUrlDetector.UrlType.AppLink(uriString = EXAMPLE_URL)

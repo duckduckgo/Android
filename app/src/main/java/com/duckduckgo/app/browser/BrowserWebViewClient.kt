@@ -181,21 +181,25 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
                     if (isForMainFrame) {
-                        webViewClientListener?.startProcessingTrackingLink()
-                        Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
 
-                        val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)
-
-                        if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
-                            webViewClientListener?.let { listener ->
-                                loadUrl(listener, webView, urlType.cleanedUrl)
-                                return listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                            return when (val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)) {
+                                is SpecialUrlDetector.UrlType.AppLink -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                                }
+                                is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
+                                    Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
+                                    loadUrl(listener, webView, parameterStrippedType.extractedUrl)
+                                    true
+                                }
+                                else -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    true
+                                }
                             }
-                        } else {
-                            webViewClientListener?.let { listener ->
-                                loadUrl(listener, webView, urlType.cleanedUrl)
-                            }
-                            return true
                         }
                     }
                     false
