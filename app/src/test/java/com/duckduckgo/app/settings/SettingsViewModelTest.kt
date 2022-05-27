@@ -40,9 +40,10 @@ import com.duckduckgo.macos_api.MacOsWaitlist
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
-import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldOnboardingStore
+import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
+import com.duckduckgo.mobile.android.vpn.waitlist.AppTrackingProtectionWaitlistDataStore
 import com.duckduckgo.mobile.android.vpn.waitlist.store.AtpWaitlistStateRepository
-import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
+import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistStateRepository
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import org.mockito.kotlin.*
@@ -86,7 +87,6 @@ class SettingsViewModelTest {
     @Mock
     lateinit var mockContext: Context
 
-    @Mock
     private lateinit var appTPRepository: AtpWaitlistStateRepository
 
     @Mock
@@ -96,7 +96,7 @@ class SettingsViewModelTest {
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
-    private lateinit var mockDeviceShieldOnboarding: DeviceShieldOnboardingStore
+    private lateinit var mockDeviceShieldOnboarding: VpnStore
 
     @Mock
     private lateinit var mockAppBuildConfig: AppBuildConfig
@@ -107,12 +107,17 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockMacOsWaitlist: MacOsWaitlist
 
+    private lateinit var appTrackingProtectionWaitlistDataStore: FakeAppTrackingProtectionWaitlistDataStore
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
+
+        appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
+        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore, mockVariantManager)
 
         testee = SettingsViewModel(
             mockContext,
@@ -136,7 +141,6 @@ class SettingsViewModelTest {
         whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
         whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
         whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
@@ -591,11 +595,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
-
+            appTrackingProtectionWaitlistDataStore.inviteCode = "inviteCode"
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
-            whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
             testee.onAppTPSettingClicked()
 
@@ -606,11 +610,11 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
         testee.commands().test {
-
+            appTrackingProtectionWaitlistDataStore.inviteCode = "inviteCode"
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
             whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
-            whenever(appTPRepository.getState()).thenReturn(WaitlistState.InBeta)
 
             testee.onAppTPSettingClicked()
 
@@ -621,10 +625,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
         testee.commands().test {
 
-            whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
 
             testee.onAppTPSettingClicked()
 
@@ -635,10 +639,10 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
-            whenever(appTPRepository.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
 
             testee.onAppTPSettingClicked()
 
@@ -649,14 +653,42 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
+    fun whenNotInAppTPRetentionStudyAndUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
         testee.commands().test {
 
-            whenever(appTPRepository.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
 
             testee.onAppTPSettingClicked()
 
             assertEquals(Command.LaunchAppTPWaitlist, awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInAppTPRetentionStudyAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+        testee.commands().test {
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
+
+            testee.onAppTPSettingClicked()
+
+            assertEquals(Command.LaunchAppTPTrackersScreen, expectMostRecentItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenInAppTPRetentionStudyAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
+        testee.commands().test {
+            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
+
+            testee.onAppTPSettingClicked()
+
+            assertEquals(Command.LaunchAppTPOnboarding, expectMostRecentItem())
 
             cancelAndConsumeRemainingEvents()
         }
@@ -704,4 +736,17 @@ class SettingsViewModelTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(theme)
         whenever(mockThemeSettingsDataStore.isCurrentlySelected(theme)).thenReturn(true)
     }
+}
+
+private class FakeAppTrackingProtectionWaitlistDataStore : AppTrackingProtectionWaitlistDataStore {
+    override var inviteCode: String? = null
+    override var waitlistTimestamp: Int = -1
+    override var waitlistToken: String? = null
+    override var sendNotification: Boolean = false
+    override var lastUsedDate: String? = null
+
+    override fun canUseEncryption(): Boolean {
+        return false
+    }
+
 }

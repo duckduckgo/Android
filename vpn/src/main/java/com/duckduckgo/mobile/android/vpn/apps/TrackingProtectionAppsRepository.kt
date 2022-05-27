@@ -28,14 +28,11 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 
 interface TrackingProtectionAppsRepository {
 
@@ -45,11 +42,13 @@ interface TrackingProtectionAppsRepository {
     /** @return the list of installed apps currently excluded */
     suspend fun getExclusionAppsList(): List<String>
 
+    fun manuallyExcludedApps(): Flow<List<Pair<String, Boolean>>>
+
     /** Remove the app to the exclusion list so that its traffic does not go through the VPN */
     suspend fun manuallyEnabledApp(packageName: String)
 
     /** Add the app to the exclusion list so that its traffic goes through the VPN */
-    suspend fun manuallyExcludedApp(packageName: String)
+    suspend fun manuallyExcludeApp(packageName: String)
 
     /** Restore protection to the default list */
     suspend fun restoreDefaultProtectedList()
@@ -110,6 +109,10 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
             .sortedBy { it.name }
             .map { it.packageName }
             .toList()
+    }
+
+    override fun manuallyExcludedApps(): Flow<List<Pair<String, Boolean>>> {
+        return appTrackerRepository.getManualAppExclusionListFlow().map { list -> list.map { it.packageId to it.isProtected } }
     }
 
     private fun shouldNotBeShown(appInfo: ApplicationInfo): Boolean {
@@ -193,7 +196,7 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         }
     }
 
-    override suspend fun manuallyExcludedApp(packageName: String) {
+    override suspend fun manuallyExcludeApp(packageName: String) {
         withContext(dispatcherProvider.io()) {
             appTrackerRepository.manuallyExcludedApp(packageName)
         }

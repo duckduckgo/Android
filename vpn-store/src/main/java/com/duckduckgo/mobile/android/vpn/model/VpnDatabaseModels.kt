@@ -89,12 +89,6 @@ data class BucketizedVpnServiceStateStats(
     @Embedded val vpnServiceStateStats: VpnServiceStateStats
 )
 
-@Entity(tableName = "vpn_preferences")
-data class VpnPreferences(
-    @PrimaryKey val preference: String,
-    val value: Boolean
-)
-
 data class TrackingApp(
     val packageId: String,
     val appDisplayName: String

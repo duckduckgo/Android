@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Aizvērt cilni</string>
     <string name="tabClosed">Cilne ir aizvērta</string>
     <string name="tabClosedUndo">Atsaukt</string>
+    <string name="downloadsMenuItemTitle">Lejupielādes</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Vietnes privātuma aizsardzība</string>
@@ -268,6 +268,8 @@
     <string name="dialogSave">Saglabāt</string>
     <string name="delete">Dzēst</string>
     <string name="edit">Rediģēt</string>
+    <string name="remove">Noņemt</string>
+    <string name="removeAll">Noņemt visu</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Meklēt DuckDuckGo</string>
@@ -293,7 +295,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Palīdziet mums uzlabot lietotni!</string>
-    <string name="surveyCtaDescription">Piedalīties mūsu īsajā, anonīmajā aptaujā un dalīties ar atsauksmi.</string>
+    <string name="surveyCtaDescription">Piedalies mūsu īsajā aptaujā un dalies ar savu atsauksmi.</string>
     <string name="surveyCtaLaunchButton">Piedalīties aptaujā</string>
     <string name="surveyCtaDismissButton">Nē, paldies</string>
     <string name="surveyActivityTitle">Lietotāju aptauja</string>
@@ -468,7 +470,7 @@
     <string name="onboardingLetsDoItButton">Darīsim to!</string>
     <string name="daxIntroCtaText"><![CDATA[Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! <br/><br/>Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Izdevās!<br/><br/>Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku! 👍]]></string>
-    <string name="daxSerpCtaText">Jūsu DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju jūsu meklēšanas vēsturi. Nekad. 🙌</string>
+    <string name="daxSerpCtaText">Tavi DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju tavu meklēšanas vēsturi. Nekad. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="zero"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
@@ -484,7 +486,7 @@
     <string name="daxMainNetworkOwnedCtaText">Mazs brīdinājums! Tā kā %1$s pieder %2$s, es nevaru viņiem liegt šeit skatīt tavas darbības.&lt;br/&gt;&lt;br/&gt;Taču pārlūko kopā ar mani, jo es varu samazināt to, ko %3$s zina par tevi kopumā, bloķējot viņu izsekotājus daudzās citās vietnēs.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Turpināt</string>
+    <string name="downloadConfirmationContinue">Lejupielādēt</string>
     <string name="downloadConfirmationSaveFileTitle">Saglabāt %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Paturēt abus</string>
     <string name="downloadConfirmationReplaceOldFileText">Aizvietot</string>
@@ -527,23 +529,33 @@
     <string name="fireproofWebsitesActivityTitle">Ugunsdrošas vietnes</string>
     <string name="settingsFireproofWebsites">Ugunsdrošas vietnes</string>
     <string name="fireproofWebsiteMenuTitleAdd">Padarīt šo vietni ugunsdrošu</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; tagad ir ugunsdrošs</string>
     <string name="fireproofWebsiteSnackbarAction">Atsaukt</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Vai tiešām vēlaties izdzēst &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Nav ugunsdrošu vietņu</string>
     <string name="fireproofWebsiteFeatureDescription">Vietnes lieto sīkfailus, lai tu varētu turpināt būt pierakstījies(-usies). Padarot vietni ugunsdrošu, sīkfaili netiek dzēsti, bet tu vari turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas. Mēs joprojām bloķēsim trešo pušu izsekotājus, kas atrodami ugunsdrošās vietnēs.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Citas iespējas ugunsdrošai tīmekļa vietnei %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Vai vēlies padarīt %1$s ugunsdrošu?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Padarot šo vietni ugunsdrošu, varēsi turpināt būt pierakstījies(-usies) arī pēc Uguns pogas lietošanas.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Padarīt ugunsdrošu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne tagad</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Tīmekļa vietnes</string>
-    <string name="fireproofWebsiteToggleText">Jautāt, kad pierakstos</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Ugunsdrošas vietnes</string>
+    <string name="fireproofWebsiteEmptyListHint">Vēl nav ugunsdrošu vietņu</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Padarīt vietnes ugunsdrošas pierakstoties</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Visām vietnēm noņemta ugunsdrošība</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ir noņemta ugunsdrošība</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Jautāt katru reizi</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vienmēr</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Nekad</string>
     <string name="disableLoginDetectionDialogTitle">Vai atspējot atgādinājumu par ugunsdrošību, kad pierakstāties vietnēs?</string>
     <string name="disableLoginDetectionDialogDescription">Šo preferenci varēsi jebkurā laikā mainīt iestatījumu sadaļā.</string>
     <string name="disableLoginDetectionDialogPositive">ATSPĒJOT</string>
     <string name="disableLoginDetectionDialogNegative">ATCELT</string>
-    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ir noņemta ugunsdrošība</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Automātiski padarīt vietnes ugunsdrošas pierakstoties?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Padarot vietnes ugunsdrošas, paliksi pierakstījies(-usies) arī pēc Uguns pogas nospiešanas. Vēlāk to vienmēr vari mainīt sadaļā Iestatījumi. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vienmēr padarīt ugunsdrošu</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Padarīt šo vietni ugunsdrošu</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Ne tagad</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Uguns pogas animācija</string>
@@ -593,7 +605,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href=\"\">Uzzini vairāk</a><u/>]]>
+        <![CDATA[DuckDuckGo automātiski bloķē daudzus izsekotājus. Izmantojot globālo privātuma kontroli (GPC), vari arī lūgt iesaistītajām vietnēm ierobežot savu personas datu pārdošanu vai kopīgošanu ar citiem uzņēmumiem. <u><a href="">Uzzini vairāk</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Globālā privātuma kontrole (GPC)</string>
     <string name="globalPrivacyControlToggle">Globālā privātuma kontrole (GPC)</string>
@@ -648,16 +660,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-pasta konfidencialitāte, vienkāršota.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju.<br /><a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi, nemainot e-pasta pakalpojumu sniedzēju.<br /><a href=""><b>Uzzini vairāk</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Tu esi sarakstā!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=\"\"><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=\"\"><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Mēs nosūtīsim tev paziņojumu, kad<br/> e-pasta aizsardzība būs sagatavota. <a href=""><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tavs uzaicinājums būs redzams šeit, kad tas būs sagatavots. Vai vēlies <a href=""><b>saņemt paziņojumu</b></a>, kad tas tiks nosūtīts?<br/><a href=""><b>Uzzini vairāk</b></a> par e-pasta aizsardzību.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Tu esi uzaicināts(-ta)!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/>nemainot e-pasta pakalpojumu sniedzēju.<br/><a href=\"\"><b>Uzzini vairāk</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloķē e-pasta izsekotājus un paslēp savu adresi,<br/>nemainot e-pasta pakalpojumu sniedzēju.<br/><a href=""><b>Uzzini vairāk</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Personīgā Duck adrese</string>
@@ -704,4 +716,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Sākuma ekrānam pievienots logrīks %1$s</string>
     <string name="settingsAddHomeScreenWidget">Sākuma ekrāna logrīks</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Pārlūko privāti, izmantojot mūsu Mac lietotni</string>
+    <string name="macos_settings_description_list">Tu esi sarakstā!</string>
+    <string name="macos_settings_description_ready">Pieejams lejupielādei Mac datorā</string>
+    <string name="macos_settings_title">DuckDuckGo darbvirsmas lietotne</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Lejupielādes</string>
+    <string name="downloadsActivityTitle">Lejupielādes</string>
+    <string name="downloadsActivityNoItemsDescription">Vēl nav lejupielādēts neviens fails</string>
+    <string name="downloadsShareTitle">Kopīgot ar…</string>
+    <string name="downloadsDownloadFinishedActionName">Atvērt</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Fails vairs nepastāv</string>
+    <string name="downloadsItemMenuShare">Kopīgot</string>
+    <string name="downloadsItemMenuDelete">Dzēst</string>
+    <string name="downloadsItemMenuCancel">Atcelt</string>
+    <string name="downloadsActivityMenuDeleteAll">Dzēst visus</string>
+    <string name="downloadsFileDeletedMessage">Izdzēsts %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Visi faili izdzēsti</string>
+    <string name="downloadsMoreOptionsContentDescription">Citas iespējas %1$s</string>
+    <string name="downloadsUndoActionName">Atsaukt</string>
+    <string name="downloadsStateInProgress">Notiek...</string>
+
 </resources>

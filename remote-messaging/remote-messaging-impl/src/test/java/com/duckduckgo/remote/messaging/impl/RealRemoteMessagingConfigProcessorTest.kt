@@ -22,7 +22,6 @@ import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.mappers.RemoteMessagingConfigJsonMapper
-import com.duckduckgo.remote.messaging.impl.matchers.AttributeMatcher
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -47,12 +46,7 @@ class RealRemoteMessagingConfigProcessorTest {
     private val remoteMessagingConfigJsonMapper = RemoteMessagingConfigJsonMapper(appBuildConfig)
     private val remoteMessagingConfigRepository = mock<RemoteMessagingConfigRepository>()
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
-    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(
-        mock<AttributeMatcher>(),
-        mock<AttributeMatcher>(),
-        mock<RemoteMessagingRepository>(),
-        mock<AttributeMatcher>(),
-    )
+    private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock(),), mock(),)
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper, remoteMessagingConfigRepository, remoteMessagingRepository, remoteMessagingConfigMatcher

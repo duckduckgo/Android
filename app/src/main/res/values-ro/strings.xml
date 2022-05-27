@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Închide</string>
     <string name="tabClosed">Filă închisă</string>
     <string name="tabClosedUndo">Anulează</string>
+    <string name="downloadsMenuItemTitle">Descărcări</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Protecția confidențialității site-ului</string>
@@ -268,6 +268,8 @@
     <string name="dialogSave">Salvare</string>
     <string name="delete">Ștergere</string>
     <string name="edit">Editare</string>
+    <string name="remove">Elimină</string>
+    <string name="removeAll">Elimină tot</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Căutare DuckDuckGo</string>
@@ -293,7 +295,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ajută-ne să îmbunătățim aplicația!</string>
-    <string name="surveyCtaDescription">Participă la sondajul nostru scurt, în mod anonim, și trimite feedbackul.</string>
+    <string name="surveyCtaDescription">Participă la scurtul nostru sondaj și trimite-ne feedbackul tău.</string>
     <string name="surveyCtaLaunchButton">Participă la sondaj</string>
     <string name="surveyCtaDismissButton">Nu, mulțumesc</string>
     <string name="surveyActivityTitle">Sondajul utilizatorului</string>
@@ -468,7 +470,7 @@
     <string name="onboardingLetsDoItButton">Să Începem!</string>
     <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
-    <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu îți voi stoca niciodată istoricul căutării. Niciodată. 🙌</string>
+    <string name="daxSerpCtaText">Căutările tale DuckDuckGo sunt anonime și nu salvez niciodată istoricul căutărilor tale. Niciodată. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ și <b>%1$d altul</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
         <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
@@ -484,7 +486,7 @@
     <string name="daxMainNetworkOwnedCtaText">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continuă</string>
+    <string name="downloadConfirmationContinue">Salvează în Descărcări</string>
     <string name="downloadConfirmationSaveFileTitle">Salvează %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Păstrează ambele</string>
     <string name="downloadConfirmationReplaceOldFileText">Înlocuiește</string>
@@ -527,23 +529,33 @@
     <string name="fireproofWebsitesActivityTitle">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
     <string name="settingsFireproofWebsites">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
     <string name="fireproofWebsiteMenuTitleAdd">Șterge activitatea și istoricul din browser pentru acest site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; nu mai păstrează acum activitatea și istoricul!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; este acum ignifugat</string>
     <string name="fireproofWebsiteSnackbarAction">Anulează</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Sigur dorești să ștergi &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Nu există site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
     <string name="fireproofWebsiteFeatureDescription">Site-urile web se bazează pe cookie-uri pentru a te menține conectat. Atunci când ștergi activitatea și istoricul unui site, cookie-urile nu vor fi șterse și vei rămâne conectat, chiar și după utilizarea butonului Ștergere activitate și istoric. Blocăm totuși instrumentele de urmărire terțe găsite pe site-urile web la care la ieșire se șterge activitatea și istoricul din browser.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Mai multe opțiuni pentru site-ul ignifug %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Dorești să ștergi activitatea și istoricul pentru %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Ștergerea activității și istoricului din browser pentru acest site te va menține conectat după utilizarea butonului Ștergere activitate și istoric.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Ștergerea activității și istoricului din browser</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nu acum</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Site-uri web</string>
-    <string name="fireproofWebsiteToggleText">Întreabă la conectare</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Site-uri cu ștergerea activității și istoricului din browser la ieșire</string>
+    <string name="fireproofWebsiteEmptyListHint">Nu există încă site-uri ignifuge</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Ignifughează site-urile la autentificare</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Ignifugarea a fost eliminată pentru toate site-urile</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Întreabă de fiecare dată</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Întotdeauna</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Niciodată</string>
     <string name="disableLoginDetectionDialogTitle">Dezactivezi dialogul de confirmare pentru ștergerea activității și istoricului la conectarea la site-uri?</string>
     <string name="disableLoginDetectionDialogDescription">Poți modifica oricând această preferință în Setări.</string>
     <string name="disableLoginDetectionDialogPositive">DEZACTIVARE</string>
     <string name="disableLoginDetectionDialogNegative">ANULARE</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Ștergerea activității și istoricului a fost eliminată pentru &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Ignifughezi automat site-urile la autentificare?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Ignifugarea site-urilor te va menține autentificat și după ce ai utilizat butonul Foc. Poți să modifici ulterior acest lucru din Setări. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Ignifughează întotdeauna</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Ignifughează acest site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Nu acum</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animație buton Foc</string>
@@ -593,7 +605,7 @@
     <!--  Global Privacy Control-->
     <string name="globalPrivacyControlActivityTitle">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlDescription">
-        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href=\"\">Află mai multe</a><u/>]]>
+        <![CDATA[DuckDuckGo blochează automat mai multe instrumente de urmărire. Cu Global Privacy Control (GPC) poți solicita, de asemenea, site-urilor web participante să restricționeze vânzarea sau partajarea datelor tale cu caracter personal cu alte companii. <u><a href="">Află mai multe</a><u/>]]>
     </string>
     <string name="globalPrivacyControlSetting">Global Privacy Control (GPC)</string>
     <string name="globalPrivacyControlToggle">Global Privacy Control (GPC)</string>
@@ -648,16 +660,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Confidențialitatea e-mailurilor, simplificată.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ești pe listă!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=\"\"><b>primești o notificare</b></a> când ajunge?<br/><a href=\"\"><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Îți vom trimite o notificare când<br/> protecția comunicațiilor prin e-mail este pregătită pentru tine. <a href=""><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitația ta va apărea aici când vom fi pregătiți pentru tine. Dorești să <a href=""><b>primești o notificare</b></a> când ajunge?<br/><a href=""><b>Află mai multe</b></a> despre protecția comunicațiilor prin e-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Ești invitat!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=\"\"><b>Află mai multe</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blochează modulele cookie de urmărire pentru e-mail și ascunde-ți adresa, fără a schimba furnizorul de e-mail. <a href=""><b>Află mai multe</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Adresa Duck personală</string>
@@ -704,4 +716,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget adăugat la ecranul de pornire</string>
     <string name="settingsAddHomeScreenWidget">Widget pe ecranul de pornire</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
+    <string name="macos_settings_description_list">Ești pe listă!</string>
+    <string name="macos_settings_description_ready">Disponibilă pentru descărcare pe Mac</string>
+    <string name="macos_settings_title">Aplicația DuckDuckGo pentru desktop</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Descărcări</string>
+    <string name="downloadsActivityTitle">Descărcări</string>
+    <string name="downloadsActivityNoItemsDescription">Nu a fost descărcat încă niciun fișier</string>
+    <string name="downloadsShareTitle">Distribuie către...</string>
+    <string name="downloadsDownloadFinishedActionName">Deschide</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Fișierul nu mai există</string>
+    <string name="downloadsItemMenuShare">Trimite…</string>
+    <string name="downloadsItemMenuDelete">Ștergere</string>
+    <string name="downloadsItemMenuCancel">Anulează</string>
+    <string name="downloadsActivityMenuDeleteAll">Șterge toate</string>
+    <string name="downloadsFileDeletedMessage">S-a șters %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Toate fișierele au fost șterse</string>
+    <string name="downloadsMoreOptionsContentDescription">Mai multe opțiuni pentru %1$s</string>
+    <string name="downloadsUndoActionName">Anulează</string>
+    <string name="downloadsStateInProgress">În curs...</string>
+
 </resources>

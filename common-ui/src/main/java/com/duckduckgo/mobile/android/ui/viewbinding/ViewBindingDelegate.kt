@@ -39,11 +39,11 @@ class ViewBindingDelegate<T : ViewBinding>(
                     ViewGroup::class.java,
                     Boolean::class.javaPrimitiveType
                 )
-            inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast<T>()
+            inflateMethod.invoke(null, LayoutInflater.from(view.context), view, true).cast()
         } catch (e: NoSuchMethodException) {
             val inflateMethod =
                 bindingClass.getMethod("inflate", LayoutInflater::class.java, ViewGroup::class.java)
-            inflateMethod.invoke(null, LayoutInflater.from(view.context), view).cast<T>()
+            inflateMethod.invoke(null, LayoutInflater.from(view.context), view).cast()
         }
 
     override fun getValue(

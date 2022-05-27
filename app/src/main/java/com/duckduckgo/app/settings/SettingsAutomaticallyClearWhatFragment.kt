@@ -71,9 +71,9 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
     @IdRes
     private fun ClearWhatOption.radioButtonId(): Int {
         return when (this) {
-            ClearWhatOption.CLEAR_NONE -> R.id.settingNone
-            ClearWhatOption.CLEAR_TABS_ONLY -> R.id.settingTabsOnly
-            ClearWhatOption.CLEAR_TABS_AND_DATA -> R.id.settingTabsAndData
+            CLEAR_NONE -> R.id.settingNone
+            CLEAR_TABS_ONLY -> R.id.settingTabsOnly
+            CLEAR_TABS_AND_DATA -> R.id.settingTabsAndData
         }
     }
 

@@ -19,18 +19,22 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.network.channels.NetworkChannelCreator
+import com.duckduckgo.mobile.android.vpn.processor.PacketInfo
+import com.duckduckgo.mobile.android.vpn.processor.PacketRequest
+import com.duckduckgo.mobile.android.vpn.processor.RealPacketInterceptorChain
+import com.duckduckgo.mobile.android.vpn.processor.VpnPacketInterceptor
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.packet.totalHeaderSize
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
@@ -44,85 +48,73 @@ import java.nio.channels.CancelledKeyException
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
-import java.util.concurrent.Executors
+import java.util.concurrent.Executors.newSingleThreadExecutor
 import java.util.concurrent.TimeUnit
+import javax.inject.Provider
 
 class UdpPacketProcessor @AssistedInject constructor(
     private val queues: VpnQueues,
-    @Assisted private val networkChannelCreator: NetworkChannelCreator,
+    networkChannelCreatorProvider: Provider<NetworkChannelCreator>,
     private val packetPersister: PacketPersister,
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     private val appNameResolver: AppNameResolver,
     private val channelCache: UdpChannelCache,
     private val healthMetricCounter: HealthMetricCounter,
     private val appBuildConfig: AppBuildConfig,
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
 ) : Runnable {
 
     @AssistedFactory
     interface Factory {
-        fun build(networkChannelCreator: NetworkChannelCreator): UdpPacketProcessor
+        fun build(): UdpPacketProcessor
     }
 
-    private var pollJobDeviceToNetwork: Job? = null
-    private var pollJobNetworkToDevice: Job? = null
+    private val networkChannelCreator by lazy {
+        networkChannelCreatorProvider.get()
+    }
+
+    private val interceptors = interceptorPlugins.getPlugins().toMutableList().apply {
+        add(
+            VpnPacketInterceptor { chain ->
+                val request = chain.request()
+                Timber.v("Proceed with UDP packet request ${request.packetInfo}")
+                request.byteChannel.write(request.byteBuffer)
+            }
+        )
+    }.toList()
+
+    private val pollJobDeviceToNetwork = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
+    private val pollJobNetworkToDevice = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
 
     val selector: Selector = Selector.open()
 
     override fun run() {
         Timber.i("Starting ${this::class.simpleName}")
 
-        if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForDeviceToNetworkWork() }
-        }
+        pollJobDeviceToNetwork.execute(
+            udpRunnable {
+                deviceToNetworkProcessing()
+            }
+        )
 
-        if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice = GlobalScope.launch(Executors.newSingleThreadExecutor().asCoroutineDispatcher()) { pollForNetworkToDeviceWork() }
-        }
+        pollJobNetworkToDevice.execute(
+            udpRunnable {
+                networkToDeviceProcessing()
+            }
+        )
     }
 
     fun stop() {
         Timber.i("Stopping ${this::class.simpleName}")
 
-        pollJobDeviceToNetwork?.cancel()
-        pollJobDeviceToNetwork = null
-
-        pollJobNetworkToDevice?.cancel()
-        pollJobNetworkToDevice = null
+        pollJobDeviceToNetwork.shutdownNow()
+        pollJobDeviceToNetwork.shutdownNow()
 
         channelCache.evictAll()
-    }
-
-    private fun pollForDeviceToNetworkWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        try {
-            while (pollJobDeviceToNetwork?.isActive == true) {
-                try {
-                    deviceToNetworkProcessing()
-                } catch (e: IOException) {
-                    Timber.w(e, "Failed to process UDP device-to-network packet")
-                } catch (e: CancelledKeyException) {
-                    Timber.w(e, "Failed to process UDP device-to-network packet")
-                }
-            }
-        } finally {
-            Timber.i("Evicting all from the channel cache")
-            channelCache.evictAll()
-        }
-    }
-
-    private suspend fun pollForNetworkToDeviceWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobNetworkToDevice?.isActive == true) {
-            try {
-                networkToDeviceProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process UDP network-to-device packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process UDP network-to-device packet")
-            }
-        }
     }
 
     /**
@@ -130,6 +122,8 @@ class UdpPacketProcessor @AssistedInject constructor(
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
     private fun deviceToNetworkProcessing() {
+        check(interceptors.isNotEmpty())
+
         val packet = queues.udpDeviceToNetwork.take() ?: return
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue(isUdp = true)
@@ -173,7 +167,18 @@ class UdpPacketProcessor @AssistedInject constructor(
             )
 
             while (payloadBuffer.hasRemaining()) {
-                val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
+                val packetRequest = PacketRequest(
+                    packetInfo = PacketInfo(
+                        IPVersion = packet.ipHeader.version,
+                        transportProtocol = connectionInfo.protocolNumber,
+                        destinationAddress = connectionInfo.destinationAddress,
+                        destinationPort = connectionInfo.destinationPort
+                    ),
+                    byteBuffer = payloadBuffer,
+                    byteChannel = channelDetails.datagramChannel
+                )
+                val chain = RealPacketInterceptorChain(interceptors, 0, packetRequest)
+                val bytesWritten = chain.proceed(packetRequest)
                 Timber.v("UDP packet. Sent $bytesWritten bytes to $cacheKey")
 
                 packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
@@ -190,12 +195,10 @@ class UdpPacketProcessor @AssistedInject constructor(
     }
 
     private fun createChannel(destination: InetSocketAddress): DatagramChannel? {
-        val channel = networkChannelCreator.createDatagramChannel()
-        try {
-            channel.connect(destination)
+        val channel = try {
+            networkChannelCreator.createDatagramChannelAndConnect(destination)
         } catch (e: IOException) {
             Timber.w(e, "Failed to connect to UDP ${destination.hostName}:${destination.port}")
-            channel.close()
             return null
         }
 
@@ -206,13 +209,12 @@ class UdpPacketProcessor @AssistedInject constructor(
      * Reads data from the network when the selector tells us it has a readable key.
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun networkToDeviceProcessing() {
+    private fun networkToDeviceProcessing() {
         val startTime = SystemClock.uptimeMillis()
         val channelsReady = selector.select(TimeUnit.SECONDS.toMillis(1))
 
         if (channelsReady == 0) {
-            delay(10)
+            Thread.sleep(10)
             return
         }
 
@@ -257,4 +259,22 @@ class UdpPacketProcessor @AssistedInject constructor(
         val datagramChannel: DatagramChannel,
         val originatingApp: OriginatingApp
     )
+}
+
+// convenience method to share the try-catch block
+private inline fun udpRunnable(crossinline block: () -> Unit): Runnable {
+    return java.lang.Runnable {
+        while (!Thread.interrupted()) {
+            try {
+                block()
+            } catch (e: IOException) {
+                Timber.w(e, "Failed to process UDP network-to-device packet")
+            } catch (e: CancelledKeyException) {
+                Timber.w(e, "Failed to process UDP network-to-device packet")
+            } catch (e: InterruptedException) {
+                Timber.v("Thread interrupted")
+                return@Runnable
+            }
+        }
+    }
 }

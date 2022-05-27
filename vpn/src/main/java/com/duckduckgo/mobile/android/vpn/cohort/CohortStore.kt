@@ -16,20 +16,14 @@
 
 package com.duckduckgo.mobile.android.vpn.cohort
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.annotation.VisibleForTesting
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDate
 import org.threeten.bp.format.DateTimeFormatter
@@ -51,15 +45,17 @@ interface CohortStore {
     scope = AppScope::class,
     boundType = CohortStore::class
 )
+@ContributesMultibinding(
+    scope = VpnScope::class,
+    boundType = VpnServiceCallbacks::class
+)
 class RealCohortStore @Inject constructor(
-    private val context: Context
+    sharedPreferencesProvider: VpnSharedPreferencesProvider
 ) : CohortStore, VpnServiceCallbacks {
 
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
-    @VisibleForTesting
-    val preferences: SharedPreferences
-        get() = context.getSharedPreferences(FILENAME, Context.MODE_MULTI_PROCESS)
+    private val preferences = sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = true)
 
     override fun getCohortStoredLocalDate(): LocalDate? {
         return preferences.getString(KEY_COHORT_LOCAL_DATE, null)?.let {
@@ -89,13 +85,4 @@ class RealCohortStore @Inject constructor(
         private const val FILENAME = "com.duckduckgo.mobile.atp.cohort.prefs"
         private const val KEY_COHORT_LOCAL_DATE = "KEY_COHORT_LOCAL_DATE"
     }
-}
-
-@Module
-@ContributesTo(VpnScope::class)
-abstract class CohortStoreModule {
-    @Binds
-    @IntoSet
-    @SingleInstanceIn(VpnScope::class)
-    abstract fun bindCohortStore(realCohortStore: RealCohortStore): VpnServiceCallbacks
 }

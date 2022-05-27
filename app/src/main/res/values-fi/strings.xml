@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Sulje välilehti</string>
     <string name="tabClosed">Välilehti suljettu</string>
     <string name="tabClosedUndo">Kumoa</string>
+    <string name="downloadsMenuItemTitle">Lataukset</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Sivuston yksityisyydensuoja</string>
@@ -264,6 +264,8 @@
     <string name="dialogSave">Tallenna</string>
     <string name="delete">Poista</string>
     <string name="edit">Muokkaa</string>
+    <string name="remove">Poista</string>
+    <string name="removeAll">Poista kaikki</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Hae DuckDuckGosta</string>
@@ -289,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Auta meitä kehittämään sovellusta!</string>
-    <string name="surveyCtaDescription">Vastaa lyhyeen anonyymiin kyselyymme ja kerro palautteesi.</string>
+    <string name="surveyCtaDescription">Vastaa lyhyeen kyselyymme ja anna palautetta.</string>
     <string name="surveyCtaLaunchButton">Vastaa kyselyyn</string>
     <string name="surveyCtaDismissButton">Ei kiitos</string>
     <string name="surveyActivityTitle">Käyttäjäkysely</string>
@@ -464,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
     <string name="daxIntroCtaText"><![CDATA[Seuraavaksi vieraile suosikkisivustoissasi! <br/><br/>Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Hyvin menee!<br/><br/>Muista, että joka kerta, kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo-haut ovat nimettömiä, enkä koskaan tallenna hakuhistoriaasi. Koskaan. 🙌</string>
+    <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat nimettömiä – emmekä tallenna hakuhistoriaasi koskaan. Ikinä. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
@@ -473,12 +475,12 @@
         <item quantity="one"><![CDATA[ yritti seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
         <item quantity="other"><![CDATA[ yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin – jatka selaamista!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Kun napautat ja selaat, estän ikävät seurantaohjelmat. <br/><br/>Siirry eteenpäin - jatka selaamista!]]></string>
     <string name="daxMainNetworkCtaText">Huomio! %1$s näkee mitä teet sivustolla %2$s enkä voi estää sitä. &lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta, estämällä heidän seurantansa monilla muilla sivustoilla.</string>
     <string name="daxMainNetworkOwnedCtaText">Hälytys! Koska %1$s omistaa palvelun %2$s, en voi estää heitä näkemästä, mitä teet täällä.&lt;br/&gt;&lt;br/&gt;Mutta jos käytät minua selaamiseen, voin vähentää, mitä %3$s saa tietää sinusta estämällä heidän seurantansa monilla muilla sivustoilla.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Jatka</string>
+    <string name="downloadConfirmationContinue">Tallenna latauksiin</string>
     <string name="downloadConfirmationSaveFileTitle">Tallenna %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Pidä molemmat</string>
     <string name="downloadConfirmationReplaceOldFileText">Korvaa</string>
@@ -524,20 +526,30 @@
     <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; on nyt palonkestävä.</string>
     <string name="fireproofWebsiteSnackbarAction">Kumoa</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Haluatko varmasti poistaa &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Ei palonkestäviä verkkosivustoja</string>
     <string name="fireproofWebsiteFeatureDescription">Verkkosivustot käyttävät evästeitä, joilla pysyt kirjautuneena sisään. Kun teet sivustosta palovarman, evästeitä ei poisteta ja pysyt kirjautuneena sisään, vaikka käytät Liekki-painiketta. Estämme edelleen kolmannen osapuolen seurannan palovarmoilla sivustoilla.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Lisää vaihtoehtoja palonkestävälle verkkosivustolle %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Haluatko tehdä sivustosta %1$s palovarman?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Sivuston tekeminen palovarmaksi tarkoittaa, että pysyt kirjautuneena, vaikka käytät Liekki-painiketta.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Tee palovarmaksi</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ei nyt</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Verkkosivustot</string>
-    <string name="fireproofWebsiteToggleText">Kysy kirjautuessa sisään</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Tee sivustoista palonkestäviä</string>
+    <string name="fireproofWebsiteEmptyListHint">Ei vielä palonkestäviä sivustoja</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Tee sivustoista palonkestäviä kirjautumisen yhteydessä.</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Palonkestävyys poistettu kaikista sivustoista</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Palonkestävyys poistettu sivustolta &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Kysy joka kerta</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Aina</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Ei koskaan</string>
     <string name="disableLoginDetectionDialogTitle">Poistetaanko palonkestävyyden muistutus käytöstä sivustoille kirjauduttaessa?</string>
     <string name="disableLoginDetectionDialogDescription">Voit muuttaa valintaa milloin tahansa asetuksista.</string>
     <string name="disableLoginDetectionDialogPositive">POISTA KÄYTÖSTÄ</string>
     <string name="disableLoginDetectionDialogNegative">PERUUTA</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Palonkestävyys poistettu sivustolta &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Tehdäänkö sivustoista palonkestäviä kirjautumisen yhteydessä?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Sivustojen tekeminen palonkestäviksi tarkoittaa, että pysyt kirjautuneena, kun käytät Liekki-painiketta. Voit muuttaa tätä asetusta milloin tahansa asetuksissa. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Tee aina palonkestäväksi</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Tee sivustosta palonkestäviä</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Ei nyt</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Liekki-painikkeen animaatio</string>
@@ -642,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Sähköpostin tietosuoja, yksinkertaisesti.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Olet listalla!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=\"\"><b>Lue lisää</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=\"\"><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=\"\"><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Lähetämme sinulle ilmoituksen, kun<br/> voit kokeilla sähköpostisuojausta. <a href=""><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Kutsusi näkyy täällä, kun on sinun vuorosi. Haluatko saada <a href=""><b>ilmoituksen</b></a>, kun kutsusi saapuu?<br/><a href=""><b>Lue lisää</b></a> sähköpostin suojauksesta.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Sinut on kutsuttu!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=\"\"><b>Lue lisää</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Estä sähköpostiseuraajat ja piilota osoitteesi<br/> vaihtamatta sähköpostintarjoajaasi.<br/><a href=""><b>Lue lisää</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Yksityinen Duck-osoite</string>
@@ -696,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s-widget lisätty aloitusnäyttöön</string>
     <string name="settingsAddHomeScreenWidget">Aloitusnäytön widget</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Selaa yksityisesti Mac-sovelluksellamme</string>
+    <string name="macos_settings_description_list">Olet listalla!</string>
+    <string name="macos_settings_description_ready">Ladattavissa Macille</string>
+    <string name="macos_settings_title">DuckDuckGo-työpöytäsovellus</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Lataukset</string>
+    <string name="downloadsActivityTitle">Lataukset</string>
+    <string name="downloadsActivityNoItemsDescription">Yhtään tiedostoa ei ole vielä ladattu</string>
+    <string name="downloadsShareTitle">Jaa...</string>
+    <string name="downloadsDownloadFinishedActionName">Avaa</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Tiedoston avaaminen ei onnistu. Tarkista yhteensopiva sovellus.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Tiedostoa ei enää ole olemassa</string>
+    <string name="downloadsItemMenuShare">Jaa</string>
+    <string name="downloadsItemMenuDelete">Poista</string>
+    <string name="downloadsItemMenuCancel">Peruuta</string>
+    <string name="downloadsActivityMenuDeleteAll">Poista kaikki</string>
+    <string name="downloadsFileDeletedMessage">%1$s poistettiin</string>
+    <string name="downloadsAllFilesDeletedMessage">Kaikki tiedostot poistettu</string>
+    <string name="downloadsMoreOptionsContentDescription">%1$s: lisäasetukset</string>
+    <string name="downloadsUndoActionName">Kumoa</string>
+    <string name="downloadsStateInProgress">Käynnissä…</string>
+
 </resources>

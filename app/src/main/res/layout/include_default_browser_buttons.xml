@@ -18,18 +18,24 @@
 
     <Button
         android:id="@+id/continueButton"
-        style="@style/OnboardingButtonSecondaryRoundedCta"
+        style="@style/Widget.DuckDuckGo.Button.Secondary.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserMaybeLater"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="@dimen/keyline_4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/launchSettingsButton"
-        style="@style/OnboardingButtonPrimaryRoundedCta"
+        style="@style/Widget.DuckDuckGo.Button.Rounded"
         android:layout_width="0dp"
+        android:layout_marginStart="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_5"
+        android:layout_marginBottom="20dp"
         android:layout_height="wrap_content"
         android:text="@string/defaultBrowserLetsDoIt"
         app:layout_constraintBottom_toTopOf="@+id/continueButton"

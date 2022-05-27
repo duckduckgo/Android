@@ -20,6 +20,6 @@ import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
 import retrofit2.http.GET
 
 interface PrivacyConfigService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/config/v1/android-config.json")
+    @GET("https://staticcdn.duckduckgo.com/trackerblocking/config/v2/android-config.json")
     suspend fun privacyConfig(): JsonPrivacyConfig
 }

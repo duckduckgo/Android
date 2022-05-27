@@ -29,8 +29,8 @@ import com.duckduckgo.remote.messaging.impl.models.asJsonFormat
 import com.duckduckgo.remote.messaging.impl.models.matches
 
 class DeviceAttributeMatcher(
-    val appBuildConfig: AppBuildConfig,
-    val appProperties: AppProperties
+    private val appBuildConfig: AppBuildConfig,
+    private val appProperties: AppProperties
 ) : AttributeMatcher {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): EvaluationResult? {
         when (matchingAttribute) {

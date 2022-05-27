@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Fermer onglet</string>
     <string name="tabClosed">Onglet fermé</string>
     <string name="tabClosedUndo">Annuler</string>
+    <string name="downloadsMenuItemTitle">Téléchargements</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Protection de la confidentialité du site</string>
@@ -264,6 +264,8 @@
     <string name="dialogSave">Enregistrer</string>
     <string name="delete">Supprimer</string>
     <string name="edit">Modifier</string>
+    <string name="remove">Supprimer</string>
+    <string name="removeAll">Tout supprimer</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Recherche DuckDuckGo</string>
@@ -289,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Aidez-nous à améliorer l\'application !</string>
-    <string name="surveyCtaDescription">Répondez à notre courte enquête anonyme et faites-nous part de vos commentaires.</string>
+    <string name="surveyCtaDescription">Répondez à notre courte enquête et faites-nous part de vos commentaires.</string>
     <string name="surveyCtaLaunchButton">Participer à l\'enquête</string>
     <string name="surveyCtaDismissButton">Non merci</string>
     <string name="surveyActivityTitle">Enquête auprès des utilisateurs</string>
@@ -464,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Allons-y !</string>
     <string name="daxIntroCtaText"><![CDATA[Maintenant, essayez de visiter un de vos sites préférés !<br/><br/>Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
-    <string name="daxSerpCtaText">Vos recherches effectuées sur DuckDuckGo sont confidentielles et je ne conserve jamais votre historique de recherche. Jamais. 🙌</string>
+    <string name="daxSerpCtaText">Les recherches effectuées sur DuckDuckGo sont anonymes et je ne conserve jamais votre historique de recherche. Jamais. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
         <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
@@ -478,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">Attention ! Comme %1$s est propriétaire de %2$s, je ne peux pas l\'empêcher d\'y suivre votre activité.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continuer</string>
+    <string name="downloadConfirmationContinue">Enregistrer dans les téléchargements</string>
     <string name="downloadConfirmationSaveFileTitle">Sauvegarder %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Garder les deux</string>
     <string name="downloadConfirmationReplaceOldFileText">Remplacer</string>
@@ -521,23 +523,33 @@
     <string name="fireproofWebsitesActivityTitle">Sites coupe-feu</string>
     <string name="settingsFireproofWebsites">Sites coupe-feu</string>
     <string name="fireproofWebsiteMenuTitleAdd">Activer le mode coupe-feu pour ce site</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; est maintenant en mode coupe-feu !</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; est maintenant en mode coupe-feu</string>
     <string name="fireproofWebsiteSnackbarAction">Annuler</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Voulez-vous vraiment supprimer &lt;b&gt;%1$s&lt;/b&gt; ?</string>
-    <string name="fireproofWebsiteEmptyListHint">Aucun site Web coupe-feu</string>
     <string name="fireproofWebsiteFeatureDescription">Les sites Web utilisent des cookies pour maintenir votre connexion. Quand vous placez un site en mode coupe-feu, les cookies sont conservés et vous restez connecté(e), même après avoir utilisé le bouton en forme de flamme. Ceci dit, les traqueurs tiers sont bloqués sur les sites coupe-feu.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Plus d\'options pour le site Web coupe-feu %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Souhaitez-vous placer %1$s en mode coupe-feu ?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Placer ce site en mode coupe-feu et utiliser le bouton en forme de flamme ne vous déconnectera pas.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Mode coupe-feu</string>
     <string name="fireproofWebsiteLoginDialogNegative">Pas maintenant</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Sites Web</string>
-    <string name="fireproofWebsiteToggleText">Choisir à la connexion</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Sites coupe-feu</string>
+    <string name="fireproofWebsiteEmptyListHint">Pas encore de sites en mode coupe-feu</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Sites Web en mode coupe-feu lors de la connexion</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Suppression du mode coupe-feu pour tous les sites</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Mode coupe-feu désactivé pour &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Toujours demander</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Toujours</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Jamais</string>
     <string name="disableLoginDetectionDialogTitle">Désactiver le rappel du mode coupe-feu lors de la connexion aux sites ?</string>
     <string name="disableLoginDetectionDialogDescription">Vous pouvez modifier cette préférence à tout moment dans Paramètres.</string>
     <string name="disableLoginDetectionDialogPositive">DÉSACTIVER</string>
     <string name="disableLoginDetectionDialogNegative">ANNULER</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Mode coupe-feu désactivé pour &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Activer automatiquement le coupe-feu des sites Web lors de la connexion ?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Placer les sites en mode coupe-feu et utiliser le bouton en forme de flamme ne vous déconnectera pas. Vous pourrez modifier ce réglage plus tard dans les paramètres. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Mode coupe-feu permanent</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Activer le mode coupe-feu pour ce site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Pas maintenant</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation du bouton en forme de flamme</string>
@@ -642,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">La confidentialité des e-mails, simplifiée.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie.<br/><a href=\"\"><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse, sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Vous êtes sur la liste !</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Nous vous contacterons lorsque la protection des e-mails sera disponible pour vous. <a href=\"\"><b>En savoir plus</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Votre invitation s\'affichera ici lorsque vous aurez accès à la fonctionnalité. Vous souhaitez <a href=\"\"><b>être prévenu(e)</b></a> de son lancement ?<br/><a href=\"\"><b>En savoir plus</b></a> sur la protection des e-mails.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Nous vous contacterons lorsque la protection des e-mails sera disponible pour vous. <a href=""><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Votre invitation s\'affichera ici lorsque vous aurez accès à la fonctionnalité. Vous souhaitez <a href=""><b>être prévenu(e)</b></a> de son lancement ?<br/><a href=""><b>En savoir plus</b></a> sur la protection des e-mails.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Vous êtes invité(e) !</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie.<br/><a href=\"\"><b>En savoir plus</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquez les traqueurs d\'e-mails et masquez votre adresse,<br/>sans changer de fournisseur de messagerie.<br/><a href=""><b>En savoir plus</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Adresse Duck personnelle</string>
@@ -696,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget ajouté à l\'écran d\'accueil</string>
     <string name="settingsAddHomeScreenWidget">Widget écran d\'accueil</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Naviguez incognito avec notre application pour Mac</string>
+    <string name="macos_settings_description_list">Vous êtes sur la liste !</string>
+    <string name="macos_settings_description_ready">Disponible en téléchargement sur Mac</string>
+    <string name="macos_settings_title">Application de bureau DuckDuckGo</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Téléchargements</string>
+    <string name="downloadsActivityTitle">Téléchargements</string>
+    <string name="downloadsActivityNoItemsDescription">Aucun fichier n\'a encore été téléchargé</string>
+    <string name="downloadsShareTitle">Partager avec…</string>
+    <string name="downloadsDownloadFinishedActionName">Ouvrir</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Impossible d\'ouvrir le fichier. Vérifiez la compatibilité de l\'application.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Le fichier n\'existe plus</string>
+    <string name="downloadsItemMenuShare">Partager</string>
+    <string name="downloadsItemMenuDelete">Supprimer</string>
+    <string name="downloadsItemMenuCancel">Annuler</string>
+    <string name="downloadsActivityMenuDeleteAll">Tout supprimer</string>
+    <string name="downloadsFileDeletedMessage">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
+    <string name="downloadsAllFilesDeletedMessage">Tous les fichiers sont supprimés.</string>
+    <string name="downloadsMoreOptionsContentDescription">Plus d\'options pour %1$s</string>
+    <string name="downloadsUndoActionName">Annuler</string>
+    <string name="downloadsStateInProgress">En cours...</string>
+
 </resources>

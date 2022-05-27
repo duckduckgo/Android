@@ -25,11 +25,14 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
+import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,6 +44,8 @@ class SurveyViewModel @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
     private val appInstallStore: AppInstallStore,
     private val appBuildConfig: AppBuildConfig,
+    private val variantManager: VariantManager,
+    private val atpCohortManager: AtpCohortManager,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -62,7 +67,7 @@ class SurveyViewModel @Inject constructor(
     }
 
     private fun addSurveyParameters(url: String): String {
-        return url.toUri()
+        val urlBuilder = url.toUri()
             .buildUpon()
             .appendQueryParameter(SurveyParams.ATB, statisticsStore.atb?.version ?: "")
             .appendQueryParameter(SurveyParams.ATB_VARIANT, statisticsStore.variant)
@@ -71,8 +76,12 @@ class SurveyViewModel @Inject constructor(
             .appendQueryParameter(SurveyParams.APP_VERSION, appBuildConfig.versionName)
             .appendQueryParameter(SurveyParams.MANUFACTURER, Build.MANUFACTURER)
             .appendQueryParameter(SurveyParams.MODEL, Build.MODEL)
-            .build()
-            .toString()
+
+        if (variantManager.isVPNRetentionStudyEnabled()) {
+            urlBuilder.appendQueryParameter(SurveyParams.ATP_COHORT, atpCohortManager.getCohort())
+        }
+
+        return urlBuilder.build().toString()
     }
 
     fun onSurveyFailedToLoad() {
@@ -88,7 +97,7 @@ class SurveyViewModel @Inject constructor(
 
     fun onSurveyCompleted() {
         survey.status = Survey.Status.DONE
-        viewModelScope.launch() {
+        viewModelScope.launch {
             withContext(dispatchers.io() + NonCancellable) {
                 surveyDao.update(survey)
             }
@@ -110,5 +119,6 @@ class SurveyViewModel @Inject constructor(
         const val APP_VERSION = "ddgv"
         const val MANUFACTURER = "man"
         const val MODEL = "mo"
+        const val ATP_COHORT = "atp_cohort"
     }
 }

@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Zamknij karta</string>
     <string name="tabClosed">Karta zamknięta</string>
     <string name="tabClosedUndo">Cofnij</string>
+    <string name="downloadsMenuItemTitle">Pobrane</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Ochrona prywatności witryny</string>
@@ -272,6 +272,8 @@
     <string name="dialogSave">Zapisz</string>
     <string name="delete">Usuń</string>
     <string name="edit">Edytuj</string>
+    <string name="remove">Usuń</string>
+    <string name="removeAll">Usuń wszystko</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Szukaj w DuckDuckGo</string>
@@ -297,7 +299,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomóż nam usprawnić aplikację!</string>
-    <string name="surveyCtaDescription">Weź udział w naszej krótkiej, anonimowej ankiecie i podziel się swoją opinią.</string>
+    <string name="surveyCtaDescription">Weź udział w krótkiej ankiecie i podziel się opinią.</string>
     <string name="surveyCtaLaunchButton">Weź udział w ankiecie</string>
     <string name="surveyCtaDismissButton">Nie, dziękuję</string>
     <string name="surveyActivityTitle">Ankieta użytkownika</string>
@@ -490,7 +492,7 @@
     <string name="daxMainNetworkOwnedCtaText">Uwaga! Ponieważ firma %1$s jest właścicielem %2$s, nie możemy jej powstrzymać przez zobaczeniem tutaj Twojej aktywności.&lt;br/&gt;&lt;br/&gt;Przeglądaj jednak ze mną. Mogę ograniczyć to, co %3$s wie o Tobie, blokując ich skrypty śledzące na wielu innych stronach.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Dalej</string>
+    <string name="downloadConfirmationContinue">Zapisz w Pobranych</string>
     <string name="downloadConfirmationSaveFileTitle">Zapisz %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Zatrzymaj oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Zastąp</string>
@@ -533,23 +535,33 @@
     <string name="fireproofWebsitesActivityTitle">Bezpieczne witryny internetowe</string>
     <string name="settingsFireproofWebsites">Bezpieczne witryny internetowe</string>
     <string name="fireproofWebsiteMenuTitleAdd">Zabezpiecz tę witrynę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz bezpieczna!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; jest teraz zabezpieczona</string>
     <string name="fireproofWebsiteSnackbarAction">Cofnij</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Czy na pewno chcesz usunąć &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Brak bezpiecznych witryn internetowych</string>
     <string name="fireproofWebsiteFeatureDescription">W witrynach internetowych są wykorzystywane pliki cookie. Kiedy użyjesz w witrynie funkcji zabezpieczenia, pliki cookie nie zostaną usunięte i pozostaniesz zalogowany(-a) nawet po użyciu przycisku Zabezpiecz. Nadal blokujemy narzędzia śledzące innych firm znalezione w zabezpieczonych witrynach.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Więcej opcji dla bezpiecznej strony internetowej %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Czy chcesz skorzystać z zabezpieczenia dla %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Zabezpieczenie tej witryny za pomocą przycisku Zabezpiecz nie spowoduje wylogowania Cię z witryny.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Zabezpiecz</string>
     <string name="fireproofWebsiteLoginDialogNegative">Nie teraz</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Witryny internetowe</string>
-    <string name="fireproofWebsiteToggleText">Zapytaj przy logowaniu</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Bezpieczne witryny internetowe</string>
+    <string name="fireproofWebsiteEmptyListHint">Brak zabezpieczonych witryn internetowych</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Zabezpieczanie witryn internetowych po zalogowaniu</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Usunięto zabezpieczenie wszystkich witryn</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Usunięto zabezpieczenie dla &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Pytaj za każdym razem</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Zawsze</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Nigdy</string>
     <string name="disableLoginDetectionDialogTitle">Wyłączyć przypomnienie o zabezpieczeniach podczas logowania się do witryn internetowych?</string>
     <string name="disableLoginDetectionDialogDescription">W każdej chwili można zmienić ten wybór w Ustawieniach.</string>
     <string name="disableLoginDetectionDialogPositive">WYŁĄCZ</string>
     <string name="disableLoginDetectionDialogNegative">ANULUJ</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Usunięto zabezpieczenie dla &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Zabezpieczać automatycznie witryny internetowe po zalogowaniu?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Zabezpieczenie witryn za pomocą przycisku Zabezpiecz nie spowoduje wylogowania. Zawsze można później zmienić ten wybór w Ustawieniach. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Zawsze zabezpieczaj</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Zabezpiecz tę witrynę</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Nie teraz</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacja przycisku ognia</string>
@@ -654,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Uproszczona prywatność poczty e-mail.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=""><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jesteś na liście!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Wyślemy Ci powiadomienie, gdy<br/> ochrona poczty e-mail będzie gotowa. <a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Twoje zaproszenie pojawi się tutaj, gdy będzie już gotowe. Chcesz <a href=\"\"><b>otrzymać powiadomienie</b></a>, gdy będzie gotowe?<br/><a href=\"\"><b>Dowiedz się więcej</b></a> o ochronie poczty e-mail.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Wyślemy Ci powiadomienie, gdy<br/> ochrona poczty e-mail będzie gotowa. <a href=""><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Twoje zaproszenie pojawi się tutaj, gdy będzie już gotowe. Chcesz <a href=""><b>otrzymać powiadomienie</b></a>, gdy będzie gotowe?<br/><a href=""><b>Dowiedz się więcej</b></a> o ochronie poczty e-mail.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Masz już zaproszenie!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=\"\"><b>Dowiedz się więcej</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Zablokuj skrypty śledzące pocztę e-mail i ukryj swój adres bez zmiany dostawcy poczty e-mail.<a href=""><b>Dowiedz się więcej</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osobisty adres Duck</string>
@@ -712,4 +724,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Dodano widżet %1$s do ekranu głównego</string>
     <string name="settingsAddHomeScreenWidget">Widżet ekranu głównego</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Przeglądaj prywatnie za pomocą aplikacji dla komputerów Mac</string>
+    <string name="macos_settings_description_list">Jesteś na liście!</string>
+    <string name="macos_settings_description_ready">Dostępne do pobrania na Mac</string>
+    <string name="macos_settings_title">Aplikacja komputerowa DuckDuckGo</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Pobrane</string>
+    <string name="downloadsActivityTitle">Pobrane</string>
+    <string name="downloadsActivityNoItemsDescription">Nie pobrano jeszcze żadnych plików</string>
+    <string name="downloadsShareTitle">Udostępnij…</string>
+    <string name="downloadsDownloadFinishedActionName">Otwórz</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Plik już nie istnieje</string>
+    <string name="downloadsItemMenuShare">Udostępnij</string>
+    <string name="downloadsItemMenuDelete">Usuń</string>
+    <string name="downloadsItemMenuCancel">Anuluj</string>
+    <string name="downloadsActivityMenuDeleteAll">Usuń wszystko</string>
+    <string name="downloadsFileDeletedMessage">Usunięto %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Wszystkie pliki usunięte</string>
+    <string name="downloadsMoreOptionsContentDescription">Więcej opcji dla %1$s</string>
+    <string name="downloadsUndoActionName">Cofnij</string>
+    <string name="downloadsStateInProgress">W trakcie…</string>
+
 </resources>

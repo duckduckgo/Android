@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp
 
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
+import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
@@ -30,21 +31,17 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtracto
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.channels.CancelledKeyException
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 import java.util.concurrent.Executors.newSingleThreadExecutor
 import kotlin.math.pow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -60,7 +57,7 @@ class TcpPacketProcessor
 @AssistedInject
 constructor(
     queues: VpnQueues,
-    @Assisted networkChannelCreator: NetworkChannelCreator,
+    connectionInitializer: ConnectionInitializer,
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
     localAddressDetector: LocalIpAddressDetector,
@@ -73,20 +70,23 @@ constructor(
     tcpSocketWriter: TcpSocketWriter,
     recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope,
-    healthMetricCounter: HealthMetricCounter
+    healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     @AssistedFactory
     interface Factory {
         fun build(
-            networkChannelCreator: NetworkChannelCreator,
             coroutineScope: CoroutineScope
         ): TcpPacketProcessor
     }
 
-    private var pollJobDeviceToNetwork: Job? = null
-    private var pollJobNetworkToDevice: Job? = null
-    private var staleTcpConnectionCleanerJob: Job? = null
+    private val pollJobDeviceToNetwork = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
+    private val pollJobNetworkToDevice = newSingleThreadExecutor().apply {
+        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
+    }
+    private val staleTcpConnectionCleanerJob = ConflatedJob()
 
     private val tcpNetworkToDevice =
         TcpNetworkToDevice(
@@ -103,7 +103,7 @@ constructor(
             queues = queues,
             selector = selector,
             socketWriter = tcpSocketWriter,
-            connectionInitializer = TcpConnectionInitializer(queues, networkChannelCreator),
+            connectionInitializer = connectionInitializer,
             trackerDetector = trackerDetector,
             packetPersister = packetPersister,
             localAddressDetector = localAddressDetector,
@@ -120,30 +120,17 @@ constructor(
     override fun run() {
         Timber.i("Starting %s", this::class.simpleName)
 
-        if (pollJobDeviceToNetwork == null) {
-            pollJobDeviceToNetwork =
-                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
-                    pollForDeviceToNetworkWork()
-                }
-        }
+        pollJobDeviceToNetwork.execute(tcpDeviceToNetwork)
+        pollJobNetworkToDevice.execute(tcpNetworkToDevice)
 
-        if (pollJobNetworkToDevice == null) {
-            pollJobNetworkToDevice =
-                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
-                    pollForNetworkToDeviceWork()
-                }
-        }
-
-        if (staleTcpConnectionCleanerJob == null) {
-            staleTcpConnectionCleanerJob =
-                vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
-                    periodicConnectionCleanup()
-                }
-        }
+        staleTcpConnectionCleanerJob +=
+            vpnCoroutineScope.launch(newSingleThreadExecutor().asCoroutineDispatcher()) {
+                periodicConnectionCleanup()
+            }
     }
 
     private suspend fun periodicConnectionCleanup() {
-        while (staleTcpConnectionCleanerJob?.isActive == true) {
+        while (staleTcpConnectionCleanerJob.isActive) {
             tcpDeviceToNetwork.cleanupStaleConnections()
             delay(PERIODIC_STALE_CONNECTION_CLEANUP_PERIOD_MS)
         }
@@ -152,42 +139,9 @@ constructor(
     fun stop() {
         Timber.i("Stopping %s", this::class.simpleName)
 
-        pollJobDeviceToNetwork?.cancel()
-        pollJobDeviceToNetwork = null
-
-        pollJobNetworkToDevice?.cancel()
-        pollJobNetworkToDevice = null
-
-        staleTcpConnectionCleanerJob?.cancel()
-        staleTcpConnectionCleanerJob = null
-    }
-
-    private fun pollForDeviceToNetworkWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobDeviceToNetwork?.isActive == true) {
-            try {
-                tcpDeviceToNetwork.deviceToNetworkProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process TCP device-to-network packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process TCP device-to-network packet")
-            }
-        }
-    }
-
-    private fun pollForNetworkToDeviceWork() {
-        setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
-
-        while (pollJobNetworkToDevice?.isActive == true) {
-            try {
-                tcpNetworkToDevice.networkToDeviceProcessing()
-            } catch (e: IOException) {
-                Timber.w(e, "Failed to process TCP network-to-device packet")
-            } catch (e: CancelledKeyException) {
-                Timber.w(e, "Failed to process TCP network-to-device packet")
-            }
-        }
+        pollJobDeviceToNetwork.shutdownNow()
+        pollJobNetworkToDevice.shutdownNow()
+        staleTcpConnectionCleanerJob.cancel()
     }
 
     data class PendingWriteData(

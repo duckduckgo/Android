@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.di
+package com.duckduckgo.bandwidth.store
 
-import javax.inject.Qualifier
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-/** Marks the device matcher implementation for remote-messaging */
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class DeviceAttrMatcher
+@Entity(tableName = "bandwidth_buckets")
+data class BandwidthBucketEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val timestamp: Long,
+    val appBytes: Long,
+    val totalBytes: Long
+)

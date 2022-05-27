@@ -18,20 +18,21 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
-import kotlinx.coroutines.test.runTest
-import com.duckduckgo.mobile.android.vpn.apps.Command.LaunchFeedback
 import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -45,19 +46,38 @@ class ManageAppsProtectionViewModelTest {
     private val trackingProtectionAppsRepository = mock<TrackingProtectionAppsRepository>()
     private val appTrackersRepository = mock<AppTrackerBlockingStatsRepository>()
     private val deviceShieldPixels = mock<DeviceShieldPixels>()
-    private val vpnStateMonitor = mock<VpnStateMonitor>()
+    private val manuallyExcludedApps = Channel<List<Pair<String, Boolean>>>(1, BufferOverflow.DROP_OLDEST)
 
     private lateinit var viewModel: ManageAppsProtectionViewModel
 
     @Before
     fun setup() {
+        whenever(trackingProtectionAppsRepository.manuallyExcludedApps()).thenReturn(manuallyExcludedApps.consumeAsFlow())
+
         viewModel = ManageAppsProtectionViewModel(
             trackingProtectionAppsRepository,
             appTrackersRepository,
             deviceShieldPixels,
-            vpnStateMonitor,
             coroutineRule.testDispatcherProvider
         )
+    }
+
+    @Test
+    fun whenAppIsManuallyExcludedThenUserMadeChangesReturnsTrue() = runTest {
+        manuallyExcludedApps.send(listOf())
+
+        viewModel.onResume(mock())
+
+        manuallyExcludedApps.send(listOf("package.com" to true))
+
+        assertTrue(viewModel.userMadeChanges())
+    }
+
+    @Test
+    fun whenNoManuallyExcludedAppsThenUserMadeChangesReturnsFalse() = runTest {
+        manuallyExcludedApps.send(listOf())
+
+        assertFalse(viewModel.userMadeChanges())
     }
 
     @Test
@@ -68,7 +88,7 @@ class ManageAppsProtectionViewModelTest {
 
         viewModel.onAppProtectionDisabled(appName, packageName, report)
 
-        verify(trackingProtectionAppsRepository).manuallyExcludedApp(packageName)
+        verify(trackingProtectionAppsRepository).manuallyExcludeApp(packageName)
     }
 
     @Test
@@ -112,7 +132,7 @@ class ManageAppsProtectionViewModelTest {
         val packageName = "com.package.name"
         viewModel.onAppProtectionEnabled(packageName)
 
-        verifyNoInteractions(deviceShieldPixels)
+        verify(deviceShieldPixels).didEnableAppProtectionFromApps()
         verify(trackingProtectionAppsRepository).manuallyEnabledApp(packageName)
     }
 
@@ -136,14 +156,23 @@ class ManageAppsProtectionViewModelTest {
     }
 
     @Test
-    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
-        val packageName = "com.package.name"
-        val appName = "App"
-        val report = false
-        viewModel.onAppProtectionDisabled(appName, packageName, report)
-
+    fun whenRestoreProtectionsThenDoNotRestartVpnOnLeavingScreen() = runTest {
         viewModel.commands().test {
-            viewModel.onLeavingScreen()
+            viewModel.restoreProtectedApps()
+            assertEquals(Command.RestartVpn, awaitItem())
+            viewModel.onPause(mock())
+            expectNoEvents()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserLeavesScreenAndChangesWereMadeThenTheVpnIsRestarted() = runTest {
+        viewModel.commands().test {
+            manuallyExcludedApps.send(listOf())
+            viewModel.onResume(mock())
+            manuallyExcludedApps.send(listOf("com.package.name" to true))
+            viewModel.onPause(mock())
             assertEquals(Command.RestartVpn, awaitItem())
             cancelAndConsumeRemainingEvents()
         }
@@ -152,7 +181,9 @@ class ManageAppsProtectionViewModelTest {
     @Test
     fun whenUserLeavesScreenAndNoChangesWereMadeThenTheVpnIsNotRestarted() = runTest {
         viewModel.commands().test {
-            viewModel.onLeavingScreen()
+            manuallyExcludedApps.send(listOf())
+            viewModel.onResume(mock())
+            viewModel.onPause(mock())
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }

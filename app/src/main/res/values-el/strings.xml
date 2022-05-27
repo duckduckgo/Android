@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Κλείσιμο καρτέλα</string>
     <string name="tabClosed">Η καρτέλα έκλεισε</string>
     <string name="tabClosedUndo">Αναίρεση</string>
+    <string name="downloadsMenuItemTitle">Λήψεις</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Προστασία της ιδιωτικότητας του ιστότοπου</string>
@@ -264,6 +264,8 @@
     <string name="dialogSave">Αποθήκευση</string>
     <string name="delete">Διαγραφή</string>
     <string name="edit">Επεξεργασία</string>
+    <string name="remove">Αφαίρεση</string>
+    <string name="removeAll">Αφαίρεση όλων</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Αναζήτηση DuckDuckGo</string>
@@ -289,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Βοηθήστε μας να βελτιώσουμε την εφαρμογή!</string>
-    <string name="surveyCtaDescription">Πάρτε μέρος στη σύντομη, ανώνυμη έρευνά μας και μοιραστείτε τα σχόλιά σας.</string>
+    <string name="surveyCtaDescription">Πάρτε μέρος στη σύντομη έρευνά μας και μοιραστείτε τα σχόλιά σας.</string>
     <string name="surveyCtaLaunchButton">Πάρτε μέρος στην έρευνα</string>
     <string name="surveyCtaDismissButton">Όχι, ευχαριστώ</string>
     <string name="surveyActivityTitle">Έρευνα χρηστών</string>
@@ -474,11 +476,11 @@
         <item quantity="other"><![CDATA[ προσπαθούσαν να σας παρακολουθήσει εδώ. <br/><br/>Τους εμπόδισα!<br/><br/> ☝️Μπορείτε να ελέγξετε τη γραμμή διευθύνσεων URL για να δείτε ποιος προσπαθεί να σας παρακολουθήσει όταν επισκέπτεστε έναν νέο ιστότοπο.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Καθώς πιέζετε και μετακινείτε τον δρομέα, θα μπλοκάρω ενοχλητικούς ιχνηλάτες. <br/><br/> Εμπρός - συνεχίστε την περιήγηση!]]></string>
-    <string name="daxMainNetworkCtaText">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
+    <string name="daxMainNetworkCtaText">Προσοχή! Δεν μπορώ να εμποδίσω το δίκτυο %1$s από το να δει τη δραστηριότητά σας στο %2$s.\n\nΑλλά περιηγηθείτε μαζί μου και θα μπορώ να περιορίσω το τι θα γνωρίζει το δίκτυο %3$s για σας συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησης σε πλήθος άλλων ιστότοπων.</string>
     <string name="daxMainNetworkOwnedCtaText">Προσοχή! Επειδή το %1$s κατέχει %2$s, δεν μπορώ να τους εμποδίσω από το να δουν τη δραστηριότητά σας εδώ.&lt;br/&gt;&lt;br/&gt;Αλλά περιηγηθείτε μαζί μου και μπορώ να περιορίσω τι θα γνωρίζει το %3$s για εσάς συνολικά, αποκλείοντας τις εφαρμογές παρακολούθησής τους σε πλήθος άλλων ιστότοπων.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Συνέχεια</string>
+    <string name="downloadConfirmationContinue">Αποθήκευση στις λήψεις</string>
     <string name="downloadConfirmationSaveFileTitle">Αποθήκευση %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Κρατήστε και τα δύο</string>
     <string name="downloadConfirmationReplaceOldFileText">Αντικατάσταση</string>
@@ -521,23 +523,33 @@
     <string name="fireproofWebsitesActivityTitle">Ασφαλείς ιστότοποι</string>
     <string name="settingsFireproofWebsites">Ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteMenuTitleAdd">Διαγράψτε τη δραστηριότητα γι\' αυτόν τον ιστότοπο</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">Το &lt;b&gt;%1$s&lt;/b&gt; είναι πλέον ασφαλές</string>
     <string name="fireproofWebsiteSnackbarAction">Αναίρεση</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Είστε βέβαιοι ότι θέλετε να διαγράψετε το &lt;b&gt;%1$s&lt;/b&gt;;</string>
-    <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ασφαλείς ιστότοποι</string>
     <string name="fireproofWebsiteFeatureDescription">Οι ιστότοποι βασίζονται σε cookies για να σας διατηρούν συνδεδεμένους. Όταν ενεργοποιείτε τη διαγραφή δραστηριότητας για έναν ιστότοπο, τα cookies δεν διαγράφονται και παραμένετε συνδεδεμένοι, ακόμα και μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Εξακολουθούμε να αποκλείουμε εφαρμογές παρακολούθησης από τρίτους που υπάρχουν σε ιστότοπους με διαγραφή δραστηριότητας.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Περισσότερες επιλογές για ασφαλή ιστότοπο %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Θα θέλατε να ενεργοποιήσετε τη διαγραφή δραστηριότητας για το %1$s;</string>
     <string name="fireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας αυτόν τον ιστότοπο, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Διαγραφή δραστηριότητας</string>
     <string name="fireproofWebsiteLoginDialogNegative">Όχι τώρα</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Ιστότοποι</string>
-    <string name="fireproofWebsiteToggleText">Ερώτηση κατά τη σύνδεση</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Ασφαλείς ιστότοποι</string>
+    <string name="fireproofWebsiteEmptyListHint">Δεν υπάρχουν ακόμα ιστότοποι στη λίστα διαγραφής δραστηριότητας</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Ασφαλείς ιστότοποι από τη σύνδεση</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Αφαίρεση διαγραφής δραστηριότητας για όλους τους ιστότοπους</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Η διαγραφή δραστηριότητας αφαιρέθηκε για το &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Να γίνεται ερώτηση κάθε φορά</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Πάντα</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Ποτέ</string>
     <string name="disableLoginDetectionDialogTitle">Απενεργοποίηση της υπενθύμισης Διαγραφής δραστηριότητας κατά τη σύνδεση σε ιστότοπους;</string>
     <string name="disableLoginDetectionDialogDescription">Μπορείτε να αλλάξετε την προτίμηση αυτή οποιαδήποτε στιγμή από τις Ρυθμίσεις.</string>
     <string name="disableLoginDetectionDialogPositive">ΑΠΕΝΕΡΓΟΠΟΙΗΣΗ</string>
     <string name="disableLoginDetectionDialogNegative">ΑΚΥΡΩΣΗ</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Η διαγραφή δραστηριότητας αφαιρέθηκε για το &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Ασφαλείς ιστότοποι, αυτόματα από τη σύνδεση;</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Ενεργοποιώντας τη διαγραφή δραστηριότητας ιστότοπου, θα παραμείνετε συνδεδεμένοι μετά τη χρήση του Κουμπιού διαγραφής δραστηριότητας. Μπορείτε πάντα να αλλάξετε την επιλογή αυτή από τις Ρυθμίσεις. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Διαγραφή δραστηριότητας, πάντα</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Διαγράψτε τη δραστηριότητα γι\' αυτόν τον ιστότοπο</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Όχι τώρα</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Κινούμενο κουμπί φωτιάς</string>
@@ -642,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Ιδιωτικότητα email, απλοποιημένη.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Είστε στη λίστα!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Θα σας στείλουμε ειδοποίηση όταν<br/> θα είναι έτοιμη για σας η Προστασία email. <a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Η πρόσκλησή σας θα εμφανιστεί εδώ όταν θα είναι έτοιμη για σας. Θέλετε να <a href=\"\"><b>λάβετε ειδοποίηση</b></a> μόλις φτάσει;<br/><a href=\"\"><b>Μάθετε περισσότερα</b></a> σχετικά με την Προστασία email.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Θα σας στείλουμε ειδοποίηση όταν<br/> θα είναι έτοιμη για σας η Προστασία email. <a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Η πρόσκλησή σας θα εμφανιστεί εδώ όταν θα είναι έτοιμη για σας. Θέλετε να <a href=""><b>λάβετε ειδοποίηση</b></a> μόλις φτάσει;<br/><a href=""><b>Μάθετε περισσότερα</b></a> σχετικά με την Προστασία email.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Έχετε προσκληθεί!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=\"\"><b>Μάθετε περισσότερα</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Αποκλείστε εφαρμογές παρακολούθησης email και αποκρύψτε τη διεύθυνσή σας, χωρίς να αλλάξετε πάροχο email.<a href=""><b>Μάθετε περισσότερα</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Προσωπική διεύθυνση Duck</string>
@@ -696,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Προστέθηκε μικροεφαρμογή %1$s στην αρχική οθόνη</string>
     <string name="settingsAddHomeScreenWidget">Μικροεφαρμογή αρχικής οθόνης</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Περιηγηθείτε ιδιωτικά με την εφαρμογή μας για Mac</string>
+    <string name="macos_settings_description_list">Είστε στη λίστα!</string>
+    <string name="macos_settings_description_ready">Διαθέσιμο για λήψη σε Mac</string>
+    <string name="macos_settings_title">Εφαρμογή DuckDuckGo για υπολογιστές</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Λήψεις</string>
+    <string name="downloadsActivityTitle">Λήψεις</string>
+    <string name="downloadsActivityNoItemsDescription">Δεν έχει γίνει ακόμα λήψη αρχείων</string>
+    <string name="downloadsShareTitle">Κοινή χρήση με...</string>
+    <string name="downloadsDownloadFinishedActionName">Άνοιγμα</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Το αρχείο δεν υπάρχει πλέον</string>
+    <string name="downloadsItemMenuShare">Κοινή χρήση</string>
+    <string name="downloadsItemMenuDelete">Διαγραφή</string>
+    <string name="downloadsItemMenuCancel">Ακύρωση</string>
+    <string name="downloadsActivityMenuDeleteAll">Διαγραφή όλων</string>
+    <string name="downloadsFileDeletedMessage">Διαγράφηκε %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Διαγράφηκαν όλα τα αρχεία</string>
+    <string name="downloadsMoreOptionsContentDescription">Περισσότερες επιλογές για %1$s</string>
+    <string name="downloadsUndoActionName">Αναίρεση</string>
+    <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
+
 </resources>

@@ -23,7 +23,7 @@ import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import javax.inject.Inject
 
-class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
+class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
 
     /**
      * Close the TCB connection and perform the necessary cleanup to remove it from caches
@@ -31,22 +31,23 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
     fun closeConnection(tcb: TCB) {
         Timber.v("Closing TCB connection %s", tcb.ipAndPort)
         socketWriter.removeFromWriteQueue(tcb)
-        TCB.closeTCB(tcb)
+        tcb.close()
     }
 
     @Synchronized
     fun sendResetPacket(
-        tcb: TCB,
+        connectionParams: ConnectionInitializer.TcpConnectionParams,
         queues: VpnQueues,
-        packet: Packet,
-        payloadSize: Int
+        payloadSize: Int,
+        isFIN: Boolean,
     ) {
         val buffer = ByteBufferPool.acquire()
+        val tcb = connectionParams.tcbOrClose() ?: return
 
         var responseAck = tcb.acknowledgementNumberToClient + payloadSize
         val responseSeq = tcb.acknowledgementNumberToServer
 
-        if (packet.tcpHeader.isFIN) {
+        if (isFIN) {
             responseAck = TcpPacketProcessor.increaseOrWraparound(responseAck, 1)
         }
 
@@ -64,5 +65,6 @@ class TCBCloser @Inject constructor(val socketWriter: TcpSocketWriter) {
         queues.networkToDevice.offerFirst(buffer)
 
         closeConnection(tcb)
+        connectionParams.close()
     }
 }

@@ -21,6 +21,7 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
+import java.util.*
 
 /**
  * @author amulya
@@ -281,7 +282,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         }
 
         fun asIconDrawable(text: String): TextDrawable {
-            return TextDrawable.builder().buildRound(text.take(1), Color.DKGRAY)
+            return builder().buildRound(text.take(1), Color.DKGRAY)
         }
     }
 
@@ -294,7 +295,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         radius = builder.radius
 
         // text and color
-        text = if (builder.toUpperCase) builder.text.toUpperCase() else builder.text
+        text = if (builder.toUpperCase) builder.text.uppercase(Locale.getDefault()) else builder.text
         color = builder.color
 
         // text paint settings

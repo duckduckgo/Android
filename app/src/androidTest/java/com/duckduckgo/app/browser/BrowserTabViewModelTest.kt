@@ -49,6 +49,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
@@ -59,6 +60,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -104,8 +106,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.VariantManager.Companion.ACTIVE_VARIANTS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.surrogates.SurrogateResponse
@@ -159,7 +160,6 @@ import org.junit.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -288,9 +288,6 @@ class BrowserTabViewModelTest {
     private lateinit var mockAppLinksHandler: AppLinksHandler
 
     @Mock
-    private lateinit var mockVariantManager: VariantManager
-
-    @Mock
     private lateinit var mockFeatureToggle: FeatureToggle
 
     @Mock
@@ -316,6 +313,9 @@ class BrowserTabViewModelTest {
 
     @Mock
     private lateinit var voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
+
+    @Mock
+    private lateinit var mockSettingsDataStore: SettingsDataStore
 
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
@@ -381,6 +381,7 @@ class BrowserTabViewModelTest {
         whenever(mockFavoritesRepository.favorites()).thenReturn(favoriteListFlow.consumeAsFlow())
         whenever(mockBookmarksRepository.bookmarks()).thenReturn(bookmarksListFlow.consumeAsFlow())
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -396,8 +397,6 @@ class BrowserTabViewModelTest {
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
             dispatchers = coroutineRule.testDispatcherProvider,
-            variantManager = mockVariantManager,
-            userEventsStore = mockUserEventsStore,
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
@@ -454,19 +453,17 @@ class BrowserTabViewModelTest {
             appLinksHandler = mockAppLinksHandler,
             contentBlocking = mockContentBlocking,
             accessibilitySettingsDataStore = accessibilitySettingsDataStore,
-            variantManager = mockVariantManager,
             ampLinks = mockAmpLinks,
             remoteMessagingModel = remoteMessagingModel,
             downloadCallback = mockDownloadCallback,
             trackingParameters = mockTrackingParameters,
             voiceSearchAvailability = voiceSearchAvailability,
-            voiceSearchPixelLogger = voiceSearchPixelLogger
+            voiceSearchPixelLogger = voiceSearchPixelLogger,
+            settingsDataStore = mockSettingsDataStore
         )
 
         testee.loadData("abc", null, false, false)
         testee.command.observeForever(mockCommandObserver)
-
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
     }
 
     @ExperimentalCoroutinesApi
@@ -695,13 +692,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
     fun whenBlankInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
@@ -1224,7 +1221,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEnteringEmptyQueryThenHideKeyboardCommandNotIssued() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(Mockito.any(Command.HideKeyboard.javaClass))
+        verify(mockCommandObserver, never()).onChanged(any(Command.HideKeyboard.javaClass))
     }
 
     @Test
@@ -1439,7 +1436,7 @@ class BrowserTabViewModelTest {
 
         testee.onRefreshRequested()
 
-        assertCommandIssued<Command.OpenInNewTab>() {
+        assertCommandIssued<Command.OpenInNewTab> {
             assertNull(sourceTabId)
         }
     }
@@ -1688,7 +1685,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         loadUrl(null)
         testee.onShareSelected()
-        verify(mockCommandObserver, never()).onChanged(any())
+        assertCommandNotIssued<Command.ShareLink>()
     }
 
     @Test
@@ -1975,9 +1972,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val command = commandCaptor.firstValue
-        assertTrue(command is Command.GenerateWebViewPreviewImage)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
     }
 
     @Test
@@ -2207,7 +2202,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
     }
 
     @Test
@@ -2452,9 +2447,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedThenAskToFireproofWebsite() {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mi" })
-
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAskEveryTimeThenAskToFireproofWebsite() {
         loginEventLiveData.value = givenLoginDetected("example.com")
         assertCommandIssued<Command.AskToFireproofWebsite> {
             assertEquals(FireproofWebsiteEntity("example.com"), this.fireproofWebsite)
@@ -2462,25 +2455,10 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionEnabledThenFireproofWebsite() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-        whenever(mockSettingsStore.appLoginDetection).thenReturn(true)
-
+    fun whenLoginDetectedAndAutomaticFireproofSettingIsAlwaysThenDoNotAskToFireproofWebsite() {
+        whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ALWAYS)
         loginEventLiveData.value = givenLoginDetected("example.com")
-
         assertCommandNotIssued<Command.AskToFireproofWebsite>()
-        verify(fireproofDialogsEventHandler).onUserConfirmedFireproofDialog("example.com")
-    }
-
-    @Test
-    fun whenLoginDetectedAndIsFireproofExperimentAndAppLoginDetectionDisabledThenDoNothing() = runTest {
-        whenever(mockVariantManager.getVariant()).thenReturn(ACTIVE_VARIANTS.first { it.key == "mj" })
-        whenever(mockSettingsStore.appLoginDetection).thenReturn(false)
-
-        loginEventLiveData.value = givenLoginDetected("example.com")
-
-        assertCommandNotIssued<Command.AskToFireproofWebsite>()
-        verify(fireproofDialogsEventHandler, never()).onUserConfirmedFireproofDialog("example.com")
     }
 
     @Test
@@ -3460,6 +3438,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(false)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
@@ -4033,6 +4025,69 @@ class BrowserTabViewModelTest {
         verify(voiceSearchPixelLogger, never()).log()
     }
 
+    @Test
+    fun whenMessageReceivedThenSetLinkOpenedInNewTabToTrue() {
+        assertFalse(testee.linkOpenedInNewTab())
+        testee.onMessageReceived()
+        assertTrue(testee.linkOpenedInNewTab())
+    }
+
+    @Test
+    fun whenPageChangedThenSetLinkOpenedInNewTabToFalse() {
+        testee.onMessageReceived()
+        loadUrl(url = "www.example.com", isBrowserShowing = true)
+        assertFalse(testee.linkOpenedInNewTab())
+    }
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
+        setBrowserShowing(false)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserShowingThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 0)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnSingleStackEntryThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 1)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMultipleEntriesThenShowHistoryCommandSent() {
+        buildNavigationHistoryStack(stackSize = 10)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 9)
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMoreThanTenEntriesThenTruncatedToMostRecentOnly() {
+        buildNavigationHistoryStack(stackSize = 20)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
+        assertCommandIssued<ShowBackNavigationHistory> {
+            assertEquals(expectedStackSize, history.size)
+        }
+    }
+
+    private fun buildNavigationHistoryStack(stackSize: Int) {
+        val history = mutableListOf<NavigationHistoryEntry>()
+        for (i in 0 until stackSize) {
+            history.add(NavigationHistoryEntry(url = "$i.example.com"))
+        }
+
+        testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
+    }
+
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
         whenever(mockGpcRepository.isGpcEnabled()).thenReturn(true)
@@ -4245,7 +4300,8 @@ class BrowserTabViewModelTest {
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
-        progress: Int? = null
+        progress: Int? = null,
+        navigationHistory: List<NavigationHistoryEntry> = emptyList()
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -4255,6 +4311,7 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
         whenever(nav.progress).thenReturn(progress)
+        whenever(nav.navigationHistory).thenReturn(navigationHistory)
         return nav
     }
 

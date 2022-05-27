@@ -17,7 +17,6 @@
 package com.duckduckgo.app.statistics
 
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
-import com.duckduckgo.app.statistics.VariantManager.VariantFeature.*
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -44,6 +43,20 @@ class VariantManagerTest {
     }
 
     @Test
+    fun retentionStudyControlGroupHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "na" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(0, variant.features.size)
+    }
+
+    @Test
+    fun retentionStudyVariantGroupWithFeatureHasExpectedWeightAndNoFeatures() {
+        val variant = variants.first { it.key == "nb" }
+        assertEqualsDouble(1.0, variant.weight)
+        assertEquals(1, variant.features.size)
+    }
+
+    @Test
     fun verifyNoDuplicateVariantNames() {
         val existingNames = mutableSetOf<String>()
         variants.forEach {
@@ -62,22 +75,5 @@ class VariantManagerTest {
         if (comparison != 0) {
             fail("Doubles are not equal. Expected $expected but was $actual")
         }
-    }
-
-    // AUTOMATIC FIREPROOFING EXPERIMENT
-    @Test
-    fun automaticFireproofingControlVariantHasExpectedWeightAndNoFeatures() {
-        val variant = variants.first { it.key == "mi" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(0, variant.features.size)
-        assertEquals(0, variant.features.size)
-    }
-
-    @Test
-    fun automaticFireproofingExperimentalVariantHasExpectedWeightAndFeatures() {
-        val variant = variants.first { it.key == "mj" }
-        assertEqualsDouble(0.0, variant.weight)
-        assertEquals(1, variant.features.size)
-        assertTrue(variant.hasFeature(FireproofExperiment))
     }
 }

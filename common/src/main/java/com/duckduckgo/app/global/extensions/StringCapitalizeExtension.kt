@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.di
+package com.duckduckgo.app.global.extensions
 
-import javax.inject.Qualifier
+import java.util.*
 
-/** Marks the Android matcher implementation for remote-messaging */
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class AndroidAppAttrMatcher
+fun String.capitalizeFirstLetter() = this.replaceFirstChar {
+    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+}

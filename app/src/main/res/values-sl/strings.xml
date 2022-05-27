@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Zapri zavihek</string>
     <string name="tabClosed">Zavihek zaprt</string>
     <string name="tabClosedUndo">Prekliči spremembe</string>
+    <string name="downloadsMenuItemTitle">Prenosi</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Zaščita zasebnosti na strani</string>
@@ -272,6 +272,8 @@
     <string name="dialogSave">Shrani</string>
     <string name="delete">Izbriši</string>
     <string name="edit">Uredi</string>
+    <string name="remove">Odstrani</string>
+    <string name="removeAll">Odstrani vse</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Poišči DuckDuckGo</string>
@@ -297,7 +299,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Pomagajte nam izboljšati aplikacijo!</string>
-    <string name="surveyCtaDescription">Izpolnite našo kratko, anonimno anketo in delite svoje povratne informacije.</string>
+    <string name="surveyCtaDescription">Izpolnite našo kratko anketo in delite svoje povratne informacije.</string>
     <string name="surveyCtaLaunchButton">Izpolnite anketo</string>
     <string name="surveyCtaDismissButton">Ne, hvala</string>
     <string name="surveyActivityTitle">Uporabniška anketa</string>
@@ -472,7 +474,7 @@
     <string name="onboardingLetsDoItButton">Dajmo se ga lotiti!</string>
     <string name="daxIntroCtaText"><![CDATA[Nato obiščite eno od svojih najljubših spletišč! <br/><br/>Blokiral bom sledilce, da vas ne bi vohunili. Prav tako bom nadgradil varnost vaše povezave. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Uspelo vam bo!<br/><br/>Ne pozabite: vsakič, ko brskate z mano, grozljiv oglas izgubi krila. 👍]]></string>
-    <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna in nikoli ne shranim vaše zgodovine iskanja. Vedno. 🙌</string>
+    <string name="daxSerpCtaText">Vaša iskanja v DuckDuckGo so anonimna in nikoli ne shranim vaše zgodovine iskanja. Nikoli. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
         <item quantity="two"><![CDATA[ in <b>%1$d drugi</b> so vas skušali zaslediti tukaj. <br/><br/>Blokiral sem jih!<br/><br/> ☝️Preverite lahko naslovno vrstico, da vidite, kdo vas poskuša zaslediti, ko obiščete novo spletišče.️]]></item>
@@ -490,7 +492,7 @@
     <string name="daxMainNetworkOwnedCtaText">Glavo gor! Ker je %1$s lastnik %2$s, mu ne moremo preprečiti, da bi videl vašo aktivnost tukaj.&lt;br/&gt;&lt;br/&gt;Toda brskaj z nami in lahko zmanjšamo količina tistega, kar %3$s ve o tebi na splošno, tako da blokiramo njihove sledilce na mnogih drugih spletnih mestih.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Nadaljuj</string>
+    <string name="downloadConfirmationContinue">Shrani med prenose</string>
     <string name="downloadConfirmationSaveFileTitle">Shrani %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Ohrani oba</string>
     <string name="downloadConfirmationReplaceOldFileText">Zamenjaj</string>
@@ -533,23 +535,33 @@
     <string name="fireproofWebsitesActivityTitle">Spletne strani s požarno zaščito</string>
     <string name="settingsFireproofWebsites">Spletne strani s požarno zaščito</string>
     <string name="fireproofWebsiteMenuTitleAdd">Ta stran je požarno zaščitena</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ima sedaj požarno zaščito!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ima odslej požarno zaščito</string>
     <string name="fireproofWebsiteSnackbarAction">Prekliči spremembe</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ste prepričani, da želite izbrisati &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Spletne strani brez požarne zaščite</string>
     <string name="fireproofWebsiteFeatureDescription">Spletne strani se zanašajo na piškotke, da boš vedno prijavljen. Ko spletno mesto požarno zaščitiš, piškotki ne bodo izbrisani in ostal boš prijavljen, tudi po uporabi gumba Fire. Še vedno blokiramo zunanje sledilce, ki jih najdemo na požarno izoliranih spletnih mestih.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Več možnosti za stran s požarno zaščito %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Želiš požarno zaščito %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">S požarno zaščito tega spletnega mesta se boste prijavili po uporabi gumba Fire.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Požarna zaščita</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne zdaj</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Spletna mesta</string>
-    <string name="fireproofWebsiteToggleText">Vprašajte ob prijavi</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Spletne strani s požarno zaščito</string>
+    <string name="fireproofWebsiteEmptyListHint">Ni spletnih mest s požarno zaščito</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Požarno zaščitite spletne strani pri prijavi</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Požarna zaščita je odstranjena za vsa spletna mesta</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Požarna zaščita odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Vprašaj vsakič</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Vedno</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Nikoli</string>
     <string name="disableLoginDetectionDialogTitle">Onemogoči opomnik o požarni zaščiti pri prijavi na spletna mesta?</string>
     <string name="disableLoginDetectionDialogDescription">To nastavitev lahko kadar koli spremenite v možnosti Nastavitve.</string>
     <string name="disableLoginDetectionDialogPositive">ONEMOGOČI</string>
     <string name="disableLoginDetectionDialogNegative">PREKLIČI</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Požarna zaščita odstranjena za &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Želite spletne strani samodejno požarno zaščititi pri prijavi?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">S požarno zaščito spletnih mest boste po uporabi gumba Fire ostali prijavljeni. To lahko pozneje kadar koli spremenite v nastavitvah. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Vedno požarno zaščiti</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Uporabi požarno zaščito za to stran</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Ne zdaj</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animacija za gumb ogenj</string>
@@ -654,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Poenostavljena zasebnost e-pošte.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Ste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=\"\"><b>Več</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=\"\"><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=\"\"><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Obvestili vas bomo, ko bo<br/> zaščita e-pošte pripravljena za vas. <a href=""><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše povabilo se bo prikazalo tukaj, ko bomo pripravljeni. Želite <a href=""><b>prejeti obvestilo</b></a>, ko prispe?<br/><a href=""><b>Preberite več</b></a> o zaščiti e-pošte.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Povabljeni ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=\"\"><b>Več</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokirajte sledilnike e-pošte in skrijte svoj naslov, brez zamenjave ponudnika e-pošte.<a href=""><b>Več</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Osebni naslov Duck</string>
@@ -712,4 +724,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Pripomoček %1$s je bil dodan na domači zaslon</string>
     <string name="settingsAddHomeScreenWidget">Pripomoček na domačem zaslonu</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Brskajte zasebno z našo aplikacijo za računalnike Mac</string>
+    <string name="macos_settings_description_list">Ste na seznamu!</string>
+    <string name="macos_settings_description_ready">Na voljo za prenos za računalnike Mac</string>
+    <string name="macos_settings_title">Namizna aplikacija DuckDuckGo</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Prenosi</string>
+    <string name="downloadsActivityTitle">Prenosi</string>
+    <string name="downloadsActivityNoItemsDescription">Nobena datoteka še ni bila prenesena</string>
+    <string name="downloadsShareTitle">Deli s/z …</string>
+    <string name="downloadsDownloadFinishedActionName">Odpri</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Datoteka ne obstaja več</string>
+    <string name="downloadsItemMenuShare">Deli</string>
+    <string name="downloadsItemMenuDelete">Izbriši</string>
+    <string name="downloadsItemMenuCancel">Preklic</string>
+    <string name="downloadsActivityMenuDeleteAll">Izbriši vse</string>
+    <string name="downloadsFileDeletedMessage">Izbrisano: %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Vse datoteke so bile izbrisane</string>
+    <string name="downloadsMoreOptionsContentDescription">Več možnosti za: %1$s</string>
+    <string name="downloadsUndoActionName">Prekliči spremembe</string>
+    <string name="downloadsStateInProgress">Poteka …</string>
+
 </resources>

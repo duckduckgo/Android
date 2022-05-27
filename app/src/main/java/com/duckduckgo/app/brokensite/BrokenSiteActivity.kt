@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.Command
 import com.duckduckgo.app.brokensite.BrokenSiteViewModel.ViewState
@@ -93,18 +92,12 @@ class BrokenSiteActivity : DuckDuckGoActivity() {
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                it?.let { processCommand(it) }
-            }
-        )
-        viewModel.viewState.observe(
-            this,
-            Observer {
-                it?.let { render(it) }
-            }
-        )
+        viewModel.command.observe(this) {
+            it?.let { processCommand(it) }
+        }
+        viewModel.viewState.observe(this) {
+            it?.let { render(it) }
+        }
     }
 
     private fun processCommand(command: Command) {

@@ -27,6 +27,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.accessibility.AccessibilityManager
+import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
@@ -159,10 +160,12 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
                     if (isForMainFrame) {
-                        webViewClientListener?.startProcessingTrackingLink()
-                        Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
-                        webView.loadUrl(urlType.extractedUrl)
-                        return true
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                            loadUrl(listener, webView, urlType.extractedUrl)
+                            return true
+                        }
                     }
                     false
                 }
@@ -178,19 +181,25 @@ class BrowserWebViewClient(
                 }
                 is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
                     if (isForMainFrame) {
-                        webViewClientListener?.startProcessingTrackingLink()
-                        Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
 
-                        val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)
-
-                        if (parameterStrippedType is SpecialUrlDetector.UrlType.AppLink) {
-                            webViewClientListener?.let { listener ->
-                                webView.loadUrl(urlType.cleanedUrl)
-                                return listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                            return when (val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)) {
+                                is SpecialUrlDetector.UrlType.AppLink -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                                }
+                                is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
+                                    Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
+                                    loadUrl(listener, webView, parameterStrippedType.extractedUrl)
+                                    true
+                                }
+                                else -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    true
+                                }
                             }
-                        } else {
-                            webView.loadUrl(urlType.cleanedUrl)
-                            return true
                         }
                     }
                     false
@@ -202,6 +211,20 @@ class BrowserWebViewClient(
                 throw e
             }
             return false
+        }
+    }
+
+    private fun loadUrl(
+        listener: WebViewClientListener,
+        webView: WebView,
+        url: String
+    ) {
+        if (listener.linkOpenedInNewTab()) {
+            webView.post {
+                webView.loadUrl(url)
+            }
+        } else {
+            webView.loadUrl(url)
         }
     }
 

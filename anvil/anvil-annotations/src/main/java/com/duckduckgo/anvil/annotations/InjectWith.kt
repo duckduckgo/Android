@@ -29,6 +29,8 @@ import kotlin.reflect.KClass
  * }
  * ```
  */
+@Target(AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class InjectWith(
     /** The parent component scope to the contributed subcomponent */
     val scope: KClass<*>,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.remote.messaging.impl.di
+package com.duckduckgo.mobile.android.vpn.processor
 
-import javax.inject.Qualifier
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.VpnScope
 
-/** Marks the Android matcher implementation for remote-messaging */
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class UserAttrMatcher
+@ContributesPluginPoint(
+    scope = VpnScope::class,
+    boundType = VpnPacketInterceptor::class
+)
+@Suppress("unused")
+interface VpnPacketInterceptorPluginPoint

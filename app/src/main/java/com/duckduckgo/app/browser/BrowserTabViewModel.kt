@@ -58,6 +58,8 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter
+import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Event
 import com.duckduckgo.app.browser.logindetection.LoginDetected
@@ -96,9 +98,9 @@ import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.settings.db.SettingsDataStore
-import com.duckduckgo.app.statistics.VariantManager
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
-import com.duckduckgo.app.statistics.isFireproofExperimentEnabled
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FAVORITE_MENU_ITEM_STATE
@@ -168,14 +170,20 @@ class BrowserTabViewModel @Inject constructor(
     private val accessibilitySettingsDataStore: AccessibilitySettingsDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appLinksHandler: AppLinksHandler,
-    private val variantManager: VariantManager,
     private val ampLinks: AmpLinks,
     private val trackingParameters: TrackingParameters,
     private val downloadCallback: DownloadCallback,
     private val voiceSearchAvailability: VoiceSearchAvailability,
-    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger
-) : WebViewClientListener, EditSavedSiteListener, HttpAuthenticationListener, SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
-    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener, UrlExtractionListener, ViewModel() {
+    private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
+    private val settingsDataStore: SettingsDataStore
+) : WebViewClientListener,
+    EditSavedSiteListener,
+    HttpAuthenticationListener,
+    SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
+    SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
+    UrlExtractionListener,
+    ViewModel(),
+    NavigationHistoryListener {
 
     private var buildingSiteFactoryJob: Job? = null
 
@@ -339,6 +347,7 @@ class BrowserTabViewModel @Inject constructor(
         class ShowPrivacyProtectionDisabledConfirmation(val domain: String) : Command()
         object AskToDisableLoginDetection : Command()
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
+        class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
@@ -420,6 +429,9 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         class EditWithSelectedQuery(val query: String) : Command()
+        class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
+        class NavigateToHistory(val historyStackIndex: Int) : Command()
+        object EmailSignEvent : Command()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -480,6 +492,7 @@ class BrowserTabViewModel @Inject constructor(
     private var deferredBlankSite: Job? = null
     private var accessibilityObserver: Job? = null
     private var isProcessingTrackingLink = false
+    private var isLinkOpenedInNewTab = false
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -530,12 +543,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             if (!isFireproofWebsite(loginEvent.forwardedToDomain)) {
                 withContext(dispatchers.main()) {
-                    if (variantManager.isFireproofExperimentEnabled()) {
-                        if (appSettingsPreferencesStore.appLoginDetection) {
-                            onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
-                        }
-                    } else {
-                        command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                    val showAutomaticFireproofDialog =
+                        settingsDataStore.automaticFireproofSetting == ASK_EVERY_TIME && settingsDataStore.showAutomaticFireproofDialog
+                    when {
+                        showAutomaticFireproofDialog ->
+                            command.value = AskToAutomateFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
+                        settingsDataStore.automaticFireproofSetting == ALWAYS ->
+                            fireproofDialogsEventHandler.onUserConfirmedFireproofDialog(loginEvent.forwardedToDomain)
+                        else ->
+                            command.value = AskToFireproofWebsite(FireproofWebsiteEntity(loginEvent.forwardedToDomain))
                     }
                 }
             }
@@ -560,6 +576,7 @@ class BrowserTabViewModel @Inject constructor(
 
         emailManager.signedInFlow().onEach { isSignedIn ->
             browserViewState.value = currentBrowserViewState().copy(isEmailSignedIn = isSignedIn)
+            command.value = EmailSignEvent
         }.launchIn(viewModelScope)
 
         observeAccessibilitySettings()
@@ -761,6 +778,19 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         pixel.fire(pixelName, params)
+    }
+
+    fun onUserLongPressedBack() {
+        val navigationHistory = webNavigationState?.navigationHistory ?: return
+
+        // we don't want the current page, so drop the first entry. Also don't want too many, so take only most recent ones.
+        val stack = navigationHistory
+            .drop(1)
+            .take(10)
+
+        if (stack.isNotEmpty()) {
+            command.value = ShowBackNavigationHistory(stack)
+        }
     }
 
     fun onUserSubmittedQuery(
@@ -1164,6 +1194,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         isProcessingTrackingLink = false
+        isLinkOpenedInNewTab = false
     }
 
     private fun cacheAppLink(url: String?) {
@@ -1835,6 +1866,24 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun onUserDismissedAutomaticFireproofLoginDialog() {
+        viewModelScope.launch {
+            fireproofDialogsEventHandler.onUserDismissedAutomaticFireproofLoginDialog()
+        }
+    }
+
+    fun onUserFireproofSiteInAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserRequestedAskEveryTime(domain)
+        }
+    }
+
+    fun onUserEnabledAutomaticFireproofLoginDialog(domain: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            fireproofDialogsEventHandler.onUserEnabledAutomaticFireproofing(domain)
+        }
+    }
+
     fun onRemoveFireproofWebsiteSnackbarUndoClicked(fireproofWebsiteEntity: FireproofWebsiteEntity) {
         viewModelScope.launch(dispatchers.io()) {
             fireproofWebsiteRepository.fireproofWebsite(fireproofWebsiteEntity.domain)
@@ -2096,6 +2145,10 @@ class BrowserTabViewModel @Inject constructor(
         globalLayoutState.value = Browser(isNewTabState = false)
     }
 
+    override fun historicalPageSelected(stackIndex: Int) {
+        command.value = NavigateToHistory(stackIndex)
+    }
+
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {
 
         if (!duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -2222,7 +2275,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        command.value = if (cta is DialogCta || cta is HomePanelCta || cta is DaxBubbleCta.DaxFireproofCta) HideKeyboard else ShowKeyboard
+        command.value = if (cta is DialogCta || cta is HomePanelCta) HideKeyboard else ShowKeyboard
     }
 
     fun registerDaxBubbleCtaDismissed() {
@@ -2303,17 +2356,6 @@ class BrowserTabViewModel @Inject constructor(
                 is HomePanelCta -> refreshCta()
                 else -> ctaViewState.value = currentCtaViewState().copy(cta = null)
             }
-        }
-    }
-
-    fun userSelectedFireproofSetting(isAutoFireproofingEnabled: Boolean) {
-        appSettingsPreferencesStore.appLoginDetection = isAutoFireproofingEnabled
-
-        val cta = currentCtaViewState().cta ?: return
-
-        viewModelScope.launch {
-            ctaViewModel.onUserClickFireproofExperimentButton(isAutoFireproofingEnabled, cta)
-            refreshCta()
         }
     }
 
@@ -2601,6 +2643,19 @@ class BrowserTabViewModel @Inject constructor(
         browserViewState.value = currentBrowserViewState().copy(
             forceRenderingTicker = System.currentTimeMillis()
         )
+    }
+
+    fun onMessageReceived() {
+        isLinkOpenedInNewTab = true
+    }
+
+    override fun linkOpenedInNewTab(): Boolean {
+        return isLinkOpenedInNewTab
+    }
+
+    @VisibleForTesting
+    fun updateWebNavigation(webNavigationState: WebNavigationState) {
+        this.webNavigationState = webNavigationState
     }
 
     companion object {

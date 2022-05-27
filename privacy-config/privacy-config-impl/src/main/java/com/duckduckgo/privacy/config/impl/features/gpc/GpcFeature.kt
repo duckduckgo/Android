@@ -20,6 +20,7 @@ import com.duckduckgo.privacy.config.store.GpcExceptionEntity
 
 data class GpcFeature(
     val state: String,
+    val minSupportedVersion: Int?,
     val exceptions: List<GpcExceptionEntity>,
     val settings: GpcSettings
 )

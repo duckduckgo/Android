@@ -23,11 +23,11 @@ import android.content.Intent.EXTRA_TEXT
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.bookmarks.ui.BookmarksActivity
 import com.duckduckgo.app.browser.BrowserViewModel.Command
@@ -143,12 +143,9 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         super.onCreate(savedInstanceState = newInstanceState, daggerInject = false)
         toolbarMockupBinding = IncludeOmnibarToolbarMockupBinding.bind(binding.root)
         setContentView(binding.root)
-        viewModel.viewState.observe(
-            this,
-            Observer {
-                renderer.renderBrowserViewState(it)
-            }
-        )
+        viewModel.viewState.observe(this) {
+            renderer.renderBrowserViewState(it)
+        }
         viewModel.awaitClearDataFinishedNotification()
     }
 
@@ -241,6 +238,15 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         transaction.commit()
     }
 
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        return if (keyCode == KeyEvent.KEYCODE_BACK) {
+            currentTab?.onLongPressBackButton()
+            true
+        } else {
+            super.onKeyLongPress(keyCode, event)
+        }
+    }
+
     private fun launchNewSearchOrQuery(intent: Intent?) {
 
         Timber.i("launchNewSearchOrQuery: $intent")
@@ -304,25 +310,16 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
     }
 
     private fun configureObservers() {
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
-        viewModel.selectedTab.observe(
-            this,
-            Observer {
-                if (it != null) selectTab(it)
-            }
-        )
-        viewModel.tabs.observe(
-            this,
-            Observer {
-                clearStaleTabs(it)
-                launch { viewModel.onTabsUpdated(it) }
-            }
-        )
+        viewModel.command.observe(this) {
+            processCommand(it)
+        }
+        viewModel.selectedTab.observe(this) {
+            if (it != null) selectTab(it)
+        }
+        viewModel.tabs.observe(this) {
+            clearStaleTabs(it)
+            launch { viewModel.onTabsUpdated(it) }
+        }
     }
 
     private fun removeObservers() {
@@ -384,12 +381,7 @@ open class BrowserActivity : DuckDuckGoActivity(), CoroutineScope by MainScope()
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
-            if (dialog.ctaVisible) {
-                viewModel.promotedFireButtonCancelled()
-                pixel.fire(FIRE_DIALOG_PROMOTED_CANCEL)
-            } else {
-                pixel.fire(FIRE_DIALOG_CANCEL)
-            }
+            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()

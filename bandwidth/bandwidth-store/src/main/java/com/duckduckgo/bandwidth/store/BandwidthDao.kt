@@ -29,4 +29,13 @@ interface BandwidthDao {
 
     @Query("SELECT * FROM bandwidth")
     fun getBandwidth(): BandwidthEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBucket(bandwidthBucketEntity: BandwidthBucketEntity)
+
+    @Query("SELECT * FROM bandwidth_buckets")
+    fun getBuckets(): List<BandwidthBucketEntity>
+
+    @Query("delete from bandwidth_buckets")
+    fun deleteAllBuckets()
 }

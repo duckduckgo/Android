@@ -40,7 +40,7 @@ import javax.inject.Provider
  */
 class UserAgentProvider constructor(
     @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
-    private val device: DeviceInfo,
+    device: DeviceInfo,
     private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
 ) {
 

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.bandwidth.impl
 
+import com.duckduckgo.bandwidth.store.BandwidthBucketEntity
 import com.duckduckgo.bandwidth.store.BandwidthDatabase
 import com.duckduckgo.bandwidth.store.BandwidthEntity
 import com.duckduckgo.di.scopes.AppScope
@@ -27,6 +28,9 @@ interface BandwidthRepository {
     fun getCurrentBandwidthData(): BandwidthData
     fun persistBandwidthData(bandwidthData: BandwidthData)
     fun getStoredBandwidthData(): BandwidthData?
+    fun persistBucket(bucket: BandwidthData)
+    fun getBuckets(): List<BandwidthData>
+    fun deleteAllBuckets()
 }
 
 @ContributesBinding(AppScope::class)
@@ -60,5 +64,25 @@ class RealBandwidthRepository @Inject constructor(
             appBytes = bandwidthEntity.appBytes,
             totalBytes = bandwidthEntity.totalBytes
         )
+    }
+
+    override fun persistBucket(bucket: BandwidthData) {
+        database.bandwidthDao().insertBucket(
+            BandwidthBucketEntity(
+                timestamp = bucket.timestamp,
+                appBytes = bucket.appBytes,
+                totalBytes = bucket.totalBytes
+            )
+        )
+    }
+
+    override fun getBuckets(): List<BandwidthData> {
+        return database.bandwidthDao().getBuckets().map {
+            BandwidthData(it.timestamp, it.appBytes, it.totalBytes)
+        }
+    }
+
+    override fun deleteAllBuckets() {
+        database.bandwidthDao().deleteAllBuckets()
     }
 }

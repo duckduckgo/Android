@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Uždaryti kortelė</string>
     <string name="tabClosed">Skirtukas uždarytas</string>
     <string name="tabClosedUndo">Anuliuoti</string>
+    <string name="downloadsMenuItemTitle">Atsisiuntimai</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Svetainės privatumo apsauga</string>
@@ -272,6 +272,8 @@
     <string name="dialogSave">Išsaugoti</string>
     <string name="delete">Trinti</string>
     <string name="edit">Redaguoti</string>
+    <string name="remove">Pašalinti</string>
+    <string name="removeAll">Pašalinti visus</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Ieškoti „DuckDuckGo“</string>
@@ -297,7 +299,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Padėkite mums tobulinti programą!</string>
-    <string name="surveyCtaDescription">Atsakykite į trumpos anoniminės apklausos klausimus ir pasidalinkite atsiliepimais.</string>
+    <string name="surveyCtaDescription">Atsakykite į trumpos apklausos klausimus ir pasidalinkite atsiliepimais.</string>
     <string name="surveyCtaLaunchButton">Dalyvauti apklausoje</string>
     <string name="surveyCtaDismissButton">Ne, dėkoju</string>
     <string name="surveyActivityTitle">Naudotojų apklausa</string>
@@ -472,7 +474,7 @@
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
     <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Atlikta!<br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
-    <string name="daxSerpCtaText">„DuckDuckGo“ paieškos yra anoniminės ir niekada nekaupiu jūsų paieškos istorijos. Niekada. 🙌</string>
+    <string name="daxSerpCtaText">Jūsų „DuckDuckGo“ paieškos yra anoniminės ir niekada neišsaugo jūsų paieškos istorijų. Niekada. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
         <item quantity="few"><![CDATA[ ir <b>%1$d kiti</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
@@ -490,7 +492,7 @@
     <string name="daxMainNetworkOwnedCtaText">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Tęsti</string>
+    <string name="downloadConfirmationContinue">Išsaugoti Atsisiuntimuose</string>
     <string name="downloadConfirmationSaveFileTitle">Išsaugoti %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Palikti abu</string>
     <string name="downloadConfirmationReplaceOldFileText">Pakeisti</string>
@@ -533,23 +535,33 @@
     <string name="fireproofWebsitesActivityTitle">Apsaugoti svetaines</string>
     <string name="settingsFireproofWebsites">Apsaugoti svetaines</string>
     <string name="fireproofWebsiteMenuTitleAdd">Apsaugoti šią svetainę</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; dabar yra apsaugota</string>
     <string name="fireproofWebsiteSnackbarAction">Anuliuoti</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt;?</string>
-    <string name="fireproofWebsiteEmptyListHint">Apsaugotų svetainių nėra</string>
     <string name="fireproofWebsiteFeatureDescription">Svetainės pagrįstos slapukais, kad liktumėte prisijungę. Pasirinkus parinktį „Fireproof“, slapukai nėra ištrinami ir liksite prisijungę net panaudoję mygtuką „Fire“. Vis tiek blokuosime trečiųjų šalių stebėjimo priemones, randamas svetainėse, kuriose pasinaudosite parinktimi „Fireproof“.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Daugiau svetainės patikrinimo parinkčių %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Ar nori pasinaudoti parinktimi „Fireproof“ %1$s?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Pasirinkę parinktį „Fireproof“ šioje svetainėje, liksite prisijungę net panaudoję mygtuką „Fire“.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Parinktis „Fireproof“</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ne dabar</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Svetainės</string>
-    <string name="fireproofWebsiteToggleText">Klausti prisijungiant</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Apsaugoti svetaines</string>
+    <string name="fireproofWebsiteEmptyListHint">Apsaugotų svetainių dar nėra</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Apsaugokite svetaines prisijungdami</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Visų svetainių apsauga pašalinta</string>
+    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; apsauga pašalinta</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Klausti kiekvieną kartą</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Visada</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Niekada</string>
     <string name="disableLoginDetectionDialogTitle">Išjungti apsaugos priminimą prisijungiant prie svetainių?</string>
     <string name="disableLoginDetectionDialogDescription">Šią nuostatą galite bet kada pakeisti nustatymuose.</string>
     <string name="disableLoginDetectionDialogPositive">IŠJUNGTI</string>
     <string name="disableLoginDetectionDialogNegative">ATŠAUKTI</string>
-    <string name="fireproofWebsiteRemovalConfirmation">&lt;b&gt;%1$s&lt;/b&gt; apsauga pašalinta</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Apsaugoti svetaines automatiškai prisijungiant?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Pasirinkę svetainių apsaugą, liksite prisijungę net panaudoję mygtuką „Fire“. Vėliau visada galite tai pakeisti nustatymuose. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Visuomet apsaugoti</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Apsaugoti šią svetainę</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Ne dabar</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Mygtuko „Fire“ animacija</string>
@@ -654,16 +666,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Supaprastintas el. pašto privatumas.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Jūs jau sąraše!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=\"\"><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=\"\"><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Atsiųsime jums pranešimą, kai<br/> el. pašto apsauga bus parengta. <b><a href="">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Jūsų kvietimas pasirodys čia, kai bus parengtas. Ar norite <a href=""><b>gauti pranešimą,</b></a> kai jis pasirodys?<br/><a href=""><b>Sužinokite daugiau</b></a> apie el. pašto apsaugą.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Esate pakviesti!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href=\"\">Sužinoti daugiau</a></b>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuokite el. pašto sekimo priemones ir slėpkite savo adresą nekeisdami savo el. pašto teikėjo.<b><a href="">Sužinoti daugiau</a></b>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Asmeninis „Duck“ adresas</string>
@@ -712,4 +724,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s valdiklis pridėtas prie pagrindinio ekrano</string>
     <string name="settingsAddHomeScreenWidget">Pagrindinio ekrano valdiklis</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
+    <string name="macos_settings_description_list">Jūs jau sąraše!</string>
+    <string name="macos_settings_description_ready">Galima atsisiųsti „Mac“</string>
+    <string name="macos_settings_title">„DuckDuckGo“ darbalaukio programa</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Atsisiuntimai</string>
+    <string name="downloadsActivityTitle">Atsisiuntimai</string>
+    <string name="downloadsActivityNoItemsDescription">Nėra atsisiųstų failų</string>
+    <string name="downloadsShareTitle">Dalintis su...</string>
+    <string name="downloadsDownloadFinishedActionName">Atviras</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Failo nebėra</string>
+    <string name="downloadsItemMenuShare">Bendrinti</string>
+    <string name="downloadsItemMenuDelete">Trinti</string>
+    <string name="downloadsItemMenuCancel">Atšaukti</string>
+    <string name="downloadsActivityMenuDeleteAll">Ištrinti viską</string>
+    <string name="downloadsFileDeletedMessage">Ištrinta %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Visi failai ištrinti</string>
+    <string name="downloadsMoreOptionsContentDescription">Daugiau parinkčių, skirtų %1$s</string>
+    <string name="downloadsUndoActionName">Anuliuoti</string>
+    <string name="downloadsStateInProgress">Vykdoma...</string>
+
 </resources>

@@ -16,8 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.apps
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -25,18 +24,12 @@ import com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageScreen
 import com.duckduckgo.mobile.android.vpn.model.BucketizedVpnTracker
 import com.duckduckgo.mobile.android.vpn.model.TrackingApp
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit.DAYS
 import javax.inject.Inject
@@ -47,15 +40,39 @@ class ManageAppsProtectionViewModel @Inject constructor(
     private val excludedApps: TrackingProtectionAppsRepository,
     private val appTrackersRepository: AppTrackerBlockingStatsRepository,
     private val pixel: DeviceShieldPixels,
-    private val vpnStateMonitor: VpnStateMonitor,
     private val dispatcherProvider: DispatcherProvider
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
-    private val manualChanges: MutableList<String> = mutableListOf()
-
+    private val currentManualProtections = mutableListOf<Pair<String, Boolean>>()
+    private val refreshSnapshot = MutableStateFlow(System.currentTimeMillis())
+    private val entryProtectionSnapshot = mutableListOf<Pair<String, Boolean>>()
+    private var latestSnapshot = 0L
     private val defaultTimeWindow = TimeWindow(5, DAYS)
+
+    private fun MutableStateFlow<Long>.refresh() {
+        viewModelScope.launch {
+            emit(System.currentTimeMillis())
+        }
+    }
+
+    init {
+        excludedApps.manuallyExcludedApps()
+            .combine(refreshSnapshot.asStateFlow()) { excludedApps, timestamp -> ManualProtectionSnapshot(timestamp, excludedApps) }
+            .flowOn(dispatcherProvider.io())
+            .onEach {
+                if (latestSnapshot != it.timestamp) {
+                    latestSnapshot = it.timestamp
+                    entryProtectionSnapshot.clear()
+                    entryProtectionSnapshot.addAll(it.snapshot)
+                }
+                currentManualProtections.clear()
+                currentManualProtections.addAll(it.snapshot)
+            }
+            .flowOn(dispatcherProvider.main())
+            .launchIn(viewModelScope)
+    }
 
     internal suspend fun getProtectedApps() = excludedApps.getAppsAndProtectionInfo().map { ViewState(it) }
 
@@ -96,13 +113,11 @@ class ManageAppsProtectionViewModel @Inject constructor(
         packageName: String,
         report: Boolean
     ) {
-        recordManualChange(packageName)
+        pixel.didDisableAppProtectionFromApps()
         viewModelScope.launch {
-
-            excludedApps.manuallyExcludedApp(packageName)
-
+            excludedApps.manuallyExcludeApp(packageName)
+            pixel.didSubmitManuallyDisableAppProtectionDialog()
             if (report) {
-                pixel.didSubmitManuallyDisableAppProtectionDialog()
                 command.send(Command.LaunchFeedback(ReportBreakageScreen.IssueDescriptionForm(appName, packageName)))
             } else {
                 pixel.didSkipManuallyDisableAppProtectionDialog()
@@ -113,35 +128,48 @@ class ManageAppsProtectionViewModel @Inject constructor(
     fun onAppProtectionEnabled(
         packageName: String
     ) {
-        recordManualChange(packageName)
+        pixel.didEnableAppProtectionFromApps()
         viewModelScope.launch {
             excludedApps.manuallyEnabledApp(packageName)
         }
     }
 
-    private fun recordManualChange(packageName: String) {
-        if (manualChanges.contains(packageName)) {
-            manualChanges.remove(packageName)
-        } else {
-            manualChanges.add(packageName)
-        }
-    }
-
     fun restoreProtectedApps() {
         pixel.restoreDefaultProtectionList()
-        manualChanges.clear()
         viewModelScope.launch {
             excludedApps.restoreDefaultProtectedList()
+            // as product wanted to restart VPN as soon as we restored protections, we need to refresh the snapshot here
+            refreshSnapshot.refresh()
             command.send(Command.RestartVpn)
         }
     }
 
-    fun userMadeChanges() = manualChanges.isNotEmpty()
+    fun userMadeChanges(): Boolean {
+        // User made changes when the manual protections entry snapshot is different from the current snapshot
+        if (currentManualProtections.size != entryProtectionSnapshot.size) return true
 
-    fun onLeavingScreen() {
+        currentManualProtections.forEach { protection ->
+            entryProtectionSnapshot.firstOrNull { it.first == protection.first }?.let { match ->
+                if (match.second != protection.second) return true
+            }
+        }
+
+        return false
+    }
+
+    fun canRestoreDefaults() = currentManualProtections.isNotEmpty()
+
+    override fun onResume(owner: LifecycleOwner) {
+        refreshSnapshot.refresh()
+    }
+
+    override fun onPause(owner: LifecycleOwner) {
+        onLeavingScreen()
+    }
+
+    private fun onLeavingScreen() {
         viewModelScope.launch {
             if (userMadeChanges()) {
-                manualChanges.clear()
                 command.send(Command.RestartVpn)
             }
         }
@@ -193,12 +221,12 @@ class ManageAppsProtectionViewModel @Inject constructor(
             command.send(Command.LaunchAllAppsProtection)
         }
     }
-
-    companion object DeviceShieldPixelParameter {
-        private const val PACKAGE_NAME = "packageName"
-        private const val EXCLUDING_REASON = "reason"
-    }
 }
+
+private data class ManualProtectionSnapshot(
+    val timestamp: Long,
+    val snapshot: List<Pair<String, Boolean>>
+)
 
 internal data class ViewState(val excludedApps: List<TrackingProtectionAppInfo>)
 internal sealed class Command {

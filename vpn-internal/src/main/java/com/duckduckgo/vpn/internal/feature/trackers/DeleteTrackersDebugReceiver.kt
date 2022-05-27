@@ -66,7 +66,7 @@ class DeleteTrackersDebugReceiverRegister @Inject constructor(
 
         receiver?.unregister()
 
-        receiver = DeleteTrackersDebugReceiver(context) { _ ->
+        receiver = DeleteTrackersDebugReceiver(context) {
             appCoroutineScope.launch {
                 vpnDatabase.vpnTrackerDao().deleteAllTrackers()
             }

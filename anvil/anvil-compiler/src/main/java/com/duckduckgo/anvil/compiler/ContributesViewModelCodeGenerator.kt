@@ -22,13 +22,14 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.compiler.api.*
 import com.squareup.anvil.compiler.internal.*
+import com.squareup.anvil.compiler.internal.reference.ClassReference
+import com.squareup.anvil.compiler.internal.reference.asClassName
+import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
-import org.jetbrains.kotlin.psi.allConstructors
 import java.io.File
 import javax.inject.Inject
 
@@ -42,37 +43,38 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
-        return projectFiles.classesAndInnerClass(module)
-            .filter { it.hasAnnotation(ContributesViewModel::class.fqName, module) }
+        return projectFiles.classAndInnerClassReferences(module)
+            .toList()
+            .filter { it.isAnnotatedWith(ContributesViewModel::class.fqName) }
             .flatMap {
                 listOf(generateFactoryPlugin(it, codeGenDir, module))
             }
             .toList()
     }
 
-    private fun generateFactoryPlugin(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
-        val factoryClassName = "${vmClass.name}_ViewModelFactory"
-        val scope = vmClass.scope(ContributesViewModel::class.fqName, module)
-        val isSingleInstanceInScope = vmClass.hasAnnotation(singleInstanceAnnotationFqName, module)
-        val constructor = vmClass.allConstructors.singleOrNull { it.hasAnnotation(Inject::class.fqName, module) }
-        val defaultParameterValues = constructor?.valueParameters?.singleOrNull { it.hasDefaultValue() }
+    private fun generateFactoryPlugin(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
+        val factoryClassName = "${vmClass.shortName}_ViewModelFactory"
+        val scope = vmClass.annotations.first { it.fqName == ContributesViewModel::class.fqName }.scopeOrNull(0)
+        val isSingleInstanceInScope = vmClass.isAnnotatedWith(singleInstanceAnnotationFqName)
+        val constructor = vmClass.constructors.singleOrNull { it.isAnnotatedWith(Inject::class.fqName) }
+        val defaultParameterValues = constructor?.parameters?.any { it.parameter.hasDefaultValue() } ?: false
         if (isSingleInstanceInScope) {
             throw AnvilCompilationException(
-                "${vmClass.requireFqName()} cannot be annotated with @SingleInstanceIn",
-                element = vmClass.identifyingElement,
+                "${vmClass.fqName} cannot be annotated with @SingleInstanceIn",
+                element = vmClass.clazz.identifyingElement,
             )
         }
         if (constructor == null) {
             throw AnvilCompilationException(
-                "${vmClass.requireFqName()} must have an @Inject constructor",
-                element = vmClass.identifyingElement,
+                "${vmClass.fqName} must have an @Inject constructor",
+                element = vmClass.clazz.identifyingElement,
             )
         }
-        if (defaultParameterValues != null) {
+        if (defaultParameterValues) {
             throw AnvilCompilationException(
-                "${vmClass.requireFqName()} constructor parameters must not have default values",
-                element = vmClass.identifyingElement,
+                "${vmClass.fqName} constructor parameters must not have default values",
+                element = vmClass.clazz.identifyingElement,
             )
         }
         val content = FileSpec.buildFile(generatedPackage, factoryClassName) {
@@ -81,7 +83,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
                     .addSuperinterface(duckduckgoViewModelFactoryPluginFqName.asClassName(module))
                     .addAnnotation(
                         AnnotationSpec.builder(ContributesMultibinding::class)
-                            .addMember("%T::class", scope.asClassName(module))
+                            .addMember("%T::class", scope!!.asClassName())
                             .build()
                     )
                     .primaryConstructor(

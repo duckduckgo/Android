@@ -16,31 +16,29 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
-import android.content.Context.MODE_PRIVATE
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.global.api.InMemorySharedPreferences
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.mobile.android.vpn.pixels.RealDeviceShieldPixels.Companion.DS_PIXELS_PREF_FILE
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
+import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
+import org.mockito.kotlin.*
 import java.util.*
 
-@RunWith(AndroidJUnit4::class)
 class RealDeviceShieldPixelsTest {
 
     private val pixel = mock<Pixel>()
+    private val sharedPreferencesProvider = mock<VpnSharedPreferencesProvider>()
 
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-    private val deviceShieldPixels: DeviceShieldPixels = RealDeviceShieldPixels(context, pixel)
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Before
     fun setup() {
-        context.getSharedPreferences(DS_PIXELS_PREF_FILE, MODE_PRIVATE).edit().clear().commit()
+        val prefs = InMemorySharedPreferences()
+        whenever(
+            sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true))
+        ).thenReturn(prefs)
+
+        deviceShieldPixels = RealDeviceShieldPixels(pixel, sharedPreferencesProvider)
     }
 
     @Test

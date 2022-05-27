@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Tabblad sluiten</string>
     <string name="tabClosed">Tabblad gesloten</string>
     <string name="tabClosedUndo">Ongedaan maken</string>
+    <string name="downloadsMenuItemTitle">Downloads</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Privacybescherming van de site</string>
@@ -264,6 +264,8 @@
     <string name="dialogSave">Opslaan</string>
     <string name="delete">Verwijderen</string>
     <string name="edit">Bewerken</string>
+    <string name="remove">Verwijderen</string>
+    <string name="removeAll">Alles verwijderen</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">DuckDuckGo doorzoeken</string>
@@ -289,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Help ons de app te verbeteren!</string>
-    <string name="surveyCtaDescription">Doe mee aan onze korte, anonieme enquête en deel je feedback.</string>
+    <string name="surveyCtaDescription">Doe mee aan onze korte enquête en deel je feedback.</string>
     <string name="surveyCtaLaunchButton">Vul de enquête in</string>
     <string name="surveyCtaDismissButton">Nee, bedankt</string>
     <string name="surveyActivityTitle">Gebruikersenquête</string>
@@ -464,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Laten we het Doen!</string>
     <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van uw favoriete sites te bezoeken! <br/><br/>Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Je kunt het!<br/><br/>Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👍]]></string>
-    <string name="daxSerpCtaText">Uw DuckDuckGo-zoekopdrachten zijn anoniem en ik sla uw zoekgeschiedenis nooit op. Nooit. 🙌</string>
+    <string name="daxSerpCtaText">Je DuckDuckGo-zoekopdrachten zijn anoniem en ik sla je zoekgeschiedenis nooit op. Nooit. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
@@ -474,11 +476,11 @@
         <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
     </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers. <br/><br/>Ga je gang - blijf browsen!]]></string>
-    <string name="daxMainNetworkCtaText">Opgelet! Ik kan niet voorkomen dat %1$s jouw activiteit op %2$s kan zien&lt;br/&gt;&lt;br/&gt;Maar als je met mij browset, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op veel andere sites te blokkeren.</string>
+    <string name="daxMainNetworkCtaText">Opgelet! Ik kan niet voorkomen dat %1$s jouw activiteit op %2$s kan zien\n\nMaar als je met mij browset, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op veel andere sites te blokkeren.</string>
     <string name="daxMainNetworkOwnedCtaText">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Doorgaan</string>
+    <string name="downloadConfirmationContinue">Opslaan in downloads</string>
     <string name="downloadConfirmationSaveFileTitle">Opslaan%1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Houd beide</string>
     <string name="downloadConfirmationReplaceOldFileText">Vervangen</string>
@@ -521,23 +523,33 @@
     <string name="fireproofWebsitesActivityTitle">Brandveilige websites</string>
     <string name="settingsFireproofWebsites">Brandveilige websites</string>
     <string name="fireproofWebsiteMenuTitleAdd">Deze website brandveilig maken</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; is nu brandveilig</string>
     <string name="fireproofWebsiteSnackbarAction">Ongedaan maken</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Weet je zeker dat je &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
-    <string name="fireproofWebsiteEmptyListHint">Geen brandveilige websites</string>
     <string name="fireproofWebsiteFeatureDescription">Websites gebruiken cookies om te zorgen dat je ingelogd blijft. Als je een site brandveilig maakt, worden de cookies niet gewist en blijf je ingelogd, zelfs nadat je de vuurknop hebt gebruikt. Trackers van derden worden ook op brandveilige websites geblokkeerd.</string>
     <string name="fireproofWebsiteOverflowContentDescription">Meer opties voor een vuurvaste website %1$s</string>
     <string name="fireproofWebsiteLoginDialogTitle">Wil je %1$s brandveilig maken?</string>
     <string name="fireproofWebsiteLoginDialogDescription">Als je deze site brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd.</string>
     <string name="fireproofWebsiteLoginDialogPositive">Brandveilig</string>
     <string name="fireproofWebsiteLoginDialogNegative">Niet nu</string>
-    <string name="fireproofWebsiteItemsSectionTitle">Websites</string>
-    <string name="fireproofWebsiteToggleText">Vragen bij inloggen</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Brandveilige websites</string>
+    <string name="fireproofWebsiteEmptyListHint">Nog geen brandveilige websites</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Brandveilige websites bij aanmelden</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Brandveiligheid verwijderd voor alle sites</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Brandveiligheid verwijderd voor &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Elke keer vragen</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Altijd</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Nooit</string>
     <string name="disableLoginDetectionDialogTitle">Herinnering voor brandveiligheid uitschakelen bij het inloggen?</string>
     <string name="disableLoginDetectionDialogDescription">Je kunt deze voorkeur op elk moment wijzigen in de instellingen.</string>
     <string name="disableLoginDetectionDialogPositive">UITSCHAKELEN</string>
     <string name="disableLoginDetectionDialogNegative">ANNULEREN</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Brandveiligheid verwijderd voor &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Websites automatisch brandvrij maken bij aanmelden?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Als je deze website brandveilig maakt, blijf je ook na het gebruiken van de vuurknop ingelogd. Je kunt dit later altijd nog wijzigen in Instellingen. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Altijd vuurbestendig</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Deze website brandveilig maken</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Niet nu</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animatie vuurknop</string>
@@ -642,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=\"\"><b>Meer informatie</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=\"\"><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=\"\"><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=""><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=""><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=""><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=\"\"><b>Meer informatie</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>
@@ -696,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%1$s widget toegevoegd aan startscherm</string>
     <string name="settingsAddHomeScreenWidget">Startschermwidget</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Browse privé met onze app voor Mac</string>
+    <string name="macos_settings_description_list">Je staat op de lijst!</string>
+    <string name="macos_settings_description_ready">Beschikbaar om te downloaden op Mac</string>
+    <string name="macos_settings_title">DuckDuckGo-bureaubladapp</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Downloads</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsActivityNoItemsDescription">Nog geen bestanden gedownload</string>
+    <string name="downloadsShareTitle">Delen met...</string>
+    <string name="downloadsDownloadFinishedActionName">Openen</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Kan bestand niet openen. Kijk of er een compatibele app is.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Bestand bestaat niet meer</string>
+    <string name="downloadsItemMenuShare">Delen</string>
+    <string name="downloadsItemMenuDelete">Verwijderen</string>
+    <string name="downloadsItemMenuCancel">Annuleren</string>
+    <string name="downloadsActivityMenuDeleteAll">Alles verwijderen</string>
+    <string name="downloadsFileDeletedMessage">%1$s verwijderd</string>
+    <string name="downloadsAllFilesDeletedMessage">Alle bestanden verwijderd</string>
+    <string name="downloadsMoreOptionsContentDescription">Meer opties voor %1$s</string>
+    <string name="downloadsUndoActionName">Ongedaan maken</string>
+    <string name="downloadsStateInProgress">Bezig...</string>
+
 </resources>

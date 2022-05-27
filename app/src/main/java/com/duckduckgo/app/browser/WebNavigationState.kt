@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.webkit.WebBackForwardList
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.WebNavigationStateChange.Unchanged
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.global.isHttpsVersionOfUri
 
 interface WebNavigationState {
@@ -30,6 +31,7 @@ interface WebNavigationState {
     val canGoForward: Boolean
     val hasNavigationHistory: Boolean
     val progress: Int?
+    val navigationHistory: List<NavigationHistoryEntry>
 }
 
 sealed class WebNavigationStateChange {
@@ -79,7 +81,7 @@ fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStat
 }
 
 data class WebViewNavigationState(
-    private val stack: WebBackForwardList,
+    val stack: WebBackForwardList,
     override val progress: Int? = null
 ) : WebNavigationState {
 
@@ -96,6 +98,8 @@ data class WebViewNavigationState(
     override val canGoForward: Boolean = stack.currentIndex + 1 < stack.size
 
     override val hasNavigationHistory = stack.size != 0
+
+    override val navigationHistory: List<NavigationHistoryEntry> = stack.toNavigationStack()
 
     /**
      * Auto generated equality method. We create this manually to omit the privately stored system stack property as
@@ -132,13 +136,24 @@ data class WebViewNavigationState(
         result = 31 * result + (progress?.hashCode() ?: 0)
         return result
     }
+
+    private fun WebBackForwardList.toNavigationStack(): List<NavigationHistoryEntry> {
+        val entryList = mutableListOf<NavigationHistoryEntry>()
+        for (i in this.currentIndex downTo 0) {
+            val currentStackItem = getItemAtIndex(i)
+            entryList.add(NavigationHistoryEntry(title = currentStackItem.title, url = currentStackItem.url))
+        }
+        return entryList
+    }
+
 }
 
 @Suppress("DataClassPrivateConstructor")
 data class EmptyNavigationState private constructor(
     override val originalUrl: String?,
     override val currentUrl: String?,
-    override val title: String?
+    override val title: String?,
+    override val navigationHistory: List<NavigationHistoryEntry> = emptyList()
 ) : WebNavigationState {
     companion object {
         operator fun invoke(webNavigationState: WebNavigationState): EmptyNavigationState {

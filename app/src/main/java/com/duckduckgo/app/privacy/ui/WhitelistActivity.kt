@@ -23,7 +23,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.lifecycle.Observer
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWhitelistBinding
@@ -82,19 +81,13 @@ class WhitelistActivity : DuckDuckGoActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.viewState.observe(
-            this,
-            Observer { viewState ->
-                viewState?.let { renderViewState(it) }
-            }
-        )
+        viewModel.viewState.observe(this) { viewState ->
+            viewState?.let { renderViewState(it) }
+        }
 
-        viewModel.command.observe(
-            this,
-            Observer {
-                processCommand(it)
-            }
-        )
+        viewModel.command.observe(this) {
+            processCommand(it)
+        }
     }
 
     private fun renderViewState(viewState: WhitelistViewModel.ViewState) {

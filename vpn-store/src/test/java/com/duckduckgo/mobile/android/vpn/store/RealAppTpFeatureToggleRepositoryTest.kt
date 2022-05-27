@@ -47,9 +47,9 @@ class RealAppTpFeatureToggleRepositoryTest {
 
     @Test
     fun whenInsertThenDelegate() {
-        repository.insert(VpnFeatureToggles(FEATURE, false))
+        repository.insert(VpnFeatureToggles(FEATURE, false, null))
 
-        verify(vpnFeatureToggleStore).insert(VpnFeatureToggles(FEATURE, false))
+        verify(vpnFeatureToggleStore).insert(VpnFeatureToggles(FEATURE, false, null))
     }
 
     @Test

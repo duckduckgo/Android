@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -46,6 +47,7 @@ class AppTPCompanyTrackersViewModelTest {
     private val statsRepository = mock<AppTrackerBlockingStatsRepository>()
     private val appsRepository = mock<TrackingProtectionAppsRepository>()
     private val timeDiffFormatter = mock<TimeDiffFormatter>()
+    private val deviceShieldPixels = mock<DeviceShieldPixels>()
 
     private lateinit var viewModel: AppTPCompanyTrackersViewModel
 
@@ -55,6 +57,7 @@ class AppTPCompanyTrackersViewModelTest {
             statsRepository,
             appsRepository,
             timeDiffFormatter,
+            deviceShieldPixels,
             CoroutineTestRule().testDispatcherProvider
         )
     }
@@ -83,7 +86,7 @@ class AppTPCompanyTrackersViewModelTest {
 
     private fun someTrackers(): List<VpnTrackerCompanySignal> {
         val defaultTrackingApp = TrackingApp("app.foo.com", "Foo App")
-        val domain: String = "example.com"
+        val domain = "example.com"
         val trackerCompanyId: Int = -1
         val timestamp: String = DatabaseDateFormatter.bucketByHour()
 

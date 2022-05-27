@@ -26,7 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class VpnRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {
 
     interface Listener {
-        fun onCancel()
+        fun OnRemoveFeatureDialogCancel()
         fun onRemoveFeature()
     }
 
@@ -61,7 +61,7 @@ class VpnRemoveFeatureConfirmationDialog private constructor(private val listene
     ) {
         cancelCta.setOnClickListener {
             dismiss()
-            listener.onCancel()
+            listener.OnRemoveFeatureDialogCancel()
         }
         removeCta.setOnClickListener {
             dismiss()

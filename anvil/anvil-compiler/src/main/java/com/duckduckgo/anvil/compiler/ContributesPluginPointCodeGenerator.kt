@@ -22,14 +22,16 @@ import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.compiler.api.*
 import com.squareup.anvil.compiler.internal.*
+import com.squareup.anvil.compiler.internal.reference.ClassReference
+import com.squareup.anvil.compiler.internal.reference.argumentAt
+import com.squareup.anvil.compiler.internal.reference.asClassName
+import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
 import dagger.multibindings.Multibinds
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtClassLiteralExpression
-import org.jetbrains.kotlin.psi.KtClassOrObject
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 import javax.inject.Inject
@@ -44,8 +46,9 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
     override fun isApplicable(context: AnvilContext): Boolean = true
 
     override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
-        return projectFiles.classesAndInnerClass(module)
-            .filter { it.hasAnnotation(ContributesPluginPoint::class.fqName, module) }
+        return projectFiles.classAndInnerClassReferences(module)
+            .toList()
+            .filter { it.isAnnotatedWith(ContributesPluginPoint::class.fqName) }
             .flatMap {
                 listOf(
                     generatePluginPoint(it, codeGenDir, module),
@@ -55,26 +58,21 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generatePluginPoint(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
-        val pluginPointClassName = "${vmClass.name}_PluginPoint"
-        val scope = vmClass.scope(ContributesPluginPoint::class.fqName, module)
-        val pluginClassName = vmClass.pluginClassName(ContributesPluginPoint::class.fqName, module)
+    private fun generatePluginPoint(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
+        val pluginPointClassName = "${vmClass.shortName}_PluginPoint"
+        val scope = vmClass.annotations.first { it.fqName == ContributesPluginPoint::class.fqName }.scopeOrNull(0)!!
+        val pluginClassName = vmClass.pluginClassName(ContributesPluginPoint::class.fqName) ?: vmClass.asClassName()
 
         if (!vmClass.isInterface()) {
             throw AnvilCompilationException(
-                "${vmClass.requireFqName()} must be an interface",
-                element = vmClass.identifyingElement,
+                "${vmClass.fqName} must be an interface",
+                element = vmClass.clazz.identifyingElement,
             )
         }
         val content = FileSpec.buildFile(generatedPackage, pluginPointClassName) {
             addType(
                 TypeSpec.classBuilder(pluginPointClassName)
-                    .addAnnotation(
-                        AnnotationSpec.builder(singleInstanceAnnotationFqName.asClassName(module))
-                            .addMember("%T::class", scope.asClassName(module))
-                            .build()
-                    )
                     .addSuperinterface(pluginPointFqName.asClassName(module).parameterizedBy(pluginClassName))
                     .primaryConstructor(
                         PropertySpec
@@ -104,11 +102,11 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
         return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassName, content)
     }
 
-    private fun generateBindingModule(vmClass: KtClassOrObject, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
-        val generatedPackage = vmClass.containingKtFile.packageFqName.toString()
-        val moduleClassName = "${vmClass.name}_PluginPoint_Module"
-        val scope = vmClass.scope(ContributesPluginPoint::class.fqName, module)
-        val pluginClassName = vmClass.pluginClassName(ContributesPluginPoint::class.fqName, module)
+    private fun generateBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+        val generatedPackage = vmClass.packageFqName.toString()
+        val moduleClassName = "${vmClass.shortName}_PluginPoint_Module"
+        val scope = vmClass.annotations.first { it.fqName == ContributesPluginPoint::class.fqName }.scopeOrNull(0)!!
+        val pluginClassName = vmClass.pluginClassName(ContributesPluginPoint::class.fqName) ?: vmClass.asClassName()
 
         val content = FileSpec.buildFile(generatedPackage, moduleClassName) {
             addType(
@@ -116,22 +114,22 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                     .addAnnotation(AnnotationSpec.builder(dagger.Module::class).build())
                     .addAnnotation(
                         AnnotationSpec
-                            .builder(ContributesTo::class).addMember("scope = %T::class", scope.asClassName(module))
+                            .builder(ContributesTo::class).addMember("scope = %T::class", scope.asClassName())
                             .build()
                     )
                     .addModifiers(KModifier.ABSTRACT)
                     .addFunction(
-                        FunSpec.builder("bindEmpty${vmClass.name}_PluginPoint")
+                        FunSpec.builder("bindEmpty${vmClass.shortName}_PluginPoint")
                             .addAnnotation(AnnotationSpec.builder(Multibinds::class).build())
                             .addModifiers(KModifier.ABSTRACT)
                             .returns(daggerSetFqName.asClassName(module).parameterizedBy(pluginClassName))
                             .build()
                     )
                     .addFunction(
-                        FunSpec.builder("bind${vmClass.name}_PluginPoint")
+                        FunSpec.builder("bind${vmClass.shortName}_PluginPoint")
                             .addParameter(
                                 "pluginPoint",
-                                FqName("$generatedPackage.${vmClass.name}_PluginPoint").asClassName(module)
+                                FqName("$generatedPackage.${vmClass.shortName}_PluginPoint").asClassName(module)
                             )
                             .addAnnotation(AnnotationSpec.builder(Binds::class).build())
                             .addModifiers(KModifier.ABSTRACT)
@@ -147,7 +145,6 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val singleInstanceAnnotationFqName = FqName("dagger.SingleInstanceIn")
         private val pluginPointFqName = FqName("com.duckduckgo.app.global.plugins.PluginPoint")
         private val kotlinCollectionFqName = FqName("kotlin.collections.Collection")
         private val daggerSetFqName = FqName("com.duckduckgo.di.DaggerSet")
@@ -166,13 +163,14 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             .addProperties(propertySpecs)
     }
 
-    private fun KtClassOrObject.pluginClassName(
-        annotationFqName: FqName,
-        module: ModuleDescriptor,
-    ): ClassName {
-        return findAnnotation(annotationFqName, module)
-            ?.findAnnotationArgument<KtClassLiteralExpression>(name = "boundType", index = 1)
-            ?.requireFqName(module)
-            ?.asClassName(module) ?: this.asClassName()
+    private fun ClassReference.Psi.pluginClassName(
+        fqName: FqName,
+    ): ClassName? {
+        return annotations
+            .first { it.fqName == fqName }
+            .argumentAt(name = "boundType", index = 1)
+            ?.annotation
+            ?.boundTypeOrNull()
+            ?.asClassName()
     }
 }
