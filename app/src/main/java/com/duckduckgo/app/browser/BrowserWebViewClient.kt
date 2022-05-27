@@ -164,8 +164,8 @@ class BrowserWebViewClient(
                             listener.startProcessingTrackingLink()
                             Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
                             loadUrl(listener, webView, urlType.extractedUrl)
+                            return true
                         }
-                        return true
                     }
                     false
                 }
