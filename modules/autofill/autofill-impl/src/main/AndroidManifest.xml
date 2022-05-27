@@ -17,4 +17,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.autofill.impl">
 
+    <application>
+        <activity
+            android:name="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity"
+            android:exported="true" />
+    </application>
+
+
 </manifest>

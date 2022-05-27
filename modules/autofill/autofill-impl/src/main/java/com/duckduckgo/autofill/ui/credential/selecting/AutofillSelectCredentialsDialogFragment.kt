@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui
+package com.duckduckgo.autofill.ui.credential.selecting
 
 import android.content.Context
 import android.os.Bundle
@@ -32,7 +32,6 @@ import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
-import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.toPx
 import com.google.android.material.bottomsheet.BottomSheetBehavior

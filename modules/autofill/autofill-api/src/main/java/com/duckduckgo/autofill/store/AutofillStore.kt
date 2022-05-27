@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store
 
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import kotlinx.coroutines.flow.Flow
 
 interface AutofillStore {
 
@@ -24,6 +25,8 @@ interface AutofillStore {
 
     suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials)
 
-    suspend fun getAllCredentials(): List<LoginCredentials>
+    suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
 
+    suspend fun deleteCredentials(id: Int)
+    suspend fun updateCredentials(credentials: LoginCredentials)
 }

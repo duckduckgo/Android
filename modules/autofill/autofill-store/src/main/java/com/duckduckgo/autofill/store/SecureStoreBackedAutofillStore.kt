@@ -27,7 +27,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -61,9 +61,25 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         }
     }
 
-    override suspend fun getAllCredentials(): List<LoginCredentials> = withContext(Dispatchers.IO) {
-        val savedCredentials = secureStorage.getAllWebsiteLoginCredentials().firstOrNull() ?: emptyList()
-        return@withContext savedCredentials.map { it.toLoginCredentials() }
+    override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> = withContext(Dispatchers.IO) {
+        val savedCredentials = secureStorage.getAllWebsiteLoginCredentials()
+            .map { list ->
+                list.map { it.toLoginCredentials() }
+            }
+        // return@withContext savedCredentials.map { it.toLoginCredentials() }
+        return@withContext savedCredentials
+    }
+
+    override suspend fun deleteCredentials(id: Int) {
+        withContext(Dispatchers.IO) {
+            secureStorage.deleteWebsiteLoginCredentials(id)
+        }
+    }
+
+    override suspend fun updateCredentials(credentials: LoginCredentials) {
+        withContext(Dispatchers.IO) {
+            secureStorage.updateWebsiteLoginCredentials(credentials.toWebsiteLoginCredentials())
+        }
     }
 
     private fun WebsiteLoginCredentials.toLoginCredentials(): LoginCredentials {
@@ -71,6 +87,13 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
             id = details.id,
             domain = details.domain,
             username = details.username,
+            password = password
+        )
+    }
+
+    private fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginCredentials {
+        return WebsiteLoginCredentials(
+            details = WebsiteLoginDetails(domain = domain, username = username, id = id),
             password = password
         )
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui.credential
+package com.duckduckgo.autofill.ui.credential.selecting
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsPickerBinding
-import com.duckduckgo.autofill.ui.credential.CredentialsPickerRecyclerAdapter.CredentialsViewHolder
+import com.duckduckgo.autofill.ui.credential.selecting.CredentialsPickerRecyclerAdapter.CredentialsViewHolder
 import timber.log.Timber
 
 class CredentialsPickerRecyclerAdapter(

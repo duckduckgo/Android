@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui
+package com.duckduckgo.autofill.ui.credential.saving
 
 import android.os.Bundle
 import android.view.LayoutInflater

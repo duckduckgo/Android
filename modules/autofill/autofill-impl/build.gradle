@@ -30,6 +30,7 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
     api project(path: ':autofill-store')
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')

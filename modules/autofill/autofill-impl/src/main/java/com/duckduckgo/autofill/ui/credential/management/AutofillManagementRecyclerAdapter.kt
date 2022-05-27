@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.ui
+package com.duckduckgo.autofill.ui.credential.management
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -28,13 +28,13 @@ import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManage
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class AutofillSettingsRecyclerAdapter(
+class AutofillManagementRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
     val faviconManager: FaviconManager,
     val onCredentialSelected: (credentials: LoginCredentials) -> Unit,
     val onCopyUsername: (credentials: LoginCredentials) -> Unit,
     val onCopyPassword: (credentials: LoginCredentials) -> Unit
-) : Adapter<AutofillSettingsRecyclerAdapter.CredentialsViewHolder>() {
+) : Adapter<AutofillManagementRecyclerAdapter.CredentialsViewHolder>() {
 
     private var credentials = listOf<LoginCredentials>()
 
@@ -56,12 +56,8 @@ class AutofillSettingsRecyclerAdapter(
             username.text = credentials.username
             domain.text = credentials.domain
 
-//            root.setOnClickListener {
-//                Timber.i("selected %s", credentials.username)
-//                onCredentialSelected(credentials)
-//            }
-
-            root.setOnClickListener { onCopyUsername(credentials) }
+            root.setOnClickListener { onCredentialSelected(credentials) }
+            // root.setOnClickListener { onCopyUsername(credentials) }
             root.setOnLongClickListener { onCopyPassword(credentials); true }
 
             updateFavicon(credentials)

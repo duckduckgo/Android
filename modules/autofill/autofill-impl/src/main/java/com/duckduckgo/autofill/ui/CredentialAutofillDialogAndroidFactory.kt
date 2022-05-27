@@ -20,6 +20,8 @@ import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment
+import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
 
 class CredentialAutofillDialogAndroidFactory : CredentialAutofillDialogFactory {
 

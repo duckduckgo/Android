@@ -2,10 +2,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.autofill.api">
 
-    <application>
-        <activity
-            android:name="com.duckduckgo.autofill.ui.AutofillSettingsActivity"
-            android:exported="true" />
-    </application>
-
 </manifest>
