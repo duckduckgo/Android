@@ -173,7 +173,6 @@ import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
-import com.duckduckgo.app.browser.print.PrintDocumentAdapterWrapper
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
@@ -2781,10 +2780,9 @@ class BrowserTabFragment :
     private fun launchPrint(url: String) {
         (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
             webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
-                val wrapper = PrintDocumentAdapterWrapper(printAdapter)
                 printManager.print(
                     url,
-                    wrapper,
+                    printAdapter,
                     PrintAttributes.Builder().build()
                 )
             }

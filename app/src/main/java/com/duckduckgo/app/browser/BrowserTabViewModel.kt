@@ -2434,7 +2434,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun printFromWebView() {
-        viewModelScope.launch(dispatchers.main()) {
+        viewModelScope.launch {
             onPrintSelected()
         }
     }
