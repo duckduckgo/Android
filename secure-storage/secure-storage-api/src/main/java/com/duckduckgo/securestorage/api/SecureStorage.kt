@@ -18,31 +18,101 @@ package com.duckduckgo.securestorage.api
 
 import kotlinx.coroutines.flow.Flow
 
+/** Public API for the secure storage feature */
 interface SecureStorage {
+
+    /**
+     * This method can be used to check if the secure storage has been instantiated properly.
+     *
+     * @return `true` if all dependencies of SecureStorage have been instantiated properly otherwise `false
+     */
     fun canAccessSecureStorage(): Boolean
 
+    /**
+     * This method authenticates the user without having to pass a user password. This method is relevant
+     * while the user password generation is still done programmatically within the secure storage. Once we support
+     * password creation, this method will be deprecated.
+     *
+     * @return Result.Success if no issues with authentication is encountered otherwise Result.Error
+     */
     suspend fun authenticateUser(): Result
 
+    /**
+     * This method authenticates the user using a provided [password].
+     *
+     * @return Result.Success if no issues with authentication is encountered otherwise Result.Error
+     */
     suspend fun authenticateUser(password: String): Result
 
+    /**
+     * This method adds a raw plaintext [WebsiteLoginCredentials] into the [SecureStorage]. This requires the user to be authenticated
+     * first see [authenticateUser].
+     *
+     * @throws UserNotAuthenticatedException if the user is not authenticated when calling this method
+     */
     @Throws(UserNotAuthenticatedException::class)
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials)
 
-    suspend fun getWebsiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>>
+    /**
+     * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
+     * This does not require the user to be authenticated since [WebsiteLoginDetails] doesn't contain any L2 data.
+     *
+     * @return Flow<List<WebsiteLoginDetails>> a flow emitting a List of plain text WebsiteLoginDetails stored in SecureStorage.
+     */
+    suspend fun websiteLoginDetailsForDomain(domain: String): Flow<List<WebsiteLoginDetails>>
 
-    suspend fun getAllWebsiteLoginDetails(): Flow<List<WebsiteLoginDetails>>
+    /**
+     * This method returns all [WebsiteLoginDetails] stored in the [SecureStorage].
+     * This does not require the user to be authenticated since [WebsiteLoginDetails] doesn't contain any L2 data.
+     *
+     * @return Flow<List<WebsiteLoginDetails>> a flow containing a List of plain text WebsiteLoginDetails stored in SecureStorage.
+     */
+    suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>>
 
+    /**
+     * This method returns the [WebsiteLoginCredentials] with the [id] stored in the [SecureStorage].
+     * This requires the user to be authenticated.
+     *
+     * @return [WebsiteLoginCredentials] containing the plaintext password
+     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     */
     @Throws(UserNotAuthenticatedException::class)
     suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentials
 
+    /**
+     * This method returns the [WebsiteLoginCredentials] with the [domain] stored in the [SecureStorage].
+     * This requires the user to be authenticated.
+     *
+     * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
+     * containing the plaintext password
+     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     */
     @Throws(UserNotAuthenticatedException::class)
-    suspend fun getWebsiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
 
+    /**
+     * This method returns all the [WebsiteLoginCredentials] stored in the [SecureStorage].
+     * This requires the user to be authenticated.
+     *
+     * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
+     * containing the plaintext password
+     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     */
     @Throws(UserNotAuthenticatedException::class)
-    suspend fun getAllWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
 
+    /**
+     * This method updates an existing [WebsiteLoginCredentials] in the [SecureStorage].
+     * This requires the user to be authenticated.
+     *
+     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     */
     @Throws(UserNotAuthenticatedException::class)
     suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentials)
 
+    /**
+     * This method removes an existing [WebsiteLoginCredentials] associated with an [id] from the [SecureStorage].
+     * This does not require the user to be authenticated.
+     */
     suspend fun deleteWebsiteLoginCredentials(id: Int)
 }

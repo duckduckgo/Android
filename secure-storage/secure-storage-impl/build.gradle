@@ -26,13 +26,13 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':di')
     implementation project(path: ':secure-storage-api')
-    api project(path: ':secure-storage-store')
+    implementation project(path: ':secure-storage-store')
 
     implementation AndroidX.room.ktx
     implementation Google.dagger
     implementation KotlinX.coroutines.core
 
-    api "net.zetetic:android-database-sqlcipher:_"
+    implementation "net.zetetic:android-database-sqlcipher:_"
 }
 
 android {
