@@ -55,10 +55,12 @@ class UserAgentPlugin @Inject constructor(
 
             val applicationAndVersionExceptionsList = applicationList intersect versionList
             val defaultExceptionList = (exceptionsList subtract applicationList) + (exceptionsList subtract versionList)
-            val applicationExceptionList = applicationList subtract versionList
-            val versionExceptionList = versionList subtract applicationList
+            val applicationExceptionList = applicationList subtract versionList subtract exceptionsList
+            val versionExceptionList = versionList subtract applicationList subtract exceptionsList
 
-            // Order matters, do not change it
+            defaultExceptionList.forEach {
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = false))
+            }
             applicationAndVersionExceptionsList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = true, omitVersion = true))
             }
@@ -67,9 +69,6 @@ class UserAgentPlugin @Inject constructor(
             }
             versionExceptionList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = true))
-            }
-            defaultExceptionList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = false))
             }
 
             userAgentRepository.updateAll(userAgentExceptions)
