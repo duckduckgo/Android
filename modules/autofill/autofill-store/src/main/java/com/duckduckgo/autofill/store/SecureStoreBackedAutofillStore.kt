@@ -37,7 +37,7 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
         val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
 
-        val storedCredentials = secureStorage.getWebsiteLoginCredentialsForDomain(url).firstOrNull() ?: emptyList()
+        val storedCredentials = secureStorage.websiteLoginCredentialsForDomain(url).firstOrNull() ?: emptyList()
         Timber.v("Found %d credentials for %s", storedCredentials.size, url)
 
         return storedCredentials.map { it.toLoginCredentials() }
@@ -62,11 +62,10 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
     }
 
     override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> = withContext(Dispatchers.IO) {
-        val savedCredentials = secureStorage.getAllWebsiteLoginCredentials()
+        val savedCredentials = secureStorage.websiteLoginCredentials()
             .map { list ->
                 list.map { it.toLoginCredentials() }
             }
-        // return@withContext savedCredentials.map { it.toLoginCredentials() }
         return@withContext savedCredentials
     }
 
