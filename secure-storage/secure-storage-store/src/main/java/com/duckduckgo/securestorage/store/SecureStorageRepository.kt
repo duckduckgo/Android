@@ -28,11 +28,11 @@ interface SecureStorageRepository {
 
     suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentialsEntity
 
-    suspend fun getWebsiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
+    suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity
 
-    suspend fun getAllWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
+    suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>>
 
     suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
 
@@ -49,11 +49,11 @@ class RealSecureStorageRepository constructor(
     override suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentialsEntity =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
-    override suspend fun getWebsiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
-        websiteLoginCredentialsDao.getWebsiteLoginCredentialsByDomain(domain)
+    override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
+        websiteLoginCredentialsDao.websiteLoginCredentialsByDomain(domain)
 
-    override suspend fun getAllWebsiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
-        websiteLoginCredentialsDao.getWebsiteLoginCredentials()
+    override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentialsEntity>> =
+        websiteLoginCredentialsDao.websiteLoginCredentials()
 
     override suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity =
         websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
