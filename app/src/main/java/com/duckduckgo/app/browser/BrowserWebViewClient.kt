@@ -37,6 +37,7 @@ import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
@@ -65,7 +66,8 @@ class BrowserWebViewClient(
     private val dispatcherProvider: DispatcherProvider,
     private val emailInjector: EmailInjector,
     private val accessibilityManager: AccessibilityManager,
-    private val ampLinks: AmpLinks
+    private val ampLinks: AmpLinks,
+    private val printInjector: PrintInjector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -272,6 +274,7 @@ class BrowserWebViewClient(
                 url?.let { prefetchFavicon(url) }
             }
             flushCookies()
+            printInjector.injectPrint(webView)
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)

@@ -232,7 +232,8 @@ class BrowserTabViewModel @Inject constructor(
         val isEmailSignedIn: Boolean = false,
         var previousAppLink: AppLink? = null,
         val canFindInPage: Boolean = false,
-        val forceRenderingTicker: Long = System.currentTimeMillis()
+        val forceRenderingTicker: Long = System.currentTimeMillis(),
+        val canPrintPage: Boolean = false
     )
 
     sealed class HighlightableButton {
@@ -349,6 +350,7 @@ class BrowserTabViewModel @Inject constructor(
         class AskToFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class AskToAutomateFireproofWebsite(val fireproofWebsite: FireproofWebsiteEntity) : Command()
         class ShareLink(val url: String) : Command()
+        class PrintLink(val url: String) : Command()
         class CopyLink(val url: String) : Command()
         class FindInPageCommand(val searchTerm: String) : Command()
         class BrokenSiteFeedback(val data: BrokenSiteData) : Command()
@@ -1158,7 +1160,8 @@ class BrowserTabViewModel @Inject constructor(
             canChangeBrowsingMode = true,
             canFireproofSite = domain != null,
             isFireproofWebsite = isFireproofWebsite(),
-            showDaxIcon = shouldShowDaxIcon(url, true)
+            showDaxIcon = shouldShowDaxIcon(url, true),
+            canPrintPage = domain != null
         )
 
         Timber.d("showPrivacyGrade=true, showSearchIcon=false, showClearButton=false")
@@ -1335,7 +1338,8 @@ class BrowserTabViewModel @Inject constructor(
             showSearchIcon = true,
             showClearButton = true,
             canFireproofSite = false,
-            showDaxIcon = false
+            showDaxIcon = false,
+            canPrintPage = false
         )
         Timber.d("showPrivacyGrade=false, showSearchIcon=true, showClearButton=true")
     }
@@ -2420,6 +2424,19 @@ class BrowserTabViewModel @Inject constructor(
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
         command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+    }
+
+    fun onPrintSelected() {
+        url?.let {
+            pixel.fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
+            command.value = PrintLink(removeAtbAndSourceParamsFromSearch(it))
+        }
+    }
+
+    fun printFromWebView() {
+        viewModelScope.launch {
+            onPrintSelected()
+        }
     }
 
     override fun openMessageInNewTab(message: Message) {

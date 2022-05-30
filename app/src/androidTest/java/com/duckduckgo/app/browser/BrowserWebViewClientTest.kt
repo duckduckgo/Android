@@ -38,6 +38,7 @@ import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
@@ -88,6 +89,7 @@ class BrowserWebViewClientTest {
     private val emailInjector: EmailInjector = mock()
     private val webResourceRequest: WebResourceRequest = mock()
     private val ampLinks: AmpLinks = mock()
+    private val printInjector: PrintInjector = mock()
 
     @UiThreadTest
     @Before
@@ -110,7 +112,8 @@ class BrowserWebViewClientTest {
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
             accessibilitySettings,
-            ampLinks
+            ampLinks,
+            printInjector
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
