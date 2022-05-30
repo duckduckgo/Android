@@ -18,10 +18,11 @@ package com.duckduckgo.securestorage.store
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Base64
 import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.toByteString
 import java.lang.Exception
 
 /**
@@ -54,12 +55,6 @@ interface SecureStorageKeyStore {
 class RealSecureStorageKeyStore constructor(
     private val context: Context
 ) : SecureStorageKeyStore {
-    companion object {
-        const val FILENAME = "com.duckduckgo.securestorage.store"
-        const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
-        const val KEY_L1KEY = "KEY_L1KEY"
-        const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
-    }
 
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
 
@@ -102,19 +97,24 @@ class RealSecureStorageKeyStore constructor(
         key: String,
         value: ByteArray?
     ) {
-        Base64.encodeToString(value, Base64.DEFAULT).also {
-            encryptedPreferences?.edit(commit = true) {
-                if (value == null) remove(key)
-                else putString(key, it)
-            }
+        encryptedPreferences?.edit(commit = true) {
+            if (value == null) remove(key)
+            else putString(key, value.toByteString().base64())
         }
     }
 
     private fun getValue(key: String): ByteArray? {
         return encryptedPreferences?.getString(key, null)?.run {
-            Base64.decode(this, Base64.DEFAULT)
+            this.decodeBase64()?.toByteArray()
         }
     }
 
     override fun canUseEncryption(): Boolean = encryptedPreferences != null
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.securestorage.store"
+        const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
+        const val KEY_L1KEY = "KEY_L1KEY"
+        const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
+    }
 }
