@@ -21,11 +21,10 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 
 interface BrowserAutofill {
 
-    fun isEnabled(): Boolean
-
     fun addJsInterface(webView: WebView, callback: Callback)
 
     fun injectCredentials(credentials: LoginCredentials)
+
 }
 
 interface Callback {

@@ -1548,7 +1548,6 @@ class BrowserTabFragment :
         }
 
         setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-            Timber.w("Fragment result received: %s %s", RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
             val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
             val originalUrl = result.getString("url") ?: return@setFragmentResultListener
             viewModel.saveCredentials(originalUrl, selectedCredentials)
@@ -1566,7 +1565,7 @@ class BrowserTabFragment :
     }
 
     private fun showAutofillDialogChooseCredentials(credentials: List<LoginCredentials>) {
-        Timber.e("onCredentialsAvailable. %d creds to choose from", credentials.size)
+        Timber.v("onCredentialsAvailable. %d creds to choose from", credentials.size)
         val url = webView?.url ?: return
         val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials)
         showDialogHidingPrevious(dialog.asDialogFragment(), CredentialAutofillPickerDialog.TAG)

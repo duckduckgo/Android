@@ -22,13 +22,6 @@ import timber.log.Timber
 
 class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInterface) : BrowserAutofill {
 
-    val enabled: Boolean = true
-
-    override fun isEnabled(): Boolean {
-        Timber.i("BrowserAutofill: Inline browser autofill, isEnabled=%s", enabled)
-        return enabled
-    }
-
     override fun addJsInterface(webView: WebView, callback: Callback) {
         Timber.v("Injecting BrowserAutofill interface")
         webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)

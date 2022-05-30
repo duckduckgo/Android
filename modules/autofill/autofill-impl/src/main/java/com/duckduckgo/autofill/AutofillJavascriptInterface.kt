@@ -107,7 +107,7 @@ class AutofillJavascriptInterface(
 
     @JavascriptInterface
     fun storeFormData(data: String) {
-        Timber.e("storeFormData called %s", data)
+        Timber.i("storeFormData called")
 
         getAutofillDataJob += coroutineScope.launch {
             val currentUrl = currentUrl() ?: return@launch

@@ -34,7 +34,6 @@ import com.duckduckgo.app.global.view.loadFavicon
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
 import com.duckduckgo.autofill.store.AutofillStore
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 
 class DuckDuckGoFaviconManager constructor(
@@ -194,19 +193,15 @@ class DuckDuckGoFaviconManager constructor(
     private suspend fun downloadFaviconFor(domain: String): Bitmap? {
         val faviconUrl = getFaviconUrl(domain) ?: return null
         val touchFaviconUrl = getTouchFaviconUrl(domain) ?: return null
-        /*faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
-            Timber.e("favicon retrieved for touch %s. size=%dx%s", touchFaviconUrl, it.width, it.height)
+        faviconDownloader.getFaviconFromUrl(touchFaviconUrl)?.let {
             return it
-        } ?: */faviconDownloader.getFaviconFromUrl(faviconUrl).let {
-            Timber.e("favicon retrieved for non-touch %s, size=%dx%s", faviconUrl, it?.width, it?.height)
+        } ?: faviconDownloader.getFaviconFromUrl(faviconUrl).let {
             return it
         }
     }
 
     private fun getFaviconUrl(domain: String): Uri? {
-        return "https://$domain".toUri().faviconLocation().also {
-            Timber.e("non-touch favicon location is %s", it)
-        }
+        return "https://$domain".toUri().faviconLocation()
     }
 
     private fun getTouchFaviconUrl(domain: String): Uri? {
@@ -218,7 +213,6 @@ class DuckDuckGoFaviconManager constructor(
         domain: String
     ): File? {
         val countSpecialCasesForSite = persistedFaviconsForDomain(domain)
-        Timber.e("countSpecialCasesForSite: %s == %d", domain, countSpecialCasesForSite)
         return if (countSpecialCasesForSite > 0) {
             faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
         } else null
@@ -230,7 +224,6 @@ class DuckDuckGoFaviconManager constructor(
     ): File? {
         val favicon = downloadFaviconFor(domain)
         return if (favicon != null) {
-            Timber.w("tryRemoteFallbackFavicon, non-null favicon downloaded")
             saveFavicon(subFolder, favicon, domain)
         } else {
             null
@@ -239,10 +232,8 @@ class DuckDuckGoFaviconManager constructor(
 
     private suspend fun persistedFaviconsForDomain(domain: String): Int {
         val query = "%$domain%"
-        Timber.i("persistedFaviconsForDomain. domain:%s, query:%s", domain, query)
 
         return withContext(dispatcherProvider.io()) {
-            Timber.i("persistedFaviconsForDomain in coroutine. domain:%s, query:%s", domain, query)
             bookmarksDao.bookmarksCountByUrl(query) +
                 locationPermissionsRepository.permissionEntitiesCountByDomain(query) +
                 fireproofWebsiteRepository.fireproofWebsitesCountByDomain(domain) +

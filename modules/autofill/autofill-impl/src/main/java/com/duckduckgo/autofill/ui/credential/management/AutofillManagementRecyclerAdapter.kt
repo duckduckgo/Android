@@ -26,7 +26,6 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ItemRowAutofillCredentialsManagementScreenBinding
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class AutofillManagementRecyclerAdapter(
     val lifecycleOwner: LifecycleOwner,
@@ -57,8 +56,6 @@ class AutofillManagementRecyclerAdapter(
             domain.text = credentials.domain
 
             root.setOnClickListener { onCredentialSelected(credentials) }
-            // root.setOnClickListener { onCopyUsername(credentials) }
-            root.setOnLongClickListener { onCopyPassword(credentials); true }
 
             updateFavicon(credentials)
         }
@@ -71,7 +68,6 @@ class AutofillManagementRecyclerAdapter(
             favicon.setImageBitmap(null)
         } else {
             lifecycleOwner.lifecycleScope.launch {
-                Timber.e("url for favicon is %s", domain)
                 faviconManager.loadToViewFromLocalOrFallback(url = domain, view = favicon)
             }
         }

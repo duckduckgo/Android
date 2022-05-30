@@ -49,10 +49,6 @@ class AutofillManagementViewMode : Fragment() {
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
-//    val viewModel by lazy {
-//        ViewModelProvider(this, viewModelFactory)[AutofillSettingsViewModel::class.java]
-//    }
-
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -91,21 +87,6 @@ class AutofillManagementViewMode : Fragment() {
                 }
             }
         }
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                while (isActive) {
-//                    Timber.i("Adding new credential")
-//                    viewModel.addCredentials(
-//                        LoginCredentials(
-//                            domain = "${System.currentTimeMillis()}.com",
-//                            username = "aaa@duck.com",
-//                            password = "${Random.nextInt(10_000_000)}"
-//                        )
-//                    )
-//                    delay(1_000)
-//                }
-//            }
-//        }
 
         viewModel.observeCredentials()
     }
