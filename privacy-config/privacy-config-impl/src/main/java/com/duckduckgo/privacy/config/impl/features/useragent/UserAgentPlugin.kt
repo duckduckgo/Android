@@ -58,17 +58,18 @@ class UserAgentPlugin @Inject constructor(
             val applicationExceptionList = applicationList subtract versionList
             val versionExceptionList = versionList subtract applicationList
 
+            // Order matters, do not change it
             applicationAndVersionExceptionsList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = true, omitVersion = true))
-            }
-            defaultExceptionList.forEach {
-                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = false))
             }
             applicationExceptionList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = true, omitVersion = false))
             }
             versionExceptionList.forEach {
                 userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = true))
+            }
+            defaultExceptionList.forEach {
+                userAgentExceptions.add(UserAgentExceptionEntity(it.domain, it.reason, omitApplication = false, omitVersion = false))
             }
 
             userAgentRepository.updateAll(userAgentExceptions)
