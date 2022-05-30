@@ -16,6 +16,7 @@
 
 package com.duckduckgo.bandwidth.impl
 
+import com.duckduckgo.bandwidth.store.BandwidthBucketEntity
 import com.duckduckgo.bandwidth.store.BandwidthDao
 import com.duckduckgo.bandwidth.store.BandwidthDatabase
 import com.duckduckgo.bandwidth.store.BandwidthEntity
@@ -82,5 +83,41 @@ class RealBandwidthRepositoryTest {
 
         verify(mockBandWidthDao).insert(bandwidthEntity)
         assertEquals(0, bandwidthEntity.id)
+    }
+
+    @Test
+    fun whenPersistBucketThenPersistBucketToDatabase() {
+        val bandwidthData = BandwidthData(appBytes = 123, totalBytes = 456)
+
+        testee.persistBucket(bandwidthData)
+
+        val bandwidthBucketEntity = BandwidthBucketEntity(
+            timestamp = bandwidthData.timestamp,
+            appBytes = bandwidthData.appBytes,
+            totalBytes = bandwidthData.totalBytes
+        )
+
+        verify(mockBandWidthDao).insertBucket(bandwidthBucketEntity)
+    }
+
+    @Test
+    fun whenGetBucketsThenReturnStoredBucketsFromDatabase() {
+        val bandwidthBucketEntity1 = BandwidthBucketEntity(timestamp = 123, appBytes = 456, totalBytes = 789)
+        val bandwidthBucketEntity2 = BandwidthBucketEntity(timestamp = 0, appBytes = 1, totalBytes = 2)
+        whenever(mockBandWidthDao.getBuckets()).thenReturn(listOf(bandwidthBucketEntity1, bandwidthBucketEntity2))
+
+        val buckets = testee.getBuckets()
+
+        val expectedBandwidthData = buckets.map { BandwidthData(it.timestamp, it.appBytes, it.totalBytes) }
+
+        assertEquals(expectedBandwidthData[0], buckets[0])
+        assertEquals(expectedBandwidthData[1], buckets[1])
+    }
+
+    @Test
+    fun whenDeleteAllBucketsThenDeleteAllBucketsFromDatabase() {
+        testee.deleteAllBuckets()
+
+        verify(mockBandWidthDao).deleteAllBuckets()
     }
 }

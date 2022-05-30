@@ -1,3 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -90,6 +105,7 @@
     <string name="closeTab">Close tab</string>
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
+    <string name="downloadsMenuItemTitle">Downloads</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Site Privacy Protection</string>
@@ -250,6 +266,7 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="remove">Remove</string>
+    <string name="removeAll">Remove All</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Search DuckDuckGo</string>
@@ -517,6 +534,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Fireproof</string>
     <string name="fireproofWebsiteLoginDialogNegative">Not now</string>
     <string name="fireproofWebsiteItemsSectionTitle">Fireproof Sites</string>
+    <string name="fireproofWebsiteEmptyListHint">No Fireproof sites yet</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Fireproof Websites on Sign-in</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Fireproofing removed for all sites</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Ask every time</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Always</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Never</string>
@@ -524,7 +545,12 @@
     <string name="disableLoginDetectionDialogDescription">You can change this preference anytime in Settings.</string>
     <string name="disableLoginDetectionDialogPositive">DISABLE</string>
     <string name="disableLoginDetectionDialogNegative">CANCEL</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Fireproofing removed for &lt;b>%s&lt;/b></string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Fireproof websites automatically on sign-in?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Fireproofing sites will keep you signed in after using the Fire Button. You can always change this later in Settings. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Always Fireproof</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Fireproof this site</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Not now</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Fire Button Animation</string>
@@ -683,4 +709,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">%s widget added to home screen</string>
     <string name="settingsAddHomeScreenWidget">Home Screen Widget</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Browse privately with our app for Mac</string>
+    <string name="macos_settings_description_list">You\'re on the list!</string>
+    <string name="macos_settings_description_ready">Available for download on Mac</string>
+    <string name="macos_settings_title">DuckDuckGo Desktop App</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Downloads</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsActivityNoItemsDescription">No files downloaded yet</string>
+    <string name="downloadsShareTitle">Share with…</string>
+    <string name="downloadsDownloadFinishedActionName">Open</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
+    <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
+    <string name="downloadsItemMenuShare">Share</string>
+    <string name="downloadsItemMenuDelete">Delete</string>
+    <string name="downloadsItemMenuCancel">Cancel</string>
+    <string name="downloadsActivityMenuDeleteAll">Delete All</string>
+    <string name="downloadsFileDeletedMessage">Deleted %s</string>
+    <string name="downloadsAllFilesDeletedMessage">All files deleted</string>
+    <string name="downloadsMoreOptionsContentDescription">More options for %s</string>
+    <string name="downloadsUndoActionName">Undo</string>
+    <string name="downloadsStateInProgress">In progress…</string>
+
 </resources>

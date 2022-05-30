@@ -157,6 +157,13 @@
                 app:iconDrawable="@drawable/ic_find_search_16" />
 
             <com.duckduckgo.mobile.android.ui.view.MenuItemView
+                    android:id="@+id/printPageMenuItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:labelText="@string/printMenuTitle"
+                    app:iconDrawable="@drawable/ic_print_16" />
+
+            <com.duckduckgo.mobile.android.ui.view.MenuItemView
                 android:id="@+id/openInAppMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

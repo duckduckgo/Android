@@ -692,13 +692,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
     fun whenBlankInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
@@ -1685,7 +1685,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         loadUrl(null)
         testee.onShareSelected()
-        verify(mockCommandObserver, never()).onChanged(any())
+        assertCommandNotIssued<Command.ShareLink>()
     }
 
     @Test
@@ -1972,9 +1972,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val command = commandCaptor.firstValue
-        assertTrue(command is Command.GenerateWebViewPreviewImage)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
     }
 
     @Test
@@ -2204,7 +2202,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
     }
 
     @Test
@@ -2514,6 +2512,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserBrowsingPressesBackThenCannotPrintPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canPrintPage)
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCanGoForward() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
@@ -2567,6 +2572,14 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanPrint() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canPrintPage)
     }
 
     @Test
@@ -3440,6 +3453,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(false)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
@@ -3597,6 +3624,21 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
         verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
         assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageThenPrintLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageThenPixelIsSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 
     @Test

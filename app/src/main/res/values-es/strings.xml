@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,13 +106,14 @@
     <string name="closeTab">Cerrar pestaña</string>
     <string name="tabClosed">Pestaña cerrada</string>
     <string name="tabClosedUndo">Deshacer</string>
+    <string name="downloadsMenuItemTitle">Descargas</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Protección de privacidad del sitio web</string>
     <string name="privacyProtectionEnabled">PROTECCIÓN DEL SITIO WEB HABILITADA</string>
     <string name="privacyProtectionDisabled">PROTECCIÓN DEL SITIO WEB DESHABILITADA</string>
     <string name="privacyDashboardActivityTitle">Panel de privacidad</string>
-    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MEJORADA DE &lt;img src=\"%1$d\" /&gt; A &lt;img src=\"%2$d\" /&gt;</string>
+    <string name="privacyProtectionUpgraded" tools:ignore="TypographyQuotes">MEJORA DE &lt;img src=\"%1$d\" /&gt; CON &lt;img src=\"%2$d\" /&gt;</string>
     <string name="privacyGradeContentDescription">Nivel de privacidad</string>
     <string name="privacyProtectionTemporarilyDisabled">Hemos desactivado temporalmente la protección de privacidad, ya que parece que está causando errores en el sitio.</string>
 
@@ -265,6 +265,7 @@
     <string name="delete">Eliminar</string>
     <string name="edit">Editar</string>
     <string name="remove">Eliminar</string>
+    <string name="removeAll">Eliminar todo</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Buscar en DuckDuckGo</string>
@@ -285,16 +286,16 @@
     <string name="searchWidgetLabel">Buscar</string>
 
     <!-- Home Screen Shortcuts -->
-    <string name="addToHome">Añadir a la pantalla de inicio</string>
+    <string name="addToHome">Añadir a la Pantalla de Inicio</string>
     <string name="shortcutAddedText">%1$s se ha añadido a tu pantalla de inicio correctamente.</string>
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Ayúdanos a mejorar la aplicación</string>
-    <string name="surveyCtaDescription">Responde a nuestra breve encuesta anónima y comparte tu opinión.</string>
+    <string name="surveyCtaDescription">Responde a nuestra breve encuesta y comparte tu opinión.</string>
     <string name="surveyCtaLaunchButton">Responder a la encuesta</string>
     <string name="surveyCtaDismissButton">No, gracias</string>
     <string name="surveyActivityTitle">Encuesta de usuario</string>
-    <string name="surveyTitle">ENCUESTA DE DUCKDUCKGO</string>
+    <string name="surveyTitle">ENCUESTA DUCKDUCKGO</string>
     <string name="surveyDismissContentDescription">Omitir encuesta</string>
     <string name="surveyLoadingErrorTitle">¡Vaya!</string>
     <string name="surveyLoadingErrorText">Nuestra encuesta no se pudo cargar en este momento.\nVuelve a intentarlo más tarde.</string>
@@ -479,7 +480,7 @@
     <string name="daxMainNetworkOwnedCtaText">¡Advertencia! Ya que %1$s es el dueño de %2$s, no puedo evitar que vea tu actividad aquí.&lt;br/&gt;&lt;br/&gt;Pero si navegas conmigo, puedo reducir lo que %3$s sabe de ti en general bloqueando sus rastreadores en muchas otras páginas.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Continuar</string>
+    <string name="downloadConfirmationContinue">Guardar en descargas</string>
     <string name="downloadConfirmationSaveFileTitle">Guardar %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Mantener los dos</string>
     <string name="downloadConfirmationReplaceOldFileText">Reemplazar</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Sitios web a prueba de fuego</string>
     <string name="settingsFireproofWebsites">Sitios web a prueba de fuego</string>
     <string name="fireproofWebsiteMenuTitleAdd">Activar a prueba de fuego para este sitio</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ya está a prueba de fuego.</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ya está a prueba de fuego</string>
     <string name="fireproofWebsiteSnackbarAction">Deshacer</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">¿Está seguro de que desea eliminar &lt;b&gt;%1$s&lt;/b&gt;?</string>
     <string name="fireproofWebsiteFeatureDescription">Los sitios web dependen de cookies para mantener tu sesión iniciada. Cuando marcas una web como «a prueba de fuego» no se borrarán las cookies y tu sesión permanecerá iniciada, incluso después de utilizar el botón Fuego. Seguiremos bloqueando rastreadores de terceros que se encuentren en sitios web a prueba de fuego.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">A prueba de fuego</string>
     <string name="fireproofWebsiteLoginDialogNegative">Ahora no</string>
     <string name="fireproofWebsiteItemsSectionTitle">Sitios web a prueba de fuego</string>
+    <string name="fireproofWebsiteEmptyListHint">Todavía no hay sitios web a prueba de fuego</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Marcar sitios web como a prueba de fuego al iniciar sesión</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Se ha eliminado la prueba de fuego en todos los sitios</string>
+    <string name="fireproofWebsiteRemovalConfirmation">A prueba de fuego desactivado para &lt;b&gt;%1$s&lt;/b&gt;</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Preguntar cada vez</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Siempre</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nunca</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Puedes cambiar esta preferencia en cualquier momento en Ajustes.</string>
     <string name="disableLoginDetectionDialogPositive">DESHABILITAR</string>
     <string name="disableLoginDetectionDialogNegative">CANCELAR</string>
-    <string name="fireproofWebsiteRemovalConfirmation">A prueba de fuego desactivado para &lt;b&gt;%1$s&lt;/b&gt;</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">¿Marcar los sitios web como a prueba de fuego automáticamente al iniciar sesión?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Marcar estos sitios como a prueba de fuego hará que la sesión se mantenga iniciada después de usar el botón Fuego. Siempre puedes cambiar esto más tarde en Ajustes. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Marcar siempre como a prueba de fuego</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Activar a prueba de fuego para este sitio</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Ahora no</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animación del botón Fuego</string>
@@ -644,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Privacidad de correo electrónico, simplificada.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico. <a href=\"\"><b>Más información</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico.<a href=""><b>Más información</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">¡Estás en la lista!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Te enviaremos una notificación cuando<br/> la protección de correo electrónico esté lista para ti. <a href=\"\"><b>Más información</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu invitación aparecerá aquí cuando estemos listos para ti. ¿Quieres <a href=\"\"><b>recibir una notificación</b></a> cuando llegue?<br/><a href=\"\"><b>Más información</b></a> sobre la protección de correo electrónico.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Te enviaremos una notificación cuando<br/> la protección de correo electrónico esté lista para ti. <a href=""><b>Más información</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu invitación aparecerá aquí cuando estemos listos para ti. ¿Quieres <a href=""><b>recibir una notificación</b></a> cuando llegue?<br/><a href=""><b>Más información</b></a> sobre la protección de correo electrónico.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">¡Estás invitado!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico. <a href=\"\"><b>Más información</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico.<a href=""><b>Más información</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Dirección personal Duck</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widget %1$s añadido a la pantalla de inicio</string>
     <string name="settingsAddHomeScreenWidget">Widget de pantalla de inicio</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Navega de forma privada con nuestra aplicación para Mac</string>
+    <string name="macos_settings_description_list">¡Estás en la lista!</string>
+    <string name="macos_settings_description_ready">Disponible para descargar en Mac</string>
+    <string name="macos_settings_title">Aplicación de escritorio DuckDuckGo</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Descargas</string>
+    <string name="downloadsActivityTitle">Descargas</string>
+    <string name="downloadsActivityNoItemsDescription">Todavía no se han descargado archivos</string>
+    <string name="downloadsShareTitle">Compartir con…</string>
+    <string name="downloadsDownloadFinishedActionName">Abrir</string>
+    <string name="downloadsCannotOpenFileErrorMessage">No se puede abrir el archivo. Busca una aplicación compatible.</string>
+    <string name="downloadsFileNotFoundErrorMessage">El archivo ya no existe</string>
+    <string name="downloadsItemMenuShare">Compartir</string>
+    <string name="downloadsItemMenuDelete">Eliminar</string>
+    <string name="downloadsItemMenuCancel">Cancelar</string>
+    <string name="downloadsActivityMenuDeleteAll">Eliminar todo</string>
+    <string name="downloadsFileDeletedMessage">%1$s eliminado</string>
+    <string name="downloadsAllFilesDeletedMessage">Todos los archivos eliminados</string>
+    <string name="downloadsMoreOptionsContentDescription">Más opciones para %1$s</string>
+    <string name="downloadsUndoActionName">Deshacer</string>
+    <string name="downloadsStateInProgress">En curso…</string>
+
 </resources>

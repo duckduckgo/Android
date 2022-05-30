@@ -19,18 +19,22 @@ package com.duckduckgo.mobile.android.vpn.processor.udp
 import android.os.Process.THREAD_PRIORITY_URGENT_DISPLAY
 import android.os.Process.setThreadPriority
 import android.os.SystemClock
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.mobile.android.vpn.health.HealthMetricCounter
+import com.duckduckgo.mobile.android.vpn.network.channels.NetworkChannelCreator
+import com.duckduckgo.mobile.android.vpn.processor.PacketInfo
+import com.duckduckgo.mobile.android.vpn.processor.PacketRequest
+import com.duckduckgo.mobile.android.vpn.processor.RealPacketInterceptorChain
+import com.duckduckgo.mobile.android.vpn.processor.VpnPacketInterceptor
 import com.duckduckgo.mobile.android.vpn.processor.packet.connectionInfo
 import com.duckduckgo.mobile.android.vpn.processor.packet.totalHeaderSize
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.AppNameResolver.OriginatingApp
 import com.duckduckgo.mobile.android.vpn.processor.requestingapp.OriginatingAppPackageIdentifierStrategy
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PACKET_TYPE_UDP
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
-import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.*
@@ -46,22 +50,38 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.util.concurrent.Executors.newSingleThreadExecutor
 import java.util.concurrent.TimeUnit
+import javax.inject.Provider
 
 class UdpPacketProcessor @AssistedInject constructor(
     private val queues: VpnQueues,
-    @Assisted private val networkChannelCreator: NetworkChannelCreator,
+    networkChannelCreatorProvider: Provider<NetworkChannelCreator>,
     private val packetPersister: PacketPersister,
     private val originatingAppPackageResolver: OriginatingAppPackageIdentifierStrategy,
     private val appNameResolver: AppNameResolver,
     private val channelCache: UdpChannelCache,
     private val healthMetricCounter: HealthMetricCounter,
     private val appBuildConfig: AppBuildConfig,
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
 ) : Runnable {
 
     @AssistedFactory
     interface Factory {
-        fun build(networkChannelCreator: NetworkChannelCreator): UdpPacketProcessor
+        fun build(): UdpPacketProcessor
     }
+
+    private val networkChannelCreator by lazy {
+        networkChannelCreatorProvider.get()
+    }
+
+    private val interceptors = interceptorPlugins.getPlugins().toMutableList().apply {
+        add(
+            VpnPacketInterceptor { chain ->
+                val request = chain.request()
+                Timber.v("Proceed with UDP packet request ${request.packetInfo}")
+                request.byteChannel.write(request.byteBuffer)
+            }
+        )
+    }.toList()
 
     private val pollJobDeviceToNetwork = newSingleThreadExecutor().apply {
         setThreadPriority(THREAD_PRIORITY_URGENT_DISPLAY)
@@ -102,6 +122,8 @@ class UdpPacketProcessor @AssistedInject constructor(
      * Instructs the selector we'll be interested in OP_READ for receiving the response to the packet we write.
      */
     private fun deviceToNetworkProcessing() {
+        check(interceptors.isNotEmpty())
+
         val packet = queues.udpDeviceToNetwork.take() ?: return
 
         healthMetricCounter.onReadFromDeviceToNetworkQueue(isUdp = true)
@@ -145,7 +167,18 @@ class UdpPacketProcessor @AssistedInject constructor(
             )
 
             while (payloadBuffer.hasRemaining()) {
-                val bytesWritten = channelDetails.datagramChannel.write(payloadBuffer)
+                val packetRequest = PacketRequest(
+                    packetInfo = PacketInfo(
+                        IPVersion = packet.ipHeader.version,
+                        transportProtocol = connectionInfo.protocolNumber,
+                        destinationAddress = connectionInfo.destinationAddress,
+                        destinationPort = connectionInfo.destinationPort
+                    ),
+                    byteBuffer = payloadBuffer,
+                    byteChannel = channelDetails.datagramChannel
+                )
+                val chain = RealPacketInterceptorChain(interceptors, 0, packetRequest)
+                val bytesWritten = chain.proceed(packetRequest)
                 Timber.v("UDP packet. Sent $bytesWritten bytes to $cacheKey")
 
                 packetPersister.persistDataSent(bytesWritten, PACKET_TYPE_UDP)
@@ -162,12 +195,10 @@ class UdpPacketProcessor @AssistedInject constructor(
     }
 
     private fun createChannel(destination: InetSocketAddress): DatagramChannel? {
-        val channel = networkChannelCreator.createDatagramChannel()
-        try {
-            channel.connect(destination)
+        val channel = try {
+            networkChannelCreator.createDatagramChannelAndConnect(destination)
         } catch (e: IOException) {
             Timber.w(e, "Failed to connect to UDP ${destination.hostName}:${destination.port}")
-            channel.close()
             return null
         }
 
@@ -242,6 +273,7 @@ private inline fun udpRunnable(crossinline block: () -> Unit): Runnable {
                 Timber.w(e, "Failed to process UDP network-to-device packet")
             } catch (e: InterruptedException) {
                 Timber.v("Thread interrupted")
+                return@Runnable
             }
         }
     }
