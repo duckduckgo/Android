@@ -71,9 +71,7 @@ class UserAgentProvider constructor(
         val host = url?.toUri()?.host
         val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
 
-        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) ||
-            shouldUseDefaultUserAgent
-        ) {
+        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
                 defaultUserAgent.get().replace(AgentRegex.platform, desktopPrefix)
             } else {
