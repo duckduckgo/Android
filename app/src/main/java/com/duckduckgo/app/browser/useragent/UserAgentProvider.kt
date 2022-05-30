@@ -71,8 +71,14 @@ class UserAgentProvider constructor(
         val host = url?.toUri()?.host
         val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
 
-        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
-            return defaultUserAgent.get()
+        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) ||
+            shouldUseDefaultUserAgent
+        ) {
+            return if (isDesktop) {
+                defaultUserAgent.get().replace(AgentRegex.platform, desktopPrefix)
+            } else {
+                defaultUserAgent.get()
+            }
         }
 
         val omitApplicationComponent = if (host != null) userAgent.isAnApplicationException(host) else false
@@ -134,14 +140,14 @@ class UserAgentProvider constructor(
         val webkitUntilEnd = Regex("(AppleWebKit/.*)")
         val safari = Regex("(Safari/[^ ]+) *")
         val version = Regex("(Version/[^ ]+) *")
+        val platform = Regex(".*Linux; Android \\d+")
     }
 
     companion object {
         const val SPACE = " "
-        const val defaultUA = "AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
         val mobilePrefix = "Mozilla/5.0 (Linux; Android ${Build.VERSION.RELEASE})"
         val desktopPrefix = "Mozilla/5.0 (X11; Linux ${System.getProperty("os.arch")})"
-        val fallbackDefaultUA = "$mobilePrefix $defaultUA"
+        val fallbackDefaultUA = "$mobilePrefix AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/96.0.4664.104 Mobile Safari/537.36"
 
         val sitesThatShouldUseDesktopAgent = listOf(
             DesktopAgentSiteOnly("m.facebook.com", listOf("dialog", "sharer"))

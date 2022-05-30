@@ -193,6 +193,13 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.converted.matches(actual))
     }
 
+    @Test
+    fun whenUserAgentShouldBeDefaultAndShouldUseDesktopAgentThenReturnDesktopUserAgent() {
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(DEFAULT_DOMAIN, true)
+        assertTrue("$actual does not match expected regex", ValidationRegex.desktop_default.matches(actual))
+    }
+
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
@@ -237,6 +244,10 @@ class UserAgentProviderTest {
     private object ValidationRegex {
         val default = Regex(
             "Mozilla/5.0 \\(Linux; Android .*? Nexus 6P Build/OPM3.171019.014\\) AppleWebKit/[.0-9]+" +
+                " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile Safari/[.0-9]+"
+        )
+        val desktop_default = Regex(
+            "Mozilla/5.0 \\(X11; Linux .*? Nexus 6P Build/OPM3.171019.014\\) AppleWebKit/[.0-9]+" +
                 " \\(KHTML, like Gecko\\) Version/[.0-9]+ Chrome/[.0-9]+ Mobile Safari/[.0-9]+"
         )
         val converted = Regex(
