@@ -18,4 +18,8 @@ package com.duckduckgo.securestorage.api
 
 import java.lang.RuntimeException
 
+/**
+ * Public data class exception that is thrown when a method that requires user authentication is accessed by a
+ * non authenticated user.
+ */
 data class UserNotAuthenticatedException(override val message: String?) : RuntimeException()
