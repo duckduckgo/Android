@@ -147,9 +147,9 @@ class NetworkTypeCollector @Inject constructor(
 
     override fun onVpnStarted(coroutineScope: CoroutineScope) {
         (context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?)?.let {
-            it.registerNetworkCallback(wifiNetworkRequest, wifiNetworkCallback)
-            it.registerNetworkCallback(cellularNetworkRequest, cellularNetworkCallback)
-            it.registerNetworkCallback(privateDnsRequest, privateDnsCallback)
+            it.safeRegisterNetworkCallback(wifiNetworkRequest, wifiNetworkCallback)
+            it.safeRegisterNetworkCallback(cellularNetworkRequest, cellularNetworkCallback)
+            it.safeRegisterNetworkCallback(privateDnsRequest, privateDnsCallback)
         }
     }
 
@@ -239,6 +239,14 @@ class NetworkTypeCollector @Inject constructor(
             unregisterNetworkCallback(networkCallback)
         }.onFailure {
             Timber.e(it, "Error unregistering the network callback")
+        }
+    }
+
+    private fun ConnectivityManager.safeRegisterNetworkCallback(networkRequest: NetworkRequest, networkCallback: NetworkCallback) {
+        kotlin.runCatching {
+            registerNetworkCallback(networkRequest, networkCallback)
+        }.onFailure {
+            Timber.e(it, "Error registering the network callback")
         }
     }
 

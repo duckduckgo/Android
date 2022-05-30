@@ -44,6 +44,11 @@ interface EmailInjector {
         alias: String?,
         url: String?
     )
+
+    fun notifyWebAppSignEvent(
+        webView: WebView,
+        url: String?
+    )
 }
 
 class EmailInjectorJs(
@@ -91,6 +96,18 @@ class EmailInjectorJs(
         }
     }
 
+    @UiThread
+    override fun notifyWebAppSignEvent(
+        webView: WebView,
+        url: String?
+    ) {
+        url?.let {
+            if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {
+                webView.evaluateJavascript("javascript:${javaScriptInjector.getSignOutFunctions(webView.context)}", null)
+            }
+        }
+    }
+
     private fun isFeatureEnabled() = featureToggle.isFeatureEnabled(PrivacyFeatureName.AutofillFeatureName, defaultValue = true)
 
     private fun isDuckDuckGoUrl(url: String?): Boolean = (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
@@ -98,6 +115,7 @@ class EmailInjectorJs(
     private class JavaScriptInjector {
         private lateinit var functions: String
         private lateinit var aliasFunctions: String
+        private lateinit var signOutFunctions: String
 
         fun getFunctionsJS(): String {
             if (!this::functions.isInitialized) {
@@ -114,6 +132,15 @@ class EmailInjectorJs(
                 aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
             }
             return aliasFunctions.replace("%s", alias.orEmpty())
+        }
+
+        fun getSignOutFunctions(
+            context: Context
+        ): String {
+            if (!this::signOutFunctions.isInitialized) {
+                signOutFunctions = context.resources.openRawResource(R.raw.signout_autofill).bufferedReader().use { it.readText() }
+            }
+            return signOutFunctions
         }
 
         fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()

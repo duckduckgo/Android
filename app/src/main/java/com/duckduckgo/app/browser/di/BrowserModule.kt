@@ -20,9 +20,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.lifecycle.LifecycleObserver
-import androidx.webkit.WebViewAssetLoader
-import androidx.webkit.WebViewAssetLoader.AssetsPathHandler
-import androidx.webkit.WebViewAssetLoader.ResourcesPathHandler
 import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.*
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -41,6 +38,7 @@ import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -129,7 +127,7 @@ class BrowserModule {
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
         ampLinks: AmpLinks,
-        assetLoader: WebViewAssetLoader
+        printInjector: PrintInjector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -149,17 +147,8 @@ class BrowserModule {
             emailInjector,
             accessibilityManager,
             ampLinks,
-            assetLoader
+            printInjector
         )
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun webViewAssetLoader(context: Context): WebViewAssetLoader {
-        return WebViewAssetLoader.Builder()
-            .addPathHandler("/assets/", AssetsPathHandler(context))
-            .addPathHandler("/res/", ResourcesPathHandler(context))
-            .build()
     }
 
     @Provides

@@ -31,7 +31,6 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.HostnameExtracto
 import com.duckduckgo.mobile.android.vpn.processor.tcp.hostname.PayloadBytesExtractor
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.LocalIpAddressDetector
 import com.duckduckgo.mobile.android.vpn.processor.tcp.tracker.VpnTrackerDetector
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
 import com.duckduckgo.mobile.android.vpn.store.PacketPersister
 import dagger.assisted.Assisted
@@ -58,7 +57,7 @@ class TcpPacketProcessor
 @AssistedInject
 constructor(
     queues: VpnQueues,
-    @Assisted networkChannelCreator: NetworkChannelCreator,
+    connectionInitializer: ConnectionInitializer,
     trackerDetector: VpnTrackerDetector,
     packetPersister: PacketPersister,
     localAddressDetector: LocalIpAddressDetector,
@@ -71,13 +70,12 @@ constructor(
     tcpSocketWriter: TcpSocketWriter,
     recentAppTrackerCache: RecentAppTrackerCache,
     @Assisted private val vpnCoroutineScope: CoroutineScope,
-    healthMetricCounter: HealthMetricCounter
+    healthMetricCounter: HealthMetricCounter,
 ) : Runnable {
 
     @AssistedFactory
     interface Factory {
         fun build(
-            networkChannelCreator: NetworkChannelCreator,
             coroutineScope: CoroutineScope
         ): TcpPacketProcessor
     }
@@ -105,7 +103,7 @@ constructor(
             queues = queues,
             selector = selector,
             socketWriter = tcpSocketWriter,
-            connectionInitializer = TcpConnectionInitializer(queues, networkChannelCreator),
+            connectionInitializer = connectionInitializer,
             trackerDetector = trackerDetector,
             packetPersister = packetPersister,
             localAddressDetector = localAddressDetector,

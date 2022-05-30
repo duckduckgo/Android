@@ -16,9 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.mobile.android.vpn.network.channels.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
-import com.duckduckgo.mobile.android.vpn.service.NetworkChannelCreator
 import com.duckduckgo.mobile.android.vpn.service.VpnQueues
+import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
@@ -27,6 +29,8 @@ import xyz.hexene.localvpn.TCB
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
+import javax.inject.Inject
+import javax.inject.Provider
 import kotlin.random.Random
 
 interface ConnectionInitializer {
@@ -64,11 +68,13 @@ interface ConnectionInitializer {
     }
 }
 
-class TcpConnectionInitializer(
+@ContributesBinding(VpnScope::class)
+class TcpConnectionInitializer @Inject constructor(
     private val queues: VpnQueues,
-    private val networkChannelCreator: NetworkChannelCreator
+    networkChannelCreatorProvider: Provider<NetworkChannelCreator>
 ) : ConnectionInitializer {
 
+    private val networkChannelCreator by lazy { networkChannelCreatorProvider.get() }
     override fun initializeConnection(params: TcpConnectionParams): Pair<TCB, SocketChannel>? {
         val key = params.key()
 
@@ -78,7 +84,7 @@ class TcpConnectionInitializer(
         Timber.d("Initializing connection $key")
 
         val pair = if (header.isSYN) {
-            val channel = networkChannelCreator.createSocketChannel()
+            val channel = networkChannelCreator.createSocketChannelAndConnect(InetSocketAddress(params.destinationAddress, params.destinationPort))
             val sequenceNumberToClient = Random.nextLong(Short.MAX_VALUE.toLong() + 1)
             val sequenceToServer = header.sequenceNumber
             val ackNumberToClient = header.sequenceNumber + 1
@@ -86,7 +92,6 @@ class TcpConnectionInitializer(
 
             val tcb = TCB(key, sequenceNumberToClient, sequenceToServer, ackNumberToClient, ackNumberToServer, channel, params.packet)
             TCB.putTCB(params.key(), tcb)
-            channel.connect(InetSocketAddress(params.destinationAddress, params.destinationPort))
             Pair(tcb, channel)
         } else {
             Timber.i("Trying to initialize a connection but is not a SYN packet; sending RST")
