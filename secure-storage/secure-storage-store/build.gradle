@@ -36,6 +36,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.room.ktx
     implementation AndroidX.security.crypto
+    implementation Square.okio
 
     kapt AndroidX.room.compiler
 }
