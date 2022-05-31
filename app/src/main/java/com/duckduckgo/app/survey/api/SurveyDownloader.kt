@@ -20,7 +20,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isVPNRetentionStudyEnabled
+import com.duckduckgo.app.statistics.isVpnExperiment
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -144,7 +144,7 @@ class SurveyDownloader @Inject constructor(
         } else if (surveyOption.isAtpEverEnabledRequired == true) {
             atpCohortManager.getCohort() != null
         } else if (surveyOption.isAtpRetentionStudyRequired == true) {
-            variantManager.isVPNRetentionStudyEnabled()
+            variantManager.isVpnExperiment()
         } else {
             true
         }

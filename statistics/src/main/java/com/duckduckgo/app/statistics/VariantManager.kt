@@ -29,7 +29,8 @@ interface VariantManager {
 
     // variant-dependant features listed here
     sealed class VariantFeature {
-        object VpnRetentionStudy : VariantFeature()
+        object VpnRetentionStudyTreatment : VariantFeature()
+        object VpnRetentionStudyControl : VariantFeature()
     }
 
     companion object {
@@ -46,9 +47,12 @@ interface VariantManager {
             Variant(key = "se", weight = 0.0, features = emptyList(), filterBy = { isSerpRegionToggleCountry() }),
 
             // AppTP Retention study experiment
-            Variant(key = "na", weight = 1.0, features = emptyList(), filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }),
             Variant(
-                key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudy),
+                key = "na", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyControl),
+                filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
+            ),
+            Variant(
+                key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyTreatment),
                 filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
             ),
         )
@@ -181,7 +185,12 @@ class ExperimentationVariantManager(
     }
 }
 
-fun VariantManager.isVPNRetentionStudyEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudy)
+fun VariantManager.isVPNRetentionStudyEnabled() = this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyTreatment)
+
+fun VariantManager.isVpnExperiment(): Boolean {
+    return this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyTreatment) ||
+        this.getVariant().hasFeature(VariantManager.VariantFeature.VpnRetentionStudyControl)
+}
 
 /**
  * A variant which can be used for experimentation.
