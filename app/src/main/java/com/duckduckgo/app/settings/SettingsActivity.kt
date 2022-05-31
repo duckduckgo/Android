@@ -58,11 +58,10 @@ import com.duckduckgo.app.settings.extension.InternalFeaturePlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
+import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
-import com.duckduckgo.macos_api.MacWaitlistState.InBeta
-import com.duckduckgo.macos_api.MacWaitlistState.JoinedWaitlist
-import com.duckduckgo.macos_api.MacWaitlistState.NotJoinedQueue
+import com.duckduckgo.macos_api.MacWaitlistState.*
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistActivity
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
@@ -96,6 +95,9 @@ class SettingsActivity :
 
     @Inject
     lateinit var addWidgetLauncher: AddWidgetLauncher
+
+    @Inject
+    lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -151,6 +153,7 @@ class SettingsActivity :
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
+            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
             locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
@@ -293,6 +296,7 @@ class SettingsActivity :
             is Command.LaunchDefaultBrowser -> launchDefaultAppScreen()
             is Command.LaunchFeedback -> launchFeedback()
             is Command.LaunchFireproofWebsites -> launchFireproofWebsites()
+            is Command.LaunchAutofillSettings -> launchAutofillSettings()
             is Command.LaunchAccessibilitySettings -> launchAccessibilitySettings()
             is Command.LaunchLocation -> launchLocation()
             is Command.LaunchWhitelist -> launchWhitelist()
@@ -368,6 +372,11 @@ class SettingsActivity :
     private fun launchFireproofWebsites() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(FireproofWebsitesActivity.intent(this), options)
+    }
+
+    private fun launchAutofillSettings() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(autofillSettingsActivityLauncher.intent(this), options)
     }
 
     private fun launchAccessibilitySettings() {
