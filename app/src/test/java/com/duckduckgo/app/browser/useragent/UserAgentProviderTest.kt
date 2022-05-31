@@ -17,8 +17,10 @@
 package com.duckduckgo.app.browser.useragent
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.UserAgent
@@ -29,16 +31,22 @@ import com.duckduckgo.privacy.config.impl.features.useragent.RealUserAgent
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.privacy.config.store.features.useragent.UserAgentRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.concurrent.CopyOnWriteArrayList
 
+@ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class UserAgentProviderTest {
+
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
 
     private lateinit var testee: UserAgentProvider
 
@@ -200,12 +208,38 @@ class UserAgentProviderTest {
         assertTrue("$actual does not match expected regex", ValidationRegex.desktop_default.matches(actual))
     }
 
+    @Test
+    fun whenUserAgentAndUrlAllowedByUserThenReturnDefaultUserAgent() {
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(ALLOWED_URL, false)
+        assertTrue("$actual does not match expected regex", ValidationRegex.default.matches(actual))
+    }
+
+    @Test
+    fun whenUserAgentAndUrlAllowedByUserAndIsDekstopThenReturnDefaultDesktopUserAgent() {
+        testee = getUserAgentProvider(Agent.DEFAULT, deviceInfo)
+        val actual = testee.userAgent(ALLOWED_URL, true)
+        assertTrue("$actual does not match expected regex", ValidationRegex.desktop_default.matches(actual))
+    }
+
     private fun getUserAgentProvider(
         defaultUserAgent: String,
         device: DeviceInfo,
         userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor> = provideUserAgentFakePluginPoint()
     ): UserAgentProvider {
-        return UserAgentProvider({ defaultUserAgent }, device, userAgentInterceptorPluginPoint, userAgent, toggle)
+        return UserAgentProvider(
+            { defaultUserAgent },
+            device,
+            userAgentInterceptorPluginPoint,
+            userAgent,
+            toggle,
+            FakeUserAllowListRepo(),
+            coroutinesTestRule.testDispatcherProvider
+        )
+    }
+
+    internal class FakeUserAllowListRepo : UserAllowListRepository {
+        override fun isDomainInUserAllowList(domain: String): Boolean = (domain == ALLOWED_HOST)
     }
 
     companion object {
@@ -220,6 +254,8 @@ class UserAgentProviderTest {
         const val UNPROTECTED_SUBDOMAIN = "http://subdomain.unprotected.com"
         const val DESKTOP_ONLY_SITE = "http://m.facebook.com"
         const val DESKTOP_ONLY_SITE_EXCEPTION = "http://m.facebook.com/dialog/"
+        const val ALLOWED_URL = "http://allowed.com"
+        const val ALLOWED_HOST = "allowed.com"
         val applicationExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "application.com", reason = "reason")))
         val versionExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "version.com", reason = "reason")))
         val defaultExceptions = CopyOnWriteArrayList(listOf(UserAgentException(domain = "default.com", reason = "reason")))

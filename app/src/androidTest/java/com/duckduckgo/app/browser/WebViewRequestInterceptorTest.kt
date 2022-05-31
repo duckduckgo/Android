@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
+import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -64,8 +65,16 @@ class WebViewRequestInterceptorTest {
     private val mockWebBackForwardList: WebBackForwardList = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
-    private val userAgentProvider: UserAgentProvider =
-        UserAgentProvider({ DEFAULT }, mock(), provideUserAgentOverridePluginPoint(), fakeUserAgent, fakeToggle)
+    private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider(
+        { "" },
+        mock(),
+        provideUserAgentOverridePluginPoint(),
+        fakeUserAgent,
+        fakeToggle,
+        fakeUserAllowListRepository,
+        coroutinesTestRule.testDispatcherProvider
+    )
 
     private var webView: WebView = mock()
 

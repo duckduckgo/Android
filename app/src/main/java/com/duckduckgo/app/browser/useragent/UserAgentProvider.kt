@@ -20,9 +20,11 @@ import android.content.Context
 import android.os.Build
 import android.webkit.WebSettings
 import androidx.core.net.toUri
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.UriString
 import com.duckduckgo.app.global.device.DeviceInfo
 import com.duckduckgo.app.global.plugins.PluginPoint
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
@@ -31,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.runBlocking
 import javax.inject.Named
 import javax.inject.Provider
 
@@ -46,7 +49,9 @@ class UserAgentProvider constructor(
     device: DeviceInfo,
     private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
     private val userAgent: UserAgent,
-    private val toggle: FeatureToggle
+    private val toggle: FeatureToggle,
+    private val userAllowListRepository: UserAllowListRepository,
+    private val dispatcher: DispatcherProvider,
 ) {
 
     private val baseAgent: String by lazy { concatWithSpaces(mobilePrefix, getWebKitVersionOnwards(false)) }
@@ -71,7 +76,9 @@ class UserAgentProvider constructor(
         val host = url?.toUri()?.host
         val shouldUseDefaultUserAgent = if (host != null) userAgent.isADefaultException(host) else false
 
-        if (!toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
+        val isDomainInUserAllowList = isHostInUserAllowedList(host)
+
+        if (isDomainInUserAllowList || !toggle.isFeatureEnabled(PrivacyFeatureName.UserAgentFeatureName) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
                 defaultUserAgent.get().replace(AgentRegex.platform, desktopPrefix)
             } else {
@@ -100,6 +107,16 @@ class UserAgentProvider constructor(
         }
 
         return userAgent
+    }
+
+    private fun isHostInUserAllowedList(host: String?): Boolean {
+        return runBlocking(dispatcher.io()) {
+            if (host == null) {
+                false
+            } else {
+                userAllowListRepository.isDomainInUserAllowList(host)
+            }
+        }
     }
 
     private fun containsExcludedPath(

@@ -65,6 +65,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -241,9 +242,19 @@ class BrowserModule {
         deviceInfo: DeviceInfo,
         userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
         userAgent: UserAgent,
-        toggle: FeatureToggle
+        toggle: FeatureToggle,
+        userAllowListRepository: UserAllowListRepository,
+        dispatcher: DispatcherProvider,
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint, userAgent, toggle)
+        return UserAgentProvider(
+            defaultUserAgent,
+            deviceInfo,
+            userAgentInterceptorPluginPoint,
+            userAgent,
+            toggle,
+            userAllowListRepository,
+            dispatcher
+        )
     }
 
     @Provides

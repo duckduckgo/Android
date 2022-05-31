@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
+import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
@@ -95,8 +96,16 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
-    private val userAgentProvider: UserAgentProvider =
-        UserAgentProvider({ "" }, mock(), provideUserAgentOverridePluginPoint(), fakeUserAgent, fakeToggle)
+    private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider(
+        { "" },
+        mock(),
+        provideUserAgentOverridePluginPoint(),
+        fakeUserAgent,
+        fakeToggle,
+        fakeUserAllowListRepository,
+        coroutinesTestRule.testDispatcherProvider
+    )
     private val mockGpc: Gpc = mock()
 
     companion object {
