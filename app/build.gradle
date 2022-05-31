@@ -150,6 +150,9 @@ fladle {
 }
 
 dependencies {
+    implementation project(path: ':autofill-api')
+    implementation project(path: ':autofill-impl')
+
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
@@ -186,6 +189,10 @@ dependencies {
     internalImplementation project(path: ':traces-impl')
 
     implementation project(path: ':bandwidth-impl')
+
+    implementation project(path: ':secure-storage-api')
+    implementation project(path: ':secure-storage-impl')
+    implementation project(path: ':secure-storage-store')
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

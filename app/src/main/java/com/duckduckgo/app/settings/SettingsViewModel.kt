@@ -110,6 +110,7 @@ class SettingsViewModel @Inject constructor(
         object LaunchEmailProtection : Command()
         object LaunchFeedback : Command()
         object LaunchFireproofWebsites : Command()
+        object LaunchAutofillSettings : Command()
         object LaunchAccessibilitySettings : Command()
         object LaunchLocation : Command()
         object LaunchWhitelist : Command()
@@ -231,6 +232,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onFireproofWebsitesClicked() {
         viewModelScope.launch { command.send(Command.LaunchFireproofWebsites) }
+    }
+
+    fun onAutofillSettingsClick() {
+        viewModelScope.launch { command.send(Command.LaunchAutofillSettings) }
     }
 
     fun onLocationClicked() {
