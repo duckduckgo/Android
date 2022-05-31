@@ -17,16 +17,37 @@
 package com.duckduckgo.autofill
 
 import android.webkit.WebView
+import com.duckduckgo.app.autofill.JavascriptInjector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInterface) : BrowserAutofill {
+class InlineBrowserAutofill(
+    private val autofillInterface: AutofillJavascriptInterface,
+    private val javascriptInjector: JavascriptInjector,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+) : BrowserAutofill {
 
     override fun addJsInterface(webView: WebView, callback: Callback) {
         Timber.v("Injecting BrowserAutofill interface")
         webView.addJavascriptInterface(autofillInterface, AutofillJavascriptInterface.INTERFACE_NAME)
         autofillInterface.webView = webView
         autofillInterface.callback = callback
+    }
+
+    override fun configureAutofillForCurrentPage(webView: WebView, url: String?) {
+        coroutineScope.launch {
+            val rawJs = javascriptInjector.getFunctionsJS()
+            val formatted = autofillInterface.getRuntimeConfiguration(rawJs, url)
+
+            withContext(Dispatchers.Main) {
+                webView.evaluateJavascript("javascript:$formatted", null)
+            }
+        }
     }
 
     override fun injectCredentials(credentials: LoginCredentials) {

@@ -77,32 +77,54 @@ class AutofillJavascriptInterface(
      *
      * Currently, we only care about logins but in future there might be other autofill types to return.
      */
-    @JavascriptInterface
-    fun getAvailableInputTypes() {
-        Timber.i("BrowserAutofill: getAvailableInputTypes called")
-        getAutofillDataJob += coroutineScope.launch {
-            val url = currentUrl()
-            val credentialsAvailable = if (url == null) {
-                false
-            } else {
-                val savedCredentials = autofillStore.getCredentials(url)
-                savedCredentials.isNotEmpty()
-            }
+//    @JavascriptInterface
+//    fun getAvailableInputTypes() {
+//        Timber.i("BrowserAutofill: getAvailableInputTypes called")
+//        getAutofillDataJob += coroutineScope.launch {
+//            val url = currentUrl()
+//            val credentialsAvailable = if (url == null) {
+//                false
+//            } else {
+//                val savedCredentials = autofillStore.getCredentials(url)
+//                savedCredentials.isNotEmpty()
+//            }
+//
+//            Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
+//
+//            val message = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable)
+//            autofillMessagePoster.postMessage(webView, message)
+//        }
+//    }
 
-            Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
+    suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
+        Timber.i("BrowserAutofill: getRuntimeConfiguration called")
 
-            val message = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable)
-            autofillMessagePoster.postMessage(webView, message)
-        }
+        val contentScope = autofillResponseWriter.generateContentScope()
+        val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
+        val userPreferences = autofillResponseWriter.generateUserPreferences()
+        val availableInputTypes = d(url)
+
+        return rawJs
+            .replace("// INJECT contentScope HERE", contentScope)
+            .replace("// INJECT userUnprotectedDomains HERE", userUnprotectedDomains)
+            .replace("// INJECT userPreferences HERE", userPreferences)
+            .replace("// INJECT availableInputTypes HERE", availableInputTypes)
     }
 
-    @JavascriptInterface
-    fun getRuntimeConfiguration() {
-        Timber.i("BrowserAutofill: getRuntimeConfiguration called")
-        getAutofillDataJob += coroutineScope.launch {
-            val config = autofillResponseWriter.generateResponseGetRuntimeConfiguration()
-            autofillMessagePoster.postMessage(webView, config)
+    suspend fun d(url: String?): String {
+        val credentialsAvailable = if (url == null) {
+            false
+        } else {
+            val savedCredentials = autofillStore.getCredentials(url)
+            savedCredentials.isNotEmpty()
         }
+
+        Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
+
+        val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable).also {
+            Timber.i("xxx: \n%s", it)
+        }
+        return "availableInputTypes = $json"
     }
 
     @JavascriptInterface
@@ -154,4 +176,5 @@ class AutofillJavascriptInterface(
     companion object {
         const val INTERFACE_NAME = "BrowserAutofill"
     }
+
 }
