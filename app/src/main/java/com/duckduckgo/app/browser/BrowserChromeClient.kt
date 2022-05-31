@@ -46,6 +46,11 @@ class BrowserChromeClient @Inject constructor(
 
     private var customView: View? = null
 
+    override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+        Timber.v("consoleMessage: %s", consoleMessage.message())
+        return true
+    }
+
     override fun onShowCustomView(
         view: View,
         callback: CustomViewCallback?
