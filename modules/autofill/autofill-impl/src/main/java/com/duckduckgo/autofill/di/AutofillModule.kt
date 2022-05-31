@@ -16,6 +16,9 @@
 
 package com.duckduckgo.autofill.di
 
+import android.content.Context
+import com.duckduckgo.app.autofill.FileBasedJavaScriptInjector
+import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
@@ -38,8 +41,12 @@ import kotlinx.coroutines.CoroutineScope
 class AutofillModule {
 
     @Provides
-    fun browserAutofill(javascriptInterface: AutofillJavascriptInterface): BrowserAutofill {
-        return InlineBrowserAutofill(javascriptInterface)
+    fun browserAutofill(
+        javascriptInterface: AutofillJavascriptInterface,
+        javascriptInjector: JavascriptInjector,
+        @AppCoroutineScope coroutineScope: CoroutineScope
+    ): BrowserAutofill {
+        return InlineBrowserAutofill(javascriptInterface, javascriptInjector, coroutineScope)
     }
 
     @Provides
@@ -58,19 +65,25 @@ class AutofillModule {
         autofillStore: AutofillStore,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         autofillMessagePoster: AutofillMessagePoster,
-        autofillResponseWriter: AutofillResponseWriter
+        autofillResponseWriter: AutofillResponseWriter,
+        context: Context
     ): AutofillJavascriptInterface {
         return AutofillJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,
             autofillMessagePoster = autofillMessagePoster,
             autofillResponseWriter = autofillResponseWriter,
-            coroutineScope = coroutineScope,
+            coroutineScope = coroutineScope
         )
     }
 
     @Provides
     fun providesFactory(): CredentialAutofillDialogFactory {
         return CredentialAutofillDialogAndroidFactory()
+    }
+
+    @Provides
+    fun providesAutofillInjector(): JavascriptInjector {
+        return FileBasedJavaScriptInjector()
     }
 }

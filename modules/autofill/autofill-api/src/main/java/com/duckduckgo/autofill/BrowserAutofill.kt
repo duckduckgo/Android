@@ -23,6 +23,8 @@ interface BrowserAutofill {
 
     fun addJsInterface(webView: WebView, callback: Callback)
 
+    fun configureAutofillForCurrentPage(webView: WebView, url: String?)
+
     fun injectCredentials(credentials: LoginCredentials)
 
 }
