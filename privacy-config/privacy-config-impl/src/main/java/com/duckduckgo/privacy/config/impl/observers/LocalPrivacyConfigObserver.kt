@@ -18,9 +18,9 @@ package com.duckduckgo.privacy.config.impl.observers
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -37,19 +37,19 @@ import dagger.SingleInstanceIn
 
 @WorkerThread
 @SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class LocalPrivacyConfigObserver @Inject constructor(
     private val context: Context,
     private val privacyConfigPersister: PrivacyConfigPersister,
     @AppCoroutineScope val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun storeLocalPrivacyConfig() {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            loadPrivacyConfig()
-        }
+    override fun onCreate(owner: LifecycleOwner) {
+        coroutineScope.launch(dispatcherProvider.io()) { loadPrivacyConfig() }
     }
 
     private suspend fun loadPrivacyConfig() {

@@ -19,8 +19,7 @@ package com.duckduckgo.app.pixels
 import com.duckduckgo.app.statistics.pixels.Pixel
 
 enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
-    APP_LAUNCH_LEGACY("ml"),
-    APP_LAUNCH("m_app_launch"),
+    APP_LAUNCH("ml"),
 
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
@@ -197,6 +196,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_REMOVE_FAVORITE_PRESSED("m_nav_rf_p"),
     MENU_ACTION_SHARE_PRESSED("m_nav_sh_p"),
     MENU_ACTION_FIND_IN_PAGE_PRESSED("m_nav_fip_p"),
+    MENU_ACTION_PRINT_PRESSED("m_nav_print_menu_item_pressed"),
     MENU_ACTION_ADD_TO_HOME_PRESSED("m_nav_ath_p"),
     MENU_ACTION_DESKTOP_SITE_ENABLE_PRESSED("m_nav_dse_p"),
     MENU_ACTION_DESKTOP_SITE_DISABLE_PRESSED("m_nav_dsd_p"),
