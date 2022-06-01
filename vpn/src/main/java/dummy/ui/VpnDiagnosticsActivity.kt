@@ -16,6 +16,7 @@
 
 package dummy.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -177,6 +178,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         }
     }
 
+    @SuppressLint("RestrictedApi")
     private fun configureEventHandlers() {
         binding.clearHealthMetricsButton.setOnClickListener {
             healthMetricCounter.clearAllMetrics()

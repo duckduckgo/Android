@@ -157,7 +157,6 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
         webTrackerCompaniesBlockedWeekTextView =
             findViewById(R.id.vpnWebTrackersCompaniesBlockedWeek)
         webTrackersBlockedWeekTextView = findViewById(R.id.vpnWebTrackersBlockedWeek)
-        lastWebTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
 
         timeRunningTodayTextView = findViewById(R.id.vpnTodayRunningTime)
         dataSentTextView = findViewById(R.id.vpnSentStats)
