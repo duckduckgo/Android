@@ -23,8 +23,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.work.*
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ReceiverScope
 import com.duckduckgo.mobile.android.vpn.dao.HeartBeatEntity
@@ -32,6 +32,7 @@ import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.dao.VpnHeartBeatDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixDao
 import com.duckduckgo.mobile.android.vpn.dao.VpnPhoenixEntity
+import com.duckduckgo.mobile.android.vpn.heartbeat.VpnServiceHeartbeatMonitor.Companion
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.squareup.anvil.annotations.ContributesTo
@@ -53,13 +54,10 @@ class VpnServiceHeartbeatMonitorModule {
     }
 
     @Provides
-    @IntoSet
-    fun provideVpnServiceHeartbeatMonitorWorkerInjectorPlugin(
-        deviceShieldPixels: DeviceShieldPixels,
-        vpnDatabase: VpnDatabase
-    ): WorkerInjectorPlugin {
-        return VpnServiceHeartbeatMonitorWorkerInjectorPlugin(deviceShieldPixels, vpnDatabase)
-    }
+    fun providesVpnPhoenixDao(vpnDatabase: VpnDatabase): VpnPhoenixDao = vpnDatabase.vpnPhoenixDao()
+
+    @Provides
+    fun providesVpnHeartBeatDao(vpnDatabase: VpnDatabase): VpnHeartBeatDao = vpnDatabase.vpnHeartBeatDao()
 }
 
 class VpnServiceHeartbeatMonitor(
@@ -69,36 +67,6 @@ class VpnServiceHeartbeatMonitor(
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     fun startHeartbeatMonitor() {
         Companion.startHeartbeatMonitor(workManager)
-    }
-
-    class VpnServiceHeartbeatMonitorWorker(
-        val context: Context,
-        params: WorkerParameters
-    ) : CoroutineWorker(context, params) {
-        lateinit var vpnPhoenixDao: VpnPhoenixDao
-        lateinit var vpnHeartBeatDao: VpnHeartBeatDao
-        lateinit var deviceShieldPixels: DeviceShieldPixels
-
-        override suspend fun doWork(): Result {
-            val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
-
-            Timber.d("HB monitor checking last HB: $lastHeartBeat")
-            if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
-                Timber.w("HB monitor: VPN stopped, restarting it")
-
-                vpnPhoenixDao.insert(VpnPhoenixEntity(reason = HeartBeatUtils.getAppExitReason(context)))
-
-                deviceShieldPixels.suddenKillBySystem()
-                deviceShieldPixels.automaticRestart()
-                TrackerBlockingVpnService.startService(context)
-            }
-
-            return Result.success()
-        }
-
-        private fun HeartBeatEntity.isAlive(): Boolean {
-            return DATA_HEART_BEAT_TYPE_ALIVE == type
-        }
     }
 
     companion object {
@@ -120,21 +88,37 @@ class VpnServiceHeartbeatMonitor(
     }
 }
 
-class VpnServiceHeartbeatMonitorWorkerInjectorPlugin(
-    private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnDatabase: VpnDatabase
-) : WorkerInjectorPlugin {
+@ContributesWorker(AppScope::class)
+class VpnServiceHeartbeatMonitorWorker(
+    val context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+    @Inject
+    lateinit var vpnPhoenixDao: VpnPhoenixDao
+    @Inject
+    lateinit var vpnHeartBeatDao: VpnHeartBeatDao
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is VpnServiceHeartbeatMonitor.VpnServiceHeartbeatMonitorWorker) {
-            worker.vpnHeartBeatDao = vpnDatabase.vpnHeartBeatDao()
-            worker.vpnPhoenixDao = vpnDatabase.vpnPhoenixDao()
-            worker.deviceShieldPixels = deviceShieldPixels
+    override suspend fun doWork(): Result {
+        val lastHeartBeat = vpnHeartBeatDao.hearBeats().maxByOrNull { it.timestamp }
 
-            return true
+        Timber.d("HB monitor checking last HB: $lastHeartBeat")
+        if (lastHeartBeat?.isAlive() == true && !TrackerBlockingVpnService.isServiceRunning(context)) {
+            Timber.w("HB monitor: VPN stopped, restarting it")
+
+            vpnPhoenixDao.insert(VpnPhoenixEntity(reason = HeartBeatUtils.getAppExitReason(context)))
+
+            deviceShieldPixels.suddenKillBySystem()
+            deviceShieldPixels.automaticRestart()
+            TrackerBlockingVpnService.startService(context)
         }
 
-        return false
+        return Result.success()
+    }
+
+    private fun HeartBeatEntity.isAlive(): Boolean {
+        return VpnServiceHeartbeatMonitor.DATA_HEART_BEAT_TYPE_ALIVE == type
     }
 }
 

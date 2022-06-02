@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
@@ -63,24 +63,6 @@ class OfflinePixelScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(WORK_REQUEST_TAG, ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
-    open class OfflinePixelWorker(
-        val context: Context,
-        params: WorkerParameters
-    ) : CoroutineWorker(context, params) {
-
-        lateinit var offlinePixelSender: OfflinePixelSender
-        override suspend fun doWork(): Result {
-            return try {
-                offlinePixelSender
-                    .sendOfflinePixels()
-                    .blockingAwait()
-                Result.success()
-            } catch (e: Exception) {
-                Result.failure()
-            }
-        }
-    }
-
     companion object {
         private const val WORK_REQUEST_TAG = "com.duckduckgo.statistics.offlinepixels.schedule"
         private const val SERVICE_INTERVAL = 3L
@@ -90,16 +72,21 @@ class OfflinePixelScheduler @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-class OfflinePixelWorkerInjectorPlugin @Inject constructor(
-    private val offlinePixelSender: OfflinePixelSender
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is OfflinePixelScheduler.OfflinePixelWorker) {
-            worker.offlinePixelSender = offlinePixelSender
-            return true
+@ContributesWorker(AppScope::class)
+open class OfflinePixelWorker(
+    val context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+    @Inject
+    lateinit var offlinePixelSender: OfflinePixelSender
+    override suspend fun doWork(): Result {
+        return try {
+            offlinePixelSender
+                .sendOfflinePixels()
+                .blockingAwait()
+            Result.success()
+        } catch (e: Exception) {
+            Result.failure()
         }
-        return false
     }
 }
