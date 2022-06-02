@@ -26,6 +26,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.impl.PrivacyConfigDownloader
@@ -36,11 +37,14 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+@ContributesWorker(AppScope::class)
 class PrivacyConfigDownloadWorker(
     context: Context,
     workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters) {
+    @Inject
     lateinit var privacyConfigDownloader: PrivacyConfigDownloader
+    @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
     override suspend fun doWork(): Result {

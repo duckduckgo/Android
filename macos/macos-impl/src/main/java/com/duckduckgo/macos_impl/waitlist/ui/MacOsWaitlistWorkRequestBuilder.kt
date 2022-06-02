@@ -18,7 +18,7 @@ package com.duckduckgo.macos_impl.waitlist.ui
 
 import android.content.Context
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.macos_impl.waitlist.ui.MacOsWaitlistWorkRequestBuilder.Companion.MACOS_WAITLIST_SYNC_WORK_TAG
@@ -26,13 +26,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.Code
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.CodeExisted
 import com.duckduckgo.macos_impl.waitlist.FetchCodeResult.NoCode
-import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistCodeNotification
 import com.duckduckgo.macos_impl.waitlist.MacOsWaitlistManager
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface MacOsWaitlistWorkRequestBuilder {
     fun waitlistRequestWork(withBigDelay: Boolean = true): OneTimeWorkRequest
@@ -62,6 +59,7 @@ class RealMacOsWaitlistWorkRequestBuilder @Inject constructor() : MacOsWaitlistW
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }
 
+@ContributesWorker(AppScope::class)
 class MacOsWaitlistWorker(
     private val context: Context,
     workerParams: WorkerParameters
@@ -87,25 +85,5 @@ class MacOsWaitlistWorker(
         }
 
         return Result.success()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class MacOsWaitlistWorkerInjectorPlugin @Inject constructor(
-    private val waitlistManager: Provider<MacOsWaitlistManager>,
-    private val notificationSender: Provider<NotificationSender>,
-    private val notification: Provider<MacOsWaitlistCodeNotification>,
-    private val workRequestBuilder: Provider<MacOsWaitlistWorkRequestBuilder>,
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is MacOsWaitlistWorker) {
-            worker.waitlistManager = waitlistManager.get()
-            worker.notificationSender = notificationSender.get()
-            worker.notification = notification.get()
-            worker.workRequestBuilder = workRequestBuilder.get()
-            return true
-        }
-        return false
     }
 }

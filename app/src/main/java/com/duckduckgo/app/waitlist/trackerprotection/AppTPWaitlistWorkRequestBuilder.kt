@@ -18,7 +18,7 @@ package com.duckduckgo.app.waitlist.trackerprotection
 
 import android.content.Context
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.AppTPWaitlistCodeNotification
 import com.duckduckgo.app.waitlist.trackerprotection.AppTPWaitlistWorkRequestBuilder.Companion.APP_TP_WAITLIST_SYNC_WORK_TAG
@@ -26,7 +26,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.waitlist.FetchCodeResult
 import com.duckduckgo.mobile.android.vpn.waitlist.AppTPWaitlistManager
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -58,6 +57,7 @@ class RealAppTPWaitlistWorkRequestBuilder @Inject constructor() : AppTPWaitlistW
     private fun networkAvailable() = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }
 
+@ContributesWorker(AppScope::class)
 class AppTPWaitlistWorker(
     private val context: Context,
     workerParams: WorkerParameters
@@ -83,25 +83,5 @@ class AppTPWaitlistWorker(
         }
 
         return Result.success()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val waitlistManager: AppTPWaitlistManager,
-    private val notificationSender: NotificationSender,
-    private val notification: AppTPWaitlistCodeNotification,
-    private val workRequestBuilder: AppTPWaitlistWorkRequestBuilder,
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is AppTPWaitlistWorker) {
-            worker.waitlistManager = waitlistManager
-            worker.notificationSender = notificationSender
-            worker.notification = notification
-            worker.workRequestBuilder = workRequestBuilder
-            return true
-        }
-        return false
     }
 }
