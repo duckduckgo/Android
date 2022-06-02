@@ -31,6 +31,7 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
+import com.google.android.material.appbar.AppBarLayout.LayoutParams
 import dagger.android.AndroidInjection
 import dagger.android.DaggerActivity
 import javax.inject.Inject

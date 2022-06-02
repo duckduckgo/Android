@@ -21,7 +21,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.webkit.WebSettings
+import android.webkit.WebSettings.LayoutAlgorithm.SINGLE_COLUMN
+import android.webkit.WebView
+import com.airbnb.lottie.utils.Utils.getScale
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
@@ -57,7 +61,9 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
-
+            it.setPadding(0, 0, 0, 0);
+            it.scrollBarStyle = WebView.SCROLLBARS_OUTSIDE_OVERLAY;
+            it.isScrollbarFadingEnabled = false;
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true
@@ -70,6 +76,8 @@ class WebViewActivity : DuckDuckGoActivity() {
                 setSupportMultipleWindows(true)
                 databaseEnabled = false
                 setSupportZoom(true)
+                layoutAlgorithm=SINGLE_COLUMN
+
             }
         }
 
@@ -110,5 +118,14 @@ class WebViewActivity : DuckDuckGoActivity() {
             intent.putExtra(TITLE_EXTRA, titleExtra)
             return intent
         }
+
+
     }
+
+
+
 }
+
+
+
+

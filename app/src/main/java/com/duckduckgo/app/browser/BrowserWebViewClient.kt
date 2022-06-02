@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.net.Uri
 import android.net.http.SslError
 import android.net.http.SslError.*
@@ -26,8 +27,8 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
+import com.airbnb.lottie.utils.Utils.getScale
 import com.duckduckgo.app.accessibility.AccessibilityManager
-import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
@@ -43,13 +44,13 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
-import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.URI
 
-class BrowserWebViewClient(
+open class BrowserWebViewClient(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val trustedCertificateStore: TrustedCertificateStore,
     private val requestRewriter: RequestRewriter,
@@ -410,4 +411,5 @@ class BrowserWebViewClient(
             it.requiresAuthentication(request)
         }
     }
+
 }

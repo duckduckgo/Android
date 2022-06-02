@@ -2159,7 +2159,7 @@ class BrowserTabFragment :
                 playPulseAnimation(targetView)
             } else {
                 if (viewState.browserShowing) {
-                    omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
+                   // omnibarScrolling.enableOmnibarScrolling(toolbarContainer)
                 }
                 pulseAnimation.stop()
             }
