@@ -45,6 +45,11 @@ interface SecureStorageKeyStore {
     var encryptedL2Key: ByteArray?
 
     /**
+     * Iv to be used for L2 key decryption
+     */
+    var encryptedL2KeyIV: ByteArray?
+
+    /**
      * This method can be check if the keystore has support encryption
      *
      * @return `true` if all the crypto dependencies needed by description is available and `false` otherwise
@@ -93,6 +98,12 @@ class RealSecureStorageKeyStore constructor(
             updateValue(KEY_ENCRYPTED_L2KEY, value)
         }
 
+    override var encryptedL2KeyIV: ByteArray?
+        get() = getValue(KEY_ENCRYPTED_L2KEY_IV)
+        set(value) {
+            updateValue(KEY_ENCRYPTED_L2KEY_IV, value)
+        }
+
     private fun updateValue(
         key: String,
         value: ByteArray?
@@ -116,5 +127,6 @@ class RealSecureStorageKeyStore constructor(
         const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
         const val KEY_L1KEY = "KEY_L1KEY"
         const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
+        const val KEY_ENCRYPTED_L2KEY_IV = "KEY_ENCRYPTED_L2KEY_IV"
     }
 }

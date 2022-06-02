@@ -17,9 +17,13 @@
 package com.duckduckgo.securestorage.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
+import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.securestorage.impl.encryption.PasswordGenerator
 import com.duckduckgo.securestorage.store.SecureStorageKeyStore
 import com.squareup.anvil.annotations.ContributesBinding
+import okio.ByteString.Companion.toByteString
+import java.security.Key
 import javax.inject.Inject
 
 /**
@@ -34,13 +38,15 @@ interface SecureStorageKeyManager {
     /**
      * Ready to use key for L2 encryption
      */
-    val l2Key: ByteArray
+    val l2Key: Key
 }
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyManager @Inject constructor(
     private val passwordGenerator: PasswordGenerator,
-    private val secureStorageKeyStore: SecureStorageKeyStore
+    private val secureStorageKeyStore: SecureStorageKeyStore,
+    private val encryptionHelper: EncryptionHelper,
+    private val secureStorageKeyGenerator: SecureStorageKeyGenerator
 ) : SecureStorageKeyManager {
 
     private val _l1Key: ByteArray by lazy {
@@ -54,8 +60,46 @@ class RealSecureStorageKeyManager @Inject constructor(
         }
     }
 
+    private val _l2Key: Key by lazy {
+        val keyMaterial = if (secureStorageKeyStore.encryptedL2Key == null) {
+            secureStorageKeyGenerator.generateKey().encoded.also {
+                encryptAndStoreL2Key(it)
+            }
+        } else {
+            encryptionHelper.decrypt(
+                EncryptedBytes(
+                    secureStorageKeyStore.encryptedL2Key!!,
+                    secureStorageKeyStore.encryptedL2KeyIV!!
+                ),
+                deriveKeyFromPassword()
+            )
+        }
+        secureStorageKeyGenerator.generateKeyFromKeyMaterial(keyMaterial)
+    }
+
     override val l1Key: ByteArray
         get() = _l1Key
-    override val l2Key: ByteArray
-        get() = TODO("Not yet implemented")
+    override val l2Key: Key
+        get() = _l2Key
+
+    private fun encryptAndStoreL2Key(keyBytes: ByteArray): ByteArray =
+        encryptionHelper.encrypt(
+            keyBytes,
+            deriveKeyFromPassword()
+        ).also {
+            secureStorageKeyStore.encryptedL2Key = it.data
+            secureStorageKeyStore.encryptedL2KeyIV = it.iv
+        }.data
+
+    private fun deriveKeyFromPassword(): Key {
+        val userPassword = if (secureStorageKeyStore.password == null) {
+            passwordGenerator.generatePassword().also {
+                secureStorageKeyStore.password = it
+            }
+        } else {
+            secureStorageKeyStore.password
+        }
+
+        return secureStorageKeyGenerator.generateKeyFromPassword(userPassword!!.toByteString().base64())
+    }
 }

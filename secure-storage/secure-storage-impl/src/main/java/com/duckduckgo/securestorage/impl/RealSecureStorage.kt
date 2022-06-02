@@ -22,6 +22,8 @@ import com.duckduckgo.securestorage.api.Result
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
+import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
+import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,7 +35,9 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RealSecureStorage @Inject constructor(
     private val secureStorageRepository: SecureStorageRepository,
-    private val dispatchers: DispatcherProvider
+    private val dispatchers: DispatcherProvider,
+    private val encryptionHelper: EncryptionHelper,
+    private val secureStorageKeyManager: SecureStorageKeyManager
 ) : SecureStorage {
 
     override fun canAccessSecureStorage(): Boolean = true
@@ -53,7 +57,6 @@ class RealSecureStorage @Inject constructor(
     }
 
     override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials) {
-        // TODO (karl) Integrate L2 encryption
         withContext(dispatchers.io()) {
             secureStorageRepository.addWebsiteLoginCredential(websiteLoginCredentials.toDataEntity())
         }
@@ -83,7 +86,6 @@ class RealSecureStorage @Inject constructor(
         }
 
     override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>> =
-        // TODO (karl) Integrate L2 encryption
         withContext(dispatchers.io()) {
             secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
                 list.map {
@@ -93,7 +95,6 @@ class RealSecureStorage @Inject constructor(
         }
 
     override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>> =
-        // TODO (karl) Integrate L2 encryption
         withContext(dispatchers.io()) {
             secureStorageRepository.websiteLoginCredentials().map { list ->
                 list.map {
@@ -103,7 +104,6 @@ class RealSecureStorage @Inject constructor(
         }
 
     override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentials) =
-        // TODO (karl) Integrate L2 encryption
         withContext(dispatchers.io()) {
             secureStorageRepository.updateWebsiteLoginCredentials(websiteLoginCredentials.toDataEntity())
         }
@@ -113,18 +113,21 @@ class RealSecureStorage @Inject constructor(
             secureStorageRepository.deleteWebsiteLoginCredentials(id)
         }
 
-    private fun WebsiteLoginCredentials.toDataEntity(): WebsiteLoginCredentialsEntity =
-        WebsiteLoginCredentialsEntity(
+    private fun WebsiteLoginCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
+        val encryptedData = encryptData(password)
+        return WebsiteLoginCredentialsEntity(
             id = details.id ?: 0,
             domain = details.domain,
             username = details.username,
-            password = password
+            password = encryptedData?.data,
+            iv = encryptedData?.iv
         )
+    }
 
     private fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginCredentials =
         WebsiteLoginCredentials(
             details = toDetails(),
-            password = password
+            password = decryptData(password, iv)
         )
 
     private fun WebsiteLoginCredentialsEntity.toDetails(): WebsiteLoginDetails =
@@ -133,6 +136,35 @@ class RealSecureStorage @Inject constructor(
             username = username,
             id = id
         )
+
+    private fun encryptData(data: String?): EncryptedString? {
+        // only encrypt when there's data
+        return data?.let {
+            encryptionHelper.encrypt(
+                it,
+                secureStorageKeyManager.l2Key
+            )
+        }
+    }
+
+    private fun decryptData(
+        data: String?,
+        iv: String?
+    ): String? {
+        // only decrypt when there's data and iv
+        return data?.let { _data ->
+            iv?.let { _iv ->
+                encryptionHelper.decrypt(
+                    EncryptedString(
+                        data = _data,
+                        iv = _iv
+                    ),
+                    secureStorageKeyManager.l2Key
+                )
+
+            }
+        }
+    }
 
     companion object {
         private const val DEFAULT_EXPIRY_IN_MILLIS = 30 * 60 * 1000

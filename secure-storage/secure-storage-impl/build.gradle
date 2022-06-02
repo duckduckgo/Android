@@ -32,6 +32,7 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation Google.dagger
     implementation KotlinX.coroutines.core
+    implementation Square.okio
 
     implementation "net.zetetic:android-database-sqlcipher:_"
 }
