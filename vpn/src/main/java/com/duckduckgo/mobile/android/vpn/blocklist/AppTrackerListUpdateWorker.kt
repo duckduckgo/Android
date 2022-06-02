@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 
 import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
@@ -125,7 +126,10 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
 ) : DefaultLifecycleObserver {
