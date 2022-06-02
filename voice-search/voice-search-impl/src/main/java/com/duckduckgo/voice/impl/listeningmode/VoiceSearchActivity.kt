@@ -83,7 +83,6 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         supportActionBar?.title = ""
     }
 
-    @SuppressLint("NewApi")
     private fun makeBackgroundTransparent() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.S) {
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
