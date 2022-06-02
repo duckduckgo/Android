@@ -68,8 +68,8 @@
         android:layout_marginStart="@dimen/keyline_5"
         android:layout_marginEnd="@dimen/keyline_5"
         android:drawablePadding="@dimen/keyline_2"
-        android:drawableTop="@drawable/ic_beta_pill"
         android:text="@string/atp_daxOnboardingIntroMessage"
+        app:drawableTopCompat="@drawable/ic_beta_pill"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/onboarding_page_title" />

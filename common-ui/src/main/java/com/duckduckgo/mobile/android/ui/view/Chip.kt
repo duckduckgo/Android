@@ -18,15 +18,15 @@ package com.duckduckgo.mobile.android.ui.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.AppCompatTextView
 
 class Chip @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : TextView(context, attrs, defStyleAttr) {
+) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     fun setChipText(@StringRes textResource: Int) {
         setText(textResource)
