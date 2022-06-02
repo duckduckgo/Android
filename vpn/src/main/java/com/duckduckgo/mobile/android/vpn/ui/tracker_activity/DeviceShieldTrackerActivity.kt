@@ -142,7 +142,6 @@ class DeviceShieldTrackerActivity :
         binding.ctaShowAll.setOnClickListener {
             viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.LaunchMostRecentActivity)
         }
-
     }
 
     override fun onActivityResult(
@@ -302,6 +301,16 @@ class DeviceShieldTrackerActivity :
         openVPNSettings()
     }
 
+    override fun onPromoteAlwaysOnGoToVPNSettings() {
+        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
+    }
+
+    private fun openVPNSettings() {
+        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+    }
+
     override fun onVpnConflictDialogContinue() {
         deviceShieldPixels.didChooseToContinueFromVpnConflictDialog()
         checkVPNPermission()
@@ -313,16 +322,6 @@ class DeviceShieldTrackerActivity :
 
     override fun onRemoveFeature() {
         viewModel.removeFeature()
-    }
-
-    override fun onPromoteAlwaysOnGoToVPNSettings() {
-        viewModel.onViewEvent(DeviceShieldTrackerActivityViewModel.ViewEvent.PromoteAlwaysOnOpenSettings)
-    }
-
-    private fun openVPNSettings() {
-        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
     }
 
     override fun onPromoteAlwaysOnRemindLater() {
@@ -344,7 +343,6 @@ class DeviceShieldTrackerActivity :
         when (val permissionStatus = checkVpnPermissionStatus()) {
             is VpnPermissionStatus.Granted -> {
                 viewModel.onViewEvent(StartVpn)
-                // viewModel.onVPNPermissionResult(RESULT_OK)
             }
             is VpnPermissionStatus.Denied -> {
                 viewModel.onVPNPermissionNeeded(permissionStatus.intent)

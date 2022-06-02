@@ -49,6 +49,7 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
@@ -59,6 +60,7 @@ import com.duckduckgo.app.browser.applinks.AppLinksHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource
 import com.duckduckgo.app.browser.favorites.FavoritesQuickAccessAdapter.QuickAccessFavorite
+import com.duckduckgo.app.browser.history.NavigationHistoryEntry
 import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
@@ -690,13 +692,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenEmptyInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
     fun whenBlankInputQueryThenQueryNavigateCommandNotSubmittedToActivity() {
         testee.onUserSubmittedQuery("     ")
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Navigate>()
     }
 
     @Test
@@ -1683,7 +1685,7 @@ class BrowserTabViewModelTest {
     fun whenUserSelectsToShareLinkWithNullUrlThenShareLinkCommandNotSent() {
         loadUrl(null)
         testee.onShareSelected()
-        verify(mockCommandObserver, never()).onChanged(any())
+        assertCommandNotIssued<Command.ShareLink>()
     }
 
     @Test
@@ -1970,9 +1972,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenUserRequestedToOpenNewTabThenGenerateWebViewPreviewImage() {
         testee.userRequestedOpeningNewTab()
-        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
-        val command = commandCaptor.firstValue
-        assertTrue(command is Command.GenerateWebViewPreviewImage)
+        assertCommandIssued<Command.GenerateWebViewPreviewImage>()
     }
 
     @Test
@@ -2202,7 +2202,7 @@ class BrowserTabViewModelTest {
         val cta = DaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
         setCta(cta)
         testee.onDaxDialogDismissed()
-        verify(mockCommandObserver, never()).onChanged(commandCaptor.capture())
+        assertCommandNotIssued<Command.DaxCommand.FinishTrackerAnimation>()
     }
 
     @Test
@@ -2512,6 +2512,13 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserBrowsingPressesBackThenCannotPrintPage() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        assertTrue(testee.onUserPressedBack())
+        assertFalse(browserViewState().canPrintPage)
+    }
+
+    @Test
     fun whenUserBrowsingPressesBackThenCanGoForward() {
         setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
         assertTrue(testee.onUserPressedBack())
@@ -2565,6 +2572,14 @@ class BrowserTabViewModelTest {
         testee.onUserPressedBack()
         testee.onUserPressedForward()
         assertTrue(browserViewState().canFindInPage)
+    }
+
+    @Test
+    fun whenUserBrowsingPressesBackAndForwardThenCanPrint() {
+        setupNavigation(skipHome = false, isBrowsing = true, canGoBack = false)
+        testee.onUserPressedBack()
+        testee.onUserPressedForward()
+        assertTrue(browserViewState().canPrintPage)
     }
 
     @Test
@@ -3438,6 +3453,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenEmailSignOutEventThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(false)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
+    fun whenEmailIsSignedInThenEmailSignEventCommandSent() = runTest {
+        emailStateFlow.emit(true)
+
+        assertCommandIssued<Command.EmailSignEvent>()
+    }
+
+    @Test
     fun whenConsumeAliasThenInjectAddressCommandSent() {
         whenever(mockEmailManager.getAlias()).thenReturn("alias")
 
@@ -3595,6 +3624,21 @@ class BrowserTabViewModelTest {
         testee.onUserSubmittedQuery("foo")
         verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
         assertCommandIssued<Navigate>()
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageThenPrintLinkCommandSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        val command = captureCommands().value as Command.PrintLink
+        assertEquals("foo.com", command.url)
+    }
+
+    @Test
+    fun whenUserSelectsToPrintPageThenPixelIsSent() {
+        loadUrl("foo.com")
+        testee.onPrintSelected()
+        verify(mockPixel).fire(AppPixelName.MENU_ACTION_PRINT_PRESSED)
     }
 
     @Test
@@ -4024,6 +4068,55 @@ class BrowserTabViewModelTest {
         loadUrl(url = "www.example.com", isBrowserShowing = true)
         assertFalse(testee.linkOpenedInNewTab())
     }
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserNotShowingThenShowHistoryCommandNotSent() {
+        setBrowserShowing(false)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnEmptyStackBrowserShowingThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 0)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnSingleStackEntryThenShowHistoryCommandNotSent() {
+        buildNavigationHistoryStack(stackSize = 1)
+        testee.onUserLongPressedBack()
+        assertCommandNotIssued<ShowBackNavigationHistory>()
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMultipleEntriesThenShowHistoryCommandSent() {
+        buildNavigationHistoryStack(stackSize = 10)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 9)
+    }
+
+    @Test
+    fun whenUserLongPressedBackOnStackWithMoreThanTenEntriesThenTruncatedToMostRecentOnly() {
+        buildNavigationHistoryStack(stackSize = 20)
+        testee.onUserLongPressedBack()
+        assertShowHistoryCommandSent(expectedStackSize = 10)
+    }
+
+    private fun assertShowHistoryCommandSent(expectedStackSize: Int) {
+        assertCommandIssued<ShowBackNavigationHistory> {
+            assertEquals(expectedStackSize, history.size)
+        }
+    }
+
+    private fun buildNavigationHistoryStack(stackSize: Int) {
+        val history = mutableListOf<NavigationHistoryEntry>()
+        for (i in 0 until stackSize) {
+            history.add(NavigationHistoryEntry(url = "$i.example.com"))
+        }
+
+        testee.navigationStateChanged(buildWebNavigation(navigationHistory = history))
+    }
 
     private fun givenUrlCanUseGpc() {
         whenever(mockFeatureToggle.isFeatureEnabled(any(), any())).thenReturn(true)
@@ -4237,7 +4330,8 @@ class BrowserTabViewModelTest {
         canGoForward: Boolean = false,
         canGoBack: Boolean = false,
         stepsToPreviousPage: Int = 0,
-        progress: Int? = null
+        progress: Int? = null,
+        navigationHistory: List<NavigationHistoryEntry> = emptyList()
     ): WebNavigationState {
         val nav: WebNavigationState = mock()
         whenever(nav.originalUrl).thenReturn(originalUrl)
@@ -4247,6 +4341,7 @@ class BrowserTabViewModelTest {
         whenever(nav.canGoBack).thenReturn(canGoBack)
         whenever(nav.stepsToPreviousPage).thenReturn(stepsToPreviousPage)
         whenever(nav.progress).thenReturn(progress)
+        whenever(nav.navigationHistory).thenReturn(navigationHistory)
         return nav
     }
 

@@ -17,9 +17,8 @@
 package com.duckduckgo.app.statistics
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -42,10 +41,9 @@ class AtbInitializer(
     private val statisticsDataStore: StatisticsDataStore,
     private val statisticsUpdater: StatisticsUpdater,
     private val listeners: Set<AtbInitializerListener>
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun initializeOnResume() {
+    override fun onResume(owner: LifecycleOwner) {
         appCoroutineScope.launch { initialize() }
     }
 

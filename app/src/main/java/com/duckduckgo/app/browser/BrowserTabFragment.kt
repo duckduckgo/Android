@@ -149,6 +149,8 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
@@ -157,6 +159,8 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
+import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
@@ -165,8 +169,11 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.history.NavigationHistorySheet
+import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -305,6 +312,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var printInjector: PrintInjector
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -865,6 +875,12 @@ class BrowserTabFragment :
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
             }
+            is ShowBackNavigationHistory -> showBackNavigationHistory(it)
+            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
+            is Command.EmailSignEvent -> {
+                notifyEmailSignEvent()
+            }
+            is Command.PrintLink -> launchPrint(it.url)
         }
     }
 
@@ -891,6 +907,12 @@ class BrowserTabFragment :
     private fun injectEmailAddress(alias: String) {
         webView?.let {
             emailInjector.injectAddressInEmailField(it, alias, it.url)
+        }
+    }
+
+    private fun notifyEmailSignEvent() {
+        webView?.let {
+            emailInjector.notifyWebAppSignEvent(it, it.url)
         }
     }
 
@@ -1482,6 +1504,7 @@ class BrowserTabFragment :
             loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
+            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
         }
 
         if (appBuildConfig.isDebug) {
@@ -1984,6 +2007,34 @@ class BrowserTabFragment :
         viewModel.onUserClickCtaSecondaryButton()
     }
 
+    private fun showBackNavigationHistory(history: ShowBackNavigationHistory) {
+        activity?.let { context ->
+            NavigationHistorySheet(
+                context, viewLifecycleOwner, faviconManager, tabId, history,
+                object : NavigationHistorySheetListener {
+                    override fun historicalPageSelected(stackIndex: Int) {
+                        viewModel.historicalPageSelected(stackIndex)
+                    }
+                }
+            ).show()
+        }
+    }
+
+    private fun navigateBackHistoryStack(index: Int) {
+        val stepsToMove = (index + 1) * -1
+        webView?.goBackOrForward(stepsToMove)
+    }
+
+    fun onLongPressBackButton() {
+        /*
+         It is possible that this can be invoked before Fragment is attached
+         If viewModelFactory isn't initialized, ignore long press
+         */
+        if (this::viewModelFactory.isInitialized) {
+            viewModel.onUserLongPressedBack()
+        }
+    }
+
     private fun launchHideTipsDialog(
         context: Context,
         cta: Cta
@@ -2148,6 +2199,9 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_NAVIGATE_BACK_PRESSED)
                     activity?.onBackPressed()
                 }
+                onMenuItemLongClicked(view.backMenuItem) {
+                    viewModel.onUserLongPressedBack()
+                }
                 onMenuItemClicked(view.refreshMenuItem) {
                     viewModel.onRefreshRequested()
                     pixel.fire(AppPixelName.MENU_ACTION_REFRESH_PRESSED.pixelName)
@@ -2201,6 +2255,9 @@ class BrowserTabFragment :
                 onMenuItemClicked(view.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()
+                }
+                onMenuItemClicked(view.printPageMenuItem) {
+                    viewModel.onPrintSelected()
                 }
             }
             view.menuScrollableContent.setOnScrollChangeListener { _, _, _, _, _ ->
@@ -2723,6 +2780,18 @@ class BrowserTabFragment :
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Could not open DownloadManager settings")
             toolbar.makeSnackbarWithNoBottomInset(R.string.downloadManagerIncompatible, Snackbar.LENGTH_INDEFINITE).show()
+        }
+    }
+
+    private fun launchPrint(url: String) {
+        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+            webView?.createPrintDocumentAdapter(url)?.let { printAdapter ->
+                printManager.print(
+                    url,
+                    printAdapter,
+                    PrintAttributes.Builder().build()
+                )
+            }
         }
     }
 

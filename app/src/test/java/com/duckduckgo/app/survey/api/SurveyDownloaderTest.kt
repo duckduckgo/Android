@@ -19,6 +19,7 @@ package com.duckduckgo.app.survey.api
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.InstantSchedulersRule
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.NOT_ALLOCATED
@@ -43,8 +44,9 @@ class SurveyDownloaderTest {
     private var mockEmailManager: EmailManager = mock()
     private var mockAtpCohortManager: AtpCohortManager = mock()
     private var mockAtpWaitlistState: AtpWaitlistStateRepository = mock()
+    private var mockVariantManager: VariantManager = mock()
     private var mockCall: Call<SurveyGroup?> = mock()
-    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager, mockAtpWaitlistState)
+    private var testee = SurveyDownloader(mockService, mockDao, mockEmailManager, mockAtpCohortManager, mockAtpWaitlistState, mockVariantManager)
 
     @get:Rule
     @Suppress("unused")
@@ -112,6 +114,37 @@ class SurveyDownloaderTest {
 
         verify(mockService, never()).survey()
         verify(mockDao, never()).insert(any())
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsRetentionStudyControlSurveyAndUserInRetentionStudyThenSurveyScheduled() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPRetentionStudy("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+        whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.NotJoinedQueue)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
+        verify(mockDao).deleteUnusedSurveys()
+    }
+
+    @Test
+    fun whenAppTpSurveyContainsRetentionStudyTreatmentSurveyAndUserInRetentionStudyThenSurveyScheduled() {
+        val mockAppTPCall = mock<Call<SurveyGroup?>>()
+        whenever(mockAppTPCall.execute()).thenReturn(Response.success(surveyWithAllocationForAppTPRetentionStudy("abc")))
+        whenever(mockService.surveyAppTp()).thenReturn(mockAppTPCall)
+        whenever(mockAtpWaitlistState.getState()).thenReturn(WaitlistState.JoinedWaitlist(true))
+        whenever(mockAtpWaitlistState.joinedAfterCuttingDate()).thenReturn(true)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
+
+        testee.download().blockingAwait()
+
+        verify(mockService, never()).survey()
+        verify(mockDao).insert(Survey("abc", SURVEY_URL, 7, SCHEDULED))
         verify(mockDao).deleteUnusedSurveys()
     }
 
@@ -204,37 +237,78 @@ class SurveyDownloaderTest {
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForEmail(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, true, null, null, listOf(SurveyUrlParameter.EmailCohortParam.parameter))
+            SurveyGroup.SurveyOption(
+                SURVEY_URL,
+                -1,
+                1.0,
+                true,
+                null,
+                null,
+                null, listOf(SurveyUrlParameter.EmailCohortParam.parameter)
+            )
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAtp(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, -1, 1.0, null, true, null, listOf(SurveyUrlParameter.AtpCohortParam.parameter))
+            SurveyGroup.SurveyOption(
+                SURVEY_URL,
+                -1, 1.0,
+                null,
+                true,
+                null,
+                null,
+                listOf(SurveyUrlParameter.AtpCohortParam.parameter)
+            )
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyWithAllocationForAppTPWaitlist(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, true, true, emptyList())
+            SurveyGroup.SurveyOption(
+                SURVEY_URL,
+                7,
+                1.0,
+                null,
+                isAtpEverEnabledRequired = true,
+                isAtpWaitlistRequired = true,
+                isAtpRetentionStudyRequired = null,
+                urlParameters = emptyList()
+            )
+        )
+        return SurveyGroup(id, surveyOptions)
+    }
+
+    private fun surveyWithAllocationForAppTPRetentionStudy(id: String): SurveyGroup {
+        val surveyOptions = listOf(
+            SurveyGroup.SurveyOption(
+                SURVEY_URL,
+                7,
+                1.0,
+                null,
+                isAtpEverEnabledRequired = false,
+                isAtpWaitlistRequired = false,
+                isAtpRetentionStudyRequired = true,
+                urlParameters = emptyList()
+            )
         )
         return SurveyGroup(id, surveyOptions)
     }

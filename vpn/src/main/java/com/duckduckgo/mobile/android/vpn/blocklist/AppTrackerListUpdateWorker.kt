@@ -19,7 +19,13 @@ package com.duckduckgo.mobile.android.vpn.blocklist
 import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ListenableWorker
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -68,6 +74,7 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
                 }
 
                 Timber.d("Updating the app tracker blocklist, eTag: ${blocklist.etag.value}")
+
                 vpnDatabase
                     .vpnAppTrackerBlockingDao()
                     .updateTrackerBlocklist(

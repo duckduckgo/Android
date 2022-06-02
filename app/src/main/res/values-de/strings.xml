@@ -14,7 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName" translatable="false">DuckDuckGo</string>
@@ -107,6 +106,7 @@
     <string name="closeTab">Alle tab</string>
     <string name="tabClosed">Tab geschlossen</string>
     <string name="tabClosedUndo">Rückgängig machen</string>
+    <string name="downloadsMenuItemTitle">Downloads</string>
 
     <!-- Privacy Dashboard Activities -->
     <string name="privacyProtectionToggle">Datenschutz der Website</string>
@@ -265,6 +265,7 @@
     <string name="delete">Löschen</string>
     <string name="edit">Bearbeiten</string>
     <string name="remove">Entfernen</string>
+    <string name="removeAll">Alle entfernen</string>
 
     <!-- Widget -->
     <string name="searchWidgetTextHint">Mit DuckDuckGo suchen</string>
@@ -290,7 +291,7 @@
 
     <!-- User Survey -->
     <string name="surveyCtaTitle">Hilf uns bei der Verbesserung der App!</string>
-    <string name="surveyCtaDescription">Nimm an unserer kurzen, anonymen Umfrage teil und gib uns dein Feedback.</string>
+    <string name="surveyCtaDescription">Nimm an unserer kurzen Umfrage teil und gib uns dein Feedback.</string>
     <string name="surveyCtaLaunchButton">An der Umfrage teilnehmen</string>
     <string name="surveyCtaDismissButton">Nein, danke</string>
     <string name="surveyActivityTitle">Benutzerumfrage</string>
@@ -460,12 +461,12 @@
     <string name="hideTipsButton">Tipps für immer ausblenden</string>
 
     <!-- New Onboarding Experience -->
-    <string name="onboardingWelcomeTitle">"Willkommen bei DuckDuckGo!"</string>
-    <string name="onboardingDaxText"><![CDATA[Das Internet kann ein bisschen gruselig sein.<br/><br/>Keine Sorge! Privat zu suchen und zu browsen ist einfacher, als du denkst.]]></string>
+    <string name="onboardingWelcomeTitle">"WILLKOMMEN BEI DUCKDUCKGO!"</string>
+    <string name="onboardingDaxText"><![CDATA[Das Internet kann ein bisschen gruselig sein.<br/><br/>Keine Sorge! Privat zu suchen und zu surfen ist einfacher als Sie denken.]]></string>
     <string name="onboardingLetsDoItButton">Fangen wir an!</string>
-    <string name="daxIntroCtaText"><![CDATA[Versuche als Nächstes, eine deiner Lieblingsseiten zu besuchen.<br/><br/>Ich blockiere Tracker, damit sie dich nicht ausspionieren können. Ich werde auch die Sicherheit deiner Verbindung verbessern, wenn das möglich ist. 🔒]]></string>
+    <string name="daxIntroCtaText"><![CDATA[Versuchen Sie als nächstes, eine Ihrer Lieblingsseiten zu besuchen! <br/><br/>Ich blockiere Tracker, damit sie Sie nicht ausspionieren können. Ich werde auch die Sicherheit Ihrer Verbindung verbessern, wenn das möglich ist. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Gut gemacht!<br/><br/>Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Werbung ihren Schrecken. 👍]]></string>
-    <string name="daxSerpCtaText">Deine DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals deinen Suchverlauf. Nie. 🙌</string>
+    <string name="daxSerpCtaText">Deine DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals deinen Suchverlauf. Unter keinen Umständen. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
         <item quantity="other"><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
@@ -474,12 +475,12 @@
         <item quantity="one"><![CDATA[ hat versucht, dich hier zu tracken. <br/><br/>Ich habe das blockiert!<br/><br/> ☝️Du kannst in der URL-Leiste überprüfen, wer versucht, dich zu tracken, wenn du eine neue Website besuchst.]]></item>
         <item quantity="other"><![CDATA[ haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der URL-Leiste überprüfen, wer versucht, dich zu tracken, wenn du eine neue Website besuchst.]]></item>
     </plurals>
-    <string name="daxNonSerpCtaText"><![CDATA[Während du tippst und scrollst, blockiere ich lästige Tracker. <br/><br/>Auf geht\'s – browse weiter!]]></string>
+    <string name="daxNonSerpCtaText"><![CDATA[Während Sie antippen und scrollen, blockiere ich lästige Tracker. <br/><br/>Auf geht\'s! — Surfen Sie weiter!]]></string>
     <string name="daxMainNetworkCtaText">Warnung! Ich kann nicht verhindern, dass für %1$s deine Aktivität auf %2$s sichtbar ist.&lt;br/&gt;&lt;br/&gt;Du kannst aber mit mir browsen, wenn ich dafür sorgen soll, dass %3$s insgesamt weniger über dich erfährt – indem ich die entsprechenden Tracker auf vielen anderen Websites blockiere.</string>
-    <string name="daxMainNetworkOwnedCtaText">Warnung! Da sich %2$s im Eigentum von %1$s befindet, kann ich nicht verhindern, dass es deine Aktivitäten hier angezeigt bekommt.&lt;br/&gt;&lt;br/&gt;Du kannst aber mit mir browsen, wenn ich dafür sorgen soll, dass %3$s insgesamt weniger über dich erfährt – indem ich die entsprechende Tracker auf vielen anderen Websites blockiere.</string>
+    <string name="daxMainNetworkOwnedCtaText">Warnung! Da sich %2$s im Eigentum von %1$s befindet, kann ich nicht verhindern, dass es deine Aktivitäten hier angezeigt bekommt.&lt;br/&gt;&lt;br/&gt;Du kannst aber mit mir browsen, wenn ich dafür sorgen soll, dass %3$s insgesamt weniger über dich erfährt – indem ich die entsprechende Tracker auf vielen anderen Websites blockiere.</string>
 
     <!-- Download Confirmation -->
-    <string name="downloadConfirmationContinue">Fortsetzen</string>
+    <string name="downloadConfirmationContinue">In Downloads speichern</string>
     <string name="downloadConfirmationSaveFileTitle">Speichern %1$s</string>
     <string name="downloadConfirmationKeepBothFilesText">Beide behalten</string>
     <string name="downloadConfirmationReplaceOldFileText">Ersetzen</string>
@@ -522,7 +523,7 @@
     <string name="fireproofWebsitesActivityTitle">Feuerfeste Seiten</string>
     <string name="settingsFireproofWebsites">Feuerfeste Seiten</string>
     <string name="fireproofWebsiteMenuTitleAdd">Diese Website feuerfest machen</string>
-    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ist jetzt feuerfest!</string>
+    <string name="fireproofWebsiteSnackbarConfirmation">&lt;b&gt;%1$s&lt;/b&gt; ist jetzt feuerfest</string>
     <string name="fireproofWebsiteSnackbarAction">Rückgängig machen</string>
     <string name="fireproofWebsiteDeleteConfirmMessage">Möchten Sie &lt;b&gt;%1$s&lt;/b&gt; wirklich löschen?</string>
     <string name="fireproofWebsiteFeatureDescription">Websites sorgen mit Cookies dafür, dass du angemeldet bleibst. Wenn du eine Website feuerfest machst, werden Cookies nicht gelöscht und du bleibst angemeldet – auch nach Verwendung der Schaltfläche „Feuer“. Wir blockieren weiterhin auf feuerfest gemachten Websites gefundene Tracker von Dritten.</string>
@@ -532,6 +533,10 @@
     <string name="fireproofWebsiteLoginDialogPositive">Feuerfest machen</string>
     <string name="fireproofWebsiteLoginDialogNegative">Jetzt nicht</string>
     <string name="fireproofWebsiteItemsSectionTitle">Feuerfeste Seiten</string>
+    <string name="fireproofWebsiteEmptyListHint">Noch keine feuerfesten Seiten</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Websites bei der Anmeldung feuerfest machen</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Feuerfestigkeit für alle Seiten entfernt</string>
+    <string name="fireproofWebsiteRemovalConfirmation">Feuerfest-Einstellung für &lt;b&gt;%1$s&lt;/b&gt; deaktiviert</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Jedes Mal fragen</string>
     <string name="fireproofWebsiteSettingsSelectionDialogAlways">Immer</string>
     <string name="fireproofWebsiteSettingsSelectionDialogNever">Nie</string>
@@ -539,7 +544,12 @@
     <string name="disableLoginDetectionDialogDescription">Diese Auswahl kann in den Einstellungen jederzeit rückgängig gemacht werden.</string>
     <string name="disableLoginDetectionDialogPositive">DEAKTIVIEREN</string>
     <string name="disableLoginDetectionDialogNegative">ABBRECHEN</string>
-    <string name="fireproofWebsiteRemovalConfirmation">Feuerfest-Einstellung für &lt;b&gt;%1$s&lt;/b&gt; deaktiviert</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Websites bei der Anmeldung automatisch feuerfest machen?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Wenn du Websites feuerfest machst, bleibst du nach Verwendung der Schaltfläche „Feuer“ angemeldet. Du kannst dies jederzeit in den Einstellungen ändern. </string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Immer feuerfest machen</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Diese Website feuerfest machen</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Jetzt nicht</string>
+
 
     <!-- Fire Animation settings -->
     <string name="settingsFireAnimation">Animation der Schaltfläche „Feuer“</string>
@@ -644,16 +654,16 @@
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">E-Mail-Datenschutz, vereinfacht.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoin"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen, ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Screen 2 -->
     <string name="emailProtectionStatusTitleJoined">Du stehst jetzt auf der Warteliste.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=\"\"><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=\"\"><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Du erhältst eine Benachrichtigung,<br/> wenn du die E-Mail-Schutzfunktion testen kannst. <a href=""><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Deine Einladung wird hier angezeigt, wenn es soweit ist. Möchtest du <a href=""><b>eine Benachrichtigung erhalten</b></a>, wenn die Einladung eintrifft?<a href=""><b>Mehr erfahren</b></a> über den E-Mail-Schutz.]]></string>
 
     <!-- Screen 3 -->
     <string name="emailProtectionStatusTitleInBeta">Du hast eine Einladung erhalten!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=\"\"><b>Mehr erfahren</b></a>.]]></string>
+    <string name="emailProtectionDescriptionInBeta"><![CDATA[E-Mail-Tracker blockieren und deine Adresse verbergen,<br/>ohne den E-Mail-Anbieter zu wechseln.<br/><a href=""><b>Mehr erfahren</b></a>.]]></string>
 
     <!-- Email Protection Sign Out -->
     <string name="emailProtectionSignOutTitle">Persönliche Duck-Adresse</string>
@@ -698,4 +708,29 @@
     <!-- Home Screen Widget -->
     <string name="homeScreenWidgetAdded">Widget „%1$s“ zum Startbildschirm hinzugefügt</string>
     <string name="settingsAddHomeScreenWidget">Widget für Startbildschirm</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Privat browsen mit unserer App für Mac</string>
+    <string name="macos_settings_description_list">Du stehst jetzt auf der Warteliste.</string>
+    <string name="macos_settings_description_ready">Verfügbar zum Herunterladen auf Mac</string>
+    <string name="macos_settings_title">DuckDuckGo-Desktop-App</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Downloads</string>
+    <string name="downloadsActivityTitle">Downloads</string>
+    <string name="downloadsActivityNoItemsDescription">Noch keine Dateien heruntergeladen</string>
+    <string name="downloadsShareTitle">Teilen mit …</string>
+    <string name="downloadsDownloadFinishedActionName">Öffnen</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Datei kann nicht geöffnet werden. Nach einer kompatiblen App suchen.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Datei existiert nicht mehr</string>
+    <string name="downloadsItemMenuShare">Teilen</string>
+    <string name="downloadsItemMenuDelete">Löschen</string>
+    <string name="downloadsItemMenuCancel">Abbrechen</string>
+    <string name="downloadsActivityMenuDeleteAll">Alle löschen</string>
+    <string name="downloadsFileDeletedMessage">%1$s gelöscht</string>
+    <string name="downloadsAllFilesDeletedMessage">Alle Dateien gelöscht</string>
+    <string name="downloadsMoreOptionsContentDescription">Mehr Optionen für %1$s</string>
+    <string name="downloadsUndoActionName">Rückgängig machen</string>
+    <string name="downloadsStateInProgress">In Bearbeitung …</string>
+
 </resources>

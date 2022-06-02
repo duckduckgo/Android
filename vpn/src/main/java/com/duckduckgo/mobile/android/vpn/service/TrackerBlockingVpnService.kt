@@ -51,14 +51,12 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.net.Inet4Address
 import java.net.InetAddress
-import java.nio.channels.DatagramChannel
-import java.nio.channels.SocketChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @InjectWith(VpnScope::class)
-class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), NetworkChannelCreator {
+class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var vpnPreferences: VpnPreferences
@@ -147,8 +145,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         super.onCreate()
         AndroidInjection.inject(this)
 
-        udpPacketProcessor = udpPacketProcessorFactory.build(this)
-        tcpPacketProcessor = tcpPacketProcessorFactory.build(this, this)
+        udpPacketProcessor = udpPacketProcessorFactory.build()
+        tcpPacketProcessor = tcpPacketProcessorFactory.build(this)
 
         Timber.e("VPN log onCreate")
     }
@@ -505,6 +503,9 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
 
             for (service in manager.getRunningServices(Int.MAX_VALUE)) {
                 if (TrackerBlockingVpnService::class.java.name == service.service.className) {
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {
+                        return service.started
+                    }
                     return true
                 }
             }
@@ -567,23 +568,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         private const val ACTION_ALWAYS_ON_START = "android.net.VpnService"
     }
 
-    override fun createDatagramChannel(): DatagramChannel {
-        return DatagramChannel.open().also { channel ->
-            channel.configureBlocking(false)
-            channel.socket().let { socket ->
-                protect(socket)
-                socket.broadcast = true
-            }
-        }
-    }
-
-    override fun createSocketChannel(): SocketChannel {
-        return SocketChannel.open().also { channel ->
-            channel.configureBlocking(false)
-            protect(channel.socket())
-        }
-    }
-
     private val INCLUDED_APPS_FOR_TESTING = listOf(
         "com.duckduckgo.networkrequestor",
         "com.cdrussell.networkrequestor",
@@ -595,9 +579,4 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), N
         "com.philips.lighting.hue2",
         "com.duckduckgo.mobile.android.debug"
     )
-}
-
-interface NetworkChannelCreator {
-    fun createDatagramChannel(): DatagramChannel
-    fun createSocketChannel(): SocketChannel
 }

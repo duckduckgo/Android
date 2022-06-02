@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackingSignal
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,7 @@ constructor(
     private val statsRepository: AppTrackerBlockingStatsRepository,
     private val excludedAppsRepository: TrackingProtectionAppsRepository,
     private val timeDiffFormatter: TimeDiffFormatter,
+    private val deviceShieldPixels: DeviceShieldPixels,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -137,9 +139,11 @@ constructor(
         viewModelScope.launch {
             withContext(dispatchers.io()) {
                 if (checked) {
+                    deviceShieldPixels.didEnableAppProtectionFromDetail()
                     excludedAppsRepository.manuallyEnabledApp(packageName)
                 } else {
-                    excludedAppsRepository.manuallyExcludedApp(packageName)
+                    deviceShieldPixels.didDisableAppProtectionFromDetail()
+                    excludedAppsRepository.manuallyExcludeApp(packageName)
                 }
             }
             command.send(Command.RestartVpn)

@@ -29,7 +29,7 @@ import timber.log.Timber;
 
 public class TCB {
     public final long creationTime;
-    public String ipAndPort;
+    public final String ipAndPort;
 
     public long sequenceNumberToClient, sequenceNumberToClientInitial;
     public long sequenceNumberToServer, sequenceNumberToServerInitial;
@@ -66,9 +66,9 @@ public class TCB {
         TIME_WAIT
     }
 
-    public Packet referencePacket;
+    public final Packet referencePacket;
 
-    public SocketChannel channel;
+    public final SocketChannel channel;
     public boolean waitingForNetworkData;
     public SelectionKey selectionKey;
 
@@ -84,6 +84,7 @@ public class TCB {
                                 evicted.closeChannel();
                             });
 
+    @Nullable
     public static TCB getTCB(String ipAndPort) {
         synchronized (tcbCache) {
             return tcbCache.get(ipAndPort);
@@ -131,13 +132,13 @@ public class TCB {
         this.creationTime = System.nanoTime();
     }
 
-    public static void closeTCB(TCB tcb) {
-        tcb.closeChannel();
+    public void close() {
+        this.closeChannel();
         synchronized (tcbCache) {
-            tcbCache.remove(tcb.ipAndPort);
+            tcbCache.remove(this.ipAndPort);
             Timber.v(
                     "Closed %s. There are now %d connections in the TCB cache",
-                    tcb.ipAndPort, tcbCache.size());
+                    this.ipAndPort, tcbCache.size());
         }
     }
 

@@ -22,14 +22,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.webkit.WebSettings
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserWebViewClient
 import com.duckduckgo.app.browser.databinding.ActivityEmailWebviewBinding
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.email.EmailInjector
+import com.duckduckgo.app.email.ui.EmailWebViewViewModel.Command
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -44,6 +50,7 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var emailInjector: EmailInjector
 
+    private val viewModel: EmailWebViewViewModel by bindViewModel()
     private val binding: ActivityEmailWebviewBinding by viewBinding()
 
     private val toolbar
@@ -79,6 +86,18 @@ class EmailWebViewActivity : DuckDuckGoActivity() {
 
         url?.let {
             binding.simpleWebview.loadUrl(it)
+        }
+
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach { processCommand(it) }.launchIn(lifecycleScope)
+    }
+
+    fun processCommand(command: Command) {
+        when (command) {
+            is Command.EmailSignEvent -> {
+                binding.simpleWebview.let {
+                    emailInjector.notifyWebAppSignEvent(it, it.url)
+                }
+            }
         }
     }
 

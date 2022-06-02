@@ -16,7 +16,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/settingsSectionPrivacy"
+    android:id="@+id/settingsSectionMore"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -42,7 +42,7 @@
         app:pillTitle="@string/settingsEmailProtectionTitle" />
 
     <com.duckduckgo.app.settings.SettingsPillWithSubtitle
-        android:id="@+id/deviceShieldSetting"
+        android:id="@+id/vpnSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/deviceShieldSetting"
+        app:layout_constraintTop_toBottomOf="@id/vpnSetting"
         app:pillDrawable="@drawable/ic_beta_pill"
         app:pillSubtitle="@string/macos_settings_description"
         app:pillTitle="@string/macos_settings_title" />

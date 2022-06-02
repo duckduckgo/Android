@@ -16,8 +16,10 @@
 
 package com.duckduckgo.mobile.android.vpn.processor.tcp
 
+import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.di.TcpNetworkSelector
+import com.duckduckgo.mobile.android.vpn.processor.*
 import com.duckduckgo.mobile.android.vpn.processor.tcp.ConnectionInitializer.TcpConnectionParams
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpPacketProcessor.PendingWriteData
 import com.duckduckgo.mobile.android.vpn.service.VpnMemoryCollectorPlugin
@@ -30,10 +32,10 @@ import xyz.hexene.localvpn.ByteBufferPool
 import xyz.hexene.localvpn.Packet
 import xyz.hexene.localvpn.TCB
 import java.nio.ByteBuffer
+import java.nio.channels.ByteChannel
 import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
-import java.nio.channels.SocketChannel
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -59,11 +61,21 @@ interface TcpSocketWriter {
 )
 class RealTcpSocketWriter @Inject constructor(
     @TcpNetworkSelector private val selector: Selector,
-    private val queues: VpnQueues
+    private val queues: VpnQueues,
+    interceptorPlugins: PluginPoint<VpnPacketInterceptor>,
 ) : TcpSocketWriter, VpnMemoryCollectorPlugin {
 
     // added an initial capacity based on what I observed from the low memory pixels we send
     private val writeQueue = ConcurrentHashMap<TCB, Deque<PendingWriteData>>(10)
+    private val interceptors = interceptorPlugins.getPlugins().toMutableList().apply {
+        add(
+            VpnPacketInterceptor { chain ->
+                val request = chain.request()
+                Timber.v("Proceed with packet request ${request.packetInfo}")
+                request.byteChannel.safeWrite(request.byteBuffer)
+            }
+        )
+    }.toList()
 
     override fun addToWriteQueue(
         pendingWriteData: PendingWriteData,
@@ -98,6 +110,8 @@ class RealTcpSocketWriter @Inject constructor(
 
     @Synchronized
     override fun writeToSocket(tcb: TCB) {
+        check(interceptors.isNotEmpty())
+
         val writeQueue = tcb.writeQueue()
 
         do {
@@ -115,7 +129,13 @@ class RealTcpSocketWriter @Inject constructor(
             val socket = writeData.socket
             val connectionParams = writeData.connectionParams
 
-            val bytesWritten = socket.safeWrite(payloadBuffer)
+            val packetRequest = PacketRequest(
+                packetInfo = tcb.referencePacket.toPacketInfo(),
+                byteBuffer = payloadBuffer,
+                byteChannel = socket
+            )
+            val chain = RealPacketInterceptorChain(interceptors, 0, packetRequest)
+            val bytesWritten: Int = chain.proceed(packetRequest)
 
             if (payloadBuffer.remaining() == 0) {
                 Timber.v("Fully wrote %d bytes for %s", payloadSize, getLogLabel(tcb))
@@ -132,7 +152,7 @@ class RealTcpSocketWriter @Inject constructor(
         tcb.channel.register(selector, OP_READ, tcb)
     }
 
-    private fun SocketChannel.safeWrite(src: ByteBuffer): Int {
+    private fun ByteChannel.safeWrite(src: ByteBuffer): Int {
         return kotlin.runCatching {
             this.write(src)
         }.getOrElse {
@@ -199,6 +219,15 @@ class RealTcpSocketWriter @Inject constructor(
         return mutableMapOf<String, String>().apply {
             this["tcpWriteQueueSize"] = writeQueueSize.toString()
         }
+    }
+
+    private fun Packet.toPacketInfo(): PacketInfo {
+        return PacketInfo(
+            IPVersion = ipHeader.version,
+            transportProtocol = ipHeader.protocol.number,
+            destinationAddress = ipHeader.sourceAddress,
+            destinationPort = tcpHeader.sourcePort
+        )
     }
 
     private fun removeEvictedTCBs() {
