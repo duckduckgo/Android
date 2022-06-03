@@ -31,10 +31,12 @@ import com.squareup.anvil.compiler.internal.reference.ClassReference
 import com.squareup.anvil.compiler.internal.reference.asClassName
 import com.squareup.anvil.compiler.internal.reference.classAndInnerClassReferences
 import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
@@ -77,7 +79,8 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
         val dependencies = vmClass.properties
             .filter { it.isAnnotatedWith(Inject::class.fqName) }
             .map {
-                PropertySpec.builder(it.name, it.type().asTypeName())
+                PropertySpec
+                    .builder(it.name, ClassName("javax.inject", "Provider").parameterizedBy(it.type().asTypeName()))
                     .addModifiers(KModifier.PRIVATE)
                     .build()
             }.toTypedArray()
@@ -130,7 +133,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
     }
 
     private fun PropertySpec.generateDependencyAssignmentString(): String {
-        return "worker.$name = $name"
+        return "worker.$name = $name.get()"
     }
 
     private fun TypeSpec.Builder.primaryConstructor(properties: Array<PropertySpec>): TypeSpec.Builder {
