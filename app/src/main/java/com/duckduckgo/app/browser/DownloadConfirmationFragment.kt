@@ -22,19 +22,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.downloads.impl.FilenameExtractor
-import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.impl.isDataUrl
+import com.duckduckgo.app.browser.databinding.DownloadConfirmationBinding
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.FilenameExtractor
+import com.duckduckgo.downloads.impl.isDataUrl
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.download_confirmation.view.*
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DownloadConfirmationFragment : BottomSheetDialogFragment() {
+
+    private val binding: DownloadConfirmationBinding by viewBinding()
 
     val listener: DownloadConfirmationDialogListener
         get() = parentFragment as DownloadConfirmationDialogListener
@@ -57,11 +60,10 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.download_confirmation, container, false)
+    ): View {
         setupDownload()
-        setupViews(view)
-        return view
+        setupViews(binding)
+        return binding.root
     }
 
     private fun setupDownload() {
@@ -75,14 +77,14 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun setupViews(view: View) {
+    private fun setupViews(binding: DownloadConfirmationBinding) {
         val fileName = file?.name ?: ""
-        view.downloadMessage.text = fileName
-        view.continueDownload.setOnClickListener {
+        binding.downloadMessage.text = fileName
+        binding.continueDownload.setOnClickListener {
             listener.continueDownload(pendingDownload)
             dismiss()
         }
-        view.cancel.setOnClickListener {
+        binding.cancel.setOnClickListener {
             Timber.i("Cancelled download for url ${pendingDownload.url}")
             listener.cancelDownload()
             dismiss()

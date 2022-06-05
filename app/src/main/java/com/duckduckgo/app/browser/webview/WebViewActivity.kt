@@ -57,7 +57,6 @@ class WebViewActivity : DuckDuckGoActivity() {
 
         binding.simpleWebview.let {
             it.webViewClient = webViewClient
-
             it.settings.apply {
                 userAgentString = userAgentProvider.userAgent()
                 javaScriptEnabled = true

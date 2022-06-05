@@ -18,16 +18,20 @@ package com.duckduckgo.app.settings
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SettingsFireAnimationSelectorFragmentBinding
+import com.duckduckgo.app.browser.databinding.SettingsThemeSelectorFragmentBinding
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsFireAnimationSelectorFragment : DialogFragment() {
+
+    private val binding by viewBinding(SettingsFireAnimationSelectorFragmentBinding::inflate)
 
     interface Listener {
         fun onFireAnimationSelected(selectedFireAnimation: FireAnimation)
@@ -37,13 +41,11 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
         val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
 
-        val rootView = View.inflate(activity, R.layout.settings_fire_animation_selector_fragment, null)
 
-        updateCurrentSelect(currentOption, rootView.findViewById(R.id.fireAnimationSelectorGroup))
+        updateCurrentSelect(currentOption, binding.fireAnimationSelectorGroup)
 
-        val radioGroup = rootView.findViewById(R.id.fireAnimationSelectorGroup) as RadioGroup
 
-        radioGroup.setOnCheckedChangeListener { group, _ ->
+        binding.fireAnimationSelectorGroup.setOnCheckedChangeListener { group, _ ->
             val fireAnimation = when (group.checkedRadioButtonId) {
                 R.id.fireAnimationFire -> HeroFire
                 R.id.fireAnimationWater -> HeroWater
@@ -58,11 +60,11 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
         }
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setTitle(R.string.settingsSelectFireAnimationDialog)
             .setPositiveButton(R.string.settingsSelectFireAnimationDialogSave) { _, _ ->
                 dialog?.let {
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+                    val selectedOption = when (binding.fireAnimationSelectorGroup.checkedRadioButtonId) {
                         R.id.fireAnimationFire -> HeroFire
                         R.id.fireAnimationWater -> HeroWater
                         R.id.fireAnimationAbstract -> HeroAbstract

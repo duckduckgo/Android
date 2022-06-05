@@ -21,11 +21,16 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
+import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionManuallyDisableAppBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ManuallyDisableAppProtectionDialog : DialogFragment() {
+class ManuallyDisableAppProtectionDialog : DialogFragment(R.layout.dialog_tracking_protection_manually_disable_app) {
+
+
+    private val binding: DialogTrackingProtectionManuallyDisableAppBinding by viewBinding()
 
     interface ManuallyDisableAppProtectionDialogListener {
         fun onAppProtectionDisabled(
@@ -50,21 +55,14 @@ class ManuallyDisableAppProtectionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_manually_disable_app, null)
-
-        val appIcon = rootView.findViewById<ImageView>(R.id.trackingProtectionAppIcon)
-        val reportCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogReport)
-        val skipCTA = rootView.findViewById<Button>(R.id.trackingProtectionExcludeAppDialogSkip)
-
         val alertDialog = MaterialAlertDialogBuilder(requireActivity(), com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog)
-            .setView(rootView)
+            .setView(binding.root)
 
         validateBundleArguments()
         isCancelable = false
 
-        populateAppIcon(appIcon)
-        configureListeners(reportCTA, skipCTA)
+        populateAppIcon(binding.trackingProtectionAppIcon)
+        configureListeners(binding.trackingProtectionExcludeAppDialogReport, binding.trackingProtectionExcludeAppDialogSkip)
 
         return alertDialog.create()
     }

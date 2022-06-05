@@ -26,7 +26,8 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
-
+import com.duckduckgo.mobile.android.databinding.ViewLayoutLabelBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 /**
  * Composite view to show an (optional) leading icon, followed by a text label, followed by a
  * trailing icon.
@@ -42,24 +43,24 @@ constructor(
     defStyleRes: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val leadingImageView: AppCompatImageView
-    private val labelTextView: AppCompatTextView
-    private val trailingImageView: AppCompatImageView
+    private val binding: ViewLayoutLabelBinding by viewBinding()
+
+
 
     private var leadingIcon: Drawable? = null
         set(value) {
             if (value == null) {
-                leadingImageView.visibility = View.GONE
+                binding.labelLeadingImageView.visibility = View.GONE
             } else {
-                leadingImageView.setImageDrawable(value)
-                leadingImageView.visibility = View.VISIBLE
+                binding.labelLeadingImageView.setImageDrawable(value)
+                binding.labelLeadingImageView.visibility = View.VISIBLE
             }
             field = value
         }
 
     private var label: String = ""
         set(value) {
-            labelTextView.text = value
+            binding.labelTextView.text = value
             field = value
         }
 
@@ -74,12 +75,12 @@ constructor(
     init {
         clipToPadding = false
         orientation = HORIZONTAL
-
-        val view = View.inflate(context, R.layout.view_layout_label, this)
-        leadingImageView = view.findViewById(R.id.label_leading_image_view)
-        labelTextView = view.findViewById(R.id.label_text_view)
-        trailingImageView = view.findViewById(R.id.label_trailing_image_view)
-        trailingImageView.setOnClickListener(onLinkClickedListener)
+        //
+        // val view = View.inflate(context, R.layout.view_layout_label, this)
+        // leadingImageView = view.findViewById(R.id.label_leading_image_view)
+        // labelTextView = view.findViewById(R.id.label_text_view)
+        // trailingImageView = view.findViewById(R.id.label_trailing_image_view)
+        binding.labelTrailingImageView.setOnClickListener(onLinkClickedListener)
 
         val a =
             context.theme.obtainStyledAttributes(

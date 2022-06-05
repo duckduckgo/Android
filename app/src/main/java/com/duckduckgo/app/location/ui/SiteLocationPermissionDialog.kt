@@ -28,11 +28,13 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -40,6 +42,8 @@ import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class SiteLocationPermissionDialog : DialogFragment() {
+
+    private val binding by viewBinding(ContentSiteLocationPermissionDialogBinding::inflate)
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -73,9 +77,6 @@ class SiteLocationPermissionDialog : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val binding = ContentSiteLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
-
         val alertDialog = AlertDialog.Builder(requireActivity()).setView(binding.root)
 
         validateBundleArguments()

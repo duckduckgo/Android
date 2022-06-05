@@ -19,11 +19,7 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +28,7 @@ import com.duckduckgo.mobile.android.ui.view.Chip
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ItemApptpCompanyDetailsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -44,7 +41,8 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         parent: ViewGroup,
         viewType: Int
     ): CompanyDetailsViewHolder {
-        return CompanyDetailsViewHolder.create(parent)
+        val binding = ItemApptpCompanyDetailsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CompanyDetailsViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -109,31 +107,17 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         }
     }
 
-    class CompanyDetailsViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    class CompanyDetailsViewHolder(val binding: ItemApptpCompanyDetailsBinding) : RecyclerView.ViewHolder(binding.root) {
         companion object {
             const val TOP_SIGNALS = 5
-            fun create(parent: ViewGroup): CompanyDetailsViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.item_apptp_company_details, parent, false)
-                return CompanyDetailsViewHolder(view)
-            }
         }
-
-        var badgeImage: ImageView = view.findViewById(R.id.tracking_company_icon)
-        var companyName: TextView = view.findViewById(R.id.tracking_company_name)
-        var trackingAttempts: TextView = view.findViewById(R.id.tracking_company_attempts)
-        var showMore: TextView = view.findViewById(R.id.tracking_company_show_more)
-        var topSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_top_signals)
-        var bottomSignalsLayout: LinearLayout = view.findViewById(R.id.tracking_company_bottom_signals)
-        var showLess: TextView = view.findViewById(R.id.tracking_company_show_less)
-
         fun bind(
             companyDetails: AppTPCompanyTrackersViewModel.CompanyTrackingDetails,
             onExpanded: (Boolean) -> Unit
         ) {
-            val badge = badgeIcon(view.context, companyDetails.companyName)
+            val badge = badgeIcon(binding.root.context, companyDetails.companyName)
             if (badge == null) {
-                badgeImage.setImageDrawable(
+                binding.trackingCompanyIcon.setImageDrawable(
                     TextDrawable.builder()
                         .beginConfig()
                         .fontSize(50)
@@ -141,49 +125,51 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
                         .buildRound(companyDetails.companyName.take(1), Color.DKGRAY)
                 )
             } else {
-                badgeImage.setImageResource(badge)
+                binding.trackingCompanyIcon.setImageResource(badge)
             }
 
-            companyName.text = companyDetails.companyDisplayName
-            trackingAttempts.text = view.context.resources.getQuantityString(
+            binding.trackingCompanyName.text = companyDetails.companyDisplayName
+            binding.trackingCompanyAttempts.text = binding.root.context.resources.getQuantityString(
                 R.plurals.atp_CompanyDetailsTrackingAttempts,
                 companyDetails.trackingAttempts, companyDetails.trackingAttempts
             )
 
-            val inflater = LayoutInflater.from(view.context)
-            topSignalsLayout.removeAllViews()
-            bottomSignalsLayout.removeAllViews()
+            val inflater = LayoutInflater.from(binding.root.context)
+            binding.trackingCompanyTopSignals.removeAllViews()
+            binding.trackingCompanyBottomSignals.removeAllViews()
 
             val topSignals = companyDetails.trackingSignals.take(TOP_SIGNALS)
             val bottomSignals = companyDetails.trackingSignals.drop(TOP_SIGNALS)
 
             topSignals.forEach {
-                val topSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, topSignalsLayout, false) as Chip
+                val topSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, binding.trackingCompanyTopSignals, false) as Chip
                 topSignal.setChipText(it.signalDisplayName)
                 topSignal.setChipIcon(it.signalIcon)
-                topSignalsLayout.addView(topSignal)
+                binding.trackingCompanyTopSignals.addView(topSignal)
             }
 
             if (bottomSignals.isNotEmpty()) {
                 bottomSignals.forEach {
-                    val bottomSignal = inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, bottomSignalsLayout, false) as Chip
+                    val bottomSignal =
+                        inflater.inflate(com.duckduckgo.mobile.android.R.layout.view_chip, binding.trackingCompanyBottomSignals, false) as Chip
                     bottomSignal.setChipText(it.signalDisplayName)
                     bottomSignal.setChipIcon(it.signalIcon)
-                    bottomSignalsLayout.addView(bottomSignal)
+                    binding.trackingCompanyBottomSignals.addView(bottomSignal)
                 }
-                showMore.show()
+                binding.trackingCompanyShowMore.show()
             } else {
-                showMore.gone()
+                binding.trackingCompanyShowMore.gone()
             }
 
-            showMore.text = String.format(view.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
-            showMore.setOnClickListener {
-                if (!bottomSignalsLayout.isVisible) {
+            binding.trackingCompanyShowMore.text =
+                String.format(binding.root.context.getString(R.string.atp_CompanyDetailsTrackingShowMore, bottomSignals.size))
+            binding.trackingCompanyShowMore.setOnClickListener {
+                if (!binding.trackingCompanyBottomSignals.isVisible) {
                     showMore()
                     onExpanded.invoke(true)
                 }
             }
-            showLess.setOnClickListener {
+            binding.trackingCompanyShowLess.setOnClickListener {
                 showLess()
                 onExpanded.invoke(false)
             }
@@ -195,15 +181,15 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         }
 
         private fun showMore() {
-            bottomSignalsLayout.show()
-            showMore.gone()
-            showLess.show()
+            binding.trackingCompanyBottomSignals.show()
+            binding.trackingCompanyShowMore.gone()
+            binding.trackingCompanyShowLess.show()
         }
 
         private fun showLess() {
-            bottomSignalsLayout.gone()
-            showMore.show()
-            showLess.gone()
+            binding.trackingCompanyBottomSignals.gone()
+            binding.trackingCompanyShowMore.show()
+            binding.trackingCompanyShowLess.show()
         }
 
         private fun badgeIcon(
@@ -221,3 +207,8 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         }
     }
 }
+
+
+
+
+

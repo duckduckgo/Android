@@ -20,24 +20,24 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.duckduckgo.app.global.extensions.safeGetApplicationIcon
+import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeaders
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityEmptyBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityEntryBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityEntryHeaderBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivitySkeletonEntryBinding
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerFeedItem
-import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
@@ -69,11 +69,11 @@ class TrackerFeedAdapter @Inject constructor(
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        return when (viewType) {
-            LOADING_STATE_TYPE -> TrackerSkeletonViewHolder.create(parent)
-            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder.create(parent)
-            DATA_STATE_TYPE -> TrackerFeedViewHolder.create(parent)
-            else -> TrackerFeedHeaderViewHolder.create(parent, timeDiffFormatter)
+          return when (viewType) {
+            LOADING_STATE_TYPE -> TrackerSkeletonViewHolder(ViewDeviceShieldActivitySkeletonEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder(ViewDeviceShieldActivityEmptyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            DATA_STATE_TYPE -> TrackerFeedViewHolder(ViewDeviceShieldActivityEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            else -> TrackerFeedHeaderViewHolder(ViewDeviceShieldActivityEntryHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),timeDiffFormatter)
         }
     }
 
@@ -108,74 +108,30 @@ class TrackerFeedAdapter @Inject constructor(
         diffResult.dispatchUpdatesTo(this@TrackerFeedAdapter)
     }
 
-    private class TrackerEmptyFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(parent: ViewGroup): TrackerEmptyFeedViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_empty, parent, false)
-                return TrackerEmptyFeedViewHolder(view)
-            }
-        }
-    }
+    private class TrackerEmptyFeedViewHolder(binding: ViewDeviceShieldActivityEmptyBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private class TrackerSkeletonViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(parent: ViewGroup): TrackerSkeletonViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_skeleton_entry, parent, false)
-                return TrackerSkeletonViewHolder(view)
-            }
-        }
-
-        var shimmerLayout: ShimmerFrameLayout = view.findViewById(R.id.shimmerFrameLayout)
-
+    private class TrackerSkeletonViewHolder(val binding: ViewDeviceShieldActivitySkeletonEntryBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind() {
-            shimmerLayout.startShimmer()
+            binding.shimmerFrameLayout.startShimmer()
         }
     }
 
     private class TrackerFeedHeaderViewHolder(
-        val view: TextView,
+        val binding: ViewDeviceShieldActivityEntryHeaderBinding,
         private val timeDiffFormatter: TimeDiffFormatter
-    ) :
-        RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(
-                parent: ViewGroup,
-                timeDiffFormatter: TimeDiffFormatter
-            ): TrackerFeedHeaderViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_entry_header, parent, false)
-                return TrackerFeedHeaderViewHolder(view as TextView, timeDiffFormatter)
-            }
-        }
+    ) : RecyclerView.ViewHolder(binding.root) {
+
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
             val title =
                 timeDiffFormatter.formatTimePassedInDays(LocalDateTime.now(), LocalDateTime.parse(item.timestamp))
-            view.text = title
+            binding.timestampHeader.text = title
         }
     }
 
-    private class TrackerFeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        companion object {
-            fun create(parent: ViewGroup): TrackerFeedViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_entry, parent, false)
-                return TrackerFeedViewHolder(view)
-            }
-        }
-
-        val context: Context = view.context
-        var activityMessage: TextView = view.findViewById(R.id.activity_message)
-        var timeSinceTrackerBlocked: TextView = view.findViewById(R.id.activity_time_since)
-        var splitter: View = view.findViewById(R.id.entry_splitter)
-        var trackingAppIcon: ImageView = view.findViewById(R.id.tracking_app_icon)
-        var trackerBadgesView: RecyclerView = view.findViewById<RecyclerView>(R.id.tracker_badges).apply {
-            adapter = TrackerBadgeAdapter()
-        }
-
-        var packageManager: PackageManager = view.context.packageManager
+    private class TrackerFeedViewHolder(val binding: ViewDeviceShieldActivityEntryBinding) : RecyclerView.ViewHolder(binding.root) {
+        val context: Context = binding.root.context
+        var packageManager: PackageManager = context.packageManager
 
         fun bind(
             tracker: TrackerFeedItem.TrackerFeedData?,
@@ -183,7 +139,7 @@ class TrackerFeedAdapter @Inject constructor(
             isLastPosition: Boolean
         ) {
             tracker?.let { item ->
-                with(activityMessage) {
+                with(binding.activityMessage) {
                     val trackingAttempts =
                         resources.getQuantityString(
                             R.plurals.atp_ActivityTrackersCompanyBlocked,
@@ -206,14 +162,15 @@ class TrackerFeedAdapter @Inject constructor(
                     text = styledText
                 }
 
-                timeSinceTrackerBlocked.text = item.displayTimestamp
+                binding.activityTimeSince.text = item.displayTimestamp
 
-                Glide.with(trackingAppIcon.context.applicationContext)
+                Glide.with(context.applicationContext)
                     .load(packageManager.safeGetApplicationIcon(item.trackingApp.packageId))
                     .error(item.trackingApp.appDisplayName.asIconDrawable())
-                    .into(trackingAppIcon)
+                    .into(binding.trackingAppIcon)
 
-                with(trackerBadgesView) {
+                with(binding.trackerBadges) {
+                    adapter = TrackerBadgeAdapter()
                     // click through recyclerview
                     suppressLayout(false)
                     (adapter as TrackerBadgeAdapter).updateData(tracker.trackingCompanyBadges)
@@ -223,9 +180,9 @@ class TrackerFeedAdapter @Inject constructor(
                     onAppClick(item)
                 }
                 if (isLastPosition) {
-                    splitter.hide()
+                    binding.entrySplitter.hide()
                 } else {
-                    splitter.show()
+                    binding.entrySplitter.show()
                 }
             }
         }

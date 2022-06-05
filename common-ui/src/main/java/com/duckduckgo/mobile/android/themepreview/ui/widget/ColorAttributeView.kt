@@ -23,6 +23,8 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ViewLayoutColorAttributeBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 /** Composite view to show an item containing a text label and a [ColorDotView]. */
 class ColorAttributeView
@@ -34,32 +36,27 @@ constructor(
     defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val colorAttributeTextView: AppCompatTextView
-    private val colorDotView: ColorDotView
+    private val binding: ViewLayoutColorAttributeBinding by viewBinding()
 
     private var attributeText: String = ""
         set(value) {
-            colorAttributeTextView.text = value
+            binding.colorAttribute.text = value
             field = value
         }
 
     private var dotFillColor: Int = Color.LTGRAY
         set(value) {
-            colorDotView.fillColor = value
+            binding.colorDot.fillColor = value
             field = value
         }
 
     private var dotStrokeColor: Int = Color.DKGRAY
         set(value) {
-            colorDotView.strokeColor = value
+            binding.colorDot.strokeColor = value
             field = value
         }
 
     init {
-        val view = View.inflate(context, R.layout.view_layout_color_attribute, this)
-        colorAttributeTextView = view.findViewById(R.id.color_attribute)
-        colorDotView = view.findViewById(R.id.color_dot)
-
         val a =
             context.theme.obtainStyledAttributes(
                 attrs, R.styleable.ColorAttributeView, defStyleAttr, defStyleRes

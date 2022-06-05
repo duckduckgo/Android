@@ -78,10 +78,12 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
             error("Cannot access view bindings, View lifecycle is ${lifecycle.currentState}")
         }
 
-        binding = bindMethod.invoke(null, thisRef.requireView()).cast<T>()
+        binding = bindMethod.invoke(null, thisRef.requireView())?.cast<T>()
 
         return binding!!
     }
 }
 
 @Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
+
+

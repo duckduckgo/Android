@@ -21,10 +21,14 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionVpnConflictBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPVpnConflictDialog private constructor(private val listener: Listener) : DialogFragment() {
+
+    private val binding by viewBinding(DialogTrackingProtectionVpnConflictBinding::inflate)
 
     interface Listener {
         fun onVpnConflictDialogDismiss()
@@ -38,23 +42,15 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_vpn_conflict, null)
-
-        val endCta = rootView.findViewById<Button>(R.id.vpnConflictDialogEndCta)
-        val startCta = rootView.findViewById<Button>(R.id.vpnConflictDialogStartCta)
-        val titleView = rootView.findViewById<TextView>(R.id.vpnConflictDialogTitle)
-        val messageView = rootView.findViewById<TextView>(R.id.vpnConflictDialogMessage)
-
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
             com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
         )
-            .setView(rootView)
+            .setView(binding.root)
 
         isCancelable = false
 
-        configureViews(titleView, messageView, startCta, endCta)
+        configureViews(binding.vpnConflictDialogTitle, binding.vpnConflictDialogMessage, binding.vpnConflictDialogStartCta, binding.vpnConflictDialogEndCta)
 
         return alertDialog.create()
     }

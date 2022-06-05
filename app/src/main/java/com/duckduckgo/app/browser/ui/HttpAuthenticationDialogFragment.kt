@@ -19,17 +19,18 @@ package com.duckduckgo.app.browser.ui
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
+import com.duckduckgo.app.browser.databinding.SettingsFireAnimationSelectorFragmentBinding
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.mobile.android.ui.view.hideKeyboard
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class HttpAuthenticationDialogFragment : DialogFragment() {
 
@@ -37,6 +38,7 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
     lateinit var request: BasicAuthenticationRequest
     var listener: HttpAuthenticationListener? = null
 
+    private val binding by viewBinding(HttpAuthenticationBinding::inflate)
     interface HttpAuthenticationListener {
         fun handleAuthentication(
             request: BasicAuthenticationRequest,
@@ -47,34 +49,27 @@ class HttpAuthenticationDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val rootView = View.inflate(activity, R.layout.http_authentication, null)
-        val usernameInput = rootView.findViewById<EditText>(R.id.usernameInput)
-        val passwordInput = rootView.findViewById<EditText>(R.id.passwordInput)
-        val informationText = rootView.findViewById<TextView>(R.id.httpAuthInformationText)
-
         validateBundleArguments()
-
         val url = requireArguments().getString(KEY_TARGET_URL)
-
-        informationText.text = getString(R.string.authenticationDialogMessage, url)
+        binding.httpAuthInformationText.text = getString(R.string.authenticationDialogMessage, url)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setPositiveButton(R.string.authenticationDialogPositiveButton) { _, _ ->
                 listener?.handleAuthentication(
                     request,
-                    BasicAuthenticationCredentials(username = usernameInput.text.toString(), password = passwordInput.text.toString())
+                    BasicAuthenticationCredentials(username = binding.usernameInput.text.toString(), password = binding.passwordInput.text.toString())
                 )
                 didUserCompleteAuthentication = true
             }.setNegativeButton(R.string.authenticationDialogNegativeButton) { _, _ ->
-                rootView.hideKeyboard()
+                binding.root.hideKeyboard()
                 listener?.cancelAuthentication(request)
                 didUserCompleteAuthentication = true
             }
             .setTitle(R.string.authenticationDialogTitle)
 
         val alert = alertBuilder.create()
-        showKeyboard(usernameInput, alert)
+        showKeyboard(binding.usernameInput, alert)
         return alert
     }
 

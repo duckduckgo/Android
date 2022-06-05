@@ -48,8 +48,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-class ManageRecentAppsProtectionActivity :
-    DuckDuckGoActivity(),
+class ManageRecentAppsProtectionActivity : DuckDuckGoActivity(),
     ManuallyEnableAppProtectionDialog.ManuallyEnableAppsProtectionDialogListener,
     ManuallyDisableAppProtectionDialog.ManuallyDisableAppProtectionDialogListener,
     RestoreDefaultProtectionDialog.RestoreDefaultProtectionDialogListener {

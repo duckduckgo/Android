@@ -24,8 +24,14 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
+import com.duckduckgo.app.browser.databinding.DialogRadioGroupSelectorFragmentBinding
+import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhatFragmentBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsAppLinksSelectorFragment : DialogFragment() {
+
+    private val binding by viewBinding(DialogRadioGroupSelectorFragmentBinding::inflate)
 
     interface Listener {
         fun onAppLinkSettingSelected(selectedSetting: AppLinkSettingType)
@@ -36,18 +42,15 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
         val currentOption: AppLinkSettingType =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AppLinkSettingType? ?: AppLinkSettingType.ASK_EVERYTIME
 
-        val rootView =
-            View.inflate(activity, R.layout.dialog_radio_group_selector_fragment, null)
 
-        updateCurrentSelection(currentOption, rootView.findViewById(R.id.selectorRadioGroup))
+        updateCurrentSelection(currentOption, binding.selectorRadioGroup)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setTitle(R.string.settingsTitleAppLinksDialog)
             .setPositiveButton(R.string.dialogSave) { _, _ ->
                 dialog?.let {
-                    val radioGroup = it.findViewById(R.id.selectorRadioGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+                    val selectedOption = when (binding.selectorRadioGroup.checkedRadioButtonId) {
                         R.id.selectorRadioButton1 -> AppLinkSettingType.ASK_EVERYTIME
                         R.id.selectorRadioButton2 -> AppLinkSettingType.ALWAYS
                         R.id.selectorRadioButton3 -> AppLinkSettingType.NEVER

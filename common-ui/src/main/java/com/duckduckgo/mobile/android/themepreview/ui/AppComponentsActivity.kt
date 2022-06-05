@@ -22,36 +22,26 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.viewpager.widget.ViewPager
-import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.ActivityAppComponentsBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.applyTheme
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.tabs.TabLayout
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class AppComponentsActivity : AppCompatActivity() {
-
-    private lateinit var viewPager: ViewPager
-    private lateinit var tabLayout: TabLayout
-    private lateinit var darkThemeSwitch: SwitchMaterial
+    private val binding: ActivityAppComponentsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val themePreferences = AppComponentsSharedPreferences(this)
         val selectedTheme = themePreferences.selectedTheme
         applyTheme(selectedTheme)
-
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app_components)
-        viewPager = findViewById(R.id.view_pager)
-        tabLayout = findViewById(R.id.tab_layout)
-        darkThemeSwitch = findViewById(R.id.dark_theme_switch)
-
-        tabLayout.setupWithViewPager(viewPager)
+        setContentView(binding.root)
+        binding.tabLayout.setupWithViewPager(binding.viewPager)
         val adapter = AppComponentsPagerAdapter(this, supportFragmentManager)
-        viewPager.adapter = adapter
+        binding.viewPager.adapter = adapter
 
-        darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
+        binding.darkThemeSwitch.quietlySetIsChecked(selectedTheme == DuckDuckGoTheme.DARK) { _, enabled ->
             themePreferences.selectedTheme =
                 if (enabled) {
                     DuckDuckGoTheme.DARK

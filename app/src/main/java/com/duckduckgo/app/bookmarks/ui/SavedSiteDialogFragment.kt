@@ -35,20 +35,18 @@ import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.C
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersActivity.Companion.KEY_CURRENT_FOLDER
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.EditBookmarkFolderDialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.DialogFragmentSavedSiteBinding
 import com.duckduckgo.app.global.view.TextChangedWatcher
 import com.duckduckgo.mobile.android.ui.view.showKeyboard
-import kotlinx.android.synthetic.main.include_find_in_page.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.R as CommonR
 
 abstract class SavedSiteDialogFragment : DialogFragment() {
 
     abstract fun onConfirmation()
     abstract fun configureUI()
 
-    private var _binding: DialogFragmentSavedSiteBinding? = null
-    protected val binding get() = _binding!!
-
+    val binding by viewBinding(DialogFragmentSavedSiteBinding::inflate)
     private var initialTitle: String? = null
     private var titleState = ValidationState.UNCHANGED
 
@@ -87,7 +85,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = DialogFragmentSavedSiteBinding.inflate(inflater, container, false)
         configureClickListeners()
         arguments?.getString(KEY_BOOKMARK_FOLDER_NAME)?.let { name ->
             binding.savedSiteLocation.setText(name)
@@ -131,11 +128,6 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     override fun onPause() {
         super.onPause()
         dialog?.window?.setWindowAnimations(android.R.style.Animation)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun configureUpNavigation(toolbar: Toolbar) {
@@ -187,7 +179,7 @@ abstract class SavedSiteDialogFragment : DialogFragment() {
     protected fun setConfirmationVisibility(inputState: ValidationState = ValidationState.UNCHANGED) {
         binding.savedSiteAppBar.toolbar.menu.findItem(R.id.action_confirm_changes).isVisible =
             (inputState == ValidationState.CHANGED || titleState == ValidationState.CHANGED || folderChanged) &&
-            (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
+                (inputState != ValidationState.INVALID && titleState != ValidationState.INVALID)
     }
 
     private val titleTextWatcher = object : TextChangedWatcher() {

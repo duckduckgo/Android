@@ -19,8 +19,8 @@ package com.duckduckgo.app.browser.history
 import android.content.Context
 import android.os.Bundle
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
+import com.duckduckgo.app.browser.databinding.NavigationHistoryPopupViewBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.history.NavigationHistoryAdapter.NavigationHistoryListener
 import com.duckduckgo.mobile.android.R
@@ -36,19 +36,23 @@ class NavigationHistorySheet(
     private val listener: NavigationHistorySheetListener
 ) : BottomSheetDialog(context, R.style.NavigationHistoryDialog) {
 
+    lateinit var binding: NavigationHistoryPopupViewBinding
+
     interface NavigationHistorySheetListener {
         fun historicalPageSelected(stackIndex: Int)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = NavigationHistoryPopupViewBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
         behavior.skipCollapsed = true
 
-        setContentView(com.duckduckgo.app.browser.R.layout.navigation_history_popup_view)
+        setContentView(binding.root)
 
-        findViewById<RecyclerView>(com.duckduckgo.app.browser.R.id.historyRecycler)?.also { recycler ->
+        binding.historyRecycler.also { recycler ->
             NavigationHistoryAdapter(
                 viewLifecycleOwner, faviconManager, tabId,
                 object : NavigationHistoryListener {

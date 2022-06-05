@@ -19,16 +19,13 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.TextDrawable
 import com.duckduckgo.mobile.android.ui.view.hide
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityTrackerBadgeBinding
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.model.TrackerCompanyBadge
 import java.util.*
 
@@ -40,7 +37,8 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         parent: ViewGroup,
         viewType: Int
     ): TrackerBadgeViewHolder {
-        return TrackerBadgeViewHolder.create(parent)
+        val binding = ViewDeviceShieldActivityTrackerBadgeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TrackerBadgeViewHolder(binding)
     }
 
     override fun onBindViewHolder(
@@ -61,32 +59,18 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         diffResult.dispatchUpdatesTo(this)
     }
 
-    class TrackerBadgeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
-        var iconBadge: ImageView = view.findViewById(R.id.tracker_company_badge_icon)
-        var textBadge: TextView = view.findViewById(R.id.tracker_company_badge_text)
-        var largeTextBadge: TextView = view.findViewById(R.id.tracker_company_large_badge_text)
-
-        companion object {
-            fun create(parent: ViewGroup): TrackerBadgeViewHolder {
-                val inflater = LayoutInflater.from(parent.context)
-                val view = inflater.inflate(R.layout.view_device_shield_activity_tracker_badge, parent, false)
-                return TrackerBadgeViewHolder(view)
-            }
-        }
-
+    class TrackerBadgeViewHolder(var binding: ViewDeviceShieldActivityTrackerBadgeBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(trackerInfo: TrackerCompanyBadge) {
             when (trackerInfo) {
                 is TrackerCompanyBadge.Company -> displayTrackerCompany(trackerInfo)
                 is TrackerCompanyBadge.Extra -> displayExtraBadge(trackerInfo)
             }
-
         }
 
         private fun displayTrackerCompany(trackerInfo: TrackerCompanyBadge.Company) {
-            val badge = badgeIcon(iconBadge.context, trackerInfo.companyName)
+            val badge = badgeIcon(binding.trackerCompanyBadgeIcon.context, trackerInfo.companyName)
             if (badge == null) {
-                iconBadge.setImageDrawable(
+                binding.trackerCompanyBadgeIcon.setImageDrawable(
                     TextDrawable.builder()
                         .beginConfig()
                         .fontSize(50)
@@ -94,11 +78,11 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
                         .buildRound(trackerInfo.companyName.take(1), Color.DKGRAY)
                 )
             } else {
-                iconBadge.setImageResource(badge)
+                binding.trackerCompanyBadgeIcon.setImageResource(badge)
             }
-            iconBadge.show()
-            textBadge.hide()
-            largeTextBadge.hide()
+            binding.trackerCompanyBadgeIcon.show()
+            binding.trackerCompanyBadgeText.hide()
+            binding.trackerCompanyLargeBadgeText.hide()
         }
 
         private fun badgeIcon(
@@ -116,25 +100,31 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
         }
 
         private fun displayExtraBadge(trackerInfo: TrackerCompanyBadge.Extra) {
-            iconBadge.hide()
+            binding.trackerCompanyBadgeIcon.hide()
             if (trackerInfo.amount > 9) {
-                largeTextBadge.text = "+${trackerInfo.amount}"
-                largeTextBadge.show()
-                textBadge.hide()
+                binding.trackerCompanyLargeBadgeText.text = "+${trackerInfo.amount}"
+                binding.trackerCompanyLargeBadgeText.show()
+                binding.trackerCompanyBadgeText.hide()
             } else {
-                textBadge.text = "+${trackerInfo.amount}"
-                textBadge.show()
-                largeTextBadge.hide()
+                binding.trackerCompanyBadgeText.text = "+${trackerInfo.amount}"
+                binding.trackerCompanyBadgeText.show()
+                binding.trackerCompanyLargeBadgeText.hide()
             }
         }
     }
 
-    private class DiffCallback(private val oldList: List<TrackerCompanyBadge>, private val newList: List<TrackerCompanyBadge>) : DiffUtil.Callback() {
+    private class DiffCallback(
+        private val oldList: List<TrackerCompanyBadge>,
+        private val newList: List<TrackerCompanyBadge>
+    ) : DiffUtil.Callback() {
         override fun getOldListSize() = oldList.size
 
         override fun getNewListSize() = newList.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areItemsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
             if (oldItem is TrackerCompanyBadge.Company && newItem is TrackerCompanyBadge.Company) {
@@ -144,7 +134,10 @@ class TrackerBadgeAdapter : RecyclerView.Adapter<TrackerBadgeAdapter.TrackerBadg
             }
         }
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        override fun areContentsTheSame(
+            oldItemPosition: Int,
+            newItemPosition: Int
+        ): Boolean {
             return oldList[oldItemPosition] == newList[newItemPosition]
         }
     }

@@ -15,14 +15,33 @@
   -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimaryDark"
     tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
 
-    <include layout="@layout/include_default_toolbar" />
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
 
-    <include layout="@layout/content_tab_switcher" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tabsRecycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:clipToPadding="false"
+        android:paddingTop="10dp"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/includeToolbar"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_tab"
+        tools:showIn="@layout/activity_tab_switcher"
+        tools:spanCount="2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,25 +17,30 @@
 package com.duckduckgo.mobile.android.vpn.ui.report
 
 import android.app.ActivityOptions
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
-import com.duckduckgo.app.global.FragmentViewModelFactory
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
+import com.duckduckgo.mobile.android.vpn.databinding.FragmentDeviceShieldCtaBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
 import com.duckduckgo.mobile.android.vpn.ui.notification.applyBoldSpanTo
 import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
@@ -46,7 +51,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class DeviceShieldFragment : Fragment() {
+class DeviceShieldFragment : Fragment(R.layout.fragment_device_shield_cta) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -54,33 +59,26 @@ class DeviceShieldFragment : Fragment() {
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
-    private lateinit var deviceShieldCtaLayout: View
-    private lateinit var deviceShieldCtaHeaderTextView: TextView
-    private lateinit var deviceShieldCtaImageView: ImageView
+    private val binding: FragmentDeviceShieldCtaBinding by viewBinding()
 
     private inline fun <reified V : ViewModel> bindViewModel() =
         lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        AndroidSupportInjection.inject(this)
-        val view = inflater.inflate(R.layout.fragment_device_shield_cta, container, false)
 
-        configureViewReferences(view)
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        configureViewReferences(binding)
         observeViewModel()
-        return view
     }
 
-    private fun configureViewReferences(view: View) {
-        deviceShieldCtaLayout = view.findViewById(R.id.deviceShieldCtaLayout)
-        deviceShieldCtaHeaderTextView = view.findViewById(R.id.deviceShieldCtaHeader)
-        deviceShieldCtaImageView = view.findViewById(R.id.deviceShieldCtaImage)
-        deviceShieldCtaLayout.setOnClickListener {
+    private fun configureViewReferences(binding: FragmentDeviceShieldCtaBinding) {
+        binding.deviceShieldCtaLayout.setOnClickListener {
             deviceShieldPixels.didPressNewTabSummary()
             val options = ActivityOptions.makeSceneTransitionAnimation(requireActivity()).toBundle()
             startActivity(DeviceShieldTrackerActivity.intent(requireActivity()), options)
@@ -126,19 +124,19 @@ class DeviceShieldFragment : Fragment() {
         if (viewState.trackersBlocked.trackers > 0) {
             renderTrackersBlockedWhenEnabled(viewState.trackersBlocked)
         } else {
-            deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabEnabled)
-            deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
+            binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabEnabled)
+            binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptb_default)
         }
     }
 
     private fun renderStateDisabled() {
-        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabDisabled)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+        binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabDisabled)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptb_warning)
     }
 
     private fun renderStateRevoked() {
-        deviceShieldCtaHeaderTextView.setText(R.string.atp_NewTabRevoked)
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_warning)
+        binding.deviceShieldCtaHeader.setText(R.string.atp_NewTabRevoked)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptb_warning)
     }
 
     private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
@@ -158,13 +156,18 @@ class DeviceShieldFragment : Fragment() {
         val pastWeekSuffix = resources.getString(R.string.atp_NewTabSuffix)
         val textToStyle = "$prefix $totalTrackers $latestAppString$optionalOtherAppsString$pastWeekSuffix"
 
-        deviceShieldCtaHeaderTextView.text = textToStyle.applyBoldSpanTo(
+        binding.deviceShieldCtaHeader.text = textToStyle.applyBoldSpanTo(
             listOf(
                 totalTrackers,
                 latestAppString,
                 optionalOtherAppsString
             )
         )
-        deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptb_default)
+        binding.deviceShieldCtaImage.setImageResource(R.drawable.ic_apptb_default)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        AndroidSupportInjection.inject(this)
     }
 }

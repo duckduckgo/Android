@@ -26,11 +26,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
+import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhenFragmentBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -39,6 +42,8 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    private val binding by viewBinding(SettingsAutomaticallyClearWhenFragmentBinding::inflate)
 
     interface Listener {
         fun onAutomaticallyClearWhenOptionSelected(clearWhenSetting: ClearWhenOption)
@@ -53,21 +58,21 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
 
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
 
-        val rootView = View.inflate(activity, R.layout.settings_automatically_clear_when_fragment, null)
+
 
         if (appBuildConfig.isDebug) {
-            showDebugOnlyOption(rootView)
+            showDebugOnlyOption()
         }
 
-        updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhenGroup))
+        updateCurrentSelect(currentOption, binding.settingsClearWhenGroup)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setTitle(R.string.settingsAutomaticallyClearWhenDialogTitle)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
-                    val radioGroup = it.findViewById(R.id.settingsClearWhenGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+
+                    val selectedOption = when (binding.settingsClearWhenGroup.checkedRadioButtonId) {
                         R.id.settingInactive5Mins -> APP_EXIT_OR_5_MINS
                         R.id.settingInactive15Mins -> APP_EXIT_OR_15_MINS
                         R.id.settingInactive30Mins -> APP_EXIT_OR_30_MINS
@@ -92,9 +97,8 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
         radioGroup.check(selectedId)
     }
 
-    private fun showDebugOnlyOption(rootView: View) {
-        val debugOption: View = rootView.findViewById(R.id.settingInactive5Seconds) ?: return
-        debugOption.show()
+    private fun showDebugOnlyOption() {
+        binding.settingInactive5Seconds.show()
     }
 
     @IdRes

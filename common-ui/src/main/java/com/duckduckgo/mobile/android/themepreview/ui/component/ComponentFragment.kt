@@ -24,15 +24,20 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.R
+import com.duckduckgo.mobile.android.databinding.FragmentComponentListBinding
+import com.duckduckgo.mobile.android.databinding.FragmentComponentsListsBinding
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-abstract class ComponentFragment : Fragment() {
+abstract class ComponentFragment : Fragment(R.layout.fragment_component_list) {
+
+    private val binding: FragmentComponentListBinding by viewBinding()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_component_list, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(
@@ -41,10 +46,9 @@ abstract class ComponentFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceBundle)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         val adapter = ComponentAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.adapter = adapter
         adapter.submitList(getComponents())
     }
 

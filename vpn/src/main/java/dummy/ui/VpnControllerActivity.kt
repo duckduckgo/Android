@@ -21,50 +21,38 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.global.DuckDuckGoActivity
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.app.global.formatters.data.DataSizeFormatter
 import com.duckduckgo.app.global.formatters.time.model.TimePassed
-import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.app.global.formatters.time.model.dateOfLastWeek
 import com.duckduckgo.app.global.formatters.time.model.dateOfPreviousMidnight
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnControllerBinding
+import com.duckduckgo.mobile.android.vpn.model.VpnTracker
 import com.duckduckgo.mobile.android.vpn.stats.DataTransfer
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.AndroidInjection
 import dummy.ui.VpnControllerViewModel.AppTrackersBlocked
-import java.text.NumberFormat
-import javax.inject.Inject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
+import java.text.NumberFormat
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope() {
-
-    private lateinit var lastAppTrackerDomainTextView: TextView
-    private lateinit var appTrackerCompaniesBlockedTodayTextView: TextView
-    private lateinit var appTrackersBlockedTodayTextView: TextView
-    private lateinit var appTrackerCompaniesBlockedWeekTextView: TextView
-    private lateinit var appTrackersBlockedWeekTextView: TextView
-
-    private lateinit var lastWebTrackerDomainTextView: TextView
-    private lateinit var webTrackerCompaniesBlockedTodayTextView: TextView
-    private lateinit var webTrackersBlockedTodayTextView: TextView
-    private lateinit var webTrackerCompaniesBlockedWeekTextView: TextView
-    private lateinit var webTrackersBlockedWeekTextView: TextView
-
-    private lateinit var appVersionText: TextView
-    private lateinit var timeRunningTodayTextView: TextView
-    private lateinit var dataSentTextView: TextView
-    private lateinit var dataReceivedTextView: TextView
-    private lateinit var uuidTextView: TextView
 
     @Inject lateinit var vpnDatabase: VpnDatabase
 
@@ -72,6 +60,7 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
 
     private val viewModel: VpnControllerViewModel by bindViewModel()
     private val packetsFormatter = NumberFormat.getInstance()
+    private val binding: ActivityVpnControllerBinding by viewBinding()
 
     private var lastAppTrackerBlocked: VpnTracker? = null
     private var lastWebTrackerBlocked: WebTrackerBlocked? = null
@@ -80,12 +69,10 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_vpn_controller)
-        setupToolbar(findViewById(R.id.toolbar))
-
+        setContentView(binding.root)
         AndroidInjection.inject(this)
 
-        setViewReferences()
+        setAppVersion()
         configureUiHandlers()
 
         subscribeForViewUpdates()
@@ -139,63 +126,41 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
     }
 
     private fun updateRelativeTimes() {
-        lastAppTrackerDomainTextView.text = generateLastAppTrackerBlocked(lastAppTrackerBlocked)
+        binding.vpnController.vpnAppLastTrackerDomain.text = generateLastAppTrackerBlocked(lastAppTrackerBlocked)
     }
 
-    private fun setViewReferences() {
-        appTrackerCompaniesBlockedTodayTextView =
-            findViewById(R.id.vpnAppTrackerCompaniesBlockedToday)
-        appTrackersBlockedTodayTextView = findViewById(R.id.vpnAppTrackersBlockedToday)
-        appTrackerCompaniesBlockedWeekTextView =
-            findViewById(R.id.vpnAppTrackerCompaniesBlockedWeek)
-        appTrackersBlockedWeekTextView = findViewById(R.id.vpnAppTrackersBlockedWeek)
-        lastAppTrackerDomainTextView = findViewById(R.id.vpnAppLastTrackerDomain)
-
-        webTrackerCompaniesBlockedTodayTextView =
-            findViewById(R.id.vpnWebTrackerCompaniesBlockedToday)
-        webTrackersBlockedTodayTextView = findViewById(R.id.vpnWebTrackersBlockedToday)
-        webTrackerCompaniesBlockedWeekTextView =
-            findViewById(R.id.vpnWebTrackersCompaniesBlockedWeek)
-        webTrackersBlockedWeekTextView = findViewById(R.id.vpnWebTrackersBlockedWeek)
-
-        timeRunningTodayTextView = findViewById(R.id.vpnTodayRunningTime)
-        dataSentTextView = findViewById(R.id.vpnSentStats)
-        dataReceivedTextView = findViewById(R.id.vpnReceivedStats)
-        uuidTextView = findViewById(R.id.vpnUUID)
-        appVersionText =
-            findViewById<TextView>(R.id.appVersionText).also {
-                it.text = packageManager.getPackageInfo(packageName, 0).versionName
-            }
+    private fun setAppVersion() {
+        binding.vpnController.appVersionText.text = packageManager.getPackageInfo(packageName, 0).versionName
     }
 
     private fun configureUiHandlers() {
-        uuidTextView.setOnClickListener {
+        binding.vpnController.vpnUUID.setOnClickListener {
             val manager: ClipboardManager =
                 getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData: ClipData = ClipData.newPlainText("VPN UUID", uuidTextView.text)
+            val clipData: ClipData = ClipData.newPlainText("VPN UUID", binding.vpnController.vpnUUID.text)
             manager.setPrimaryClip(clipData)
             Snackbar.make(
-                uuidTextView, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT
+                binding.vpnController.vpnUUID, "UUID is now copied to the Clipboard", Snackbar.LENGTH_SHORT
             )
                 .show()
         }
     }
 
     private fun renderTimeRunning(timeRunningMillis: Long) {
-        timeRunningTodayTextView.text = generateTimeRunningMessage(timeRunningMillis)
+        binding.vpnController.vpnTodayRunningTime.text = generateTimeRunningMessage(timeRunningMillis)
     }
 
     private fun renderDataStats(
         dataSent: DataTransfer,
         dataReceived: DataTransfer
     ) {
-        dataSentTextView.text =
+        binding.vpnController.vpnDataSentLabel.text =
             getString(
                 R.string.vpnDataTransferred,
                 dataSizeFormatter.format(dataSent.dataSize),
                 packetsFormatter.format(dataSent.numberPackets)
             )
-        dataReceivedTextView.text =
+        binding.vpnController.vpnReceivedStats.text =
             getString(
                 R.string.vpnDataTransferred,
                 dataSizeFormatter.format(dataReceived.dataSize),
@@ -204,40 +169,40 @@ class VpnControllerActivity : DuckDuckGoActivity(), CoroutineScope by MainScope(
     }
 
     private fun renderUuid(uuid: String) {
-        uuidTextView.text = uuid
+        binding.vpnController.vpnUUID.text = uuid
     }
 
     private fun renderTodayAppTrackerData(trackerData: AppTrackersBlocked) {
-        appTrackerCompaniesBlockedTodayTextView.text =
+        binding.vpnController.vpnAppTrackerCompaniesBlockedToday.text =
             generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
-        appTrackersBlockedTodayTextView.text =
+        binding.vpnController.vpnAppTrackersBlockedToday.text =
             generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
         lastAppTrackerBlocked = trackerData.trackerList.firstOrNull()
         updateRelativeTimes()
     }
 
     private fun renderLastWeekAppTrackerData(trackerData: AppTrackersBlocked) {
-        appTrackerCompaniesBlockedWeekTextView.text =
+        binding.vpnController.vpnAppTrackerCompaniesBlockedWeek.text =
             generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
-        appTrackersBlockedWeekTextView.text =
+        binding.vpnController.vpnAppTrackersBlockedWeek.text =
             generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 
     private fun renderTodayWebTrackerData(trackerData: VpnControllerViewModel.WebTrackersBlocked) {
-        webTrackerCompaniesBlockedTodayTextView.text =
+        binding.vpnController.vpnWebTrackerCompaniesBlockedToday.text =
             generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = false)
-        webTrackersBlockedTodayTextView.text =
+        binding.vpnController.vpnWebTrackersBlockedToday.text =
             generateTrackersBlocked(trackerData.trackerList.size, displayWeek = false)
         lastWebTrackerBlocked = trackerData.trackerList.firstOrNull()
-        lastWebTrackerDomainTextView.text = generateLastWebTrackerBlocked(lastWebTrackerBlocked)
+        binding.vpnController.vpnWebLastTrackerDomain.text = generateLastWebTrackerBlocked(lastWebTrackerBlocked)
     }
 
     private fun renderLastWeekWebTrackerData(
         trackerData: VpnControllerViewModel.WebTrackersBlocked
     ) {
-        webTrackerCompaniesBlockedWeekTextView.text =
+        binding.vpnController.vpnWebTrackersCompaniesBlockedWeek.text =
             generateTrackerCompaniesBlocked(trackerData.byCompany().size, displayWeek = true)
-        webTrackersBlockedWeekTextView.text =
+        binding.vpnController.vpnWebTrackersBlockedWeek.text =
             generateTrackersBlocked(trackerData.trackerList.size, displayWeek = true)
     }
 

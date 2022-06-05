@@ -24,10 +24,16 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
+import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhatFragmentBinding
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.*
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
+class SettingsAutomaticallyClearWhatFragment : DialogFragment( R.layout.settings_automatically_clear_what_fragment) {
+
+    private val binding by viewBinding(SettingsAutomaticallyClearWhatFragmentBinding::inflate)
 
     interface Listener {
         fun onAutomaticallyClearWhatOptionSelected(clearWhatSetting: ClearWhatOption)
@@ -37,16 +43,14 @@ class SettingsAutomaticallyClearWhatFragment : DialogFragment() {
 
         val currentOption: ClearWhatOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhatOption? ?: CLEAR_NONE
 
-        val rootView = View.inflate(activity, R.layout.settings_automatically_clear_what_fragment, null)
-        updateCurrentSelect(currentOption, rootView.findViewById(R.id.settingsClearWhatGroup))
+        updateCurrentSelect(currentOption, binding.settingsClearWhatGroup)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setTitle(R.string.settingsAutomaticallyClearWhatDialogTitle)
             .setPositiveButton(R.string.settingsAutomaticallyClearingDialogSave) { _, _ ->
                 dialog?.let {
-                    val radioGroup = it.findViewById(R.id.settingsClearWhatGroup) as RadioGroup
-                    val selectedOption = when (radioGroup.checkedRadioButtonId) {
+                    val selectedOption = when (binding.settingsClearWhatGroup.checkedRadioButtonId) {
                         R.id.settingTabsOnly -> CLEAR_TABS_ONLY
                         R.id.settingTabsAndData -> CLEAR_TABS_AND_DATA
                         else -> CLEAR_NONE

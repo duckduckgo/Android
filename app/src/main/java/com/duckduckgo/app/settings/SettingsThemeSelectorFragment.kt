@@ -18,6 +18,7 @@ package com.duckduckgo.app.settings
 
 import android.app.Dialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -25,10 +26,16 @@ import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.SettingsThemeSelectorFragmentBinding
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
-import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.*
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.LIGHT
+import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsThemeSelectorFragment : DialogFragment() {
+
+    private val binding by viewBinding(SettingsThemeSelectorFragmentBinding::inflate)
 
     interface Listener {
         fun onThemeSelected(selectedTheme: DuckDuckGoTheme)
@@ -39,17 +46,14 @@ class SettingsThemeSelectorFragment : DialogFragment() {
         val currentOption: DuckDuckGoTheme =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as DuckDuckGoTheme? ?: LIGHT
 
-        val rootView =
-            View.inflate(activity, R.layout.settings_theme_selector_fragment, null)
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            rootView.findViewById<RadioButton>(R.id.themeSelectorSystemDefault).visibility =
+            binding.themeSelectorGroup.findViewById<RadioButton>(R.id.themeSelectorSystemDefault).visibility =
                 View.VISIBLE
         }
-        updateCurrentSelect(currentOption, rootView.findViewById(R.id.themeSelectorGroup))
+        updateCurrentSelect(currentOption, binding.themeSelectorGroup)
 
         val alertBuilder = AlertDialog.Builder(requireActivity())
-            .setView(rootView)
+            .setView(binding.root)
             .setTitle(R.string.settingsTheme)
             .setPositiveButton(R.string.settingsThemeDialogSave) { _, _ ->
                 dialog?.let {

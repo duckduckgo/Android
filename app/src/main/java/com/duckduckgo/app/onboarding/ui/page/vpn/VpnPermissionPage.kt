@@ -54,8 +54,6 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPVpnConflictDialog.Listener
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
-import kotlinx.android.synthetic.main.include_default_browser_buttons.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject

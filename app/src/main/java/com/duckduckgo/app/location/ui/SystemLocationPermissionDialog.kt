@@ -23,9 +23,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDialogBinding
+import com.duckduckgo.app.browser.databinding.SettingsFireAnimationSelectorFragmentBinding
 import com.duckduckgo.app.global.view.websiteFromGeoLocationsApiOrigin
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SystemLocationPermissionDialog : DialogFragment() {
+
+    private val binding by viewBinding(ContentSystemLocationPermissionDialogBinding::inflate)
+
 
     interface SystemLocationPermissionDialogListener {
         fun onSystemLocationPermissionAllowed()
@@ -38,8 +43,6 @@ class SystemLocationPermissionDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
-
-        val binding = ContentSystemLocationPermissionDialogBinding.inflate(layoutInflater, null, false)
 
         val alertBuilder = AlertDialog.Builder(requireActivity()).setView(binding.root)
 

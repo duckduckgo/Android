@@ -27,16 +27,25 @@ import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingPageBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ItemApptpCompanyDetailsBinding
+import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder
 
 class DeviceShieldOnboardingAdapter(
     private val pages: List<VpnOnboardingViewModel.OnboardingPage>,
     private val clickListener: () -> Unit
 ) : RecyclerView.Adapter<PageViewHolder>() {
 
+
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ) = PageViewHolder(parent)
+    ): PageViewHolder {
+        val binding = ActivityVpnOnboardingPageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PageViewHolder(binding)
+    }
+
 
     override fun getItemCount() = pages.size
 
@@ -48,22 +57,15 @@ class DeviceShieldOnboardingAdapter(
     }
 }
 
-class PageViewHolder(parent: ViewGroup) :
-    RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.activity_vpn_onboarding_page, parent, false)
-    ) {
-    private val pageTitle: TextView = itemView.findViewById(R.id.onboarding_page_title)
-    private val pageText: TextView = itemView.findViewById(R.id.onboarding_page_text)
-    private val onboardingHeader: ImageView = itemView.findViewById(R.id.onboarding_page_image)
-    private val onboardingAnimation: LottieAnimationView = itemView.findViewById(R.id.onboarding_page_animation)
-
+class PageViewHolder(val binding: ActivityVpnOnboardingPageBinding) : RecyclerView.ViewHolder(binding.root)
+    {
     fun bind(
         page: VpnOnboardingViewModel.OnboardingPage,
         position: Int,
         clickListener: () -> Unit
     ) {
-        pageTitle.setText(page.title)
-        pageText.setText(page.text)
+        binding.onboardingPageTitle.setText(page.title)
+        binding.onboardingPageText.setText(page.text)
 
         when (position) {
             0 -> {
@@ -74,7 +76,7 @@ class PageViewHolder(parent: ViewGroup) :
             }
             2 -> {
                 showHeaderView(page.imageHeader)
-                pageText.addClickableLink("learn_more_link", pageText.context.getText(page.text)) {
+                binding.onboardingPageText.addClickableLink("learn_more_link",     binding.onboardingPageText.context.getText(page.text)) {
                     clickListener()
                 }
             }
@@ -85,18 +87,18 @@ class PageViewHolder(parent: ViewGroup) :
     }
 
     private fun showAnimationView(animation: Int) {
-        onboardingAnimation.show()
-        onboardingHeader.gone()
+        binding.onboardingPageAnimation.show()
+        binding.onboardingPageImage.gone()
 
         LottieCompositionFactory.fromRawRes(itemView.context, animation)
-        onboardingAnimation.setAnimation(animation)
-        onboardingAnimation.playAnimation()
+        binding.onboardingPageAnimation.setAnimation(animation)
+        binding.onboardingPageAnimation.playAnimation()
     }
 
     private fun showHeaderView(image: Int) {
-        onboardingAnimation.gone()
-        onboardingHeader.show()
+        binding.onboardingPageAnimation.gone()
+        binding.onboardingPageImage.show()
 
-        onboardingHeader.setImageResource(image)
+        binding.onboardingPageImage.setImageResource(image)
     }
 }

@@ -34,8 +34,7 @@ abstract class OnboardingPageFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? =
-        inflater.inflate(layoutResource(), container, false)
+    ): View? = inflater.inflate(layoutResource(), container, false)
 
     fun onContinuePressed() {
         when (activity) {

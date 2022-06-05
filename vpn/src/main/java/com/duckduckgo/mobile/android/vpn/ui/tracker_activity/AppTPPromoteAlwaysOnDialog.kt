@@ -20,10 +20,16 @@ import android.app.Dialog
 import android.os.Bundle
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionConfirmDisableBinding
+import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionPromoteAlwaysOnBinding
+import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionVpnConflictBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Listener) : DialogFragment() {
+
+    private val binding by viewBinding(DialogTrackingProtectionPromoteAlwaysOnBinding::inflate)
 
     interface Listener {
         fun onPromoteAlwaysOnGoToVPNSettings()
@@ -37,22 +43,15 @@ class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Liste
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
-        val rootView = layoutInflater.inflate(R.layout.dialog_tracking_protection_promote_always_on, null)
-
-        val goToSettings = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogSettings)
-        val remindLater = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogLater)
-        val forget = rootView.findViewById<Button>(R.id.promoteAlwaysOnDialogForget)
-
         val alertDialog = MaterialAlertDialogBuilder(
             requireActivity(),
             com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_RoundedDialog
         )
-            .setView(rootView)
+            .setView(binding.root)
 
         isCancelable = false
 
-        configureListeners(goToSettings, remindLater, forget)
+        configureListeners(binding.promoteAlwaysOnDialogSettings, binding.promoteAlwaysOnDialogLater, binding.promoteAlwaysOnDialogForget)
 
         return alertDialog.create()
     }

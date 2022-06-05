@@ -28,7 +28,10 @@ import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayoutManager
+import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
+import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityTrackerBadgeBinding
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
@@ -36,7 +39,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class DeviceShieldActivityFeedFragment : Fragment() {
+class DeviceShieldActivityFeedFragment : Fragment(R.layout.view_device_shield_activity_feed) {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -50,12 +53,14 @@ class DeviceShieldActivityFeedFragment : Fragment() {
 
     private var feedListener: DeviceShieldActivityFeedListener? = null
 
+    private val binding: ViewDeviceShieldActivityFeedBinding by viewBinding()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.view_device_shield_activity_feed, container, false)
+    ): View {
+        return binding.root
     }
 
     override fun onViewCreated(
@@ -63,7 +68,7 @@ class DeviceShieldActivityFeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ) {
         AndroidInjection.inject(this)
-        with(view.findViewById<RecyclerView>(R.id.activity_recycler_view)) {
+        with(binding.activityRecyclerView) {
             val stickyHeadersLayoutManager =
                 StickyHeadersLinearLayoutManager<TrackerFeedAdapter>(this@DeviceShieldActivityFeedFragment.requireContext())
             layoutManager = stickyHeadersLayoutManager
