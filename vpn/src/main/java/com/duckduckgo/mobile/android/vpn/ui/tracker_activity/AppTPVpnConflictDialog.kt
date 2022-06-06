@@ -50,7 +50,10 @@ class AppTPVpnConflictDialog private constructor(private val listener: Listener)
 
         isCancelable = false
 
-        configureViews(binding.vpnConflictDialogTitle, binding.vpnConflictDialogMessage, binding.vpnConflictDialogStartCta, binding.vpnConflictDialogEndCta)
+        configureViews(
+            binding.vpnConflictDialogTitle, binding.vpnConflictDialogMessage,
+            binding.vpnConflictDialogStartCta, binding.vpnConflictDialogEndCta
+        )
 
         return alertDialog.create()
     }

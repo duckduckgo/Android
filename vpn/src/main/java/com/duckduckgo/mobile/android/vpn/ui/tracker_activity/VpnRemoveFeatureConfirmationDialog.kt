@@ -25,7 +25,8 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionRemoveFeatureConfirmDisableBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class VpnRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) : DialogFragment(R.layout.dialog_tracking_protection_remove_feature_confirm_disable) {
+class VpnRemoveFeatureConfirmationDialog private constructor(private val listener: Listener) :
+    DialogFragment(R.layout.dialog_tracking_protection_remove_feature_confirm_disable) {
 
     private val binding by viewBinding(DialogTrackingProtectionRemoveFeatureConfirmDisableBinding::inflate)
 

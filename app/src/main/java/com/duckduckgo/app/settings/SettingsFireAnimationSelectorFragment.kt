@@ -24,7 +24,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SettingsFireAnimationSelectorFragmentBinding
-import com.duckduckgo.app.browser.databinding.SettingsThemeSelectorFragmentBinding
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.clear.FireAnimation.*
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -41,9 +40,7 @@ class SettingsFireAnimationSelectorFragment : DialogFragment() {
 
         val currentOption: FireAnimation = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as FireAnimation? ?: HeroFire
 
-
         updateCurrentSelect(currentOption, binding.fireAnimationSelectorGroup)
-
 
         binding.fireAnimationSelectorGroup.setOnCheckedChangeListener { group, _ ->
             val fireAnimation = when (group.checkedRadioButtonId) {

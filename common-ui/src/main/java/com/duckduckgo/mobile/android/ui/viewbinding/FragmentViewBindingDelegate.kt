@@ -85,5 +85,3 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 }
 
 @Suppress("UNCHECKED_CAST") private fun <T> Any.cast(): T = this as T
-
-

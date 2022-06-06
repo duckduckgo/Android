@@ -19,9 +19,7 @@ package com.duckduckgo.mobile.android.themepreview.ui.widget
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
-import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewLayoutColorAttributeBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding

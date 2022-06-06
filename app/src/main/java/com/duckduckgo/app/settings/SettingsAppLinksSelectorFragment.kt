@@ -18,15 +18,12 @@ package com.duckduckgo.app.settings
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
 import com.duckduckgo.app.browser.databinding.DialogRadioGroupSelectorFragmentBinding
-import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhatFragmentBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 class SettingsAppLinksSelectorFragment : DialogFragment() {
@@ -41,7 +38,6 @@ class SettingsAppLinksSelectorFragment : DialogFragment() {
 
         val currentOption: AppLinkSettingType =
             arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as AppLinkSettingType? ?: AppLinkSettingType.ASK_EVERYTIME
-
 
         updateCurrentSelection(currentOption, binding.selectorRadioGroup)
 

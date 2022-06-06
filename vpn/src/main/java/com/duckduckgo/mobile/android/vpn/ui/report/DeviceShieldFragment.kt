@@ -21,9 +21,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -65,8 +63,6 @@ class DeviceShieldFragment : Fragment(R.layout.fragment_device_shield_cta) {
         lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
-
-
 
     override fun onViewCreated(
         view: View,

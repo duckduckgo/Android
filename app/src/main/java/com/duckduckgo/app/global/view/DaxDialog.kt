@@ -29,7 +29,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
-import com.duckduckgo.app.browser.databinding.DialogRadioGroupSelectorFragmentBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
 interface DaxDialog {
@@ -50,7 +49,6 @@ interface DaxDialogListener {
 class TypewriterDaxDialog : DialogFragment(), DaxDialog {
 
     private val binding by viewBinding(ContentDaxDialogBinding::inflate)
-
 
     private var daxText: String = ""
     private var primaryButtonText: String = ""

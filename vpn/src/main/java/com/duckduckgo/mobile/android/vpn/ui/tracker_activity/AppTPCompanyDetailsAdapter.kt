@@ -207,8 +207,3 @@ class AppTPCompanyDetailsAdapter : RecyclerView.Adapter<AppTPCompanyDetailsAdapt
         }
     }
 }
-
-
-
-
-

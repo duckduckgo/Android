@@ -27,7 +27,6 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppInfo.Companion.LOADS_WEBSITES_EXCLUSION_REASON
 import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionManuallyEnableAppBinding
-import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionVpnConflictBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ManuallyEnableAppProtectionDialog : DialogFragment() {

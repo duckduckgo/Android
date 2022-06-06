@@ -18,25 +18,17 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.view.gone
 import com.duckduckgo.mobile.android.ui.view.show
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingPageBinding
-import com.duckduckgo.mobile.android.vpn.databinding.ItemApptpCompanyDetailsBinding
-import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyDetailsAdapter.CompanyDetailsViewHolder
 
 class DeviceShieldOnboardingAdapter(
     private val pages: List<VpnOnboardingViewModel.OnboardingPage>,
     private val clickListener: () -> Unit
 ) : RecyclerView.Adapter<PageViewHolder>() {
-
-
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -45,7 +37,6 @@ class DeviceShieldOnboardingAdapter(
         val binding = ActivityVpnOnboardingPageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return PageViewHolder(binding)
     }
-
 
     override fun getItemCount() = pages.size
 
@@ -57,8 +48,7 @@ class DeviceShieldOnboardingAdapter(
     }
 }
 
-class PageViewHolder(val binding: ActivityVpnOnboardingPageBinding) : RecyclerView.ViewHolder(binding.root)
-    {
+class PageViewHolder(val binding: ActivityVpnOnboardingPageBinding) : RecyclerView.ViewHolder(binding.root) {
     fun bind(
         page: VpnOnboardingViewModel.OnboardingPage,
         position: Int,
@@ -76,7 +66,7 @@ class PageViewHolder(val binding: ActivityVpnOnboardingPageBinding) : RecyclerVi
             }
             2 -> {
                 showHeaderView(page.imageHeader)
-                binding.onboardingPageText.addClickableLink("learn_more_link",     binding.onboardingPageText.context.getText(page.text)) {
+                binding.onboardingPageText.addClickableLink("learn_more_link", binding.onboardingPageText.context.getText(page.text)) {
                     clickListener()
                 }
             }

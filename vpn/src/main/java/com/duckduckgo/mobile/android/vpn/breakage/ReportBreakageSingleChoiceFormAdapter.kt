@@ -17,14 +17,10 @@
 package com.duckduckgo.mobile.android.vpn.breakage
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
-import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewReportBreakageTextSingleChoiceEntryBinding
 
 class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : RecyclerView.Adapter<ReportBreakageSingleChoiceFormViewHolder>() {
@@ -46,7 +42,6 @@ class ReportBreakageSingleChoiceFormAdapter(private val listener: Listener) : Re
         val binding = ViewReportBreakageTextSingleChoiceEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ReportBreakageSingleChoiceFormViewHolder(binding)
     }
-
 
     override fun onBindViewHolder(
         holder: ReportBreakageSingleChoiceFormViewHolder,

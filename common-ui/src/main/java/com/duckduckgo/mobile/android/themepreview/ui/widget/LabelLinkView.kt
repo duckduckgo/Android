@@ -23,8 +23,6 @@ import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewLayoutLabelBinding
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -44,8 +42,6 @@ constructor(
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding: ViewLayoutLabelBinding by viewBinding()
-
-
 
     private var leadingIcon: Drawable? = null
         set(value) {

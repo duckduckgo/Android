@@ -23,7 +23,6 @@ import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionConfirmDisableBinding
-import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionRestoreDefaultsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPDisableConfirmationDialog private constructor(private val listener: Listener) : DialogFragment() {

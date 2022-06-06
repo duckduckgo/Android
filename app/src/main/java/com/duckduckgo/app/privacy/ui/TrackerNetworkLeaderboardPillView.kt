@@ -18,15 +18,12 @@ package com.duckduckgo.app.privacy.ui
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewNetworkTrackerPillBinding
-import com.duckduckgo.app.browser.databinding.ViewTabSwitcherButtonBinding
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardEntry
 import com.duckduckgo.app.privacy.renderer.TrackersRenderer
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
-
 
 class TrackerNetworkLeaderboardPillView : FrameLayout {
 
@@ -51,8 +48,6 @@ class TrackerNetworkLeaderboardPillView : FrameLayout {
     ) : super(context, attrs, defStyleAttr) {
 
     }
-
-
 
     fun render(
         networkEntity: NetworkLeaderboardEntry?,

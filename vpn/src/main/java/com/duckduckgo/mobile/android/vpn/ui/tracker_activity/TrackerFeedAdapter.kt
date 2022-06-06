@@ -69,11 +69,24 @@ class TrackerFeedAdapter @Inject constructor(
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-          return when (viewType) {
-            LOADING_STATE_TYPE -> TrackerSkeletonViewHolder(ViewDeviceShieldActivitySkeletonEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder(ViewDeviceShieldActivityEmptyBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            DATA_STATE_TYPE -> TrackerFeedViewHolder(ViewDeviceShieldActivityEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            else -> TrackerFeedHeaderViewHolder(ViewDeviceShieldActivityEntryHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),timeDiffFormatter)
+        return when (viewType) {
+            LOADING_STATE_TYPE -> TrackerSkeletonViewHolder(
+                ViewDeviceShieldActivitySkeletonEntryBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            EMPTY_STATE_TYPE -> TrackerEmptyFeedViewHolder(
+                ViewDeviceShieldActivityEmptyBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            DATA_STATE_TYPE -> TrackerFeedViewHolder(
+                ViewDeviceShieldActivityEntryBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false)
+            )
+            else -> TrackerFeedHeaderViewHolder(
+                ViewDeviceShieldActivityEntryHeaderBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false),
+                timeDiffFormatter
+            )
         }
     }
 
@@ -120,7 +133,6 @@ class TrackerFeedAdapter @Inject constructor(
         val binding: ViewDeviceShieldActivityEntryHeaderBinding,
         private val timeDiffFormatter: TimeDiffFormatter
     ) : RecyclerView.ViewHolder(binding.root) {
-
 
         fun bind(item: TrackerFeedItem.TrackerFeedItemHeader) {
             val title =

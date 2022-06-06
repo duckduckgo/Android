@@ -29,7 +29,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ManuallyDisableAppProtectionDialog : DialogFragment(R.layout.dialog_tracking_protection_manually_disable_app) {
 
-
     private val binding: DialogTrackingProtectionManuallyDisableAppBinding by viewBinding()
 
     interface ManuallyDisableAppProtectionDialogListener {

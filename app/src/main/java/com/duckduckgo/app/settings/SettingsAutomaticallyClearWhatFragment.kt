@@ -18,20 +18,17 @@ package com.duckduckgo.app.settings
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ContentDaxDialogBinding
-import com.duckduckgo.app.browser.databinding.ContentSiteLocationPermissionDialogBinding
 import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhatFragmentBinding
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhatOption.*
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 
-class SettingsAutomaticallyClearWhatFragment : DialogFragment( R.layout.settings_automatically_clear_what_fragment) {
+class SettingsAutomaticallyClearWhatFragment : DialogFragment(R.layout.settings_automatically_clear_what_fragment) {
 
     private val binding by viewBinding(SettingsAutomaticallyClearWhatFragmentBinding::inflate)
 

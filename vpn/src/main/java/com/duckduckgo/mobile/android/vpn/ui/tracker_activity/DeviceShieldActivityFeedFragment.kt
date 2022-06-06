@@ -18,12 +18,9 @@ package com.duckduckgo.mobile.android.vpn.ui.tracker_activity
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.FragmentScope
@@ -31,7 +28,6 @@ import com.duckduckgo.mobile.android.ui.recyclerviewext.StickyHeadersLinearLayou
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityFeedBinding
-import com.duckduckgo.mobile.android.vpn.databinding.ViewDeviceShieldActivityTrackerBadgeBinding
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository.TimeWindow
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
@@ -54,14 +50,6 @@ class DeviceShieldActivityFeedFragment : Fragment(R.layout.view_device_shield_ac
     private var feedListener: DeviceShieldActivityFeedListener? = null
 
     private val binding: ViewDeviceShieldActivityFeedBinding by viewBinding()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return binding.root
-    }
 
     override fun onViewCreated(
         view: View,

@@ -19,14 +19,12 @@ package com.duckduckgo.app.settings
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.view.View
 import android.widget.RadioGroup
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.SettingsAutomaticallyClearWhenFragmentBinding
 import com.duckduckgo.mobile.android.ui.view.show
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -57,8 +55,6 @@ class SettingsAutomaticallyClearWhenFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val currentOption: ClearWhenOption = arguments?.getSerializable(DEFAULT_OPTION_EXTRA) as ClearWhenOption? ?: APP_EXIT_ONLY
-
-
 
         if (appBuildConfig.isDebug) {
             showDebugOnlyOption()

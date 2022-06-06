@@ -22,9 +22,7 @@ import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.mobile.android.vpn.R
-import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionConfirmDisableBinding
 import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionPromoteAlwaysOnBinding
-import com.duckduckgo.mobile.android.vpn.databinding.DialogTrackingProtectionVpnConflictBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class AppTPPromoteAlwaysOnDialog private constructor(private val listener: Listener) : DialogFragment() {
