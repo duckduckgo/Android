@@ -18,35 +18,49 @@ package com.duckduckgo.app.global.api
 
 import android.webkit.WebSettings
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.fakes.FeatureToggleFake
+import com.duckduckgo.app.fakes.UserAgentFake
+import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.device.ContextDeviceInfo
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.privacy.config.api.UserAgent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class ApiRequestInterceptorTest {
 
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private lateinit var testee: ApiRequestInterceptor
-
     private lateinit var userAgentProvider: UserAgentProvider
-
-    @Mock private lateinit var appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig = mock()
+    private val fakeUserAgent: UserAgent = UserAgentFake()
+    private val fakeToggle: FeatureToggle = FeatureToggleFake()
+    private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
 
     @Before
     fun before() {
-        MockitoAnnotations.openMocks(this)
-
         whenever(appBuildConfig.versionName).thenReturn("name")
 
         userAgentProvider = UserAgentProvider(
             { WebSettings.getDefaultUserAgent(InstrumentationRegistry.getInstrumentation().context) },
             ContextDeviceInfo(InstrumentationRegistry.getInstrumentation().context),
-            provideUserAgentOverridePluginPoint()
+            provideUserAgentOverridePluginPoint(),
+            fakeUserAgent,
+            fakeToggle,
+            fakeUserAllowListRepository,
+            coroutinesTestRule.testDispatcherProvider
         )
 
         testee = ApiRequestInterceptor(

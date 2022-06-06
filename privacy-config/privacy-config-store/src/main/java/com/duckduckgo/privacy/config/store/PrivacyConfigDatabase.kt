@@ -32,12 +32,13 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.duckduckgo.privacy.config.store.features.amplinks.AmpLinksDao
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersDao
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryDao
+import com.duckduckgo.privacy.config.store.features.useragent.UserAgentDao
 
 @TypeConverters(
     RuleTypeConverter::class,
 )
 @Database(
-    exportSchema = true, version = 8,
+    exportSchema = true, version = 9,
     entities = [
         TrackerAllowlistEntity::class,
         UnprotectedTemporaryEntity::class,
@@ -52,7 +53,8 @@ import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.Unprote
         AmpLinkExceptionEntity::class,
         TrackingParameterEntity::class,
         TrackingParameterExceptionEntity::class,
-        AutofillExceptionEntity::class
+        AutofillExceptionEntity::class,
+        UserAgentExceptionEntity::class,
     ]
 )
 abstract class PrivacyConfigDatabase : RoomDatabase() {
@@ -67,6 +69,7 @@ abstract class PrivacyConfigDatabase : RoomDatabase() {
     abstract fun ampLinksDao(): AmpLinksDao
     abstract fun trackingParametersDao(): TrackingParametersDao
     abstract fun autofillDao(): AutofillDao
+    abstract fun userAgentDao(): UserAgentDao
 }
 
 val MIGRATION_2_3 = object : Migration(2, 3) {

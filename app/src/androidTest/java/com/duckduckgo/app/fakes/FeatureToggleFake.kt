@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.config.api
+package com.duckduckgo.app.fakes
 
 import com.duckduckgo.feature.toggles.api.FeatureName
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 
-/** List of [FeatureName] that belong to the Privacy Configuration */
-enum class PrivacyFeatureName(override val value: String) : FeatureName {
-    ContentBlockingFeatureName("contentBlocking"),
-    GpcFeatureName("gpc"),
-    HttpsFeatureName("https"),
-    TrackerAllowlistFeatureName("trackerAllowlist"),
-    DrmFeatureName("eme"),
-    AmpLinksFeatureName("ampLinks"),
-    TrackingParametersFeatureName("trackingParameters"),
-    AutofillFeatureName("autofill"),
-    UserAgentFeatureName("customUserAgent"),
+class FeatureToggleFake : FeatureToggle {
+    override fun isFeatureEnabled(
+        featureName: FeatureName,
+        defaultValue: Boolean
+    ): Boolean = true
 }
