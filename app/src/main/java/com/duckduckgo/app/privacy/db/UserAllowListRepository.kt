@@ -18,14 +18,12 @@ package com.duckduckgo.app.privacy.db
 
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface UserAllowListRepository {
     fun isDomainInUserAllowList(domain: String): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealUserAllowListRepository @Inject constructor(
     private val userWhitelistDao: UserWhitelistDao,
