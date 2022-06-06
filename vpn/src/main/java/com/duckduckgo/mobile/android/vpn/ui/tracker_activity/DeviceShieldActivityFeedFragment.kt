@@ -55,14 +55,7 @@ class DeviceShieldActivityFeedFragment : Fragment(R.layout.view_device_shield_ac
 
     private val binding: ViewDeviceShieldActivityFeedBinding by viewBinding()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return binding.root
-    }
-
+    
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?
