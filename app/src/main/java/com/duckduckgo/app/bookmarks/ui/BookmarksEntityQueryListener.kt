@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.bookmarks.model.BookmarkFolder
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.bookmarks.ui.bookmarkfolders.BookmarkFoldersAdapter
@@ -27,11 +28,13 @@ class BookmarksEntityQueryListener(
     private val bookmarkFoldersAdapter: BookmarkFoldersAdapter
 ) {
 
+    @SuppressLint("NotifyDataSetChanged")
     fun onQueryTextChange(newText: String): Boolean {
         viewModel.viewState.value?.bookmarks?.let { bookmarks ->
             viewModel.viewState.value?.bookmarkFolders?.let { bookmarkFolders ->
                 val filteredFolders = filterBookmarkFolders(newText, bookmarkFolders)
                 bookmarksAdapter.setItems(filterBookmarks(newText, bookmarks), filteredFolders.isEmpty())
+                bookmarksAdapter.notifyDataSetChanged()
                 bookmarkFoldersAdapter.bookmarkFolderItems = filteredFolders
             }
         }

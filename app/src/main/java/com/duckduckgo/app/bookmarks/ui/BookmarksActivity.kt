@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.bookmarks.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -145,37 +146,38 @@ class BookmarksActivity : DuckDuckGoActivity() {
         contentBookmarksBinding.recycler.itemAnimator = null
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeViewModel(parentId: Long) {
         viewModel.viewState.observe(
-            this,
-            { viewState ->
-                viewState?.let { state ->
-                    if (parentId == ROOT_FOLDER_ID) {
-                        favoritesAdapter.favoriteItems = state.favorites.map { FavoritesAdapter.FavoriteItem(it) }
-                    }
-                    bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
-                    bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
-                    setSearchMenuItemVisibility()
+            this
+        ) { viewState ->
+            viewState?.let { state ->
+                if (parentId == ROOT_FOLDER_ID) {
+                    favoritesAdapter.setItems(state.favorites.map { FavoritesAdapter.FavoriteItem(it) })
+                    favoritesAdapter.notifyDataSetChanged()
                 }
+                bookmarksAdapter.setItems(state.bookmarks.map { BookmarksAdapter.BookmarkItem(it) }, state.bookmarkFolders.isEmpty())
+                bookmarksAdapter.notifyDataSetChanged()
+                bookmarkFoldersAdapter.bookmarkFolderItems = state.bookmarkFolders.map { BookmarkFoldersAdapter.BookmarkFolderItem(it) }
+                setSearchMenuItemVisibility()
             }
-        )
+        }
 
         viewModel.command.observe(
-            this,
-            {
-                when (it) {
-                    is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
-                    is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
-                    is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
-                    is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
-                    is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
-                    is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
-                    is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
-                }
+            this
+        ) {
+            when (it) {
+                is BookmarksViewModel.Command.ConfirmDeleteSavedSite -> confirmDeleteSavedSite(it.savedSite)
+                is BookmarksViewModel.Command.OpenSavedSite -> openSavedSite(it.savedSite)
+                is BookmarksViewModel.Command.ShowEditSavedSite -> showEditSavedSiteDialog(it.savedSite)
+                is BookmarksViewModel.Command.ImportedSavedSites -> showImportedSavedSites(it.importSavedSitesResult)
+                is BookmarksViewModel.Command.ExportedSavedSites -> showExportedSavedSites(it.exportSavedSitesResult)
+                is BookmarksViewModel.Command.OpenBookmarkFolder -> openBookmarkFolder(it.bookmarkFolder)
+                is BookmarksViewModel.Command.ShowEditBookmarkFolder -> editBookmarkFolder(it.bookmarkFolder)
+                is BookmarksViewModel.Command.DeleteBookmarkFolder -> deleteBookmarkFolder(it.bookmarkFolder)
+                is BookmarksViewModel.Command.ConfirmDeleteBookmarkFolder -> confirmDeleteBookmarkFolder(it.bookmarkFolder, it.folderBranch)
             }
-        )
+        }
     }
 
     private fun showImportedSavedSites(result: ImportSavedSitesResult) {

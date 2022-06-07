@@ -21,18 +21,18 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class BookmarksAdapter(
@@ -40,12 +40,14 @@ class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : ListAdapter<BookmarksAdapter.BookmarksItemTypes, BookmarkScreenViewHolders>(BookmarksDiffCallback()) {
+) : RecyclerView.Adapter<BookmarkScreenViewHolders>() {
 
     companion object {
         const val EMPTY_STATE_TYPE = 0
         const val BOOKMARK_TYPE = 1
     }
+
+    private val bookmarkItems: MutableList<BookmarksItemTypes> = mutableListOf()
 
     interface BookmarksItemTypes
     object EmptyHint : BookmarksItemTypes
@@ -56,7 +58,7 @@ class BookmarksAdapter(
         showEmptyHint: Boolean
     ) {
         val generatedList = generateNewList(bookmarkItems, showEmptyHint)
-        submitList(generatedList)
+        this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
     }
 
     private fun generateNewList(
@@ -66,7 +68,7 @@ class BookmarksAdapter(
         if (!showEmptyHint) {
             return value
         }
-        return if (value.isEmpty()) listOf(EmptyHint) else value
+        return value.ifEmpty { listOf(EmptyHint) }
     }
 
     override fun onCreateViewHolder(
@@ -93,7 +95,7 @@ class BookmarksAdapter(
     ) {
         when (holder) {
             is BookmarkScreenViewHolders.BookmarksViewHolder -> {
-                holder.update((getItem(position) as BookmarkItem).bookmark)
+                holder.update((this.bookmarkItems[position] as BookmarkItem).bookmark)
             }
             is BookmarkScreenViewHolders.EmptyHint -> {
                 holder.bind()
@@ -102,10 +104,14 @@ class BookmarksAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (getItem(position)) {
+        return when (this.bookmarkItems[position]) {
             is EmptyHint -> EMPTY_STATE_TYPE
             else -> BOOKMARK_TYPE
         }
+    }
+
+    override fun getItemCount(): Int {
+        return this.bookmarkItems.size
     }
 }
 
@@ -138,7 +144,7 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             )
             twoListItem.setTitle(bookmark.title)
             twoListItem.setSubtitle(parseDisplayUrl(bookmark.url))
-            loadFavicon(bookmark.url)
+            loadFavicon(bookmark.url, twoListItem.imageView())
 
             twoListItem.setOverflowClickListener { anchor ->
                 showOverFlowMenu(anchor, bookmark)
@@ -149,9 +155,9 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
             }
         }
 
-        private fun loadFavicon(url: String) {
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
+        private fun loadFavicon(url: String, image: ImageView) {
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = image)
             }
         }
 

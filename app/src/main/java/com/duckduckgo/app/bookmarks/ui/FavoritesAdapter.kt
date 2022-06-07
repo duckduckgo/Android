@@ -21,19 +21,19 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteEntryBinding
 import com.duckduckgo.app.browser.databinding.ViewSavedSiteSectionTitleBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.baseHost
 import com.duckduckgo.mobile.android.ui.menu.PopupMenu
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FavoritesAdapter(
@@ -41,7 +41,7 @@ class FavoritesAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager
-) : ListAdapter<FavoritesAdapter.FavoriteItemTypes, FavoritesScreenViewHolders>(FavoritesDiffCallback()) {
+) : RecyclerView.Adapter<FavoritesScreenViewHolders>() {
 
     companion object {
         const val FAVORITE_SECTION_TITLE_TYPE = 0
@@ -49,19 +49,22 @@ class FavoritesAdapter(
         const val FAVORITE_TYPE = 2
     }
 
+    private val favoriteItems: MutableList<FavoriteItemTypes> = mutableListOf()
+
     interface FavoriteItemTypes
     object Header : FavoriteItemTypes
     object EmptyHint : FavoriteItemTypes
     data class FavoriteItem(val favorite: Favorite) : FavoriteItemTypes
 
-    var favoriteItems: List<FavoriteItemTypes> = emptyList()
-        set(value) {
-            field = generateNewList(value)
-            submitList(field)
-        }
+    fun setItems(
+        favoriteItems: List<FavoriteItem>
+    ) {
+        val generatedList = generateNewList(favoriteItems)
+        this.favoriteItems.clear().also { this.favoriteItems.addAll(generatedList) }
+    }
 
     private fun generateNewList(value: List<FavoriteItemTypes>): List<FavoriteItemTypes> {
-        return listOf(Header) + (if (value.isEmpty()) listOf(EmptyHint) else value)
+        return listOf(Header) + value.ifEmpty { listOf(EmptyHint) }
     }
 
     override fun onCreateViewHolder(
@@ -160,7 +163,7 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
 
             listItem.setTitle(favorite.title)
             listItem.setSubtitle(parseDisplayUrl(favorite.url))
-            loadFavicon(favorite.url)
+            loadFavicon(favorite.url, listItem.imageView())
 
             listItem.setOverflowClickListener { anchor ->
                 showOverFlowMenu(anchor, favorite)
@@ -171,9 +174,9 @@ sealed class FavoritesScreenViewHolders(itemView: View) : RecyclerView.ViewHolde
             }
         }
 
-        private fun loadFavicon(url: String) {
-            lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewFromLocalOrFallback(url = url, view = itemView.findViewById(CommonR.id.image))
+        private fun loadFavicon(url: String, image: ImageView) {
+            lifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                faviconManager.loadToViewFromLocalOrFallback(url = url, view = image)
             }
         }
 
