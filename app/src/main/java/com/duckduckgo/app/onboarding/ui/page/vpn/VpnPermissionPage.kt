@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.onboarding.ui.page.vpn
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.lifecycle.Lifecycle
@@ -46,6 +48,7 @@ import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ShowV
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.ShowVpnConflictDialog
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.Command.StartVpn
 import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPagesViewModel.VpnPermissionStatus
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.ui.view.addClickableLink
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -65,6 +68,9 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val binding: ContentOnboardingVpnPermissionBinding by viewBinding()
 
@@ -142,8 +148,13 @@ class VpnPermissionPage : OnboardingPageFragment(), Listener {
         startActivity(DeviceShieldFAQActivity.intent(requireContext()))
     }
 
+    @SuppressLint("InlinedApi")
     private fun openVpnSettings() {
-        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+            Intent(Settings.ACTION_VPN_SETTINGS)
+        } else {
+            Intent("android.net.vpn.SETTINGS")
+        }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }
