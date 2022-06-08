@@ -625,52 +625,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Блокира имейл тракерите и скрива Вашия адрес</string>
     <string name="newEmailAliasMenuTitle">Създаване на Duck адрес</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Да се премахне ли защитата на имейла?</string>
-    <string name="emailSignOutDialogText">Забележка: При премахване на защитата на имейла от устройството, Вашият Duck адрес няма да бъде изтрит.</string>
-    <string name="emailSignOutDialogCancel">Отмени</string>
-    <string name="emailSignOutDialogDisable">Премахване</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Списък с чакащи за имейл</string>
-    <string name="waitlistNotificationTitle">Защитата на имейла е готова!</string>
-    <string name="waitlistNotificationDescription">Отворете поканата</string>
-
     <string name="waitlistNotificationDialogDescription">Искате ли да Ви изпратим известие, когато дойде Вашият ред?</string>
     <string name="waitlistNotificationDialogNoThanks">Не, благодаря</string>
     <string name="waitlistNotificationDialogNotifyMe">УВЕДОМЕТЕ МЕ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Защита на имейл (Бета версия)</string>
     <string name="emailProtectionActivityTitle">Защита на имейл (Бета версия)</string>
-    <string name="emailProtectionFooterDescription">Не е необходимо да споделяте лична информация, за да се включите в списъка с чакащи. Ще си осигурите място на опашката с клеймо за време, което съществува само на вашето устройство, така можем да ви уведомим, когато дойде вашия ред.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Възникна грешка при включване в списъка с чакащи, моля, опитайте отново по-късно</string>
-    <string name="emailProtectionDuckAddressCta">Вече имам Duck адрес</string>
-    <string name="emailProtectionInviteCodeCta">Имам код за покана</string>
-    <string name="emailProtectionWaitlistCta">Включване в списък с чакащи за личен адрес</string>
-    <string name="emailProtectionGetStartedCta">Първи стъпки</string>
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Поверителност на имейла с две думи.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес, без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Вече сте в списъка!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ще Ви изпратим известие, когато<br/> Вашата защита на имейли е готова. <a href=""><b>Научете повече</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Вашата покана ще се покаже, когато сме готови. Искате ли да <a href=""><b>получите известие</b></a>, когато пристигне?<br/><a href=""><b>Научете повече</b></a> за защитата на имейли.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Получихте покана!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Блокирайте имейл тракерите и скрийте своя адрес,<br/>без да променяте своя имейл доставчик.<a href=""><b>Научете повече</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Личен Duck адрес</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Когато защитата на имейли бъде премахната от това устройство, ще бъде премахната и опцията за попълване на Вашия личен Duck адрес или генериран нов личен Duck адрес в полетата за имейл при сърфиране в мрежата.<br/><br/>Ако искате да изтриете напълно своите Duck адреси или имате други въпроси или мнения, свържете се с нас на <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Премахване от устройството</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Редактиране на отметка</string>

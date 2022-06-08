@@ -637,52 +637,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokira programe za praćenje e-pošte i skriva vašu adresu</string>
     <string name="newEmailAliasMenuTitle">Izradite Duck adresu</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Ukloniti zaštitu e-pošte?</string>
-    <string name="emailSignOutDialogText">Napomena: uklanjanjem zaštite e-pošte s ovog uređaja neće se izbrisati vaša Duck adresa.</string>
-    <string name="emailSignOutDialogCancel">Otkaži</string>
-    <string name="emailSignOutDialogDisable">Ukloni</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Lista čekanja e-pošte</string>
-    <string name="waitlistNotificationTitle">Zaštita e-pošte je spremna!</string>
-    <string name="waitlistNotificationDescription">Otvori svoju pozivnicu</string>
-
     <string name="waitlistNotificationDialogDescription">Želite li da vam pošaljemo obavijest kad dođete na red?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, hvala</string>
     <string name="waitlistNotificationDialogNotifyMe">OBAVIJESTI ME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Zaštita e-pošte (Beta)</string>
     <string name="emailProtectionActivityTitle">Zaštita e-pošte (Beta)</string>
-    <string name="emailProtectionFooterDescription">Nećeš morati podijeliti nikakve osobne podatke za pridruživanje listi čekanja. Svoje ćeš mjesto osigurati u skladu s vremenskom oznakom koja postoji samo na tvom uređaju kako bismo te mogli obavijestiti kada na tebe dođe red.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Došlo je do pogreške prilikom pridruživanja listi čekanja; pokušajte ponovo kasnije</string>
-    <string name="emailProtectionDuckAddressCta">Već imam Duck adresu</string>
-    <string name="emailProtectionInviteCodeCta">Imam pozivnu šifru</string>
-    <string name="emailProtectionWaitlistCta">Pridružite se privatnoj listi čekanja</string>
-    <string name="emailProtectionGetStartedCta">Započnite</string>
     <string name="emailNotSupported">Uređaj nije podržan</string>
     <string name="emailNotSupportedExplanation">Zaštita e-pošte omogućuje ti stvaranje privatnih adresa e-pošte koje uklanjaju praćenje e-pošte. Adrese koje kreiraš moramo šifrirati i pohraniti lokalno na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, zaštita e-pošte nije dostupna.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Zaštita privatnosti e-pošte, na jednostavan način.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu bez promjene pružatelja usluga e-pošte. <br/><a href=""><b>Saznaj više</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Na popisu ste!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Poslat ćemo vam obavijest kada<br/>zaštita e-pošte bude spremna za vas. <a href=""><b>Saznajte više</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaša pozivnica pojavit će se ovdje kad budemo spremni za vas. Želite li <a href=""><b>dobiti obavijest</b></a> kad stigne?<br/><a href=""><b>Saznajte više</b></a> o zaštiti e-pošte.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Pozvani ste!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokiraj programe za praćenje e-pošte i sakrij svoju adresu <br/>bez promjene pružatelja usluga e-pošte.<br/> <a href=""><b>Saznaj više</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osobna Duck adresa</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Uklanjanjem zaštite e-pošte s ovog uređaja uklanja se mogućnost da se polja za e-poštu dok pregledavate web popune vašom osobnom Duck adresom ili novogeneriranom privatnom Duck adresom.<br/><br/>Da biste u potpunosti izbrisali svoje Duck adrese ili za bilo kakva druga pitanja ili povratne informacije, obratite nam se na <a href=\"mailto:support@duck.com\">support@duck.com</a> .]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Ukloni s uređaja</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>

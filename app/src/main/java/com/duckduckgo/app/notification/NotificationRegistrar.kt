@@ -72,11 +72,6 @@ class NotificationRegistrar @Inject constructor(
             R.string.notificationChannelTutorials,
             NotificationManagerCompat.IMPORTANCE_DEFAULT
         )
-        val EMAIL_WAITLIST = Channel(
-            "com.duckduckgo.email",
-            R.string.notificationChannelEmailWaitlist,
-            NotificationManagerCompat.IMPORTANCE_HIGH
-        )
         val APP_TP_WAITLIST = Channel(
             "com.duckduckgo.apptp",
             VpnR.string.atp_WaitlistActivityWaitlistTitle,
@@ -105,7 +100,6 @@ class NotificationRegistrar @Inject constructor(
         ChannelType.FILE_DOWNLOADING,
         ChannelType.FILE_DOWNLOADED,
         ChannelType.TUTORIALS,
-        ChannelType.EMAIL_WAITLIST,
         ChannelType.APP_TP_WAITLIST
     )
 

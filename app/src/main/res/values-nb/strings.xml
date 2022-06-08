@@ -625,52 +625,19 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkerer e-postsporere og skjuler adressen din</string>
     <string name="newEmailAliasMenuTitle">Opprett Duck-adresse</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Vil du fjerne e-postbeskyttelse?</string>
-    <string name="emailSignOutDialogText">Merk: Duck-adressen din slettes ikke ved at du fjerner e-postbeskyttelse fra denne enheten.</string>
-    <string name="emailSignOutDialogCancel">Avbryt</string>
-    <string name="emailSignOutDialogDisable">Fjern</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Venteliste for e-post</string>
-    <string name="waitlistNotificationTitle">E-postbeskyttelse er klar!</string>
-    <string name="waitlistNotificationDescription">Åpne invitasjonen din</string>
-
     <string name="waitlistNotificationDialogDescription">Skal vi sende et varsel til deg når det er din tur?</string>
     <string name="waitlistNotificationDialogNoThanks">Nei takk</string>
     <string name="waitlistNotificationDialogNotifyMe">VARSLE MEG</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-postbeskyttelse (Beta)</string>
     <string name="emailProtectionActivityTitle">E-postbeskyttelse (Beta)</string>
-    <string name="emailProtectionFooterDescription">Du behøver ikke å dele noen personopplysninger for å sette deg på ventelisten. Du sikrer plassen din i køen med et tidsstempel som kun eksisterer på enheten din, så vi kan varsle deg når det er din tur.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Det oppstod en feil under registrering for ventelisten. Prøv igjen senere.</string>
-    <string name="emailProtectionDuckAddressCta">Jeg har allerede en Duck-adresse</string>
-    <string name="emailProtectionInviteCodeCta">Jeg har en invitasjonskode</string>
-    <string name="emailProtectionWaitlistCta">Sett deg på den private ventelisten</string>
-    <string name="emailProtectionGetStartedCta">Kom i gang</string>
     <string name="emailNotSupported">Enheten støttes ikke</string>
     <string name="emailNotSupportedExplanation">Med e-postbeskyttelse kan du opprette private e-postadresser som fjerner e-postsporere. Vi må kryptere og lagre disse adressene du oppretter, lokalt på enheten din. Fordi enheten din ikke støtter kryptert lagring, er e-postbeskyttelse utilgjengelig.</string>
 
     <!-- Screen 1-->
     <string name="emailProtectionStatusTitleJoin">Personvern for e-post gjort enkelt.</string>
     <string name="emailProtectionDescriptionJoin"><![CDATA[Blokker e-postsporere og skjul adressen din, uten å bytte e-postleverandør.<br/><a href=""><b>Finn ut mer</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Du er satt på listen!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Vi sender deg et varsel når<br/> e-postbeskyttelse er klar for deg. <a href=""><b>Finn ut mer</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Invitasjonen vises her når vi er klare for deg. Vil du <a href=""><b>få et varsel</b></a> når den kommer?<br/><a href=""><b>Finn ut mer om</b></a> e-postbeskyttelse.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Du er invitert!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokker e-postsporere og skjul adressen din,<br/>uten å bytte e-postleverandør.<br/><a href=""><b>Finn ut mer</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Personlig Duck-adresse</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Hvis du fjerner e-postbeskyttelse fra denne enheten, fjerner du muligheten til å fylle inn din personlige Duck-adresse eller en nygenerert privat Duck-adresse i e-postfelt når du surfer på nettet.<br/><br/>Hvis du vil slette Duck-adressene dine helt, eller har andre spørsmål eller tilbakemeldinger, kan du kontakte oss på <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Fjern fra enheten</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediger bokmerke</string>

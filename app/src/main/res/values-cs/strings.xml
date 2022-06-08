@@ -637,52 +637,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokuje sledování e-mailů a skryje vaši adresu</string>
     <string name="newEmailAliasMenuTitle">Vytvořit adresu Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Odstranit ochranu e-mailů?</string>
-    <string name="emailSignOutDialogText">Poznámka: Odebrání ochrany e-mailů z tohoto zařízení neodstraní vaši adresu Duck.</string>
-    <string name="emailSignOutDialogCancel">Zrušit</string>
-    <string name="emailSignOutDialogDisable">Odstranit</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Pořadník e-mailu</string>
-    <string name="waitlistNotificationTitle">Ochrana e-mailu je připravená.</string>
-    <string name="waitlistNotificationDescription">Otevřít pozvánku</string>
-
     <string name="waitlistNotificationDialogDescription">Chcete, abychom vám poslali upozornění, až na vás bude řada?</string>
     <string name="waitlistNotificationDialogNoThanks">Ne, děkuji</string>
     <string name="waitlistNotificationDialogNotifyMe">UPOZORNĚTE MĚ</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Ochrana e-mailů (beta verze)</string>
     <string name="emailProtectionActivityTitle">Ochrana e-mailů (beta verze)</string>
-    <string name="emailProtectionFooterDescription">Kvůli zařazení do pořadníku není nutné sdílet žádné osobní údaje. Tvoje místo se určuje podle časového razítka uloženého jen v tvém zařízení, abychom tě mohli upozornit, až budeš na řadě.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Při připojení k pořadníku došlo k chybě, zkuste to znovu později</string>
-    <string name="emailProtectionDuckAddressCta">Už mám adresu Duck</string>
-    <string name="emailProtectionInviteCodeCta">Mám zvací kód</string>
-    <string name="emailProtectionWaitlistCta">Připojte se k soukromému pořadníku</string>
-    <string name="emailProtectionGetStartedCta">Začínáme</string>
     <string name="emailNotSupported">Zařízení není podporované</string>
     <string name="emailNotSupportedExplanation">Ochrana e-mailu umožňuje vytvářet soukromé e-mailové adresy, pomocí kterých obejdeš trackery e-mailů. Tyhle adresy potřebujeme zašifrovat a uložit přímo v tvém zařízení. Ochrana e-mailů není k dispozici, protože tvoje zařízení nepodporuje šifrování úložiště.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-mailové soukromí, zjednodušené.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokování trackerů e-mailu a skrytí adresy bez změny e-mailového poskytovatele.<br/><a href=""><b>Více informací</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Jste na seznamu!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Až pro vás bude služba ochrany<br/> e-mailů připravena, zašleme vám upozornění. <a href=""><b>Více informací</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vaše pozvánka se tu objeví, až na vás budeme připraveni. Chcete <a href=""><b>dostat upozornění,</b></a> až dorazí? <br/><a href=""><b>Více informací</b></a> o ochraně e-mailů.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Byli jste pozváni!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokuj trackery e-mailů a skryj svou adresu<br/>bez změny e-mailového poskytovatele.<br/><a href=""><b>Více informací</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Osobní adresa Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Odebráním ochrany e-mailů z tohoto zařízení se při procházení webu odstraní možnost vyplnit osobní adresu Duck nebo nově vygenerovanou soukromou adresu Duck do e-mailových polí. <br/><br/>Chcete-li úplně vymazat vaše adresy Duck nebo máte-li jakékoli další dotazy nebo zpětnou vazbu, obraťte se na nás na adrese <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Odebrat ze zařízení</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Upravit záložku</string>

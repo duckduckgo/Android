@@ -625,52 +625,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blokkeert e-mailtrackers en verbergt je adres</string>
     <string name="newEmailAliasMenuTitle">Duck-adres aanmaken</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">E-mailbescherming verwijderen?</string>
-    <string name="emailSignOutDialogText">Let op: als je E-mailbescherming van dit apparaat verwijdert, wordt je Duck-adres niet verwijderd.</string>
-    <string name="emailSignOutDialogCancel">Annuleren</string>
-    <string name="emailSignOutDialogDisable">Verwijderen</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">E-mailwachtlijst</string>
-    <string name="waitlistNotificationTitle">E-mailbescherming is klaar!</string>
-    <string name="waitlistNotificationDescription">Open je uitnodiging</string>
-
     <string name="waitlistNotificationDialogDescription">Wil je dat we je een melding sturen als je aan de beurt bent?</string>
     <string name="waitlistNotificationDialogNoThanks">Nee, bedankt</string>
     <string name="waitlistNotificationDialogNotifyMe">MELDING STUREN</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">E-mailbescherming (bèta)</string>
     <string name="emailProtectionActivityTitle">E-mailbescherming (bèta)</string>
-    <string name="emailProtectionFooterDescription">Je hoeft geen persoonsgegevens te delen om op de wachtlijst te komen. Je beveiligt je plaats met een tijdstempel die alleen op jouw apparaat bestaat. Zo kunnen we je informeren wanneer je aan de beurt bent.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Er is een fout opgetreden bij het inschrijven op de wachtlijst. Probeer het later opnieuw</string>
-    <string name="emailProtectionDuckAddressCta">Ik heb al een Duck-adres</string>
-    <string name="emailProtectionInviteCodeCta">Ik heb een uitnodigingscode</string>
-    <string name="emailProtectionWaitlistCta">Schrijf je in voor de privéwachtlijst</string>
-    <string name="emailProtectionGetStartedCta">Aan de slag</string>
     <string name="emailNotSupported">Apparaat wordt niet ondersteund</string>
     <string name="emailNotSupportedExplanation">Met E-mailbescherming maak je privémailadressen die e-mailtrackers verwijderen. De adressen die je lokaal op je apparaat maakt, dienen we te versleutelen en opslaan. E-mailbescherming is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">E-mailprivacy, vereenvoudigd.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Je staat op de lijst!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We sturen je een melding wanneer<br/> E-mailbescherming voor je klaar staat. <a href=""><b>Meer informatie</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Je uitnodiging wordt hier weergegeven als je aan de beurt bent. Wil <a href=""><b>je een melding krijgen</b></a> wanneer deze binnen is?<br/><a href=""><b>Meer informatie</b></a> over E-mailbescherming.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Je bent uitgenodigd!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blokkeer e-mailtrackers en verberg je adres, zonder van e-mailprovider te wisselen.<a href=""><b>Meer informatie</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Persoonlijk Duck-adres</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Als je E-mailbescherming van dit apparaat verwijdert, kun je je persoonlijke Duck-adres niet meer invullen en geen nieuwe privé-Duck-adressen genereren in e-mailvelden terwijl je op het internet browset.<br/><br/>Als je je Duck-adressen volledig wilt verwijderen of als je andere vragen of feedback hebt, neem dan contact met ons op via <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Verwijderen van apparaat</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>

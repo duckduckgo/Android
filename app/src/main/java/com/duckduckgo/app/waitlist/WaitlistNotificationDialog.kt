@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.waitlist.email
+package com.duckduckgo.app.waitlist
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -49,6 +49,8 @@ class WaitlistNotificationDialog : DialogFragment() {
     }
 
     companion object {
+        const val NOTIFICATION_DIALOG_TAG = "NOTIFICATION_DIALOG_FRAGMENT"
+
         fun create(): WaitlistNotificationDialog = WaitlistNotificationDialog()
     }
 }

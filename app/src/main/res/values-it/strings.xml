@@ -625,52 +625,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blocca il sistema di tracciamento e-mail e nasconde il tuo indirizzo</string>
     <string name="newEmailAliasMenuTitle">Crea indirizzo Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Rimuovere protezioni e-mail?</string>
-    <string name="emailSignOutDialogText">Nota: la rimozione delle protezioni e-mail da questo dispositivo non eliminerà il tuo indirizzo Duck.</string>
-    <string name="emailSignOutDialogCancel">Annulla</string>
-    <string name="emailSignOutDialogDisable">Rimuovi</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Lista d\'attesa per e-mail</string>
-    <string name="waitlistNotificationTitle">Protezione email pronta.</string>
-    <string name="waitlistNotificationDescription">Apri il tuo invito</string>
-
     <string name="waitlistNotificationDialogDescription">Vuoi ricevere una notifica quando è il tuo turno?</string>
     <string name="waitlistNotificationDialogNoThanks">No, grazie</string>
     <string name="waitlistNotificationDialogNotifyMe">INVIAMI UNA NOTIFICA</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Protezione e-mail (beta)</string>
     <string name="emailProtectionActivityTitle">Protezione e-mail (beta)</string>
-    <string name="emailProtectionFooterDescription">Per iscriverti alla lista d\'attesa non dovrai comunicare informazioni personali. Ti assicurerai un posto in coda con una marca temporale presente esclusivamente sul tuo dispositivo, così potremo avvisarti quando è il tuo turno.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Si è verificato un errore durante l\'iscrizione alla lista d\'attesa, riprova più tardi</string>
-    <string name="emailProtectionDuckAddressCta">Ho già un indirizzo Duck</string>
-    <string name="emailProtectionInviteCodeCta">Ho un codice invito</string>
-    <string name="emailProtectionWaitlistCta">Iscriviti alla lista d\'attesa privata</string>
-    <string name="emailProtectionGetStartedCta">Iniziamo</string>
     <string name="emailNotSupported">Dispositivo non supportato</string>
     <string name="emailNotSupportedExplanation">Protezione email consente di creare indirizzi e-mail privati che rimuovono i sistemi di tracciamento delle e-mail. Dobbiamo crittografare e archiviare questi indirizzi che crei localmente sul tuo dispositivo. Poiché il tuo dispositivo non supporta l\'archiviazione crittografata, Protezione email non è disponibile.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Tutelare la privacy delle e-mail, ora è semplice.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=""><b>Ulteriori informazioni</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">Sei sulla lista.</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Ti invieremo una notifica quando la funzione Protezione<br/> e-mail sarà pronta per te. <a href=""><b>Ulteriori informazioni</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Vedrai il tuo invito qui quando saremo pronti per te. Vuoi <a href=""><b>ricevere una notifica</b></a> quando arriva?<br/><a href=""><b>Ulteriori informazioni</b></a> sulla protezione e-mail.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">Hai ricevuto un invito.</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Blocca il sistema di tracciamento email e nascondi il tuo indirizzo, senza cambiare il provider di posta elettronica.<a href=""><b>Ulteriori informazioni</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Crea indirizzo Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Rimuovendo la funzione Protezione e-mail da questo dispositivo rimuoverai l\'opzione di compilazione automatica del tuo indirizzo Duck personale o di un indirizzo Duck privato appena generato nei campi e-mail mentre navighi sul web.<br/><br/>Per eliminare completamente i tuoi indirizzi Duck o per qualsiasi altra domanda o feedback, contattaci all\'indirizzo <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Rimuovi dal dispositivo</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Modifica segnalibro</string>

@@ -626,52 +626,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Blocks email trackers and hides your address</string>
     <string name="newEmailAliasMenuTitle">Create Duck Address</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">Remove Email Protections?</string>
-    <string name="emailSignOutDialogText">Note: Removing Email Protections from this device will not delete your Duck Address.</string>
-    <string name="emailSignOutDialogCancel">Cancel</string>
-    <string name="emailSignOutDialogDisable">Remove</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Email waitlist</string>
-    <string name="waitlistNotificationTitle">Email Protection is ready!</string>
-    <string name="waitlistNotificationDescription">Open your invite</string>
-
     <string name="waitlistNotificationDialogDescription">Would you like us to send you a notification when it\'s your turn?</string>
     <string name="waitlistNotificationDialogNoThanks">No Thanks</string>
     <string name="waitlistNotificationDialogNotifyMe">Notify Me</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Email Protection (Beta)</string>
     <string name="emailProtectionActivityTitle">Email Protection (Beta)</string>
-    <string name="emailProtectionFooterDescription">You won\'t need to share any personal information to join the waitlist. You\'ll secure your place in line with a timestamp that exists solely on your device so we can notify you when it\'s your turn.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">An error happened while joining the Waitlist, please try again later</string>
-    <string name="emailProtectionDuckAddressCta">I already have a Duck Address</string>
-    <string name="emailProtectionInviteCodeCta">I have an Invite Code</string>
-    <string name="emailProtectionWaitlistCta">Join the Private Waitlist</string>
-    <string name="emailProtectionGetStartedCta">Get Started</string>
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Email privacy, simplified.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Block email trackers and hide your address, without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">You\'re on the list!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[We\'ll send you a notification when<br/> Email Protection is ready for you. <a href=""><b>Learn more</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Your invite will show up here when we\'re ready for you. Want to <a href=""><b>get a notification</b></a> when it arrives?<br/><a href=""><b>Learn more</b></a> about Email Protection.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">You\'re Invited!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Block email trackers and hide your address,<br/>without switching your email provider.<br/><a href=""><b>Learn more</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Personal Duck Address</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Removing Email Protection from this device removes the option to fill in your Personal Duck Address or a newly generated Private Duck Address into email fields as you browse the web.<br/><br/>To delete your Duck Addresses entirely, or for any other questions or feedback, reach out to us at <a href="mailto:support@duck.com">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Remove from Device</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>

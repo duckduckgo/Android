@@ -27,6 +27,7 @@ import com.duckduckgo.app.fire.FireAnimationLoader
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsViewModel.Command
+import com.duckduckgo.app.settings.SettingsViewModel.Companion.EMAIL_PROTECTION_URL
 import com.duckduckgo.app.settings.clear.ClearWhatOption.CLEAR_NONE
 import com.duckduckgo.app.settings.clear.ClearWhenOption.APP_EXIT_ONLY
 import com.duckduckgo.app.settings.clear.FireAnimation
@@ -695,11 +696,24 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenOnEmailProtectionSettingClickedThenEmitCommandLaunchEmailProtection() = runTest {
+    fun whenOnEmailProtectionSettingClickedAndEmailIsSupportedThenEmitCommandLaunchEmailProtection() = runTest {
+        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(true)
         testee.commands().test {
             testee.onEmailProtectionSettingClicked()
 
-            assertEquals(Command.LaunchEmailProtection, awaitItem())
+            assertEquals(Command.LaunchEmailProtection(EMAIL_PROTECTION_URL), awaitItem())
+
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnEmailProtectionSettingClickedAndEmailIsNotSupportedThenEmitCommandLaunchEmailProtectionNotSupported() = runTest {
+        whenever(mockEmailManager.isEmailFeatureSupported()).thenReturn(false)
+        testee.commands().test {
+            testee.onEmailProtectionSettingClicked()
+
+            assertEquals(Command.LaunchEmailProtectionNotSUpported, awaitItem())
 
             cancelAndConsumeRemainingEvents()
         }

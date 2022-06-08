@@ -346,16 +346,10 @@
             android:label="@string/accessibilityActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
-            android:name="com.duckduckgo.app.email.ui.EmailProtectionActivity"
+            android:name="com.duckduckgo.app.email.ui.EmailProtectionUnsupportedActivity"
             android:label="@string/emailProtectionActivityTitle"
             android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
-            android:name="com.duckduckgo.app.email.ui.EmailWebViewActivity"
-            android:label="@string/emailProtectionWebViewActivityTitle"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.duckduckgo.app.email.ui.EmailProtectionActivity"
             tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name="com.duckduckgo.app.settings.FireAnimationActivity"

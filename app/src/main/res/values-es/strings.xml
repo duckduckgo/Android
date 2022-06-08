@@ -625,52 +625,15 @@
     <string name="autofillTooltipGenerateAddressDescription">Bloquea los rastreadores de correo electrónico y oculta tu dirección</string>
     <string name="newEmailAliasMenuTitle">Crear dirección Duck</string>
 
-    <!-- Email Sign Out Dialog -->
-    <string name="emailSignOutDialogTitle">¿Eliminar las protecciones de correo electrónico?</string>
-    <string name="emailSignOutDialogText">Nota: Eliminar las protecciones de correo electrónico de este dispositivo no eliminará tu dirección Duck.</string>
-    <string name="emailSignOutDialogCancel">Cancelar</string>
-    <string name="emailSignOutDialogDisable">Eliminar</string>
-
     <!-- Waitlist Notification -->
-    <string name="notificationChannelEmailWaitlist">Lista de espera de correo electrónico</string>
-    <string name="waitlistNotificationTitle">¡Email Protection está listo!</string>
-    <string name="waitlistNotificationDescription">Abrir tu invitación</string>
-
     <string name="waitlistNotificationDialogDescription">¿Quieres que te enviemos una notificación cuando te toque?</string>
     <string name="waitlistNotificationDialogNoThanks">No, gracias</string>
     <string name="waitlistNotificationDialogNotifyMe">NOTIFICARME</string>
 
     <!-- Email Protection -->
-    <string name="emailProtectionWebViewActivityTitle">Protección de correo electrónico (beta)</string>
     <string name="emailProtectionActivityTitle">Protección de correo electrónico (beta)</string>
-    <string name="emailProtectionFooterDescription">No tendrás que compartir ninguna información personal para unirte a la lista de espera. Asegurarás tu lugar en la fila con una marca de tiempo que existe únicamente en tu dispositivo para que podamos notificarte cuando sea tu turno.</string>
-    <string name="emailProtectionErrorJoiningWaitlist">Se ha producido un error al unirte a la lista de espera, inténtalo de nuevo más tarde</string>
-    <string name="emailProtectionDuckAddressCta">Ya tengo una dirección Duck</string>
-    <string name="emailProtectionInviteCodeCta">Tengo un código de invitación</string>
-    <string name="emailProtectionWaitlistCta">Unirse a la lista de espera privada</string>
-    <string name="emailProtectionGetStartedCta">Empezar</string>
     <string name="emailNotSupported">Dispositivo no compatible</string>
     <string name="emailNotSupportedExplanation">Email Protection te permite crear direcciones de correo electrónico privadas que eliminan los rastreadores de correo electrónico. Necesitamos encriptar y almacenar las direcciones que creas localmente en tu dispositivo. Debido a que tu dispositivo no admite el almacenamiento cifrado, Email Protection no está disponible.</string>
-
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Privacidad de correo electrónico, simplificada.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico.<a href=""><b>Más información</b></a>.]]></string>
-
-    <!-- Screen 2 -->
-    <string name="emailProtectionStatusTitleJoined">¡Estás en la lista!</string>
-    <string name="emailProtectionDescriptionJoinedWithNotification"><![CDATA[Te enviaremos una notificación cuando<br/> la protección de correo electrónico esté lista para ti. <a href=""><b>Más información</b></a>.]]></string>
-    <string name="emailProtectionDescriptionJoinedWithoutNotification"><![CDATA[Tu invitación aparecerá aquí cuando estemos listos para ti. ¿Quieres <a href=""><b>recibir una notificación</b></a> cuando llegue?<br/><a href=""><b>Más información</b></a> sobre la protección de correo electrónico.]]></string>
-
-    <!-- Screen 3 -->
-    <string name="emailProtectionStatusTitleInBeta">¡Estás invitado!</string>
-    <string name="emailProtectionDescriptionInBeta"><![CDATA[Bloquea los rastreadores de correo electrónico y oculta tu dirección sin cambiar de proveedor de correo electrónico.<a href=""><b>Más información</b></a>.]]></string>
-
-    <!-- Email Protection Sign Out -->
-    <string name="emailProtectionSignOutTitle">Dirección personal Duck</string>
-    <string name="emailProtectionSignOutFooter">
-        <![CDATA[Eliminar la protección de correo electrónico de este dispositivo elimina la opción de completar tu dirección Duck personal o una dirección Duck privada recién generada en los campos de correo electrónico mientras navegas por internet.<br/><br/>Para eliminar por completo tus direcciones Duck, o para cualquier otra pregunta o comentario, ponte en contacto con nosotros en <a href=\"mailto:support@duck.com\">support@duck.com</a>.]]>
-    </string>
-    <string name="emailProtectionSignOutRemoveCta">Eliminar del dispositivo</string>
 
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Editar marcador</string>
