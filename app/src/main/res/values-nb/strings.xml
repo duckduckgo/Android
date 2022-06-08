@@ -635,10 +635,6 @@
     <string name="emailNotSupported">Enheten støttes ikke</string>
     <string name="emailNotSupportedExplanation">Med e-postbeskyttelse kan du opprette private e-postadresser som fjerner e-postsporere. Vi må kryptere og lagre disse adressene du oppretter, lokalt på enheten din. Fordi enheten din ikke støtter kryptert lagring, er e-postbeskyttelse utilgjengelig.</string>
 
-    <!-- Screen 1-->
-    <string name="emailProtectionStatusTitleJoin">Personvern for e-post gjort enkelt.</string>
-    <string name="emailProtectionDescriptionJoin"><![CDATA[Blokker e-postsporere og skjul adressen din, uten å bytte e-postleverandør.<br/><a href=""><b>Finn ut mer</b></a>.]]></string>
-
     <!-- Bookmark folders -->
     <string name="bookmarkDialogTitleEdit">Rediger bokmerke</string>
     <string name="favoriteDialogTitleEdit">Rediger favoritt</string>
