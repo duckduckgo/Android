@@ -54,7 +54,7 @@
                     android:paddingTop="42dp"
                     android:text="App Components"
                     android:textAppearance="@style/TextAppearance.DuckDuckGo.Headline1"
-                    android:drawableStart="@drawable/ic_dax_icon"
+                    app:drawableStartCompat="@drawable/ic_dax_icon"
                     android:drawablePadding="@dimen/keyline_2"/>
 
                 <FrameLayout

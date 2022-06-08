@@ -27,6 +27,7 @@ import com.duckduckgo.privacy.config.api.GpcHeaderEnabledSite
 import com.duckduckgo.privacy.config.api.HttpsException
 import com.duckduckgo.privacy.config.api.AmpLinkException
 import com.duckduckgo.privacy.config.api.TrackingParameterException
+import com.duckduckgo.privacy.config.api.UserAgentException
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -114,6 +115,18 @@ data class ContentBlockingExceptionEntity(
 
 fun ContentBlockingExceptionEntity.toContentBlockingException(): ContentBlockingException {
     return ContentBlockingException(domain = this.domain, reason = this.reason)
+}
+
+@Entity(tableName = "user_agent_exceptions")
+data class UserAgentExceptionEntity(
+    @PrimaryKey val domain: String,
+    val reason: String,
+    val omitApplication: Boolean,
+    val omitVersion: Boolean
+)
+
+fun UserAgentExceptionEntity.toUserAgentException(): UserAgentException {
+    return UserAgentException(domain = this.domain, reason = this.reason)
 }
 
 @Entity(tableName = "privacy_config")
