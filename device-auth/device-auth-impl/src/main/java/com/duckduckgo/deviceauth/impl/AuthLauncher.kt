@@ -29,7 +29,7 @@ import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Failed
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,7 +48,7 @@ interface AuthLauncher {
     )
 }
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class RealAuthLauncher @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig
