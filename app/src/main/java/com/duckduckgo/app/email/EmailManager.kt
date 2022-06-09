@@ -146,18 +146,6 @@ class AppEmailManager(
         }
     }
 
-    sealed class FetchCodeResult {
-        object Code : FetchCodeResult()
-        object NoCode : FetchCodeResult()
-        object CodeExisted : FetchCodeResult()
-    }
-
-    sealed class WaitlistState {
-        object NotJoinedQueue : WaitlistState()
-        data class JoinedQueue(val notify: Boolean = false) : WaitlistState()
-        object InBeta : WaitlistState()
-    }
-
     companion object {
         const val DUCK_EMAIL_DOMAIN = "@duck.com"
         const val UNKNOWN_COHORT = "unknown"
