@@ -22,4 +22,5 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    implementation AndroidX.fragment.ktx
 }
