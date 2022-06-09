@@ -1,0 +1,24 @@
+name: Npm Updates
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+
+jobs:
+  npm_update:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: checkout actions
+        uses: actions/checkout@v2
+      - name: Use Node.js 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Npm update
+        run: |
+          npm update --omit=dev --ignore-scripts
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: npm updates
