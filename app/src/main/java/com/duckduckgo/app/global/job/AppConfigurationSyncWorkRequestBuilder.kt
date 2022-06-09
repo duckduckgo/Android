@@ -18,10 +18,9 @@ package com.duckduckgo.app.global.job
 
 import android.content.Context
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.Single
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -44,6 +43,7 @@ class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
     }
 }
 
+@ContributesWorker(AppScope::class)
 class AppConfigurationWorker(
     context: Context,
     workerParams: WorkerParameters
@@ -63,19 +63,5 @@ class AppConfigurationWorker(
                 Timber.w(it, "App configuration sync work failed")
                 Result.retry()
             }
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val configurationDownloader: ConfigurationDownloader
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is AppConfigurationWorker) {
-            worker.appConfigurationDownloader = configurationDownloader
-            return true
-        }
-        return false
     }
 }
