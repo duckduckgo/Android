@@ -1,0 +1,45 @@
+<!-- https://www.123rf.com/login/ -->
+<form id="signin-details-wrapper" class="h-auto w-100">
+    <div class="w-100 mt-15 mt-sm-20 mt-md-30"><label class="SigninForm__inputLabel" for="userName">USERNAME /
+            EMAIL</label>
+        <div id="userName-wrapper" class="TextInput">
+            <div class="TextInput__wrapper TextInput__wrapper--withIcon"><input type="text" id="userName"
+                    class="TextInput__input" value="" spellcheck="false" placeholder="" name="userName" maxlength="50"
+                    data-manual-scoring="username"></div>
+        </div>
+    </div>
+    <div class="w-100 d-flex flex-column mt-10 mt-sm-15 mt-md-20"><label class="SigninForm__inputLabel"
+            for="userPassword">PASSWORD</label>
+        <div id="userPassword-wrapper" class="TextInput">
+            <div class="TextInput__wrapper TextInput__wrapper--withIcon"><input type="password" id="userPassword"
+                    class="TextInput__input" value="" spellcheck="false" placeholder="" name="userPassword"
+                    maxlength="50" data-manual-scoring="password"><span role="presentation"
+                    class="TextInput__iconWithTooltip"><img alt="Show Password"
+                        src="https://assets-cdn.123rf.com/ui-components/assets/images/eye-open-icon.png"></span></div>
+        </div>
+    </div>
+    <div class="mt-1 mt-md-2"><span class="SigninForm__forgotPasswordLink d-inline-block float-right" role="link"
+            tabindex="0">Forgot Password</span></div>
+    <div class="d-flex flex-column align-items-center mt-45 SigninForm__recaptchaInv">
+        <div>
+            <div>
+                <div class="grecaptcha-badge" data-style="bottomright"
+                    style="width: 256px; height: 60px; display: block; transition: right 0.3s ease; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-top-left-radius: 2px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; overflow: hidden;">
+                    <div class="grecaptcha-logo"><iframe title="reCAPTCHA"
+                            src="https://recaptcha.net/recaptcha/api2/anchor?ar=1&amp;k=6Ldh9MIZAAAAAAPwhbTWII8bBwRAurxbBnyRPWMQ&amp;co=aHR0cHM6Ly93d3cuMTIzcmYuY29tOjQ0Mw..&amp;hl=en&amp;type=image&amp;v=Y-cOIEkAqcfDdup_qnnmkxIC&amp;theme=light&amp;size=invisible&amp;badge=bottomright&amp;cb=cghmpqhda9pl"
+                            width="256" height="60" role="presentation" name="a-wwlj7ql3d7l2" frameborder="0"
+                            scrolling="no"
+                            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                    </div>
+                    <div class="grecaptcha-error"></div><textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                        class="g-recaptcha-response"
+                        style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                </div><iframe style="display: none;"></iframe>
+            </div>
+        </div><span class="SigninForm__reCaptchaErrorText"></span>
+    </div>
+    <div class="w-100 mt-15 mt-sm-30"><button id="login-button" data-testid="login-button" name="login-button"
+            type="submit"
+            class="Button Button__wrapper Button__link Button__wrapper--modern Button__wrapper--primary SigninForm__signinButton"
+            data-manual-submit="">login</button></div>
+</form>

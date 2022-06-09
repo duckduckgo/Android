@@ -1,0 +1,13 @@
+{
+  "spec_dir": "unit-test",
+  "spec_files": [
+    "**/*[sS]pec.?(m)js",
+    "**/*.js"
+  ],
+  "jsLoader": "import",
+  "helpers": [
+    "helpers/**/*.?(m)js"
+  ],
+  "stopSpecOnExpectationFailure": false,
+  "random": true
+}

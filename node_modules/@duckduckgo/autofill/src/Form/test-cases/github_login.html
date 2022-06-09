@@ -1,0 +1,39 @@
+<!-- https://github.com/login -->
+
+<form data-turbo="false" action="/session" accept-charset="UTF-8" method="post"><input type="hidden"
+        name="authenticity_token"
+        value="avLamE0QwBKGmAyF6aI3ferzm-sbXdWj08FaUSoOBZ7-SFA6KMfaLcrCjK2oiIqHI1fDZDZi6aF-3SINSxiPLw"> <label
+        for="login_field">
+        Username or email address
+    </label>
+    <input type="text" name="login" id="login_field" class="form-control input-block js-login-field"
+        autocapitalize="off" autocorrect="off" autocomplete="username" autofocus="autofocus"
+        data-manual-scoring="username">
+
+    <div class="position-relative">
+        <label for="password">
+            Password
+        </label>
+        <input type="password" name="password" id="password" class="form-control input-block js-password-field"
+            autocomplete="current-password" data-manual-scoring="password">
+        <input type="hidden" name="trusted_device" id="trusted_device" autocomplete="off" class="form-control">
+
+        <input type="hidden" class="js-webauthn-support" name="webauthn-support" value="unsupported">
+        <input type="hidden" class="js-webauthn-iuvpaa-support" name="webauthn-iuvpaa-support" value="unsupported">
+        <input type="hidden" name="return_to" id="return_to" value="https://github.com/signup" autocomplete="off"
+            class="form-control">
+        <input type="hidden" name="allow_signup" id="allow_signup" autocomplete="off" class="form-control">
+        <input type="hidden" name="client_id" id="client_id" autocomplete="off" class="form-control">
+        <input type="hidden" name="integration" id="integration" autocomplete="off" class="form-control">
+        <input type="text" name="required_field_a888" hidden="hidden" class="form-control"><input type="hidden"
+            name="timestamp" value="1648183219481" autocomplete="off" class="form-control"><input type="hidden"
+            name="timestamp_secret" value="59ab65c7e805262c4c76be3edfa582e2dc952e258b6a7c47215ddca70122a75c"
+            autocomplete="off" class="form-control">
+
+        <input type="submit" name="commit" value="Sign in" class="btn btn-primary btn-block js-sign-in-button"
+            data-disable-with="Signing in…" data-signin-label="Sign in"
+            data-sso-label="Sign in with your identity provider" development="false" data-manual-submit="">
+
+        <a class="label-link position-absolute top-0 right-0" tabindex="0" href="/password_reset">Forgot password?</a>
+    </div>
+</form>

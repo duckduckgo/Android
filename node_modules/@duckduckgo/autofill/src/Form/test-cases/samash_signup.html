@@ -1,0 +1,97 @@
+<form class="form-customer-create" id="social-form-create" novalidate="novalidate">
+    <div class="social-login-popup-tabs">
+        <div class="social-login-popup-headings">
+            <div class="social-login-popup-subheading subheading-login action back">Log In</div>
+            <div class="social-login-popup-subheading subheading-register current">Register</div>
+        </div>
+    </div>
+    <div class="social-login-popup-tab-register">
+        <div class="social-login-popup-subtitle"><span id="block-customer-login-heading" role="heading" aria-level="2"
+                                                       class="social-login-popup-subtitle-text">Create an account</span>
+            <span class="social-login-popup-subtitle-note">Required</span></div>
+        <div class="block-content">
+            <fieldset class="fieldset create info"><input type="hidden" name="success_url" value=""><input type="hidden"
+                                                                                                           name="error_url"
+                                                                                                           value="">
+                <div class="field field-name-firstname required"><label class="label"
+                                                                        for="social-login-popup-create-firstname"><span>First Name</span></label>
+                    <div class="control"><input type="text" id="social-login-popup-create-firstname" name="firstname"
+                                                value="" title="First Name" class="input-text required-entry"
+                                                data-validate="{required:true}" aria-required="true" data-manual-scoring="firstName"></div>
+                </div>
+                <div class="field field-name-lastname required"><label class="label"
+                                                                       for="social-login-popup-create-lastname"><span>Last Name</span></label>
+                    <div class="control"><input type="text" id="social-login-popup-create-lastname" name="lastname"
+                                                value="" title="Last Name" class="input-text required-entry"
+                                                data-validate="{required:true}" aria-required="true" data-manual-scoring="lastName"></div>
+                </div>
+                <div class="field required"><label for="social-login-popup-create-email"
+                                                   class="label required">Email</label>
+                    <div class="control"><input type="email" name="email" id="social-login-popup-create-email" value=""
+                                                title="Email" class="input-text"
+                                                data-validate="{required:true, 'validate-email':true}"
+                                                aria-required="true" data-manual-scoring="emailAddress"></div>
+                </div>
+            </fieldset>
+            <fieldset class="fieldset create account" data-hasrequired="* Required Fields">
+                <div class="field password required"><label for="password" class="label required">Password</label>
+                    <div class="control"><input type="password" name="password" id="social-login-popup-create-pass"
+                                                title="Password" class="input-text"
+                                                data-validate="{required:true, 'validate-password':true}"
+                                                autocomplete="off" aria-required="true" data-manual-scoring="password"></div>
+                </div>
+                <div class="field confirmation required"><label for="password-confirmation" class="label required">Confirm
+                    Password</label>
+                    <div class="control"><input type="password" name="password_confirmation" title="Confirm Password"
+                                                id="password-confirmation-social" class="input-text"
+                                                data-validate="{required:true, equalTo:'#social-login-popup-create-pass'}"
+                                                autocomplete="off" aria-required="true" data-manual-scoring="password"></div>
+                </div><!-- BLOCK social-create-captcha --><!-- /BLOCK social-create-captcha --> </fieldset>
+            <div class="actions-toolbar social-login-actions-toolbar">
+                <div class="primary social-login-actions-toolbar-primary">
+                    <div>
+                        <div class="grecaptcha-badge" data-style="none"
+                             style="width: 256px; height: 60px; position: fixed; visibility: hidden;">
+                            <div class="grecaptcha-logo">
+                                <iframe title="reCAPTCHA"
+                                        src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LclSqYZAAAAAItLamEh88kH4arheZQQO_Kqea19&amp;co=aHR0cHM6Ly93d3cuc2FtYXNoLmNvbTo0NDM.&amp;hl=en&amp;v=zLD1nfkNCJC1kEswSRdSyd-p&amp;theme=light&amp;size=invisible&amp;badge=bottomright&amp;cb=bp7acp6e2wqc"
+                                        width="256" height="60" role="presentation" name="a-mqxwpt9juof3"
+                                        frameborder="0" scrolling="no"
+                                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                            </div>
+                            <div class="grecaptcha-error"></div>
+                            <textarea id="g-recaptcha-response-1" name="g-recaptcha-response"
+                                      class="g-recaptcha-response"
+                                      style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                        </div>
+                        <iframe style="display: none;"></iframe>
+                    </div>
+                    <button type="submit" class="action create primary social-login-popup-button"
+                            title="Create Account" data-manual-submit><span>Create Account</span></button>
+                </div>
+                <div class="social-login-actions-privacy-note">
+                    <div data-content-type="row" data-appearance="contained" data-element="main">
+                        <div data-enable-parallax="0" data-parallax-speed="0.5" data-background-images="{}"
+                             data-element="inner"
+                             style="justify-content: flex-start; display: flex; flex-direction: column; background-position: left top; background-size: cover; background-repeat: no-repeat; background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;">
+                            <div class="pagebuilder-column-group" style="display: flex;"
+                                 data-content-type="column-group" data-grid-size="12" data-element="main">
+                                <div class="pagebuilder-column" data-content-type="column" data-appearance="full-height"
+                                     data-background-images="{}" data-element="main"
+                                     style="justify-content: flex-start; display: flex; flex-direction: column; background-position: left top; background-size: cover; background-repeat: no-repeat; background-attachment: scroll; border-style: none; border-width: 1px; border-radius: 0px; width: 100%; margin: 0px; padding: 0px; align-self: stretch;">
+                                    <div data-content-type="text" data-appearance="default" data-element="main"
+                                         style="border-style: none; border-width: 1px; border-radius: 0px; margin: 0px; padding: 0px;">
+                                        <p>By creating an account, you agree to our <a title="Privacy Policy"
+                                                                                       href="/help/privacy-policy">Privacy
+                                            Policy</a> and <a title="Terms Conditions"
+                                                              href="/help/terms-and-conditions">Terms Conditions</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="amasty_invisible_token"></form>

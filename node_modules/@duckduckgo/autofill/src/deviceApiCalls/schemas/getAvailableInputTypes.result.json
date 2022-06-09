@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "GetAvailableInputTypesResult",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "description": "A string used to identify this result. It's optional",
+      "type": "string",
+      "const": "getAvailableInputTypesResponse"
+    },
+    "success": {
+      "type": "object",
+      "title": "AvailableInputTypes",
+      "additionalProperties": false,
+      "properties": {
+        "credentials": {
+          "description": "true if *any* credentials are available",
+          "type": "boolean"
+        },
+        "identities": {
+          "description": "true if *any* identities are available",
+          "type": "boolean"
+        },
+        "creditCards": {
+          "description": "true if *any* credit cards are available",
+          "type": "boolean"
+        },
+        "email": {
+          "description": "true if signed in for Email Protection",
+          "type": "boolean"
+        }
+      }
+    },
+    "error":  {
+      "$ref": "error.json"
+    }
+  },
+  "required": [
+    "success"
+  ]
+}
