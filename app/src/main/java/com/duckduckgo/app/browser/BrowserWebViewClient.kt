@@ -27,7 +27,6 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.accessibility.AccessibilityManager
-import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.TrackingParameterLink
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
@@ -114,7 +113,7 @@ class BrowserWebViewClient(
                 return false
             }
 
-            return when (val urlType = specialUrlDetector.determineType(url)) {
+            return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
                 is SpecialUrlDetector.UrlType.Email -> {
                     webViewClientListener?.sendEmailRequested(urlType.emailAddress)
                     true
@@ -187,7 +186,10 @@ class BrowserWebViewClient(
                             listener.startProcessingTrackingLink()
                             Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
 
-                            return when (val parameterStrippedType = specialUrlDetector.processUrl(urlType.cleanedUrl)) {
+                            return when (
+                                val parameterStrippedType =
+                                    specialUrlDetector.processUrl(initiatingUrl = webView.originalUrl, uriString = urlType.cleanedUrl)
+                            ) {
                                 is SpecialUrlDetector.UrlType.AppLink -> {
                                     loadUrl(listener, webView, urlType.cleanedUrl)
                                     listener.handleAppLink(parameterStrippedType, isForMainFrame)
