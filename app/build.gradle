@@ -36,7 +36,7 @@ android {
             main {
                 java {
                     resources {
-                        srcDirs += "$projectDir/../node_modules/@duckduckgo/autofill/dist/".toString()
+                        srcDirs += files("$projectDir/../node_modules/@duckduckgo/autofill/dist/".toString())
                         srcDirs += files("$projectDir/../submodules/".toString())
                     }
                 }
