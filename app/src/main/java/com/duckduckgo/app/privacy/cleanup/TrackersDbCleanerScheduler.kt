@@ -22,12 +22,10 @@ import androidx.lifecycle.*
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnTrackerDao
@@ -41,6 +39,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)
@@ -55,29 +54,7 @@ class TrackersDbCleanerSchedulerModule {
     }
 
     @Provides
-    @IntoSet
-    fun provideTrackersDbCleanerWorkerInjectorPlugin(
-        appDatabase: AppDatabase,
-        vpnDatabase: VpnDatabase
-    ): WorkerInjectorPlugin {
-        return TrackersDbCleanerWorkerInjectorPlugin(appDatabase, vpnDatabase)
-    }
-}
-
-class TrackersDbCleanerWorkerInjectorPlugin(
-    private val appDatabase: AppDatabase,
-    private val vpnDatabase: VpnDatabase
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is TrackersDbCleanerWorker) {
-            worker.appTrackersDao = vpnDatabase.vpnTrackerDao()
-            worker.webTrackersBlockedDao = appDatabase.webTrackersBlockedDao()
-            return true
-        }
-
-        return false
-    }
+    fun providesVpnTrackerDao(vpnDatabase: VpnDatabase): VpnTrackerDao = vpnDatabase.vpnTrackerDao()
 }
 
 class TrackersDbCleanerScheduler(private val workManager: WorkManager) : DefaultLifecycleObserver {
@@ -96,12 +73,15 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : Default
     }
 }
 
+@ContributesWorker(AppScope::class)
 class TrackersDbCleanerWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), CoroutineScope {
 
+    @Inject
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
+    @Inject
     lateinit var appTrackersDao: VpnTrackerDao
 
     @WorkerThread

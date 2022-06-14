@@ -18,13 +18,12 @@ package com.duckduckgo.app.waitlist.email
 
 import android.content.Context
 import androidx.work.*
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -51,6 +50,7 @@ class EmailWaitlistWorkRequestBuilder @Inject constructor() {
     }
 }
 
+@ContributesWorker(AppScope::class)
 class EmailWaitlistWorker(
     private val context: Context,
     workerParams: WorkerParameters
@@ -77,25 +77,5 @@ class EmailWaitlistWorker(
         }
 
         return Result.success()
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppConfigurationWorkerInjectorPlugin @Inject constructor(
-    private val emailManager: EmailManager,
-    private val notificationSender: NotificationSender,
-    private val notification: EmailWaitlistCodeNotification,
-    private val emailWaitlistWorkRequestBuilder: EmailWaitlistWorkRequestBuilder,
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is EmailWaitlistWorker) {
-            worker.emailManager = emailManager
-            worker.notificationSender = notificationSender
-            worker.notification = notification
-            worker.emailWaitlistWorkRequestBuilder = emailWaitlistWorkRequestBuilder
-            return true
-        }
-        return false
     }
 }

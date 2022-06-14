@@ -18,46 +18,17 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import javax.inject.Inject
 
-@Module
-@ContributesTo(AppScope::class)
-object VpnServiceHeartbeatMonitorModule {
-
-    @Provides
-    @IntoSet
-    fun provideVpnReminderNotificationWorkerInjectorPlugin(
-        vpnReminderReceiverManager: VpnReminderReceiverManager
-    ): WorkerInjectorPlugin {
-        return VpnReminderNotificationWorkerInjectorPlugin(vpnReminderReceiverManager)
-    }
-}
-
-class VpnReminderNotificationWorkerInjectorPlugin(
-    private val vpnReminderReceiverManager: VpnReminderReceiverManager
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is VpnReminderNotificationWorker) {
-            worker.vpnReminderReceiverManager = vpnReminderReceiverManager
-            return true
-        }
-
-        return false
-    }
-}
-
+@ContributesWorker(AppScope::class)
 class VpnReminderNotificationWorker(
     val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
+    @Inject
     lateinit var vpnReminderReceiverManager: VpnReminderReceiverManager
 
     override suspend fun doWork(): Result {

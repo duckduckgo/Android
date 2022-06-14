@@ -22,9 +22,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.browser.WebViewVersionProvider
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
 import com.duckduckgo.di.scopes.AppScope
@@ -80,7 +80,7 @@ class EnqueuedPixelWorker @Inject constructor(
         return false
     }
 
-    private fun submitUnsentFirePixels() {
+    fun submitUnsentFirePixels() {
         val count = unsentForgetAllPixelStore.pendingPixelCountClearData
         Timber.i("Found $count unsent clear data pixels")
         if (count > 0) {
@@ -88,22 +88,6 @@ class EnqueuedPixelWorker @Inject constructor(
                 pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
             }
             unsentForgetAllPixelStore.resetCount()
-        }
-    }
-
-    class RealEnqueuedPixelWorker(
-        val context: Context,
-        parameters: WorkerParameters
-    ) : CoroutineWorker(context, parameters) {
-        lateinit var pixel: Pixel
-        lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
-
-        override suspend fun doWork(): Result {
-            Timber.v("Sending enqueued pixels")
-
-            enqueuedPixelWorker.submitUnsentFirePixels()
-
-            return Result.success()
         }
     }
 
@@ -124,19 +108,21 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-class EnqueuedPixelWorkerInjectorPlugin @Inject constructor(
-    private val pixel: Provider<Pixel>,
-    private val enqueuedPixelWorker: Provider<EnqueuedPixelWorker>
-) : WorkerInjectorPlugin {
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is EnqueuedPixelWorker.RealEnqueuedPixelWorker) {
-            worker.pixel = pixel.get()
-            worker.enqueuedPixelWorker = enqueuedPixelWorker.get()
+@ContributesWorker(AppScope::class)
+class RealEnqueuedPixelWorker(
+    val context: Context,
+    parameters: WorkerParameters
+) : CoroutineWorker(context, parameters) {
+    @Inject
+    lateinit var pixel: Pixel
+    @Inject
+    lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
-            return true
-        }
+    override suspend fun doWork(): Result {
+        Timber.v("Sending enqueued pixels")
 
-        return false
+        enqueuedPixelWorker.submitUnsentFirePixels()
+
+        return Result.success()
     }
 }
