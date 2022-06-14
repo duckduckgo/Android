@@ -22,7 +22,6 @@ import com.duckduckgo.securestorage.api.Result
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
-import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
@@ -36,11 +35,10 @@ import javax.inject.Inject
 class RealSecureStorage @Inject constructor(
     private val secureStorageRepository: SecureStorageRepository,
     private val dispatchers: DispatcherProvider,
-    private val encryptionHelper: EncryptionHelper,
-    private val secureStorageKeyManager: SecureStorageKeyManager
+    private val l2DataTransformer: L2DataTransformer
 ) : SecureStorage {
 
-    override fun canAccessSecureStorage(): Boolean = true
+    override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData()
 
     override suspend fun authenticateUser(): Result {
         // TODO (karl) Implement authentication. This is only relevant for L2. Note the expiry here will change once implemented.
@@ -137,15 +135,8 @@ class RealSecureStorage @Inject constructor(
             id = id
         )
 
-    private fun encryptData(data: String?): EncryptedString? {
-        // only encrypt when there's data
-        return data?.let {
-            encryptionHelper.encrypt(
-                it,
-                secureStorageKeyManager.l2Key
-            )
-        }
-    }
+    // only encrypt when there's data
+    private fun encryptData(data: String?): EncryptedString? = data?.let { l2DataTransformer.encrypt(it) }
 
     private fun decryptData(
         data: String?,
@@ -154,14 +145,7 @@ class RealSecureStorage @Inject constructor(
         // only decrypt when there's data and iv
         return data?.let { _data ->
             iv?.let { _iv ->
-                encryptionHelper.decrypt(
-                    EncryptedString(
-                        data = _data,
-                        iv = _iv
-                    ),
-                    secureStorageKeyManager.l2Key
-                )
-
+                l2DataTransformer.decrypt(_data, _iv)
             }
         }
     }

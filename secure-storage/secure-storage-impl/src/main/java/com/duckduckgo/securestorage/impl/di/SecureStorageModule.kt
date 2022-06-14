@@ -19,7 +19,7 @@ package com.duckduckgo.securestorage.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.impl.SecureStorageKeyManager
+import com.duckduckgo.securestorage.impl.SecureStorageKeyProvider
 import com.duckduckgo.securestorage.store.RealSecureStorageKeyStore
 import com.duckduckgo.securestorage.store.RealSecureStorageRepository
 import com.duckduckgo.securestorage.store.SecureStorageKeyStore
@@ -45,13 +45,13 @@ object SecureStorageModule {
     @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageDatabase(
         context: Context,
-        keyManager: SecureStorageKeyManager
+        keyProvider: SecureStorageKeyProvider
     ): SecureStorageDatabase {
         return Room.databaseBuilder(
             context,
             SecureStorageDatabase::class.java,
             "secure_storage_database_encrypted.db"
-        ).openHelperFactory(SupportFactory(keyManager.l1Key))
+        ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
             .addMigrations(*ALL_MIGRATIONS)
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
