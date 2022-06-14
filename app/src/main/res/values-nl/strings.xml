@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Ongedaan maken</string>
     <string name="downloadsStateInProgress">Bezig...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Bescherming tegen app-tracking</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">App trackers blokkeren op je apparaat</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Ingeschakeld</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
+
 </resources>

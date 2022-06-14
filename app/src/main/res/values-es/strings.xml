@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Deshacer</string>
     <string name="downloadsStateInProgress">En curso…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Protección frente al rastreo de aplicaciones</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Bloquea los rastreadores de aplicaciones en tu dispositivo</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Activado</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Desactivado</string>
+
 </resources>

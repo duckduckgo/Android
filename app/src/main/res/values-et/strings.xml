@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Võta tagasi</string>
     <string name="downloadsStateInProgress">Pooleli…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Rakenduse jälgimise kaitse</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokeeri oma seadmes rakenduste jälgurid</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Lubatud</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Keelatud</string>
+
 </resources>

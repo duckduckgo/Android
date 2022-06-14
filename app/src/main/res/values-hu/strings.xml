@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Visszavonás</string>
     <string name="downloadsStateInProgress">Folyamatban…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Alkalmazáskövetés elleni védelem</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Alkalmazáskövetők letiltása az eszközödön</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Engedélyezve</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Letiltva</string>
+
 </resources>

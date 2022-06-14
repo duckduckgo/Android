@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Återställ</string>
     <string name="downloadsStateInProgress">Pågår …</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Skydd mot appspårning</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blockera appspårare på din enhet</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktiverad</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Inaktiverad</string>
+
 </resources>

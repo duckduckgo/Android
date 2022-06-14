@@ -749,4 +749,10 @@
     <string name="downloadsUndoActionName">Vrátenie späť</string>
     <string name="downloadsStateInProgress">Prebieha…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Ochrana pred sledovaním činnosti v aplikáciách</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokovanie sledovacích nástrojov aplikácií vo vašom zariadení</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Povolené</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Zakázané</string>
+
 </resources>

@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Anular</string>
     <string name="downloadsStateInProgress">Em curso…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Proteção contra o rastreamento por aplicações</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Bloquear rastreadores de aplicações no teu dispositivo</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Ativado</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Desativado</string>
+
 </resources>

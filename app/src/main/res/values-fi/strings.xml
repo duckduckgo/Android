@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Kumoa</string>
     <string name="downloadsStateInProgress">Käynnissä…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Sovellusten seurantasuojaus</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Estä sovellusseuranta laitteessa</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Käytössä</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Pois käytöstä</string>
+
 </resources>

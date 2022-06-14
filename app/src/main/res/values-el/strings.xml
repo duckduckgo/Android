@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Αναίρεση</string>
     <string name="downloadsStateInProgress">Σε εξέλιξη...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Προστασία παρακολούθησης από εφαρμογές</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Αποκλείστε εφαρμογές παρακολούθησης στη συσκευή σας</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Ενεργοποιήθηκε</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Απενεργοποιήθηκε</string>
+
 </resources>

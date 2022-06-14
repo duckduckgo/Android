@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Rückgängig machen</string>
     <string name="downloadsStateInProgress">In Bearbeitung …</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Schutz gegen App-Tracking</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blockiere App-Tracker auf deinem Gerät</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktiviert</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Deaktiviert</string>
+
 </resources>

@@ -749,4 +749,11 @@
     <string name="downloadsUndoActionName">Отменить</string>
     <string name="downloadsStateInProgress">Выполняется…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Блокировка отслеживания приложениями</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Блокируйте трекеры приложений на своем устройстве</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Включено</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Отключено</string>
+
+
 </resources>

@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Geri al</string>
     <string name="downloadsStateInProgress">Devam ediyor…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Uygulama İzleme Koruması</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Cihazınızdaki uygulama izleyicileri engelleyin</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Etkin</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Devre Dışı</string>
+
 </resources>

@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Angre</string>
     <string name="downloadsStateInProgress">Pågår…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Beskyttelse mot appsporing</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokker appsporere på enheten din</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktivert</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
+
 </resources>

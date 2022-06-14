@@ -749,4 +749,10 @@
     <string name="downloadsUndoActionName">Cofnij</string>
     <string name="downloadsStateInProgress">W trakcie…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokowanie skryptów śledzących aplikacji na urządzeniu</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Włączone</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Wyłączone</string>
+
 </resources>

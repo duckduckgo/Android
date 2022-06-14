@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Отмяна</string>
     <string name="downloadsStateInProgress">В процес на изпълнение…</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Защита от проследяване в приложения</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Блокиране на тракерите на Вашето устройство</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Активирано</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Деактивирано</string>
+
 </resources>

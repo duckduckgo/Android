@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Fortryd</string>
     <string name="downloadsStateInProgress">I gang ...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">App-sporingsbeskyttelse</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Bloker app-trackere på din enhed</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktiveret</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Deaktiveret</string>
+
 </resources>

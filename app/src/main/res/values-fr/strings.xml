@@ -733,4 +733,10 @@
     <string name="downloadsUndoActionName">Annuler</string>
     <string name="downloadsStateInProgress">En cours...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Protection contre le suivi des applications</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Bloquer les traqueurs d\'applications sur votre appareil</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Activé</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Désactivé</string>
+
 </resources>

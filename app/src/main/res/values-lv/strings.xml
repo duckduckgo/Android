@@ -741,4 +741,10 @@
     <string name="downloadsUndoActionName">Atsaukt</string>
     <string name="downloadsStateInProgress">Notiek...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Lietotņu izsekotāju bloķēšana ierīcē</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Iespējots</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Atspējots</string>
+
 </resources>

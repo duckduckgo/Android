@@ -749,4 +749,10 @@
     <string name="downloadsUndoActionName">Poništi</string>
     <string name="downloadsStateInProgress">U tijeku...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Zaštita od praćenja aplikacija</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokiraj aplikacija za praćenje na tvom uređaju</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Omogućeno</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Onemogućeno</string>
+
 </resources>

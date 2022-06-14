@@ -749,4 +749,10 @@
     <string name="downloadsUndoActionName">Anuliuoti</string>
     <string name="downloadsStateInProgress">Vykdoma...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Programų sekimo apsauga</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokuokite programėlių stebėjimo priemones savo įrenginyje</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Įjungta</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Išjungta</string>
+
 </resources>

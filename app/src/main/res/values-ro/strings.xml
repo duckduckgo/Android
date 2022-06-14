@@ -741,4 +741,10 @@
     <string name="downloadsUndoActionName">Anulează</string>
     <string name="downloadsStateInProgress">În curs...</string>
 
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Protecția la urmărirea aplicațiilor</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blochează tehnologiile de urmărire pe dispozitivul tău</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Activat</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Dezactivat</string>
+
 </resources>
