@@ -29,6 +29,7 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
+    implementation project(path: ':device-auth-api')
     api project(path: ':autofill-store')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
