@@ -41,11 +41,6 @@ interface SecureStorageKeyProvider {
      * Ready to use key for L2 encryption using the generated user password
      */
     fun getl2Key(): Key
-
-    /**
-     * Ready to use key for L2 encryption usinhg a user entered password
-     */
-    fun getl2Key(password: String): Key
 }
 
 @ContributesBinding(AppScope::class)
@@ -58,6 +53,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
 
     override fun canAccessKeyStore(): Boolean = secureStorageKeyStore.canUseEncryption()
 
+    @Synchronized
     override fun getl1Key(): ByteArray {
         // If no key exists in the keystore, we generate a new one and store it
         return if (secureStorageKeyStore.l1Key == null) {
@@ -69,6 +65,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
         }
     }
 
+    @Synchronized
     override fun getl2Key(): Key {
         val userPassword = if (secureStorageKeyStore.password == null) {
             passwordGenerator.generatePassword().also {
@@ -81,7 +78,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
         return getl2Key(userPassword!!.toByteString().base64())
     }
 
-    override fun getl2Key(password: String): Key {
+    private fun getl2Key(password: String): Key {
         val keyMaterial = if (secureStorageKeyStore.encryptedL2Key == null) {
             secureStorageKeyGenerator.generateKey().encoded.also {
                 encryptAndStoreL2Key(it, password)

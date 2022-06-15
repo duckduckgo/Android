@@ -124,7 +124,8 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         return String(decrypt(encryptedBytes, key))
     }
 
-    private fun String.transformToByteArray(): ByteArray = this.decodeBase64()?.toByteArray() ?: ByteArray(0)
+    private fun String.transformToByteArray(): ByteArray =
+        this.decodeBase64()?.toByteArray() ?: throw InternalSecureStorageException("Error while decoding string data to Base64")
 
     private fun ByteArray.transformToString(): String = this.toByteString().base64()
 

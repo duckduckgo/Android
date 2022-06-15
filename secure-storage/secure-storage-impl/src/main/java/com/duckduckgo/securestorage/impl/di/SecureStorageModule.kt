@@ -38,6 +38,7 @@ import net.sqlcipher.database.SupportFactory
 object SecureStorageModule {
 
     @Provides
+    @SingleInstanceIn(AppScope::class)
     fun providesSecureStorageKeyStore(context: Context): SecureStorageKeyStore =
         RealSecureStorageKeyStore(context)
 
