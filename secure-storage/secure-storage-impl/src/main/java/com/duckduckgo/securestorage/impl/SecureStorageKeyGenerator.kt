@@ -31,7 +31,10 @@ import javax.inject.Inject
 interface SecureStorageKeyGenerator {
     fun generateKey(): Key
     fun generateKeyFromKeyMaterial(keyMaterial: ByteArray): Key
-    fun generateKeyFromPassword(password: String): Key
+    fun generateKeyFromPassword(
+        password: String,
+        salt: ByteArray
+    ): Key
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,12 +62,15 @@ class RealSecureStorageKeyGenerator @Inject constructor(
         KeyProperties.KEY_ALGORITHM_AES
     )
 
-    override fun generateKeyFromPassword(password: String): Key =
+    override fun generateKeyFromPassword(
+        password: String,
+        salt: ByteArray
+    ): Key =
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
             passwordSecretKeyFactory.generateSecret(
                 PBEKeySpec(
                     password.toCharArray(),
-                    PASSWORD_SALT,
+                    salt,
                     ITERATIONS_26_UP,
                     SIZE
                 )
@@ -73,15 +79,16 @@ class RealSecureStorageKeyGenerator @Inject constructor(
             legacyPasswordSecretKeyFactory.generateSecret(
                 PBEKeySpec(
                     password.toCharArray(),
-                    PASSWORD_SALT,
+                    salt,
                     ITERATIONS_LEGACY,
                     SIZE
                 )
             )
+        }.run {
+            SecretKeySpec(this.encoded, KeyProperties.KEY_ALGORITHM_AES)
         }
 
     companion object {
-        private val PASSWORD_SALT = "R=M|]^C`{:VJD^Y)STYC".toByteArray()
         private const val ITERATIONS_26_UP = 100_000
         private const val ITERATIONS_LEGACY = 50_000
         private const val SIZE = 256

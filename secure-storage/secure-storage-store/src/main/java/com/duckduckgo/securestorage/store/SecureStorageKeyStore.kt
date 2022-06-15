@@ -40,6 +40,11 @@ interface SecureStorageKeyStore {
     var l1Key: ByteArray?
 
     /**
+     * Salt to be used when generating the key for l2 encryption from the password
+     */
+    var passwordSalt: ByteArray?
+
+    /**
      * Encrypted key that can be decrypted to be used for L2 encryption
      */
     var encryptedL2Key: ByteArray?
@@ -92,6 +97,12 @@ class RealSecureStorageKeyStore constructor(
             updateValue(KEY_L1KEY, value)
         }
 
+    override var passwordSalt: ByteArray?
+        get() = getValue(KEY_PASSWORD_SALT)
+        set(value) {
+            updateValue(KEY_PASSWORD_SALT, value)
+        }
+
     override var encryptedL2Key: ByteArray?
         get() = getValue(KEY_ENCRYPTED_L2KEY)
         set(value) {
@@ -126,6 +137,7 @@ class RealSecureStorageKeyStore constructor(
         const val FILENAME = "com.duckduckgo.securestorage.store"
         const val KEY_GENERATED_PASSWORD = "KEY_GENERATED_PASSWORD"
         const val KEY_L1KEY = "KEY_L1KEY"
+        const val KEY_PASSWORD_SALT = "KEY_PASSWORD_SALT"
         const val KEY_ENCRYPTED_L2KEY = "KEY_ENCRYPTED_L2KEY"
         const val KEY_ENCRYPTED_L2KEY_IV = "KEY_ENCRYPTED_L2KEY_IV"
     }

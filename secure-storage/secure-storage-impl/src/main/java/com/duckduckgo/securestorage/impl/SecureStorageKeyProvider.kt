@@ -19,7 +19,7 @@ package com.duckduckgo.securestorage.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
-import com.duckduckgo.securestorage.impl.encryption.PasswordGenerator
+import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import com.duckduckgo.securestorage.store.SecureStorageKeyStore
 import com.squareup.anvil.annotations.ContributesBinding
 import okio.ByteString.Companion.toByteString
@@ -45,7 +45,7 @@ interface SecureStorageKeyProvider {
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyProvider @Inject constructor(
-    private val passwordGenerator: PasswordGenerator,
+    private val randomBytesGenerator: RandomBytesGenerator,
     private val secureStorageKeyStore: SecureStorageKeyStore,
     private val encryptionHelper: EncryptionHelper,
     private val secureStorageKeyGenerator: SecureStorageKeyGenerator
@@ -57,7 +57,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
     override fun getl1Key(): ByteArray {
         // If no key exists in the keystore, we generate a new one and store it
         return if (secureStorageKeyStore.l1Key == null) {
-            passwordGenerator.generatePassword().also {
+            randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
                 secureStorageKeyStore.l1Key = it
             }
         } else {
@@ -68,7 +68,7 @@ class RealSecureStorageKeyProvider @Inject constructor(
     @Synchronized
     override fun getl2Key(): Key {
         val userPassword = if (secureStorageKeyStore.password == null) {
-            passwordGenerator.generatePassword().also {
+            randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
                 secureStorageKeyStore.password = it
             }
         } else {
@@ -107,5 +107,20 @@ class RealSecureStorageKeyProvider @Inject constructor(
             secureStorageKeyStore.encryptedL2KeyIV = it.iv
         }.data
 
-    private fun deriveKeyFromPassword(password: String) = secureStorageKeyGenerator.generateKeyFromPassword(password)
+    private fun getPasswordSalt() = if (secureStorageKeyStore.passwordSalt == null) {
+        randomBytesGenerator.generateBytes(PASSWORD_KEY_SALT_SIZE).also {
+            secureStorageKeyStore.passwordSalt = it
+        }
+    } else {
+        secureStorageKeyStore.passwordSalt!!
+    }
+
+    private fun deriveKeyFromPassword(password: String) =
+        secureStorageKeyGenerator.generateKeyFromPassword(password, getPasswordSalt())
+
+    companion object {
+        private const val L1_PASSPHRASE_SIZE = 32
+        private const val PASSWORD_SIZE = 32
+        private const val PASSWORD_KEY_SALT_SIZE = 32
+    }
 }
