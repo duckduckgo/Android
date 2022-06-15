@@ -466,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Fangen wir an!</string>
     <string name="daxIntroCtaText"><![CDATA[Versuchen Sie als nächstes, eine Ihrer Lieblingsseiten zu besuchen! <br/><br/>Ich blockiere Tracker, damit sie Sie nicht ausspionieren können. Ich werde auch die Sicherheit Ihrer Verbindung verbessern, wenn das möglich ist. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Gut gemacht!<br/><br/>Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Werbung ihren Schrecken. 👍]]></string>
-    <string name="daxSerpCtaText">Deine DuckDuckGo-Suchanfragen sind anonym und ich speichere niemals deinen Suchverlauf. Unter keinen Umständen. 🙌</string>
+    <string name="daxSerpCtaText">Deine DuckDuckGo-Suchanfragen sind anonym. Immer. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ und <b>%1$d weiteres Tracker-Netzwerk</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
         <item quantity="other"><![CDATA[ und <b>%1$d weitere Tracker-Netzwerke</b> haben versucht, dich hier zu tracken. <br/><br/>Ich habe sie blockiert!<br/><br/> ☝️Du kannst in der Adressleiste sehen, wer dich beim Besuch einer neuen Website tracken will.]]></item>
