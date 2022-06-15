@@ -32,6 +32,9 @@ import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementEditMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementViewMode
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
@@ -41,6 +44,7 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
@@ -50,15 +54,26 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private var inEditMode: Boolean = false
 
+    @Inject
+    lateinit var deviceAuthenticator: DeviceAuthenticator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        if (savedInstanceState == null) {
-            showViewMode()
-        }
+        // TODO implement reauth when app is backgrounded
+        deviceAuthenticator.authenticate(AUTOFILL, this) {
+            if (it == AuthResult.Success) {
+                if (savedInstanceState == null) {
+                    showViewMode()
+                }
 
-        observeViewModel()
+                observeViewModel()
+            } else {
+                // TODO show locked autofill UI once available
+                finish()
+            }
+        }
     }
 
     private fun observeViewModel() {
