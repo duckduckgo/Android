@@ -23,11 +23,11 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
     private val appBuildConfig: AppBuildConfig,
