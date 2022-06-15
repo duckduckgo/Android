@@ -98,6 +98,7 @@ android {
         }
     }
     lintOptions {
+        disable 'ObsoleteLintCustomCheck'
         abortOnError true
         baseline file("lint-baseline.xml")
     }
@@ -333,7 +334,7 @@ tasks.register('android_checks') {
 }
 
 tasks.register('jvm_checks') {
-    dependsOn 'spotlessCheck', 'testPlayDebugUnitTest'
+    dependsOn 'spotlessCheck', 'lint', 'testPlayDebugUnitTest'
 }
 
 tasks.register('androidTestsBuild') {

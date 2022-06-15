@@ -54,7 +54,7 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
         private const val PIXEL_PREFIX = "m_atp_"
 
         // list here the pixels that except from this interceptor
-        val PIXEL_EXCEPTIONS = listOf(
+        private val PIXEL_EXCEPTIONS = listOf(
             "m_atp_imp_beta_instructions_d",
             "m_atp_imp_beta_instructions_c",
             "m_atp_imp_article_d",
@@ -71,9 +71,6 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
             "m_atp_imp_tracker_activity_detail_u",
             "m_atp_imp_tracker_activity_detail_d",
             "m_atp_imp_tracker_activity_detail_c",
-            "m_atp_imp_company_trackers_activity_u",
-            "m_atp_imp_company_trackers_activity_d",
-            "m_atp_imp_company_trackers_activity_c",
             "m_atp_imp_manage_recent_app_settings_activity_u",
             "m_atp_imp_manage_recent_app_settings_activity_d",
             "m_atp_imp_manage_recent_app_settings_activity_c",
@@ -101,6 +98,12 @@ class AtpPixelRemovalInterceptor @Inject constructor() : Interceptor, PixelInter
             "m_atp_ev_enabled_dax_onboarding_u",
             "m_atp_ev_enabled_dax_onboarding_d",
             "m_atp_ev_enabled_dax_onboarding_c",
+            "m_atp_ev_enabled_on_launch_c",
+            "m_atp_ev_enabled_on_launch_d",
+            "m_atp_ev_disabled_on_launch_c",
+            "m_atp_ev_disabled_on_launch_d",
+            "m_atp_ev_enabled_on_search_d",
+            "m_atp_ev_disabled_on_search_d",
         )
     }
 

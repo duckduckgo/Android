@@ -21,9 +21,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.VpnCoroutineScope
@@ -61,7 +61,10 @@ class DeviceShieldNotificationsDebugReceiver(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
@@ -71,10 +74,9 @@ class DeviceShieldNotificationsDebugReceiverRegister @Inject constructor(
     private val dailyNotificationPressedHandler: DailyNotificationPressedHandler,
     private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
     @VpnCoroutineScope private val vpnCoroutineScope: CoroutineScope
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun register() {
+    override fun onCreate(owner: LifecycleOwner) {
         if (!appBuildConfig.isDebug) {
             Timber.i("Will not register DeviceShieldNotificationsDebugReceiver, not in DEBUG mode")
             return

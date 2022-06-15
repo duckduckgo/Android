@@ -25,13 +25,18 @@ import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.browser.useragent.UserAgentProvider
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.fakes.FeatureToggleFake
+import com.duckduckgo.app.fakes.UserAgentFake
+import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
+import com.duckduckgo.privacy.config.api.UserAgent
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,7 +46,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.MockitoAnnotations
 
 @ExperimentalCoroutinesApi
 class WebViewRequestInterceptorTest {
@@ -59,14 +63,24 @@ class WebViewRequestInterceptorTest {
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
     private val mockGpc: Gpc = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
-    private val userAgentProvider: UserAgentProvider = UserAgentProvider({ DEFAULT }, mock(), provideUserAgentOverridePluginPoint())
+    private val fakeUserAgent: UserAgent = UserAgentFake()
+    private val fakeToggle: FeatureToggle = FeatureToggleFake()
+    private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
+    private val userAgentProvider: UserAgentProvider = UserAgentProvider(
+        { "" },
+        mock(),
+        provideUserAgentOverridePluginPoint(),
+        fakeUserAgent,
+        fakeToggle,
+        fakeUserAllowListRepository,
+        coroutinesTestRule.testDispatcherProvider
+    )
 
     private var webView: WebView = mock()
 
     @UiThreadTest
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
         configureUserAgent()
         configureStack()
 

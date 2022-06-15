@@ -187,7 +187,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
                 if (it.moveToFirst()) {
                     var index = 0
                     do {
-                        val tabId = it.getString(it.getColumnIndex("tabId"))
+                        val colInd = it.getColumnIndex("tabId")
+                        val tabId = it.getString(colInd)
                         database.execSQL("UPDATE `tabs` SET position=$index where `tabId` = \"$tabId\"")
                         index += 1
                     } while (it.moveToNext())
