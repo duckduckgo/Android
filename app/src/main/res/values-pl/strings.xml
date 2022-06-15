@@ -474,7 +474,7 @@
     <string name="onboardingLetsDoItButton">Zróbmy to!</string>
     <string name="daxIntroCtaText"><![CDATA[Spróbuj teraz odwiedzić jedną z twoich ulubionych stron! <br/><br/>Zablokuję cię, aby nie mogły cię szpiegować. Jeśli to możliwe, poprawię również bezpieczeństwo twojego połączenia. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Udało się!<br/><br/>Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wścibska reklama przestaje działać. 👍]]></string>
-    <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe, a ja nigdy nie przechowuję Twojej historii wyszukiwania. Przenigdy. 🙌</string>
+    <string name="daxSerpCtaText">Twoje wyszukiwania w DuckDuckGo są anonimowe. Zawsze. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ i <b>%1$d inny</b> próbowali Cię tutaj śledzić. <br/><br/>Zablokowałem je!<br/><br/> ☝️ Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
         <item quantity="few"><![CDATA[ i <b>%1$d innych</b> próbowało Cię tutaj śledzić. <br/><br/>Zablokowałem je!<br/><br/> ☝️ Możesz sprawdzić pasek adresu, aby zobaczyć, kto próbuje Cię śledzić, gdy odwiedzasz nową witrynę.️]]></item>
@@ -748,5 +748,11 @@
     <string name="downloadsMoreOptionsContentDescription">Więcej opcji dla %1$s</string>
     <string name="downloadsUndoActionName">Cofnij</string>
     <string name="downloadsStateInProgress">W trakcie…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Ochrona przed śledzeniem przez aplikacje</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokowanie skryptów śledzących aplikacji na urządzeniu</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Włączone</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Wyłączone</string>
 
 </resources>
