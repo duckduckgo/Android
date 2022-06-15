@@ -18,8 +18,8 @@ package com.duckduckgo.app.waitlist.email
 
 import android.content.Context
 import androidx.work.*
-import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.email.EmailManager.FetchCodeResult
 import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.app.notification.NotificationSender
 import com.duckduckgo.app.notification.model.EmailWaitlistCodeNotification
@@ -71,9 +71,9 @@ class EmailWaitlistWorker(
     override suspend fun doWork(): Result {
 
         when (emailManager.fetchInviteCode()) {
-            AppEmailManager.FetchCodeResult.CodeExisted -> Result.success()
-            AppEmailManager.FetchCodeResult.Code -> notificationSender.sendNotification(notification)
-            AppEmailManager.FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork())
+            FetchCodeResult.CodeExisted -> Result.success()
+            FetchCodeResult.Code -> notificationSender.sendNotification(notification)
+            FetchCodeResult.NoCode -> WorkManager.getInstance(context).enqueue(emailWaitlistWorkRequestBuilder.waitlistRequestWork())
         }
 
         return Result.success()

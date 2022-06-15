@@ -24,7 +24,6 @@ import timber.log.Timber
 
 class AutofillResponseWriter(val moshi: Moshi) {
 
-    private val availableInputTypesAdapter = moshi.adapter(AutofillAvailableInputTypesResponse::class.java).indent("  ")
     private val availableInputTypesAdapterx = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
     private val autofillDataAdapter = moshi.adapter(AutofillDataResponse::class.java).indent("  ")
 
@@ -36,9 +35,8 @@ class AutofillResponseWriter(val moshi: Moshi) {
         }
     }
 
-    fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean): String {
-        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable)
-        // val topLevelResponse = AutofillAvailableInputTypesResponse(availableInputTypes)
+    fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {
+        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
         return availableInputTypesAdapterx.toJson(availableInputTypes)
     }
 

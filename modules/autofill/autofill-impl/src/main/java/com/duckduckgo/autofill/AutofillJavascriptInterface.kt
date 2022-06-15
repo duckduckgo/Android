@@ -19,6 +19,7 @@ package com.duckduckgo.autofill
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
@@ -37,6 +38,7 @@ class AutofillJavascriptInterface(
     private val autofillStore: AutofillStore,
     private val autofillMessagePoster: AutofillMessagePoster,
     private val autofillResponseWriter: AutofillResponseWriter,
+    private val emailManager: EmailManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     var callback: Callback? = null
 ) {
@@ -65,44 +67,13 @@ class AutofillJavascriptInterface(
         }
     }
 
-    /**
-     * Requested from JS; requesting to know if we have autofill data saved.
-     *
-     * When called, we need to determine if we have any saved data to autofill.
-     * The response is NOT specifying whether we support something generally,
-     * but specifically if we have autofill data for the current page.
-     *
-     * Currently, the response is returned synchronously;
-     * in future this will be an async response using WebMessages.
-     *
-     * Currently, we only care about logins but in future there might be other autofill types to return.
-     */
-//    @JavascriptInterface
-//    fun getAvailableInputTypes() {
-//        Timber.i("BrowserAutofill: getAvailableInputTypes called")
-//        getAutofillDataJob += coroutineScope.launch {
-//            val url = currentUrl()
-//            val credentialsAvailable = if (url == null) {
-//                false
-//            } else {
-//                val savedCredentials = autofillStore.getCredentials(url)
-//                savedCredentials.isNotEmpty()
-//            }
-//
-//            Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
-//
-//            val message = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable)
-//            autofillMessagePoster.postMessage(webView, message)
-//        }
-//    }
-
     suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
         Timber.i("BrowserAutofill: getRuntimeConfiguration called")
 
         val contentScope = autofillResponseWriter.generateContentScope()
         val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
         val userPreferences = autofillResponseWriter.generateUserPreferences()
-        val availableInputTypes = d(url)
+        val availableInputTypes = generateAvailableInputTypes(url)
 
         return rawJs
             .replace("// INJECT contentScope HERE", contentScope)
@@ -111,20 +82,28 @@ class AutofillJavascriptInterface(
             .replace("// INJECT availableInputTypes HERE", availableInputTypes)
     }
 
-    suspend fun d(url: String?): String {
+    suspend fun generateAvailableInputTypes(url: String?): String {
+        val credentialsAvailable = determineIfCredentialsAvailable(url)
+        val emailAvailable = determineIfEmailAvailable()
+
+        Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
+
+        val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
+            Timber.i("xxx: \n%s", it)
+        }
+        return "availableInputTypes = $json"
+    }
+
+    private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
+
+    private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         val credentialsAvailable = if (url == null) {
             false
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
             savedCredentials.isNotEmpty()
         }
-
-        Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
-
-        val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable).also {
-            Timber.i("xxx: \n%s", it)
-        }
-        return "availableInputTypes = $json"
+        return credentialsAvailable
     }
 
     @JavascriptInterface

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.autofill
 
 import android.content.Context
+import com.duckduckgo.app.global.R
 import java.io.BufferedReader
 
 interface JavascriptInjector {
@@ -48,7 +49,7 @@ class FileBasedJavaScriptInjector : JavascriptInjector {
         alias: String?
     ): String {
         if (!this::aliasFunctions.isInitialized) {
-            aliasFunctions = loadJs("inject_alias.js")
+            aliasFunctions = context.resources.openRawResource(R.raw.inject_alias).bufferedReader().use { it.readText() }
         }
         return aliasFunctions.replace("%s", alias.orEmpty())
     }
@@ -57,7 +58,7 @@ class FileBasedJavaScriptInjector : JavascriptInjector {
         context: Context
     ): String {
         if (!this::signOutFunctions.isInitialized) {
-            signOutFunctions = loadJs("signout_autofill.js")
+            signOutFunctions = context.resources.openRawResource(R.raw.signout_autofill).bufferedReader().use { it.readText() }
         }
         return signOutFunctions
     }
