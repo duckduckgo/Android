@@ -34,6 +34,7 @@ data class AutofillAvailableInputTypesResponse(
 ) {
 
     data class AvailableInputSuccessResponse(
-        val credentials: Boolean
+        val credentials: Boolean,
+        val email: Boolean
     )
 }

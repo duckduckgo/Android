@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.autofill.FileBasedJavaScriptInjector
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.BrowserAutofill
@@ -66,6 +67,7 @@ class AutofillModule {
         @AppCoroutineScope coroutineScope: CoroutineScope,
         autofillMessagePoster: AutofillMessagePoster,
         autofillResponseWriter: AutofillResponseWriter,
+        emailManager: EmailManager,
         context: Context
     ): AutofillJavascriptInterface {
         return AutofillJavascriptInterface(
@@ -73,6 +75,7 @@ class AutofillModule {
             autofillStore = autofillStore,
             autofillMessagePoster = autofillMessagePoster,
             autofillResponseWriter = autofillResponseWriter,
+            emailManager = emailManager,
             coroutineScope = coroutineScope
         )
     }

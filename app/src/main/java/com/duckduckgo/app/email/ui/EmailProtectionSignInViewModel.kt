@@ -20,8 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.email.AppEmailManager
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.email.EmailManager.*
 import com.duckduckgo.app.email.api.EmailService
 import com.duckduckgo.app.waitlist.email.EmailWaitlistWorkRequestBuilder
 import com.duckduckgo.app.pixels.AppPixelName
@@ -57,7 +57,7 @@ class EmailProtectionSignInViewModel @Inject constructor(
         object ShowNotificationDialog : Command()
     }
 
-    data class ViewState(val waitlistState: AppEmailManager.WaitlistState)
+    data class ViewState(val waitlistState: WaitlistState)
 
     fun haveADuckAddress() {
         viewModelScope.launch {
