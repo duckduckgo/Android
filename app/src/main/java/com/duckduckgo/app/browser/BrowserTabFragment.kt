@@ -189,6 +189,8 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -329,6 +331,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var printInjector: PrintInjector
+
+    @Inject
+    lateinit var deviceAuthenticator: DeviceAuthenticator
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -1539,18 +1544,24 @@ class BrowserTabFragment :
     }
 
     private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
-        browserAutofill.addJsInterface(it, autofillCallback)
+        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
+            browserAutofill.addJsInterface(it, autofillCallback)
 
-        setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-            val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
-            val originalUrl = result.getString("url") ?: return@setFragmentResultListener
-            viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
-        }
+            setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
+                deviceAuthenticator.authenticate(AUTOFILL, this) {
+                    if (it is DeviceAuthenticator.AuthResult.Success) {
+                        val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@authenticate
+                        val originalUrl = result.getString("url") ?: return@authenticate
+                        viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
+                    }
+                }
+            }
 
-        setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-            val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
-            val originalUrl = result.getString("url") ?: return@setFragmentResultListener
-            viewModel.saveCredentials(originalUrl, selectedCredentials)
+            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
+                val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
+                val originalUrl = result.getString("url") ?: return@setFragmentResultListener
+                viewModel.saveCredentials(originalUrl, selectedCredentials)
+            }
         }
     }
 
