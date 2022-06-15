@@ -84,7 +84,8 @@ class AutofillResponseWriter(val moshi: Moshi) {
                       "inputType_creditCards": false,
                       "emailProtection": true,
                       "password_generation": false,
-                      "credentials_saving": true
+                      "credentials_saving": true,
+                      "inlineIcon_credentials": false
                     }
                   }
                 }
