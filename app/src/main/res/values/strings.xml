@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2019 DuckDuckGo
+  ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -467,7 +467,7 @@
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
     <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: Every time you browse with me, a creepy ad loses its wings. 👍]]></string>
-    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous and I never save your search history. Ever. 🙌</string>
+    <string name="daxSerpCtaText">Your DuckDuckGo searches are anonymous. Always. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[&#160;and <b>%d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
         <item quantity="other"><![CDATA[&#160;and <b>%d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
@@ -733,5 +733,11 @@
     <string name="downloadsMoreOptionsContentDescription">More options for %s</string>
     <string name="downloadsUndoActionName">Undo</string>
     <string name="downloadsStateInProgress">In progress…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">App Tracking Protection</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Block app trackers on your device</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Enabled</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Disabled</string>
 
 </resources>
