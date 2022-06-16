@@ -250,7 +250,6 @@ class BrowserWebViewClient(
             }
             lastPageStarted = url
             browserAutofill.configureAutofillForCurrentPage(webView, url)
-            // emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {
