@@ -33,9 +33,6 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Spotless
-        run: ./gradlew spotlessCheck --stacktrace
-
       - name: JVM checks
         run: ./gradlew jvm_checks
 

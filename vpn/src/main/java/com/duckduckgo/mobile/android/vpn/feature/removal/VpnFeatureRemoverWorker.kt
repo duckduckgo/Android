@@ -19,13 +19,18 @@ package com.duckduckgo.mobile.android.vpn.feature.removal
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
+import javax.inject.Inject
 
+@ContributesWorker(AppScope::class)
 class VpnFeatureRemoverWorker(
     val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
+    @Inject
     lateinit var vpnFeatureRemover: VpnFeatureRemover
 
     override suspend fun doWork(): Result {

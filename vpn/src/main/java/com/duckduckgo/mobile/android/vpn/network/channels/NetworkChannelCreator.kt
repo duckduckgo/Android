@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.network.channels
 
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.squareup.anvil.annotations.ContributesBinding
@@ -51,7 +52,8 @@ interface NetworkChannelCreator {
 
 @ContributesBinding(VpnScope::class)
 class NetworkChannelCreatorImpl @Inject constructor(
-    vpnServiceProvider: Provider<TrackerBlockingVpnService>
+    vpnServiceProvider: Provider<TrackerBlockingVpnService>,
+    private val appBuildConfig: AppBuildConfig,
 ) : NetworkChannelCreator {
 
     private val vpnService by lazy { vpnServiceProvider.get() }
@@ -61,7 +63,9 @@ class NetworkChannelCreatorImpl @Inject constructor(
         return DatagramChannel.open().also { channel ->
             channel.configureBlocking(false)
             channel.socket().run {
-                vpnService.protect(this)
+                if (socketNeedsProtection()) {
+                    vpnService.protect(this)
+                }
                 broadcast = true
             }
             try {
@@ -78,7 +82,9 @@ class NetworkChannelCreatorImpl @Inject constructor(
     override fun createSocketChannelAndConnect(inetSocketAddress: InetSocketAddress): SocketChannel {
         return SocketChannel.open().also { channel ->
             channel.configureBlocking(false)
-            vpnService.protect(channel.socket())
+            if (socketNeedsProtection()) {
+                vpnService.protect(channel.socket())
+            }
             try {
                 channel.connect(inetSocketAddress)
             } catch (e: IOException) {
@@ -86,5 +92,9 @@ class NetworkChannelCreatorImpl @Inject constructor(
                 throw e
             }
         }
+    }
+
+    private fun socketNeedsProtection(): Boolean {
+        return appBuildConfig.sdkInt !in 21..30
     }
 }

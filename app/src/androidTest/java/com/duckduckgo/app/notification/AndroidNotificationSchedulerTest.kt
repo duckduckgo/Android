@@ -26,8 +26,6 @@ import androidx.work.WorkManager
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.CoroutineTestRule
-import com.duckduckgo.app.notification.NotificationScheduler.ClearDataNotificationWorker
-import com.duckduckgo.app.notification.NotificationScheduler.PrivacyNotificationWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever

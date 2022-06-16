@@ -466,7 +466,7 @@
     <string name="onboardingLetsDoItButton">La oss gjøre det!</string>
     <string name="daxIntroCtaText"><![CDATA[Deretter kan du besøke et av favorittnettstedene dine! <br/><br/>Jeg blokkerer sporere slik at de ikke kan spionere på deg. Jeg vil også oppgradere sikkerheten til tilkoblingen din hvis mulig. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Dette går bra!<br/><br/>Husk: Hver gang du surfer med meg, klippes vingene av en ekkel annonse. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme, og jeg lagrer aldri søkehistorikken din. Aldri. 🙌</string>
+    <string name="daxSerpCtaText">DuckDuckGo-søkene dine er anonyme. Alltid. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ og <b>%1$d annen</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
         <item quantity="other"><![CDATA[ og <b>%1$d andre</b> prøvde å spore deg her. <br/><br/>Jeg blokkerte dem!<br/><br/> ☝️Du kan sjekke adresselinjen for å se hvem som prøver å spore deg når du besøker et nytt nettsted.️]]></item>
@@ -732,5 +732,11 @@
     <string name="downloadsMoreOptionsContentDescription">Flere alternativer for %1$s</string>
     <string name="downloadsUndoActionName">Angre</string>
     <string name="downloadsStateInProgress">Pågår…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Beskyttelse mot appsporing</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Blokker appsporere på enheten din</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Aktivert</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Deaktivert</string>
 
 </resources>

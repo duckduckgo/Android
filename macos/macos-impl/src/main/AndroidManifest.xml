@@ -17,7 +17,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.macos_impl">
-    <application>
+    <application android:supportsRtl="true">
     <activity
         android:name=".waitlist.ui.MacOsWaitlistActivity"
         android:label="@string/macos_app"
