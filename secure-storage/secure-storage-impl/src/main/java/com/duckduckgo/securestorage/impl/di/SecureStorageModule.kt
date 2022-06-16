@@ -20,13 +20,14 @@ import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.SecureStorageKeyProvider
-import com.duckduckgo.securestorage.store.RealSecureStorageKeyStore
+import com.duckduckgo.securestorage.store.RealSecureStorageKeyRepository
 import com.duckduckgo.securestorage.store.RealSecureStorageRepository
-import com.duckduckgo.securestorage.store.SecureStorageKeyStore
+import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import com.duckduckgo.securestorage.store.SecureStorageRepository
 import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsDao
+import com.duckduckgo.securestorage.store.keys.RealSecureStorageKeyStore
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
@@ -39,8 +40,8 @@ object SecureStorageModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesSecureStorageKeyStore(context: Context): SecureStorageKeyStore =
-        RealSecureStorageKeyStore(context)
+    fun providesSecureStorageKeyStore(context: Context): SecureStorageKeyRepository =
+        RealSecureStorageKeyRepository(RealSecureStorageKeyStore(context))
 
     @Provides
     @SingleInstanceIn(AppScope::class)
