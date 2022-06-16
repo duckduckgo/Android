@@ -1,0 +1,81 @@
+<!-- https://www.ebay-kleinanzeigen.de/m-benutzer-anmeldung.html -->
+
+<form id="registration-form" class="c-frm" action="/m-benutzer-anmeldung.html" method="post"><input type="hidden" name="registrationWenkseSessionId" value="304eb71a-8615-471c-8a00-f8a5c55ed426">
+        <fieldset>
+                <h1 class="formlegend headline-medium">Registrieren in 30 Sekunden</h1>
+
+                <div class="l-row l-container-row">
+                    <section class="a-span-12 and-pushed l-col" id="registration-data">
+
+                        <div class="formgroup l-container-row">
+                            <label class="formgroup-label" for="registration-email">E-Mail</label>
+                            <div class="formgroup-input">
+                                <input id="registration-email" name="email" class="formcontrol" autofocus="true" type="email" value=""  data-manual-scoring="emailAddress"></div>
+                        </div>
+                        <div class="formgroup l-container-row">
+                            <label class="formgroup-label" for="registration-password">Passwort</label>
+                            <div class="formgroup-input">
+                                <input id="registration-password" name="password" type="password" class="formcontrol" value=""  data-manual-scoring="password"></div>
+                            <div id="password-eye"></div>
+                        </div>
+                        <div id="password-rules" class="is-hidden">
+                                <div id="password-length" class="password-rule">
+                                    <div class="password-bullet-point"></div>
+                                    <div>Passwortlänge von mindestens 8 Zeichen</div>
+                                </div>
+                                <div id="password-uppercase" class="password-rule">
+                                    <div class="password-bullet-point"></div>
+                                    <div>Mindestens ein Großbuchstabe</div>
+                                </div>
+                                <div id="password-lowercase" class="password-rule">
+                                    <div class="password-bullet-point"></div>
+                                    <div>Mindestens ein Kleinbuchstabe</div>
+                                </div>
+                                <div id="password-special-character" class="password-rule">
+                                    <div class="password-bullet-point"></div>
+                                    <div>Mindestens ein Sonderzeichen</div>
+                                </div>
+                                <div id="password-number" class="password-rule">
+                                    <div class="password-bullet-point"></div>
+                                    <div>Mindestens eine Zahl</div>
+                                </div>
+                        </div>
+                        <div class="formgroup l-container-row">
+                            <label class="formgroup-label" for="registration-recaptcha"></label>
+                            <div class="formgroup-input">
+                                <p class="recaptcha-error is-hidden">Der reCAPTCHA-Service ist nicht erreichbar. Bitte überprüfe deine Internet-Verbindung und versuche es erneut.</p>
+                                <div id="registration-recaptcha" class="g-recaptcha" data-error-callback="onRecaptchaError" data-callback="onRecaptchaResponse" data-sitekey="6LcZlE0UAAAAAFQKM6e6WA2XynMyr6WFd5z1l1Nr"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LcZlE0UAAAAAFQKM6e6WA2XynMyr6WFd5z1l1Nr&amp;co=aHR0cHM6Ly93d3cuZWJheS1rbGVpbmFuemVpZ2VuLmRlOjQ0Mw..&amp;hl=de&amp;v=2uoiJ4hP3NUoP9v_eBNfU6CR&amp;size=normal&amp;cb=lf9c2lnrh8md" width="304" height="78" role="presentation" name="a-9mzi941a2ib8" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+                                </div>
+                        </div>
+                        <div class="l-container-row">
+                            <p>Es gelten unsere <a href="https://themen.ebay-kleinanzeigen.de/nutzungsbedingungen/" target="_blank" rel="noopener">Nutzungsbedingungen</a>. Informationen zur Verarbeitung Deiner Daten findest Du in unserer <a href="https://themen.ebay-kleinanzeigen.de/datenschutzerklaerung/" target="_blank" rel="noopener">Datenschutzerklärung</a>.
+                            </p>
+
+                            <div class="l-row">
+                                <div class="a-span-2 l-col"> <input id="marketing-optin" name="marketingOptIn" class="formcontrol" type="checkbox" value="true"><input type="hidden" name="_marketingOptIn" value="on"></div>
+
+                                <div class="a-span-22 l-col">
+                                    <label for="marketing-optin">
+                                        Ja, zu regelmäßigen Mails von uns mit Produktinfos, Tipps, Aktionen und spannenden Geschichten über uns und mobile.de - Abmelden geht jederzeit
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="l-container-row">
+                            <button id="registration-submit" class="button" type="submit" data-manual-submit="">
+            <span>Kostenlos registrieren</span>
+            </button>
+    </div>
+                    </section>
+                    <section class="a-span-11 and-pushed-1 l-col" id="extra-info">
+                        <ul class="iconlist">
+                            <li><i class="iconlist-icon icon-star-open-black"></i><span class="iconlist-text">Überall verfügbare Merkliste</span></li>
+                            <li><i class="iconlist-icon icon-message-gray"></i><span class="iconlist-text">Nachrichten überall lesen und beantworten</span></li>
+                            <li><i class="iconlist-icon icon-pencil-black"></i><span class="iconlist-text">Einfaches Verwalten und Bearbeiten von Anzeigen</span></li>
+                        </ul>
+                    </section>
+                </div>
+            </fieldset>
+    <div>
+<input type="hidden" name="_csrf" value="f70b4073-83d0-4a84-8bc4-ccc6a1670137">
+</div></form>

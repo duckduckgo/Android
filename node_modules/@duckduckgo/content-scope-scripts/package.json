@@ -1,0 +1,45 @@
+{
+  "name": "@duckduckgo/content-scope-scripts",
+  "version": "1.1.2",
+  "scripts": {
+    "postinstall": "npm run copy-sjcl",
+    "copy-sjcl": "node scripts/generateSJCL.js",
+    "build": "npm run build-firefox && npm run build-chrome && npm run build-apple && npm run build-integration",
+    "build-firefox": "mkdir -p build/firefox/ && node scripts/inject.mjs firefox > build/firefox/inject.js",
+    "build-chrome": "mkdir -p build/chrome/ && node scripts/inject.mjs chrome > build/chrome/inject.js",
+    "build-apple": "mkdir -p build/apple/ && node scripts/inject.mjs apple > build/apple/contentScope.js",
+    "build-integration": "mkdir -p build/integration/ && node scripts/inject.mjs integration > build/integration/contentScope.js && npm run copy-build-integration",
+    "copy-build-integration": "cp build/integration/contentScope.js integration-test/extension",
+    "tsc": "tsc",
+    "lint": "eslint . && npm run tsc",
+    "lint-no-output-globals": "eslint build/apple/contentScope.js --rule '{\"no-implicit-globals\": [\"error\"]}' --no-ignore --no-eslintrc --parser-options=ecmaVersion:10",
+    "lint-fix": "npm run lint -- --fix",
+    "test-unit": "jasmine --config=unit-test/config.json",
+    "test-int": "npm run build-integration && jasmine --config=integration-test/config.js",
+    "test-int-x": "xvfb-run --server-args='-screen 0 1024x768x24' npm run test-int",
+    "test-clean-tree": "npm run build && sh scripts/check-for-changes.sh",
+    "test": "npm run lint && npm run lint-no-output-globals && npm run test-unit && npm run test-int"
+  },
+  "type": "module",
+  "dependencies": {
+    "seedrandom": "^3.0.5",
+    "sjcl": "^1.0.8"
+  },
+  "devDependencies": {
+    "@canvas/image-data": "^1.0.0",
+    "@fingerprintjs/fingerprintjs": "^3.3.3",
+    "@rollup/plugin-commonjs": "^21.1.0",
+    "@rollup/plugin-node-resolve": "^13.2.1",
+    "@rollup/plugin-replace": "^4.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "jasmine": "^4.1.0",
+    "puppeteer": "^13.6.0",
+    "rollup": "^2.70.2",
+    "rollup-plugin-dynamic-import-variables": "^1.1.0",
+    "typescript": "^4.6.3"
+  }
+}

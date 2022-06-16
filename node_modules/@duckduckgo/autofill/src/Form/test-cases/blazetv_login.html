@@ -1,0 +1,15 @@
+<!-- https://www.blazetv.com/login -->
+<form class="ur-form ng-pristine ng-invalid ng-invalid-required" name="vm.loginForm" autocomplete="on"
+    novalidate="novalidate"><label ng-class="{ 'has-error': vm.loginForm.email.$invalid }" class="has-error">Email<input
+            class="ur-input ng-pristine ng-empty ng-invalid ng-invalid-required ng-touched" type="text" name="email"
+            ng-model="vm.email" urfs-focus-on="vm.emailNeedsFocus" autofocus="autofocus" required="required" style=""
+            data-manual-scoring="username"><!-- ngIf: vm.loginForm.email.$invalid --><span class="sr-only ng-scope"
+            aria-live="polite" ng-if="vm.loginForm.email.$invalid">Invalid E-mail</span>
+        <!-- end ngIf: vm.loginForm.email.$invalid --></label><label
+        ng-class="{ 'has-error': vm.loginForm.password.$invalid }" class="has-error">Password<input
+            class="ur-input ng-pristine ng-untouched ng-empty ng-invalid ng-invalid-required" type="password"
+            name="password" ng-model="vm.password" required="required" data-manual-scoring="password">
+        <!-- ngIf: vm.loginForm.password.$invalid --><span class="sr-only ng-scope" aria-live="polite"
+            ng-if="vm.loginForm.password.$invalid">Invalid Password</span>
+        <!-- end ngIf: vm.loginForm.password.$invalid --></label><button class="ur-btn ur-btn-primary ripple"
+        type="submit" ng-click="vm.login()" ripple-color="#eee" data-manual-submit="">Submit</button></form>

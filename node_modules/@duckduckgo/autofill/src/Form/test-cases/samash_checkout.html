@@ -1,0 +1,621 @@
+<!-- https://www.samash.com/checkout/#shipping -->
+<!-- Note that here we have two separate forms, but they are on the same page -->
+<form class="form form-login" data-role="email-with-possible-login" data-bind="submit:login" method="post" novalidate="novalidate">
+    <fieldset id="customer-email-fieldset" class="fieldset" data-bind="blockLoader: isLoading">
+        <div class="field required">
+            <label class="label" for="customer-email"><span data-bind="i18n: 'Email Address'">Email Address</span></label>
+            <div class="control _with-tooltip">
+                <input class="input-text" type="email" data-bind="
+                            textInput: email,
+                            hasFocus: emailFocused,
+                            afterRender: emailHasChanged,
+                            mageInit: {'mage/trim-input':{}}" name="username" data-validate="{required:true, 'validate-email':true}" id="customer-email" aria-required="true" data-manual-scoring="emailAddress">
+                <!-- ko template: 'ui/form/element/helper/tooltip' -->
+                <div class="field-tooltip toggle">
+
+                    <!-- ko if: (tooltip.link)--><!-- /ko -->
+
+                    <span id="tooltip-label" class="label"><!-- ko i18n: 'Tooltip' --><span>Tooltip</span><!-- /ko --></span>
+                    <!-- ko if: (!tooltip.link)-->
+                    <span id="tooltip" class="field-tooltip-action action-help" tabindex="0" data-toggle="dropdown" data-bind="mageInit: {'dropdown':{'activeClass': '_active', 'parent': '.field-tooltip.toggle'}}" aria-labelledby="tooltip-label" aria-haspopup="true" aria-expanded="false" role="button">
+         </span>
+                    <!-- /ko -->
+
+                    <div class="field-tooltip-content" data-target="dropdown" data-bind="i18n: tooltip.description" aria-hidden="true">We'll send your order confirmation here.</div>
+                </div>
+                <!-- /ko -->
+                <span class="note" data-bind="fadeVisible: isPasswordVisible() == false"><!-- ko i18n: 'You can create an account after checkout.'--><span>You can create an account after checkout.</span><!-- /ko --></span>
+            </div>
+        </div>
+
+        <!--Hidden fields -->
+        <fieldset class="fieldset hidden-fields" data-bind="fadeVisible: isPasswordVisible" style="display: none;">
+            <div class="field">
+                <label class="label" for="customer-password"><span data-bind="i18n: 'Password'">Password</span></label>
+                <div class="control">
+                    <input class="input-text" data-bind="
+                                attr: {
+                                    placeholder: $t('Password'),
+                                }" type="password" name="password" id="customer-password" data-validate="{required:true}" autocomplete="off" placeholder="Password" data-manual-scoring="password">
+                    <span class="note" data-bind="i18n: 'You already have an account with us. Sign in or continue as guest.'">You already have an account with us. Sign in or continue as guest.</span>
+                </div>
+
+            </div>
+            <!-- ko foreach: getRegion('additional-login-form-fields') -->
+            <!-- ko template: getTemplate() -->
+            <!-- ko foreach: {data: elems, as: 'element'} -->
+            <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+            <input name="captcha_form_id" type="hidden" data-bind="value: formId,  attr: {'data-scope': dataScope}" value="user_login" data-scope="">
+            <!-- ko if: (isRequired() && getIsVisible())--><!-- /ko -->
+            <!-- /ko --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <div class="actions-toolbar">
+                <input name="context" type="hidden" value="checkout">
+                <div class="primary">
+                    <button type="submit" class="action login primary" data-action="checkout-method-login" data-manual-submit><span data-bind="i18n: 'Login'">Login</span></button>
+                </div>
+                <div class="secondary">
+                    <a class="action remind" data-bind="attr: { href: forgotPasswordUrl }" href="https://www.samash.com/customer/account/forgotpassword/">
+                        <span data-bind="i18n: 'Forgot Your Password?'">Forgot Your Password?</span>
+                    </a>
+                </div>
+            </div>
+        </fieldset>
+        <!--Hidden fields -->
+    </fieldset>
+</form>
+
+<form class="form checkout-popup-form-shipping-address" id="co-shipping-form" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}" data-hasrequired="* Required Fields">
+    <div class="required-fields" data-bind="i18n: 'Required'">Required</div>
+    <!-- ko foreach: getRegion('before-fields') -->
+    <!-- ko template: getTemplate() -->
+    <!-- ko foreach: {data: elems, as: 'element'} --><!-- /ko -->
+    <!-- /ko -->
+    <!--/ko-->
+    <div id="shipping-new-address-form" class="fieldset address">
+        <!-- ko foreach: getRegion('additional-fieldsets') -->
+        <!-- ko template: getTemplate() -->
+        <!-- ko foreach: {data: elems, as: 'element'} -->
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.firstname">
+            <div data-bind="css: 'field-' + element.inputName" class="field-firstname">
+                <label class="label" data-bind="attr: { for: element.uid }" for="F4A8J3F">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">First Name</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="firstname" aria-required="true" aria-invalid="false" id="F4A8J3F" data-manual-scoring="firstName">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.lastname">
+            <div data-bind="css: 'field-' + element.inputName" class="field-lastname">
+                <label class="label" data-bind="attr: { for: element.uid }" for="NDKLJ7H">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">Last Name</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="lastname" aria-required="true" aria-invalid="false" id="NDKLJ7H" data-manual-scoring="lastName">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+        <fieldset class="field street admin__control-fields required" data-bind="css: additionalClasses">
+            <legend class="label">
+                <span data-bind="i18n: element.label">Street Address</span>
+            </legend>
+            <div class="control">
+                <!-- ko foreach: { data: elems, as: 'element' } -->
+
+                <!-- ko if: element.visible() -->
+
+                <!-- ko ifnot: (element.input_type == 'checkbox' || element.input_type == 'radio') -->
+                <!-- ko template: $parent.fieldTemplate -->
+
+                <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.street.0">
+                    <div data-bind="css: 'field-' + element.inputName" class="field-street[0]">
+                        <label class="label" data-bind="attr: { for: element.uid }" for="OPPY8NK">
+                            <!-- ko if: element.label -->
+                            <span data-bind="i18n: element.label">Street Address: Line 1</span>
+                            <!-- /ko -->
+                        </label>
+                        <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                            <!-- ko ifnot: element.hasAddons() -->
+                            <!-- ko template: element.elementTmpl -->
+                            <input class="input-text ddg-autofilled" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="street[0]" aria-required="true" aria-invalid="false" id="OPPY8NK" data-manual-scoring="addressStreet" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;">
+                            <!-- /ko -->
+                            <!-- /ko -->
+
+                            <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                            <!-- ko if: element.tooltip --><!-- /ko -->
+
+                            <!-- ko if: element.notice --><!-- /ko -->
+
+                            <!-- ko if: element.error() --><!-- /ko -->
+
+                            <!-- ko if: element.warn() --><!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: (element.input_type == 'checkbox' || element.input_type == 'radio') --><!-- /ko -->
+
+                <!-- /ko -->
+
+
+
+                <!-- ko if: element.visible() -->
+
+                <!-- ko ifnot: (element.input_type == 'checkbox' || element.input_type == 'radio') -->
+                <!-- ko template: $parent.fieldTemplate -->
+
+                <div class="field additional" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.street.1">
+                    <div data-bind="css: 'field-' + element.inputName" class="field-street[1]">
+                        <label class="label" data-bind="attr: { for: element.uid }" for="KB4RWNA">
+                            <!-- ko if: element.label -->
+                            <span data-bind="i18n: element.label">Street Address: Line 2</span>
+                            <!-- /ko -->
+                        </label>
+                        <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                            <!-- ko ifnot: element.hasAddons() -->
+                            <!-- ko template: element.elementTmpl -->
+                            <input class="input-text ddg-autofilled" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="street[1]" aria-invalid="false" id="KB4RWNA" data-manual-scoring="addressStreet2" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;">
+                            <!-- /ko -->
+                            <!-- /ko -->
+
+                            <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                            <!-- ko if: element.tooltip --><!-- /ko -->
+
+                            <!-- ko if: element.notice --><!-- /ko -->
+
+                            <!-- ko if: element.error() --><!-- /ko -->
+
+                            <!-- ko if: element.warn() --><!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: (element.input_type == 'checkbox' || element.input_type == 'radio') --><!-- /ko -->
+
+                <!-- /ko -->
+
+                <!-- /ko -->
+
+                <!-- ko if: validateWholeGroup --><!-- /ko -->
+            </div>
+        </fieldset>
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.city">
+            <div data-bind="css: 'field-' + element.inputName" class="field-city">
+                <label class="label" data-bind="attr: { for: element.uid }" for="FS2M0JF">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">City</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text ddg-autofilled" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="city" aria-required="true" aria-invalid="false" id="FS2M0JF" data-manual-scoring="addressCity" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.region_id">
+            <div data-bind="css: 'field-' + element.inputName" class="field-region_id">
+                <label class="label" data-bind="attr: { for: element.uid }" for="UM3FB3Q">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">State/Province</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <select class="select ddg-autofilled" data-bind="
+    attr: {
+        name: inputName,
+        id: uid,
+        disabled: disabled,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        placeholder: placeholder
+    },
+    hasFocus: focused,
+    optgroup: options,
+    value: value,
+    optionsCaption: caption,
+    optionsValue: 'value',
+    optionsText: 'label',
+    optionsAfterRender: function(option, item) {
+        if (item &amp;&amp; item.disabled) {
+            ko.applyBindingsToNode(option, {attr: {disabled: true}}, item);
+        }
+    }" name="region_id" id="UM3FB3Q" aria-required="true" aria-invalid="false" data-manual-scoring="addressProvince" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;"><option value="">Please select a region, state or province.</option><option data-title="Alabama" value="1">Alabama</option><option data-title="Alaska" value="2">Alaska</option><option data-title="American Samoa" value="3">American Samoa</option><option data-title="Arizona" value="4">Arizona</option><option data-title="Arkansas" value="5">Arkansas</option><option data-title="Armed Forces Africa" value="6">Armed Forces Africa</option><option data-title="Armed Forces Americas" value="7">Armed Forces Americas</option><option data-title="Armed Forces Canada" value="8">Armed Forces Canada</option><option data-title="Armed Forces Europe" value="9">Armed Forces Europe</option><option data-title="Armed Forces Middle East" value="10">Armed Forces Middle East</option><option data-title="Armed Forces Pacific" value="11">Armed Forces Pacific</option><option data-title="California" value="12">California</option><option data-title="Colorado" value="13">Colorado</option><option data-title="Connecticut" value="14">Connecticut</option><option data-title="Delaware" value="15">Delaware</option><option data-title="District of Columbia" value="16">District of Columbia</option><option data-title="Federated States Of Micronesia" value="17">Federated States Of Micronesia</option><option data-title="Florida" value="18">Florida</option><option data-title="Georgia" value="19">Georgia</option><option data-title="Guam" value="20">Guam</option><option data-title="Hawaii" value="21">Hawaii</option><option data-title="Idaho" value="22">Idaho</option><option data-title="Illinois" value="23">Illinois</option><option data-title="Indiana" value="24">Indiana</option><option data-title="Iowa" value="25">Iowa</option><option data-title="Kansas" value="26">Kansas</option><option data-title="Kentucky" value="27">Kentucky</option><option data-title="Louisiana" value="28">Louisiana</option><option data-title="Maine" value="29">Maine</option><option data-title="Marshall Islands" value="30">Marshall Islands</option><option data-title="Maryland" value="31">Maryland</option><option data-title="Massachusetts" value="32">Massachusetts</option><option data-title="Michigan" value="33">Michigan</option><option data-title="Minnesota" value="34">Minnesota</option><option data-title="Mississippi" value="35">Mississippi</option><option data-title="Missouri" value="36">Missouri</option><option data-title="Montana" value="37">Montana</option><option data-title="Nebraska" value="38">Nebraska</option><option data-title="Nevada" value="39">Nevada</option><option data-title="New Hampshire" value="40">New Hampshire</option><option data-title="New Jersey" value="41">New Jersey</option><option data-title="New Mexico" value="42">New Mexico</option><option data-title="New York" value="43">New York</option><option data-title="North Carolina" value="44">North Carolina</option><option data-title="North Dakota" value="45">North Dakota</option><option data-title="Northern Mariana Islands" value="46">Northern Mariana Islands</option><option data-title="Ohio" value="47">Ohio</option><option data-title="Oklahoma" value="48">Oklahoma</option><option data-title="Oregon" value="49">Oregon</option><option data-title="Palau" value="50">Palau</option><option data-title="Pennsylvania" value="51">Pennsylvania</option><option data-title="Puerto Rico" value="52">Puerto Rico</option><option data-title="Rhode Island" value="53">Rhode Island</option><option data-title="South Carolina" value="54">South Carolina</option><option data-title="South Dakota" value="55">South Dakota</option><option data-title="Tennessee" value="56">Tennessee</option><option data-title="Texas" value="57">Texas</option><option data-title="Utah" value="58">Utah</option><option data-title="Vermont" value="59">Vermont</option><option data-title="Virgin Islands" value="60">Virgin Islands</option><option data-title="Virginia" value="61">Virginia</option><option data-title="Washington" value="62">Washington</option><option data-title="West Virginia" value="63">West Virginia</option><option data-title="Wisconsin" value="64">Wisconsin</option><option data-title="Wyoming" value="65">Wyoming</option></select>
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.region" style="display: none;">
+            <div data-bind="css: 'field-' + element.inputName" class="field-region">
+                <label class="label" data-bind="attr: { for: element.uid }" for="JTXFV6Y">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">State/Province</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="region" aria-required="true" aria-invalid="false" id="JTXFV6Y" data-manual-scoring="addressProvince">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.postcode">
+            <div data-bind="css: 'field-' + element.inputName" class="field-postcode">
+                <label class="label" data-bind="attr: { for: element.uid }" for="PCG8Q1V">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">Zip/Postal Code</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text ddg-autofilled" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="postcode" aria-required="true" aria-invalid="false" id="PCG8Q1V" data-manual-scoring="addressPostalCode" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip --><!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() --><div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.country_id">
+        <div data-bind="css: 'field-' + element.inputName" class="field-country_id">
+            <label class="label" data-bind="attr: { for: element.uid }" for="JKFV6W0">
+                <!-- ko if: element.label -->
+                <span data-bind="i18n: element.label">Country</span>
+                <!-- /ko -->
+            </label>
+            <div class="control" data-bind="css: {'_with-tooltip': element.tooltip}">
+                <!-- ko ifnot: element.hasAddons() -->
+                <!-- ko template: element.elementTmpl -->
+                <select class="select ddg-autofilled" data-bind="
+    attr: {
+        name: inputName,
+        id: uid,
+        disabled: disabled,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        placeholder: placeholder
+    },
+    hasFocus: focused,
+    optgroup: options,
+    value: value,
+    optionsCaption: caption,
+    optionsValue: 'value',
+    optionsText: 'label',
+    optionsAfterRender: function(option, item) {
+        if (item &amp;&amp; item.disabled) {
+            ko.applyBindingsToNode(option, {attr: {disabled: true}}, item);
+        }
+    }" name="country_id" id="JKFV6W0" aria-required="true" aria-invalid="false" data-manual-scoring="addressCountryCode" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;"><option data-title="United States" value="US">United States</option></select>
+                <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                <!-- ko if: element.tooltip --><!-- /ko -->
+
+                <!-- ko if: element.notice --><!-- /ko -->
+
+                <!-- ko if: element.error() --><!-- /ko -->
+
+                <!-- ko if: element.warn() --><!-- /ko -->
+            </div>
+        </div>
+
+        <!-- ko if: isLinkAvailable() -->
+        <div class="select-link-wrapper" data-bind="html: getLinkContent()"><p><a title="Details for international cusomers " href="/help-center/international-customers" target="_blank" rel="noopener">International Customers Click Here</a></p></div>
+        <!-- /ko -->
+    </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+
+        <!-- ko if: hasTemplate() --><!-- ko template: getTemplate() -->
+
+        <div class="field _required" data-bind="
+    visible: visible,
+    attr: {'name': element.dataScope},
+    css: additionalClasses
+" name="shippingAddress.telephone">
+            <div data-bind="css: 'field-' + element.inputName" class="field-telephone">
+                <label class="label" data-bind="attr: { for: element.uid }" for="VYX3NOV">
+                    <!-- ko if: element.label -->
+                    <span data-bind="i18n: element.label">Phone number</span>
+                    <!-- /ko -->
+                </label>
+                <div class="control _with-tooltip" data-bind="css: {'_with-tooltip': element.tooltip}">
+                    <!-- ko ifnot: element.hasAddons() -->
+                    <!-- ko template: element.elementTmpl -->
+                    <input class="input-text ddg-autofilled" type="text" data-bind="
+    value: value,
+    valueUpdate: 'keyup',
+    hasFocus: focused,
+    attr: {
+        name: inputName,
+        placeholder: placeholder,
+        'aria-describedby': getDescriptionId(),
+        'aria-required': required,
+        'aria-invalid': error() ? true : 'false',
+        id: uid,
+        disabled: disabled
+    }" name="telephone" aria-required="true" aria-invalid="false" id="VYX3NOV" data-manual-scoring="phone" style="background-color: rgb(248, 244, 152) !important; color: rgb(51, 51, 51) !important;">
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.hasAddons() --><!-- /ko -->
+
+                    <!-- ko if: element.tooltip -->
+                    <!-- ko template: element.tooltipTpl -->
+                    <div class="field-tooltip toggle">
+
+                        <!-- ko if: (tooltip.link)--><!-- /ko -->
+
+                        <span id="tooltip-label" class="label"><!-- ko i18n: 'Tooltip' --><span>Tooltip</span><!-- /ko --></span>
+                        <!-- ko if: (!tooltip.link)-->
+                        <span id="tooltip" class="field-tooltip-action action-help" tabindex="0" data-toggle="dropdown" data-bind="mageInit: {'dropdown':{'activeClass': '_active', 'parent': '.field-tooltip.toggle'}}" aria-labelledby="tooltip-label" aria-haspopup="true" aria-expanded="false" role="button">
+         </span>
+                        <!-- /ko -->
+
+                        <div class="field-tooltip-content" data-target="dropdown" data-bind="i18n: tooltip.description" aria-hidden="true">For delivery questions.</div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+
+                    <!-- ko if: element.notice --><!-- /ko -->
+
+                    <!-- ko if: element.error() --><!-- /ko -->
+
+                    <!-- ko if: element.warn() --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+        <!-- /ko --><!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+        <!--/ko-->
+        <!-- ko if: (isCustomerLoggedIn) --><!-- /ko -->
+    </div>
+</form>

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GetAutofillDataRequest",
+  "type": "object",
+  "description": "This describes the argument given to `getAutofillData(data)`",
+  "additionalProperties": false,
+  "properties": {
+    "inputType": {
+      "description": "This is the combined input type, such as `credentials.username`",
+      "type": "string"
+    },
+    "mainType": {
+      "description": "The main input type",
+      "type": "string",
+      "enum": [
+        "credentials",
+        "identities",
+        "creditCards"
+      ]
+    },
+    "subType": {
+      "description": "Just the subtype, such as `password` or `username`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "inputType",
+    "mainType",
+    "subType"
+  ]
+}
