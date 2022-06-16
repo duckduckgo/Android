@@ -466,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Laten we het Doen!</string>
     <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van uw favoriete sites te bezoeken! <br/><br/>Ik blokkeer trackers zodat ze u niet kunnen bespioneren. Ik zal ook indien mogelijk de beveiliging van uw verbinding upgraden. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Je kunt het!<br/><br/>Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👍]]></string>
-    <string name="daxSerpCtaText">Je DuckDuckGo-zoekopdrachten zijn anoniem en ik sla je zoekgeschiedenis nooit op. Nooit. 🙌</string>
+    <string name="daxSerpCtaText">Je DuckDuckGo-zoekopdrachten zijn anoniem. Altijd. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
         <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
@@ -732,5 +732,11 @@
     <string name="downloadsMoreOptionsContentDescription">Meer opties voor %1$s</string>
     <string name="downloadsUndoActionName">Ongedaan maken</string>
     <string name="downloadsStateInProgress">Bezig...</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Bescherming tegen app-tracking</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">App trackers blokkeren op je apparaat</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Ingeschakeld</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Uitgeschakeld</string>
 
 </resources>
