@@ -1,0 +1,30 @@
+{
+  "name": "sjcl",
+  "version": "1.0.8",
+  "description": "Stanford Javascript Crypto Library",
+  "main": "sjcl.js",
+  "author": "bitwiseshiftleft",
+  "license": "(BSD-2-Clause OR GPL-2.0-only)",
+  "homepage": "https://github.com/bitwiseshiftleft/sjcl",
+  "keywords": [
+    "encryption",
+    "high-level",
+    "crypto"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitwiseshiftleft/sjcl.git"
+  },
+  "scripts": {
+    "test": "make test",
+    "jsdoc": "jsdoc -c jsdoc.conf.json",
+    "lint": "eslint . || true"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "devDependencies": {
+    "eslint": "^2.11.1",
+    "jsdoc": "3.4.0"
+  }
+}

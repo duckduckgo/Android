@@ -1,0 +1,117 @@
+<!-- https://www.wikihow.com/Special:CreateAccount -->
+<form class="mw-htmlform mw-ui-vform mw-ui-container" action="/Special:CreateAccount" method="post" id="userlogin2"
+    name="userlogin2">
+    <div>
+        <div class="mw-htmlform-field-HTMLInfoField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">
+                <div id="mw-createacct-status-area"></div>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginText mw-ui-vform-field"><label for="wpName2">Username</label>
+            <div class="mw-input"><input id="wpName2" name="wpName" size="20" class="loginText mw-ui-input" tabindex="1"
+                    required="" data-manual-scoring="username">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLCheckField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">
+                <div class="mw-ui-checkbox"><input name="wpUseRealNameAsDisplay" type="checkbox" value="1"
+                        id="wpUseRealNameAsDisplay" tabindex="2">&nbsp;<label for="wpUseRealNameAsDisplay">I would like
+                        to use my real name as my display name.</label></div>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginPassword mw-ui-vform-field mw-htmlform-hide-if"
+            data-hide-if="[&quot;===&quot;,&quot;wpCreateaccountMail&quot;,&quot;1&quot;]"><label
+                for="wpPassword2">Password</label>
+            <div class="mw-input"><input id="wpPassword2" name="wpPassword" size="20" class="loginPassword mw-ui-input"
+                    tabindex="3" required="" type="password" data-ddg-autofill="true" data-manual-scoring="password">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginPassword mw-ui-vform-field mw-htmlform-hide-if"
+            data-hide-if="[&quot;===&quot;,&quot;wpCreateaccountMail&quot;,&quot;1&quot;]"><label for="wpRetype">Confirm
+                password</label>
+            <div class="mw-input"><input id="wpRetype" name="retype" size="20" class="loginPassword mw-ui-input"
+                    tabindex="4" required="" type="password" data-ddg-autofill="true" data-manual-scoring="password">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginText mw-ui-vform-field"><label for="wpEmail">Email</label>
+            <div class="mw-input"><input id="wpEmail" name="email" size="20" class="loginText mw-ui-input" tabindex="5"
+                    required="" type="email" data-ddg-autofill="true" data-manual-scoring="emailAddress">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginText mw-ui-vform-field"><label for="wpRealName">Real name
+                (optional)</label>
+            <div class="mw-input"><input id="wpRealName" name="realname" size="20" class="loginText mw-ui-input"
+                    tabindex="6" data-manual-scoring="fullName">
+            </div>
+        </div>
+        <div class="htmlform-tip">If you choose to provide one, this will be used for giving you attribution for your
+            work. Otherwise, any articles that you create or edit will display your user name.</div>
+        <div class="mw-htmlform-field-HTMLCheckField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">
+                <div class="mw-ui-checkbox"><input name="wpRemember" type="checkbox" value="1" id="wpRemember"
+                        tabindex="7">&nbsp;<label for="wpRemember">Remember me</label></div>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLReCaptchaNoCaptchaField mw-ui-vform-field"><label
+                for="mw-input-captchaWord">To protect the wiki against automated account creation, we kindly ask you to
+                solve the following CAPTCHA:</label>
+            <div class="mw-input">
+                <div class="g-recaptcha" data-sitekey="6Lcr6DIaAAAAAK717S76_3LC2vwGgGiy6I6x8S28">
+                    <div style="width: 304px; height: 78px;">
+                        <div><iframe title="reCAPTCHA"
+                                src="https://www.recaptcha.net/recaptcha/api2/anchor?ar=1&amp;k=6Lcr6DIaAAAAAK717S76_3LC2vwGgGiy6I6x8S28&amp;co=aHR0cHM6Ly93d3cud2lraWhvdy5jb206NDQz&amp;hl=en&amp;v=Y-cOIEkAqcfDdup_qnnmkxIC&amp;size=normal&amp;cb=wtrokgr0ilzu"
+                                width="304" height="78" role="presentation" name="a-tkismf7bwbys" frameborder="0"
+                                scrolling="no"
+                                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                        </div><textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                            class="g-recaptcha-response"
+                            style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                    </div><iframe style="display: none;"></iframe>
+                </div><noscript>
+                    &lt;div&gt;
+                    &lt;div style="width: 302px; height: 422px; position: relative;"&gt;
+                    &lt;div style="width: 302px; height: 422px; position: absolute;"&gt;
+                    &lt;iframe
+                    src="https://www.recaptcha.net/recaptcha/api/fallback?k=6Lcr6DIaAAAAAK717S76_3LC2vwGgGiy6I6x8S28&amp;hl=en"
+                    frameborder="0" scrolling="no"
+                    style="width: 302px; height:422px; border-style: none;"&gt;
+                    &lt;/iframe&gt;
+                    &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div style="width: 300px; height: 60px; border-style: none;
+                    bottom: 12px; left: 25px; margin: 0px; padding: 0px; right: 25px;
+                    background: #f9f9f9; border: 1px solid #c1c1c1; border-radius: 3px;"&gt;
+                    &lt;textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                    class="g-recaptcha-response"
+                    style="width: 250px; height: 40px; border: 1px solid #c1c1c1;
+                    margin: 10px 25px; padding: 0px; resize: none;" &gt;
+                    &lt;/textarea&gt;
+                    &lt;/div&gt;
+                    &lt;/div&gt;
+                </noscript>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLSubmitField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel"><button
+                    class="mw-htmlform-submit mw-ui-button mw-ui-primary mw-ui-progressive" id="wpCreateaccount"
+                    type="submit" name="wpCreateaccount" value="Create your account" tabindex="9"
+                    data-manual-submit="">Create your account</button>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLInfoField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">
+                <div id="signupend"></div>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLInfoField captcha_fineprint mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">By creating an account, you confirm that you are at least 16 years
+                old and agree to wikiHow’s <a href="/wikiHow:Terms-of-Use" title="wikiHow:Terms of Use">Terms of
+                    Use</a>.
+            </div>
+        </div>
+    </div><input id="wpEditToken" type="hidden" value="+\" name="wpEditToken">
+    <input type="hidden" value="Special:CreateAccount" name="title">
+    <input name="authAction" type="hidden" value="create">
+    <input name="force" type="hidden">
+    <input name="wpCreateaccountToken" type="hidden" value="3abf6bc677d2aaae10efd271700890416253b1b8+\">
+</form>

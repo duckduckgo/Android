@@ -1,0 +1,56 @@
+<!-- https://stackoverflow.com/users/login -->
+<form id="login-form" class="d-flex fd-column gs12 gsy" action="/users/login" method="POST">
+    <input type="hidden" name="fkey" value="ca6239eec5b9364da29935b422ddeacd289a578b6ee4b4a591050b440cbca2d6">
+    <input type="hidden" name="ssrc" value="login">
+    <div class="d-flex fd-column gs4 gsy js-auth-item">
+        <label class="flex--item s-label" for="email">Email</label>
+        <div class="d-flex ps-relative">
+            <input class="s-input" id="email" type="email" size="30" maxlength="100" name="email"
+                data-manual-scoring="username">
+            <svg aria-hidden="true" class="s-input-icon js-alert-icon d-none svg-icon iconAlertCircle" width="18"
+                height="18" viewBox="0 0 18 18">
+                <path
+                    d="M9 17c-4.36 0-8-3.64-8-8 0-4.36 3.64-8 8-8 4.36 0 8 3.64 8 8 0 4.36-3.64 8-8 8ZM8 4v6h2V4H8Zm0 8v2h2v-2H8Z">
+                </path>
+            </svg>
+        </div>
+        <p class="flex--item s-input-message js-error-message d-none">
+
+        </p>
+
+    </div>
+    <div class="d-flex fd-column-reverse gs4 gsy js-auth-item">
+        <p class="flex--item s-input-message js-error-message d-none">
+
+        </p>
+
+        <div class="d-flex ps-relative js-password">
+            <input class="flex--item s-input" type="password" autocomplete="off" name="password" id="password"
+                data-manual-scoring="password">
+            <svg aria-hidden="true" class="s-input-icon js-alert-icon d-none svg-icon iconAlertCircle" width="18"
+                height="18" viewBox="0 0 18 18">
+                <path
+                    d="M9 17c-4.36 0-8-3.64-8-8 0-4.36 3.64-8 8-8 4.36 0 8 3.64 8 8 0 4.36-3.64 8-8 8ZM8 4v6h2V4H8Zm0 8v2h2v-2H8Z">
+                </path>
+            </svg>
+        </div>
+        <div class="d-flex ai-center ps-relative jc-space-between">
+            <label class="flex--item s-label" for="password">Password</label>
+
+            <a class="flex--item s-link fs-caption" href="/users/account-recovery">Forgot password?</a>
+        </div>
+    </div>
+    <div class="d-flex gs4 gsy fd-column js-auth-item">
+        <button class="flex--item s-btn s-btn__primary" id="submit-button" name="submit-button"
+            data-manual-submit="">Log in</button>
+        <p class="flex--item s-input-message js-error-message d-none">
+
+        </p>
+
+    </div>
+
+    <input type="hidden" id="oauth_version" name="oauth_version">
+    <input type="hidden" id="oauth_server" name="oauth_server">
+
+
+</form>

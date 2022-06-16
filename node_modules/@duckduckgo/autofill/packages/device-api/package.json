@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "description": "RPC-style calls with Zod validations + type safety",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duckduckgo/duckduckgo-autofill.git"
+  },
+  "keywords": [
+    "duckduckgo",
+    "zod",
+    "rpc"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/duckduckgo/duckduckgo-autofill/issues"
+  },
+  "homepage": "https://github.com/duckduckgo/duckduckgo-autofill/blob/main/packages/device-api/readme.md"
+}

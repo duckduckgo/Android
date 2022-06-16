@@ -1,0 +1,29 @@
+<!-- https://www.babycenter.com/login.htm -->
+<form id="login" method="post" action="/do_login_secure.htm" name="login" class="bcForm spacer">
+    <input type="hidden" id="referringUrl" name="referringUrl" value="">
+    <div id="login.errors" class="formError">
+    </div>
+    <div class="formRow">
+        <div class="errorMsg"></div>
+        <label for="j_username" id="loginEmailLabel">Email address</label>
+        <input id="member.email" name="j_username" type="text" maxlength="125" tabindex="3"
+            data-manual-scoring="username">
+    </div>
+    <div class="formRow">
+        <label for="j_password" id="loginPasswordLabel"> Password </label>
+        <input id="member.password" name="j_password" type="password" autocomplete="off" maxlength="250" tabindex="4"
+            data-manual-scoring="password">
+        <div class="formNote">
+            <a href="/forgotPassword.htm" tabindex="5">Forgot your password?</a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="remembermeLabel formRow">
+        <input tabindex="7" type="checkbox" name="_rememberMe" value="true" checked="">
+        <label for="_rememberMe" class="inlineLabel"> Keep me logged in </label> <br>
+    </div>
+    <div class="clear"></div>
+    <div class="formRow formSubmit">
+        <button class="btn_ primary medium" tabindex="8" type="submit" data-manual-submit="">Log in</button>
+    </div>
+</form>

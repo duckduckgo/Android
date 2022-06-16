@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Password generator default settings</title>
+</head>
+<body>
+    <h1>Password generator default settings</h1>
+    <pre><code id="rules"></code></pre>
+    <pre><code id="parameters"></code></pre>
+    <pre><code id="password"></code></pre>
+    <pre><code id="entropy"></code></pre>
+    <script type="module">
+        import {generate} from "./index.js";
+        import {Password} from './lib/apple.password.js'
+        const elements = {
+            rules: document.querySelector("#rules"),
+            parameters: document.querySelector("#parameters"),
+            password: document.querySelector("#password"),
+            entropy: document.querySelector("#entropy"),
+        }
+        const passwords = [];
+        for (let i = 0; i < 10; i++) {
+            passwords.push(generate())
+        }
+        elements.password.textContent = passwords.join('\n');
+        elements.rules.textContent = Password.defaults.defaultPasswordRules;
+
+        const {parameters, entropy} = new Password().parse(Password.defaults.defaultPasswordRules);
+        elements.parameters.textContent = JSON.stringify(parameters, null, 2);
+        elements.entropy.textContent = `Entropy: ${entropy}`;
+    </script>
+</body>
+</html>

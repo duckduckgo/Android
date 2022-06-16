@@ -1,0 +1,40 @@
+<!-- https://www.containerstore.com/profile/login.htm?successUrl=%2fwelcome.htm -->
+<form id="form-login" class="" name="signInForm" action="/loginProcess" method="post"><input type="hidden"
+        name="CSRF_TOKEN" value="09MJ5lvHHwvbX0hqof7FIMai9G6zCJ99T8l3XpDjA4Wy8HvCVWc0f3eOh7oWSnXC">
+
+    <div class="field-group">
+        <div class="pop-input-group">
+            <input type="email" class="account-email-input pop-input" name="j_username" id="j_username" value=""
+                placeholder="Email Address" data-manual-scoring="username">
+        </div>
+    </div>
+    <div class="field-group password-area">
+        <div class="horizontal-label-input">
+            <label for="newCustomerField">
+                <input class="newOrExistingCustomer" id="newCustomerField" type="radio" name="newCustomerField"
+                    value="true">&nbsp;I am a new Customer
+            </label>
+            <br>
+        </div>
+
+        <div>
+            <label for="existingCustomer" class="existing-customer-label">
+                <input class="newOrExistingCustomer" id="existingCustomer" type="radio" name="newCustomerField"
+                    value="false" checked="checked">&nbsp;I have a password
+            </label>
+
+            <div class="input-wrapper pop-input-group existing-customer-input">
+                <input class="loginField passwordField pop-input" type="password" name="j_password" id="j_password"
+                    autocomplete="off" placeholder="Password" data-manual-scoring="password">
+                <a class="underlined forgot-password-text" href="/profile/forgotPassword.htm">Forgot your password?</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+
+    <input name="successUrl" type="hidden" value="/welcome.htm">
+    <input name="failureUrl" type="hidden" value="/profile/login.htm?failed=true">
+    <input class="btn bem-btn--primary submit-button" id="submit" type="submit" name="submit" value="Sign In"
+        data-manual-submit="">
+</form>

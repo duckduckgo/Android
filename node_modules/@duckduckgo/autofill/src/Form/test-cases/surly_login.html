@@ -1,0 +1,15 @@
+<!-- https://sur.ly/ -->
+<form id="loginForm" class="auth-form" method="post" action="/analytics/auth">
+    <input type="text" placeholder="e-mail" name="login_mail" data-manual-scoring="username">
+    <input type="password" placeholder="password" name="login_pass" data-manual-scoring="password">
+    <div class="error-message" style="display: none;"></div>
+    <div class="wrapper-button">
+        <button type="submit" class="button-1 btn-submit" data-manual-submit="">
+            <span class="btn-text">Sign in</span>
+            <span class="btn-loader"><i class="fa fa-spinner fa-pulse"></i></span>
+        </button>
+    </div>
+    <div class="wrapper-text">
+        <a href="#" class="open-pop-up forgot-password" data-popup="forgot-password">Forgot your password?</a>
+    </div>
+</form>

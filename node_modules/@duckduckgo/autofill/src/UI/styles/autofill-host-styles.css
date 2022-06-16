@@ -1,0 +1,29 @@
+@font-face {
+    font-family: 'DDG_ProximaNova';
+    /* This url is changed for Firefox at build time */
+    src: url('chrome-extension://__MSG_@@extension_id__/public/font/ProximaNova-Reg-webfont.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DDG_ProximaNova';
+    /* This url is changed for Firefox at build time */
+    src: url('chrome-extension://__MSG_@@extension_id__/public/font/ProximaNova-Bold-webfont.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+}
+
+.ddg-autofilled {
+    background-color: #F8F498 !important;
+    color: #333333 !important;
+}
+
+input[data-ddg-autofill] {
+    /* This url is changed for Firefox at build time */
+    background-image: url('chrome-extension://__MSG_@@extension_id__/public/../img/logo-small.svg') !important;
+    background-size: auto 24px !important;
+    background-position: center right 2px !important;
+    background-repeat: no-repeat !important;
+    background-origin: content-box !important;
+}

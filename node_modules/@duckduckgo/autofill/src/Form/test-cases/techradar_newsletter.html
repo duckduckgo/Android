@@ -1,0 +1,170 @@
+<!-- https://www.mymagazine.co.uk/AccessSubscription -->
+<form id="j_id0:theForm" name="j_id0:theForm" method="post" action="https://www.mymagazine.co.uk/AccessSubscription?refURL=http%3A%2F%2Fwww.mymagazine.co.uk%2FAccessSubscription" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="j_id0:theForm" value="j_id0:theForm">
+
+                        
+                        
+                        
+                        <div class="row small-collapse medium-uncollapse">
+                            <div class="columns large-6 small-12">
+                               
+                                    <div>
+                                        <h4>Access your subscription</h4>
+                                    </div>
+                                    <div class="row small-collapse medium-uncollapse">
+                                        <div class="small-12 large-10 columns">
+                                            <label style="font-weight: bold;">Enter Your Email<input id="j_id0:theForm:emailInput" type="text" name="j_id0:theForm:emailInput" class="trackEvent emailInput" onkeyup="searchContactEmails(j$(this));" autocomplete="off" placeholder="This is the email address used when purchasing the subscription" data-action="UA:type-email" data-category="User Account" data-manual-scoring="username" style="">
+                                                </label>
+
+                                            <p class="greyFontColor small-12 large-12" id="forgotEmail"><a href="/ForgotEmail" onclick="fireFAOnForgotEmailRedirect();" style="text-decoration: underline; font-style: inherit;" class="greyFontColor help-text trackEvent" data-action="UA:forgotten-email-link" data-category="User Account"> 
+                                                    Forgotten which email you registered with?</a>
+                                            </p>
+
+                                            <div class="mydropdown small-12" id="searchDropDown">
+                                                <div aria-hidden="false" class="searchResultsUL f-dropdown large-12 small-12" id="searchResultsUL" style="display: none;">
+                                                    <div>
+                                                        <div class="row small-collapse medium-uncollapse subscriptionForm">
+                                                            <div class="small-9 large-10 columns" style="padding-left: 0px !important;">
+                                                                It looks like you haven’t set up an account yet. We just need a bit more information from you to locate your subscription and create an account
+                                                                <div class="trackEvent invalidEmailInput small-12 large-10 help-text" data-action="UA:type-email-error-invalid-email" data-category="User Account" style="display: none; color: red; padding-top: 2%;">
+                                                                  This not a valid email address. Please check and try again
+                                                                </div>
+                                                            </div>
+                                                            <button class="small-3 large-2 columns button trackEvent" data-action="UA:registration-start-cta" data-category="User Account" onclick="callRegisterForm();" style="margin:auto;" type="button">Next
+                                                            </button>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row small-collapse medium-uncollapse" id="passwordElement" style="display: none;">
+                                        <div class="small-12 large-10 columns">
+                                            <label style="font-weight: bold;">
+                                                Enter Your Password &nbsp;
+                                                <span aria-haspopup="true" class="has-tip" data-tooltip="true" style="border-bottom: 0px !important;" title="" aria-describedby="nwgru1-tooltip" data-yeti-box="nwgru1-tooltip" data-toggle="nwgru1-tooltip" data-resize="nwgru1-tooltip">ⓘ
+                                                </span><input id="j_id0:theForm:passwordInput" type="password" name="j_id0:theForm:passwordInput" value="" class="passwordInput trackEvent" placeholder="This is a minimum of 8 characters long and contains at least 1 letter and 1 number" data-action="UA:login-type-password" data-category="User Account" data-manual-scoring="password">
+                                            </label>
+
+                                            <p class="greyFontColor small-12 large-12" style="margin-top: -10px; margin-bottom: .176rem;">
+                                                <a class="trackEvent help-text greyFontColor" onclick="preGoToResetPassword();" style="text-decoration: underline; font-style: inherit;">Forgot Your Password?</a>
+                                            </p>
+
+                                            <span class="emptyEmailInput small-12 large-12 help-text" style="display: none; color: red;"> 
+                                                    Please Type Your Email And Password 
+                                                </span>
+                                            <span class="invalidPassword small-12 large-12 help-text" style="display: none; color: red;"> 
+                                                Your password is incorrect.  Please check and try again or click to <a class="trackEvent" html-data-action="UA:login-password-error" html-data-category="User Account" onclick="goToResetPassword();" style="text-decoration: underline;">reset your password</a>
+                                            </span>
+                                            <a class="trackInvalidPassword trackEvent" data-action="UA:login-password-error" data-category="User Account"></a>
+                                        </div>
+
+                                        <div class="small-12 large-2 columns">
+                                            <label>&nbsp;</label>
+                                            <button class="small-12 large-12 columns loginButton button trackEvent" data-action="UA:login-password-submit" data-category="User Account" onclick="loginUser(); fireGA('login', 'login attempt', undefined, undefined);" type="button">Login</button>
+                                        </div>
+                                    </div>
+                               
+                            </div>
+
+                            <div class="columns large-6 small-12">
+                                <div>
+                                    <h4>Frequently asked questions</h4>
+                                </div>
+                                <label> &nbsp;</label>
+                                
+                                
+                                
+                                <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="Only one of my subscriptions is showing up in my account" onclick="toogleFAQ(this);" style="width: 100%">
+                                    Only one of my subscriptions is showing up in my account
+                                    <div class="tri0"></div>
+                                </div>
+                                <div class="answers">
+                                    If you've bought more than one subscription and only one is showing up in your account, it may be you bought them using different e-mail address or delivery details. Please contact customer services <a class="greyFontColor" href="/ContactUs">directly</a> who will be happy to help you.
+                                </div>
+                                <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="Can I speak to Customer Services directly?" onclick="toogleFAQ(this);" style="width: 100%">
+                                    Can I speak to Customer Services directly?
+                                    <div class="tri0"></div>
+                                </div>
+                                <div class="answers">
+                                    
+                                        <p>You can reach customer support by:</p>
+                                        <p><b>Email</b>: help@mymagazine.co.uk</p>
+                                        <p><b>Telephone</b>: 0330 3331 122 (Mon-Fri, 9am-5pm)</p>
+                                        
+                                        <p><b>Online</b>: <a href="/HelpSubscription" style="color: rgb(177, 0, 25); font-weight: bold;" target="_blank">www.mymagazine.co.uk/HelpSubscription</a></p>
+                                        
+                                        <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="US Titles/Numbers" onclick="toogleFAQ(this);" style="width: 100%">
+                                            US Titles/Numbers
+                                            <div class="tri0"></div>
+                                        </div>
+                                        <div class="answers">
+                                            <p>Bass Player: 1-800-234-1831</p>
+                                            <p>Guitar Player: 1-800-289-9839</p>
+                                            <p>Guitar World: 1-800-456-6441</p>
+                                            <p>Mac|Life: 1-844-779-2822</p>
+                                            <p>Maximum PC: 1-844-779-2822</p>
+                                            <p>PC Gamer US: 1-844-779-2822</p>
+                                            <p>Call us toll-free from 8:30am to 5pm (Mon-Fri, EST)</p>
+                                            
+                                        </div>
+                                    
+                                </div>
+                                
+                                <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="I can’t login. Who can help me?" onclick="toogleFAQ(this);" style="width: 100%">
+                                    I can’t login. Who can help me?
+                                    <div class="tri0"></div>
+                                </div>
+                                
+                                <div class="answers">
+                                    
+                                        <p>Unfortunately, it can take up to 48 hours for a new subscription to be set up. If you ordered more than 48 hours ago and you are still having trouble logging in, please contact us by:</p>
+                                        <p><b>Email</b>: help@mymagazine.co.uk</p>
+                                        <p><b>Telephone</b>: 0330 3331 122 (Mon-Fri, 9am-5pm)</p>
+                                        
+                                        <p><b>Online</b>: <a href="/HelpSubscription" style="color: rgb(177, 0, 25); font-weight: bold;" target="_blank">www.mymagazine.co.uk/HelpSubscription</a></p>
+                                        
+                                        <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="US Titles/Numbers" onclick="toogleFAQ(this);" style="width: 100%">
+                                            US Titles/Numbers
+                                            <div class="tri0"></div>
+                                        </div>
+                                        <div class="answers">
+                                            <p>Bass Player: 1-800-234-1831</p>
+                                            <p>Guitar Player: 1-800-289-9839</p>
+                                            <p>Guitar World: 1-800-456-6441</p>
+                                            <p>Mac|Life: 1-844-779-2822</p>
+                                            <p>Maximum PC: 1-844-779-2822</p>
+                                            <p>PC Gamer US: 1-844-779-2822</p>
+                                            <p>Call us toll-free from 8am to 7pm (Mon-Fri, EDT) and 10am to 2pm (Sat, EDT)</p>
+                                            
+                                        </div>
+                                    
+                                </div>
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                
+                                <div class="greyFontColor faqQuestion trackEvent" data-action="UA:expand-faq" data-category="User Account" data-label="How do I access my digital magazine" onclick="toogleFAQ(this);" style="width: 100%">
+                                    How do I access my digital magazine?
+                                    <div class="tri0"></div>
+                                </div>
+                                <div class="answers">
+                                    Please follow <a href="https://www.magazinesdirect.com/digital/instructions.html" target="_blank"><u>these instructions</u></a> to get started
+                                </div>
+                            </div>
+                        </div><span id="j_id0:theForm:boolVars">
+                            <script>
+                                var invalidPassword = 'false';
+                                var isUserFound = 'false';
+                            </script></span><script id="j_id0:theForm:j_id35" type="text/javascript">login=function(){A4J.AJAX.Submit('j_id0:theForm',null,{'similarityGroupingId':'j_id0:theForm:j_id35','parameters':{'j_id0:theForm:j_id35':'j_id0:theForm:j_id35'} ,'status':'j_id0:j_id8:j_id9:status'} )};
+</script><script id="j_id0:theForm:j_id36" type="text/javascript">findEmail=function(){A4J.AJAX.Submit('j_id0:theForm',null,{'similarityGroupingId':'j_id0:theForm:j_id36','oncomplete':function(request,event,data){findEmailOnComplete();},'parameters':{'j_id0:theForm:j_id36':'j_id0:theForm:j_id36'} } )};
+</script><script id="j_id0:theForm:j_id37" type="text/javascript">goToFindSubscription=function(){A4J.AJAX.Submit('j_id0:theForm',null,{'similarityGroupingId':'j_id0:theForm:j_id37','parameters':{'j_id0:theForm:j_id37':'j_id0:theForm:j_id37'} ,'status':'j_id0:j_id8:j_id9:status'} )};
+</script><script id="j_id0:theForm:j_id38" type="text/javascript">goToResetPassword=function(){A4J.AJAX.Submit('j_id0:theForm',null,{'similarityGroupingId':'j_id0:theForm:j_id38','parameters':{'j_id0:theForm:j_id38':'j_id0:theForm:j_id38'} ,'status':'j_id0:j_id8:j_id9:status'} )};
+</script><script id="j_id0:theForm:j_id39" type="text/javascript">goToHomePage=function(){A4J.AJAX.Submit('j_id0:theForm',null,{'similarityGroupingId':'j_id0:theForm:j_id39','parameters':{'j_id0:theForm:j_id39':'j_id0:theForm:j_id39'} ,'status':'j_id0:j_id8:j_id9:status'} )};
+</script><div id="j_id0:theForm:j_id76"></div>
+</form>

@@ -1,0 +1,798 @@
+<!-- https://www.thermoworks.com/checkout -->
+
+<!-- step 1: email -->
+
+<form id="checkout-customer-guest" class="checkout-form" data-test="checkout-customer-guest" novalidate=""
+    autocomplete="off">
+    <fieldset class="form-fieldset">
+        <legend class="form-legend is-srOnly">Guest Customer</legend>
+        <div class="form-body">
+            <p><span>Checking out as a <strong>Guest</strong>? You'll be able to save your details to create an account
+                    with us later.</span></p>
+            <div class="customerEmail-container">
+                <div class="customerEmail-body">
+                    <div class="form-field"><label for="email" class="form-label optimizedCheckout-form-label">Email
+                            Address</label><input name="email" autocomplete="off" id="email"
+                            class="form-input optimizedCheckout-form-input" type="email" value=""
+                            data-manual-scoring="emailAddress"></div>
+                </div>
+                <div class="form-actions customerEmail-action"><button id="checkout-customer-continue"
+                        class="button customerEmail-button button--primary optimizedCheckout-buttonPrimary"
+                        data-test="customer-continue-as-guest-button" type="submit" data-manual-submit="">Continue as
+                        guest</button></div>
+            </div>
+            <p>Already have an account? <a data-test="customer-continue-button" id="checkout-customer-login">Sign in
+                    now</a></p>
+        </div>
+    </fieldset>
+</form>
+
+
+<!-- step 2: address -->
+
+<form autocomplete="on" novalidate="">
+    <fieldset class="form-fieldset">
+        <div class="form-body">
+            <fieldset id="checkoutShippingAddress" class="form-fieldset">
+                <div class="form-body">
+                    <div>
+                        <fieldset class="form-fieldset">
+                            <div class="form-body">
+                                <div class="checkout-address">
+                                    <div class="dynamic-form-field dynamic-form-field--firstName">
+                                        <div class="form-field"><label for="firstNameInput"
+                                                class="form-label optimizedCheckout-form-label">First Name</label><input
+                                                autocomplete="qbfvm" id="firstNameInput"
+                                                name="shippingAddress.firstName"
+                                                class="form-input optimizedCheckout-form-input" type="text"
+                                                data-test="firstNameInput-text" value=""
+                                                data-manual-scoring="firstName"></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--lastName">
+                                        <div class="form-field"><label for="lastNameInput"
+                                                class="form-label optimizedCheckout-form-label">Last Name</label><input
+                                                autocomplete="family-name" id="lastNameInput"
+                                                name="shippingAddress.lastName"
+                                                class="form-input optimizedCheckout-form-input" type="text"
+                                                data-test="lastNameInput-text" value="" data-manual-scoring="lastName">
+                                        </div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--company">
+                                        <div class="form-field"><label for="companyInput"
+                                                class="form-label optimizedCheckout-form-label">Company Name <small
+                                                    class="optimizedCheckout-contentSecondary">(Optional)</small></label><input
+                                                autocomplete="organization" id="companyInput"
+                                                name="shippingAddress.company"
+                                                class="form-input optimizedCheckout-form-input" type="text"
+                                                data-test="companyInput-text" value="" data-manual-scoring="unknown">
+                                        </div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--countryCode">
+                                        <div class="form-field"><label for="countryCodeInput"
+                                                class="form-label optimizedCheckout-form-label">Country</label><select
+                                                autocomplete="country" class="form-select optimizedCheckout-form-select"
+                                                data-test="countryCodeInput-select" id="countryCodeInput"
+                                                name="shippingAddress.countryCode"
+                                                data-manual-scoring="addressCountryCode">
+                                                <option value="">Select a country</option>
+                                                <option value="AF">Afghanistan</option>
+                                                <option value="AL">Albania</option>
+                                                <option value="DZ">Algeria</option>
+                                                <option value="AS">American Samoa</option>
+                                                <option value="AD">Andorra</option>
+                                                <option value="AO">Angola</option>
+                                                <option value="AI">Anguilla</option>
+                                                <option value="AQ">Antarctica</option>
+                                                <option value="AG">Antigua and Barbuda</option>
+                                                <option value="AR">Argentina</option>
+                                                <option value="AM">Armenia</option>
+                                                <option value="AW">Aruba</option>
+                                                <option value="AU">Australia</option>
+                                                <option value="AT">Austria</option>
+                                                <option value="AZ">Azerbaijan</option>
+                                                <option value="BS">Bahamas</option>
+                                                <option value="BH">Bahrain</option>
+                                                <option value="BD">Bangladesh</option>
+                                                <option value="BB">Barbados</option>
+                                                <option value="BY">Belarus</option>
+                                                <option value="BE">Belgium</option>
+                                                <option value="BZ">Belize</option>
+                                                <option value="BJ">Benin</option>
+                                                <option value="BM">Bermuda</option>
+                                                <option value="BT">Bhutan</option>
+                                                <option value="BO">Bolivia</option>
+                                                <option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+                                                <option value="BA">Bosnia and Herzegovina</option>
+                                                <option value="BW">Botswana</option>
+                                                <option value="BV">Bouvet Island</option>
+                                                <option value="BR">Brazil</option>
+                                                <option value="IO">British Indian Ocean Territory</option>
+                                                <option value="BN">Brunei Darussalam</option>
+                                                <option value="BG">Bulgaria</option>
+                                                <option value="BF">Burkina Faso</option>
+                                                <option value="BI">Burundi</option>
+                                                <option value="KH">Cambodia</option>
+                                                <option value="CM">Cameroon</option>
+                                                <option value="CA">Canada</option>
+                                                <option value="CV">Cape Verde</option>
+                                                <option value="KY">Cayman Islands</option>
+                                                <option value="CF">Central African Republic</option>
+                                                <option value="TD">Chad</option>
+                                                <option value="CL">Chile</option>
+                                                <option value="CN">China</option>
+                                                <option value="CX">Christmas Island</option>
+                                                <option value="CC">Cocos (Keeling) Islands</option>
+                                                <option value="CO">Colombia</option>
+                                                <option value="KM">Comoros</option>
+                                                <option value="CG">Congo</option>
+                                                <option value="CD">Congo, the Democratic Republic of the</option>
+                                                <option value="CK">Cook Islands</option>
+                                                <option value="CR">Costa Rica</option>
+                                                <option value="CI">Cote d'Ivoire</option>
+                                                <option value="HR">Croatia</option>
+                                                <option value="CW">Curaçao</option>
+                                                <option value="CY">Cyprus</option>
+                                                <option value="CZ">Czech Republic</option>
+                                                <option value="DK">Denmark</option>
+                                                <option value="DJ">Djibouti</option>
+                                                <option value="DM">Dominica</option>
+                                                <option value="DO">Dominican Republic</option>
+                                                <option value="EC">Ecuador</option>
+                                                <option value="EG">Egypt</option>
+                                                <option value="SV">El Salvador</option>
+                                                <option value="GQ">Equatorial Guinea</option>
+                                                <option value="ER">Eritrea</option>
+                                                <option value="EE">Estonia</option>
+                                                <option value="ET">Ethiopia</option>
+                                                <option value="FK">Falkland Islands (Malvinas)</option>
+                                                <option value="FO">Faroe Islands</option>
+                                                <option value="FJ">Fiji</option>
+                                                <option value="FI">Finland</option>
+                                                <option value="FR">France</option>
+                                                <option value="GF">French Guiana</option>
+                                                <option value="PF">French Polynesia</option>
+                                                <option value="TF">French Southern Territories</option>
+                                                <option value="GA">Gabon</option>
+                                                <option value="GM">Gambia</option>
+                                                <option value="GE">Georgia</option>
+                                                <option value="DE">Germany</option>
+                                                <option value="GH">Ghana</option>
+                                                <option value="GI">Gibraltar</option>
+                                                <option value="GR">Greece</option>
+                                                <option value="GL">Greenland</option>
+                                                <option value="GD">Grenada</option>
+                                                <option value="GP">Guadeloupe</option>
+                                                <option value="GU">Guam</option>
+                                                <option value="GT">Guatemala</option>
+                                                <option value="GG">Guernsey</option>
+                                                <option value="GN">Guinea</option>
+                                                <option value="GW">Guinea-Bissau</option>
+                                                <option value="GY">Guyana</option>
+                                                <option value="HT">Haiti</option>
+                                                <option value="HM">Heard Island and Mcdonald Islands</option>
+                                                <option value="VA">Holy See (Vatican City State)</option>
+                                                <option value="HN">Honduras</option>
+                                                <option value="HK">Hong Kong</option>
+                                                <option value="HU">Hungary</option>
+                                                <option value="IS">Iceland</option>
+                                                <option value="IN">India</option>
+                                                <option value="ID">Indonesia</option>
+                                                <option value="IQ">Iraq</option>
+                                                <option value="IE">Ireland</option>
+                                                <option value="IM">Isle of Man</option>
+                                                <option value="IL">Israel</option>
+                                                <option value="IT">Italy</option>
+                                                <option value="JM">Jamaica</option>
+                                                <option value="JP">Japan</option>
+                                                <option value="JE">Jersey</option>
+                                                <option value="JO">Jordan</option>
+                                                <option value="KZ">Kazakhstan</option>
+                                                <option value="KE">Kenya</option>
+                                                <option value="KI">Kiribati</option>
+                                                <option value="KR">Korea, Republic of</option>
+                                                <option value="KW">Kuwait</option>
+                                                <option value="KG">Kyrgyzstan</option>
+                                                <option value="LA">Lao People's Democratic Republic</option>
+                                                <option value="LV">Latvia</option>
+                                                <option value="LB">Lebanon</option>
+                                                <option value="LS">Lesotho</option>
+                                                <option value="LR">Liberia</option>
+                                                <option value="LY">Libya</option>
+                                                <option value="LI">Liechtenstein</option>
+                                                <option value="LT">Lithuania</option>
+                                                <option value="LU">Luxembourg</option>
+                                                <option value="MO">Macao</option>
+                                                <option value="MK">Macedonia, the Former Yugoslav Republic of</option>
+                                                <option value="MG">Madagascar</option>
+                                                <option value="MW">Malawi</option>
+                                                <option value="MY">Malaysia</option>
+                                                <option value="MV">Maldives</option>
+                                                <option value="ML">Mali</option>
+                                                <option value="MT">Malta</option>
+                                                <option value="MH">Marshall Islands</option>
+                                                <option value="MQ">Martinique</option>
+                                                <option value="MR">Mauritania</option>
+                                                <option value="MU">Mauritius</option>
+                                                <option value="YT">Mayotte</option>
+                                                <option value="MX">Mexico</option>
+                                                <option value="FM">Micronesia, Federated States of</option>
+                                                <option value="MD">Moldova, Republic of</option>
+                                                <option value="MC">Monaco</option>
+                                                <option value="MN">Mongolia</option>
+                                                <option value="ME">Montenegro</option>
+                                                <option value="MS">Montserrat</option>
+                                                <option value="MA">Morocco</option>
+                                                <option value="MZ">Mozambique</option>
+                                                <option value="MM">Myanmar</option>
+                                                <option value="NA">Namibia</option>
+                                                <option value="NR">Nauru</option>
+                                                <option value="NP">Nepal</option>
+                                                <option value="NL">Netherlands</option>
+                                                <option value="NC">New Caledonia</option>
+                                                <option value="NZ">New Zealand</option>
+                                                <option value="NI">Nicaragua</option>
+                                                <option value="NE">Niger</option>
+                                                <option value="NG">Nigeria</option>
+                                                <option value="NU">Niue</option>
+                                                <option value="NF">Norfolk Island</option>
+                                                <option value="MP">Northern Mariana Islands</option>
+                                                <option value="NO">Norway</option>
+                                                <option value="OM">Oman</option>
+                                                <option value="PK">Pakistan</option>
+                                                <option value="PW">Palau</option>
+                                                <option value="PS">Palestinian Territory, Occupied</option>
+                                                <option value="PA">Panama</option>
+                                                <option value="PG">Papua New Guinea</option>
+                                                <option value="PY">Paraguay</option>
+                                                <option value="PE">Peru</option>
+                                                <option value="PH">Philippines</option>
+                                                <option value="PN">Pitcairn</option>
+                                                <option value="PL">Poland</option>
+                                                <option value="PT">Portugal</option>
+                                                <option value="PR">Puerto Rico</option>
+                                                <option value="QA">Qatar</option>
+                                                <option value="XK">Republic of Kosovo</option>
+                                                <option value="RE">Reunion</option>
+                                                <option value="RO">Romania</option>
+                                                <option value="RU">Russian Federation</option>
+                                                <option value="RW">Rwanda</option>
+                                                <option value="SH">Saint Helena</option>
+                                                <option value="KN">Saint Kitts and Nevis</option>
+                                                <option value="LC">Saint Lucia</option>
+                                                <option value="PM">Saint Pierre and Miquelon</option>
+                                                <option value="VC">Saint Vincent and the Grenadines</option>
+                                                <option value="WS">Samoa</option>
+                                                <option value="SM">San Marino</option>
+                                                <option value="ST">Sao Tome and Principe</option>
+                                                <option value="SA">Saudi Arabia</option>
+                                                <option value="SN">Senegal</option>
+                                                <option value="RS">Serbia</option>
+                                                <option value="SC">Seychelles</option>
+                                                <option value="SL">Sierra Leone</option>
+                                                <option value="SG">Singapore</option>
+                                                <option value="SX">Sint Maarten</option>
+                                                <option value="SK">Slovakia</option>
+                                                <option value="SI">Slovenia</option>
+                                                <option value="SB">Solomon Islands</option>
+                                                <option value="SO">Somalia</option>
+                                                <option value="ZA">South Africa</option>
+                                                <option value="GS">South Georgia and the South Sandwich Islands</option>
+                                                <option value="ES">Spain</option>
+                                                <option value="LK">Sri Lanka</option>
+                                                <option value="SD">Sudan</option>
+                                                <option value="SR">Suriname</option>
+                                                <option value="SJ">Svalbard and Jan Mayen</option>
+                                                <option value="SZ">Swaziland</option>
+                                                <option value="SE">Sweden</option>
+                                                <option value="CH">Switzerland</option>
+                                                <option value="TW">Taiwan</option>
+                                                <option value="TJ">Tajikistan</option>
+                                                <option value="TZ">Tanzania, United Republic of</option>
+                                                <option value="TH">Thailand</option>
+                                                <option value="TL">Timor-Leste</option>
+                                                <option value="TG">Togo</option>
+                                                <option value="TK">Tokelau</option>
+                                                <option value="TO">Tonga</option>
+                                                <option value="TT">Trinidad and Tobago</option>
+                                                <option value="TN">Tunisia</option>
+                                                <option value="TR">Turkey</option>
+                                                <option value="TM">Turkmenistan</option>
+                                                <option value="TC">Turks and Caicos Islands</option>
+                                                <option value="TV">Tuvalu</option>
+                                                <option value="UG">Uganda</option>
+                                                <option value="UA">Ukraine</option>
+                                                <option value="AE">United Arab Emirates</option>
+                                                <option value="GB">United Kingdom</option>
+                                                <option value="US">United States</option>
+                                                <option value="UM">United States Minor Outlying Islands</option>
+                                                <option value="UY">Uruguay</option>
+                                                <option value="UZ">Uzbekistan</option>
+                                                <option value="VU">Vanuatu</option>
+                                                <option value="VE">Venezuela</option>
+                                                <option value="VN">Viet Nam</option>
+                                                <option value="VG">Virgin Islands, British</option>
+                                                <option value="VI">Virgin Islands, U.S.</option>
+                                                <option value="WF">Wallis and Futuna</option>
+                                                <option value="EH">Western Sahara</option>
+                                                <option value="YE">Yemen</option>
+                                                <option value="ZM">Zambia</option>
+                                                <option value="ZW">Zimbabwe</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--postCode">
+                                        <div class="form-field"><label for="postCodeInput"
+                                                class="form-label optimizedCheckout-form-label">Postal
+                                                Code</label><input id="postCodeInput" name="shippingAddress.postalCode"
+                                                class="form-input optimizedCheckout-form-input ui-autocomplete-input"
+                                                type="text" data-test="postCodeInput-text" value="" autocomplete="off"
+                                                data-manual-scoring="addressPostalCode"><span role="status"
+                                                aria-live="polite" class="ui-helper-hidden-accessible"></span></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--city">
+                                        <div class="form-field"><label for="cityInput"
+                                                class="form-label optimizedCheckout-form-label">City</label><input
+                                                id="cityInput" name="shippingAddress.city"
+                                                class="form-input optimizedCheckout-form-input ui-autocomplete-input"
+                                                type="text" data-test="cityInput-text" value="" autocomplete="off"
+                                                data-manual-scoring="addressCity"><span role="status" aria-live="polite"
+                                                class="ui-helper-hidden-accessible"></span></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--provinceCode">
+                                        <div class="form-field"><label for="provinceCodeInput"
+                                                class="form-label optimizedCheckout-form-label">State/Province</label><select
+                                                autocomplete="address-level1"
+                                                class="form-select optimizedCheckout-form-select"
+                                                data-test="provinceCodeInput-select" id="provinceCodeInput"
+                                                name="shippingAddress.stateOrProvinceCode"
+                                                data-manual-scoring="addressProvince">
+                                                <option value="">Select a state</option>
+                                                <option value="AL">Alabama</option>
+                                                <option value="AK">Alaska</option>
+                                                <option value="AS">American Samoa</option>
+                                                <option value="AZ">Arizona</option>
+                                                <option value="AR">Arkansas</option>
+                                                <option value="AA">Armed Forces Americas</option>
+                                                <option value="AE">Armed Forces Europe</option>
+                                                <option value="AP">Armed Forces Pacific</option>
+                                                <option value="CA">California</option>
+                                                <option value="CO">Colorado</option>
+                                                <option value="CT">Connecticut</option>
+                                                <option value="DE">Delaware</option>
+                                                <option value="DC">District of Columbia</option>
+                                                <option value="FM">Federated States Of Micronesia</option>
+                                                <option value="FL">Florida</option>
+                                                <option value="GA">Georgia</option>
+                                                <option value="GU">Guam</option>
+                                                <option value="HI">Hawaii</option>
+                                                <option value="ID">Idaho</option>
+                                                <option value="IL">Illinois</option>
+                                                <option value="IN">Indiana</option>
+                                                <option value="IA">Iowa</option>
+                                                <option value="KS">Kansas</option>
+                                                <option value="KY">Kentucky</option>
+                                                <option value="LA">Louisiana</option>
+                                                <option value="ME">Maine</option>
+                                                <option value="MH">Marshall Islands</option>
+                                                <option value="MD">Maryland</option>
+                                                <option value="MA">Massachusetts</option>
+                                                <option value="MI">Michigan</option>
+                                                <option value="MN">Minnesota</option>
+                                                <option value="MS">Mississippi</option>
+                                                <option value="MO">Missouri</option>
+                                                <option value="MT">Montana</option>
+                                                <option value="NE">Nebraska</option>
+                                                <option value="NV">Nevada</option>
+                                                <option value="NH">New Hampshire</option>
+                                                <option value="NJ">New Jersey</option>
+                                                <option value="NM">New Mexico</option>
+                                                <option value="NY">New York</option>
+                                                <option value="NC">North Carolina</option>
+                                                <option value="ND">North Dakota</option>
+                                                <option value="MP">Northern Mariana Islands</option>
+                                                <option value="OH">Ohio</option>
+                                                <option value="OK">Oklahoma</option>
+                                                <option value="OR">Oregon</option>
+                                                <option value="PW">Palau</option>
+                                                <option value="PA">Pennsylvania</option>
+                                                <option value="PR">Puerto Rico</option>
+                                                <option value="RI">Rhode Island</option>
+                                                <option value="SC">South Carolina</option>
+                                                <option value="SD">South Dakota</option>
+                                                <option value="TN">Tennessee</option>
+                                                <option value="TX">Texas</option>
+                                                <option value="UT">Utah</option>
+                                                <option value="VT">Vermont</option>
+                                                <option value="VI">Virgin Islands</option>
+                                                <option value="VA">Virginia</option>
+                                                <option value="WA">Washington</option>
+                                                <option value="WV">West Virginia</option>
+                                                <option value="WI">Wisconsin</option>
+                                                <option value="WY">Wyoming</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--addressLine1">
+                                        <div class="form-field"><label for="addressLine1Input"
+                                                class="form-label optimizedCheckout-form-label">Address</label><input
+                                                id="addressLine1Input" name="shippingAddress.address1"
+                                                class="form-input optimizedCheckout-form-input ui-autocomplete-input"
+                                                type="text" data-test="addressLine1Input-text" value=""
+                                                autocomplete="off" data-manual-scoring="addressStreet"><span
+                                                role="status" aria-live="polite"
+                                                class="ui-helper-hidden-accessible"></span></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--addressLine2">
+                                        <div class="form-field"><label for="addressLine2Input"
+                                                class="form-label optimizedCheckout-form-label">Apartment/Suite/Building
+                                                <small
+                                                    class="optimizedCheckout-contentSecondary">(Optional)</small></label><input
+                                                id="addressLine2Input" name="shippingAddress.address2"
+                                                class="form-input optimizedCheckout-form-input ui-autocomplete-input"
+                                                type="text" data-test="addressLine2Input-text" value=""
+                                                autocomplete="off" data-manual-scoring="addressStreet2"><span
+                                                role="status" aria-live="polite"
+                                                class="ui-helper-hidden-accessible"></span></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--phone">
+                                        <div class="form-field"><label for="phoneInput"
+                                                class="form-label optimizedCheckout-form-label">Phone
+                                                Number</label><input autocomplete="tel" id="phoneInput"
+                                                name="shippingAddress.phone"
+                                                class="form-input optimizedCheckout-form-input" type="text"
+                                                data-test="phoneInput-text" value="" data-manual-scoring="phone"></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--field_31">
+                                        <div class="form-field"><label for="field_31Input"
+                                                class="form-label optimizedCheckout-form-label">Address Type <small
+                                                    class="optimizedCheckout-contentSecondary">(Optional)</small></label><input
+                                                name="shippingAddress.customFields.field_31"
+                                                class="form-checkbox optimizedCheckout-form-checkbox"
+                                                id="field_31Input-0" type="checkbox"
+                                                data-test="field_31Input-0-checkbox" value="0"><label
+                                                for="field_31Input-0"
+                                                class="form-label optimizedCheckout-form-label">Residential
+                                                Address</label></div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--field_41">
+                                        <div class="form-field"><label for="field_41Input"
+                                                class="form-label optimizedCheckout-form-label">GIFT MESSAGE (printed on
+                                                packing slip) <small
+                                                    class="optimizedCheckout-contentSecondary">(Optional)</small></label><input
+                                                maxlength="88" id="field_41Input"
+                                                name="shippingAddress.customFields.field_41"
+                                                class="form-input optimizedCheckout-form-input" type="text"
+                                                data-test="field_41Input-text" value="" data-manual-scoring="unknown">
+                                        </div>
+                                    </div>
+                                    <div class="dynamic-form-field dynamic-form-field--field_45">
+                                        <div class="form-field"><label for="field_45Input"
+                                                class="form-label optimizedCheckout-form-label">I use ThermoWorks
+                                                products at <small
+                                                    class="optimizedCheckout-contentSecondary">(Optional)</small></label><input
+                                                name="shippingAddress.customFields.field_45"
+                                                class="form-radio optimizedCheckout-form-radio" id="field_45Input-0"
+                                                type="radio" data-test="field_45Input-0-radio" value="0"><label
+                                                for="field_45Input-0"
+                                                class="form-label optimizedCheckout-form-label">Home</label><input
+                                                name="shippingAddress.customFields.field_45"
+                                                class="form-radio optimizedCheckout-form-radio" id="field_45Input-1"
+                                                type="radio" data-test="field_45Input-1-radio" value="1"><label
+                                                for="field_45Input-1"
+                                                class="form-label optimizedCheckout-form-label">Work</label><input
+                                                name="shippingAddress.customFields.field_45"
+                                                class="form-radio optimizedCheckout-form-radio" id="field_45Input-2"
+                                                type="radio" data-test="field_45Input-2-radio" value="2"><label
+                                                for="field_45Input-2"
+                                                class="form-label optimizedCheckout-form-label">Both</label></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-body">
+                <div class="form-field"><input name="billingSameAsShipping"
+                        class="form-checkbox optimizedCheckout-form-checkbox" id="sameAsBilling" type="checkbox"
+                        value="true" checked=""><label for="sameAsBilling"
+                        class="form-label optimizedCheckout-form-label">My billing address is the same as my shipping
+                        address.</label></div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset id="checkout-shipping-options" class="form-fieldset">
+        <legend class="form-legend optimizedCheckout-headingSecondary">Shipping Method</legend>
+        <div class="form-body">
+            <div class="loadingOverlay-container">
+                <div class="shippingOptions-panel optimizedCheckout-overlay">
+                    <p class="shippingOptions-panel-message optimizedCheckout-primaryContent">Please enter a shipping
+                        address in order to see shipping quotes</p>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="form-fieldset" data-test="checkout-shipping-comments">
+        <legend class="form-legend optimizedCheckout-headingSecondary">Special Shipping Instructions</legend>
+        <div class="form-body">
+            <div class="form-field"><label for="orderComment"
+                    class="form-label is-srOnly optimizedCheckout-form-label">Order Comments</label><input
+                    name="orderComment" autocomplete="off" maxlength="2000"
+                    class="form-input optimizedCheckout-form-input" type="text" value=""></div>
+        </div>
+    </fieldset>
+    <div class="form-actions"><button id="checkout-shipping-continue"
+            class="button button--primary optimizedCheckout-buttonPrimary" type="submit"
+            data-manual-submit="">Continue</button></div>
+</form>
+
+<!-- step 3: payment -->
+
+<li
+    class="form-checklist-item optimizedCheckout-form-checklist-item form-checklist-item--selected optimizedCheckout-form-checklist-item--selected">
+    <div class="form-checklist-header form-checklist-header--selected">
+        <div class="form-field"><input name="paymentProviderRadio"
+                class="form-checklist-checkbox optimizedCheckout-form-checklist-checkbox" id="radio-cybersource"
+                type="radio" value="cybersource" autocomplete="lnmb2"><label for="radio-cybersource"
+                class="form-label optimizedCheckout-form-label"><span class="paymentProviderHeader-name"
+                    data-test="payment-method-name">Credit Card</span>
+                <div class="paymentProviderHeader-cc">
+                    <ul class="creditCardTypes-list">
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-visa"><svg
+                                        aria-labelledby="iconCardVisaTitle" height="100" role="img"
+                                        viewBox="0 0 148 100" width="148" xmlns="http://www.w3.org/2000/svg">
+                                        <title id="iconCardVisaTitle">Visa</title>
+                                        <g fill="none" fill-rule="evenodd">
+                                            <path
+                                                d="M148 84c0 6.6-5.55 12-12 12H12C5.55 96 0 90.6 0 84V12C0 5.4 5.55 0 12 0h124c6.45 0 12 5.4 12 12v72z"
+                                                fill="#F3F4F4"></path>
+                                            <path d="M0 24V12C0 5.4 5.74 0 12 0h124c6.26 0 12 5.4 12 12v12"
+                                                fill="#01579F"></path>
+                                            <path d="M148 76v12c0 8.667-5.74 12-12 12H12c-6.26 0-12-3.333-12-12V76"
+                                                fill="#FAA41D"></path>
+                                            <path
+                                                d="M55.01 65.267l4.72-29.186h7.546l-4.72 29.19H55.01M89.913 36.8c-1.49-.59-3.85-1.242-6.77-1.242-7.452 0-12.7 3.974-12.73 9.656-.063 4.19 3.756 6.52 6.613 7.918 2.92 1.428 3.913 2.36 3.913 3.633-.04 1.957-2.36 2.857-4.54 2.857-3.014 0-4.628-.465-7.08-1.552l-.996-.466-1.055 6.55c1.77.808 5.03 1.52 8.415 1.553 7.92 0 13.075-3.912 13.137-9.967.03-3.322-1.987-5.868-6.334-7.948-2.64-1.336-4.256-2.236-4.256-3.602.032-1.242 1.367-2.514 4.348-2.514 2.453-.06 4.254.53 5.62 1.12l.684.31L89.91 36.8m10.03 18.13c.62-1.675 3.013-8.165 3.013-8.165-.03.062.62-1.707.994-2.794l.525 2.52s1.428 6.986 1.74 8.445H99.94zm9.317-18.846h-5.84c-1.8 0-3.17.53-3.945 2.424L88.265 65.27h7.918s1.305-3.6 1.585-4.377h9.687c.217 1.024.9 4.377.9 4.377h6.987l-6.082-29.19zm-60.555 0l-7.39 19.904-.807-4.037c-1.37-4.652-5.653-9.713-10.435-12.23l6.77 25.52h7.98L56.68 36.09H48.7"
+                                                fill="#3B5CAA"></path>
+                                            <path
+                                                d="M34.454 36.08H22.312l-.124.59c9.47 2.423 15.744 8.26 18.32 15.277L37.87 38.534c-.436-1.863-1.77-2.39-3.416-2.453"
+                                                fill="#F8A51D"></path>
+                                        </g>
+                                    </svg></div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium"
+                                    data-test="credit-card-icon-american-express"><svg
+                                        aria-labelledby="iconCardAmexTitle" height="104" role="img"
+                                        viewBox="0 0 156 104" width="156" xmlns="http://www.w3.org/2000/svg">
+                                        <title id="iconCardAmexTitle">Amex</title>
+                                        <g fill="none" fill-rule="evenodd">
+                                            <path
+                                                d="M144 104H12c-6.15 0-12-5.85-12-12V12C0 5.85 5.85 0 12 0h132c6.15 0 12 5.85 12 12v80c0 6.15-5.85 12-12 12z"
+                                                fill="#60C7EE"></path>
+                                            <g fill="#FFF">
+                                                <path
+                                                    d="M95.05 46.532v3.68h12.93v4.723H95.05V59.5h12.79l5.244-6.824-4.673-6.144H95.05m-59.707 9.382h5.906l-2.97-8.324-2.94 8.324">
+                                                </path>
+                                                <path
+                                                    d="M128.833 52.77l11.29-15.125h-19.067l-2.536 3.9-2.608-3.9h-46.59l-1.254 4.224-1.264-4.227H31.27L17.72 68.687h17.326l1.31-3.822h3.824l1.345 3.822h73.594l3.28-4.594 3.28 4.594h19.36l-4.867-6.343-7.342-9.574zM83.185 64.744H76.38v-17.66l-5.243 17.66h-6.16l-5.233-17.66v17.66H44.318l-1.345-3.823H33.54l-1.312 3.826h-8.483L33.85 41.588h9.065L52.94 64.56V41.59h10.927l4.214 14.09 4.187-14.09h10.92v23.156zm40.524 0l-5.31-7.44-5.31 7.44H86.72V41.588h27.085l4.76 7.124 4.63-7.124h9.062l-8.37 11.215 9.16 11.94h-9.338z">
+                                                </path>
+                                            </g>
+                                        </g>
+                                    </svg></div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-mastercard">
+                                    <svg aria-labelledby="iconCardMasterTitle" role="img" viewBox="0 0 131.39 86.9"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <title id="iconCardMasterTitle">Master</title>
+                                        <path d="M48.37 15.14h34.66v56.61H48.37z" fill="#ff5f00"></path>
+                                        <path
+                                            d="M51.94 43.45a35.94 35.94 0 0113.75-28.3 36 36 0 100 56.61 35.94 35.94 0 01-13.75-28.31z"
+                                            fill="#eb001b"></path>
+                                        <path
+                                            d="M120.5 65.76V64.6h.5v-.24h-1.19v.24h.47v1.16zm2.31 0v-1.4h-.36l-.42 1-.42-1h-.36v1.4h.26V64.7l.39.91h.27l.39-.91v1.06zM123.94 43.45a36 36 0 01-58.25 28.3 36 36 0 000-56.61 36 36 0 0158.25 28.3z"
+                                            fill="#f79e1b"></path>
+                                    </svg>
+                                </div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-diners-club">
+                                    <svg aria-labelledby="iconCardDinnersClubTitle" height="104" role="img"
+                                        viewBox="0 0 152 104" width="152" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink">
+                                        <title id="iconCardDinnersClubTitle">Dinners Club</title>
+                                        <defs>
+                                            <rect height="104" id="a" rx="12" width="152"></rect>
+                                        </defs>
+                                        <g fill="none" fill-rule="evenodd">
+                                            <mask fill="#fff" id="b">
+                                                <use xlink:href="#a"></use>
+                                            </mask>
+                                            <use fill="#F4F4F4" xlink:href="#a"></use>
+                                            <rect fill="#F4F4F4" height="104" mask="url(#b)" rx="12" width="152" x="1">
+                                            </rect>
+                                            <g transform="translate(42 26)">
+                                                <ellipse cx="26.716" cy="26" fill="#009FDA" rx="26" ry="26"></ellipse>
+                                                <path
+                                                    d="M24.116 0c13 0 25.997 11.643 25.997 26 0 14.355-12.997 26-25.997 26V0z"
+                                                    fill="#009FDA"></path>
+                                                <path
+                                                    d="M24.116 52V0H42.75c13 0 25.997 11.643 25.997 26 0 14.355-12.997 26-25.997 26H24.116z"
+                                                    fill="#009FDA"></path>
+                                                <circle cx="25.255" cy="27.139" fill="#F3F4F4" r="24.539"></circle>
+                                                <path
+                                                    d="M38.255 24.983c0-7.09-6.34-13.02-11.54-14.583v29.167c5.2-1.563 11.54-7.488 11.54-14.584zM5.916 24.986c0 7.09 6.34 13.02 11.54 14.583V10.4c-5.2 1.565-11.54 7.493-11.54 14.586z"
+                                                    fill="#009FDA"></path>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-discover"><svg
+                                        aria-labelledby="iconCardDiscoverTitle" height="104" role="img"
+                                        viewBox="0 0 152 104" width="152" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink">
+                                        <title id="iconCardDiscoverTitle">Discover</title>
+                                        <defs>
+                                            <rect height="104" id="a" rx="12" width="152"></rect>
+                                        </defs>
+                                        <g fill="none" fill-rule="evenodd">
+                                            <mask fill="#fff" id="b">
+                                                <use xlink:href="#a"></use>
+                                            </mask>
+                                            <use fill="#F4F4F4" xlink:href="#a"></use>
+                                            <rect fill="#F4F4F4" height="104" mask="url(#b)" rx="12" width="152" x="1">
+                                            </rect>
+                                            <path
+                                                d="M70.553 104H149c2.21 0 4-1.783 4-4.007V46.597C142.305 71.907 111.28 93.04 70.553 104z"
+                                                fill="#F76E20" mask="url(#b)"></path>
+                                            <g mask="url(#b)" transform="translate(19 42)">
+                                                <path
+                                                    d="M14.763 9.22c0 2.94-.824 5.19-2.47 6.752-1.652 1.56-4.035 2.344-7.15 2.344H.155V.466H5.68c2.876 0 5.106.772 6.69 2.31C13.97 4.31 14.764 6.46 14.764 9.22zm-3.876.1c0-3.834-1.672-5.75-5.004-5.75h-1.99v11.62h1.602c3.596.002 5.392-1.957 5.392-5.87zM17.51 18.316V.466h3.733v17.85H17.51zM34.774 13.608c0 1.616-.57 2.88-1.718 3.81-1.146.927-2.734 1.397-4.773 1.397-1.874 0-3.54-.36-4.987-1.074v-3.516c1.19.543 2.196.915 3.017 1.14.822.218 1.577.327 2.26.327.815 0 1.446-.16 1.882-.475.43-.313.657-.792.657-1.413 0-.35-.095-.66-.292-.933-.188-.277-.474-.54-.85-.79-.374-.25-1.134-.657-2.28-1.21-1.073-.512-1.877-1.008-2.42-1.477-.542-.47-.967-1.018-1.288-1.65-.32-.63-.48-1.363-.48-2.2 0-1.577.526-2.818 1.582-3.72 1.06-.908 2.514-1.356 4.38-1.356.913 0 1.787.108 2.617.328.83.217 1.702.53 2.607.927l-1.203 2.942c-.94-.39-1.72-.67-2.334-.818-.616-.153-1.22-.232-1.81-.232-.71 0-1.254.164-1.627.502-.38.334-.567.768-.567 1.305 0 .335.076.623.23.875.152.25.395.487.728.72.332.23 1.125.647 2.366 1.25 1.643.8 2.77 1.6 3.384 2.4.613.796.92 1.778.92 2.943zM46.018 3.62c-1.406 0-2.49.54-3.263 1.605C41.98 6.295 41.6 7.79 41.6 9.7c0 3.978 1.473 5.97 4.418 5.97 1.238 0 2.727-.305 4.492-.94v3.175c-1.446.613-3.06.916-4.842.916-2.56 0-4.52-.79-5.875-2.367-1.357-1.572-2.034-3.834-2.034-6.782 0-1.855.335-3.48 1.003-4.874.662-1.402 1.623-2.467 2.87-3.212C42.884.84 44.345.467 46.022.467c1.71 0 3.43.42 5.152 1.258l-1.203 3.077c-.663-.317-1.32-.592-1.99-.83-.67-.238-1.322-.352-1.964-.352zM81.828.467h3.77l-5.98 17.85h-4.07L69.578.466h3.772l3.312 10.62c.182.632.38 1.356.572 2.195.19.836.316 1.408.368 1.737.087-.75.387-2.05.902-3.932L81.828.468zM97.072 18.316h-10.14V.466h10.14V3.57h-6.407v3.92h5.964v3.1h-5.965v4.6h6.407v3.126zM105.128 11.467v6.85h-3.732V.466h5.13c2.39 0 4.158.44 5.31 1.326 1.145.882 1.72 2.22 1.72 4.02 0 1.048-.286 1.987-.853 2.802-.57.82-1.376 1.46-2.418 1.925 2.647 4.007 4.37 6.603 5.175 7.773h-4.142l-4.203-6.85-1.987.004zm0-3.077h1.206c1.177 0 2.05-.2 2.612-.596.558-.402.842-1.03.842-1.883 0-.847-.29-1.445-.862-1.806-.573-.36-1.46-.537-2.664-.537h-1.14l.006 4.823z"
+                                                    fill="#414042"></path>
+                                                <ellipse cx="61.024" cy="9.393" fill="#F76E20" rx="8.802" ry="8.926">
+                                                </ellipse>
+                                            </g>
+                                        </g>
+                                    </svg></div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-maestro"><svg
+                                        aria-labelledby="iconCardMaestroTitle" fill="none" role="img"
+                                        viewBox="0 0 36 24" xmlns="http://www.w3.org/2000/svg">
+                                        <title id="iconCardMaestroTitle">Maestro</title>
+                                        <rect fill="#000" height="24" rx="3" width="36"></rect>
+                                        <path
+                                            d="M12.69 22.66v-1.4a.83.83 0 00-.89-.9.87.87 0 00-.79.4.82.82 0 00-.74-.4.74.74 0 00-.65.34v-.28h-.5v2.24h.5v-1.25a.52.52 0 01.55-.6c.32 0 .49.22.49.6v1.25h.5V21.4a.53.53 0 01.54-.6c.33 0 .5.22.5.6v1.25h.49zm2.74-1.12v-1.12h-.49v.28a.85.85 0 00-.7-.33 1.17 1.17 0 000 2.35.85.85 0 00.7-.33v.27h.49v-1.12zm-1.81 0a.68.68 0 11.68.72.67.67 0 01-.69-.72zm12.25-1.17a1.26 1.26 0 01.86.34c.1.1.2.23.25.37.13.3.13.64 0 .94a1.13 1.13 0 01-.63.63c-.31.12-.66.12-.97 0a1.16 1.16 0 01-.63-.63c-.12-.3-.12-.64 0-.94a1.15 1.15 0 01.63-.62c.16-.06.32-.1.49-.1v.01zm0 .47c-.1 0-.19.02-.28.05a.66.66 0 00-.37.38.82.82 0 000 .59.66.66 0 00.37.38.76.76 0 00.8-.15.68.68 0 00.14-.23.81.81 0 000-.59.68.68 0 00-.15-.23.67.67 0 00-.23-.15.73.73 0 00-.28-.06zm-7.78.7c0-.7-.44-1.17-1.07-1.17a1.17 1.17 0 10.04 2.35c.33.01.66-.1.91-.32l-.23-.36c-.19.15-.42.23-.65.24a.62.62 0 01-.68-.55h1.67v-.19zm-1.67-.2a.58.58 0 01.6-.54.56.56 0 01.56.55h-1.16zm3.72-.35a1.44 1.44 0 00-.7-.19c-.27 0-.43.1-.43.26 0 .17.17.2.38.23l.24.03c.48.07.78.28.78.67 0 .4-.38.73-1.02.73-.35.01-.69-.09-.97-.29l.23-.38c.22.16.48.24.75.24.33 0 .51-.1.51-.28 0-.12-.12-.2-.4-.23l-.23-.03c-.5-.07-.77-.3-.77-.67 0-.44.36-.72.94-.72.32 0 .63.08.91.24l-.22.4zm2.35-.12h-.8v1.01c0 .24.08.38.33.38a.9.9 0 00.43-.13l.14.42c-.18.12-.4.18-.6.18-.59 0-.79-.31-.79-.84v-1.02h-.45v-.44h.45v-.69h.5v.69h.8v.44zm1.69-.5c.12 0 .24.02.35.06l-.15.47a.8.8 0 00-.3-.06c-.33 0-.48.2-.48.58v1.25h-.49v-2.24h.49v.27a.66.66 0 01.59-.33h-.01zm3.38 1.97a.23.23 0 01.16.06l.05.07a.22.22 0 01-.12.3.22.22 0 01-.1 0 .23.23 0 01-.2-.13.22.22 0 010-.17.23.23 0 01.12-.12l.08-.01zm0 .4a.17.17 0 00.12-.06.17.17 0 00.05-.15.17.17 0 00-.24-.13.17.17 0 00-.06.04.17.17 0 000 .23.17.17 0 00.13.05v.01zm.01-.29a.1.1 0 01.06.02.06.06 0 01.02.05v.02l-.01.02a.08.08 0 01-.05.02l.07.08h-.06l-.06-.08h-.02v.08h-.05v-.2h.1zm-.05.04v.06h.08v-.01-.01a.02.02 0 000-.02h-.03l-.05-.02z"
+                                            fill="#fff"></path>
+                                        <path d="M14.3 3.31h7.4v13.3h-7.4V3.3z" fill="#7673C0"></path>
+                                        <path
+                                            d="M14.77 9.96A8.44 8.44 0 0118 3.3a8.46 8.46 0 100 13.3 8.44 8.44 0 01-3.23-6.65z"
+                                            fill="#EB001B"></path>
+                                        <path
+                                            d="M31.68 9.96A8.45 8.45 0 0118 16.6a8.45 8.45 0 000-13.3 8.46 8.46 0 0113.68 6.66z"
+                                            fill="#00A1DF"></path>
+                                    </svg></div>
+                            </span></li>
+                        <li class="creditCardTypes-list-item"><span class="cardIcon">
+                                <div class="icon cardIcon-icon icon--medium" data-test="credit-card-icon-jcb"><svg
+                                        aria-labelledby="iconCardJCBTitle" clip-rule="evenodd" fill-rule="evenodd"
+                                        role="img" stroke-linejoin="round" stroke-miterlimit="1.4" viewBox="0 0 480 301"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <title id="iconCardJCBTitle">JCB</title>
+                                        <path
+                                            d="M444 0H24C12 0 0 12 0 24v240.1c0 24 12 36 36 36h408c24 0 36-12 36-36v-228C480 12 468 0 444 0z"
+                                            fill="#f4f4f4"></path>
+                                        <path
+                                            d="M314.8 174.9h21.5l2.7-.2c4-.8 7.6-4.5 7.6-9.6 0-5-3.5-8.6-7.6-9.6l-2.7-.3h-21.5V175z"
+                                            fill="#469951" fill-rule="nonzero"></path>
+                                        <path
+                                            d="M333.9 39.2a37.3 37.3 0 0 0-37.3 37.2v38.7h52.6c1.2 0 2.7 0 3.7.2 11.9.7 20.7 6.8 20.7 17.4 0 8.4-6 15.6-17 17v.4c12 .8 21.3 7.6 21.3 18 0 11.3-10.3 18.7-23.8 18.7h-57.7v75.7h54.7a37.3 37.3 0 0 0 37.2-37.3v-186H334z"
+                                            fill="#469951" fill-rule="nonzero"></path>
+                                        <path
+                                            d="M343.9 135.2c0-5-3.5-8.2-7.6-8.8l-2-.2h-19.5v18h19.5c.3 0 1.4 0 2-.2 4.1-.6 7.6-3.9 7.6-8.8z"
+                                            fill="#469951" fill-rule="nonzero"></path>
+                                        <path
+                                            d="M128 39.2a37.3 37.3 0 0 0-37.3 37.2v92a73.7 73.7 0 0 0 32.2 8.3c12.8 0 19.8-7.7 19.8-18.4V115h32v43.2c0 16.8-10.5 30.5-46 30.5-21.4 0-38.2-4.7-38.2-4.7v78.4h54.7a37.3 37.3 0 0 0 37.2-37.3V39.2H128z"
+                                            fill="#245797" fill-rule="nonzero"></path>
+                                        <path
+                                            d="M231 39.2a37.3 37.3 0 0 0-37.3 37.2v48.8c9.4-8 25.8-13.1 52.2-12 14 .7 29.2 4.6 29.2 4.6v15.8a70.9 70.9 0 0 0-28.2-8.2c-20-1.5-32.1 8.4-32.1 25.5 0 17.4 12 27.3 32 25.6a74.3 74.3 0 0 0 28.3-8.2v15.8s-15 3.9-29.2 4.5c-26.4 1.2-42.8-3.9-52.2-11.9v86h54.6a37.3 37.3 0 0 0 37.3-37.3V39.2h-54.7z"
+                                            fill="#ca4638" fill-rule="nonzero"></path>
+                                    </svg></div>
+                            </span></li>
+                    </ul>
+                </div>
+            </label></div>
+    </div>
+    <div class="form-checklist-body form-checklist-body-enter-done">
+        <div style="">
+            <div class="paymentMethod paymentMethod--creditCard">
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend is-srOnly">Credit card</legend>
+                    <div class="form-body">
+                        <div class="form-ccFields">
+                            <div class="form-field form-field--ccNumber"><label for="hostedForm.errors.cardNumber"
+                                    class="form-label optimizedCheckout-form-label">Credit Card Number</label>
+                                <div id="cybersource-ccNumber" class="form-input optimizedCheckout-form-input has-icon">
+                                    <div id="hosted-field"
+                                        style="height: 100%; width: 100%; overflow: hidden; padding: 0px; margin: 0px;">
+                                        <form novalidate="" style="height: 100%; width: 100%;"><button
+                                                style="display: none;"></button><input
+                                                style="background-color: transparent; border: 0px none; display: block; height: 100%; margin: 0px; outline: currentcolor none medium; padding: 0px; width: 100%; color: rgb(51, 51, 51); font-family: Arial, Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 400;"
+                                                id="card-number" placeholder="" autocomplete="cc-number"
+                                                aria-label="Credit Card Number" data-manual-scoring="cardNumber"><input
+                                                autocomplete="cc-csc" id="autocomplete-card-code" tabindex="-1"
+                                                style="position: absolute; opacity: 0; z-index: -1;"><input
+                                                autocomplete="cc-exp" id="autocomplete-card-expiry" tabindex="-1"
+                                                style="position: absolute; opacity: 0; z-index: -1;"><input
+                                                autocomplete="cc-name" id="autocomplete-card-name" tabindex="-1"
+                                                style="position: absolute; opacity: 0; z-index: -1;"></form>
+                                    </div>
+                                </div>
+                                <div class="icon"><svg height="24" viewBox="0 0 24 24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z">
+                                        </path>
+                                    </svg></div>
+                            </div>
+                            <div class="form-field form-field--ccExpiry"><label for="hostedForm.errors.cardExpiry"
+                                    class="form-label optimizedCheckout-form-label">Expiration</label>
+                                <div id="cybersource-ccExpiry" class="form-input optimizedCheckout-form-input">
+                                    <div id="hosted-field"
+                                        style="height: 100%; width: 100%; overflow: hidden; padding: 0px; margin: 0px;">
+                                        <form novalidate="" style="height: 100%; width: 100%;"><button
+                                                style="display: none;"></button><input
+                                                style="background-color: transparent; border: 0px none; display: block; height: 100%; margin: 0px; outline: currentcolor none medium; padding: 0px; width: 100%; color: rgb(51, 51, 51); font-family: Arial, Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 400;"
+                                                id="card-expiry" placeholder="MM / YY" autocomplete="cc-exp"
+                                                aria-label="Expiration" data-manual-scoring="expiration"></form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field form-field--ccName"><label for="hostedForm.errors.cardName"
+                                    class="form-label optimizedCheckout-form-label">Name on Card</label>
+                                <div id="cybersource-ccName"
+                                    class="form-input optimizedCheckout-form-input form-input--focus optimizedCheckout-form-input--focus">
+                                    <div id="hosted-field"
+                                        style="height: 100%; width: 100%; overflow: hidden; padding: 0px; margin: 0px;">
+                                        <form novalidate="" style="height: 100%; width: 100%;"><button
+                                                style="display: none;"></button><input
+                                                style="background-color: transparent; border: 0px none; display: block; height: 100%; margin: 0px; outline: currentcolor none medium; padding: 0px; width: 100%; color: rgb(51, 51, 51); font-family: Arial, Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 400;"
+                                                id="card-name" placeholder="" autocomplete="cc-name"
+                                                aria-label="Name on Card" data-manual-scoring="cardName"></form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-field form-ccFields-field--ccCvv"><label for="hostedForm.errors.cardCode"
+                                    class="form-label optimizedCheckout-form-label">CVV<span><span class="has-tip">
+                                            <div class="icon"><svg height="24" viewBox="0 0 24 24" width="24"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z">
+                                                    </path>
+                                                </svg></div>
+                                        </span></span></label>
+                                <div id="cybersource-ccCvv" class="form-input optimizedCheckout-form-input has-icon">
+                                    <div id="hosted-field"
+                                        style="height: 100%; width: 100%; overflow: hidden; padding: 0px; margin: 0px;">
+                                        <form novalidate="" style="height: 100%; width: 100%;"><button
+                                                style="display: none;"></button><input
+                                                style="background-color: transparent; border: 0px none; display: block; height: 100%; margin: 0px; outline: currentcolor none medium; padding: 0px; width: 100%; color: rgb(51, 51, 51); font-family: Arial, Arial, Helvetica, sans-serif; font-size: 13px; font-weight: 400;"
+                                                id="card-code" placeholder="" autocomplete="cc-csc" aria-label="CVV"
+                                                data-manual-scoring="cardSecurityCode"></form>
+                                    </div>
+                                </div>
+                                <div class="icon"><svg height="24" viewBox="0 0 24 24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z">
+                                        </path>
+                                    </svg></div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</li>

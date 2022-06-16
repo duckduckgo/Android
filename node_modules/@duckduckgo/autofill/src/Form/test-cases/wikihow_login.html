@@ -1,0 +1,43 @@
+<!-- https://www.wikihow.com/Special:UserLogin -->
+<form class="mw-htmlform mw-ui-vform mw-ui-container" action="/Special:UserLogin" method="post" name="userlogin">
+    <div class="mw-htmlform-nolabel">
+        <div class="mw-htmlform-field-HTMLTextField loginText mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel"><input id="wpName1" name="wpName" size="20"
+                    class="loginText mw-ui-input" placeholder="Username or email" tabindex="1" required="" autofocus=""
+                    data-manual-scoring="username">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLTextField loginPassword mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel"><input id="wpPassword1" name="wpPassword" size="20"
+                    class="loginPassword mw-ui-input" placeholder="Password" tabindex="2" required="" type="password"
+                    data-manual-scoring="password">
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLCheckField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">
+                <div class="mw-ui-checkbox"><input name="wpRemember" type="checkbox" value="1" id="wpRemember"
+                        tabindex="3">&nbsp;<label for="wpRemember">Remember me</label></div>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLSubmitField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel"><button
+                    class="mw-htmlform-submit mw-ui-button mw-ui-primary mw-ui-progressive" id="wpLoginAttempt"
+                    type="submit" name="wploginattempt" value="Log in" tabindex="4" data-manual-submit="">Log
+                    in</button>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLInfoField mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel"><a href="/Special:PasswordReset"
+                    title="Special:PasswordReset">Forgot your password?</a>
+            </div>
+        </div>
+        <div class="mw-htmlform-field-HTMLInfoField userloginprompt mw-ui-vform-field">
+            <div class="mw-input mw-htmlform-nolabel">You must have cookies enabled to log in to wikiHow.
+            </div>
+        </div>
+    </div><input id="wpEditToken" type="hidden" value="+\" name="wpEditToken">
+    <input type="hidden" value="Special:UserLogin" name="title">
+    <input name="authAction" type="hidden" value="login">
+    <input name="force" type="hidden">
+    <input name="wpLoginToken" type="hidden" value="383b8b572ed3ffcc8e661aed7d08bc3e6253b233+\">
+</form>
