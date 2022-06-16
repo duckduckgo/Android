@@ -1,0 +1,76 @@
+<!-- https://www.itemfix.com/user?a=register -->
+<form>
+    <div class="col-sm-12 pad-none add-new-item-outer contact-form-outer">
+
+        <div class="col-sm-12 pad-none add-item-license-con">
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>User Name</label>
+                <input type="text" name="name" class="form-control" data-manual-scoring="username">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Email</label>
+                <input type="text" name="email1" class="form-control" data-ddg-autofill="true"
+                    data-manual-scoring="emailAddress">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Repeat Email</label>
+                <input type="text" name="email2" class="form-control" data-ddg-autofill="true"
+                    data-manual-scoring="emailAddress">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Password</label>
+                <input type="password" name="password1" class="form-control" data-ddg-autofill="true"
+                    data-manual-scoring="password">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Repeat Password</label>
+                <input type="password" name="password2" class="form-control" data-ddg-autofill="true"
+                    data-manual-scoring="password">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Select your birth date:</label>
+                <input type="text" id="datepicker" name="date_of_birth_string" placeholder="Select your birth date"
+                    class="form-control hasDatepicker" data-manual-scoring="birthday">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form contact-form-textarea">
+                <label>Are you Robot?</label>
+
+                <div class="create-account-terms-con">
+                    <div class="col-sm-12 pad-none create-account-pic">
+                        <div class="g-recaptcha" data-theme="light"
+                            data-sitekey="6LdYJVgaAAAAADzJFpXAYFyeJBB8TFXaF6AGMCfB">
+                            <div style="width: 304px; height: 78px;">
+                                <div><iframe title="reCAPTCHA"
+                                        src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LdYJVgaAAAAADzJFpXAYFyeJBB8TFXaF6AGMCfB&amp;co=aHR0cHM6Ly93d3cuaXRlbWZpeC5jb206NDQz&amp;hl=en&amp;v=Y-cOIEkAqcfDdup_qnnmkxIC&amp;theme=light&amp;size=normal&amp;cb=91sdmftluzw8"
+                                        width="304" height="78" role="presentation" name="a-h8uzm1l4jl5j"
+                                        frameborder="0" scrolling="no"
+                                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                                </div><textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                                    class="g-recaptcha-response"
+                                    style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                            </div><iframe style="display: none;"></iframe>
+                        </div>
+                    </div>
+                    <!--col-sm-12 pad-none create-account-pic-->
+                    <div class="custom-control custom-checkbox mt-3">
+                        <input name="agree_to_tos" type="checkbox" class="custom-control-input" id="terms" value="1">
+                        <label class="custom-control-label" for="terms">I agree to the &nbsp;<a href="tos"
+                                target="_blank">terms and conditions</a>&nbsp;and&nbsp;<a href="faq#rules"
+                                target="_blank">content rules</a></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 pad-none sent-button-con"><input type="button" value="Create Account"
+                    onclick="$.post('https://www.itemfix.com/api/v1/user/new',$(this).closest('form').serialize(),function(data){if(data.error){alert(data.msg); grecaptcha.reset(); } else { location.href=data.user_channel_url;}},'json');"
+                    data-manual-submit=""> </div>
+
+        </div>
+    </div>
+</form>

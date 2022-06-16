@@ -1,0 +1,81 @@
+<!-- https://sso.godaddy.com/v1/account/create?realm=idp&app=dashboard.api&path=%2Fvh-login-redirect&marketid=en-GB&iframe=false -->
+<form id="" method="POST" enctype="application/x-www-form-urlencoded">
+    <div class="">
+        <div id="create-email-input">
+            <div class="ff-form-field inline-input inline-input-required fs-mask">
+                <div class="ff-field ff-focused"><input autocomplete="off" dir="ltr" type="email" label="Email"
+                                                        message="" class="ff-input" spellcheck="false"
+                                                        autocapitalize="none" aria-label="Email. ." aria-required="true"
+                                                        aria-disabled="false" aria-labelledby="label-email"
+                                                        aria-describedby="message" required="" id="email"
+                                                        value="" data-manual-scoring="emailAddress"><label class="ff-label" for="email" id="label-email"
+                                                                                                           aria-required="false">Email</label></div>
+            </div>
+        </div>
+        <div id="create-username-input">
+            <div class="ff-form-field inline-input inline-input-required fs-mask">
+                <div class="ff-field"><input autocomplete="off" label="Username" message="" class="ff-input"
+                                             spellcheck="false" autocapitalize="none" aria-label="Username. ."
+                                             aria-required="true" aria-disabled="false" aria-labelledby="label-username"
+                                             aria-describedby="message" required="" id="username" value="" data-manual-scoring="username"><label
+                        class="ff-label" for="username" id="label-username" aria-required="false">Username</label></div>
+            </div>
+        </div>
+        <div id="password-container">
+            <div class="ux-criteria-connect">
+                <div class="ff-form-field inline-input inline-input-required fs-exclude">
+                    <div class="ff-field"><input autocomplete="off" type="password" label="Password" message=""
+                                                 tabindex="0" aria-label="Password. ." aria-required="true"
+                                                 aria-disabled="false" aria-labelledby="label-new-password"
+                                                 aria-describedby="message" class="ff-input" required=""
+                                                 id="new-password" value="" data-manual-scoring="password"><label class="ff-label" for="new-password"
+                                                                                                                  id="label-new-password"
+                                                                                                                  aria-required="false">Password</label>
+                        <button aria-label="Show password"
+                                class="ux-button ux-button-inline text-primary-o show-hide-btn" type="button"><span
+                                class="ux-button-text">Show</span></button>
+                    </div>
+                </div>
+                <div role="alert" class="ux-criteria">
+                    <div class="ux-criteria-content fade-out">
+                        <div role="alert" class="ux-criteria-rule" aria-hidden="false"><span class="icon "><svg
+                                class="uxicon-svg-container" height="17" width="17" role="img" aria-hidden="true"><use
+                                fill="currentColor" xlink:href="#svg-container-checkmark"></use></svg></span><span
+                                class="ux-criteria-rule-text">Be at least 9 characters</span></div>
+                        <div class="ux-progress ux-progress-bar ux-progress-sm ux-progress-danger">
+                            <div id="very-weak" class="ux-progress-label">Very Weak</div>
+                            <div role="progressbar" aria-valuenow="20" aria-valuemax="100" aria-valuemin="0"
+                                 aria-labelledby="very-weak" class="ux-progress-area"><span class="ux-progress-fill"
+                                                                                            style="width: 20%;"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div id="consent-container">
+                <div class="bg-faint gray-internal-container"><p>I want to receive personalized offers, updates, and
+                    information about GoDaddy products and services.</p>
+                    <div class="ux-button-set">
+                        <div class="ux-button-set-margin ux-button-set-split" role="group">
+                            <button aria-label="Agree" class="ux-button ux-button-primary" id="consent-accept-button"
+                                    type="button"><span class="ux-button-text">Agree</span></button>
+                            <button aria-label="Decline" class="ux-button ux-button-secondary"
+                                    id="consent-decline-button" type="button"><span
+                                    class="ux-button-text">Decline</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button aria-label="Create Account" class="ux-button ux-button-primary" id="submitBtn" type="button"
+                disabled="" data-manual-submit><span class="ux-button-text">Create Account</span></button>
+    </div>
+    <div id="create_acct_submit_btn_container" class=""><p class="tos-text">By creating an account, you agree to
+        GoDaddy's <a target="_blank" id="tos-link"
+                     href="https://www.godaddy.com/legal/agreements/universal-terms-of-service-agreement">Terms &amp;
+            Conditions</a> and <a target="_blank" id="privacy-link"
+                                  href="https://www.godaddy.com/legal/agreements/privacy-policy">Privacy Policy</a></p>
+    </div>
+</form>

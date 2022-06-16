@@ -1,0 +1,5 @@
+{
+  "example": {
+    "paramsValidator": "schemas/example.params.json"
+  }
+}

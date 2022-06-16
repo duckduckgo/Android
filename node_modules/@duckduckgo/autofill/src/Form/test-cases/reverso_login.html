@@ -1,0 +1,35 @@
+<!-- https://account.reverso.net/Account/Login -->
+<form id="account" method="post" action="/Account/Login" novalidate="novalidate">
+                <div class="register-link register-link-mobile">
+                    New user? <a href="/Account/Register">Create an account here.</a>
+                </div>
+                <div class="text-danger validation-summary-valid" data-valmsg-summary="true"><ul><li style="display:none"></li>
+</ul></div>
+                <div class="form-group">
+                    <label class="service-holder-label" for="Email">Email</label>
+                    <input class="form-control service-holder-inp" placeholder="E-mail:" type="email" data-val="true" data-val-email="The e-mail address is invalid." data-val-required="Please fill in the e-mail address." id="Email" name="Email" value="" data-manual-scoring="username">
+                    <span class="text-danger field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                </div>
+                <div class="form-group">
+                    <label class="service-holder-label" for="Password">Password:</label>
+                    <input class="form-control service-holder-inp" placeholder="Password:" type="password" data-val="true" data-val-required="Please fill in the 'Password' field." id="Password" name="Password" data-manual-scoring="password">
+                    <span class="text-danger field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                </div>
+                <div class="forgot-password-holder">
+                    <a class="link-small" id="forgot-password" href="/Account/ForgotPassword">Forgot your password?</a>
+                </div>
+                    <div class="form-group">
+                        <div class="service-holder-checkbox checkbox">
+                            <label for="RememberMe">
+                                <input type="checkbox" data-val="true" data-val-required="The Remember me field is required." id="RememberMe" name="RememberMe" value="true">
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+                <div class="form-group text-center mb-0">
+                    <button class="btn btn-primary btn-submit" type="submit" data-manual-submit="">Login</button>
+                </div>
+                <div class="form-group text-center">
+                    <a class="link-small" href="/Account/ActivateAccount">Didn't you receive the activation link?</a>
+                </div>
+            <input name="__RequestVerificationToken" type="hidden" value="CfDJ8F91Pkfe7TBLoS8ZYzxdQYuS1rWgNckKB63Nu_kFaW7Zf5Zl-kd82sUGiL68lkMG_WsZ_TwBoqxjOO2VgkCR33BI-vXbzh0joazcTrJ4MIS-UPOLuCKOvW1_7k44SLynVf8yMq9rK6SrlL3QlWHyWVU"><input name="RememberMe" type="hidden" value="false"></form>

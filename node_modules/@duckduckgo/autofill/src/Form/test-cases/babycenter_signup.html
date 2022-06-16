@@ -1,0 +1,127 @@
+<!-- https://www.babycenter.com/register.htm -->
+<form class="bcForm registrationForm theFormRecaptchaTarget" action="/register.htm" method="post">
+    <div class="formRow tight">
+        <div class="emailErrorMsg errorMsg"></div>
+        <input name="email" class="emailInputBox" placeholder="Email" type="email" value="" size="30" maxlength="250"
+            autocomplete="username" data-ddg-autofill="true" data-manual-scoring="emailAddress">
+    </div>
+    <div class="formRow">
+        <div class="passwordErrorMsg errorMsg"></div>
+        <input name="password" class="passwordInputBox" placeholder="Password (6-20 characters)" type="password"
+            value="" size="30" maxlength="250" autocomplete="new-password" data-ddg-autofill="true"
+            data-manual-scoring="password">
+    </div>
+    <div class="formRow tight dueDateRow">
+        <div class="preconErrorMsg errorMsg"></div>
+        <label>Due date or child's birthday</label>
+        <div class="inlineSelects">
+            <select name="babies[0].month" data-manual-scoring="unknown">
+                <option value="-1" selected="">mm</option>
+                <option value="0">Jan</option>
+                <option value="1">Feb</option>
+                <option value="2">Mar</option>
+                <option value="3">Apr</option>
+                <option value="4">May</option>
+                <option value="5">Jun</option>
+                <option value="6">Jul</option>
+                <option value="7">Aug</option>
+                <option value="8">Sep</option>
+                <option value="9">Oct</option>
+                <option value="10">Nov</option>
+                <option value="11">Dec</option>
+            </select><select name="babies[0].day" data-manual-scoring="unknown">
+                <option value="-1" selected="">dd</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select><select name="babies[0].year" data-manual-scoring="unknown">
+                <option value="-1" selected="">yyyy</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+                <option value="2014">2014</option>
+                <option value="2013">2013</option>
+                <option value="2012">2012</option>
+                <option value="2011">2011</option>
+                <option value="2010">2010</option>
+                <option value="2009">2009</option>
+                <option value="2008">2008</option>
+                <option value="2007">2007</option>
+                <option value="2006">2006</option>
+                <option value="2005">2005</option>
+                <option value="2004">2004</option>
+                <option value="2003">2003</option>
+            </select>
+        </div>
+    </div>
+    <div class="formRow preconRow">
+        <div class="regFormPreconInputBox">
+            <div class="preconCheckbox uncheckedCheckbox"></div>
+            <div class="conceiveTxt">Trying to conceive</div>
+        </div>
+    </div>
+    <div class="dueDateCalcContainer bodyLinks">
+        <a class="dueDateCalcOpener">Calculate my due date</a>
+    </div>
+    <input name="coRegPartner" value="MultiPartner" type="hidden">
+    <div class="submitButton">
+        <div>
+            <div class="grecaptcha-badge" data-style="bottomright"
+                style="width: 256px; height: 60px; display: block; transition: right 0.3s ease; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-top-left-radius: 2px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; overflow: hidden;">
+                <div class="grecaptcha-logo"><iframe title="reCAPTCHA"
+                        src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LcprJAbAAAAAPbGAiX9rNvC03mbz4CLHV1xjQlk&amp;co=aHR0cHM6Ly93d3cuYmFieWNlbnRlci5jb206NDQz&amp;hl=en&amp;v=gZWLhEUEJFxEhoT5hpjn2xHK&amp;size=invisible&amp;sa=submit&amp;cb=76090z2c42qs"
+                        width="256" height="60" role="presentation" name="a-pn8rxz6oqmwm" frameborder="0" scrolling="no"
+                        sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                </div>
+                <div class="grecaptcha-error"></div><textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                    class="g-recaptcha-response"
+                    style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+            </div><iframe style="display: none;"></iframe>
+        </div><button type="submit" class="g-recaptcha joinNow promo"
+            data-sitekey="6LcprJAbAAAAAPbGAiX9rNvC03mbz4CLHV1xjQlk" data-callback="recaptchaOnSubmitPassthrough"
+            data-action="submit" data-manual-submit="">Track my baby</button>
+    </div>
+    <input name="formOpen" type="hidden" value="false"><input name="token" type="hidden" value=""><input
+        name="member.preconception" class="preConHidden" type="hidden" value="false"><input name="referingUrl"
+        type="hidden" value=""><input type="hidden" name="registrationReferrer" value="">
+    <input type="hidden" name="flatReg" value="true">
+    <input type="hidden" name="brandChannel" value="expert">
+    <input type="hidden" name="siteSource" value="classic-standaloneReg">
+    <input type="hidden" class="regFormPageName" name="pageName" value="Account | Registration | Basic information">
+    <div>
+    </div>
+</form>

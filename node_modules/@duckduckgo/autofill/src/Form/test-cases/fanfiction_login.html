@@ -1,0 +1,151 @@
+<!-- https://www.fanfiction.net/login.php?cache=bust -->
+<form action="?" method="post" name="login" id="login">
+    <div style="width:330px;text-align:left;border-left: 1px solid #dddddd;" class="table-bordered">
+        <div class="tcat" style="border-bottom: 1px solid #ddd;border-left:1px solid #ddd;"><b>FanFiction Login
+                with...<a href="/signup.php" style="float:right">Sign Up</a></b></div>
+        <table class="table" width="330px" cellpadding="4" id="gui_table1i">
+            <tbody>
+                <tr>
+                    <td style="border-top:0;border-left:0;">
+                        <div align="center">
+                            <a title="Login with FictionPress.com "
+                                href="https://www.fictionpress.com/login_sister.php?state=fc40d0020da16ac2f21ef974b23a0af8f8401eede935cf4e86a0c222a8844109">FictionPress</a>
+                            <a style="text-decoration:none;" title="Login with Google"
+                                href="https://accounts.google.com/o/oauth2/auth?response_type=code&amp;client_id=402848448275.apps.googleusercontent.com&amp;redirect_uri=https%3A%2F%2Fwww.fanfiction.net%2Fapi%2Foauth_google.php&amp;scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&amp;state=fc40d0020da16ac2f21ef974b23a0af8f8401eede935cf4e86a0c222a8844109"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/google.png"></a> <a
+                                style="text-decoration:none;" title="Login with Facebook"
+                                href="https://www.facebook.com/v12.0/dialog/oauth?client_id=256723737773954&amp;redirect_uri=https%3A%2F%2Fwww.fanfiction.net%2Fapi%2Foauth_facebook.php&amp;scope=public_profile%2Cemail&amp;state=fc40d0020da16ac2f21ef974b23a0af8f8401eede935cf4e86a0c222a8844109&amp;display=page"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/facebook.png"></a>
+                            <a style="text-decoration:none;" title="Login with Twitter"
+                                href="https://www.fanfiction.net/api/oauth_twitter_pre.php?state=fc40d0020da16ac2f21ef974b23a0af8f8401eede935cf4e86a0c222a8844109"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/twitter.png"></a> <a
+                                style="text-decoration:none;" title="Login with Amazon" id="amazon_login" href="#"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/amazon.png"></a>
+                        </div>
+                        <div align="center" class="lc-wrapper" style="margin-top:10px;"><span class="lc">or</span></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><input id="email" placeholder="Email" type="text"
+                            name="email" required="" class="input-block-level" title="Please enter your email address"
+                            value="" autofocus="autofocus" data-manual-scoring="username"></td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><input id="password" placeholder="Password" type="password"
+                            class="input-block-level" required="" title="Please enter your password" name="password"
+                            data-manual-scoring="password"></td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;">
+                        <script>
+                            var email = '';
+                            var captchaVerified = false;
+                            var captchaRequired = null;
+                            var validator = null;
+
+                            function gotCaptcha(token) {
+                                captchaVerified = true;
+                                $('#submitBtn').attr("disabled", false);
+                                $('#login').submit();
+                            }
+
+                            function ajax_pre_verify() {
+                                var b = $('#submitBtn');
+                                var efield = $('#email');
+                                var f = $('#login');
+
+                                if (validator == null) {
+                                    validator = $('#login').validate();
+                                }
+
+                                if (!validator.form()) {
+                                    return false;
+                                }
+
+                                if (captchaVerified) {
+                                    f.submit();
+                                    return false;
+                                }
+
+                                if (captchaRequired == false) {
+                                    if (efield.val() != email) {
+                                        captchaRequired = null;
+                                    } else {
+                                        f.submit();
+                                        return false;
+                                    }
+                                }
+
+                                if (captchaRequired != null) {
+                                    return false;
+                                }
+
+                                email = efield.val()
+                                console.log(email);
+
+                                b.attr('disabled', true);
+                                //efield.attr('disabled', true);    
+
+                                $.ajax({
+                                    url: '/api/ajax_captcha_preverify.php',
+                                    type: 'POST',
+                                    data: ({ email: email })
+                                }
+                                ).done(function (data) {
+                                    //efield.attr('disabled', false);    
+
+                                    var d = $.parseJSON(data);
+                                    console.log('data' + data);
+
+                                    if (d.error != 'undefined' && !d.error) {
+                                        captchaRequired = false;
+                                        console.log('good');
+                                        b.attr('disabled', false);
+                                        f.submit();
+                                    } else {
+                                        captchaRequired = true;
+                                        $('#verify').show();
+                                        console.log('bad');
+                                    }
+                                });
+
+                                return false;
+                            }
+                        </script>
+                        <div id="verify" style="display:none;">
+                            <script src="https://www.google.com/recaptcha/api.js" async="" defer=""></script>
+                            <center>
+                                <div class="g-recaptcha" data-sitekey="6Lchi5oUAAAAAJHAr4HknrPqYwzuGyvY93-zfFl0"
+                                    data-callback="gotCaptcha">
+                                    <div style="width: 304px; height: 78px;">
+                                        <div><iframe title="reCAPTCHA"
+                                                src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Lchi5oUAAAAAJHAr4HknrPqYwzuGyvY93-zfFl0&amp;co=aHR0cHM6Ly93d3cuZmFuZmljdGlvbi5uZXQ6NDQz&amp;hl=en&amp;v=Y-cOIEkAqcfDdup_qnnmkxIC&amp;size=normal&amp;cb=bb4ysoiyt7d0"
+                                                width="304" height="78" role="presentation" name="a-17nhvqtj78t"
+                                                frameborder="0" scrolling="no"
+                                                sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                                        </div><textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                                            class="g-recaptcha-response"
+                                            style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                                    </div><iframe style="display: none;"></iframe>
+                                </div>
+                            </center>
+                            <div style="height:16px;"></div>
+                        </div>
+                        <button id="submitBtn" class="btn btn-block" onclick="return ajax_pre_verify();"
+                            data-manual-submit="">Login</button>
+                        <input type="hidden" name="notop" value="0">
+                        <input type="hidden" name="refer" value="">
+                        <input type="hidden" name="state"
+                            value="fc40d0020da16ac2f21ef974b23a0af8f8401eede935cf4e86a0c222a8844109">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><a style="float:right" href="/recover.php">Forgot
+                            Password</a> <label class="checkbox"><input id="remember" style="float:none" type="checkbox"
+                                name="remember" value="1" checked=""> Remember me</label> </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</form>

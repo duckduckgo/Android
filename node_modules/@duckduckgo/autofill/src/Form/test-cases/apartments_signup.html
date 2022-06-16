@@ -1,0 +1,128 @@
+<!-- https://www.apartments.com/-->
+<div id="registrationForm" class="grid-container space-xs-8 space-16">
+                <div class="xs-12 modal-header">
+                    <button class="btn-close close" data-dismiss="modal" aria-label="Close">
+                        <i class="storyicon closeStoryIcon"></i>
+                    </button>
+
+                    <p class="header3">Create an account</p>
+                    <p class="or-sign-in">
+                        Or,
+                        <a id="signupSignin" href="javascript:void(0)">sign into your account</a>
+                    </p>
+                    <span id="signupError" class="error"></span>
+                </div>
+
+                <div class="modalBody">
+
+                    <div class="xs-6">
+                        <fieldset class="text md">
+                            <label for="signupFirstName">
+                                First Name
+                            </label>
+                            <input id="signupFirstName" maxlength="50" type="text" data-manual-scoring="firstName">
+                            <div id="signupFirstNameError" class="error-message" role="alert"></div>
+                        </fieldset>
+                    </div>
+
+                    <div class="xs-6">
+                        <fieldset class="text md">
+                            <label for="signupLastName">
+                                Last Name
+                            </label>
+                            <input id="signupLastName" maxlength="50" type="text" data-manual-scoring="lastName">
+                            <div id="signupLastNameError" class="error-message" role="alert"></div>
+                        </fieldset>
+                    </div>
+
+                    <div class="xs-12">
+                        <fieldset class="text md">
+                            <label for="signupEmail">
+                                Email Address
+                            </label>
+                            <input id="signupEmail" maxlength="50" type="text"  data-manual-scoring="emailAddress">
+                            <div id="signupEmailError" class="error-message" role="alert"></div>
+                        </fieldset>
+                    </div>
+
+                        <div class="xs-12">
+                            <fieldset class="checkbox">
+                                <input id="signupIndustryProfessional" type="checkbox" class="checkbox-default" data-manual-scoring="unknown">
+                                <label for="signupIndustryProfessional">
+                                    I am an industry professional
+                                </label>
+                                <div id="signupIndustryProfessionalError" class="error-message" role="alert"></div>
+                            </fieldset>
+                        </div>
+                        <div id="signupIndustryContainer" style="display: none;">
+                            <div class="xs-12">
+                                <p class="header3">Which role best describes you?</p>
+                            </div>
+
+                            <div class="xs-12">
+                                <div class="bootstrap-select-container">
+                                    <label class="formLabel" for="settingsState">I am a ...</label>
+                                    <select id="signupIndustryRoleSelect" class="selectpicker selectDropdown" style="display: none;">
+                                        <option value="" selected="">Select</option>
+                                        <option value="1">Property Manager</option>
+                                        <option value="2">Broker/Agent</option>
+                                    </select><div class="btn-group bootstrap-select selectDropdown"><button type="button" class="btn dropdownToggle selectpicker btn-default" data-toggle="dropdown" data-id="signupIndustryRoleSelect" title="Select"><span class="filter-option pull-left">Select</span>&nbsp;<span class="caret"></span></button><div class="dropdownMenu open" role="combobox"><ul class="dropdownMenu inner selectpicker" role="menu"><li rel="0" class="selected"><a tabindex="0" class="" style=""><span class="text">Select</span><i class="glyphicon glyphicon-ok icon-ok check-mark"></i></a></li><li rel="1"><a tabindex="0" class="" style=""><span class="text">Property Manager</span><i class="glyphicon glyphicon-ok icon-ok check-mark"></i></a></li><li rel="2"><a tabindex="0" class="" style=""><span class="text">Broker/Agent</span><i class="glyphicon glyphicon-ok icon-ok check-mark"></i></a></li></ul></div></div>
+                                    <div id="signupIndustryRoleSelectError" class="error-message" role="alert"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                <div class="xs-12">
+                    <div id="signupReCaptcha"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LfAZf0UAAAAAHMLAEHq-4jSUUk9Z3HKFgkvjFl-&amp;co=aHR0cHM6Ly93d3cuYXBhcnRtZW50cy5jb206NDQz&amp;hl=en&amp;v=2uoiJ4hP3NUoP9v_eBNfU6CR&amp;size=normal&amp;cb=ctokaldc928v" width="304" height="78" role="presentation" name="a-ht9p3clfajsb" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+                    <div id="signupReCaptchaError" class="error-message" role="alert"></div>
+                </div>
+
+                    <div class="xs-12">
+                        <button type="button" id="signupBtn" class="btn btn-md btn-primary" disabled="" data-manual-submit="">
+                            Sign Up
+                        </button>
+                    </div>
+
+                    <div class="xs-12 or-rule-container">
+                        <hr>
+                        <span>Or</span>
+                    </div>
+
+                    <div class="xs-12">
+                        <button id="googleLogin" class="btn btn-google">
+                            Continue with Google
+                            <i class="storyillustration googleStoryIllustration"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                        </button>
+                    </div>
+
+                    <div class="xs-12">
+                        <button id="facebookLogin" class="btn btn-facebook">
+                            Continue with Facebook
+                            <i class="storyicon facebook2StoryIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="xs-12">
+                        <button id="appleLogin" class="btn btn-apple">
+                            Continue with Apple
+                            <i class="storyicon appleStoryIcon"></i>
+                        </button>
+                    </div>
+
+
+
+                    <div class="xs-12">
+                        <p class="terms">
+                            By registering, I accept the Apartments.com 
+                            <a class="greenLink" target="_blank" href="https://www.apartments.com/about/terms-of-service">Terms of Use.</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div id="signUpLoadingSpinner" class="loading">
+                    <div class="content">
+                        <i class="storyillustration apartmentsLogoStoryIllustration"></i>
+                        <p>Saving...</p>
+                    </div>
+                </div>
+            </div>

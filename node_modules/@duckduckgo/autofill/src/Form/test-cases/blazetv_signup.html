@@ -1,0 +1,33 @@
+<!-- https://www.blazetv.com/signup -->
+<form
+    class="ur-form ng-pristine ng-invalid ng-invalid-required ng-valid-pattern ng-valid-email ng-valid-minlength ng-valid-match"
+    name="vm.signupForm" autocomplete="on" novalidate="novalidate">
+    <div class="form-group has-error" ng-class="{ 'has-error': vm.signupForm.email.$invalid }"><label
+            for="email">Email</label><input
+            class="ur-input ng-pristine ng-empty ng-invalid ng-invalid-required ng-valid-pattern ng-valid-email ng-touched"
+            type="email" id="email" name="email" ng-model="vm.email" ng-pattern="/[^\s@]+@[^\s@]+\.[^\s@]+/"
+            urfs-focus-on="vm.emailNeedsFocus" autofocus="autofocus" required="required" 
+            data-manual-scoring="emailAddress">
+        <div class="form-text form-error" aria-live="assertive">Valid email required</div>
+    </div>
+    <div class="form-group has-error" ng-class="{ 'has-error': vm.signupForm.password.$invalid }"><label
+            for="password">Password</label><input
+            class="ur-input ng-pristine ng-untouched ng-empty ng-invalid ng-invalid-required ng-valid-minlength"
+            type="password" id="password" name="password" ng-model="vm.password" ng-minlength="6" required="required"
+             data-manual-scoring="password">
+        <div class="form-text form-error" aria-live="assertive">Password must be at least 6 characters</div>
+    </div>
+    <div class="form-group has-error" ng-class="{ 'has-error': vm.signupForm.confirmPassword.$invalid }"><label
+            for="confirmPassword">Confirm Password</label><input
+            class="ur-input ng-pristine ng-untouched ng-isolate-scope ng-empty ng-invalid ng-invalid-required ng-valid-match"
+            type="password" id="confirmPassword" name="confirmPassword" ng-model="vm.confirm"
+            confirm-password="vm.password" required="required"  data-manual-scoring="password">
+        <div class="form-text form-error" aria-live="assertive">Must match password</div>
+    </div>
+    <div class="form-group" style="margin-bottom: 20px"><span>By clicking Sign Up, you agree to have read and accepted
+            the&nbsp;</span><a href="https://www.blazetv.com/pages/terms-of-use/a/terms-of-service"
+            target="_blank">Terms of Use</a><span>&nbsp;and the&nbsp;</span><a
+            href="https://www.blazetv.com/pages/privacy-policy/i/privacy-policy" target="_blank">Privacy Policy</a>
+    </div><button class="ur-btn ur-btn-primary ripple" type="submit" ng-click="vm.signup()" ripple-color="#eee"
+        data-manual-submit="">Sign Up</button>
+</form>
