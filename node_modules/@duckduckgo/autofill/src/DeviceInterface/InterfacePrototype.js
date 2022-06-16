@@ -4,7 +4,7 @@ import {
     sendAndWaitForAnswer,
     formatDuckAddress,
     autofillEnabled,
-    notifyWebApp
+    notifyWebApp, getDaxBoundingBox
 } from '../autofill-utils'
 
 import { getInputType, getSubtypeFromType } from '../Form/matching'
@@ -345,13 +345,21 @@ class InterfacePrototype {
     /**
      * @param {import("../Form/Form").Form} form
      * @param {HTMLInputElement} input
-     * @param {{ (): { x: number; y: number; height: number; width: number; } }} getPosition
      * @param {{ x: number; y: number; } | null} click
      */
-    attachTooltip (form, input, getPosition, click) {
+    attachTooltip (form, input, click) {
+        // Avoid flashing tooltip from background tabs on macOS
+        if (document.visibilityState !== 'visible') return
+
         form.activeInput = input
         this.currentAttached = form
         const inputType = getInputType(input)
+
+        /** @type {PosFn} */
+        const getPosition = () => {
+            // In extensions, the tooltip is centered on the Dax icon
+            return this.globalConfig.isApp ? input.getBoundingClientRect() : getDaxBoundingBox(input)
+        }
 
         // todo: this will be migrated to use NativeUIController soon
         if (this.globalConfig.isMobileApp && inputType === 'identities.emailAddress') {

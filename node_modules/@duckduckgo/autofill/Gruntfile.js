@@ -85,9 +85,13 @@ module.exports = function (grunt) {
          * modified or deleted.
          */
         watch: {
+            schemas: {
+                files: ['src/deviceApiCalls/**/*.{json,js}', 'packages/device-api/**/*.{json,js}'],
+                tasks: ['exec:schemaCompile']
+            },
             scripts: {
                 files: ['src/**/*.{json,js}', 'packages/password/**/*.{json,js}', 'packages/device-api/**/*.{json,js}'],
-                tasks: ['exec:schemaCompile', 'browserify:dist', 'browserify:debug', 'exec:copyAssets']
+                tasks: ['browserify:dist', 'browserify:debug', 'exec:copyAssets']
             },
             html: {
                 files: ['src/**/*.html'],

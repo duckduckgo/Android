@@ -5,7 +5,6 @@ import {
     removeInlineStyles,
     setValue,
     isEventWithinDax,
-    getDaxBoundingBox,
     isLikelyASubmitButton,
     isVisible
 } from '../autofill-utils'
@@ -342,10 +341,6 @@ class Form {
 
             const input = e.target
             let click = null
-            const getPosition = () => {
-                // In extensions, the tooltip is centered on the Dax icon
-                return this.device.globalConfig.isApp ? input.getBoundingClientRect() : getDaxBoundingBox(input)
-            }
 
             // Checks for mousedown event
             if (e.type === 'pointerdown') {
@@ -369,7 +364,7 @@ class Form {
                 }
 
                 this.touched.add(input)
-                this.device.attachTooltip(this, input, getPosition, click)
+                this.device.attachTooltip(this, input, click)
             }
         }
 

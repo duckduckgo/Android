@@ -4221,15 +4221,23 @@ class InterfacePrototype {
   /**
    * @param {import("../Form/Form").Form} form
    * @param {HTMLInputElement} input
-   * @param {{ (): { x: number; y: number; height: number; width: number; } }} getPosition
    * @param {{ x: number; y: number; } | null} click
    */
 
 
-  attachTooltip(form, input, getPosition, click) {
+  attachTooltip(form, input, click) {
+    // Avoid flashing tooltip from background tabs on macOS
+    if (document.visibilityState !== 'visible') return;
     form.activeInput = input;
     this.currentAttached = form;
-    const inputType = (0, _matching.getInputType)(input); // todo: this will be migrated to use NativeUIController soon
+    const inputType = (0, _matching.getInputType)(input);
+    /** @type {PosFn} */
+
+    const getPosition = () => {
+      // In extensions, the tooltip is centered on the Dax icon
+      return this.globalConfig.isApp ? input.getBoundingClientRect() : (0, _autofillUtils.getDaxBoundingBox)(input);
+    }; // todo: this will be migrated to use NativeUIController soon
+
 
     if (this.globalConfig.isMobileApp && inputType === 'identities.emailAddress') {
       this.getAlias().then(alias => {
@@ -4944,13 +4952,7 @@ class Form {
       }
 
       const input = e.target;
-      let click = null;
-
-      const getPosition = () => {
-        // In extensions, the tooltip is centered on the Dax icon
-        return this.device.globalConfig.isApp ? input.getBoundingClientRect() : (0, _autofillUtils.getDaxBoundingBox)(input);
-      }; // Checks for mousedown event
-
+      let click = null; // Checks for mousedown event
 
       if (e.type === 'pointerdown') {
         click = getMainClickCoords(e);
@@ -4969,7 +4971,7 @@ class Form {
         }
 
         this.touched.add(input);
-        this.device.attachTooltip(this, input, getPosition, click);
+        this.device.attachTooltip(this, input, click);
       }
     };
 
