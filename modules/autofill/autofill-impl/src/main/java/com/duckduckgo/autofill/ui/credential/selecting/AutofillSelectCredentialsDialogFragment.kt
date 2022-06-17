@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.ui.credential.selecting
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -89,14 +90,22 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     private fun configureRecyclerView(binding: ContentAutofillSelectCredentialsTooltipBinding) {
         binding.availableCredentialsRecycler.adapter =
             CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
-                val result =
-                    Bundle().also {
-                        it.putString("url", getOriginalUrl())
-                        it.putParcelable("creds", selectedCredentials)
-                    }
+                val result = Bundle().also {
+                    it.putBoolean("cancelled", false)
+                    it.putString("url", getOriginalUrl())
+                    it.putParcelable("creds", selectedCredentials)
+                }
                 parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_PICKER, result)
                 dismiss()
             }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        val result = Bundle().also {
+            it.putBoolean("cancelled", true)
+            it.putString("url", getOriginalUrl())
+        }
+        parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_PICKER, result)
     }
 
     private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>("creds")!!

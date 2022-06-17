@@ -50,7 +50,12 @@ class InlineBrowserAutofill(
         }
     }
 
-    override fun injectCredentials(credentials: LoginCredentials) {
-        autofillInterface.injectCredentials(credentials)
+    override fun injectCredentials(credentials: LoginCredentials?) {
+        if (credentials == null) {
+            autofillInterface.injectNoCredentials()
+        } else {
+            autofillInterface.injectCredentials(credentials)
+        }
+
     }
 }
