@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/GetAutofillDataResponse",
+  "title": "GetAutofillDataResponse",
+  "type": "object",
+  "properties": {
+    "type": {
+      "title": "This is the 'type' field on message that may be sent back to the window",
+      "description": "Required on Android + Windows devices, optional on iOS",
+      "type": "string",
+      "const": "getAutofillDataResponse"
+    },
+    "success": {
+      "$id": "#/definitions/AutofillData",
+      "title": "GetAutofillDataResponse Success Response",
+      "description": "The data returned, containing only fields that will be auto-filled",
+      "type": "object",
+      "oneOf": [
+        { "$ref": "#/definitions/Credentials" }
+      ]
+    },
+    "error": {
+      "$ref": "#/definitions/GenericError"
+    }
+  },
+  "required": [
+    "success"
+  ]
+}

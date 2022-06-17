@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/Identity",
+  "title": "Identity",
+  "description": "A user's Identity",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type":"string"
+    },
+    "title": {
+      "description": "This is the only required field",
+      "type":"string"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "middleName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "birthdayDay": {
+      "type": "string"
+    },
+    "birthdayMonth": {
+      "type": "string"
+    },
+    "birthdayYear": {
+      "type": "string"
+    },
+    "addressStreet": {
+      "type": "string"
+    },
+    "addressStreet2": {
+      "type": "string"
+    },
+    "addressCity": {
+      "type": "string"
+    },
+    "addressProvince": {
+      "type": "string"
+    },
+    "addressPostalCode": {
+      "type": "string"
+    },
+    "addressCountryCode": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "emailAddress": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}
