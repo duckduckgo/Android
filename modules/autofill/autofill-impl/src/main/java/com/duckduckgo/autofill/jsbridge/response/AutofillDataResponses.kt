@@ -18,7 +18,7 @@ package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 
-data class AutofillDataResponse(
+data class ContainingCredentials(
     val type: String = "getAutofillDataResponse",
     val success: CredentialSuccessResponse
 ) {
@@ -29,12 +29,17 @@ data class AutofillDataResponse(
     )
 }
 
-data class AutofillAvailableInputTypesResponse(
-    val availableInputTypes: AvailableInputSuccessResponse
+data class EmptyResponse(
+    val type: String = "getAutofillDataResponse",
+    val success: EmptyCredentialResponse
 ) {
 
-    data class AvailableInputSuccessResponse(
-        val credentials: Boolean,
-        val email: Boolean
+    data class EmptyCredentialResponse(
+        val action: String = "non"
     )
 }
+
+data class AvailableInputSuccessResponse(
+    val credentials: Boolean,
+    val email: Boolean
+)

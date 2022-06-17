@@ -17,31 +17,38 @@
 package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
-import com.duckduckgo.autofill.jsbridge.response.AutofillAvailableInputTypesResponse.AvailableInputSuccessResponse
-import com.duckduckgo.autofill.jsbridge.response.AutofillDataResponse.CredentialSuccessResponse
 import com.squareup.moshi.Moshi
 import timber.log.Timber
 
 class AutofillResponseWriter(val moshi: Moshi) {
 
-    private val availableInputTypesAdapterx = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
-    private val autofillDataAdapter = moshi.adapter(AutofillDataResponse::class.java).indent("  ")
+    private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
+    private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")
+    private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
 
     fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
-        val credentialsResponse = CredentialSuccessResponse(credentials)
-        val topLevelResponse = AutofillDataResponse(success = credentialsResponse)
-        return autofillDataAdapter.toJson(topLevelResponse).also {
-            Timber.i("xxx\n%s", it)
+        val credentialsResponse = ContainingCredentials.CredentialSuccessResponse(credentials)
+        val topLevelResponse = ContainingCredentials(success = credentialsResponse)
+        return autofillDataAdapterCredentialsAvailable.toJson(topLevelResponse).also {
+            Timber.i("autofillDataResponse\n%s", it)
+        }
+    }
+
+    fun generateEmptyResponseGetAutofillData(): String {
+        val credentialsResponse = EmptyResponse.EmptyCredentialResponse()
+        val topLevelResponse = EmptyResponse(success = credentialsResponse)
+        return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse).also {
+            Timber.i("autofillDataResponse\n%s", it)
         }
     }
 
     fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {
         val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
-        return availableInputTypesAdapterx.toJson(availableInputTypes)
+        return availableInputTypesAdapter.toJson(availableInputTypes)
     }
 
     /*
-    * contentScope: dump of the most up-to-date privacy remote config, untouched by Android code
+    * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
     */
     fun generateContentScope(): String {
         return """
@@ -66,7 +73,10 @@ class AutofillResponseWriter(val moshi: Moshi) {
         """.trimIndent()
     }
 
-    fun generateUserPreferences(): String {
+    fun generateUserPreferences(
+        autofillCredentials: Boolean,
+        showInlineKeyIcon: Boolean = false
+    ): String {
         return """
             userPreferences = {
               "debug": false,
@@ -77,13 +87,13 @@ class AutofillResponseWriter(val moshi: Moshi) {
                 "autofill": {
                   "settings": {
                     "featureToggles": {
-                      "inputType_credentials": true,
+                      "inputType_credentials": $autofillCredentials,
                       "inputType_identities": false,
                       "inputType_creditCards": false,
                       "emailProtection": true,
                       "password_generation": false,
                       "credentials_saving": true,
-                      "inlineIcon_credentials": false
+                      "inlineIcon_credentials": $showInlineKeyIcon
                     }
                   }
                 }

@@ -429,6 +429,7 @@ class BrowserTabViewModel @Inject constructor(
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+        class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -2657,6 +2658,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
         command.postValue(InjectCredentials(originalUrl, credentials))
+    }
+
+    fun returnNoCredentialsWithPage(originalUrl: String) {
+        command.postValue(CancelIncomingAutofillRequest(originalUrl))
     }
 
     fun saveCredentials(url: String, credentials: LoginCredentials) {

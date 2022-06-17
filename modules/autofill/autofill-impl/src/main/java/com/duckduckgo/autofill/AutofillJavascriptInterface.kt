@@ -25,6 +25,7 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import kotlinx.coroutines.CoroutineScope
@@ -48,10 +49,14 @@ class AutofillJavascriptInterface(
 
     @JavascriptInterface
     fun getAutofillData(requestString: String) {
-        Timber.i("BrowserAutofill: getAutofillData called:\n%s", requestString)
+        Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
         getAutofillDataJob += coroutineScope.launch {
             val request = requestParser.parseAutofillDataRequest(requestString)
-            Timber.i("Parsed request\ninputType: %s\nsubType: %s", request.mainType, request.subType)
+
+            if (request.mainType != CREDENTIALS) {
+                Timber.w("Autofill type %s unsupported", request.mainType)
+                return@launch
+            }
 
             val url = currentUrl()
             if (url == null) {
@@ -62,17 +67,22 @@ class AutofillJavascriptInterface(
             val credentials = autofillStore.getCredentials(url)
 
             withContext(Dispatchers.Main) {
-                callback?.onCredentialsAvailableToInject(credentials)
+                if (credentials.isEmpty()) {
+                    callback?.noCredentialsAvailable(url)
+
+                } else {
+                    callback?.onCredentialsAvailableToInject(credentials)
+                }
             }
         }
     }
 
     suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
-        Timber.i("BrowserAutofill: getRuntimeConfiguration called")
+        Timber.v("BrowserAutofill: getRuntimeConfiguration called")
 
         val contentScope = autofillResponseWriter.generateContentScope()
         val userUnprotectedDomains = autofillResponseWriter.generateUserUnprotectedDomains()
-        val userPreferences = autofillResponseWriter.generateUserPreferences()
+        val userPreferences = autofillResponseWriter.generateUserPreferences(autofillCredentials = determineIfAutofillEnabled())
         val availableInputTypes = generateAvailableInputTypes(url)
 
         return rawJs
@@ -84,17 +94,21 @@ class AutofillJavascriptInterface(
 
     suspend fun generateAvailableInputTypes(url: String?): String {
         val credentialsAvailable = determineIfCredentialsAvailable(url)
+
         val emailAvailable = determineIfEmailAvailable()
 
-        Timber.v("Credentials available for %s: %s", url, credentialsAvailable)
-
         val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
-            Timber.i("xxx: \n%s", it)
+            Timber.i("availableInputTypes for %s: \n%s", url, it)
         }
         return "availableInputTypes = $json"
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
+
+    private fun determineIfAutofillEnabled(): Boolean {
+        // in the future, we'll tie this into the global user-facing settings (and remote config)
+        return true
+    }
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         val credentialsAvailable = if (url == null) {
@@ -127,6 +141,12 @@ class AutofillJavascriptInterface(
         getAutofillDataJob += coroutineScope.launch {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
+        }
+    }
+
+    fun injectNoCredentials() {
+        getAutofillDataJob += coroutineScope.launch {
+            autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
     }
 

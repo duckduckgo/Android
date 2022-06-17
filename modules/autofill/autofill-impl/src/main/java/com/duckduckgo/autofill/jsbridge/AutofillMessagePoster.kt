@@ -43,15 +43,6 @@ class AutofillMessagePoster {
         }
     }
 
-    suspend fun injectRuntimeConfiguration(webView: WebView?, javascript: String) {
-        webView?.let { wv ->
-            withContext(Dispatchers.Main) {
-                wv.evaluateJavascript("javascript:$javascript", null)
-            }
-        }
-
-    }
-
     companion object {
         private val WILDCARD_ORIGIN_URL = "*".toUri()
     }
