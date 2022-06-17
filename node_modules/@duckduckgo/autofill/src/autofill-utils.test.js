@@ -1,4 +1,5 @@
-import { setValue, isAutofillEnabledFromProcessedConfig } from './autofill-utils'
+import { setValue } from './autofill-utils'
+import {isFeatureEnabledFromProcessedConfig} from '@duckduckgo/content-scope-scripts'
 
 const renderInputWithEvents = () => {
     const input = document.createElement('input')
@@ -85,34 +86,34 @@ describe('value setting on selects', function () {
 
 describe('config checking', () => {
     it('autofill in enabledFeatures should enable', () => {
-        expect(isAutofillEnabledFromProcessedConfig({
+        expect(isFeatureEnabledFromProcessedConfig({
             site: {
                 isBroken: false,
                 enabledFeatures: ['autofill']
             }
-        })).toBe(true)
+        }, 'autofill')).toBe(true)
 
-        expect(isAutofillEnabledFromProcessedConfig({
+        expect(isFeatureEnabledFromProcessedConfig({
             site: {
                 isBroken: false,
                 enabledFeatures: []
             }
-        })).toBe(false)
+        }, 'autofill')).toBe(false)
     })
 
     it('autofill in isBroken should disable', () => {
-        expect(isAutofillEnabledFromProcessedConfig({
+        expect(isFeatureEnabledFromProcessedConfig({
             site: {
                 isBroken: false,
                 enabledFeatures: ['autofill']
             }
-        })).toBe(true)
+        }, 'autofill')).toBe(true)
 
-        expect(isAutofillEnabledFromProcessedConfig({
+        expect(isFeatureEnabledFromProcessedConfig({
             site: {
                 isBroken: true,
                 enabledFeatures: ['autofill']
             }
-        })).toBe(false)
+        }, 'autofill')).toBe(false)
     })
 })

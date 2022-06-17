@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/ShowAutofillParentRequest",
+  "title": "ShowAutofillParentRequest Request Object",
+  "type": "object",
+  "description": "This describes the argument given to showAutofillParent(data)",
+  "properties": {
+    "wasFromClick": {
+      "type": "boolean"
+    },
+    "inputTop": {
+      "type": "number"
+    },
+    "inputLeft": {
+      "type": "number"
+    },
+    "inputHeight": {
+      "type": "number"
+    },
+    "inputWidth": {
+      "type": "number"
+    },
+    "serializedInputContext": {
+      "description": "JSON string that will be available from `getAutofillInitData()`",
+      "type": "string"
+    }
+  },
+  "required": [
+    "wasFromClick",
+    "inputTop",
+    "inputLeft",
+    "inputHeight",
+    "inputWidth",
+    "serializedInputContext"
+  ]
+}
