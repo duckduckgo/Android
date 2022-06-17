@@ -1,4 +1,5 @@
 import { getDataKeySync } from './utils.js'
+// @ts-ignore
 import Seedrandom from 'seedrandom'
 
 /**

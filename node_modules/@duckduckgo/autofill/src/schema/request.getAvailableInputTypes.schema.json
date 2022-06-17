@@ -1,0 +1,7 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/GetAvailableInputTypesRequest",
+  "type": "object",
+  "title": "GetAvailableInputTypesRequest",
+  "description": "This method does not currently send any data"
+}
