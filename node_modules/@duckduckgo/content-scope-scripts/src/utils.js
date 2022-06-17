@@ -98,6 +98,15 @@ export function isFeatureBroken (args, feature) {
     return args.site.isBroken || args.site.allowlisted || !args.site.enabledFeatures.includes(feature)
 }
 
+export function isFeatureEnabledFromProcessedConfig (processedConfig, featureName) {
+    const site = processedConfig.site
+    if (site.isBroken || !site.enabledFeatures.includes(featureName)) {
+        return false
+    }
+
+    return true
+}
+
 /**
  * For each property defined on the object, update it with the target value.
  */
