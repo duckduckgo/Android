@@ -16,67 +16,62 @@ include ':app-store'
 include ':appbuildconfig-api'
 include ':common-test'
 
-include ':feature-toggles-api'
-include ':feature-toggles-impl'
-project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
-project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
+"feature-toggles".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+}
 
-include ':privacy-config-api'
-include ':privacy-config-impl'
-include ':privacy-config-store'
-project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
-project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
-project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
+"privacy-config".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':remote-messaging-api'
-include ':remote-messaging-impl'
-include ':remote-messaging-store'
-project(':remote-messaging-api').projectDir = new File('remote-messaging/remote-messaging-api')
-project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
-project(':remote-messaging-store').projectDir = new File('remote-messaging/remote-messaging-store')
+"remote-messaging".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':voice-search-api'
-include ':voice-search-impl'
-include ':voice-search-store'
-project(':voice-search-api').projectDir = new File('voice-search/voice-search-api')
-project(':voice-search-impl').projectDir = new File('voice-search/voice-search-impl')
-project(':voice-search-store').projectDir = new File('voice-search/voice-search-store')
+"voice-search".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':downloads-api'
-include ':downloads-impl'
-include ':downloads-store'
-project(':downloads-api').projectDir = new File('downloads/downloads-api')
-project(':downloads-impl').projectDir = new File('downloads/downloads-impl')
-project(':downloads-store').projectDir = new File('downloads/downloads-store')
+"downloads".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':traces-api'
-include ':traces-impl'
-project(':traces-api').projectDir = new File('traces/traces-api')
-project(':traces-impl').projectDir = new File('traces/traces-impl')
+"traces".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+}
 
-include ':anrs-api'
-include ':anrs-impl'
-include ':anrs-store'
-project(':anrs-api').projectDir = new File('anrs/anrs-api')
-project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
-project(':anrs-store').projectDir = new File('anrs/anrs-store')
+"anrs".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':macos-api'
-include ':macos-impl'
-include ':macos-store'
-project(':macos-api').projectDir = new File('macos/macos-api')
-project(':macos-impl').projectDir = new File('macos/macos-impl')
-project(':macos-store').projectDir = new File('macos/macos-store')
+"macos".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':bandwidth-impl'
-include ':bandwidth-store'
-project(':bandwidth-impl').projectDir = new File('bandwidth/bandwidth-impl')
-project(':bandwidth-store').projectDir = new File('bandwidth/bandwidth-store')
+"bandwidth".with {
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
 
-include ':anvil-compiler'
-include ':anvil-annotations'
-project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
-project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
+"anvil".with {
+    include ":$it-compiler"; project(":$it-compiler").projectDir = new File("modules/$it/$it-compiler")
+    include ":$it-annotations"; project(":$it-annotations").projectDir = new File("modules/$it/$it-annotations")
+}
+
 
 rootProject.children.each { subproject ->
 
