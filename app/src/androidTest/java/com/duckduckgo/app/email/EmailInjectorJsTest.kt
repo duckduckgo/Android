@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.app.autofill.FileBasedJavaScriptInjector
+import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
@@ -37,11 +38,13 @@ class EmailInjectorJsTest {
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockAutofill: Autofill = mock()
+    private val javascriptInjector: JavascriptInjector = FileBasedJavaScriptInjector()
     lateinit var testee: EmailInjectorJs
 
     @Before
     fun setup() {
-        testee = EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, mockAutofill)
+        testee =
+            EmailInjectorJs(mockEmailManager, DuckDuckGoUrlDetector(), mockDispatcherProvider, mockFeatureToggle, javascriptInjector, mockAutofill)
 
         whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
@@ -214,26 +217,22 @@ class EmailInjectorJsTest {
         verify(webView, never()).evaluateJavascript(jsToEvaluate, null)
     }
 
-    private fun getJsToEvaluate(): String {
-        val js = readResource().use { it?.readText() }.orEmpty()
-        return "javascript:$js"
-    }
-
     private fun getAliasJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.inject_alias)
+        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(com.duckduckgo.app.global.R.raw.inject_alias)
             .bufferedReader()
             .use { it.readText() }
         return "javascript:$js"
     }
 
     private fun getNotifySignOutJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.signout_autofill)
-            .bufferedReader()
-            .use { it.readText() }
+        val js =
+            InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(com.duckduckgo.app.global.R.raw.signout_autofill)
+                .bufferedReader()
+                .use { it.readText() }
         return "javascript:$js"
     }
 
-    private fun readResource(): BufferedReader? {
-        return javaClass.classLoader?.getResource("autofill.js")?.openStream()?.bufferedReader()
+    private fun readResource(resourceName: String): BufferedReader? {
+        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
     }
 }
