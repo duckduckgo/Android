@@ -2,19 +2,7 @@ plugins {
     id("de.fayard.refreshVersions") version "0.40.1"
 }
 
-include ':browser-api'
-include ':vpn'
-include ':vpn-store'
-include ':vpn-api'
-include ':vpn-internal'
-include ':di'
 include ':app'
-include ':statistics'
-include ':common'
-include ':common-ui'
-include ':app-store'
-include ':appbuildconfig-api'
-include ':common-test'
 
 "feature-toggles".with {
     include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
@@ -72,6 +60,38 @@ include ':common-test'
     include ":$it-annotations"; project(":$it-annotations").projectDir = new File("modules/$it/$it-annotations")
 }
 
+"di".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+}
+
+"statistics".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+}
+
+"app-store".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+}
+
+"browser-api".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+}
+
+"app-build-config".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
+}
+
+"common".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+    include ":$it-ui"; project(":$it-ui").projectDir = new File("modules/$it-ui")
+    include ":$it-test"; project(":$it-test").projectDir = new File("modules/$it-test")
+}
+
+"vpn".with {
+    include ":$it"; project(":$it").projectDir = new File("modules/$it")
+    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it-store")
+    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it-api")
+    include ":$it-internal"; project(":$it-internal").projectDir = new File("modules/$it-internal")
+}
 
 rootProject.children.each { subproject ->
 
