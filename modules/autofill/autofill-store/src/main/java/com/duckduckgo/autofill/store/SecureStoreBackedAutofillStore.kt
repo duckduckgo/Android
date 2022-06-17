@@ -26,9 +26,7 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
@@ -43,7 +41,10 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         return storedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials) {
+    override suspend fun saveCredentials(
+        rawUrl: String,
+        credentials: LoginCredentials
+    ) {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
@@ -55,30 +56,22 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         val loginDetails = WebsiteLoginDetails(domain = url, username = credentials.username)
         val webSiteLoginCredentials = WebsiteLoginCredentials(loginDetails, password = credentials.password)
 
-        // todo this should be handled internally by secure storage
-        withContext(Dispatchers.IO) {
-            secureStorage.addWebsiteLoginCredential(webSiteLoginCredentials)
-        }
+        secureStorage.addWebsiteLoginCredential(webSiteLoginCredentials)
     }
 
-    override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> = withContext(Dispatchers.IO) {
-        val savedCredentials = secureStorage.websiteLoginCredentials()
+    override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> {
+        return secureStorage.websiteLoginCredentials()
             .map { list ->
                 list.map { it.toLoginCredentials() }
             }
-        return@withContext savedCredentials
     }
 
     override suspend fun deleteCredentials(id: Int) {
-        withContext(Dispatchers.IO) {
-            secureStorage.deleteWebsiteLoginCredentials(id)
-        }
+        secureStorage.deleteWebsiteLoginCredentials(id)
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials) {
-        withContext(Dispatchers.IO) {
-            secureStorage.updateWebsiteLoginCredentials(credentials.toWebsiteLoginCredentials())
-        }
+        secureStorage.updateWebsiteLoginCredentials(credentials.toWebsiteLoginCredentials())
     }
 
     private fun WebsiteLoginCredentials.toLoginCredentials(): LoginCredentials {
@@ -96,7 +89,6 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
             password = password
         )
     }
-
 }
 
 @Module
