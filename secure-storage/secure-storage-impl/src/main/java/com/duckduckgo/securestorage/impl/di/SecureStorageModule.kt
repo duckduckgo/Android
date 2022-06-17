@@ -19,6 +19,9 @@ package com.duckduckgo.securestorage.impl.di
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.impl.DerivedKeySecretFactory
+import com.duckduckgo.securestorage.impl.LegacyDerivedKeySecretFactory
+import com.duckduckgo.securestorage.impl.RealDerivedKeySecretFactory
 import com.duckduckgo.securestorage.impl.SecureStorageKeyProvider
 import com.duckduckgo.securestorage.store.RealSecureStorageKeyRepository
 import com.duckduckgo.securestorage.store.RealSecureStorageRepository
@@ -33,6 +36,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import net.sqlcipher.database.SupportFactory
+import javax.inject.Named
 
 @Module
 @ContributesTo(AppScope::class)
@@ -68,4 +72,17 @@ object SecureStorageModule {
     @Provides
     fun providesSecureStorageRepository(websiteLoginCredentialsDao: WebsiteLoginCredentialsDao): SecureStorageRepository =
         RealSecureStorageRepository(websiteLoginCredentialsDao)
+}
+
+@Module
+@ContributesTo(AppScope::class)
+object SecureStorageKeyModule {
+    @Provides
+    @Named("DerivedKeySecretFactoryFor26Up")
+    fun provideDerivedKeySecretFactoryFor26Up(): DerivedKeySecretFactory = RealDerivedKeySecretFactory()
+
+    @Provides
+    @Named("DerivedKeySecretFactoryForLegacy")
+    fun provideDerivedKeySecretFactoryForLegacy(): DerivedKeySecretFactory = LegacyDerivedKeySecretFactory()
+
 }
