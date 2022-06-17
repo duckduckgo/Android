@@ -27,18 +27,18 @@ import javax.inject.Inject
 /**
  * This class is responsible for generating new ByteArray passwords/passphrase that can be used for any purpose
  */
-interface PasswordGenerator {
-    fun generatePassword(): ByteArray
+interface RandomBytesGenerator {
+    fun generateBytes(size: Int): ByteArray
 }
 
 @ContributesBinding(AppScope::class)
-class RealPasswordGenerator @Inject constructor(
+class RealRandomBytesGenerator @Inject constructor(
     private val appBuildConfig: AppBuildConfig
-) : PasswordGenerator {
+) : RandomBytesGenerator {
 
     @SuppressLint("NewApi")
-    override fun generatePassword(): ByteArray {
-        return ByteArray(32).apply {
+    override fun generateBytes(size: Int): ByteArray {
+        return ByteArray(size).apply {
             if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
                 SecureRandom.getInstanceStrong().nextBytes(this)
             } else {
