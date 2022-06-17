@@ -7,6 +7,7 @@ describe('Cookie', () => {
             expect(cki.name).toEqual('foo')
             expect(cki.value).toEqual('bar=bar&foo=foo&John=Doe&Doe=John')
             expect(cki.maxAge).toEqual('1000')
+            // @ts-ignore
             expect(cki.domain).toEqual('.example.com')
         })
     })
@@ -17,6 +18,7 @@ describe('Cookie', () => {
             expect(cki.getExpiry()).toBeLessThan(0)
         })
         it('cookie expires in the future', () => {
+            // @ts-ignore
             const expectedExpiry = (new Date('Wed, 21 Aug 2030 20:00:00 UTC') - new Date()) / 1000
             const cki = new Cookie('jsdata=783; expires= Wed, 21 Aug 2030 20:00:00 UTC; Secure; SameSite=Lax')
             expect(cki.getExpiry()).toBeCloseTo(expectedExpiry, 0)

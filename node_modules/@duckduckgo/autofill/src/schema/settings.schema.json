@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/AutofillSettings",
+  "title": "AutofillSettings",
+  "type": "object",
+  "properties": {
+    "featureToggles": {
+      "title": "FeatureToggles",
+      "$id": "#/definitions/FeatureToggles",
+      "description": "These are toggles used throughout the application to enable/disable features fully",
+      "type": "object",
+      "properties": {
+        "inputType_credentials": {
+          "type": "boolean"
+        },
+        "inputType_identities": {
+          "type": "boolean"
+        },
+        "inputType_creditCards": {
+          "type": "boolean"
+        },
+        "emailProtection": {
+          "type": "boolean"
+        },
+        "password_generation": {
+          "type": "boolean"
+        },
+        "credentials_saving": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "inputType_credentials",
+        "inputType_identities",
+        "inputType_creditCards",
+        "emailProtection",
+        "password_generation",
+        "credentials_saving"
+      ]
+    }
+  },
+  "required": [
+    "featureToggles"
+  ]
+}

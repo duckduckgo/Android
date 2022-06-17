@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/GetRuntimeConfigurationRequest",
+  "title": "GetRuntimeConfigurationRequest",
+  "description": "This method does not currently send any data"
+}

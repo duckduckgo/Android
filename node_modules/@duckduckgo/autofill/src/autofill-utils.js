@@ -21,41 +21,23 @@ const sendAndWaitForAnswer = (msgOrFn, expectedResponse) => {
 
     return new Promise((resolve) => {
         const handler = e => {
-            if (e.origin !== window.origin) return
-            if (!e.data || (e.data && !(e.data[expectedResponse] || e.data.type === expectedResponse))) return
-
+            if (e.origin !== window.origin) {
+                console.log(`❌ origin-mismatch e.origin(${e.origin}) !== window.origin(${window.origin})`)
+                return
+            }
+            if (!e.data) {
+                console.log('❌ event.data missing')
+                return
+            }
+            if (!(e.data[expectedResponse] || e.data.type === expectedResponse)) {
+                console.log('❌ event.data or event.data.type mismatch', JSON.stringify(e.data))
+                return
+            }
             resolve(e.data)
             window.removeEventListener('message', handler)
         }
         window.addEventListener('message', handler)
     })
-}
-
-/**
- * @param {GlobalConfig} globalConfig
- * @param [processConfig]
- * @return {boolean}
- */
-const autofillEnabled = (globalConfig, processConfig) => {
-    if (!globalConfig.contentScope) {
-        // Return enabled for platforms that haven't implemented the config yet
-        return true
-    }
-
-    const { contentScope, userUnprotectedDomains, userPreferences } = globalConfig
-
-    // Check config on Apple platforms
-    const processedConfig = processConfig(contentScope, userUnprotectedDomains, userPreferences)
-    return isAutofillEnabledFromProcessedConfig(processedConfig)
-}
-
-const isAutofillEnabledFromProcessedConfig = (processedConfig) => {
-    const site = processedConfig.site
-    if (site.isBroken || !site.enabledFeatures.includes('autofill')) {
-        return false
-    }
-
-    return true
 }
 
 // Access the original setter (needed to bypass React's implementation on mobile)
@@ -181,7 +163,8 @@ const safeExecute = (el, fn) => {
                 // The browser doesn't support Intersection Observer v2, falling back to v1 behavior.
                 change.isVisible = true
             }
-            if (change.isIntersecting && change.isVisible) {
+            // todo(Shane): Why is this broken on windows...
+            if (change.isIntersecting) {
                 fn()
             }
         }
@@ -290,8 +273,6 @@ const isLikelyASubmitButton = (el) => {
 export {
     notifyWebApp,
     sendAndWaitForAnswer,
-    isAutofillEnabledFromProcessedConfig,
-    autofillEnabled,
     setValue,
     safeExecute,
     isVisible,

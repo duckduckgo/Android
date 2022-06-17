@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/RuntimeConfiguration",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "Runtime Configuration Schema",
+  "description": "Required Properties to enable an instance of RuntimeConfiguration",
+  "properties": {
+    "contentScope": {
+      "$ref": "#/definitions/ContentScope"
+    },
+    "userUnprotectedDomains": {
+      "type": "array",
+      "items": {}
+    },
+    "userPreferences": {
+      "$ref": "#/definitions/UserPreferences"
+    }
+  },
+  "required": [
+    "contentScope",
+    "userPreferences",
+    "userUnprotectedDomains"
+  ],
+  "definitions": {
+    "ContentScope": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "features": {
+          "$ref": "#/definitions/ContentScopeFeatures"
+        },
+        "unprotectedTemporary": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "features",
+        "unprotectedTemporary"
+      ],
+      "title": "ContentScope"
+    },
+    "ContentScopeFeatures": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/ContentScopeFeatureItem"
+      },
+      "title": "ContentScopeFeatures"
+    },
+    "ContentScopeFeatureItem": {
+      "type": "object",
+      "properties": {
+        "exceptions": {
+          "type": "array",
+          "items": {}
+        },
+        "state": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "exceptions",
+        "state"
+      ],
+      "title": "ContentScopeFeatureItem"
+    },
+    "UserPreferences": {
+      "type": "object",
+      "properties": {
+        "debug": {
+          "type": "boolean"
+        },
+        "platform": {
+          "$ref": "#/definitions/Platform"
+        },
+        "features": {
+          "$ref": "#/definitions/UserPreferencesFeatures"
+        }
+      },
+      "required": [
+        "debug",
+        "features",
+        "platform"
+      ],
+      "title": "UserPreferences"
+    },
+    "UserPreferencesFeatures": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UserPreferencesFeatureItem"
+      },
+      "title": "UserPreferencesFeatures"
+    },
+    "UserPreferencesFeatureItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/Settings"
+        }
+      },
+      "required": [
+        "settings"
+      ],
+      "title": "UserPreferencesFeatureItem"
+    },
+    "Settings": {
+      "type": "object",
+      "additionalProperties": true,
+      "title": "Settings"
+    },
+    "Platform": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "ios",
+            "macos",
+            "windows",
+            "extension",
+            "android",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Platform"
+    }
+  }
+}
