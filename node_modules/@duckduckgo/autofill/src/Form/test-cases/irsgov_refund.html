@@ -1,0 +1,140 @@
+<!-- https://sa.www4.irs.gov/irfof/lang/en/irfofgetstatus.jsp -->
+<form name="form1" method="post" action="../../IRServlet?app=IRFOF&amp;action=refund" onsubmit="return validateForm();">
+
+    <input type="hidden" name="selectLanguage" value="en">
+
+    <input type="hidden" name="usertype" value="taxpayer">
+
+
+
+    <div id="floatright" class="changelanguagelink">
+        <a href="../../IRServlet?app=IRFOF&amp;selectLanguage=sp" tabindex="7" title="Haga clic en este enlace si quiere la versión de esta página en español.">Obtener Estado de Reembolso</a>
+    </div>
+
+    <h2>Get Refund Status</h2>
+    Please enter your Social Security Number, your Filing Status and the refund amount as shown on your tax return.
+
+    <div class="smallcontent">*See our
+        <a href="javascript:privacy_notice()" tabindex="8" title="Please select this link to display the Privacy Notice.">
+            Privacy	Notice</a>
+        regarding our request for your personal information.
+    </div>
+
+    <img src="/irfof/images/en/1x1-grey.gif" width="650" height="1" alt="">
+
+    <div id="leftcontent">
+        <div class="datalabels">
+            Social Security Number
+            <img src="/irfof/images/en/red-arrow.gif" width="15" height="14" alt="">
+        </div>
+        <label for="Social Security Number">
+			<span class="smallcontent">
+				You must enter the
+				<a href="javascript:makeNewWindowSSN()" tabindex="9" title="Please select this link for help with Social Security Number.">
+					SSN or IRS Individual Taxpayer Identification Number shown on your tax return</a>.
+			</span>
+        </label>
+    </div>
+    <div id="rightcontent">
+        <fieldset class="fieldset" title="Please enter Social Security Number here">
+            <legend class="label-names">Please enter Social Security Number here.</legend>
+            <input tabindex="10" type="password" name="TIN3" id="TIN3" size="3" maxlength="3" onkeyup="numericOnly(this,'',false,'all'); autoComplete(document.forms[0],this);" value="" autocomplete="off" inputmode="numeric" data-manual-scoring="unknown">
+            -
+            <input tabindex="11" type="password" name="TIN2" id="TIN2" size="2" maxlength="2" onkeyup="numericOnly(this,'',false,'all'); autoComplete(document.forms[0],this);" value="" autocomplete="off" inputmode="numeric" data-manual-scoring="unknown">
+            -
+            <input tabindex="12" type="text" name="TIN5" id="TIN5" size="5" maxlength="5" onkeyup="TIN5Validate(this);" value="" autocomplete="off" inputmode="numeric" data-manual-scoring="unknown">
+            <label for="TIN3" class="label-names">
+                Please enter the first three digits of your Social Security Number.
+            </label>
+            <label for="TIN2" class="label-names">
+                Please enter the second two digits of your Social Security Number.
+            </label>
+            <label for="TIN5" class="label-names">
+                Please enter the last four digits of your Social Security Number.
+            </label>
+        </fieldset>
+    </div>
+    <br>
+    <img src="/irfof/images/en/1x1-grey.gif" width="650" height="1" alt="">
+    <div id="leftcontent">
+        <div class="datalabels">
+            Filing Status
+            <img src="/irfof/images/en/red-arrow.gif" width="15" height="14" alt="">
+        </div>
+        <label for="Filing Status">
+			<span class="smallcontent">
+				Please select the
+				<a href="javascript:makeNewWindowFS()" tabindex="13" title="Please select this link for help with Filing Status.">
+					Filing Status shown on your tax return</a>.
+			</span>
+        </label>
+    </div>
+    <div id="rightcontent">
+        <fieldset title="Please select a Filing Status here." class="fieldset">
+            <legend class="label-names">
+                Please select a Filing Status here.
+            </legend>
+            <input tabindex="14" type="radio" name="filingStatus" id="filingStatus1" value="1">
+            <label for="filingStatus1">
+                Single
+            </label>
+            <br>
+            <input tabindex="15" type="radio" name="filingStatus" id="filingStatus2" value="2">
+            <label for="filingStatus2">
+                Married-Filing Joint Return
+            </label>
+            <br>
+            <input tabindex="16" type="radio" name="filingStatus" id="filingStatus3" value="3">
+            <label for="filingStatus3">
+                Married-Filing Separate Return
+            </label>
+            <br>
+            <input tabindex="17" type="radio" name="filingStatus" id="filingStatus4" value="4">
+            <label for="filingStatus4">
+                Head of Household
+            </label>
+            <br>
+            <input tabindex="18" type="radio" name="filingStatus" id="filingStatus5" value="5">
+            <label for="filingStatus5">
+                Qualifying Widow(er)
+            </label>
+        </fieldset>
+    </div>
+    <img src="/irfof/images/en/1x1-grey.gif" width="650" height="1" alt="">
+    <div id="leftcontent">
+        <div class="datalabels">
+            Refund Amount
+            <img src="/irfof/images/en/red-arrow.gif" width="15" height="14" alt="">
+        </div>
+        <label for="Refund Amount">
+			<span class="smallcontent">
+				You must enter the exact whole dollar
+				<a href="javascript:makeNewWindowRefAmt()" tabindex="19" title="Please select this link for help with Refund Amount.">
+					Refund Amount shown on your tax return</a>.
+				Providing the exact whole dollar amount is essential to receiving the correct response.<br>
+			</span>
+        </label>
+    </div>
+    <div id="rightcontent">
+        <fieldset title="Please enter Refund Amount here." class="fieldset">
+            <legend class="label-names">
+                Please enter Refund Amount here.
+            </legend>
+            $ <input tabindex="20" type="text" id="refundAmount" name="refundAmount" maxlength="13" size="13" value="" onblur="validateAmount(this,true)" inputmode="decimal" data-manual-scoring="unknown">
+            <label for="refundAmount" class="label-names">
+                Please enter Refund Amount here.
+            </label>
+        </fieldset>
+    </div>
+
+    <div id="button">
+        <fieldset title="Please select this button to continue getting your Refund Status." class="fieldset">
+            <legend class="label-names">Submit Button</legend>
+            <input tabindex="21" type="submit" name="Submit2" id="Submit2" title="Please select this button to continue getting your Refund Status." value="Submit" data-manual-submit>
+            <label for="Submit2" class="label-names">
+                Please select this button to continue getting your Refund Status.
+            </label>
+            <br>
+        </fieldset>
+    </div>
+</form>

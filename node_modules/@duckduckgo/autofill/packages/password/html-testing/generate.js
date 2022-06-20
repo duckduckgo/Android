@@ -23,7 +23,7 @@ const manualEntries = {
 const joined = [...Object.entries(manualEntries), ...Object.entries(rules)]
 const outputs = []
 const password = new Password({
-    getRandomValues: (v) => require('crypto').randomFillSync(v)
+    getRandomValues: (/** @type {any} */ v) => require('crypto').randomFillSync(v)
 })
 
 for (let [domain, value] of joined) {

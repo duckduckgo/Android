@@ -1,0 +1,828 @@
+<!-- https://www.disneyworld.eu/login -->
+<form novalidate="" ng-submit="vm.register()" name="vm.create"
+      class="ng-pristine ng-invalid ng-invalid-required ng-valid-maxlength ng-valid-pattern ng-invalid-m-i-s-s-i-n-g_-v-a-l-u-e ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-r-i-m ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-o-o_-s-h-o-r-t ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-o-o_-l-o-n-g ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-m-i-s-s-i-n-g_-e-x-p-e-c-t-e-d_-c-h-a-r-s ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-c-r-e-d-i-t-c-a-r-d ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-l-i-k-e_-p-h-o-n-e_-n-u-m-b-e-r">
+    <section class="section section-your-account-fields"><!-- ngIf: vm.flow === 'identity' && vm.guest.profile.email -->
+        <div class="field-group ng-isolate-scope" sequence="name-fields" context="create" model="vm.guest.profile"
+             render-config="vm.renderConfig" is-inline="true"><!-- ngIf: visible('prefix') -->
+            <!-- end ngIf: visible('prefix') --><!-- ngIf: visible('firstName') -->
+            <!-- end ngIf: visible('firstName') --><!-- ngIf: visible('middleName') -->
+            <!-- end ngIf: visible('middleName') --><!-- ngIf: visible('lastName') -->
+            <!-- end ngIf: visible('lastName') --><!-- ngIf: visible('pronunciationName') -->
+            <!-- ngIf: visible('suffix') -->
+            <div class="field field-prefix ng-scope ng-isolate-scope" sequencekey="prefix"
+                 ng-class="{ 'field-required': vm.config.prefix.required }" field-error-when="create.error.prefix"
+                 context="context" ng-if="visible('prefix')" model="model" config="config.profile"
+                 show-placeholder="showPlaceholders"><label><span
+                    class="name ng-binding">Prefix (optional)</span><select ng-model="vm.model.prefix"
+                                                                            ng-options="prefix.value as prefix.label for prefix in vm.prefixes | localeSort"
+                                                                            ng-class="{ placeholder: !vm.model.prefix }"
+                                                                            aria-label="Prefix (optional)"
+                                                                            class="ng-pristine ng-valid placeholder ng-touched"
+                                                                            tabindex="0" aria-invalid="false">
+                <option value="" ng-disabled="vm.required" class="ng-binding">Prefix (optional)</option>
+                <option value="0" label="Miss">Miss</option>
+                <option value="1" label="Mr">Mr</option>
+                <option value="2" label="Mrs">Mrs</option>
+                <option value="3" label="Ms">Ms</option>
+                <option value="4" label="Mx.">Mx.</option>
+            </select>
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-prefix"
+                     notify="create.error.prefix" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </label></div>
+            <div class="field field-first-name ng-scope ng-isolate-scope badgeable field-required"
+                 sequencekey="first-name" ng-class="{ 'field-required': vm.config.firstName.required }"
+                 field-error-when="create.error.firstName" context="context" ng-if="visible('firstName')" model="model"
+                 config="config.profile"><label><span class="name ng-binding">First Name</span>
+                <!-- ngIf: vm.config.firstName.disabled --> <!-- ngIf: !vm.config.firstName.disabled --><span
+                        ng-if="!vm.config.firstName.disabled" class="input-wrapper ng-scope"><input type="text"
+                                                                                                    name="firstName"
+                                                                                                    placeholder="First Name"
+                                                                                                    aria-label="First Name"
+                                                                                                    maxlength="64"
+                                                                                                    autocomplete="given-name"
+                                                                                                    autocorrect="off"
+                                                                                                    spellcheck="false"
+                                                                                                    ng-required="vm.config.firstName.required"
+                                                                                                    ng-model="vm.model.firstName"
+                                                                                                    did-validate=""
+                                                                                                    class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-maxlength"
+                                                                                                    aria-invalid="false"
+                                                                                                    tabindex="0"
+                                                                                                    aria-describedby="notification-create-error-firstName"
+                                                                                                    required="required"
+                                                                                                    data-manual-scoring="firstName"
+                                                                                                    aria-required="true"></span>
+                <!-- end ngIf: !vm.config.firstName.disabled -->
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-firstName"
+                     notify="create.error.firstName" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </label></div>
+            <div class="field field-middle-name ng-scope ng-isolate-scope badgeable" sequencekey="middle-name"
+                 ng-class="{ 'field-required': vm.config.middleName.required }"
+                 field-error-when="create.error.middleName" context="context" ng-if="visible('middleName')"
+                 model="model" config="config.profile"><label><span
+                    class="name ng-binding">Middle Name (optional)</span> <!-- ngIf: vm.config.middleName.disabled -->
+                <!-- ngIf: !vm.config.middleName.disabled --><span ng-if="!vm.config.middleName.disabled"
+                                                                   class="input-wrapper ng-scope"><input type="text"
+                                                                                                         name="middleName"
+                                                                                                         placeholder="Middle Name (optional)"
+                                                                                                         aria-label="Middle Name (optional)"
+                                                                                                         maxlength="20"
+                                                                                                         autocomplete="additional-name"
+                                                                                                         autocorrect="off"
+                                                                                                         spellcheck="false"
+                                                                                                         ng-required="vm.config.middleName.required"
+                                                                                                         ng-model="vm.model.middleName"
+                                                                                                         did-validate=""
+                                                                                                         class="ng-pristine ng-untouched ng-valid ng-valid-maxlength ng-valid-required"
+                                                                                                         aria-invalid="false"
+                                                                                                         tabindex="0"
+                                                                                                         aria-describedby="notification-create-error-middleName"
+                                                                                                         data-manual-scoring="middleName"
+                                                                                                         aria-required="false"></span>
+                <!-- end ngIf: !vm.config.middleName.disabled -->
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-middleName"
+                     notify="create.error.middleName" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </label></div>
+            <div class="field field-last-name ng-scope ng-isolate-scope badgeable field-required"
+                 sequencekey="last-name" ng-class="{ 'field-required': vm.config.lastName.required }"
+                 field-error-when="create.error.lastName" context="context" ng-if="visible('lastName')" model="model"
+                 config="config.profile"><label><span class="name ng-binding">Last Name</span>
+                <!-- ngIf: vm.config.lastName.disabled --> <!-- ngIf: !vm.config.lastName.disabled --><span
+                        ng-if="!vm.config.lastName.disabled" class="input-wrapper ng-scope"><input type="text"
+                                                                                                   name="lastName"
+                                                                                                   placeholder="Last Name"
+                                                                                                   aria-label="Last Name"
+                                                                                                   maxlength="64"
+                                                                                                   autocomplete="family-name"
+                                                                                                   autocorrect="off"
+                                                                                                   spellcheck="false"
+                                                                                                   ng-required="vm.config.lastName.required"
+                                                                                                   ng-model="vm.model.lastName"
+                                                                                                   did-validate=""
+                                                                                                   class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-maxlength"
+                                                                                                   aria-invalid="false"
+                                                                                                   tabindex="0"
+                                                                                                   aria-describedby="notification-create-error-lastName"
+                                                                                                   required="required"
+                                                                                                   data-manual-scoring="lastName"
+                                                                                                   aria-required="true"></span>
+                <!-- end ngIf: !vm.config.lastName.disabled -->
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-lastName"
+                     notify="create.error.lastName" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </label></div>
+            <div class="field field-suffix ng-scope ng-isolate-scope" sequencekey="suffix"
+                 ng-class="{ 'field-required': vm.config.suffix.required }" field-error-when="create.error.suffix"
+                 context="context" ng-if="visible('suffix')" model="model" config="config.profile"
+                 show-placeholder="showPlaceholders"><label><span
+                    class="name ng-binding">Suffix (optional)</span><select ng-model="vm.model.suffix"
+                                                                            ng-options="suffix.value as suffix.label for suffix in vm.suffixes | localeSort"
+                                                                            ng-class="{ placeholder: !vm.model.suffix }"
+                                                                            aria-label="Suffix (optional)"
+                                                                            class="ng-pristine ng-untouched ng-valid placeholder"
+                                                                            tabindex="0" aria-invalid="false">
+                <option value="" ng-disabled="vm.config.suffix.required" class="ng-binding" aria-disabled="false">Suffix
+                    (optional)
+                </option>
+                <option value="0" label="2nd">2nd</option>
+                <option value="1" label="3rd">3rd</option>
+                <option value="2" label="CPA">CPA</option>
+                <option value="3" label="DC">DC</option>
+                <option value="4" label="DDS">DDS</option>
+                <option value="5" label="Esq.">Esq.</option>
+                <option value="6" label="II">II</option>
+                <option value="7" label="III">III</option>
+                <option value="8" label="IV">IV</option>
+                <option value="9" label="JD">JD</option>
+                <option value="10" label="Jr">Jr</option>
+                <option value="11" label="MD">MD</option>
+                <option value="12" label="PhD">PhD</option>
+                <option value="13" label="Sr">Sr</option>
+                <option value="14" label="V">V</option>
+                <option value="15" label="VI">VI</option>
+                <option value="16" label="VM">VM</option>
+            </select>
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-suffix"
+                     notify="create.error.suffix" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </label></div><!-- end ngIf: visible('suffix') --></div>
+        <div class="field-group ng-isolate-scope ng-valid" tabindex="-1" ng-model="vm.guest"
+             render-config="vm.renderConfig" ui-config="vm.uiConfig" form="vm.create" context="create"
+             aria-invalid="false"><!-- ngIf: renderConfig.profile.email.visible -->
+            <div class="field field-email ng-scope badgeable field-required"
+                 ng-class="{'field-required': renderConfig.profile.email.required}"
+                 field-error-when="create.error.email" ng-if="renderConfig.profile.email.visible"><label><span
+                    class="name ng-binding">Email Address</span> <span class="input-wrapper"><input type="email"
+                                                                                                    name="email"
+                                                                                                    placeholder="Email Address"
+                                                                                                    aria-label="Email Address"
+                                                                                                    maxlength="200"
+                                                                                                    autocapitalize="none"
+                                                                                                    autocomplete="email"
+                                                                                                    autocorrect="off"
+                                                                                                    spellcheck="false"
+                                                                                                    ng-model="model.profile.email"
+                                                                                                    ng-pattern="/^[^\@\<\&quot;\>]+\@[^\.\@\<\&quot;\>]+\.[^\.\@\<\&quot;\>]+[^\@\<\&quot;\>]*$/"
+                                                                                                    ng-required="renderConfig.profile.email.required"
+                                                                                                    ng-keyup="checkIfMatchesVerifyEmail($event)"
+                                                                                                    did-disable-validate=""
+                                                                                                    did-validate="true"
+                                                                                                    class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-pattern ng-valid-maxlength"
+                                                                                                    aria-invalid="false"
+                                                                                                    tabindex="0"
+                                                                                                    aria-describedby="notification-create-error-email"
+                                                                                                    required="required"
+                                                                                                    data-manual-scoring="emailAddress"
+                                                                                                    aria-required="true"></span></label>
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-email"
+                     notify="create.error.email" notify-parameters="{loginValue: model.profile.email}" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </div><!-- end ngIf: renderConfig.profile.email.visible -->
+            <!-- ngIf: !renderConfig.profile.email.required && renderConfig.profile.username --></div>
+        <!-- ngIf: vm.renderConfig.profile.parentEmail.visible --><!-- ngIf: vm.uiConfig.emailConfirmation -->
+        <!-- ngIf: vm.renderConfig.displayName.enabled && vm.renderConfig.displayName.visible -->
+        <div context="create" render-config="vm.renderConfig" model="vm.guest.profile.phones"
+             filter-on="['mobile', 'night', 'day']" default-country="vm.phoneCountry" class="ng-isolate-scope">
+            <!-- ngRepeat: phone in phones --></div><!-- uiView:  -->
+        <section ui-view="" class="workflow workflow-create-set-password ng-scope section-empty"></section>
+        <!-- ngIf: vm.renderConfig.profile.password.visible -->
+        <div class="field-group ng-scope ng-isolate-scope" context="create" new-password="vm.guest.password"
+             verify-new-password="vm.verifyNewPassword" ng-if="vm.renderConfig.profile.password.visible">
+            <div class="field field-new-password badgeable" field-error-when="create.error.newPassword" ng-class="{
+            'field-valid': vm.newPasswordModelCtrl.$valid,
+            'show-rules': vm.showRules
+         }" tabindex="-1"><label><span class="name ng-isolate-scope"
+                                       did-translate="create.label.NEW_PASSWORD">Password</span> <span
+                    class="input-wrapper"><input type="password" name="newPassword" placeholder="Password"
+                                                 aria-label="Password" autocapitalize="none" autocomplete="new-password"
+                                                 autocorrect="off" spellcheck="false" ng-model="vm.newPassword"
+                                                 ng-required="::(vm.context === 'create' || vm.context === 'ppu')"
+                                                 ng-change="vm.onChange()" ng-focus="vm.onFocus()" ng-blur="vm.onBlur()"
+                                                 ng-keydown="vm.onKeydown($event)" ng-trim="false"
+                                                 ng-model-options="{ allowInvalid: true }" did-aria-fix=""
+                                                 did-new-password-validate=""
+                                                 class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-invalid-m-i-s-s-i-n-g_-v-a-l-u-e ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-r-i-m ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-o-o_-s-h-o-r-t ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-t-o-o_-l-o-n-g ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-m-i-s-s-i-n-g_-e-x-p-e-c-t-e-d_-c-h-a-r-s ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-c-r-e-d-i-t-c-a-r-d ng-valid-i-n-v-a-l-i-d_-v-a-l-u-e_-p-a-s-s-w-o-r-d_-l-i-k-e_-p-h-o-n-e_-n-u-m-b-e-r"
+                                                 aria-invalid="false" tabindex="0"
+                                                 aria-describedby="notification-create-error-newPassword"
+                                                 required="required" aria-required="true" data-manual-scoring="password"></span>
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-newPassword"
+                     notify="create.error.newPassword" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+                <div class="password-rules message" aria-expanded="">
+                    <div class="strength-meter ng-isolate-scope" ng-class="vm.barStrength" score="0" context="create">
+                        <div class="meter-bar" aria-hidden="true">
+                            <div class="step">1</div>
+                            <div class="step">2</div>
+                            <div class="step">3</div>
+                            <div class="step">4</div>
+                            <div class="step">5</div>
+                            <div class="step">6</div>
+                        </div>
+                        <span class="meter-state state-weak ng-binding"
+                              ng-bind="(vm.context + '.info.newPassword.STRENGTH_WEAK' | translate)">Weak</span> <span
+                            class="meter-state state-ok ng-binding"
+                            ng-bind="(vm.context + '.info.newPassword.STRENGTH_OK' | translate)">OK</span> <span
+                            class="meter-state state-strong ng-binding"
+                            ng-bind="(vm.context + '.info.newPassword.STRENGTH_STRONG' | translate)">Strong</span> <span
+                            class="meter-state state-invalid ng-binding"
+                            ng-bind="(vm.context + '.info.newPassword.STRENGTH_INVALID' | translate)">Invalid</span>
+                    </div>
+                    <ul>
+                        <li ng-class="!vm.newPasswordModelCtrl.$error.MISSING_VALUE &amp;&amp;
+                                  (vm.newPasswordModelCtrl.$error.INVALID_VALUE_PASSWORD_TOO_SHORT ||
+                                  vm.newPasswordModelCtrl.$error.INVALID_VALUE_PASSWORD_TOO_LONG)
+                                  ? 'message-error' : 'message-info'"
+                            ng-bind="( vm.context + '.info.newPassword.PASSWORD_LENGTH' | translate )"
+                            class="ng-binding message-info">Enter at least 6 characters.
+                        </li>
+                        <li class="message-info ng-binding"
+                            ng-bind="( vm.context + '.info.newPassword.SUGGESTION' | translate )">Don't use the password
+                            from another account.
+                        </li>
+                        <li ng-class="!vm.newPasswordModelCtrl.$error.MISSING_VALUE &amp;&amp;
+                                  vm.newPasswordModelCtrl.$error.INVALID_VALUE_PASSWORD_MISSING_EXPECTED_CHARS
+                                  ? 'message-error' : 'message-info'"
+                            ng-bind="( vm.context + '.info.newPassword.ALLOWED_VALUES' | translate )"
+                            class="ng-binding message-info">Use letters together with spaces, numbers, or symbols
+                            (!@#$%^&amp;*).
+                        </li>
+                    </ul>
+                </div>
+            </label></div><!-- ngIf: ::!vm.confirmPassword -->
+            <div ng-if="::!vm.confirmPassword" class="block show-password-action ng-scope"><label
+                    class="checkbox"><input type="checkbox" name="togglePasswordDisplay" ng-model="vm.displayPassword"
+                                            ng-change="vm.showPasswordClick()" class="ng-pristine ng-untouched ng-valid"
+                                            tabindex="0" aria-checked="false" aria-invalid="false"> <span
+                    class="name ng-isolate-scope"
+                    did-translate="update.header.SHOW_PASSWORD">Show password</span></label></div>
+            <!-- end ngIf: ::!vm.confirmPassword --><!-- ngIf: ::vm.confirmPassword --></div>
+        <!-- end ngIf: vm.renderConfig.profile.password.visible -->
+        <!-- ngIf: ::vm.touchid.isEnabled() && !vm.isSocial --></section>
+    <section class="section section-gender-dob-lang"><!-- ngIf: vm.renderConfig.profile.gender.visible -->
+        <!-- ngIf: vm.renderConfig.profile.dateOfBirth.visible && vm.featureRenderConfig.showMaskedDob -->
+        <div class="field-group ng-scope ng-isolate-scope ng-valid field-required"
+             ng-class="{ 'field-required': renderConfig.required }" notifications="create" tabindex="-1"
+             aria-invalid="false" ng-model="vm.guest.profile.dateOfBirth" context="create"
+             render-config="vm.renderConfig.profile.dateOfBirth"
+             ng-if="vm.renderConfig.profile.dateOfBirth.visible &amp;&amp; vm.featureRenderConfig.showMaskedDob">
+            <!-- ngIf: !initialValue -->
+            <div class="field field-dob badgeable ng-scope"
+                 ng-class="{ 'field-use-external-name': context === 'create.dob' }"
+                 field-error-when="create.error.dateOfBirth" ng-if="!initialValue"><span class="name ng-binding"
+                                                                                         ng-bind="label">Birth Date</span>
+                <span class="input-wrapper"><label class="mask placeholder" data-mask="Birth Date dd/mm/yyyy"
+                                                   ng-class="{ placeholder: !model }"><input type="tel"
+                                                                                             name="dateOfBirth"
+                                                                                             autocapitalize="none"
+                                                                                             autocomplete="bday"
+                                                                                             autocorrect="off"
+                                                                                             spellcheck="false"
+                                                                                             ng-blur="blur()"
+                                                                                             aria-describedby="notification-create-error-dateOfBirth" data-manual-scoring="birthday"> <input
+                        type="hidden" name="dateOfBirth" ng-model="model" ng-required="required"
+                        class="ng-pristine ng-untouched ng-valid ng-valid-required" tabindex="0"
+                        aria-describedby="notification-create-error-dateOfBirth" aria-required="false"
+                        aria-invalid="false"></label></span>
+                <div class="message-error message no-height ng-isolate-scope" id="notification-create-error-dateOfBirth"
+                     notify="create.error.dateOfBirth" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+            </div><!-- end ngIf: !initialValue --><!-- ngIf: initialValue --></div>
+        <!-- end ngIf: vm.renderConfig.profile.dateOfBirth.visible && vm.featureRenderConfig.showMaskedDob -->
+        <!-- ngIf: vm.renderConfig.profile.dateOfBirth.visible && vm.featureRenderConfig.showSelectDob -->
+        <!-- ngIf: vm.renderConfig.profile.languagePreference.visible --></section>
+    <!-- ngIf: vm.renderConfig.profile.addresses.type -->
+    <section class="section section-addresses ng-scope" ng-if="vm.renderConfig.profile.addresses.type">
+        <!-- ngRepeat: address in vm.guest.profile.addresses -->
+        <section class="section section-address ng-scope ng-isolate-scope"
+                 ng-repeat="address in vm.guest.profile.addresses" address="address" render-config="vm.renderConfig"
+                 context="create"><h3 class="title title-secondary ng-isolate-scope"
+                                      did-translate="address.headers.BILLING">Billing Address</h3>
+            <div class="field-group ng-isolate-scope" addresstype="BILLING" context="context" config="config"
+                 address="address" render-config="renderConfig"><!-- ngIf: config.country.visible -->
+                <div class="field field-address-country ng-scope ng-isolate-scope field-required field-use-placeholder"
+                     ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                     field-error-when="create.error.addresses.BILLING.country" ng-if="config.country.visible"
+                     context="create"><span class="name ng-binding">Country/Region</span><select name="address.country"
+                                                                                                 aria-label="Country/Region"
+                                                                                                 ng-model="address.country"
+                                                                                                 ng-options="country.value as country.label for country in ::countries"
+                                                                                                 ng-class="{ placeholder: !address.country }"
+                                                                                                 ng-disabled="config.disabled"
+                                                                                                 class="ng-pristine ng-untouched ng-valid placeholder"
+                                                                                                 tabindex="0"
+                                                                                                 aria-disabled="false"
+                                                                                                 aria-invalid="false" data-manual-scoring="addressCountryCode">
+                    <option value="" ng-disabled="config.required" ng-bind="showPlaceholder ? label : '--'"
+                            class="ng-binding" aria-disabled="true" disabled="disabled">Country/Region
+                    </option>
+                    <option value="0" label="Malta">Malta</option>
+                    <option value="1" label="Afghanistan">Afghanistan</option>
+                    <option value="2" label="Aland Islands">Aland Islands</option>
+                    <option value="3" label="Albania">Albania</option>
+                    <option value="4" label="Algeria">Algeria</option>
+                    <option value="5" label="American Samoa">American Samoa</option>
+                    <option value="6" label="Andorra">Andorra</option>
+                    <option value="7" label="Angola">Angola</option>
+                    <option value="8" label="Anguilla">Anguilla</option>
+                    <option value="9" label="Antarctica">Antarctica</option>
+                    <option value="10" label="Antigua and Barbuda">Antigua and Barbuda</option>
+                    <option value="11" label="Argentina">Argentina</option>
+                    <option value="12" label="Armenia">Armenia</option>
+                    <option value="13" label="Aruba">Aruba</option>
+                    <option value="14" label="Australia">Australia</option>
+                    <option value="15" label="Austria">Austria</option>
+                    <option value="16" label="Azerbaijan">Azerbaijan</option>
+                    <option value="17" label="Bahamas">Bahamas</option>
+                    <option value="18" label="Bahrain">Bahrain</option>
+                    <option value="19" label="Bangladesh">Bangladesh</option>
+                    <option value="20" label="Barbados">Barbados</option>
+                    <option value="21" label="Belarus">Belarus</option>
+                    <option value="22" label="Belgium">Belgium</option>
+                    <option value="23" label="Belize">Belize</option>
+                    <option value="24" label="Benin">Benin</option>
+                    <option value="25" label="Bermuda">Bermuda</option>
+                    <option value="26" label="Bhutan">Bhutan</option>
+                    <option value="27" label="Bolivia">Bolivia</option>
+                    <option value="28" label="Bonaire, Sint Eustatius and Saba">Bonaire, Sint Eustatius and Saba
+                    </option>
+                    <option value="29" label="Bosnia and Herzegowina">Bosnia and Herzegowina</option>
+                    <option value="30" label="Botswana">Botswana</option>
+                    <option value="31" label="Bouvet Island">Bouvet Island</option>
+                    <option value="32" label="Brazil">Brazil</option>
+                    <option value="33" label="British Indian Ocean Territory">British Indian Ocean Territory</option>
+                    <option value="34" label="Brunei Darussalam">Brunei Darussalam</option>
+                    <option value="35" label="Bulgaria">Bulgaria</option>
+                    <option value="36" label="Burkina Faso">Burkina Faso</option>
+                    <option value="37" label="Burundi">Burundi</option>
+                    <option value="38" label="Cambodia">Cambodia</option>
+                    <option value="39" label="Cameroon">Cameroon</option>
+                    <option value="40" label="Canada">Canada</option>
+                    <option value="41" label="Cape Verde">Cape Verde</option>
+                    <option value="42" label="Cayman Islands">Cayman Islands</option>
+                    <option value="43" label="Central African Republic">Central African Republic</option>
+                    <option value="44" label="Chad">Chad</option>
+                    <option value="45" label="Chile">Chile</option>
+                    <option value="46" label="China">China</option>
+                    <option value="47" label="Christmas Island">Christmas Island</option>
+                    <option value="48" label="Cocos (Keeling) Islands">Cocos (Keeling) Islands</option>
+                    <option value="49" label="Colombia">Colombia</option>
+                    <option value="50" label="Comoros">Comoros</option>
+                    <option value="51" label="Congo">Congo</option>
+                    <option value="52" label="Cook Islands">Cook Islands</option>
+                    <option value="53" label="Costa Rica">Costa Rica</option>
+                    <option value="54" label="Cote d'Ivoire">Cote d'Ivoire</option>
+                    <option value="55" label="Croatia">Croatia</option>
+                    <option value="56" label="Curacao">Curacao</option>
+                    <option value="57" label="Cyprus">Cyprus</option>
+                    <option value="58" label="Czech Republic">Czech Republic</option>
+                    <option value="59" label="Democratic Republic of Congo">Democratic Republic of Congo</option>
+                    <option value="60" label="Denmark">Denmark</option>
+                    <option value="61" label="Djibouti">Djibouti</option>
+                    <option value="62" label="Dominica">Dominica</option>
+                    <option value="63" label="Dominican Republic">Dominican Republic</option>
+                    <option value="64" label="Ecuador">Ecuador</option>
+                    <option value="65" label="Egypt">Egypt</option>
+                    <option value="66" label="El Salvador">El Salvador</option>
+                    <option value="67" label="Equatorial Guinea">Equatorial Guinea</option>
+                    <option value="68" label="Eritrea">Eritrea</option>
+                    <option value="69" label="Estonia">Estonia</option>
+                    <option value="70" label="Ethiopia">Ethiopia</option>
+                    <option value="71" label="Falkland Islands">Falkland Islands</option>
+                    <option value="72" label="Faroe Islands">Faroe Islands</option>
+                    <option value="73" label="Fiji">Fiji</option>
+                    <option value="74" label="Finland">Finland</option>
+                    <option value="75" label="France">France</option>
+                    <option value="76" label="French Guiana">French Guiana</option>
+                    <option value="77" label="French Polynesia">French Polynesia</option>
+                    <option value="78" label="French Southern Territories">French Southern Territories</option>
+                    <option value="79" label="Gabon">Gabon</option>
+                    <option value="80" label="Gambia">Gambia</option>
+                    <option value="81" label="Georgia">Georgia</option>
+                    <option value="82" label="Germany">Germany</option>
+                    <option value="83" label="Ghana">Ghana</option>
+                    <option value="84" label="Gibraltar">Gibraltar</option>
+                    <option value="85" label="Great Britain">Great Britain</option>
+                    <option value="86" label="Greece">Greece</option>
+                    <option value="87" label="Greenland">Greenland</option>
+                    <option value="88" label="Grenada">Grenada</option>
+                    <option value="89" label="Guadeloupe">Guadeloupe</option>
+                    <option value="90" label="Guam">Guam</option>
+                    <option value="91" label="Guatemala">Guatemala</option>
+                    <option value="92" label="Guernsey">Guernsey</option>
+                    <option value="93" label="Guinea">Guinea</option>
+                    <option value="94" label="Guinea-Bissau">Guinea-Bissau</option>
+                    <option value="95" label="Guyana">Guyana</option>
+                    <option value="96" label="Haiti">Haiti</option>
+                    <option value="97" label="Heard and McDonald Islands">Heard and McDonald Islands</option>
+                    <option value="98" label="Holy See (Vatican City State)">Holy See (Vatican City State)</option>
+                    <option value="99" label="Honduras">Honduras</option>
+                    <option value="100" label="Hong Kong">Hong Kong</option>
+                    <option value="101" label="Hungary">Hungary</option>
+                    <option value="102" label="Iceland">Iceland</option>
+                    <option value="103" label="India">India</option>
+                    <option value="104" label="Indonesia">Indonesia</option>
+                    <option value="105" label="Iraq">Iraq</option>
+                    <option value="106" label="Ireland">Ireland</option>
+                    <option value="107" label="Isle of Man">Isle of Man</option>
+                    <option value="108" label="Israel">Israel</option>
+                    <option value="109" label="Italy">Italy</option>
+                    <option value="110" label="Jamaica">Jamaica</option>
+                    <option value="111" label="Japan">Japan</option>
+                    <option value="112" label="Jersey">Jersey</option>
+                    <option value="113" label="Jordan">Jordan</option>
+                    <option value="114" label="Kazakhstan">Kazakhstan</option>
+                    <option value="115" label="Kenya">Kenya</option>
+                    <option value="116" label="Kiribati">Kiribati</option>
+                    <option value="117" label="Korea, Republic of">Korea, Republic of</option>
+                    <option value="118" label="Kosovo">Kosovo</option>
+                    <option value="119" label="Kuwait">Kuwait</option>
+                    <option value="120" label="Kyrgystan">Kyrgystan</option>
+                    <option value="121" label="Laos">Laos</option>
+                    <option value="122" label="Latvia">Latvia</option>
+                    <option value="123" label="Lebanon">Lebanon</option>
+                    <option value="124" label="Lesotho">Lesotho</option>
+                    <option value="125" label="Liberia">Liberia</option>
+                    <option value="126" label="Libya">Libya</option>
+                    <option value="127" label="Liechtenstein">Liechtenstein</option>
+                    <option value="128" label="Lithuania">Lithuania</option>
+                    <option value="129" label="Luxembourg">Luxembourg</option>
+                    <option value="130" label="Macau">Macau</option>
+                    <option value="131" label="Macedonia">Macedonia</option>
+                    <option value="132" label="Madagascar">Madagascar</option>
+                    <option value="133" label="Malawi">Malawi</option>
+                    <option value="134" label="Malaysia">Malaysia</option>
+                    <option value="135" label="Maldives">Maldives</option>
+                    <option value="136" label="Mali">Mali</option>
+                    <option value="137" label="Malta">Malta</option>
+                    <option value="138" label="Marshall Islands">Marshall Islands</option>
+                    <option value="139" label="Martinique">Martinique</option>
+                    <option value="140" label="Mauritania">Mauritania</option>
+                    <option value="141" label="Mauritius">Mauritius</option>
+                    <option value="142" label="Mayotte">Mayotte</option>
+                    <option value="143" label="Mexico">Mexico</option>
+                    <option value="144" label="Micronesia">Micronesia</option>
+                    <option value="145" label="Moldova, Republic of">Moldova, Republic of</option>
+                    <option value="146" label="Monaco">Monaco</option>
+                    <option value="147" label="Mongolia">Mongolia</option>
+                    <option value="148" label="Montenegro">Montenegro</option>
+                    <option value="149" label="Montserrat">Montserrat</option>
+                    <option value="150" label="Morocco">Morocco</option>
+                    <option value="151" label="Mozambique">Mozambique</option>
+                    <option value="152" label="Myanmar">Myanmar</option>
+                    <option value="153" label="Namibia">Namibia</option>
+                    <option value="154" label="Nauru">Nauru</option>
+                    <option value="155" label="Nepal">Nepal</option>
+                    <option value="156" label="Netherlands">Netherlands</option>
+                    <option value="157" label="New Calendonia">New Calendonia</option>
+                    <option value="158" label="New Zealand">New Zealand</option>
+                    <option value="159" label="Nicaragua">Nicaragua</option>
+                    <option value="160" label="Niger">Niger</option>
+                    <option value="161" label="Nigeria">Nigeria</option>
+                    <option value="162" label="Niue">Niue</option>
+                    <option value="163" label="Norfolk Island">Norfolk Island</option>
+                    <option value="164" label="Northern Mariana Islands">Northern Mariana Islands</option>
+                    <option value="165" label="Norway">Norway</option>
+                    <option value="166" label="Oman">Oman</option>
+                    <option value="167" label="Pakistan">Pakistan</option>
+                    <option value="168" label="Palau">Palau</option>
+                    <option value="169" label="Palestine">Palestine</option>
+                    <option value="170" label="Panama">Panama</option>
+                    <option value="171" label="Papua New Guinea">Papua New Guinea</option>
+                    <option value="172" label="Paraguay">Paraguay</option>
+                    <option value="173" label="Peru">Peru</option>
+                    <option value="174" label="Philippines">Philippines</option>
+                    <option value="175" label="Pitcairn">Pitcairn</option>
+                    <option value="176" label="Poland">Poland</option>
+                    <option value="177" label="Portugal">Portugal</option>
+                    <option value="178" label="Puerto Rico">Puerto Rico</option>
+                    <option value="179" label="Qatar">Qatar</option>
+                    <option value="180" label="Reunion">Reunion</option>
+                    <option value="181" label="Romania">Romania</option>
+                    <option value="182" label="Russian Federation">Russian Federation</option>
+                    <option value="183" label="Rwanda">Rwanda</option>
+                    <option value="184" label="Saint Barthelemy">Saint Barthelemy</option>
+                    <option value="185" label="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+                    <option value="186" label="Saint Lucia">Saint Lucia</option>
+                    <option value="187" label="Saint Martin (French part)">Saint Martin (French part)</option>
+                    <option value="188" label="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines
+                    </option>
+                    <option value="189" label="Samoa">Samoa</option>
+                    <option value="190" label="San Marino">San Marino</option>
+                    <option value="191" label="Sao Tome and Principe">Sao Tome and Principe</option>
+                    <option value="192" label="Saudi Arabia">Saudi Arabia</option>
+                    <option value="193" label="Senegal">Senegal</option>
+                    <option value="194" label="Serbia">Serbia</option>
+                    <option value="195" label="Seychelles">Seychelles</option>
+                    <option value="196" label="Sierra Leone">Sierra Leone</option>
+                    <option value="197" label="Singapore">Singapore</option>
+                    <option value="198" label="Sint Maarten (Dutch part)">Sint Maarten (Dutch part)</option>
+                    <option value="199" label="Slovakia">Slovakia</option>
+                    <option value="200" label="Slovenia">Slovenia</option>
+                    <option value="201" label="Soloman Islands">Soloman Islands</option>
+                    <option value="202" label="Somalia">Somalia</option>
+                    <option value="203" label="South Africa">South Africa</option>
+                    <option value="204" label="South Georgia">South Georgia</option>
+                    <option value="205" label="South Sudan">South Sudan</option>
+                    <option value="206" label="Spain">Spain</option>
+                    <option value="207" label="Sri Lanka">Sri Lanka</option>
+                    <option value="208" label="St. Helena">St. Helena</option>
+                    <option value="209" label="St. Pierre and Miquelon">St. Pierre and Miquelon</option>
+                    <option value="210" label="Suriname">Suriname</option>
+                    <option value="211" label="Svalbard and Jan Mayen">Svalbard and Jan Mayen</option>
+                    <option value="212" label="Swaziland">Swaziland</option>
+                    <option value="213" label="Sweden">Sweden</option>
+                    <option value="214" label="Switzerland">Switzerland</option>
+                    <option value="215" label="Taiwan">Taiwan</option>
+                    <option value="216" label="Tajikistan">Tajikistan</option>
+                    <option value="217" label="Tanzania">Tanzania</option>
+                    <option value="218" label="Thailand">Thailand</option>
+                    <option value="219" label="Timor-Leste">Timor-Leste</option>
+                    <option value="220" label="Togo">Togo</option>
+                    <option value="221" label="Tokelau">Tokelau</option>
+                    <option value="222" label="Tonga">Tonga</option>
+                    <option value="223" label="Trinidad and Tobago">Trinidad and Tobago</option>
+                    <option value="224" label="Tunisia">Tunisia</option>
+                    <option value="225" label="Turkey">Turkey</option>
+                    <option value="226" label="Turkmenistan">Turkmenistan</option>
+                    <option value="227" label="Turks and Caicos Islands">Turks and Caicos Islands</option>
+                    <option value="228" label="Tuvalu">Tuvalu</option>
+                    <option value="229" label="Uganda">Uganda</option>
+                    <option value="230" label="Ukraine">Ukraine</option>
+                    <option value="231" label="United Arab Emirates">United Arab Emirates</option>
+                    <option value="232" label="United Kingdom">United Kingdom</option>
+                    <option value="233" label="United States">United States</option>
+                    <option value="234" label="United States Minor Outlying Islands">United States Minor Outlying
+                        Islands
+                    </option>
+                    <option value="235" label="Uruguay">Uruguay</option>
+                    <option value="236" label="Uzbekistan">Uzbekistan</option>
+                    <option value="237" label="Vanuatu">Vanuatu</option>
+                    <option value="238" label="Venezuela">Venezuela</option>
+                    <option value="239" label="Vietnam">Vietnam</option>
+                    <option value="240" label="Virgin Islands (British)">Virgin Islands (British)</option>
+                    <option value="241" label="Virgin Islands (US)">Virgin Islands (US)</option>
+                    <option value="242" label="Wallis and Fatuna">Wallis and Fatuna</option>
+                    <option value="243" label="Western Sahara">Western Sahara</option>
+                    <option value="244" label="Yemen">Yemen</option>
+                    <option value="245" label="Zambia">Zambia</option>
+                    <option value="246" label="Zimbabwe">Zimbabwe</option>
+                </select>
+                    <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                         notify="create.error.addresses.BILLING.country" style="">
+                        <div class="container"><!-- ngRepeat: item in parsedItems -->
+                            <!-- ngIf: parsedListItems.length --></div>
+                    </div>
+                </div><!-- end ngIf: config.country.visible --><!-- ngIf: config.line1.visible -->
+                <!-- end ngIf: config.line1.visible --><!-- ngIf: config.line2.visible -->
+                <!-- end ngIf: config.line2.visible --><!-- ngIf: config.line3.visible -->
+                <!-- ngIf: config.city.visible --><!-- end ngIf: config.city.visible -->
+                <!-- ngIf: config.stateProvince.visible --><!-- end ngIf: config.stateProvince.visible -->
+                <!-- ngIf: config.postalCode.visible -->
+                <div class="field field-address-line1 field-required field-use-placeholder" sequencekey="line1"
+                     ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                     field-error-when="create.error.addresses.BILLING.line1" ng-if="config.line1.visible"
+                     line-name="line1" context="create"><label><span class="name ng-binding">Address</span> <span
+                        class="input-wrapper"><input type="text" name="addresses.BILLING.line1" placeholder="Address"
+                                                     aria-label="Address" maxlength="200" autocomplete="address-line1"
+                                                     autocorrect="off" spellcheck="false" ng-model="address[lineName]"
+                                                     ng-disabled="config.disabled" ng-required="config.required"
+                                                     did-validate=""
+                                                     class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-maxlength"
+                                                     aria-invalid="false" tabindex="0" aria-describedby="notification-"
+                                                     aria-disabled="false" required="required"
+                                                     aria-required="true" data-manual-scoring="addressStreet"></span></label>
+                    <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                         notify="create.error.addresses.BILLING.line1" style="">
+                        <div class="container"><!-- ngRepeat: item in parsedItems -->
+                            <!-- ngIf: parsedListItems.length --></div>
+                    </div>
+                </div>
+                <div class="field field-address-line2 field-use-placeholder" sequencekey="line2"
+                     ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                     field-error-when="create.error.addresses.BILLING.line2" ng-if="config.line2.visible"
+                     line-name="line2" context="create"><label><span class="name ng-binding">Line 2 (optional)</span>
+                    <span class="input-wrapper"><input type="text" name="addresses.BILLING.line2"
+                                                       placeholder="Line 2 (optional)" aria-label="Line 2 (optional)"
+                                                       maxlength="200" autocomplete="address-line2" autocorrect="off"
+                                                       spellcheck="false" ng-model="address[lineName]"
+                                                       ng-disabled="config.disabled" ng-required="config.required"
+                                                       did-validate=""
+                                                       class="ng-pristine ng-untouched ng-valid ng-valid-maxlength ng-valid-required"
+                                                       aria-invalid="false" tabindex="0"
+                                                       aria-describedby="notification-" aria-disabled="false"
+                                                       aria-required="false" data-manual-scoring="addressStreet2"></span></label>
+                    <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                         notify="create.error.addresses.BILLING.line2" style="">
+                        <div class="container"><!-- ngRepeat: item in parsedItems -->
+                            <!-- ngIf: parsedListItems.length --></div>
+                    </div>
+                </div>
+                <div class="field field-address-city ng-scope ng-isolate-scope badgeable field-required field-use-placeholder"
+                     sequencekey="city"
+                     ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                     field-error-when="create.error.addresses.BILLING.city" ng-if="config.city.visible"
+                     context="create"><span class="name ng-binding">Town/City</span> <span class="input-wrapper"><input
+                        type="text" name="addresses.BILLING.city" placeholder="Town/City" aria-label="Town/City"
+                        maxlength="200" autocomplete="on" autocorrect="on" spellcheck="default" ng-model="address.city"
+                        ng-disabled="config.disabled" ng-required="config.required" did-validate=""
+                        class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-maxlength"
+                        aria-invalid="false" tabindex="0" aria-describedby="notification-" aria-disabled="false"
+                        required="required" aria-required="true" data-manual-scoring="addressCity"></span>
+                    <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                         notify="create.error.addresses.BILLING.city" style="">
+                        <div class="container"><!-- ngRepeat: item in parsedItems -->
+                            <!-- ngIf: parsedListItems.length --></div>
+                    </div>
+                </div>
+                <div class="field-group ng-scope ng-isolate-scope" sequencekey="state-province"
+                     ng-if="config.stateProvince.visible" context="create">
+                    <div class="field field-address-region field-required field-use-placeholder"
+                         ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                         ng-switch="inputType" field-error-when="create.error.addresses.BILLING.stateProvince"><label
+                            ng-switch="inputType"><span class="name ng-binding">County</span><select
+                            name="address.stateProvince" aria-label="County" ng-model="address.stateProvince"
+                            ng-options="region.value as region.label for region in regions"
+                            ng-class="{ placeholder: !address.stateProvince }" ng-show="regions"
+                            class="ng-pristine ng-untouched ng-valid placeholder" tabindex="0" aria-hidden="false"
+                            aria-invalid="false" data-manual-scoring="addressProvince">
+                        <option value="" ng-bind="showPlaceholder ? label : '--'" class="ng-binding">County</option>
+                        <option value="0" label="Alabama">Alabama</option>
+                        <option value="1" label="Alaska">Alaska</option>
+                        <option value="2" label="Arizona">Arizona</option>
+                        <option value="3" label="Arkansas">Arkansas</option>
+                        <option value="4" label="California">California</option>
+                        <option value="5" label="Colorado">Colorado</option>
+                        <option value="6" label="Connecticut">Connecticut</option>
+                        <option value="7" label="Delaware">Delaware</option>
+                        <option value="8" label="District of Columbia">District of Columbia</option>
+                        <option value="9" label="Florida">Florida</option>
+                        <option value="10" label="Georgia">Georgia</option>
+                        <option value="11" label="Hawaii">Hawaii</option>
+                        <option value="12" label="Idaho">Idaho</option>
+                        <option value="13" label="Illinois">Illinois</option>
+                        <option value="14" label="Indiana">Indiana</option>
+                        <option value="15" label="Iowa">Iowa</option>
+                        <option value="16" label="Kansas">Kansas</option>
+                        <option value="17" label="Kentucky">Kentucky</option>
+                        <option value="18" label="Louisiana">Louisiana</option>
+                        <option value="19" label="Maine">Maine</option>
+                        <option value="20" label="Maryland">Maryland</option>
+                        <option value="21" label="Massachusetts">Massachusetts</option>
+                        <option value="22" label="Michigan">Michigan</option>
+                        <option value="23" label="Minnesota">Minnesota</option>
+                        <option value="24" label="Mississippi">Mississippi</option>
+                        <option value="25" label="Missouri">Missouri</option>
+                        <option value="26" label="Montana">Montana</option>
+                        <option value="27" label="Nebraska">Nebraska</option>
+                        <option value="28" label="Nevada">Nevada</option>
+                        <option value="29" label="New Hampshire">New Hampshire</option>
+                        <option value="30" label="New Jersey">New Jersey</option>
+                        <option value="31" label="New Mexico">New Mexico</option>
+                        <option value="32" label="New York">New York</option>
+                        <option value="33" label="North Carolina">North Carolina</option>
+                        <option value="34" label="North Dakota">North Dakota</option>
+                        <option value="35" label="Ohio">Ohio</option>
+                        <option value="36" label="Oklahoma">Oklahoma</option>
+                        <option value="37" label="Oregon">Oregon</option>
+                        <option value="38" label="Pennsylvania">Pennsylvania</option>
+                        <option value="39" label="Rhode Island">Rhode Island</option>
+                        <option value="40" label="South Carolina">South Carolina</option>
+                        <option value="41" label="South Dakota">South Dakota</option>
+                        <option value="42" label="Tennessee">Tennessee</option>
+                        <option value="43" label="Texas">Texas</option>
+                        <option value="44" label="Utah">Utah</option>
+                        <option value="45" label="Vermont">Vermont</option>
+                        <option value="46" label="Virginia">Virginia</option>
+                        <option value="47" label="Washington">Washington</option>
+                        <option value="48" label="West Virginia">West Virginia</option>
+                        <option value="49" label="Wisconsin">Wisconsin</option>
+                        <option value="50" label="Wyoming">Wyoming</option>
+                    </select><input type="text" name="address.stateProvince" placeholder="County" aria-label="County"
+                                    maxlength="200" autocomplete="address-level1" autocorrect="on" spellcheck="default"
+                                    ng-model="address.stateProvince" ng-hide="regions"
+                                    class="ng-pristine ng-untouched ng-valid ng-valid-maxlength ng-hide" tabindex="0"
+                                    aria-describedby="notification-" aria-invalid="false"
+                                    aria-hidden="[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object],[object Object]" data-manual-scoring="addressProvince"></label>
+                        <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                             notify="create.error.addresses.BILLING.stateProvince" style="">
+                            <div class="container"><!-- ngRepeat: item in parsedItems -->
+                                <!-- ngIf: parsedListItems.length --></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field field-address-postal-code field-compact ng-scope ng-isolate-scope badgeable field-required field-use-placeholder"
+                     sequencekey="postal-code"
+                     ng-class="{ 'field-required': config.required, 'field-use-external-name': showLabel, 'field-use-placeholder': showPlaceholder }"
+                     field-error-when="create.error.addresses.BILLING.postalCode" ng-if="config.postalCode.visible"
+                     context="create"><span class="name ng-binding">Postcode</span> <span class="input-wrapper"><input
+                        type="text" name="addresses.BILLING.postalCode" maxlength="100" autocomplete="postal-code"
+                        autocorrect="off" spellcheck="false" placeholder="Postcode" aria-label="Postcode"
+                        ng-model="address.postalCode" ng-disabled="config.disabled" ng-required="config.required"
+                        did-validate=""
+                        class="ng-pristine ng-untouched ng-invalid ng-invalid-required ng-valid-maxlength"
+                        aria-invalid="false" tabindex="0" aria-describedby="notification-" aria-disabled="false"
+                        required="required" aria-required="true" data-manual-scoring="addressPostalCode"></span>
+                    <div class="message-error message no-height ng-isolate-scope" id="notification-"
+                         notify="create.error.addresses.BILLING.postalCode" style="">
+                        <div class="container"><!-- ngRepeat: item in parsedItems -->
+                            <!-- ngIf: parsedListItems.length --></div>
+                    </div>
+                </div><!-- end ngIf: config.postalCode.visible --></div>
+        </section><!-- end ngRepeat: address in vm.guest.profile.addresses --></section>
+    <!-- end ngIf: vm.renderConfig.profile.addresses.type --><!-- ngIf: vm.isCastMemberEnabled -->
+    <!-- ngIf: vm.showMarketing -->
+    <div class="field-group ng-scope ng-isolate-scope" context="create" model="vm.guest.marketing"
+         ng-if="vm.showMarketing" show-header="vm.isCastMemberEnabled" render-config="vm.renderConfig">
+        <!-- ngIf: showHeader --><!-- ngIf: marketingItems.length && toDisplayListHeader && descriptionText -->
+        <!-- ngRepeat: item in marketingItems -->
+        <div class="field ng-scope" ng-repeat="item in marketingItems"><label class="checkbox"><input type="checkbox"
+                                                                                                      ng-checked="item.checked"
+                                                                                                      ng-model="item.checked"
+                                                                                                      ng-change="toggleChecked(item)"
+                                                                                                      tabindex="0"
+                                                                                                      class="ng-pristine ng-untouched ng-valid"
+                                                                                                      aria-checked="false"
+                                                                                                      aria-invalid="false">
+            <span class="name ng-isolate-scope"
+                  did-translate="epc.list.4_Disney_Vacation_Club_L_My_Disney_Photopass_(MXP)_L_TPR_ABD_LOB_99988_TPR_AULANI_100001_TPR_DI_100002_TPR_GLDN_OAK_100000_WDIGFamilySites_disCruiseLine.text">Yes! I would like to receive, by email, special offers and updates about <b>Disney Parks &amp; Resorts</b> businesses and other products and services of <a
+                    target="_blank"
+                    href="https://privacy.thewaltdisneycompany.com/en/definitions/#The-Walt-Disney-Family-of-Companies"
+                    rel="noopener"><b>The Walt Disney Family of Companies</b></a>.</span></label></div>
+        <!-- end ngRepeat: item in marketingItems --></div><!-- end ngIf: vm.showMarketing -->
+    <!-- ngIf: vm.showLegal -->
+    <section class="section section-communication ng-scope" ng-if="vm.showLegal">
+        <!-- ngRepeat: document in vm.legalDocuments -->
+        <div ng-class="{'field-group': model.displayCheckbox, block: !model.displayCheckbox}" model="document"
+             ng-repeat="document in vm.legalDocuments" display-checkbox="true"
+             class="ng-scope ng-isolate-scope field-group"><!-- ngIf: model.displayCheckbox -->
+            <div class="field field-required field-tou" field-error-when="legal.WDW-NGE2-TOU.error"
+                 ng-if="model.displayCheckbox">
+                <div class="message-error message no-height ng-isolate-scope" id="notification-legal-WDW-NGE2-TOU-error"
+                     notify="legal.WDW-NGE2-TOU.error" style="">
+                    <div class="container"><!-- ngRepeat: item in parsedItems -->
+                        <!-- ngIf: parsedListItems.length --></div>
+                </div>
+                <label class="checkbox"><input type="checkbox" ng-model="model.accepted"
+                                               class="ng-pristine ng-untouched ng-valid"
+                                               aria-describedby="notification-legal-WDW-NGE2-TOU-error" tabindex="0"
+                                               aria-checked="false" aria-invalid="false"> <span
+                        class="name ng-isolate-scope" did-translate="legal.WDW-NGE2-TOU_create">I have read and agree to the <a
+                        class="underlined" target="_blank"
+                        href="https://disneyworld.disney.go.com/park-experience-terms-conditions/" rel="noopener">My Disney Experience Terms and Conditions</a>.</span></label>
+            </div><!-- end ngIf: model.displayCheckbox --><!-- ngIf: !model.displayCheckbox --></div>
+        <!-- end ngRepeat: document in vm.legalDocuments -->
+        <div ng-class="{'field-group': model.displayCheckbox, block: !model.displayCheckbox}" model="document"
+             ng-repeat="document in vm.legalDocuments" display-checkbox="false" class="ng-scope ng-isolate-scope block">
+            <!-- ngIf: model.displayCheckbox --><!-- ngIf: !model.displayCheckbox --><p
+                class="legal ng-scope ng-isolate-scope" ng-if="!model.displayCheckbox"
+                did-translate="legal.cookie_gtou_ppv2_proxy_create">By creating an account, you agree to our <a
+                target="_blank" href="https://disneytermsofuse.com/english/" rel="noopener">Terms of Use</a> and
+            acknowledge that you have read our <a target="_blank"
+                                                  href="https://privacy.thewaltdisneycompany.com/en/current-privacy-policy/"
+                                                  rel="noopener">Privacy Policy</a>, <a target="_blank"
+                                                                                        href="https://privacy.thewaltdisneycompany.com/en/current-privacy-policy/cookies-policy"
+                                                                                        rel="noopener">Cookies
+                Policy</a> and <a target="_blank"
+                                  href="https://privacy.thewaltdisneycompany.com/en/current-privacy-policy/privacy-notice/"
+                                  rel="noopener">EU Privacy Rights</a>. <span did-expanding-text=""
+                                                                              class="expanding-text"><a href="#"
+                                                                                                        class="ng-scope">More...</a><span
+                    class="expandable ng-scope"></span></span></p><!-- end ngIf: !model.displayCheckbox --></div>
+        <!-- end ngRepeat: document in vm.legalDocuments --></section><!-- end ngIf: vm.showLegal -->
+    <!-- ngIf: (vm.isGalc && !vm.uiConfig.hideLegalCountry) && !vm.guest.legalAssertions -->
+    <section class="section section-legal-county ng-scope"
+             ng-if="(vm.isGalc &amp;&amp; !vm.uiConfig.hideLegalCountry) &amp;&amp; !vm.guest.legalAssertions">
+        <section ng-model="vm.guest" on-change-country-click="vm.setLegalCountry" ng-origin="CREATE"
+                 class="ng-isolate-scope ng-valid" tabindex="-1" aria-invalid="false"><!-- ngIf: !inline --><p
+                did-translate="create.legalCountry.status" ng-if="!inline" translate-compile=""
+                translate-values="{ homeCountry: ( 'countryLabels.' + countryCode | translate ), beginLink: '<a ng-click=&quot;onChangeCountryClick()&quot;>', endLink: '</a>'}"
+                class="ng-scope ng-isolate-scope">My home country/region: Malta. <a ng-click="onChangeCountryClick()"
+                                                                                    tabindex="0">Change</a>.</p>
+            <!-- end ngIf: !inline --><!-- ngIf: inline --></section>
+    </section><!-- end ngIf: (vm.isGalc && !vm.uiConfig.hideLegalCountry) && !vm.guest.legalAssertions -->
+    <section class="section section-submit">
+        <div class="btn-group"><!-- ngIf: !vm.isSetPassword() -->
+            <button class="btn btn-primary ng-scope ng-isolate-scope" ng-if="!vm.isSetPassword()"
+                    did-translate="create.SIGN_UP" type="submit" style="" data-manual-submit>Create Account
+            </button><!-- end ngIf: !vm.isSetPassword() --></div>
+    </section>
+</form>
