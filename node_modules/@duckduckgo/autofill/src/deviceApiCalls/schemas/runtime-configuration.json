@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "RuntimeConfiguration",
+  "description": "Required Properties to enable an instance of RuntimeConfiguration",
+  "properties": {
+    "contentScope": {
+      "title": "ContentScope",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "title": "ContentScopeFeatures",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "exceptions": {
+                "type": "array",
+                "items": {}
+              },
+              "state": {
+                "type": "string",
+                "enum": ["enabled", "disabled"]
+              },
+              "settings": {
+                "title": "ContentScopeFeaturesItem_Settings",
+                "type": "object"
+              }
+            },
+            "required": [
+              "exceptions",
+              "state"
+            ]
+          }
+        },
+        "unprotectedTemporary": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "features",
+        "unprotectedTemporary"
+      ]
+    },
+    "userUnprotectedDomains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" }
+        }
+      }
+    },
+    "userPreferences": {
+      "title": "UserPreferences",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "globalPrivacyControlValue": {
+          "type": "boolean"
+        },
+        "sessionKey": {
+          "type": "string"
+        },
+        "debug": {
+          "type": "boolean"
+        },
+        "platform": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "macos",
+                "windows",
+                "extension",
+                "android",
+                "unknown"
+              ]
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "features": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "settings": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "required": [
+              "settings"
+            ]
+          }
+        }
+      },
+      "required": [
+        "debug",
+        "features",
+        "platform"
+      ]
+    }
+  },
+  "required": [
+    "contentScope",
+    "userPreferences",
+    "userUnprotectedDomains"
+  ]
+}

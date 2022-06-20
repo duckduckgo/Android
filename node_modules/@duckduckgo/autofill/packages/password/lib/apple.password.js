@@ -40,7 +40,7 @@ const defaults = Object.freeze({
     defaultPasswordRules: constants.DEFAULT_PASSWORD_RULES,
     defaultRequiredCharacterSets: ['abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '0123456789'],
     /**
-     * @type {typeof window.crypto.getRandomValues | typeof import("crypto").randomFillSync | null}
+     * @type {typeof window.crypto.getRandomValues | null}
      */
     getRandomValues: null
 })
