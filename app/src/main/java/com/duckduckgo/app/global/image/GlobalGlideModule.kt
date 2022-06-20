@@ -24,9 +24,9 @@ import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
+import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
-import com.duckduckgo.app.browser.useragent.DefaultUserAgentModule
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
@@ -46,7 +46,7 @@ class GlobalGlideModule : AppGlideModule() {
                 val request = chain.request()
 
                 return@addInterceptor request.newBuilder()
-                    .header("User-Agent", getDefaultUserAgent(context))
+                    .header("User-Agent", getGlideUserAgent(context))
                     .build().run {
                         chain.proceed(this)
                     }
@@ -89,8 +89,8 @@ class GlobalGlideModule : AppGlideModule() {
         )
     }
 
-    private fun getDefaultUserAgent(context: Context): String {
-        // This is not great, but Glide Module can't be placed inside DI :|
-        return DefaultUserAgentModule().provideDefaultUserAgent(context)
+    private fun getGlideUserAgent(context: Context): String {
+        return "DuckDuckGo/${BuildConfig.VERSION_NAME.split(".").first()} " +
+            "(${context.applicationInfo.packageName}; Android API ${Build.VERSION.SDK_INT})"
     }
 }
