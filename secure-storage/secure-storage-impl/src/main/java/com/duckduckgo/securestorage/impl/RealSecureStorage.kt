@@ -18,7 +18,6 @@ package com.duckduckgo.securestorage.impl
 
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.securestorage.api.Result
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
@@ -39,20 +38,6 @@ class RealSecureStorage @Inject constructor(
 ) : SecureStorage {
 
     override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData()
-
-    override suspend fun authenticateUser(): Result {
-        // TODO (karl) Implement authentication. This is only relevant for L2. Note the expiry here will change once implemented.
-        return withContext(dispatchers.io()) {
-            Result.Success(expiryInMillis = System.currentTimeMillis() + DEFAULT_EXPIRY_IN_MILLIS)
-        }
-    }
-
-    override suspend fun authenticateUser(password: String): Result {
-        // TODO (karl) Implement authentication. This is only relevant for L2. Note the expiry here will change once implemented.
-        return withContext(dispatchers.io()) {
-            Result.Success(expiryInMillis = System.currentTimeMillis() + DEFAULT_EXPIRY_IN_MILLIS)
-        }
-    }
 
     override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials) {
         withContext(dispatchers.io()) {
@@ -148,9 +133,5 @@ class RealSecureStorage @Inject constructor(
                 l2DataTransformer.decrypt(_data, _iv)
             }
         }
-    }
-
-    companion object {
-        private const val DEFAULT_EXPIRY_IN_MILLIS = 30 * 60 * 1000
     }
 }
