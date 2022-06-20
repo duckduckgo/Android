@@ -24,6 +24,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':appbuildconfig-api')
+    implementation project(path: ':common')
     implementation project(path: ':di')
     implementation project(path: ':secure-storage-api')
     implementation project(path: ':secure-storage-store')
@@ -31,6 +32,7 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation Google.dagger
     implementation KotlinX.coroutines.core
+    implementation Square.okio
 
     implementation "net.zetetic:android-database-sqlcipher:_"
 }

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/StoreFormDataRequest",
+  "title": "StoreFormData Request",
+  "type": "object",
+  "description": "Autofill could send this data at any point. \n\nIt will **not** listen for a response, it's expected that the native side will handle",
+  "properties": {
+    "credentials": {
+      "type": "object",
+      "$id": "#/definitions/CredentialsOutgoing",
+      "properties": {
+        "username": {
+          "description": "Optional username",
+          "type": "string"
+        },
+        "password": {
+          "description": "Optional password",
+          "type": "string"
+        }
+      }
+    },
+    "identities": {
+      "description": "todo(Shane): Rename to identity",
+      "$ref": "#/definitions/Identity"
+    },
+    "creditCards": {
+      "description": "todo(Shane): Rename to creditCard",
+      "$ref": "#/definitions/CreditCard"
+    }
+  }
+}

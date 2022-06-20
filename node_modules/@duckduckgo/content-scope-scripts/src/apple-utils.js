@@ -12,6 +12,10 @@ function getTopLevelURL () {
     }
 }
 
+/**
+ * @param {URL} topLevelUrl
+ * @param {*} featureList
+ */
 function isUnprotectedDomain (topLevelUrl, featureList) {
     let unprotectedDomain = false
     const domainParts = topLevelUrl && topLevelUrl.host ? topLevelUrl.host.split('.') : []
@@ -28,21 +32,29 @@ function isUnprotectedDomain (topLevelUrl, featureList) {
     return unprotectedDomain
 }
 
-export function processConfig (data, userList, preferences) {
-    const topLevelUrl = getTopLevelURL()
+/**
+ * @param {*} data
+ * @param {string[]} userList
+ * @param {*} preferences
+ * @param {string|URL} [maybeTopLevelUrl]
+ */
+export function processConfig (data, userList, preferences, maybeTopLevelUrl) {
+    const topLevelUrl = maybeTopLevelUrl || getTopLevelURL()
     const allowlisted = userList.filter(domain => domain === topLevelUrl.host).length > 0
     const enabledFeatures = Object.keys(data.features).filter((featureName) => {
         const feature = data.features[featureName]
         return feature.state === 'enabled' && !isUnprotectedDomain(topLevelUrl, feature.exceptions)
     })
     const isBroken = isUnprotectedDomain(topLevelUrl, data.unprotectedTemporary)
-    preferences.site = {
-        domain: topLevelUrl.hostname,
-        isBroken,
-        allowlisted,
-        enabledFeatures
+    const prefs = {
+        ...preferences,
+        site: {
+            domain: topLevelUrl.hostname,
+            isBroken,
+            allowlisted,
+            enabledFeatures
+        },
+        cookie: {}
     }
-    // TODO
-    preferences.cookie = {}
-    return preferences
+    return prefs
 }

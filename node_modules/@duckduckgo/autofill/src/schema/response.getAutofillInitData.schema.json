@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/definitions/GetAutofillInitDataResponse",
+  "title": "GetAutofillInitDataResponse",
+  "type": "object",
+  "properties": {
+    "type": {
+      "title": "This is the 'type' field on message that may be sent back to the window",
+      "description": "Required on Android + Windows devices, optional on iOS",
+      "type": "string",
+      "const": "getAutofillInitDataResponse"
+    },
+    "success": {
+      "title": "GetAutofillInitDataResponse Success Response",
+      "$id": "#/definitions/AutofillInitData",
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Credentials"
+          }
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "creditCards": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "serializedInputContext": {
+          "description": "A clone of the `serializedInputContext` that was sent in the request",
+          "type": "string"
+        }
+      },
+      "required": [
+        "serializedInputContext",
+        "credentials",
+        "creditCards",
+        "identities"
+      ]
+    },
+    "error": {
+      "$ref": "#/definitions/GenericError"
+    }
+  },
+  "required": [
+    "success"
+  ]
+}

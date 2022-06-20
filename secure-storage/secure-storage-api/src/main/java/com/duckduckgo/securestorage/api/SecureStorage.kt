@@ -29,33 +29,16 @@ interface SecureStorage {
     fun canAccessSecureStorage(): Boolean
 
     /**
-     * This method authenticates the user without having to pass a user password. This method is relevant
-     * while the user password generation is still done programmatically within the secure storage. Once we support
-     * password creation, this method will be deprecated.
+     * This method adds a raw plaintext [WebsiteLoginCredentials] into the [SecureStorage].
      *
-     * @return Result.Success if no issues with authentication is encountered otherwise Result.Error
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
-    suspend fun authenticateUser(): Result
-
-    /**
-     * This method authenticates the user using a provided [password].
-     *
-     * @return Result.Success if no issues with authentication is encountered otherwise Result.Error
-     */
-    suspend fun authenticateUser(password: String): Result
-
-    /**
-     * This method adds a raw plaintext [WebsiteLoginCredentials] into the [SecureStorage]. This requires the user to be authenticated
-     * first see [authenticateUser].
-     *
-     * @throws UserNotAuthenticatedException if the user is not authenticated when calling this method
-     */
-    @Throws(UserNotAuthenticatedException::class)
+    @Throws(SecureStorageException::class)
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials)
 
     /**
      * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
-     * This does not require the user to be authenticated since [WebsiteLoginDetails] doesn't contain any L2 data.
+     * Only L1 encrypted data is returned by these function. This is best use when the need is only to access non-sensitive data.
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow emitting a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
@@ -63,7 +46,7 @@ interface SecureStorage {
 
     /**
      * This method returns all [WebsiteLoginDetails] stored in the [SecureStorage].
-     * This does not require the user to be authenticated since [WebsiteLoginDetails] doesn't contain any L2 data.
+     * Only L1 encrypted data is returned by these function. This is best use when the need is only to access non-sensitive data.
      *
      * @return Flow<List<WebsiteLoginDetails>> a flow containing a List of plain text WebsiteLoginDetails stored in SecureStorage.
      */
@@ -71,48 +54,46 @@ interface SecureStorage {
 
     /**
      * This method returns the [WebsiteLoginCredentials] with the [id] stored in the [SecureStorage].
-     * This requires the user to be authenticated.
+     * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
      * @return [WebsiteLoginCredentials] containing the plaintext password
-     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
-    @Throws(UserNotAuthenticatedException::class)
+    @Throws(SecureStorageException::class)
     suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentials
 
     /**
      * This method returns the [WebsiteLoginCredentials] with the [domain] stored in the [SecureStorage].
-     * This requires the user to be authenticated.
+     * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
      * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
      * containing the plaintext password
-     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
-    @Throws(UserNotAuthenticatedException::class)
+    @Throws(SecureStorageException::class)
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
 
     /**
      * This method returns all the [WebsiteLoginCredentials] stored in the [SecureStorage].
-     * This requires the user to be authenticated.
+     * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
      * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
      * containing the plaintext password
-     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
-    @Throws(UserNotAuthenticatedException::class)
+    @Throws(SecureStorageException::class)
     suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
 
     /**
      * This method updates an existing [WebsiteLoginCredentials] in the [SecureStorage].
-     * This requires the user to be authenticated.
      *
-     * @throws [UserNotAuthenticatedException] if the user is not authenticated when calling this method
+     * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
-    @Throws(UserNotAuthenticatedException::class)
+    @Throws(SecureStorageException::class)
     suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentials)
 
     /**
      * This method removes an existing [WebsiteLoginCredentials] associated with an [id] from the [SecureStorage].
-     * This does not require the user to be authenticated.
      */
     suspend fun deleteWebsiteLoginCredentials(id: Int)
 }
