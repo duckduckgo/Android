@@ -19,6 +19,7 @@ package com.duckduckgo.privacy.config.store.features.trackingparameters
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.privacy.config.store.*
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -30,6 +31,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@ExperimentalCoroutinesApi
 class RealTrackingParametersRepositoryTest {
 
     @get:Rule

@@ -22,6 +22,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
@@ -360,9 +361,11 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsTrackingParameterLinkThenTrackingParameterLinkTypeDetected() {
-        whenever(mockTrackingParameters.cleanTrackingParameters(anyString())).thenReturn("https://www.example.com/query.html")
+        whenever(mockTrackingParameters.cleanTrackingParameters(initiatingUrl = anyString(), url = anyString()))
+            .thenReturn("https://www.example.com/query.html")
         val expected = TrackingParameterLink::class
-        val actual = testee.determineType("https://www.example.com/query.html?utm_example=something")
+        val actual =
+            testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com/query.html?utm_example=something".toUri())
         assertEquals(expected, actual::class)
         assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
     }

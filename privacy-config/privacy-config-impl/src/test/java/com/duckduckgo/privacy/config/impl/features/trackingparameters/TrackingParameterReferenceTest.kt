@@ -74,7 +74,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() {
-        val cleanedUrl = testee.cleanTrackingParameters(testCase.testURL)
+        val cleanedUrl = testee.cleanTrackingParameters(initiatingUrl = testCase.initiatorURL, url = testCase.testURL)
         if (cleanedUrl != null) {
             assertEquals(testCase.expectURL, cleanedUrl)
         } else {
@@ -94,7 +94,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
         jsonObject.keys().forEach { key ->
             val trackingParametersFeature: TrackingParametersFeature? = jsonAdapter.fromJson(jsonObject.get(key).toString())
             exceptions.addAll(trackingParametersFeature!!.exceptions)
-            trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it.toRegex(RegexOption.IGNORE_CASE) })
+            trackingParameters.addAll(trackingParametersFeature.settings.parameters.map { it.toRegex() })
         }
         whenever(mockRepository.exceptions).thenReturn(exceptions)
         whenever(mockRepository.parameters).thenReturn(trackingParameters)
@@ -103,6 +103,7 @@ class TrackingParameterReferenceTest(private val testCase: TestCase) {
     data class TestCase(
         val name: String,
         val testURL: String,
+        val initiatorURL: String,
         val expectURL: String,
         val exceptPlatforms: List<String>
     )
