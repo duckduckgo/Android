@@ -26,6 +26,8 @@ import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX1
 import com.duckduckgo.app.browser.certificates.rootstore.IsrgRootX2
+import com.duckduckgo.app.browser.useragent.DefaultUserAgentModule
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.tls.HandshakeCertificates
 import timber.log.Timber
@@ -39,6 +41,20 @@ class GlobalGlideModule : AppGlideModule() {
         glide: Glide,
         registry: Registry
     ) {
+        val okHttpClientBuilder = OkHttpClient.Builder()
+            .addInterceptor { chain: Interceptor.Chain ->
+                val request = chain.request()
+
+                val defaultUserAgent = getDefaultUserAgent(context)
+                Timber.d("Use default UA for Glide requests - $defaultUserAgent")
+
+                return@addInterceptor request.newBuilder()
+                    .header("User-Agent", defaultUserAgent)
+                    .build().run {
+                        chain.proceed(this)
+                    }
+            }
+
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
             try {
                 Timber.d("Registering OkHttp-based ModelLoader for GlideUrl")
@@ -52,22 +68,32 @@ class GlobalGlideModule : AppGlideModule() {
                     .addPlatformTrustedCertificates()
                     .build()
 
-                val okHttpClient = OkHttpClient.Builder()
+                okHttpClientBuilder
                     .sslSocketFactory(handshakeCertificates.sslSocketFactory(), handshakeCertificates.trustManager)
-                    .build()
 
                 // use our custom okHttp instead of default HTTPUrlConnection
                 registry.replace(
                     GlideUrl::class.java,
                     InputStream::class.java,
-                    OkHttpUrlLoader.Factory(okHttpClient)
+                    OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
                 )
             } catch (t: Throwable) {
                 Timber.d("Error registering GlideModule for GlideUrl: $t")
                 super.registerComponents(context, glide, registry)
+                return
             }
-        } else {
-            super.registerComponents(context, glide, registry)
         }
+
+        // use our custom okHttp instead of default HTTPUrlConnection
+        registry.replace(
+            GlideUrl::class.java,
+            InputStream::class.java,
+            OkHttpUrlLoader.Factory(okHttpClientBuilder.build())
+        )
+    }
+
+    private fun getDefaultUserAgent(context: Context): String {
+        // This is not great, but Glide Module can't be placed inside DI :|
+        return DefaultUserAgentModule().provideDefaultUserAgent(context)
     }
 }
