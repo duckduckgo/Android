@@ -45,11 +45,8 @@ class GlobalGlideModule : AppGlideModule() {
             .addInterceptor { chain: Interceptor.Chain ->
                 val request = chain.request()
 
-                val defaultUserAgent = getDefaultUserAgent(context)
-                Timber.d("Use default UA for Glide requests - $defaultUserAgent")
-
                 return@addInterceptor request.newBuilder()
-                    .header("User-Agent", defaultUserAgent)
+                    .header("User-Agent", getDefaultUserAgent(context))
                     .build().run {
                         chain.proceed(this)
                     }
