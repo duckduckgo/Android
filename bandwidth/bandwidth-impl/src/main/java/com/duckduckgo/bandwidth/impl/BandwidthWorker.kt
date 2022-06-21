@@ -24,11 +24,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import com.squareup.anvil.annotations.ContributesTo
@@ -38,6 +37,7 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)
@@ -46,27 +46,6 @@ class BandwidthSchedulerModule {
     @IntoSet
     fun provideBandwidthScheduler(workManager: WorkManager, atpCohortManager: AtpCohortManager): LifecycleObserver {
         return BandwidthScheduler(workManager, atpCohortManager)
-    }
-
-    @Provides
-    @IntoSet
-    fun provideBandwidthWorkerInjectorPlugin(
-        bandwidthCollector: BandwidthCollector
-    ): WorkerInjectorPlugin {
-        return BandwidthWorkerInjectorPlugin(bandwidthCollector)
-    }
-}
-
-class BandwidthWorkerInjectorPlugin(
-    private val bandwidthCollector: BandwidthCollector
-) : WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is BandwidthWorker) {
-            worker.bandwidthCollector = bandwidthCollector
-            return true
-        }
-        return false
     }
 }
 
@@ -90,11 +69,13 @@ class BandwidthScheduler(
     }
 }
 
+@ContributesWorker(AppScope::class)
 class BandwidthWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams), CoroutineScope {
 
+    @Inject
     lateinit var bandwidthCollector: BandwidthCollector
 
     @WorkerThread

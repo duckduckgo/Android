@@ -1,0 +1,63 @@
+<!-- https://www.fanfiction.net/signup.php -->
+<form id="register" method="POST" name="myform" novalidate="novalidate">
+    <div style="width:330px;text-align:left;border-left: 1px solid #dddddd;" class="table-bordered">
+        <div class="tcat" style="border-bottom: 1px solid #ddd;border-left:1px solid #ddd;"><b>Sign up with...</b></div>
+        <table class="table" width="330px" cellpadding="4" id="gui_table1i">
+            <tbody>
+                <tr>
+                    <td style="border-top:0;border-left:0;">
+                        <div align="center">
+                            <a title="Sign up with FictionPress.com "
+                                href="https://www.fictionpress.com/login_sister.php?state=de9a9b89e79e2d19c7bbd2f1a20cfcf047c47dce0b4eb43b7d1025ee519796b9">FictionPress</a>
+                            <a title="Sign up with Google"
+                                href="https://accounts.google.com/o/oauth2/auth?response_type=code&amp;client_id=402848448275.apps.googleusercontent.com&amp;redirect_uri=https%3A%2F%2Fwww.fanfiction.net%2Fapi%2Foauth_google.php&amp;scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&amp;state=de9a9b89e79e2d19c7bbd2f1a20cfcf047c47dce0b4eb43b7d1025ee519796b9"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/google.png"></a> <a
+                                title="Sign up with Facebook"
+                                href="https://www.facebook.com/v12.0/dialog/oauth?client_id=256723737773954&amp;redirect_uri=https%3A%2F%2Fwww.fanfiction.net%2Fapi%2Foauth_facebook.php&amp;scope=public_profile%2Cemail&amp;state=de9a9b89e79e2d19c7bbd2f1a20cfcf047c47dce0b4eb43b7d1025ee519796b9&amp;display=popup"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/facebook.png"></a>
+                            <a title="Sign up with Twitter"
+                                href="https://www.fanfiction.net/api/oauth_twitter_pre.php?state=de9a9b89e79e2d19c7bbd2f1a20cfcf047c47dce0b4eb43b7d1025ee519796b9"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/twitter.png"></a> <a
+                                title="Sign up with Amazon" id="amazon_login" href="#"><img style="margin-left:5px;"
+                                    src="//ff74.b-cdn.net/static/social-24/amazon.png"></a> <a href="#"
+                                title="Sign up with Email" onclick="navigator.id.request();"><img
+                                    style="margin-left:5px;" src="//ff74.b-cdn.net/static/social-24/email.png"></a>
+                        </div>
+                        <div align="center" class="lc-wrapper" style="margin-top:10px;"><span class="lc">or</span></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;">
+                        <input class="input-block-level" type="Text" name="penname" maxlength="30" size="35" required=""
+                            title="Enter your desired username. Valid characters: A-Z a-z 0-9 . ' -" value=""
+                            placeholder="Username" data-manual-scoring="username">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><input class="input-block-level" id="email" type="text"
+                            name="email" size="35" required="" title="Enter your email address" value=""
+                            placeholder="Email" data-ddg-autofill="true" data-manual-scoring="emailAddress">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><input class="input-block-level" id="password"
+                            type="password" name="password" size="35" required="" minlength="8"
+                            title="Password must be 8  letters or more and contain at least 1 number" value=""
+                            placeholder="Password" data-ddg-autofill="true" data-manual-scoring="password">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border-top:0;border-left:0;"><button class="btn btn-block" type="submit"
+                            data-manual-submit="">Sign Up</button>
+                        <input type="hidden" name="action" value="ready">
+                        <span style="color:gray;font-size:0.9em">By signing up you verify you are
+                            at least 13 years of age and accept the <a href="/tos/" target="_new"
+                                style="color:gray;">Terms of Service</a>
+                            and <a href="/privacy/" target="_new" style="color:gray;">Privacy Policy</a>.</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</form>

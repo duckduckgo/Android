@@ -43,6 +43,7 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
             put(APP_EXCEPTION_RULE_LIST, vpnDatabase.vpnAppTrackerBlockingDao().getTrackerExceptionRulesMetadata()?.eTag.orEmpty())
             appPackageId?.let {
                 put(PACKAGE_ID_IS_PROTECTED, isUnprotectedByDefault(appPackageId).toString())
+                put(PACKAGE_ID_PROTECTION_OVERRIDEN, isProtectionOverriden(appPackageId).toString())
             }
         }
     }
@@ -52,10 +53,15 @@ class VpnAppTrackerListInfoCollector @Inject constructor(
             appTrackerRepository.getAppExclusionList().any { it.packageId == appPackageId }
     }
 
+    private fun isProtectionOverriden(appPackageId: String): Boolean {
+        return appTrackerRepository.getManualAppExclusionList().firstOrNull { it.packageId == appPackageId } != null
+    }
+
     companion object {
         private const val APP_TRACKER_BLOCKLIST = "appTrackerListEtag"
         private const val APP_EXCLUSION_LIST = "appExclusionListEtag"
         private const val APP_EXCEPTION_RULE_LIST = "appExceptionRuleListEtag"
         private const val PACKAGE_ID_IS_PROTECTED = "reportedAppUnprotectedByDefault"
+        private const val PACKAGE_ID_PROTECTION_OVERRIDEN = "overridenDefaultProtection"
     }
 }

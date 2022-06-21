@@ -1,0 +1,11 @@
+{
+  "name": "ddg-android",
+  "version": "1.0.0",
+  "description": "android project",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#4.6.0"
+  }
+}

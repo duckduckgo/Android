@@ -48,19 +48,20 @@ class RealTrackingParameters @Inject constructor(
 
     override var lastCleanedUrl: String? = null
 
-    override fun isAnException(url: String): Boolean {
-        return matches(url) ||
+    override fun isAnException(initiatingUrl: String?, url: String): Boolean {
+        return matches(initiatingUrl) || matches(url) ||
             unprotectedTemporary.isAnException(url) ||
             userWhiteListRepository.userWhiteList.contains(url.toUri().domain())
     }
 
-    private fun matches(url: String): Boolean {
+    private fun matches(url: String?): Boolean {
+        if (url == null) return false
         return trackingParametersRepository.exceptions.any { UriString.sameOrSubdomain(url, it.domain) }
     }
 
-    override fun cleanTrackingParameters(url: String): String? {
+    override fun cleanTrackingParameters(initiatingUrl: String?, url: String): String? {
         if (!featureToggle.isFeatureEnabled(PrivacyFeatureName.TrackingParametersFeatureName)) return null
-        if (isAnException(url)) return null
+        if (isAnException(initiatingUrl, url)) return null
 
         val trackingParameters = trackingParametersRepository.parameters
 

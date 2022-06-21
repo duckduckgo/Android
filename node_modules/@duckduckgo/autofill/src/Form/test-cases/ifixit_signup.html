@@ -1,0 +1,85 @@
+<!-- https://www.ifixit.com/# -->
+<form id="registerForm" class="onlyRegister" method="post" action="/Login?nojs=true">
+    <div id="reg-username-div" class="inputWrapper">
+        <label for="username">
+            Name </label>
+        <input id="reg-username" tabindex="875" title="Name" type="text" name="reg-username" value=""
+            placeholder="Albert Einstein" data-manual-scoring="fullName">
+    </div>
+
+    <div id="reg-unique-username-div" class="inputWrapper">
+        <label for="reg-unique-username">
+            Unique Username </label>
+        <input id="reg-unique-username" tabindex="876" title="Unique Username" type="text" name="reg-unique-username"
+            value="" placeholder="albert" data-manual-scoring="username">
+        <span id="reg-unique-username-at">@</span>
+        <div id="verify-label-parent">
+            <label for="reg-unique-username" id="valid-name" class="valid-name">
+                <i class="fa fa-check"></i> </label>
+            <label for="reg-unique-username" id="invalid-name" class="invalid-name">
+                <i class="fa fa-times"></i> </label>
+        </div>
+    </div>
+    <div id="reg-email-div" class="inputWrapper">
+        <label for="reg-email">
+            Email </label>
+        <input type="text" value="" pattern="[^ @]*@[^ @]*" name="reg-email" id="reg-email" title="Email" tabindex="877"
+            placeholder="albert@domain.com" style="" data-manual-scoring="emailAddress">
+        <p>We'll use your email to send you updates on your community contributions.</p>
+    </div>
+    <div id="reg-password-div" class="inputWrapper">
+        <label for="reg-password">Password</label>
+        <div id="reg-password-wrap">
+            <input id="reg-password" name="reg-password" type="password" title="Password" tabindex="878"
+                data-manual-scoring="password">
+            <span id="js-password-icon" class="show-password" title="show/hide password" style="display: none;">
+                <i class="fa fa-eye-slash fa-lg"></i> </span>
+        </div>
+    </div>
+
+    <div id="email-preferences" class="js-email-subscriptions" style="display: none;">
+        <h4 id="subscription-heading">
+            Level up your repair skills by subscribing to: </h4>
+        <div class="radioGroup">
+            <p>
+                Monthly highlights from iFixit's online community </p>
+            <label id="community-yes">
+                <input type="radio" name="digest-emails" value="yes"
+                    class="ifixit-control js-community-yes-subscription" required="">
+                <span>Yes!</span>
+            </label>
+            <label id="community-no">
+                <input type="radio" name="digest-emails" value="no" class="ifixit-control" required="">
+                <span>No, thanks</span>
+            </label>
+        </div>
+
+        <div class="radioGroup">
+            <p>
+                Weekly repair tips, Right to Repair news, and first look access to teardowns </p>
+            <label id="newsletter-yes">
+                <input type="radio" name="news-emails" value="yes" class="ifixit-control js-newsletter-yes-subscription"
+                    required="">
+                <span>Yes!</span>
+            </label>
+            <label id="newsletter-no">
+                <input type="radio" name="news-emails" value="no" class="ifixit-control" required="">
+                <span>No, thanks</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="showRegister js-captcha-container captcha-container">
+    </div>
+    <div id="form-captcha-register" class="g-recaptcha" data-sitekey="6LdcrYcUAAAAADXZZ8mZBNd48Qpg6jF6_Zp2s1t5"
+        style="transform: scale(0.7);"></div>
+
+    <button id="registerBtn" type="submit" tabindex="879" class="button button-action-solid"
+        data-manual-submit="">Create My Account </button>
+
+    <p>
+
+        By joining iFixit, you agree to our <a href="/Info/Privacy">Privacy Policy</a> and <a
+            href="/Info/Terms_of_Use">Terms</a>. </p>
+
+</form>

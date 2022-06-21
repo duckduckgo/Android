@@ -470,7 +470,7 @@
     <string name="onboardingLetsDoItButton">Darīsim to!</string>
     <string name="daxIntroCtaText"><![CDATA[Tagad pamēģiniet ieiet kādā no jūsu mīļākajām vietnēm! <br/><br/>Es nobloķēšu izsekotājus, lai viņi nevarētu jūs izspiegot. Ja iespējams, uzlabošu arī jūsu savienojuma drošību. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Izdevās!<br/><br/>Atceries: katru reizi, kad pārlūkosi kopā ar mani, kaitinošās reklāmas zaudēs savu spēku! 👍]]></string>
-    <string name="daxSerpCtaText">Tavi DuckDuckGo meklējumi ir anonīmi, un es nekad neuzglabāju tavu meklēšanas vēsturi. Nekad. 🙌</string>
+    <string name="daxSerpCtaText">Tavi DuckDuckGo meklējumi ir anonīmi. Vienmēr. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="zero"><![CDATA[ un <b>%1$d citas vietnes</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
         <item quantity="one"><![CDATA[ un <b>%1$d cita vietne</b> mēģināja tevi šeit izsekot. <br/><br/>Es tās nobloķēju!<br/><br/> ☝️ Vari pārbaudīt adreses joslu, lai redzētu, kas tevi mēģina izsekot, kad tu apmeklē jaunu vietni.️]]></item>
@@ -740,5 +740,11 @@
     <string name="downloadsMoreOptionsContentDescription">Citas iespējas %1$s</string>
     <string name="downloadsUndoActionName">Atsaukt</string>
     <string name="downloadsStateInProgress">Notiek...</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Lietotņu pretizsekošanas aizsardzība</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Lietotņu izsekotāju bloķēšana ierīcē</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Iespējots</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Atspējots</string>
 
 </resources>

@@ -1,0 +1,69 @@
+<!-- https://www.carmax.com/mycarmax/register -->
+<form class="kmx-form" method="post" novalidate="">
+    <input id="ReturnURL" name="ReturnURL" type="hidden" value="">
+    <h1 class="kmx-typography--display-2 d-none-desktop">Register for a MyCarMax account</h1>
+    <p class="kmx-typography--body-2 m-b-s d-none-desktop">Save cars you're interested in and your vehicle searches, set
+        up search alerts and set up CarMax Auto Finance payments.</p>
+    <div class="kmx-input-group">
+        <div class="kmx-text-field kmx-text-field--first-name m-v-0">
+            <div class="kmx-text-field__wrapper">
+                <input class="kmx-text-field__input" aria-labelledby="first-name-label" name="firstName" maxlength="50"
+                    type="text" required="" placeholder=" " data-manual-scoring="firstName">
+                <label class="kmx-text-field__label kmx-text-field__label--required" id="first-name-label"
+                    for="first-name">First name</label>
+                <div class="kmx-text-field__border"></div>
+            </div>
+            <div class="kmx-text-field__error-text">First Name required, max length 50</div>
+        </div>
+        <div class="kmx-text-field kmx-text-field--last-name m-v-0">
+            <div class="kmx-text-field__wrapper">
+                <input class="kmx-text-field__input fs-mask" aria-labelledby="last-name-label" name="lastName"
+                    maxlength="50" type="text" required="" placeholder=" " data-manual-scoring="lastName">
+                <label class="kmx-text-field__label kmx-text-field__label--required" id="last-name-label"
+                    for="last-name">Last name</label>
+                <div class="kmx-text-field__border"></div>
+            </div>
+            <div class="kmx-text-field__error-text">Last Name required, max length 50</div>
+        </div>
+    </div>
+    <div class="kmx-text-field kmx-text-field--email">
+        <div class="kmx-text-field__wrapper">
+            <input class="kmx-text-field__input fs-mask" name="email" aria-labelledby="email-label" type="text"
+                required="" placeholder=" " data-ddg-autofill="true" data-manual-scoring="emailAddress">
+            <label class="kmx-text-field__label kmx-text-field__label--required" id="email-label"
+                for="email">Email</label>
+            <div class="kmx-text-field__border"></div>
+        </div>
+        <div class="kmx-text-field__error-text">This email is not valid; please double check it</div>
+    </div>
+    <div class="kmx-text-field kmx-text-field--password">
+        <div class="kmx-text-field__wrapper">
+            <input class="kmx-text-field__input" name="password" type="password" aria-labelledby="password-label"
+                maxlength="256" required="" placeholder=" " data-ddg-autofill="true" data-manual-scoring="password">
+            <label class="kmx-text-field__label kmx-text-field__label--required" id="password-label"
+                for="password">Password</label>
+            <div class="kmx-text-field__border"></div>
+        </div>
+        <div class="kmx-text-field__error-text">Include a minimum of 8 characters and at least one number and one
+            letter. No spaces, please.</div>
+        <div class="kmx-text-field__helper-text kmx-text-field__helper-text--persistent">Include a minimum of 8
+            characters and at least one number and one letter. No spaces, please.</div>
+    </div>
+    <div class="kmx-text-field kmx-text-field--password-confirm m-b-m">
+        <div class="kmx-text-field__wrapper">
+            <input class="kmx-text-field__input" name="retypepassword" aria-labelledby="confirm-label" type="password"
+                maxlength="256" required="" placeholder=" " data-ddg-autofill="true" data-manual-scoring="password">
+            <label class="kmx-text-field__label kmx-text-field__label--required" id="confirm-label"
+                for="confirm-password">Confirm password</label>
+            <div class="kmx-text-field__border"></div>
+        </div>
+        <div class="kmx-text-field__error-text">Password must match</div>
+    </div>
+    <input class="kmx-button kmx-button--primary kmx-button--full" type="Submit" value="Register" data-manual-submit="">
+    <p class="kmx-typography--body-2 text-center text-weight-normal m-v-0 m-t-m">
+        Already have an account?<br>
+        <a href="/mycarmax/sign-in?ReturnUrl=" class="kmx-typography--link">Sign-In to your account</a>
+    </p>
+    <input name="__RequestVerificationToken" type="hidden"
+        value="CfDJ8PIJD4Wd3QtIk7_YFxUS6W72FY8g52giiNp3Fo-_LhxDt0Yp_ZIwUSV_1oaYjjrAE3FhlE8e5fDuz-yvMj2uK8gED9LsIwZrphr-Z53kyvNiIq3J2_yPxohqc3Jna96bgDlt3NbMxV8k9lASWecLT0w">
+</form>

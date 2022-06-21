@@ -17,19 +17,17 @@
 package com.duckduckgo.mobile.android.vpn.blocklist
 
 import android.content.Context
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.LifecycleOwner
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ListenableWorker
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
-
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExceptionRuleMetadata
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerMetadata
@@ -40,9 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+@ContributesWorker(AppScope::class)
 class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParameters) :
     CoroutineWorker(context, workerParameters) {
+    @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
+    @Inject
     lateinit var vpnDatabase: VpnDatabase
 
     override suspend fun doWork(): Result {
@@ -127,13 +128,15 @@ class AppTrackerListUpdateWorker(context: Context, workerParameters: WorkerParam
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = LifecycleObserver::class
+)
 class AppTrackerListUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    fun scheduleBlocklistUpdateWork() {
+    override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Scheduling tracker blocklist update worker")
         val workerRequest =
             PeriodicWorkRequestBuilder<AppTrackerListUpdateWorker>(12, TimeUnit.HOURS)
@@ -147,24 +150,5 @@ class AppTrackerListUpdateWorkerScheduler @Inject constructor(
 
     companion object {
         private const val APP_TRACKER_LIST_UPDATE_WORKER_TAG = "APP_TRACKER_LIST_UPDATE_WORKER_TAG"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTrackerListUpdateWorkerPlugin
-@Inject
-constructor(
-    private val appTrackerListDownloader: AppTrackerListDownloader,
-    private val vpnDatabase: VpnDatabase
-) : WorkerInjectorPlugin {
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is AppTrackerListUpdateWorker) {
-            Timber.v("Injecting dependencies for AppTrackerListUpdateWorker")
-            worker.appTrackerListDownloader = appTrackerListDownloader
-            worker.vpnDatabase = vpnDatabase
-            return true
-        }
-
-        return false
     }
 }

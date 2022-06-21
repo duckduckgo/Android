@@ -1,0 +1,22 @@
+<!-- https://www.thermoworks.com/login.php -->
+<form class="login-form form" action="/login.php?action=check_login" method="post">
+    <h2 class="tt-login-title">Welcome Back!</h2>
+
+
+    <div class="form-field form-field--input form-field--inputEmail form-field--error">
+        <label class="form-label" for="login_email">Email Address:</label>
+        <input class="form-input" name="login_email" id="login_email" type="email" data-manual-scoring="username">
+        <span style="" class="form-inlineMessage" role="alert">Please use a valid email address, such as
+            user@example.com.</span>
+    </div>
+    <div class="form-field form-field--input form-field--inputPassword">
+        <label class="form-label" for="login_pass">Password:</label>
+        <input class="form-input" id="login_pass" type="password" name="login_pass" autocomplete="off"
+            data-manual-scoring="password">
+        <span style="display: none;"></span>
+    </div>
+    <div class="form-actions">
+        <input type="submit" class="button button--primary tt-button--bold" value="Sign in" data-manual-submit="">
+        <a class="forgot-password" href="/login.php?action=reset_password">Forgot your password?</a>
+    </div>
+</form>

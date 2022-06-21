@@ -16,9 +16,11 @@
 
 package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -30,6 +32,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
@@ -53,6 +56,9 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
 
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
@@ -255,10 +261,15 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
         deviceShieldPixels.didChooseToDismissVpnConflictDialog()
     }
 
+    @SuppressLint("InlinedApi")
     override fun onVpnConflictDialogGoToSettings() {
         deviceShieldPixels.didChooseToOpenSettingsFromVpnConflictDialog()
 
-        val intent = Intent(Settings.ACTION_VPN_SETTINGS)
+        val intent = if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
+            Intent(Settings.ACTION_VPN_SETTINGS)
+        } else {
+            Intent("android.net.vpn.SETTINGS")
+        }
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
     }

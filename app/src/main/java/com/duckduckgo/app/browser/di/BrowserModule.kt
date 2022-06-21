@@ -38,6 +38,7 @@ import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.serviceworker.ServiceWorkerLifecycleObserver
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
@@ -65,6 +66,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.plugins.PluginPoint
 import com.duckduckgo.app.httpsupgrade.HttpsUpgrader
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
@@ -82,9 +84,11 @@ import com.duckduckgo.downloads.impl.AndroidFileDownloader
 import com.duckduckgo.downloads.impl.DataUriDownloader
 import com.duckduckgo.downloads.impl.DownloadFileService
 import com.duckduckgo.downloads.impl.NetworkFileDownloader
+import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.privacy.config.api.UserAgent
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -125,7 +129,8 @@ class BrowserModule {
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
-        ampLinks: AmpLinks
+        ampLinks: AmpLinks,
+        printInjector: PrintInjector
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -144,7 +149,8 @@ class BrowserModule {
             dispatcherProvider,
             emailInjector,
             accessibilityManager,
-            ampLinks
+            ampLinks,
+            printInjector
         )
     }
 
@@ -237,9 +243,21 @@ class BrowserModule {
     fun userAgentProvider(
         @Named("defaultUserAgent") defaultUserAgent: Provider<String>,
         deviceInfo: DeviceInfo,
-        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>
+        userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
+        userAgent: UserAgent,
+        toggle: FeatureToggle,
+        userAllowListRepository: UserAllowListRepository,
+        dispatcher: DispatcherProvider,
     ): UserAgentProvider {
-        return UserAgentProvider(defaultUserAgent, deviceInfo, userAgentInterceptorPluginPoint)
+        return UserAgentProvider(
+            defaultUserAgent,
+            deviceInfo,
+            userAgentInterceptorPluginPoint,
+            userAgent,
+            toggle,
+            userAllowListRepository,
+            dispatcher
+        )
     }
 
     @Provides

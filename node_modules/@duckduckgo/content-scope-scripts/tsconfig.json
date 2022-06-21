@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+  },
+  "include": [
+    "src/globals.d.ts"
+  ],
+  "files": [
+    "src/canvas.js",
+    "src/features/fingerprinting-canvas.js",
+  ]
+}

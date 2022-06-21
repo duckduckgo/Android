@@ -466,7 +466,7 @@
     <string name="onboardingLetsDoItButton">Aloitetaan!</string>
     <string name="daxIntroCtaText"><![CDATA[Seuraavaksi vieraile suosikkisivustoissasi! <br/><br/>Estän jäljittäjät, jotta he eivät voi vakoilla sinua. Päivitän myös yhteytesi suojauksen, jos mahdollista. 🔒]]></string>
     <string name="daxEndCtaText"><![CDATA[Hyvin menee!<br/><br/>Muista, että joka kerta, kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👍]]></string>
-    <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat nimettömiä – emmekä tallenna hakuhistoriaasi koskaan. Ikinä. 🙌</string>
+    <string name="daxSerpCtaText">DuckDuckGo-hakusi ovat aina nimettömiä. 🙌</string>
     <plurals name="daxTrackersBlockedCtaText">
         <item quantity="one"><![CDATA[ ja <b>%1$d muu</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
         <item quantity="other"><![CDATA[ ja <b>%1$d muuta</b> yrittivät seurata sinua tänne. <br/><br/>Estin sen!<br/><br/> ☝️Tarkista osoiteriviltä, kuka yrittää seurata sinua, kun vierailet uudella sivustolla.️]]></item>
@@ -732,5 +732,11 @@
     <string name="downloadsMoreOptionsContentDescription">%1$s: lisäasetukset</string>
     <string name="downloadsUndoActionName">Kumoa</string>
     <string name="downloadsStateInProgress">Käynnissä…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Sovellusten seurantasuojaus</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Estä sovellusseuranta laitteessa</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Käytössä</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Pois käytöstä</string>
 
 </resources>

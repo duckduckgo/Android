@@ -1,0 +1,59 @@
+<form class="form-customer-login" id="social-form-login" novalidate="novalidate">
+    <div class="social-login-popup-tabs">
+        <div class="social-login-popup-headings">
+            <div class="social-login-popup-subheading subheading-login current">Log In</div>
+            <div class="social-login-popup-subheading subheading-register action create">Register</div>
+        </div>
+    </div>
+    <div class="social-login-popup-tab-login"><input name="form_key" type="hidden" value="XVEGTKkYrLrX1TDA">
+        <div class="social-login-popup-subtitle"><span id="block-customer-login-heading" role="heading" aria-level="2"
+                                                       class="social-login-popup-subtitle-text">Log In to Your Account</span>
+            <span class="social-login-popup-subtitle-note">Required</span></div>
+        <div class="block-content">
+            <fieldset class="fieldset login">
+                <div class="field email required"><label class="label"
+                                                         for="social-login-popup-log-in-email"><span>Email</span></label>
+                    <div class="control"><input name="username" id="social-login-popup-log-in-email" type="email"
+                                                data-ac-test="form-login_input_email" class="input-text" value=""
+                                                autocomplete="off" title="Email"
+                                                data-validate="{required:true, 'validate-email':true}"
+                                                aria-required="true" data-manual-scoring="username"></div>
+                </div>
+                <div class="field password">
+                    <div class="secondary required"><label for="social-login-popup-log-in-pass" class="label"><span>Password</span></label>
+                        <a class="action remind social-login-popup-forgot-password" href="#">Forgot Your Password?</a>
+                    </div>
+                    <div class="control"><input name="password" id="social-login-popup-log-in-pass" type="password"
+                                                data-ac-test="form-login_input_password" class="input-text"
+                                                autocomplete="off" title="Password"
+                                                data-validate="{required:true, 'validate-password':true}"
+                                                data-manual-scoring="password"></div>
+                </div><!-- BLOCK social-login-captcha --><!-- /BLOCK social-login-captcha -->
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <div>
+                            <div class="grecaptcha-badge" data-style="bottomright"
+                                 style="width: 256px; height: 60px; display: block; transition: right 0.3s ease 0s; position: fixed; bottom: 14px; right: -186px; box-shadow: gray 0px 0px 5px; border-radius: 2px; overflow: hidden;">
+                                <div class="grecaptcha-logo">
+                                    <iframe title="reCAPTCHA"
+                                            src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6LclSqYZAAAAAItLamEh88kH4arheZQQO_Kqea19&amp;co=aHR0cHM6Ly93d3cuc2FtYXNoLmNvbTo0NDM.&amp;hl=en&amp;v=zLD1nfkNCJC1kEswSRdSyd-p&amp;theme=light&amp;size=invisible&amp;badge=bottomright&amp;cb=5nurkiwxfn7n"
+                                            width="256" height="60" role="presentation" name="a-be6lkzsd05rs"
+                                            frameborder="0" scrolling="no"
+                                            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation"></iframe>
+                                </div>
+                                <div class="grecaptcha-error"></div>
+                                <textarea id="g-recaptcha-response" name="g-recaptcha-response"
+                                          class="g-recaptcha-response"
+                                          style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" data-ac-test="form-login_action_submit"
+                                class="action login primary social-login-popup-button"
+                                id="bnt-social-login-authentication" data-manual-submit>Log in
+                        </button>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <input type="hidden" name="amasty_invisible_token"></form>

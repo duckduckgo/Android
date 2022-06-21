@@ -17,11 +17,9 @@
 package com.duckduckgo.mobile.android.vpn.feature.removal
 
 import androidx.core.app.NotificationManagerCompat
-import androidx.work.ListenableWorker
 import androidx.work.WorkManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -32,7 +30,6 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificationScheduler.Companion.VPN_WEEKLY_NOTIFICATION_ID
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -45,7 +42,6 @@ interface VpnFeatureRemover {
 }
 
 @ContributesBinding(scope = AppScope::class, boundType = VpnFeatureRemover::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = WorkerInjectorPlugin::class)
 class DefaultVpnFeatureRemover @Inject constructor(
     private val vpnStore: VpnStore,
     private val notificationManager: NotificationManagerCompat,
@@ -54,16 +50,7 @@ class DefaultVpnFeatureRemover @Inject constructor(
     private val workManagerProvider: Provider<WorkManager>,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider
-) : VpnFeatureRemover, WorkerInjectorPlugin {
-
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is VpnFeatureRemoverWorker) {
-            worker.vpnFeatureRemover = this
-            return true
-        }
-
-        return false
-    }
+) : VpnFeatureRemover {
 
     override fun manuallyRemoveFeature() {
         appCoroutineScope.launch(dispatcherProvider.io()) {

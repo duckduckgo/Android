@@ -1,0 +1,3 @@
+build/
+lib/
+integration-test/extension/contentScope.js

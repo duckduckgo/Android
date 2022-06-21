@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.content.IntentFilter
@@ -31,9 +32,9 @@ import timber.log.Timber
 import java.net.URISyntaxException
 
 interface SpecialUrlDetector {
-    fun determineType(uri: Uri): UrlType
+    fun determineType(initiatingUrl: String?, uri: Uri): UrlType
     fun determineType(uriString: String?): UrlType
-    fun processUrl(uriString: String): UrlType
+    fun processUrl(initiatingUrl: String?, uriString: String): UrlType
 
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
@@ -67,7 +68,7 @@ class SpecialUrlDetectorImpl(
     private val trackingParameters: TrackingParameters
 ) : SpecialUrlDetector {
 
-    override fun determineType(uri: Uri): UrlType {
+    override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
         val uriString = uri.toString()
 
         return when (val scheme = uri.scheme) {
@@ -76,7 +77,7 @@ class SpecialUrlDetectorImpl(
             MAILTO_SCHEME -> buildEmail(uriString)
             SMS_SCHEME -> buildSms(uriString)
             SMSTO_SCHEME -> buildSmsTo(uriString)
-            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(uriString)
+            HTTP_SCHEME, HTTPS_SCHEME, DATA_SCHEME -> processUrl(initiatingUrl, uriString)
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME -> UrlType.SearchQuery(uriString)
             null -> UrlType.SearchQuery(uriString)
             else -> checkForIntent(scheme, uriString)
@@ -94,8 +95,8 @@ class SpecialUrlDetectorImpl(
 
     private fun buildSmsTo(uriString: String): UrlType = UrlType.Sms(uriString.removePrefix("$SMSTO_SCHEME:").truncate(SMS_MAX_LENGTH))
 
-    override fun processUrl(uriString: String): UrlType {
-        trackingParameters.cleanTrackingParameters(uriString)?.let { cleanedUrl ->
+    override fun processUrl(initiatingUrl: String?, uriString: String): UrlType {
+        trackingParameters.cleanTrackingParameters(initiatingUrl = initiatingUrl, url = uriString)?.let { cleanedUrl ->
             return UrlType.TrackingParameterLink(cleanedUrl = cleanedUrl)
         }
 
@@ -127,6 +128,7 @@ class SpecialUrlDetectorImpl(
         return UrlType.Web(uriString)
     }
 
+    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun queryActivities(uriString: String): MutableList<ResolveInfo> {
         val browsableIntent = Intent.parseUri(uriString, URI_NO_FLAG)
@@ -140,6 +142,7 @@ class SpecialUrlDetectorImpl(
         }
     }
 
+    @SuppressLint("WrongConstant")
     @Throws(URISyntaxException::class)
     private fun buildNonBrowserIntent(
         nonBrowserActivity: ResolveInfo,
@@ -171,6 +174,7 @@ class SpecialUrlDetectorImpl(
         return UrlType.SearchQuery(uriString)
     }
 
+    @SuppressLint("WrongConstant")
     private fun buildIntent(uriString: String): UrlType {
         return try {
             val intent = Intent.parseUri(uriString, URI_NO_FLAG)
@@ -183,6 +187,7 @@ class SpecialUrlDetectorImpl(
         }
     }
 
+    @SuppressLint("WrongConstant")
     private fun buildFallbackIntent(fallbackUrl: String?): Intent? {
         if (determineType(fallbackUrl) is UrlType.NonHttpAppLink) {
             return Intent.parseUri(fallbackUrl, URI_NO_FLAG)
@@ -193,7 +198,7 @@ class SpecialUrlDetectorImpl(
     override fun determineType(uriString: String?): UrlType {
         if (uriString == null) return UrlType.Web("")
 
-        return determineType(Uri.parse(uriString))
+        return determineType(initiatingUrl = null, uri = Uri.parse(uriString))
     }
 
     private fun String.truncate(maxLength: Int): String = if (this.length > maxLength) this.substring(0, maxLength) else this

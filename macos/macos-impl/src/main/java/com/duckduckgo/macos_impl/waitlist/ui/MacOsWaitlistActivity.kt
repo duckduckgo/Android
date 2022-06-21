@@ -23,8 +23,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -169,11 +167,7 @@ class MacOsWaitlistActivity : DuckDuckGoActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT
         )
         try {
-            if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP_MR1) {
-                startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite), pi.intentSender))
-            } else {
-                startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite)))
-            }
+            startActivity(Intent.createChooser(share, getString(R.string.macos_waitlist_share_invite), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
             Timber.w(e, "Activity not found")
         }

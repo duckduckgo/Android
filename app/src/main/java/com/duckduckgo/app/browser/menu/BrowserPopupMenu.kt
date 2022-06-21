@@ -45,6 +45,7 @@ class BrowserPopupMenu(
             backMenuItem.isEnabled = viewState.canGoBack
             forwardMenuItem.isEnabled = viewState.canGoForward
             refreshMenuItem.isEnabled = browserShowing
+            printPageMenuItem.isEnabled = browserShowing
 
             newTabMenuItem.isVisible = browserShowing
             sharePageMenuItem?.isVisible = viewState.canSharePage
@@ -115,6 +116,7 @@ class BrowserPopupMenu(
             siteOptionsMenuDivider.isVisible = viewState.browserShowing
             browserOptionsMenuDivider.isVisible = viewState.browserShowing
             settingsMenuDivider.isVisible = viewState.browserShowing
+            printPageMenuItem?.isVisible = viewState.canPrintPage
         }
     }
 }

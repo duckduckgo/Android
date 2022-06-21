@@ -19,12 +19,9 @@ package com.duckduckgo.app.notification
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
-import com.duckduckgo.app.notification.model.ClearDataNotification
-import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -85,37 +82,6 @@ class NotificationScheduler(
         workManager.enqueue(request)
     }
 
-    // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
-    // delete this as part of https://app.asana.com/0/414730916066338/1119619712088571
-    class ShowClearDataNotification(
-        context: Context,
-        params: WorkerParameters
-    ) : ClearDataNotificationWorker(context, params)
-
-    open class ClearDataNotificationWorker(
-        context: Context,
-        params: WorkerParameters
-    ) : SchedulableNotificationWorker(context, params)
-
-    class PrivacyNotificationWorker(
-        context: Context,
-        params: WorkerParameters
-    ) : SchedulableNotificationWorker(context, params)
-
-    open class SchedulableNotificationWorker(
-        val context: Context,
-        params: WorkerParameters
-    ) : CoroutineWorker(context, params) {
-
-        lateinit var notificationSender: NotificationSender
-        lateinit var notification: SchedulableNotification
-
-        override suspend fun doWork(): Result {
-            notificationSender.sendNotification(notification)
-            return Result.success()
-        }
-    }
-
     companion object {
         const val UNUSED_APP_WORK_REQUEST_TAG = "com.duckduckgo.notification.schedule"
         const val CLEAR_DATA_DELAY_DURATION_IN_DAYS = 3L
@@ -123,34 +89,35 @@ class NotificationScheduler(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-class ClearDataNotificationWorkerInjectorPlugin @Inject constructor(
-    private val notificationSender: NotificationSender,
-    private val clearDataNotification: ClearDataNotification
-) : WorkerInjectorPlugin {
+// Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
+// delete this as part of https://app.asana.com/0/414730916066338/1119619712088571
+class ShowClearDataNotification(
+    context: Context,
+    params: WorkerParameters
+) : ClearDataNotificationWorker(context, params)
 
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is NotificationScheduler.ClearDataNotificationWorker) {
-            worker.notificationSender = notificationSender
-            worker.notification = clearDataNotification
-            return true
-        }
-        return false
-    }
-}
+open class ClearDataNotificationWorker(
+    context: Context,
+    params: WorkerParameters
+) : SchedulableNotificationWorker(context, params)
 
-@ContributesMultibinding(AppScope::class)
-class PrivacyNotificationWorkerInjectorPlugin @Inject constructor(
-    private val notificationSender: NotificationSender,
-    private val privacyProtectionNotification: PrivacyProtectionNotification
-) : WorkerInjectorPlugin {
+class PrivacyNotificationWorker(
+    context: Context,
+    params: WorkerParameters
+) : SchedulableNotificationWorker(context, params)
 
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is NotificationScheduler.PrivacyNotificationWorker) {
-            worker.notificationSender = notificationSender
-            worker.notification = privacyProtectionNotification
-            return true
-        }
-        return false
+@ContributesWorker(AppScope::class)
+open class SchedulableNotificationWorker(
+    val context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+    @Inject
+    lateinit var notificationSender: NotificationSender
+    @Inject
+    lateinit var notification: SchedulableNotification
+
+    override suspend fun doWork(): Result {
+        notificationSender.sendNotification(notification)
+        return Result.success()
     }
 }

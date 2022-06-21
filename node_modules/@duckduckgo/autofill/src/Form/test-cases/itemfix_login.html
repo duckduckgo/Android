@@ -1,0 +1,25 @@
+<!-- https://www.itemfix.com/user?a=login -->
+<form method="post" action="https://www.itemfix.com/">
+    <div class="col-sm-12 pad-none add-new-item-outer contact-form-outer">
+
+        <div class="col-sm-12 pad-none add-item-license-con">
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Email</label>
+                <input type="email" name="user_email" class="form-control" required="required"
+                    data-manual-scoring="username">
+            </div>
+
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <label>Password</label>
+                <input type="password" name="user_password" class="form-control" required="required"
+                    data-manual-scoring="password">
+            </div>
+            <div class="col-sm-12 pad-none form-group add-item-license-form">
+                <a href="user?a=retrieve_lost_password">lost password?</a>
+            </div>
+            <div class="col-sm-12 pad-none sent-button-con"><input type="submit" value="Login" data-manual-submit="">
+            </div>
+        </div>
+    </div>
+    <input type="hidden" name="login" value="1">
+</form>

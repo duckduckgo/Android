@@ -65,9 +65,18 @@ class AppTpBandwidthCollector @Inject constructor(
         job += coroutineScope.launch {
             while (isActive) {
                 val currentBandwidthData = bandwidthRepository.getCurrentBandwidthData()
+                val buckets = bandwidthRepository.getBuckets()
+
+                if (buckets.isNotEmpty()) {
+                    if (currentBandwidthData.totalBytes < buckets.last().totalBytes || currentBandwidthData.timestamp < buckets.last().timestamp) {
+                        bandwidthRepository.deleteAllBuckets()
+                        delay(TimeUnit.MINUTES.toMillis(BUCKET_PERIOD_MINUTES))
+                        continue
+                    }
+                }
+
                 persistBucket(BandwidthData(appBytes = currentBandwidthData.appBytes, totalBytes = currentBandwidthData.totalBytes))
 
-                val buckets = bandwidthRepository.getBuckets()
                 if (buckets.size == NUM_BUCKETS_PER_PERIOD) {
                     sendPixel(buckets)
                     bandwidthRepository.deleteAllBuckets()

@@ -1,0 +1,61 @@
+<!-- https://sso.godaddy.com/?realm=idp&app=dashboard.api&path=%2fvh-login-redirect&marketid=en-GB -->
+<div>
+    <div id="username-container">
+        <div class="ff-form-field inline-input inline-input-required fs-mask">
+            <div class="ff-field"><input autocomplete="off" type="text" label="Username or Customer #" message=""
+                                         aria-label="Username or Customer #. ." aria-required="true"
+                                         aria-disabled="false" aria-labelledby="label-username"
+                                         aria-describedby="message" class="ff-input" required="" id="username" value="" data-manual-scoring="username"><label
+                    class="ff-label" for="username" id="label-username" aria-required="false">Username or Customer
+                #</label></div>
+        </div>
+    </div>
+    <div id="password-container">
+        <div class="ff-form-field inline-input inline-input-required fs-mask">
+            <div class="ff-field"><input autocomplete="off" message="" label="Password" class="ff-input" type="password"
+                                         aria-label="Password. ." aria-required="true" aria-disabled="false"
+                                         aria-labelledby="label-password" aria-describedby="message" required=""
+                                         id="password" value="" data-manual-scoring="password"><label class="ff-label" for="password"
+                                                                                                      id="label-password" aria-required="false">Password</label>
+                <button aria-label="Show password" class="ux-button ux-button-inline text-primary-o show-hide-btn"
+                        type="button"><span class="ux-button-text">Show</span></button>
+            </div>
+        </div>
+    </div>
+    <div id="remember-me-container" class="input-container">
+        <fieldset class="form-group">
+            <div class="ux-custom-control ux-custom-checkbox">
+                <div class="ux-custom-target" role="switch" aria-checked="true"><input tabindex="0" id="remember-me"
+                                                                                       type="checkbox"
+                                                                                       aria-labelledby="label-remember-me"
+                                                                                       aria-required="false"
+                                                                                       class="custom-control-input"
+                                                                                       value="true" checked="">
+                    <svg class="uxicon-svg-container ux-control-indicator" height="1.5em" width="1.5em" role="img">
+                        <use fill="currentColor" xlink:href="#svg-container-checkmark"></use>
+                    </svg>
+                    <label for="remember-me" id="label-remember-me">Keep me signed in on this device</label></div>
+            </div>
+        </fieldset>
+    </div>
+    <button class="ux-button ux-button-primary btn btn-purchase btn-block" id="submitBtn" type="button" data-manual-submit><span
+            class="ux-button-text">Sign In</span></button>
+    <div id="social-login-buttons-container" class="two-only"><p id="text-social-button-divider">or sign in with</p>
+        <div class="ux-button-set">
+            <div class="ux-button-set-margin ux-button-set-split" role="group">
+                <button aria-label="Sign in with Facebook"
+                        class="ux-button ux-button-secondary alternative-login-button" id="facebook_auth" type="button">
+                    <svg class="uxicon-svg-container" height="1.5em" width="1.5em" role="presentation">
+                        <use fill="currentColor" xlink:href="#svg-container-facebook"></use>
+                    </svg>
+                    <span class="ux-button-text"><span id="facebook-btn-txt">Facebook</span></span></button>
+                <button aria-label="Sign in with Google" class="ux-button ux-button-secondary alternative-login-button"
+                        id="google_auth" type="button">
+                    <svg class="uxicon-svg-container" height="1.5em" width="1.5em" role="presentation">
+                        <use fill="currentColor" xlink:href="#svg-container-google"></use>
+                    </svg>
+                    <span class="ux-button-text"><span id="google-btn-txt">Google</span></span></button>
+            </div>
+        </div>
+    </div>
+</div>

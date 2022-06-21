@@ -23,7 +23,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -39,6 +39,7 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 @Module
 @ContributesTo(AppScope::class)
@@ -50,12 +51,8 @@ object DeviceShieldStatusReportingModule {
     }
 
     @Provides
-    @IntoSet
-    fun provideDeviceShieldStatusReportingWorkerInjectorPlugin(
-        deviceShieldPixels: DeviceShieldPixels,
-        vpnDatabase: VpnDatabase
-    ): WorkerInjectorPlugin {
-        return DeviceShieldStatusReportingWorkerInjectorPlugin(deviceShieldPixels, vpnDatabase)
+    fun provideVpnServiceStateStatsDao(vpnDatabase: VpnDatabase): VpnServiceStateStatsDao {
+        return vpnDatabase.vpnServiceStateDao()
     }
 }
 
@@ -78,56 +75,45 @@ class DeviceShieldStatusReporting(
             .build().run { workManager.enqueueUniquePeriodicWork(WORKER_STATUS_REPORTING_TAG, ExistingPeriodicWorkPolicy.KEEP, this) }
     }
 
-    class DeviceShieldStatusReportingWorker(
-        private val context: Context,
-        params: WorkerParameters
-    ) : CoroutineWorker(context, params) {
-        lateinit var deviceShieldPixels: DeviceShieldPixels
-        lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
-
-        override suspend fun doWork(): Result {
-            if (TrackerBlockingVpnService.isServiceRunning(context)) {
-                deviceShieldPixels.reportEnabled()
-            } else {
-                deviceShieldPixels.reportDisabled()
-            }
-
-            sendLastDayVpnEnableDisableCounts()
-
-            return Result.success()
-        }
-
-        private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(Dispatchers.IO) {
-            val startTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
-                DatabaseDateFormatter.timestamp(this)
-            }
-
-            val lastDayVpnStats = vpnServiceStateStatsDao.getServiceStateStatsSince(startTime)
-                .groupBy { it.day }[startTime.substringBefore("T")]
-                ?.groupBy { it.vpnServiceStateStats.state }
-
-            lastDayVpnStats?.let { stats ->
-                deviceShieldPixels.reportLastDayEnableCount(stats[VpnServiceState.ENABLED].orEmpty().size)
-                deviceShieldPixels.reportLastDayDisableCount(stats[VpnServiceState.DISABLED].orEmpty().size)
-            }
-        }
-    }
-
     companion object {
         private const val WORKER_STATUS_REPORTING_TAG = "WORKER_STATUS_REPORTING_TAG"
     }
 }
 
-class DeviceShieldStatusReportingWorkerInjectorPlugin(
-    private val deviceShieldPixels: DeviceShieldPixels,
-    private val vpnDatabase: VpnDatabase
-) : WorkerInjectorPlugin {
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is DeviceShieldStatusReporting.DeviceShieldStatusReportingWorker) {
-            worker.deviceShieldPixels = deviceShieldPixels
-            worker.vpnServiceStateStatsDao = vpnDatabase.vpnServiceStateDao()
-            return true
+@ContributesWorker(AppScope::class)
+class DeviceShieldStatusReportingWorker(
+    private val context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+    @Inject
+    lateinit var deviceShieldPixels: DeviceShieldPixels
+    @Inject
+    lateinit var vpnServiceStateStatsDao: VpnServiceStateStatsDao
+
+    override suspend fun doWork(): Result {
+        if (TrackerBlockingVpnService.isServiceRunning(context)) {
+            deviceShieldPixels.reportEnabled()
+        } else {
+            deviceShieldPixels.reportDisabled()
         }
-        return false
+
+        sendLastDayVpnEnableDisableCounts()
+
+        return Result.success()
+    }
+
+    private suspend fun sendLastDayVpnEnableDisableCounts() = withContext(Dispatchers.IO) {
+        val startTime = LocalDateTime.now().minusDays(1).toLocalDate().atStartOfDay().run {
+            DatabaseDateFormatter.timestamp(this)
+        }
+
+        val lastDayVpnStats = vpnServiceStateStatsDao.getServiceStateStatsSince(startTime)
+            .groupBy { it.day }[startTime.substringBefore("T")]
+            ?.groupBy { it.vpnServiceStateStats.state }
+
+        lastDayVpnStats?.let { stats ->
+            deviceShieldPixels.reportLastDayEnableCount(stats[VpnServiceState.ENABLED].orEmpty().size)
+            deviceShieldPixels.reportLastDayDisableCount(stats[VpnServiceState.DISABLED].orEmpty().size)
+        }
     }
 }
