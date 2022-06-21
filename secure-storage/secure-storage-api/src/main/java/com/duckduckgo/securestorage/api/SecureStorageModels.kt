@@ -22,7 +22,7 @@ package com.duckduckgo.securestorage.api
  * [details] contains all l1 encrypted attributes
  * [password] plain text password. All succeeding l2 and above attributes should be added here directly.
  */
-data class WebsiteLoginCredentials(
+data class WebsiteLoginDetailsWithCredentials(
     val details: WebsiteLoginDetails,
     val password: String?
 )

@@ -106,8 +106,8 @@ include ':app'
 }
 
 "device-auth".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
 }
 
 rootProject.children.each { subproject ->
