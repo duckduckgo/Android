@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.Flow
 interface SecureStorageRepository {
     suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity)
 
-    suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentialsEntity
-
     suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>>
 
     suspend fun getWebsiteLoginCredentialsForId(id: Int): WebsiteLoginCredentialsEntity
@@ -45,9 +43,6 @@ class RealSecureStorageRepository constructor(
     override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentialsEntity) {
         websiteLoginCredentialsDao.insert(websiteLoginCredentials)
     }
-
-    override suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentialsEntity =
-        websiteLoginCredentialsDao.getWebsiteLoginCredentialsById(id)
 
     override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentialsEntity>> =
         websiteLoginCredentialsDao.websiteLoginCredentialsByDomain(domain)
