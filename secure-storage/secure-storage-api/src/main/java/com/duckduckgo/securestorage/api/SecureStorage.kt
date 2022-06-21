@@ -24,17 +24,17 @@ interface SecureStorage {
     /**
      * This method can be used to check if the secure storage has been instantiated properly.
      *
-     * @return `true` if all dependencies of SecureStorage have been instantiated properly otherwise `false
+     * @return `true` if all dependencies of SecureStorage have been instantiated properly otherwise `false`
      */
     fun canAccessSecureStorage(): Boolean
 
     /**
-     * This method adds a raw plaintext [WebsiteLoginCredentials] into the [SecureStorage].
+     * This method adds a raw plaintext [WebsiteLoginDetailsWithCredentials] into the [SecureStorage].
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials)
+    suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials)
 
     /**
      * This method returns all [WebsiteLoginDetails] with the [domain] stored in the [SecureStorage].
@@ -53,47 +53,47 @@ interface SecureStorage {
     suspend fun websiteLoginDetails(): Flow<List<WebsiteLoginDetails>>
 
     /**
-     * This method returns the [WebsiteLoginCredentials] with the [id] stored in the [SecureStorage].
+     * This method returns the [WebsiteLoginDetailsWithCredentials] with the [id] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
-     * @return [WebsiteLoginCredentials] containing the plaintext password
+     * @return [WebsiteLoginDetailsWithCredentials] containing the plaintext password
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentials
+    suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials
 
     /**
-     * This method returns the [WebsiteLoginCredentials] with the [domain] stored in the [SecureStorage].
+     * This method returns the [WebsiteLoginDetailsWithCredentials] with the [domain] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
-     * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
-     * containing the plaintext password
+     * @return Flow<List<WebsiteLoginDetailsWithCredentials>> a flow emitting a List of plain text WebsiteLoginDetailsWithCredentials stored
+     * in SecureStorage containing the plaintext password
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>>
 
     /**
-     * This method returns all the [WebsiteLoginCredentials] stored in the [SecureStorage].
+     * This method returns all the [WebsiteLoginDetailsWithCredentials] stored in the [SecureStorage].
      * This returns decrypted sensitive data (encrypted in L2). Use this only when sensitive data is needed to be accessed.
      *
-     * @return Flow<List<WebsiteLoginCredentials>>  a flow emitting a List of plain text WebsiteLoginCredentials stored in SecureStorage
-     * containing the plaintext password
+     * @return Flow<List<WebsiteLoginDetailsWithCredentials>>  a flow emitting a List of plain text WebsiteLoginDetailsWithCredentials stored
+     * in SecureStorage containing the plaintext password
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>>
+    suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>>
 
     /**
-     * This method updates an existing [WebsiteLoginCredentials] in the [SecureStorage].
+     * This method updates an existing [WebsiteLoginDetailsWithCredentials] in the [SecureStorage].
      *
      * @throws [SecureStorageException] if something went wrong while trying to perform the action. See type to get more info on the cause.
      */
     @Throws(SecureStorageException::class)
-    suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentials)
+    suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials)
 
     /**
-     * This method removes an existing [WebsiteLoginCredentials] associated with an [id] from the [SecureStorage].
+     * This method removes an existing [WebsiteLoginDetailsWithCredentials] associated with an [id] from the [SecureStorage].
      */
-    suspend fun deleteWebsiteLoginCredentials(id: Int)
+    suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int)
 }

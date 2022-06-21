@@ -19,7 +19,7 @@ package com.duckduckgo.securestorage.impl
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
+import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.securestorage.store.SecureStorageRepository
@@ -39,9 +39,9 @@ class RealSecureStorage @Inject constructor(
 
     override fun canAccessSecureStorage(): Boolean = l2DataTransformer.canProcessData()
 
-    override suspend fun addWebsiteLoginCredential(websiteLoginCredentials: WebsiteLoginCredentials) {
+    override suspend fun addWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) {
         withContext(dispatchers.io()) {
-            secureStorageRepository.addWebsiteLoginCredential(websiteLoginCredentials.toDataEntity())
+            secureStorageRepository.addWebsiteLoginCredential(websiteLoginDetailsWithCredentials.toDataEntity())
         }
     }
 
@@ -63,12 +63,12 @@ class RealSecureStorage @Inject constructor(
             }
         }
 
-    override suspend fun getWebsiteLoginCredentials(id: Int): WebsiteLoginCredentials =
+    override suspend fun getWebsiteLoginDetailsWithCredentials(id: Int): WebsiteLoginDetailsWithCredentials =
         withContext(dispatchers.io()) {
             secureStorageRepository.getWebsiteLoginCredentialsForId(id).toCredentials()
         }
 
-    override suspend fun websiteLoginCredentialsForDomain(domain: String): Flow<List<WebsiteLoginCredentials>> =
+    override suspend fun websiteLoginDetailsWithCredentialsForDomain(domain: String): Flow<List<WebsiteLoginDetailsWithCredentials>> =
         withContext(dispatchers.io()) {
             secureStorageRepository.websiteLoginCredentialsForDomain(domain).map { list ->
                 list.map {
@@ -77,7 +77,7 @@ class RealSecureStorage @Inject constructor(
             }
         }
 
-    override suspend fun websiteLoginCredentials(): Flow<List<WebsiteLoginCredentials>> =
+    override suspend fun websiteLoginDetailsWithCredentials(): Flow<List<WebsiteLoginDetailsWithCredentials>> =
         withContext(dispatchers.io()) {
             secureStorageRepository.websiteLoginCredentials().map { list ->
                 list.map {
@@ -86,17 +86,17 @@ class RealSecureStorage @Inject constructor(
             }
         }
 
-    override suspend fun updateWebsiteLoginCredentials(websiteLoginCredentials: WebsiteLoginCredentials) =
+    override suspend fun updateWebsiteLoginDetailsWithCredentials(websiteLoginDetailsWithCredentials: WebsiteLoginDetailsWithCredentials) =
         withContext(dispatchers.io()) {
-            secureStorageRepository.updateWebsiteLoginCredentials(websiteLoginCredentials.toDataEntity())
+            secureStorageRepository.updateWebsiteLoginCredentials(websiteLoginDetailsWithCredentials.toDataEntity())
         }
 
-    override suspend fun deleteWebsiteLoginCredentials(id: Int) =
+    override suspend fun deleteWebsiteLoginDetailsWithCredentials(id: Int) =
         withContext(dispatchers.io()) {
             secureStorageRepository.deleteWebsiteLoginCredentials(id)
         }
 
-    private fun WebsiteLoginCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
+    private fun WebsiteLoginDetailsWithCredentials.toDataEntity(): WebsiteLoginCredentialsEntity {
         val encryptedData = encryptData(password)
         return WebsiteLoginCredentialsEntity(
             id = details.id ?: 0,
@@ -107,8 +107,8 @@ class RealSecureStorage @Inject constructor(
         )
     }
 
-    private fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginCredentials =
-        WebsiteLoginCredentials(
+    private fun WebsiteLoginCredentialsEntity.toCredentials(): WebsiteLoginDetailsWithCredentials =
+        WebsiteLoginDetailsWithCredentials(
             details = toDetails(),
             password = decryptData(password, iv)
         )
