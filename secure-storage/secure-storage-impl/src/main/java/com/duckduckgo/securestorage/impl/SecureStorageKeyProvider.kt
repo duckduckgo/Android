@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
-import com.duckduckgo.securestorage.store.SecureStorageKeyStore
+import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import okio.ByteString.Companion.toByteString
 import java.security.Key
@@ -46,48 +46,48 @@ interface SecureStorageKeyProvider {
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyProvider @Inject constructor(
     private val randomBytesGenerator: RandomBytesGenerator,
-    private val secureStorageKeyStore: SecureStorageKeyStore,
+    private val secureStorageKeyRepository: SecureStorageKeyRepository,
     private val encryptionHelper: EncryptionHelper,
     private val secureStorageKeyGenerator: SecureStorageKeyGenerator
 ) : SecureStorageKeyProvider {
 
-    override fun canAccessKeyStore(): Boolean = secureStorageKeyStore.canUseEncryption()
+    override fun canAccessKeyStore(): Boolean = secureStorageKeyRepository.canUseEncryption()
 
     @Synchronized
     override fun getl1Key(): ByteArray {
         // If no key exists in the keystore, we generate a new one and store it
-        return if (secureStorageKeyStore.l1Key == null) {
+        return if (secureStorageKeyRepository.l1Key == null) {
             randomBytesGenerator.generateBytes(L1_PASSPHRASE_SIZE).also {
-                secureStorageKeyStore.l1Key = it
+                secureStorageKeyRepository.l1Key = it
             }
         } else {
-            secureStorageKeyStore.l1Key!!
+            secureStorageKeyRepository.l1Key!!
         }
     }
 
     @Synchronized
     override fun getl2Key(): Key {
-        val userPassword = if (secureStorageKeyStore.password == null) {
+        val userPassword = if (secureStorageKeyRepository.password == null) {
             randomBytesGenerator.generateBytes(PASSWORD_SIZE).also {
-                secureStorageKeyStore.password = it
+                secureStorageKeyRepository.password = it
             }
         } else {
-            secureStorageKeyStore.password
+            secureStorageKeyRepository.password
         }
 
         return getl2Key(userPassword!!.toByteString().base64())
     }
 
     private fun getl2Key(password: String): Key {
-        val keyMaterial = if (secureStorageKeyStore.encryptedL2Key == null) {
+        val keyMaterial = if (secureStorageKeyRepository.encryptedL2Key == null) {
             secureStorageKeyGenerator.generateKey().encoded.also {
                 encryptAndStoreL2Key(it, password)
             }
         } else {
             encryptionHelper.decrypt(
                 EncryptedBytes(
-                    secureStorageKeyStore.encryptedL2Key!!,
-                    secureStorageKeyStore.encryptedL2KeyIV!!
+                    secureStorageKeyRepository.encryptedL2Key!!,
+                    secureStorageKeyRepository.encryptedL2KeyIV!!
                 ),
                 deriveKeyFromPassword(password)
             )
@@ -103,16 +103,16 @@ class RealSecureStorageKeyProvider @Inject constructor(
             keyBytes,
             deriveKeyFromPassword(password)
         ).also {
-            secureStorageKeyStore.encryptedL2Key = it.data
-            secureStorageKeyStore.encryptedL2KeyIV = it.iv
+            secureStorageKeyRepository.encryptedL2Key = it.data
+            secureStorageKeyRepository.encryptedL2KeyIV = it.iv
         }.data
 
-    private fun getPasswordSalt() = if (secureStorageKeyStore.passwordSalt == null) {
+    private fun getPasswordSalt() = if (secureStorageKeyRepository.passwordSalt == null) {
         randomBytesGenerator.generateBytes(PASSWORD_KEY_SALT_SIZE).also {
-            secureStorageKeyStore.passwordSalt = it
+            secureStorageKeyRepository.passwordSalt = it
         }
     } else {
-        secureStorageKeyStore.passwordSalt!!
+        secureStorageKeyRepository.passwordSalt!!
     }
 
     private fun deriveKeyFromPassword(password: String) =

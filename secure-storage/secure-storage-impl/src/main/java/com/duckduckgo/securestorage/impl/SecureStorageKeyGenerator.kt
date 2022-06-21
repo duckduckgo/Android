@@ -23,10 +23,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.security.Key
 import javax.crypto.KeyGenerator
-import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
 
 interface SecureStorageKeyGenerator {
     fun generateKey(): Key
@@ -39,20 +40,14 @@ interface SecureStorageKeyGenerator {
 
 @ContributesBinding(AppScope::class)
 class RealSecureStorageKeyGenerator @Inject constructor(
-    private val appBuildConfig: AppBuildConfig
+    private val appBuildConfig: AppBuildConfig,
+    @Named("DerivedKeySecretFactoryFor26Up") private val derivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
+    @Named("DerivedKeySecretFactoryForLegacy") private val legacyDerivedKeySecretFactory: Provider<DerivedKeySecretFactory>,
 ) : SecureStorageKeyGenerator {
     private val keyGenerator: KeyGenerator by lazy {
         KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES).also {
             it.init(SIZE)
         }
-    }
-
-    private val passwordSecretKeyFactory by lazy {
-        SecretKeyFactory.getInstance("PBKDF2withHmacSHA256")
-    }
-
-    private val legacyPasswordSecretKeyFactory by lazy {
-        SecretKeyFactory.getInstance("PBKDF2withHmacSHA1")
     }
 
     override fun generateKey(): Key = keyGenerator.generateKey()
@@ -67,7 +62,7 @@ class RealSecureStorageKeyGenerator @Inject constructor(
         salt: ByteArray
     ): Key =
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
-            passwordSecretKeyFactory.generateSecret(
+            derivedKeySecretFactory.get().getKey(
                 PBEKeySpec(
                     password.toCharArray(),
                     salt,
@@ -76,7 +71,7 @@ class RealSecureStorageKeyGenerator @Inject constructor(
                 )
             )
         } else {
-            legacyPasswordSecretKeyFactory.generateSecret(
+            legacyDerivedKeySecretFactory.get().getKey(
                 PBEKeySpec(
                     password.toCharArray(),
                     salt,
