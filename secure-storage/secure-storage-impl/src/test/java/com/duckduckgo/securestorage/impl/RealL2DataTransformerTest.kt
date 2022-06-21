@@ -17,6 +17,7 @@
 package com.duckduckgo.securestorage.impl
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -43,10 +44,17 @@ class RealL2DataTransformerTest {
     }
 
     @Test
-    fun whenCanProcessDataThenReturnCanAccessKeyStore() {
+    fun whenCanProcessDataThenReturnCanAccessKeyStoreTrue() {
         whenever(secureStorageKeyProvider.canAccessKeyStore()).thenReturn(true)
 
         assertTrue(testee.canProcessData())
+    }
+
+    @Test
+    fun whenCanProcessDataFalseThenReturnCanAccessKeyStoreFalse() {
+        whenever(secureStorageKeyProvider.canAccessKeyStore()).thenReturn(false)
+
+        assertFalse(testee.canProcessData())
     }
 
     @Test

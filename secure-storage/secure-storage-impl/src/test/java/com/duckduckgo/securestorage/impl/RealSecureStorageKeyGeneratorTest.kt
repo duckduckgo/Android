@@ -45,7 +45,7 @@ class RealSecureStorageKeyGeneratorTest {
         MockitoAnnotations.openMocks(this)
 
         val key = mock(Key::class.java)
-        whenever(key.encoded).thenReturn("Zm9vYg==".toByteArray())
+        whenever(key.encoded).thenReturn(randomBytes)
         whenever(derivedKeySecretFactory.getKey(any())).thenReturn(key)
         whenever(legacyDerivedKeySecretFactory.getKey(any())).thenReturn(key)
 
@@ -63,7 +63,7 @@ class RealSecureStorageKeyGeneratorTest {
 
     @Test
     fun whenKeyIsGeneratedFromKeyMaterialThenAlgorithmShouldBeAES() {
-        val keyMaterial = "Zm9vYg==".toByteArray()
+        val keyMaterial = randomBytes
         assertEquals("AES", testee.generateKeyFromKeyMaterial(keyMaterial).algorithm)
     }
 
@@ -71,7 +71,7 @@ class RealSecureStorageKeyGeneratorTest {
     fun whenKeyIsGeneratedFromPasswordForSDK26MaterialThenUseDerivedKeySecretFactoryAndAlgorithmShouldBeAES() {
         whenever(appBuildConfig.sdkInt).thenReturn(26)
 
-        val result = testee.generateKeyFromPassword("password", "Zm9vYg==".toByteArray())
+        val result = testee.generateKeyFromPassword("password", randomBytes)
 
         verify(derivedKeySecretFactory).getKey(any())
         assertEquals("AES", result.algorithm)
@@ -81,9 +81,13 @@ class RealSecureStorageKeyGeneratorTest {
     fun whenKeyIsGeneratedFromPasswordForSDK25MaterialThenUseLegacyDerivedKeySecretFactoryAndAlgorithmShouldBeAES() {
         whenever(appBuildConfig.sdkInt).thenReturn(25)
 
-        val result = testee.generateKeyFromPassword("password", "Zm9vYg==".toByteArray())
+        val result = testee.generateKeyFromPassword("password", randomBytes)
 
         verify(legacyDerivedKeySecretFactory).getKey(any())
         assertEquals("AES", result.algorithm)
+    }
+
+    companion object {
+        private val randomBytes = "Zm9vYg==".toByteArray()
     }
 }
