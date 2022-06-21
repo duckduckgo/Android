@@ -21,9 +21,7 @@ import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import timber.log.Timber;
 
@@ -73,7 +71,7 @@ public class TCB {
     public SelectionKey selectionKey;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
-    public static final LRUCache<String, TCB> tcbCache =
+    private static final LRUCache<String, TCB> tcbCache =
             new LRUCache<>(
                     MAX_CACHE_SIZE,
                     (LRUCache.CleanupCallback<String, TCB>)
@@ -98,14 +96,10 @@ public class TCB {
         Timber.v("TCB cache size has now reached %d entries", tcbCache.size());
     }
 
-    public static List<TCB> copyTCBs() {
-        List<TCB> tcbCopy = new ArrayList<>();
+    public static int size() {
         synchronized (tcbCache) {
-            for (Map.Entry<String, TCB> entry : tcbCache.entrySet()) {
-                tcbCopy.add(entry.getValue());
-            }
+            return tcbCache.size();
         }
-        return tcbCopy;
     }
 
     public TCB(

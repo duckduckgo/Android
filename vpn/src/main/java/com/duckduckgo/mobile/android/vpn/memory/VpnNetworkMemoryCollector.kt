@@ -40,7 +40,7 @@ class VpnNetworkMemoryCollector @Inject constructor() : VpnMemoryCollectorPlugin
         }
 
         return mutableMapOf<String, String>().apply {
-            this["TCBCacheSize"] = TCB.tcbCache.size.toString()
+            this["TCBCacheSize"] = TCB.size().toString()
 
             memoryStat?.let { memory ->
                 val procMemory = memory.split(" ")
