@@ -20,7 +20,7 @@ import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginCredentials
+import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -35,7 +35,7 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
         val url = rawUrl.extractSchemeAndDomain() ?: return emptyList()
 
-        val storedCredentials = secureStorage.websiteLoginCredentialsForDomain(url).firstOrNull() ?: emptyList()
+        val storedCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: emptyList()
         Timber.v("Found %d credentials for %s", storedCredentials.size, url)
 
         return storedCredentials.map { it.toLoginCredentials() }
@@ -54,27 +54,27 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
 
         val loginDetails = WebsiteLoginDetails(domain = url, username = credentials.username)
-        val webSiteLoginCredentials = WebsiteLoginCredentials(loginDetails, password = credentials.password)
+        val webSiteLoginCredentials = WebsiteLoginDetailsWithCredentials(loginDetails, password = credentials.password)
 
-        secureStorage.addWebsiteLoginCredential(webSiteLoginCredentials)
+        secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
     }
 
     override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> {
-        return secureStorage.websiteLoginCredentials()
+        return secureStorage.websiteLoginDetailsWithCredentials()
             .map { list ->
                 list.map { it.toLoginCredentials() }
             }
     }
 
     override suspend fun deleteCredentials(id: Int) {
-        secureStorage.deleteWebsiteLoginCredentials(id)
+        secureStorage.deleteWebsiteLoginDetailsWithCredentials(id)
     }
 
     override suspend fun updateCredentials(credentials: LoginCredentials) {
-        secureStorage.updateWebsiteLoginCredentials(credentials.toWebsiteLoginCredentials())
+        secureStorage.updateWebsiteLoginDetailsWithCredentials(credentials.toWebsiteLoginCredentials())
     }
 
-    private fun WebsiteLoginCredentials.toLoginCredentials(): LoginCredentials {
+    private fun WebsiteLoginDetailsWithCredentials.toLoginCredentials(): LoginCredentials {
         return LoginCredentials(
             id = details.id,
             domain = details.domain,
@@ -83,8 +83,8 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
         )
     }
 
-    private fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginCredentials {
-        return WebsiteLoginCredentials(
+    private fun LoginCredentials.toWebsiteLoginCredentials(): WebsiteLoginDetailsWithCredentials {
+        return WebsiteLoginDetailsWithCredentials(
             details = WebsiteLoginDetails(domain = domain, username = username, id = id),
             password = password
         )
