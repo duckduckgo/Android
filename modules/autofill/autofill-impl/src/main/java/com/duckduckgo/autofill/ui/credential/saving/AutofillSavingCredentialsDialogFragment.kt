@@ -22,11 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.autofill.CredentialSavePickerDialog
-import com.duckduckgo.autofill.CredentialSavePickerDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_SAVE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.mobile.android.ui.view.toPx
@@ -42,10 +40,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         savedInstanceState: Bundle?
     ): View? {
         dialog?.setOnShowListener {
-            val d = it as BottomSheetDialog
-            val sheet: FrameLayout = d.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
-
-            d.findViewById<TextView>(R.id.shareCredentialsTitle)?.text = "Save Login?"
+            val dialog = it as BottomSheetDialog
+            val sheet: FrameLayout = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
             BottomSheetBehavior.from(sheet).setPeekHeight(600.toPx(), true)
         }
 
@@ -61,10 +57,10 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         view.findViewById<Button>(R.id.saveLoginButton).setOnClickListener {
 
             val result = Bundle().also {
-                it.putString("url", getOriginalUrl())
-                it.putParcelable("creds", getCredentialsToSave())
+                it.putString(CredentialSavePickerDialog.KEY_URL, getOriginalUrl())
+                it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, getCredentialsToSave())
             }
-            parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
+            parentFragment?.setFragmentResult(CredentialSavePickerDialog.RESULT_KEY_CREDENTIAL_RESULT_SAVE, result)
             dismiss()
         }
 
@@ -74,9 +70,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     }
 
-    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>("creds")!!
+    private fun getCredentialsToSave() = arguments?.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS)!!
 
-    private fun getOriginalUrl() = arguments?.getString("url")!!
+    private fun getOriginalUrl() = arguments?.getString(CredentialSavePickerDialog.KEY_URL)!!
 
     // needed to avoid an untyped cast when wanting to show DialogFragment, as outside this module
     // it is known by its interface CredentialAutofillPickerDialog, not as a DialogFragment.
@@ -92,8 +88,8 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             val fragment = AutofillSavingCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString("url", url)
-                    it.putParcelable("creds", credentials)
+                    it.putString(CredentialSavePickerDialog.KEY_URL, url)
+                    it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
                 }
             return fragment
         }

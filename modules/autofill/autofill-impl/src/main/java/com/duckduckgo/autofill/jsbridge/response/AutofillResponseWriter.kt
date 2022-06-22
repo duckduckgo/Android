@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.squareup.moshi.Moshi
-import timber.log.Timber
 
 class AutofillResponseWriter(val moshi: Moshi) {
 
@@ -29,17 +28,13 @@ class AutofillResponseWriter(val moshi: Moshi) {
     fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
         val credentialsResponse = ContainingCredentials.CredentialSuccessResponse(credentials)
         val topLevelResponse = ContainingCredentials(success = credentialsResponse)
-        return autofillDataAdapterCredentialsAvailable.toJson(topLevelResponse).also {
-            Timber.i("autofillDataResponse\n%s", it)
-        }
+        return autofillDataAdapterCredentialsAvailable.toJson(topLevelResponse)
     }
 
     fun generateEmptyResponseGetAutofillData(): String {
         val credentialsResponse = EmptyResponse.EmptyCredentialResponse()
         val topLevelResponse = EmptyResponse(success = credentialsResponse)
-        return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse).also {
-            Timber.i("autofillDataResponse\n%s", it)
-        }
+        return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse)
     }
 
     fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {

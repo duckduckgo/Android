@@ -30,7 +30,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.extractDomain
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
-import com.duckduckgo.autofill.CredentialAutofillPickerDialog.Companion.RESULT_KEY_CREDENTIAL_PICKER
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
 import com.duckduckgo.di.scopes.FragmentScope
@@ -91,26 +90,26 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         binding.availableCredentialsRecycler.adapter =
             CredentialsPickerRecyclerAdapter(this, faviconManager, getAvailableCredentials()) { selectedCredentials ->
                 val result = Bundle().also {
-                    it.putBoolean("cancelled", false)
-                    it.putString("url", getOriginalUrl())
-                    it.putParcelable("creds", selectedCredentials)
+                    it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)
+                    it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
+                    it.putParcelable(CredentialAutofillPickerDialog.KEY_CREDENTIALS, selectedCredentials)
                 }
-                parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_PICKER, result)
+                parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
                 dismiss()
             }
     }
 
     override fun onCancel(dialog: DialogInterface) {
         val result = Bundle().also {
-            it.putBoolean("cancelled", true)
-            it.putString("url", getOriginalUrl())
+            it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, true)
+            it.putString(CredentialAutofillPickerDialog.KEY_URL, getOriginalUrl())
         }
-        parentFragment?.setFragmentResult(RESULT_KEY_CREDENTIAL_PICKER, result)
+        parentFragment?.setFragmentResult(CredentialAutofillPickerDialog.RESULT_KEY_CREDENTIAL_PICKER, result)
     }
 
-    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>("creds")!!
+    private fun getAvailableCredentials() = arguments?.getParcelableArrayList<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS)!!
 
-    private fun getOriginalUrl() = arguments?.getString("url")!!
+    private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
 
     // needed to avoid an untyped cast when wanting to show DialogFragment, as outside this module
     // it is known by its interface CredentialAutofillPickerDialog, not as a DialogFragment.
@@ -128,8 +127,8 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             val fragment = AutofillSelectCredentialsDialogFragment()
             fragment.arguments =
                 Bundle().also {
-                    it.putString("url", url)
-                    it.putParcelableArrayList("creds", cr)
+                    it.putString(CredentialAutofillPickerDialog.KEY_URL, url)
+                    it.putParcelableArrayList(CredentialAutofillPickerDialog.KEY_CREDENTIALS, cr)
                 }
             return fragment
         }

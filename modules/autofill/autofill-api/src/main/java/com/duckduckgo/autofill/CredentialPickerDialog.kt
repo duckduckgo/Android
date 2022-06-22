@@ -25,6 +25,9 @@ interface CredentialAutofillPickerDialog {
     companion object {
         const val TAG = "CredentialAutofillPickerDialog"
         const val RESULT_KEY_CREDENTIAL_PICKER = "CredentialAutofillPickerDialogResult"
+        const val KEY_CANCELLED = "cancelled"
+        const val KEY_URL = "url"
+        const val KEY_CREDENTIALS = "credentials"
     }
 }
 
@@ -34,14 +37,8 @@ interface CredentialSavePickerDialog {
     companion object {
         const val TAG = "CredentialSavePickerDialog"
         const val RESULT_KEY_CREDENTIAL_RESULT_SAVE = "CredentialSavePickerDialogResultSave"
-    }
-}
-
-interface CredentialManagementDialog {
-    fun asDialogFragment(): DialogFragment
-
-    companion object {
-        const val TAG = "CredentialManagementDialog"
+        const val KEY_URL = "url"
+        const val KEY_CREDENTIALS = "credentials"
     }
 }
 

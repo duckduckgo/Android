@@ -18,44 +18,55 @@ package com.duckduckgo.app.browser.autofill
 
 import android.os.Bundle
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.browser.BrowserTabViewModel
+import com.duckduckgo.autofill.CredentialAutofillPickerDialog
+import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import timber.log.Timber
 import javax.inject.Inject
 
-class AutofillCredentialsSelectionResultHandler @Inject constructor(val deviceAuthenticator: DeviceAuthenticator) {
+class AutofillCredentialsSelectionResultHandler @Inject constructor(private val deviceAuthenticator: DeviceAuthenticator) {
 
     fun processAutofillCredentialSelectionResult(
         result: Bundle,
         browserTabFragment: BrowserTabFragment,
-        viewModel: BrowserTabViewModel,
+        credentialInjector: CredentialInjector,
     ) {
-        val originalUrl = result.getString("url") ?: return
+        val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialAutofillPickerDialog.KEY_CREDENTIALS) ?: return
 
-        if (result.getBoolean("cancelled")) {
+        if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
             Timber.v("Autofill: User cancelled credential selection")
-            viewModel.returnNoCredentialsWithPage(originalUrl)
+            credentialInjector.returnNoCredentialsWithPage(originalUrl)
             return
         }
 
-        deviceAuthenticator.authenticate(DeviceAuthenticator.Features.AUTOFILL, browserTabFragment) {
-            val successfullyAuthenticated = it is AuthResult.Success
+        deviceAuthenticator.authenticate(AUTOFILL, browserTabFragment) {
+            val successfullyAuthenticated = it is Success
             Timber.v("Autofill: user selected credential to use. Successfully authenticated: %s", successfullyAuthenticated)
 
             if (successfullyAuthenticated) {
-                val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@authenticate
-                viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
+                credentialInjector.shareCredentialsWithPage(originalUrl, selectedCredentials)
             } else {
-                viewModel.returnNoCredentialsWithPage(originalUrl)
+                credentialInjector.returnNoCredentialsWithPage(originalUrl)
             }
         }
     }
 
-    fun processSaveCredentialsResult(result: Bundle, viewModel: BrowserTabViewModel) {
-        val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return
-        val originalUrl = result.getString("url") ?: return
-        viewModel.saveCredentials(originalUrl, selectedCredentials)
+    fun processSaveCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver) {
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialSavePickerDialog.KEY_CREDENTIALS) ?: return
+        val originalUrl = result.getString(CredentialSavePickerDialog.KEY_URL) ?: return
+        credentialSaver.saveCredentials(originalUrl, selectedCredentials)
+    }
+
+    interface CredentialInjector {
+        fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials)
+        fun returnNoCredentialsWithPage(originalUrl: String)
+    }
+
+    interface AutofillCredentialSaver {
+        fun saveCredentials(url: String, credentials: LoginCredentials)
     }
 }

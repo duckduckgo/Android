@@ -69,7 +69,6 @@ class AutofillJavascriptInterface(
             withContext(Dispatchers.Main) {
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
-
                 } else {
                     callback?.onCredentialsAvailableToInject(credentials)
                 }
@@ -92,23 +91,20 @@ class AutofillJavascriptInterface(
             .replace("// INJECT availableInputTypes HERE", availableInputTypes)
     }
 
-    suspend fun generateAvailableInputTypes(url: String?): String {
+    private suspend fun generateAvailableInputTypes(url: String?): String {
         val credentialsAvailable = determineIfCredentialsAvailable(url)
-
         val emailAvailable = determineIfEmailAvailable()
 
         val json = autofillResponseWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
-            Timber.i("availableInputTypes for %s: \n%s", url, it)
+            Timber.v("availableInputTypes for %s: \n%s", url, it)
         }
         return "availableInputTypes = $json"
     }
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
-    private fun determineIfAutofillEnabled(): Boolean {
-        // in the future, we'll tie this into the global user-facing settings (and remote config)
-        return true
-    }
+    // in the future, we'll tie this into the global user-facing settings (and remote config)
+    private fun determineIfAutofillEnabled(): Boolean = true
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         val credentialsAvailable = if (url == null) {
@@ -122,7 +118,7 @@ class AutofillJavascriptInterface(
 
     @JavascriptInterface
     fun storeFormData(data: String) {
-        Timber.i("storeFormData called")
+        Timber.i("storeFormData called, credentials provided to be persisted")
 
         getAutofillDataJob += coroutineScope.launch {
             val currentUrl = currentUrl() ?: return@launch
