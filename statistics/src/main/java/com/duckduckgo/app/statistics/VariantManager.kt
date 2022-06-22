@@ -48,11 +48,11 @@ interface VariantManager {
 
             // AppTP Retention study experiment
             Variant(
-                key = "na", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyControl),
+                key = "na", weight = 0.0, features = listOf(VariantFeature.VpnRetentionStudyControl),
                 filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
             ),
             Variant(
-                key = "nb", weight = 1.0, features = listOf(VariantFeature.VpnRetentionStudyTreatment),
+                key = "nb", weight = 0.0, features = listOf(VariantFeature.VpnRetentionStudyTreatment),
                 filterBy = { config -> config.sdkInt < 31 && isEnglishLocale() }
             ),
         )

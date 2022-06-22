@@ -1,0 +1,178 @@
+<!-- https://dict.leo.org/myleo/register.php -->
+<form method="POST" action="register.php?" name="register" id="register" class="register m-bottom-large"
+    data-dz-viewport="workspace"><input type="hidden" name="postback" value="register"><input type="hidden" name="lp"
+        value="ende"><input type="hidden" name="lang" value="en">
+    <div class="bs-1 m-bottom-large" data-dz-role="container">
+        <header>
+            <h1 class="f1 bg-darkyellow p-h-large p-v">Create your LEO account</h1>
+        </header>
+        <div class="wgt-content">
+            <div title="" class="alert p-v-large p-right-large bg-blue"><span><i role="img " alt="i"
+                        class="icon noselect icon_information icon_size_24 darkgray"> </i></span><span>Fields marked
+                    with an asterisk ‘*’ are required fields. Your <b>username (login)</b> is not displayed, your
+                    <b>nick</b> is how others will identify you in your forum posts.<br>For more information, read the
+                    four-step guide to registration: <a target="_blank" class="fw-b white"
+                        href="/pages/help/ende/myLEO_en.html">MyLEO</a>&nbsp;</span></div>
+            <div class="p-h-large p-top-large">
+                <h2 class="f2 m-bottom-medium">Login data</h2>
+                <div data-dz-ui="servervalidator validator" class="form-table" data-dz-role="validator"><label
+                        class="form-row required"><span>Login<span data-dz-ui="hoverbox"><i
+                                    class="icon noselect icon_information-outline icon_size_16 d-ib p-left is-clickable pink"
+                                    role="img ">&nbsp;</i>
+                                <div class="d-n">
+                                    <header class="bg-darkgray p-large">Please choose a <strong>username
+                                        </strong><b>(login)</b>:</header>
+                                    <div class="tf1 p-h-large">
+                                        <ul class="lf1">
+                                            <li>For security reasons, your username is not visible to others.</li>
+                                            <li>Your username needs to be between 5 and 32 characters long and may
+                                                contain letters (excluding umlauts), numbers (0-9) and hyphens.</li>
+                                            <li>Usernames are unique. If someone else has already registered with your
+                                                username, LEO will offer you a list of alternatives to choose from.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </span></span><span>
+                            <div class="form-elm-t form-elm-t-singl" data-dz-area="ql-container">
+                                <div><input type="text" class="seamless" name="value[person][0][login][]"
+                                        id="value[person][0][login][]" accesskey="L" maxlength="36" value=""
+                                        autocomplete="username" data-manual-scoring="username"></div>
+                            </div>
+                            <div class="form-elm-helper">Between 5 and 32 characters</div>
+                        </span></label></div>
+                <div data-dz-ui="passwordvalidator validator" class="form-table" data-dz-role="validator"><label
+                        class="form-row required"><span>Password</span><span>
+                            <div class="form-elm-t form-elm-t-singl">
+                                <div><input type="password" class="seamless" name="value[person][0][password][]"
+                                        id="value[person][0][password][]" value="" accesskey="P"
+                                        autocomplete="new-password" 
+                                        data-manual-scoring="password"></div>
+                            </div>
+                            <div class="form-elm-helper"></div>
+                        </span></label><label class="form-row required"><span>Repeat password</span><span>
+                            <div class="form-elm-t form-elm-t-singl">
+                                <div><input type="password" class="seamless" name="value[person][0][password2][]"
+                                        id="value[person][0][password2][]" value="" accesskey="R"
+                                        autocomplete="new-password" 
+                                        data-manual-scoring="password"></div>
+                            </div>
+                            <div class="form-elm-helper"></div>
+                        </span></label></div>
+            </div>
+            <div class="bg-lightgray p-h-large p-top-large">
+                <h2 class="f2 m-bottom-large">Personal data</h2>
+                <div data-dz-ui="emailvalidator validator servervalidator" class="form-table" data-dz-role="validator">
+                    <label class="form-row required"><span>Email address</span><span>
+                            <div class="form-elm-t form-elm-t-singl" data-dz-area="ql-container">
+                                <div><input type="text" class="seamless" name="value[person][0][email][]"
+                                        id="value[person][0][email][]" accesskey="E" maxlength="132" value=""
+                                        autocomplete="email" 
+                                        data-manual-scoring="emailAddress"></div>
+                            </div>
+                            <div class="form-elm-helper"></div>
+                        </span></label><label class="form-row required"><span>Repeat Email address</span><span>
+                            <div class="form-elm-t form-elm-t-singl" data-dz-area="ql-container">
+                                <div><input type="text" class="seamless" name="value[person][0][email2][]"
+                                        id="value[person][0][email2][]" accesskey="R" maxlength="132" value=""
+                                        autocomplete="email" 
+                                        data-manual-scoring="emailAddress"></div>
+                            </div>
+                            <div class="form-elm-helper"></div>
+                        </span></label></div>
+                <div class="form-table">
+                    <div class="form-row"><span> </span><span><small class="darkgray">After registration, LEO will send
+                                you an email containing a link to a web page. You will be required to validate your
+                                email address and confirm your registration by clicking the link. Please make sure that
+                                the email address you indicated during the registration process is
+                                correct.</small></span></div>
+                </div>
+                <h2 class="f2 m-bottom-large">LEO community</h2>
+                <div data-dz-ui="servervalidator validator" class="form-table" data-dz-role="validator"><label
+                        class="form-row required"><span>Nick<span data-dz-ui="hoverbox"><i
+                                    class="icon noselect icon_information-outline icon_size_16 d-ib p-left is-clickable pink"
+                                    role="img ">&nbsp;</i>
+                                <div class="d-n">
+                                    <header class="bg-darkgray p-large">Please choose a <b>nick (alias)</b>:</header>
+                                    <div class="tf1 p-h-large">
+                                        <ul class="lf1">
+                                            <li>You do <strong>not </strong>need your nick to log in to your LEO
+                                                account.</li>
+                                            <li>Your nick is how others will identify you in your forum posts.</li>
+                                            <li>Your nick needs to be between 3 and 32 characters long and may contain
+                                                letters (including umlauts), numbers and hyphens.</li>
+                                            <li>Nicks are unique. If someone else has already registered with your nick,
+                                                LEO will offer you a list of alternatives to choose from.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </span></span><span>
+                            <div class="form-elm-t form-elm-t-singl" data-dz-area="ql-container">
+                                <div><input type="text" class="seamless" name="value[person][0][nick][]"
+                                        id="value[person][0][nick][]" accesskey="N" maxlength="36" value=""
+                                        autocomplete="nickname" data-manual-scoring="unknown"></div>
+                            </div>
+                            <div class="form-elm-helper">Between 3 and 32 characters</div>
+                        </span></label></div>
+                <div class="form-table"><label class="form-row"><span><input type="checkbox" value="true"
+                                class="form-elm" name="value[person][0][pm][]" id="value[person][0][pm][]"
+                                checked="checked"></span><span>Enable private messages<span data-dz-ui="hoverbox"><i
+                                    class="icon noselect icon_information-outline icon_size_16 d-ib p-left is-clickable pink"
+                                    role="img ">&nbsp;</i>
+                                <div class="d-n">
+                                    <header class="bg-darkgray p-large">
+                                        <strong>Get in touch with other users</strong>
+                                    </header>
+                                    <div class="tf1 p-large">Tick the box to exchange messages with other LEO users via
+                                        LEO's private message system (no email address required).</div>
+                                </div>
+                            </span>
+                            <div class="form-elm-helper"></div>
+                        </span></label></div>
+            </div>
+            <div class="p-h-large">
+                <h2 class="f2 m-bottom-medium">User verification</h2>
+                <div class="form-table"><label class="form-row required" data-dz-ui="validator"
+                        data-dz-ui-options="{&quot;validator&quot;: {&quot;regex&quot;: &quot;^[A-Z0-9]{6,6}$&quot;, &quot;code&quot;: &quot;CaptchaErr2&quot;}}"
+                        data-dz-role="validator"><span>Code</span><span><img style="vertical-align:top;" width="180px"
+                                height="60px" alt="captcha"
+                                src="/trainer/img/captcha.php?value=ZFGPfn9MwO4%2B7h7JnorHcyUkN%2FC5%2F%2Bt%2BKeRXe1NYjiXkhJ4FxdAp2XONVBvm1vvcQuAMpx1D%2BtCjCvBafMCmd9363Az7gYSC2zQ1dFnrjThBYz7wRwyxgSWs1Pub0X1Ff3EolwFnRxAT19%2FpYmYklTKv%2Bvq1hW6eViC9%2BkjVjY26O7QRH7RNWAnEzCaGYsWKB4f096%2Fz2UUpSqxcXtHKXcgz%2FBjp1GpEQCFbQrFWXEAObupmGRh7S0ROLMQzBhNbU1XwHNql2KML6ICWXtq47UVn5SOG2QyK9LKLVgkFAAHLS4fW37Ydy17RKlnMGSCc4Bkymtoog6RQU%2B9UJOnLlrAmt3vMnGBFCsNWvYMNHuEKNwBClUSqP2pw2XDokDiMKJ4oef%2BMEidY653dqlbsmIuw7Zi1OKZXRKzpZQsfIOH8If1i5nMZhijDNjhOxpb%2B5ZImm64WRcApTZfN3U%2F6iL4Bum%2FGMwftuvDsDD7qjKWyL3js5szT50EqkmFQWVPYRnTDNztkjLLNQMXiI0xNmNBRlwWRc8YKqwzUllPUCOgWPYdIecSNVeQ0pxFO8qo%2BDLv3mGijEX1KNXfbyakUsBSqZ0afKbbrqn%2BCNZfyIMDhxUJAYZ6KJkzTeEwMU4P7HoWPzpmWaey01Cx4Vdn%2Blp32VZYJb2GyApq4ua9r02I%3D"><input
+                                type="hidden" name="crypt" data-dz-validator="false"
+                                value="ZFGPfn9MwO4+7h7JnorHcyUkN/C5/+t+KeRXe1NYjiXkhJ4FxdAp2XONVBvm1vvcQuAMpx1D+tCjCvBafMCmd9363Az7gYSC2zQ1dFnrjThBYz7wRwyxgSWs1Pub0X1Ff3EolwFnRxAT19/pYmYklTKv+vq1hW6eViC9+kjVjY26O7QRH7RNWAnEzCaGYsWKB4f096/z2UUpSqxcXtHKXcgz/Bjp1GpEQCFbQrFWXEAObupmGRh7S0ROLMQzBhNbU1XwHNql2KML6ICWXtq47UVn5SOG2QyK9LKLVgkFAAHLS4fW37Ydy17RKlnMGSCc4Bkymtoog6RQU+9UJOnLlrAmt3vMnGBFCsNWvYMNHuEKNwBClUSqP2pw2XDokDiMKJ4oef+MEidY653dqlbsmIuw7Zi1OKZXRKzpZQsfIOH8If1i5nMZhijDNjhOxpb+5ZImm64WRcApTZfN3U/6iL4Bum/GMwftuvDsDD7qjKWyL3js5szT50EqkmFQWVPYRnTDNztkjLLNQMXiI0xNmNBRlwWRc8YKqwzUllPUCOgWPYdIecSNVeQ0pxFO8qo+DLv3mGijEX1KNXfbyakUsBSqZ0afKbbrqn+CNZfyIMDhxUJAYZ6KJkzTeEwMU4P7HoWPzpmWaey01Cx4Vdn+lp32VZYJb2GyApq4ua9r02I="><br><br><input
+                                type="text" autocomplete="off" name="value[person][0][captcha][]" size="" value=""
+                                maxlength="">
+                            <div class="form-elm-helper"><span class="darkgray">This code protects our site from SPAM.
+                                    It contains six characters (numbers and capital letters).</span></div>
+                        </span></label></div>
+                <div data-dz-ui="checkboxvalidator validator" class="form-table"
+                    data-dz-ui-options="{&quot;checkboxvalidator&quot;: {&quot;code&quot;: &quot;CheckboxErr1&quot;}}"
+                    data-dz-role="validator"><label class="form-row required"><span><input type="checkbox" value="true"
+                                class="form-elm" name="value[person][0][termsofuse][]"
+                                id="value[person][0][termsofuse][]"></span><span>I have read and accept the <a
+                                target="_blank" class="c-link tf-bold" href="/pages/about/ende/termsOfUsage_en.html">
+                                <strong>Terms of Usage</strong>
+                            </a> . I am aware that re-registering an account after being banned by the LEO team is a
+                            violation of our rules (cf. section 6.4 of our Terms of Usage).<div class="form-elm-helper">
+                            </div></span></label></div>
+                <div data-dz-ui="checkboxvalidator validator" class="form-table"
+                    data-dz-ui-options="{&quot;checkboxvalidator&quot;: {&quot;code&quot;: &quot;CheckboxErr2&quot;}}"
+                    data-dz-role="validator"><label class="form-row required"><span><input type="checkbox" value="true"
+                                class="form-elm" name="value[person][0][privacy][]"
+                                id="value[person][0][privacy][]"></span><span>I have read and understood the <a
+                                target="_blank" class="c-link tf-bold"
+                                href="/pages/about/ende/privacyPolicy_en.html">Privacy Policy</a> and agree to the
+                            collection and processing of my personal data in accordance with this policy.<div
+                                class="form-elm-helper"></div></span></label></div>
+            </div>
+            <div class="m-bottom-large p-h-large darkgray"><small>For more information, read the four-step guide to
+                    registration: <a target="_blank" class="fw-b darkblue"
+                        href="/pages/help/ende/myLEO_en.html">MyLEO</a>&nbsp;</small></div>
+        </div>
+        <footer class="wgt-footer bg-lightblue">
+            <div class="button-flat-container ta-r m-bottom-large"><input type="hidden" name="action"
+                    value="save"><button class="button button-flat m-right"
+                    onclick="$(this).dz(&quot;manager&quot;).root.register(this);return false;"
+                    onkeyup="if (event.keyCode == 13) {$(this).dz(&quot;manager&quot;).root.register(this);return false;;cancelEvent(event);}"
+                    type="submit" data-manual-submit="">Register now.</button></div>
+        </footer>
+    </div>
+</form>

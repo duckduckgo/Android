@@ -1,0 +1,73 @@
+<!-- https://account.reverso.net/Account/Register -->
+<form method="post" action="/Account/Register" novalidate="novalidate">
+    <div class="register-link register-link-mobile">
+        Already have an account? <a href="/Account/Login">Login here. </a>
+    </div>
+    <div class="text-danger validation-summary-valid" data-valmsg-summary="true">
+        <ul>
+            <li style="display:none"></li>
+        </ul>
+    </div>
+    <div class="form-group">
+        <label class="service-holder-label" for="Input_Email">Email</label>
+        <input class="form-control service-holder-inp" placeholder="Email" type="email" data-val="true"
+            data-val-email="The e-mail address is invalid." data-val-required="Please fill in the e-mail address."
+            id="Input_Email" name="Input.Email" value="" data-ddg-autofill="true" data-manual-scoring="emailAddress">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Input.Email"
+            data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        <label class="service-holder-label" for="Input_Password">Password:</label>
+        <input class="form-control service-holder-inp" placeholder="Password" type="password" data-val="true"
+            data-val-required="Please fill in the 'Password' field." id="Input_Password" name="Input.Password"
+            data-ddg-autofill="true" data-manual-scoring="password">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Input.Password"
+            data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        <label class="service-holder-label" for="Input_ConfirmPassword">Confirm password:</label>
+        <input class="form-control service-holder-inp" placeholder="Confirm password" type="password" data-val="true"
+            data-val-equalto="The passwords do not match!" data-val-equalto-other="*.Password"
+            data-val-required="Please confirm your password." id="Input_ConfirmPassword" name="Input.ConfirmPassword"
+            data-ddg-autofill="true" data-manual-scoring="password">
+        <span class="text-danger field-validation-valid" data-valmsg-for="Input.ConfirmPassword"
+            data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+
+        <input id="g-recaptcha-response" name="g-recaptcha-response" type="hidden"
+            value="03AGdBq24E--pTRh_ySUOh96x9agQvZ6lY5YK_Nipiw6-RIzSvlReO5hK2nFtHoM1iK5dBHQ1O-YVW7-B0qg7-dt08mY_WdZe0sNc-mWeYaHaL7jJO0Oe-oKAzkhNxNTTfc89wsZ4CP7vP9Funrxm40ywC23jaHOqqFZX6OHUOSu4BulPr6D-42xaOScyDhZqagi0NRz1Uo_ckerDKgS2UzMs21jfTSVwoWrZrk4xkPrM3Zl_m5DVE-XCYWCaaVPXne16WKgmJC88-PHZ8FdTXTZgZWZXNWdED5n9wVSCLefYefSmU77U8UqckaAUH5o-ncZ-4MtMgv6qICC58zGfd5jHuXBV5seYGYUPx8Nfajf1JAsg_qniTSe4OtOE9sdZrM07IV-T94uosd5zx1iK2_CKhSHUpdd8NFVjEntMiuk6axCKRF8WQhmmhL44ocInBroTaXCKKJ5MTHyunavnHMBsnMzX2WtnJtw">
+        <script
+            src="https://www.google.com/recaptcha/api.js?render=6LeUMPYUAAAAAIlafW_84Xez6o9HhnMiGwArkKUT&amp;hl=en"></script>
+        <script>
+            if (typeof grecaptcha !== 'undefined') {
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('6LeUMPYUAAAAAIlafW_84Xez6o9HhnMiGwArkKUT', { 'action': 'register' }).then(function (token) {
+                        document.getElementById('g-recaptcha-response').value = token;
+                    });
+                });
+            }
+        </script>
+    </div>
+    <div class="form-group">
+        <div class="service-holder-checkbox checkbox">
+            <label for="Input_IsSubscribedToNewsletters">
+                <input type="checkbox" checked="checked" data-val="true"
+                    data-val-required="Please fill in the 'I accept to receive email notifications from Reverso.' field."
+                    id="Input_IsSubscribedToNewsletters" name="Input.IsSubscribedToNewsletters" value="true">
+                I accept to receive email notifications from Reverso.
+            </label>
+        </div>
+    </div>
+    <div class="form-group text-center mb-0">
+        <button id="recaptcha" type="submit" class="btn btn-primary btn-submit" data-manual-submit="">Sign up</button>
+    </div>
+    <div class="form-group text-center">
+        <div class="tos-disclaimer">
+            by signing up, you agree to our <a class="link-small" href="/Terms">terms of use</a><br>
+        </div>
+    </div>
+    <input name="__RequestVerificationToken" type="hidden"
+        value="CfDJ8F91Pkfe7TBLoS8ZYzxdQYt6g99rDedDdYPUCj2vIpmSofIb1d-7-zhHvA2wUTuJRCYobzwK2eEzb6IWlP_4LUnephg-HrQ1NX_motSANjQvtSDBV3ZGMW7CiQARdYxv8ETRcdmaCs6wuFCLZBFq6zI"><input
+        name="Input.IsSubscribedToNewsletters" type="hidden" value="false">
+</form>

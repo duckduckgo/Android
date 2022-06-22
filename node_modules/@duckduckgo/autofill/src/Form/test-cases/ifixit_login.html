@@ -1,0 +1,22 @@
+<!-- https://www.ifixit.com/# -->
+<form id="loginForm" class="onlyLogin" method="post" action="/Login?nojs=true">
+    <div class="inputWrapper">
+        <label for="email">
+            Email </label>
+        <input type="email" pattern="[^ @]*@[^ @]*" name="email" id="email" title="Email" tabindex="872"
+            data-manual-scoring="username">
+    </div>
+
+    <div class="inputWrapper">
+        <a href="/login/forgot_password" id="forgotLink" data-action="showPasswordReset" tabindex="901"
+            class="forgot formToggle">
+            Forgot? </a>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" title="Password" tabindex="873"
+            data-manual-scoring="password">
+    </div>
+
+
+    <button id="loginBtn" type="submit" tabindex="874" class="button button-action-solid" data-manual-submit="">Log In
+    </button>
+</form>

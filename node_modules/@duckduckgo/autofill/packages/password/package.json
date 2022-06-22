@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "version": "1.0.0",
+  "description": "Password generation utilities",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test",
+    "generate:html": "node html-testing/generate.js",
+    "rules:update": "node scripts/rules.js --write-rules-json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/duckduckgo/duckduckgo-autofill.git"
+  },
+  "keywords": [
+    "duckduckgo",
+    "password"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/duckduckgo/duckduckgo-autofill/issues"
+  },
+  "homepage": "https://github.com/duckduckgo/duckduckgo-autofill/blob/main/packages/password/docs/password.md"
+}

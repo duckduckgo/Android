@@ -17,7 +17,6 @@
 package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
-import android.content.pm.ApplicationInfo.CATEGORY_UNDEFINED
 
 private fun parseAppCategory(category: Int): AppCategory {
     return when (category) {
@@ -45,12 +44,17 @@ fun ApplicationInfo.getAppCategoryCompat(): Int {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         category
     } else {
-        CATEGORY_UNDEFINED
+        -1 // inlined value of CATEGORY_UNDEFINED
     }
 }
 
 fun ApplicationInfo.isGame(): Boolean {
-    return getAppCategoryCompat() == ApplicationInfo.CATEGORY_GAME
+    val category = getAppCategoryCompat()
+    return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        category == ApplicationInfo.CATEGORY_GAME
+    } else {
+        category == 0 // inlined value of CATEGORY_GAME
+    }
 }
 
 fun ApplicationInfo.isSystemApp(): Boolean {

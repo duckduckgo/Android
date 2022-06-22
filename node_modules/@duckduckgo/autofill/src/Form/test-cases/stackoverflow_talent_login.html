@@ -1,0 +1,35 @@
+<!-- https://talent.stackoverflow.com/users/login -->
+<form class="d-flex gs12 gsy fd-column" id="login-form" action="https://talent.stackoverflow.com/users/login"
+    method="POST">
+    <input id="returnUrl" name="returnUrl" type="hidden"
+        value="https://talent.stackoverflow.com/users/authenticate?openid_identifier=https:%2F%2Fopenid.stackauth.com%2F">
+    <input id="rememberMe" name="rememberMe" type="hidden" value="True">
+    <input name="fkey" type="hidden" value="3e19d5c2225b156b070affa157de8050"><input name="sid" type="hidden" value="0">
+    <div class="flex--item">
+        <div class="d-flex gs4 gsy fd-column">
+            <label class="flex--item s-label" for="username">Email</label>
+            <div class="d-flex ps-relative">
+                <input class="flex--item s-input" type="email" name="username" id="username" size="30" maxlength="100"
+                    data-manual-scoring="username">
+            </div>
+        </div>
+    </div>
+    <div class="flex--item d-flex gs4 gsy fd-column fd-column-reverse">
+        <div class="flex--item d-flex ps-relative">
+            <input class="flex--item s-input" type="password" name="password" id="password"
+                data-manual-scoring="password">
+        </div>
+        <div class="d-flex ai-center jc-space-between">
+            <label class="flex--item s-label" for="password">Password</label>
+            <a class="flex--item s-link" id="forgot-pw" href="/users/notifypassword">Forgot password?</a>
+        </div>
+    </div>
+    <button class="flex--item s-btn s-btn__primary" type="submit" id="submit-button" name="submit-button"
+        data-manual-submit="">Log in</button>
+    <div id="openid_form" class="d-none">
+        <input type="hidden" id="oauth_version" name="oauth_version">
+        <input type="hidden" id="oauth_server" name="oauth_server">
+        <input type="hidden" id="openid_username" name="openid_username" value="">
+        <input type="hidden" id="openid_identifier" name="openid_identifier" class="openid-identifier">
+    </div>
+</form>

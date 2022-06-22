@@ -21,7 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.app.global.plugins.worker.WorkerInjectorPlugin
+import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
@@ -34,11 +34,14 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+@ContributesWorker(AppScope::class)
 class AppTrackerExclusionListUpdateWorker(
     context: Context,
     workerParameters: WorkerParameters
 ) : CoroutineWorker(context, workerParameters) {
+    @Inject
     lateinit var appTrackerListDownloader: AppTrackerListDownloader
+    @Inject
     lateinit var vpnDatabase: VpnDatabase
 
     override suspend fun doWork(): Result {
@@ -136,22 +139,5 @@ class AppTrackerExclusionListUpdateWorkerScheduler @Inject constructor(
 
     companion object {
         private const val APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG = "APP_TRACKER_EXCLUSION_LIST_UPDATE_WORKER_TAG"
-    }
-}
-
-@ContributesMultibinding(AppScope::class)
-class AppTrackerExclusionListUpdateWorkerPlugin @Inject constructor(
-    private val appTrackerListDownloader: AppTrackerListDownloader,
-    private val vpnDatabase: VpnDatabase
-) : WorkerInjectorPlugin {
-    override fun inject(worker: ListenableWorker): Boolean {
-        if (worker is AppTrackerExclusionListUpdateWorker) {
-            Timber.v("Injecting dependencies for AppTrackerExclusionListUpdateWorker")
-            worker.appTrackerListDownloader = appTrackerListDownloader
-            worker.vpnDatabase = vpnDatabase
-            return true
-        }
-
-        return false
     }
 }

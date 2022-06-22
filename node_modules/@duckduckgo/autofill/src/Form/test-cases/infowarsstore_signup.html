@@ -1,0 +1,106 @@
+<!-- https://www.infowarsstore.com/customer/account/create -->
+<form class="form create account form-create-account" action="https://www.infowarsstore.com/customer/account/createpost/" method="post" id="form-validate" enctype="multipart/form-data" autocomplete="off" novalidate="novalidate">
+        <input name="form_key" type="hidden" value="EmWgQqQLVrUGMnnB">    <fieldset class="fieldset create info">
+        <legend class="legend"><span>Personal Information</span></legend><br>
+        <input type="hidden" name="success_url" value="">
+        <input type="hidden" name="error_url" value="">
+        
+            <div class="field field-name-firstname required">
+            <label class="label" for="firstname"><span>First Name</span></label>
+            <div class="control">
+                <input type="text" id="firstname" name="firstname" value="" title="First Name" class="input-text required-entry" data-validate="{required:true}" autocomplete="off" aria-required="true"  data-manual-scoring="firstName">
+            </div>
+        </div>
+            <div class="field field-name-lastname required">
+            <label class="label" for="lastname"><span>Last Name</span></label>
+            <div class="control">
+                <input type="text" id="lastname" name="lastname" value="" title="Last Name" class="input-text required-entry" data-validate="{required:true}" autocomplete="off" aria-required="true"  data-manual-scoring="lastName">
+            </div>
+        </div>
+    
+    
+                <div class="field choice newsletter">
+            <input type="checkbox" name="is_subscribed" title="Sign Up for Newsletter" value="1" id="is_subscribed" class="checkbox">
+            <label for="is_subscribed" class="label">
+                <span>Sign Up for Newsletter</span>
+            </label>
+        </div>
+                        
+        
+                
+                
+                
+                                                            
+            
+    <div class="field choice">
+        <input type="checkbox" name="assistance_allowed_checkbox" title="Allow remote shopping assistance" value="1" id="assistance_allowed_checkbox" class="checkbox">
+        <label for="assistance_allowed_checkbox" class="label">
+            <span>Allow remote shopping assistance</span>
+        </label>
+
+        <input type="hidden" name="assistance_allowed" value="">
+
+        <div class="field-tooltip toggle">
+            <span id="tooltip-label" class="label"><span>Tooltip</span></span>
+            <span id="tooltip" class="field-tooltip-action action-help" tabindex="0" data-toggle="dropdown" data-bind="mageInit: {'dropdown':{'activeClass': '_active', 'parent': '.field-tooltip.toggle'}}" aria-labelledby="tooltip-label" aria-haspopup="true" aria-expanded="false" role="button">
+         </span>
+            <div class="field-tooltip-content" data-target="dropdown" aria-hidden="true">
+                This allows merchants to "see what you see" and take actions on your behalf in order to provide better assistance.            </div>
+        </div>
+    </div>
+    </fieldset>
+
+    <fieldset class="fieldset create account" data-hasrequired="* Required Fields">
+        <legend class="legend"><span>Sign-in Information</span></legend><br>
+        <div class="field required">
+            <label for="email_address" class="label"><span>Email</span></label>
+            <div class="control">
+                <input type="email" name="email" id="email_address" autocomplete="email" value="" title="Email" class="input-text" data-validate="{required:true, 'validate-email':true}" aria-required="true"  data-manual-scoring="emailAddress">
+            </div>
+        </div>
+        <div class="field password required">
+            <label for="password" class="label"><span>Password</span></label>
+            <div class="control">
+                                <input type="password" name="password" id="password" title="Password" class="input-text" data-password-min-length="8" data-password-min-character-sets="1" data-validate="{required:true, 'validate-customer-password':true}" autocomplete="off" aria-required="true"  data-manual-scoring="password">
+                <div id="password-strength-meter-container" data-role="password-strength-meter" aria-live="polite">
+                    <div id="password-strength-meter" class="password-strength-meter">
+                        Password Strength:
+                        <span id="password-strength-meter-label" data-role="password-strength-meter-label">
+                            No Password                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="field confirmation required">
+            <label for="password-confirmation" class="label">
+                <span>Confirm Password</span>
+            </label>
+            <div class="control">
+                <input type="password" name="password_confirmation" title="Confirm Password" id="password-confirmation" class="input-text" data-validate="{required:true, equalTo:'#password'}" aria-required="true"  data-manual-scoring="password">
+            </div>
+        </div>
+        <div class="field choice" data-bind="scope: 'showPassword'">
+            <!-- ko template: getTemplate() -->
+
+<input type="checkbox" name="show-password" title="Show Password" id="show-password" class="checkbox" data-role="show-password" data-bind="checked: isPasswordVisible">
+<label for="show-password" class="label"><span data-bind="i18n: 'Show Password'">Show Password</span></label>
+<!-- /ko -->
+        </div>
+    </fieldset>
+
+    <fieldset class="fieldset additional_info">
+            </fieldset>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit" class="action submit primary" title="Create an Account" data-manual-submit="">
+                <span>Create an Account</span>
+            </button>
+        </div>
+        <div class="secondary">
+            <a class="action back" href="https://www.infowarsstore.com/customer/account/login/">
+                <span>Back</span>
+            </a>
+        </div>
+    </div>
+</form>

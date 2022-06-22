@@ -18,6 +18,9 @@ package com.duckduckgo.app.global
 import android.net.Uri
 import android.net.Uri.parse
 import com.duckduckgo.app.global.UrlScheme.Companion.http
+import java.io.UnsupportedEncodingException
+import java.net.URLEncoder
+import java.util.*
 
 val IP_REGEX =
     Regex(
@@ -123,8 +126,57 @@ data class ValidUrl(
 
 fun Uri.replaceQueryParameters(queryParameters: List<String>): Uri {
     val newUri = buildUpon().clearQuery()
-    for (parameter in queryParameters) {
-        newUri.appendQueryParameter(parameter, getQueryParameter(parameter))
+    val query = queryParameters.joinToString(separator = "&") { parameter ->
+        getEncodedQueryParameters(parameter).joinToString(separator = "&") {
+            "$parameter=$it"
+        }
     }
+    newUri.encodedQuery(query)
     return newUri.build()
+}
+
+/**
+ * This method is exactly the same as [Uri.getQueryParameters] except it doesn't decode each entry in the values list.
+ * @return a list of encoded values.
+ */
+fun Uri.getEncodedQueryParameters(key: String?): List<String> {
+    if (isOpaque) {
+        throw UnsupportedOperationException("This isn't a hierarchical URI.")
+    }
+    if (key == null) {
+        throw NullPointerException("key")
+    }
+    val query: String = encodedQuery ?: return emptyList()
+    val encodedKey: String = try {
+        URLEncoder.encode(key, "UTF-8")
+    } catch (e: UnsupportedEncodingException) {
+        throw AssertionError(e)
+    }
+    val values = ArrayList<String>()
+    var start = 0
+    do {
+        val nextAmpersand = query.indexOf('&', start)
+        val end = if (nextAmpersand != -1) nextAmpersand else query.length
+        var separator = query.indexOf('=', start)
+        if (separator > end || separator == -1) {
+            separator = end
+        }
+        if (separator - start == encodedKey.length &&
+            query.regionMatches(start, encodedKey, 0, encodedKey.length)
+        ) {
+            if (separator == end) {
+                values.add("")
+            } else {
+                values.add(query.substring(separator + 1, end))
+            }
+        }
+
+        // Move start to end of name.
+        start = if (nextAmpersand != -1) {
+            nextAmpersand + 1
+        } else {
+            break
+        }
+    } while (true)
+    return Collections.unmodifiableList(values)
 }

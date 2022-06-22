@@ -1,0 +1,29 @@
+<!-- https://www.infowarsstore.com/customer/account/login -->
+<form class="form form-login" action="https://www.infowarsstore.com/customer/account/loginPost/" method="post" id="login-form" novalidate="novalidate">
+            <input name="form_key" type="hidden" value="EmWgQqQLVrUGMnnB">            <fieldset class="fieldset login" data-hasrequired="* Required Fields">
+                <div class="field note">If you have an account, sign in with your email address.</div>
+                <div class="field email required">
+                    <label class="label" for="email"><span>Email</span></label>
+                    <div class="control">
+                        <input name="login[username]" value="" autocomplete="off" id="email" type="email" class="input-text" title="Email" data-validate="{required:true, 'validate-email':true}" aria-required="true" data-manual-scoring="username">
+                    </div>
+                </div>
+                <div class="field password required">
+                    <label for="pass" class="label"><span>Password</span></label>
+                    <div class="control">
+                        <input name="login[password]" type="password" autocomplete="off" class="input-text" id="pass" title="Password" data-validate="{required:true}" aria-required="true" data-manual-scoring="password">
+                    </div>
+                </div>
+                <div class="field choice" data-bind="scope: 'showPassword'">
+                    <!-- ko template: getTemplate() -->
+
+<input type="checkbox" name="show-password" title="Show Password" id="show-password" class="checkbox" data-role="show-password" data-bind="checked: isPasswordVisible">
+<label for="show-password" class="label"><span data-bind="i18n: 'Show Password'">Show Password</span></label>
+<!-- /ko -->
+                </div>
+                                <div class="actions-toolbar">
+                    <div class="primary"><button type="submit" class="action login primary" name="send" id="send2" data-manual-submit=""><span>Sign In</span></button></div>
+                    <div class="secondary"><a class="action remind" href="https://www.infowarsstore.com/customer/account/forgotpassword/"><span>Forgot Your Password?</span></a></div>
+                </div>
+            </fieldset>
+        </form>

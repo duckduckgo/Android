@@ -1,55 +1,124 @@
 {
     "trackingParameters": {
-        "name": "Tracking parameters are able to be removed from a URL",
+        "name": "Tracking parameters protection",
         "desc": "Those tests use config_reference.json",
         "referenceConfig": "config_reference.json",
         "tests": [
             {
-                "name": "Remove utm tracking parameters from URL",
-                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&utm_campaign=test&utm_term=test&utm_content=test",
-                "expectURL": "http://www.example.com/test.html",
-                "exceptPlatforms": []
-            },
-            {
-                "name": "Remove fbclid parameter and retain other parameters",
-                "testURL": "http://www.example.com/test.html?fbclid=test&q=test&id=5",
-                "expectURL": "http://www.example.com/test.html?q=test&id=5",
-                "exceptPlatforms": []
-            },
-            {
-                "name": "Retain all non tracking parameters",
+                "name": "Non-tracking parameters are not removed",
                 "testURL": "http://www.example.com/test.html?q=test&id=5",
                 "expectURL": "http://www.example.com/test.html?q=test&id=5",
                 "exceptPlatforms": []
             },
             {
-                "name": "Don't remove parameters because domain is in exceptions list",
-                "testURL": "http://example2.com/test.html?gclid=test&fbclid=test",
-                "expectURL": "http://example2.com/test.html?gclid=test&fbclid=test",
+                "name": "Parameters with values that match tracking parameter names are not removed",
+                "testURL": "http://www.example.com/test.html?a=utm_test&b=regexp&c=gclid&d=fbclid",
+                "expectURL": "http://www.example.com/test.html?a=utm_test&b=regexp&c=gclid&d=fbclid",
                 "exceptPlatforms": []
             },
             {
-                "name": "Remove 2 tracking parameters and retain other parameters",
-                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&q=test&id=5",
+                "name": "Plain-text tracking paramters are removed",
+                "testURL": "http://example.com/?a=123&gclid=test&fbclid=value&b=456",
+                "expectURL": "http://example.com/?a=123&b=456",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "When plain-text tracking parameters are removed, other parameters are preserved",
+                "testURL": "http://www.example.com/test.html?fbclid=test&q=test&id=5",
                 "expectURL": "http://www.example.com/test.html?q=test&id=5",
                 "exceptPlatforms": []
             },
             {
-                "name": "Param is in URL path",
-                "testURL": "http://gclid.example.com/fbclid=123",
-                "expectURL": "http://gclid.example.com/fbclid=123",
+                "name": "Parameters similar to plain-text tracking parameters are not removed",
+                "testURL": "http://www.example.com/test.html?fbclid1=test",
+                "expectURL": "http://www.example.com/test.html?fbclid1=test",
                 "exceptPlatforms": []
             },
             {
-                "name": "Param has no value",
-                "testURL": "http://www.example.com/test.html?fbclid&gclid",
+                "name": "Parameters case insensitively matching plain-text tracking parameters are not removed",
+                "testURL": "http://www.example.com/test.html?FBCLID=test",
+                "expectURL": "http://www.example.com/test.html?FBCLID=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters that match a regular expression are removed",
+                "testURL": "http://www.example.com/test.html?utm_source=test&utm_medium=test&utm_campaign=test&utm_term=test&utm_content=test",
                 "expectURL": "http://www.example.com/test.html",
                 "exceptPlatforms": []
             },
             {
-                "name": "Param ALMOST matches",
-                "testURL": "http://www.example.com/test.html?fbclid1=test",
-                "expectURL": "http://www.example.com/test.html?fbclid1=test",
+                "name": "Tracking parameters that only case-insensitively match a regular expressions are not removed",
+                "testURL": "http://www.example.com/test.html?utm_NOPE=test",
+                "expectURL": "http://www.example.com/test.html?utm_NOPE=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters only literally matching regular expression are not removed",
+                "testURL": "http://www.example.com/test.html?reg*exp=test&regexp=test",
+                "expectURL": "http://www.example.com/test.html?reg*exp=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Duplicate plain-text tracking parameters are removed",
+                "testURL": "http://www.example.com/test.html?gclid=123&gclid=456&test=test&gclid=789",
+                "expectURL": "http://www.example.com/test.html?test=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Duplicate non-tracking parameters are not removed",
+                "testURL": "http://www.example.com/test.html?test=123&test=456&utm_source=test&test=789",
+                "expectURL": "http://www.example.com/test.html?test=123&test=456&test=789",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Remaining parameter order is preserved after tracking parameters are removed",
+                "testURL": "http://www.example.com/test.html?ZEBRA=zzz&zebra=ZZZ&utm_source=test&alpca=BBB&alpca=bbb",
+                "expectURL": "http://www.example.com/test.html?ZEBRA=zzz&zebra=ZZZ&alpca=BBB&alpca=bbb",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are not removed when request domain is in exceptions list",
+                "testURL": "http://allowlisted.com/test.html?gclid=test&fbclid=test",
+                "expectURL": "http://allowlisted.com/test.html?gclid=test&fbclid=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are not removed when request domain is subdomain of domain in exceptions list",
+                "testURL": "http://subdomain.allowlisted.com/test.html?gclid=test&fbclid=test",
+                "expectURL": "http://subdomain.allowlisted.com/test.html?gclid=test&fbclid=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are removed when request + initiator domain are not in exceptions list",
+                "testURL": "http://example.com/test.html?gclid=test&fbclid=test",
+                "initiatorURL": "http://example.com/",
+                "expectURL": "http://example.com/test.html",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are not removed when the initiator domain is in exceptions list",
+                "testURL": "http://example.com/test.html?gclid=test&fbclid=test",
+                "initiatorURL": "http://allowlisted.com/",
+                "expectURL": "http://example.com/test.html?gclid=test&fbclid=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are not removed when initiator domain is subdomain of domain in exceptions list",
+                "testURL": "http://example.com/test.html?gclid=test&fbclid=test",
+                "initiatorURL": "http://subdomain.allowlisted.com/",
+                "expectURL": "http://example.com/test.html?gclid=test&fbclid=test",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are removed even if other parts of the URL match a tracking parameter name",
+                "testURL": "http://gclid.example.com/gclid/gclid?a=123&gclid=456",
+                "expectURL": "http://gclid.example.com/gclid/gclid?a=123",
+                "exceptPlatforms": []
+            },
+            {
+                "name": "Tracking parameters are removed correctly even when some parameters have no value",
+                "testURL": "http://www.example.com/test.html?a=123&fbclid&gclid&regexp&utm_tracker&b=456",
+                "expectURL": "http://www.example.com/test.html?a=123&b=456",
                 "exceptPlatforms": []
             }
         ]
