@@ -21,18 +21,23 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class AutofillRequestParser @Inject constructor(val moshi: Moshi) {
+interface AutofillRequestParser {
+    suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest
+    suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest
+}
+
+class AutofillJsonRequestParser @Inject constructor(val moshi: Moshi) : AutofillRequestParser {
 
     private val autofillDataRequestParser by lazy { moshi.adapter(AutofillDataRequest::class.java) }
     private val autofillStoreFormDataRequestParser by lazy { moshi.adapter(AutofillStoreFormDataRequest::class.java) }
 
-    suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
+    override suspend fun parseAutofillDataRequest(request: String): AutofillDataRequest {
         return withContext(Dispatchers.Default) {
             autofillDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }
     }
 
-    suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
+    override suspend fun parseStoreFormDataRequest(request: String): AutofillStoreFormDataRequest {
         return withContext(Dispatchers.Default) {
             autofillStoreFormDataRequestParser.fromJson(request) ?: throw IllegalArgumentException("Failed to parse autofill request")
         }

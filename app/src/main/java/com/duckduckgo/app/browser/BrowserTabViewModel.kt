@@ -2673,6 +2673,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun updateCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.updateCredentials(url, credentials)
+        }
+    }
+
     fun onConfigurationChanged() {
         browserViewState.value = currentBrowserViewState().copy(
             forceRenderingTicker = System.currentTimeMillis()

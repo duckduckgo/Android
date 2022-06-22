@@ -26,10 +26,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-class AutofillMessagePoster {
+interface AutofillMessagePoster {
+    suspend fun postMessage(webView: WebView?, message: String)
+}
+
+class AutofillWebViewMessagePoster : AutofillMessagePoster {
 
     @SuppressLint("RequiresFeature")
-    suspend fun postMessage(webView: WebView?, message: String) {
+    override suspend fun postMessage(webView: WebView?, message: String) {
 
         webView?.let { wv ->
             withContext(Dispatchers.Main) {

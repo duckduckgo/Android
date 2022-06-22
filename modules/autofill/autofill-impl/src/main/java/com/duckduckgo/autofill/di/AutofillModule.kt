@@ -26,7 +26,10 @@ import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.InlineBrowserAutofill
+import com.duckduckgo.autofill.jsbridge.AutofillWebViewMessagePoster
+import com.duckduckgo.autofill.jsbridge.request.AutofillJsonRequestParser
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
+import com.duckduckgo.autofill.jsbridge.response.AutofillJsonResponseWriter
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.autofill.ui.CredentialAutofillDialogAndroidFactory
@@ -52,12 +55,12 @@ class AutofillModule {
 
     @Provides
     fun providesAutofillMessagePoster(): AutofillMessagePoster {
-        return AutofillMessagePoster()
+        return AutofillWebViewMessagePoster()
     }
 
     @Provides
     fun providesAutofillResponseWriter(moshi: Moshi): AutofillResponseWriter {
-        return AutofillResponseWriter(moshi)
+        return AutofillJsonResponseWriter(moshi)
     }
 
     @Provides
@@ -88,5 +91,10 @@ class AutofillModule {
     @Provides
     fun providesAutofillInjector(): JavascriptInjector {
         return FileBasedJavaScriptInjector()
+    }
+
+    @Provides
+    fun autofillRequestParser(moshi: Moshi): AutofillRequestParser {
+        return AutofillJsonRequestParser(moshi)
     }
 }

@@ -19,8 +19,10 @@ package com.duckduckgo.autofill.ui
 import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment
+import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingUpdatingExistingCredentialsDialogFragment
 import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
 
 class CredentialAutofillDialogAndroidFactory : CredentialAutofillDialogFactory {
@@ -31,5 +33,9 @@ class CredentialAutofillDialogAndroidFactory : CredentialAutofillDialogFactory {
 
     override fun autofillSavingCredentialsDialog(url: String, credentials: LoginCredentials): CredentialSavePickerDialog {
         return AutofillSavingCredentialsDialogFragment.instance(url, credentials)
+    }
+
+    override fun autofillSavingUpdateCredentialsDialog(url: String, credentials: LoginCredentials): CredentialUpdateExistingCredentialsDialog {
+        return AutofillSavingUpdatingExistingCredentialsDialogFragment.instance(url, credentials)
     }
 }
