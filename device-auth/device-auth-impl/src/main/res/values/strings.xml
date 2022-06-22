@@ -15,6 +15,6 @@
   -->
 
 <resources>
-    <string name="autofill_auth_text">Unlock to use saved logins</string>
-    <string name="biometric_prompt_title">Enter credentials for "DuckDuckGo"</string>
+    <string name="autofill_auth_text">Unlock to use Saved Logins</string>
+    <string name="biometric_prompt_title">Verify it\'s you</string>
 </resources>
