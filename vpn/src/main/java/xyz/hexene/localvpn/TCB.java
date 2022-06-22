@@ -23,15 +23,18 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import timber.log.Timber;
 
 public class TCB {
     public final long creationTime;
     public final String ipAndPort;
 
-    public long sequenceNumberToClient, sequenceNumberToClientInitial;
-    public long sequenceNumberToServer, sequenceNumberToServerInitial;
-    public long acknowledgementNumberToClient, acknowledgementNumberToServer;
+    public final AtomicLong sequenceNumberToClient = new AtomicLong();
+    public final AtomicLong sequenceNumberToClientInitial = new AtomicLong();
+    public final long sequenceNumberToServer, sequenceNumberToServerInitial;
+    public final AtomicLong acknowledgementNumberToClient = new AtomicLong();
+    public final AtomicLong acknowledgementNumberToServer = new AtomicLong();
     public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
@@ -114,12 +117,12 @@ public class TCB {
         this.tcbState = new TcbState();
         this.ipAndPort = ipAndPort;
 
-        this.sequenceNumberToClient = sequenceNumberToClient;
-        this.sequenceNumberToClientInitial = sequenceNumberToClient;
+        this.sequenceNumberToClient.set(sequenceNumberToClient);
+        this.sequenceNumberToClientInitial.set(sequenceNumberToClient);
         this.sequenceNumberToServer = sequenceNumberToServer;
         this.sequenceNumberToServerInitial = sequenceNumberToServer;
-        this.acknowledgementNumberToClient = acknowledgementNumberToClient;
-        this.acknowledgementNumberToServer = acknowledgementNumberToServer;
+        this.acknowledgementNumberToClient.set(acknowledgementNumberToClient);
+        this.acknowledgementNumberToServer.set(acknowledgementNumberToServer);
 
         this.channel = channel;
         this.referencePacket = referencePacket;
