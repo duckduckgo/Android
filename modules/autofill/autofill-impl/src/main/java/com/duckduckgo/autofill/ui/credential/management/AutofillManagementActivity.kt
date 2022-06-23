@@ -30,7 +30,9 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementEditMode
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementViewMode
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
@@ -60,19 +62,27 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        observeViewModel()
+        viewModel.launchDeviceAuth(savedInstanceState)
+    }
 
-        // TODO implement reauth when app is backgrounded
-        deviceAuthenticator.authenticate(AUTOFILL, this) {
-            if (it == AuthResult.Success) {
-                if (savedInstanceState == null) {
-                    showViewMode()
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (!hasFocus) viewModel.lock()
+    }
+
+    private fun launchDeviceAuth(savedInstanceState: Bundle?) {
+        if (deviceAuthenticator.hasValidDeviceAuthentication()) {
+            deviceAuthenticator.authenticate(AUTOFILL, this) {
+                if (it == AuthResult.Success) {
+                    viewModel.unlock()
+                    if (savedInstanceState == null) {
+                        showViewMode()
+                    }
                 }
-
-                observeViewModel()
-            } else {
-                // TODO show locked autofill UI once available
-                finish()
             }
+        } else {
+            viewModel.disabled()
         }
     }
 
@@ -95,7 +105,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
-
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
@@ -105,6 +114,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowEditMode -> showEditMode(command.credentials)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
+            is ShowDisabledMode -> showDisabledMode()
+            is ShowLockedMode -> showLockMode()
+            is LaunchDeviceAuth -> launchDeviceAuth(command.savedInstanceState)
             else -> processed = false
         }
         if (processed) {
@@ -139,6 +151,27 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         inEditMode = true
     }
 
+    private fun showLockMode() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            // addToBackStack(null)
+            replace(
+                R.id.fragment_container_view,
+                AutofillManagementLockedMode.instance()
+            )
+        }
+        inEditMode = false
+    }
+
+    private fun showDisabledMode() {
+        supportFragmentManager.commit {
+            setReorderingAllowed(true)
+            // addToBackStack(null)
+            replace(R.id.fragment_container_view, AutofillManagementDisabledMode.instance())
+        }
+        inEditMode = false
+    }
+
     override fun onBackPressed() {
         if (inEditMode) {
             showViewMode()
@@ -152,7 +185,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             return Intent(context, AutofillManagementActivity::class.java)
         }
     }
-
 }
 
 @ContributesTo(AppScope::class)
