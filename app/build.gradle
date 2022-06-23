@@ -201,6 +201,9 @@ dependencies {
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
 
+    implementation project(':site-permissions-api')
+    implementation project(':site-permissions-impl')
+
     implementation project(':bandwidth-impl')
     implementation project(':bandwidth-store')
 
