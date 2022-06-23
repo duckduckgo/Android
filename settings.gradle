@@ -25,17 +25,12 @@ rootDir.eachFile(groovy.io.FileType.DIRECTORIES) { File parent ->
                     }
                 }
                 if (shouldAddSubProject) {
-                    include ":${child.name}"; project(":${child.name}").projectDir = new File("${parent.name}/${child.name}")
+                    include ":${child.name}";
+                    project(":${child.name}").projectDir = new File("${parent.name}/${child.name}")
                 }
             }
         }
     }
-}
-
-"site-permissions".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
 }
 
 "ad-click".with {
