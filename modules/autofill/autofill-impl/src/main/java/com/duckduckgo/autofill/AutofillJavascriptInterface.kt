@@ -103,8 +103,8 @@ class AutofillJavascriptInterface(
 
     private fun determineIfEmailAvailable(): Boolean = emailManager.isSignedIn()
 
-    // in the future, we'll tie this into the global user-facing settings (and remote config)
-    private fun determineIfAutofillEnabled(): Boolean = true
+    // in the future, we'll also tie this into feature toggles and remote config
+    private fun determineIfAutofillEnabled(): Boolean = autofillStore.autofillEnabled
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
         val credentialsAvailable = if (url == null) {

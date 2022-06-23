@@ -31,7 +31,7 @@ import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementEditMode
-import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementViewMode
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
@@ -62,10 +62,14 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
 
         // TODO implement reauth when app is backgrounded
+        showAuthenticationChallenge(savedInstanceState)
+    }
+
+    private fun showAuthenticationChallenge(savedInstanceState: Bundle?) {
         deviceAuthenticator.authenticate(AUTOFILL, this) {
             if (it == AuthResult.Success) {
                 if (savedInstanceState == null) {
-                    showViewMode()
+                    showListMode()
                 }
 
                 observeViewModel()
@@ -101,7 +105,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowViewMode -> showViewMode()
+            is ShowListMode -> showListMode()
             is ShowEditMode -> showEditMode(command.credentials)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
@@ -117,12 +121,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         Snackbar.make(binding.root, "$type copied to clipboard", Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun showViewMode() {
+    private fun showListMode() {
         Timber.e("Show view mode")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             // addToBackStack(null)
-            replace(R.id.fragment_container_view, AutofillManagementViewMode.instance())
+            replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
         }
 
         inEditMode = false
@@ -141,7 +145,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         if (inEditMode) {
-            showViewMode()
+            showListMode()
         } else {
             super.onBackPressed()
         }

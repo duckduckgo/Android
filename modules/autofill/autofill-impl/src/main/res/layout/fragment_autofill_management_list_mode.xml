@@ -20,17 +20,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementViewMode">
+    tools:context="com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode">
 
     <TextView
         android:id="@+id/enabledToggleLabel"
         android:layout_width="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         style="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content"
         android:text="[l10n] Save and Autofill Logins" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/enabledToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/enabledToggleLabel"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/logins"

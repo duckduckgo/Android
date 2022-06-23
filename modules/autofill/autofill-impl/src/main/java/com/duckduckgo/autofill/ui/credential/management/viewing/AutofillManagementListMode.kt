@@ -22,6 +22,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
+import android.widget.RadioGroup.OnCheckedChangeListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -30,18 +32,19 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.domain.app.LoginCredentials
-import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementViewModeBinding
+import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class AutofillManagementViewMode : Fragment() {
+class AutofillManagementListMode : Fragment() {
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -53,8 +56,15 @@ class AutofillManagementViewMode : Fragment() {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
 
-    private lateinit var binding: FragmentAutofillManagementViewModeBinding
+    private lateinit var binding: FragmentAutofillManagementListModeBinding
     private lateinit var adapter: AutofillManagementRecyclerAdapter
+
+    private val globalAutofillToggleListener = object : CompoundButton.OnCheckedChangeListener {
+
+        override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+            if (isChecked) viewModel.onEnableAutofill() else viewModel.onDisableAutofill()
+        }
+    }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -62,9 +72,15 @@ class AutofillManagementViewMode : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAutofillManagementViewModeBinding.inflate(inflater, container, false)
+        binding = FragmentAutofillManagementListModeBinding.inflate(inflater, container, false)
+        configureToggle()
         configureRecyclerView()
         return binding.root
+    }
+
+    private fun configureToggle() {
+        // binding.enabledToggle.isEnabled = false
+        binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -76,6 +92,7 @@ class AutofillManagementViewMode : Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.viewState.collect { state ->
+                    binding.enabledToggle.quietlySetIsChecked(state.autofillEnabled, globalAutofillToggleListener)
                     credentialsListUpdated(state.logins)
                 }
             }
@@ -131,7 +148,7 @@ class AutofillManagementViewMode : Fragment() {
 
     companion object {
         fun instance() =
-            AutofillManagementViewMode().apply {
+            AutofillManagementListMode().apply {
                 arguments = Bundle().apply {
                 }
             }

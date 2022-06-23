@@ -73,6 +73,7 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
