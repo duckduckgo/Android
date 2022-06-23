@@ -60,7 +60,6 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
-import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
 

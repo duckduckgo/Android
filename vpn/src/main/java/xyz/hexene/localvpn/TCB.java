@@ -19,7 +19,6 @@ package xyz.hexene.localvpn;
 import androidx.annotation.Nullable;
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
