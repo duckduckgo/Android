@@ -247,9 +247,11 @@ class TcpDeviceToNetwork(
                     }
                 }
                 WaitToConnect -> {
-                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
+                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.ipAndPort)
+                    synchronized(queues.selectorQueue) {
+                        queues.selectorQueue.offerLast(TcpSelectorOp(SelectionKey.OP_CONNECT, tcb))
+                    }
                     selector.wakeup()
-                    tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
                 }
                 else -> Timber.w("Unexpected action: %s", it)
             }
@@ -312,13 +314,6 @@ class TcpDeviceToNetwork(
                 return
             }
 
-            if (!tcb.waitingForNetworkData) {
-                Timber.v("Register for OP_READ and wait for network data. %s.", tcb.ipAndPort)
-                selector.wakeup()
-                tcb.selectionKey.interestOps(OP_READ)
-                tcb.waitingForNetworkData = true
-            }
-
             try {
                 val seqNumber = packet.tcpHeader.acknowledgementNumber
                 var ackNumber = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
@@ -327,11 +322,13 @@ class TcpDeviceToNetwork(
                 }
                 tcb.acknowledgementNumberToClient = ackNumber
 
-                selector.wakeup()
-                tcb.channel.register(selector, OP_WRITE, tcb)
-
                 val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)
+
+                synchronized(queues.selectorQueue) {
+                    queues.selectorQueue.offerLast(TcpSelectorOp(OP_WRITE, tcb))
+                }
+                selector.wakeup()
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten

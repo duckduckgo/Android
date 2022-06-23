@@ -83,10 +83,20 @@ class TcpNetworkToDevice(
      * When data is read, we add it to the network-to-device queue, which will result in the packet being written back to the TUN.
      */
     private fun networkToDeviceProcessing() {
+        // Register for queued operation changes
+        synchronized(queues.selectorQueue) {
+            val iterator = queues.selectorQueue.iterator()
+            while (iterator.hasNext()) {
+                val tcpSelectorOp = iterator.next()
+                iterator.remove()
+
+                tcpSelectorOp.tcb.channel.register(selector, tcpSelectorOp.operation, tcpSelectorOp.tcb)
+            }
+        }
+
         val channelsReady = selector.select()
 
         if (channelsReady == 0) {
-            Thread.sleep(10)
             return
         }
 
@@ -306,3 +316,5 @@ class TcpNetworkToDevice(
         private const val OP_NONE = 0
     }
 }
+
+data class TcpSelectorOp(val operation: Int, val tcb: TCB)

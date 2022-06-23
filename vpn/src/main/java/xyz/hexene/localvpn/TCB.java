@@ -70,7 +70,6 @@ public class TCB {
 
     public final SocketChannel channel;
     public boolean waitingForNetworkData;
-    public SelectionKey selectionKey;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
     public static final LRUCache<String, TCB> tcbCache =

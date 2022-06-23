@@ -231,7 +231,6 @@ constructor(
             queues.networkToDevice.offerFirst(buffer)
 
             try {
-                selectionKey.cancel()
                 channel.close()
             } catch (e: Exception) {
                 Timber.w(e, "Problem closing socket connection for %s", ipAndPort)
