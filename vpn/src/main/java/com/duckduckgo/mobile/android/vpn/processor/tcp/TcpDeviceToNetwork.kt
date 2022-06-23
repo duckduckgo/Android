@@ -187,11 +187,11 @@ class TcpDeviceToNetwork(
         )
 
         if (packet.tcpHeader.isACK) {
-            tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
+            tcb.acknowledgementNumberToServer.set(packet.tcpHeader.acknowledgementNumber)
         }
 
         val action = TcpStateFlow.newPacket(
-            connectionParams.key(), tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial
+            connectionParams.key(), tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial.get()
         )
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
         Timber.v("payloadBuffer size: %s", payloadBuffer)
@@ -238,11 +238,11 @@ class TcpDeviceToNetwork(
                         params.packet.updateTcpBuffer(
                             params.responseBuffer,
                             (SYN or ACK).toByte(),
-                            tcb.sequenceNumberToClient,
-                            tcb.acknowledgementNumberToClient,
+                            tcb.sequenceNumberToClient.get(),
+                            tcb.acknowledgementNumberToClient.get(),
                             0
                         )
-                        tcb.sequenceNumberToClient++
+                        tcb.sequenceNumberToClient.incrementAndGet()
                         queues.networkToDevice.offer(params.responseBuffer)
                     }
                 }
@@ -320,7 +320,7 @@ class TcpDeviceToNetwork(
                 if (packet.tcpHeader.isFIN || packet.tcpHeader.isRST || packet.tcpHeader.isSYN) {
                     ackNumber = increaseOrWraparound(ackNumber, 1)
                 }
-                tcb.acknowledgementNumberToClient = ackNumber
+                tcb.acknowledgementNumberToClient.set(ackNumber)
 
                 val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)

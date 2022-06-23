@@ -175,17 +175,17 @@ class TcpNetworkToDevice(
             "Network-to-device packet %s. %d bytes. %s",
             tcb.ipAndPort,
             readBytes,
-            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
+            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get())
         )
         packet.updateTcpBuffer(
             receiveBuffer,
             (PSH or ACK).toByte(),
-            tcb.sequenceNumberToClient,
-            tcb.acknowledgementNumberToClient,
+            tcb.sequenceNumberToClient.get(),
+            tcb.acknowledgementNumberToClient.get(),
             readBytes
         )
 
-        tcb.sequenceNumberToClient += readBytes
+        tcb.sequenceNumberToClient.addAndGet(readBytes.toLong())
         receiveBuffer.position(tcb.referencePacket.totalHeaderSize() + readBytes)
 
         offerToNetworkToDeviceQueue(receiveBuffer, tcb, packet)
@@ -201,7 +201,7 @@ class TcpNetworkToDevice(
             tcb.ipAndPort,
             tcb.tcbState,
             TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - tcb.creationTime),
-            logPacketDetails(packet, tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient)
+            logPacketDetails(packet, tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get())
         )
 
         key.cancel()
@@ -231,11 +231,11 @@ class TcpNetworkToDevice(
         packet.updateTcpBuffer(
             buffer,
             (RST or ACK).toByte(),
-            tcb.sequenceNumberToClient,
-            tcb.acknowledgementNumberToClient,
+            tcb.sequenceNumberToClient.get(),
+            tcb.acknowledgementNumberToClient.get(),
             0
         )
-        tcb.sequenceNumberToClient++
+        tcb.sequenceNumberToClient.incrementAndGet()
         offerToNetworkToDeviceQueue(buffer, tcb, packet)
 
         tcbCloser.closeConnection(tcb)
@@ -257,13 +257,13 @@ class TcpNetworkToDevice(
                 packet.updateTcpBuffer(
                     responseBuffer,
                     (SYN or ACK).toByte(),
-                    tcb.sequenceNumberToClient,
-                    tcb.acknowledgementNumberToClient,
+                    tcb.sequenceNumberToClient.get(),
+                    tcb.acknowledgementNumberToClient.get(),
                     0
                 )
 
                 offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
-                tcb.sequenceNumberToClient++
+                tcb.sequenceNumberToClient.incrementAndGet()
 
                 tcb.channel.register(selector, OP_NONE)
             } else {
@@ -274,7 +274,7 @@ class TcpNetworkToDevice(
         }.onFailure {
             Timber.w(it, "Failed to process TCP connect %s", tcb.ipAndPort)
             responseBuffer.clear()
-            packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient, 0)
+            packet.updateTcpBuffer(responseBuffer, RST.toByte(), 0, tcb.acknowledgementNumberToClient.get(), 0)
 
             offerToNetworkToDeviceQueue(responseBuffer, tcb, packet)
 
