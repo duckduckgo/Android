@@ -180,17 +180,17 @@ class RealTcpSocketWriter @Inject constructor(
         writeData: PendingWriteData,
         connectionParams: TcpConnectionParams
     ) {
-        tcb.acknowledgementNumberToClient = writeData.ackNumber
-        tcb.acknowledgementNumberToServer = writeData.seqNumber
+        tcb.acknowledgementNumberToClient.set(writeData.ackNumber)
+        tcb.acknowledgementNumberToServer.set(writeData.seqNumber)
 
-        val seqToClient = tcb.sequenceNumberToClient
-        val ackToServer = tcb.acknowledgementNumberToServer
+        val seqToClient = tcb.sequenceNumberToClient.get()
+        val ackToServer = tcb.acknowledgementNumberToServer.get()
         val seqAckDiff = seqToClient - ackToServer
         Timber.v(
             "%s - seqToClient=%d, ackToClient=%d, ackToServer=%d, diff=%d",
             writeData.tcb.ipAndPort,
             seqToClient,
-            tcb.acknowledgementNumberToClient,
+            tcb.acknowledgementNumberToClient.get(),
             ackToServer,
             seqAckDiff
         )
@@ -200,8 +200,8 @@ class RealTcpSocketWriter @Inject constructor(
         tcb.referencePacket.updateTcpBuffer(
             responseBuffer,
             Packet.TCPHeader.ACK.toByte(),
-            tcb.sequenceNumberToClient,
-            tcb.acknowledgementNumberToClient,
+            tcb.sequenceNumberToClient.get(),
+            tcb.acknowledgementNumberToClient.get(),
             0
         )
         ByteBufferPool.release(writeData.payloadBuffer)
