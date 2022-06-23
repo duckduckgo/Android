@@ -98,14 +98,11 @@ class RealTcpSocketWriter @Inject constructor(
 
     private fun getLogLabel(tcb: TCB) = "${tcb.requestingAppName}/${tcb.requestingAppPackage} ${tcb.ipAndPort}"
 
-    @Synchronized
     private fun TCB.writeQueue(): Deque<PendingWriteData> {
-        val existingQueue = writeQueue[this]
-        if (existingQueue != null) return existingQueue
+        return writeQueue.getOrPut(this) {
+            LinkedList()
+        }
 
-        val newQueue = LinkedList<PendingWriteData>()
-        writeQueue[this] = newQueue
-        return newQueue
     }
 
     @Synchronized
