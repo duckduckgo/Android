@@ -74,7 +74,7 @@ class AutofillSettingsViewModel @Inject constructor(
             _commands.value = updatedList
         }
     }
-:
+
     fun commandProcessed(command: Command) {
         commands.value.let { currentCommands ->
             val updatedList = currentCommands.filterNot { it.id == command.id }
