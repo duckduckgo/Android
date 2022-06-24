@@ -56,14 +56,14 @@ class RealSavedSitesImporter(
 
             savedSites.filterIsInstance<SavedSite.Bookmark>().map {
                 BookmarkEntity(title = it.title, url = it.url, parentId = (it as SavedSite.Bookmark).parentId)
-            }.apply {
-                bookmarksDao.insertList(this)
+            }.also {
+                bookmarksDao.insertList(it)
             }
 
             savedSites.filterIsInstance<SavedSite.Favorite>().filter { it.url.isNotEmpty() }.map { site ->
                 FavoriteEntity(title = site.title.takeIf { it.isNotEmpty() } ?: site.url, url = site.url, position = site.position)
-            }.apply {
-                favoritesDao.insertList(this)
+            }.also {
+                favoritesDao.insertList(it)
             }
 
             ImportSavedSitesResult.Success(savedSites)
