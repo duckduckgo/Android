@@ -16,18 +16,17 @@
 
 package com.duckduckgo.autofill.di
 
-import android.content.Context
 import com.duckduckgo.app.autofill.FileBasedJavaScriptInjector
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillJavascriptInterface
-import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.InlineBrowserAutofill
 import com.duckduckgo.autofill.jsbridge.AutofillWebViewMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillJsonRequestParser
+import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.response.AutofillJsonResponseWriter
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
@@ -70,8 +69,7 @@ class AutofillModule {
         @AppCoroutineScope coroutineScope: CoroutineScope,
         autofillMessagePoster: AutofillMessagePoster,
         autofillResponseWriter: AutofillResponseWriter,
-        emailManager: EmailManager,
-        context: Context
+        emailManager: EmailManager
     ): AutofillJavascriptInterface {
         return AutofillJavascriptInterface(
             requestParser = requestParser,

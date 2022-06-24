@@ -19,7 +19,6 @@ package xyz.hexene.localvpn;
 import androidx.annotation.Nullable;
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
@@ -71,7 +70,6 @@ public class TCB {
 
     public final SocketChannel channel;
     public boolean waitingForNetworkData;
-    public SelectionKey selectionKey;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
     private static final LRUCache<String, TCB> tcbCache =
