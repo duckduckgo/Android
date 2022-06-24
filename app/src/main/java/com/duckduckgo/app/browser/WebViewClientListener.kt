@@ -21,6 +21,7 @@ import android.net.Uri
 import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -35,6 +36,7 @@ interface WebViewClientListener {
     fun willOverrideUrl(newUrl: String)
     fun redirectTriggeredByGpc()
 
+    fun onSitePermissionRequested(request: PermissionRequest)
     fun onSiteLocationPermissionRequested(
         origin: String,
         callback: GeolocationPermissions.Callback

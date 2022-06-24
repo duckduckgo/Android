@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.site.permissions.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.content.Context
+import android.webkit.PermissionRequest
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+interface SitePermissionsRepository {
+
+    fun getSitePermissionsFromRequest(url: String, resources: Array<String>): Array<String>
+
+    fun sitePermissionsRequested(request: PermissionRequest)
 }

@@ -1,4 +1,6 @@
 package com.duckduckgo.site.permissions.api
 
-class SitePermissionsLauncher {
+interface SitePermissionsLauncher {
+
+    fun showSitePermissionsDialog(permissions: List<String>)
 }

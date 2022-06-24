@@ -25,6 +25,7 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View
 import android.webkit.GeolocationPermissions
+import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -122,6 +123,8 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.privacy.config.api.*
 import com.duckduckgo.remote.messaging.api.RemoteMessage
+import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.site.permissions.api.SitePermissionsRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import com.jakewharton.rxrelay2.PublishRelay
@@ -179,7 +182,8 @@ class BrowserTabViewModel @Inject constructor(
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val settingsDataStore: SettingsDataStore,
     private val autofillStore: AutofillStore,
-    private val adClickManager: AdClickManager
+    private val adClickManager: AdClickManager,
+    private val sitePermissionsRepository: SitePermissionsRepository
 ) : WebViewClientListener,
     EditSavedSiteListener,
     HttpAuthenticationListener,
@@ -1399,6 +1403,10 @@ class BrowserTabViewModel @Inject constructor(
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
         }
+    }
+
+    override fun onSitePermissionRequested(request: PermissionRequest) {
+        sitePermissionsRepository.sitePermissionsRequested(request)
     }
 
     override fun onSiteLocationPermissionRequested(
