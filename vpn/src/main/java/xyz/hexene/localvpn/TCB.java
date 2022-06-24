@@ -19,21 +19,21 @@ package xyz.hexene.localvpn;
 import androidx.annotation.Nullable;
 import com.duckduckgo.mobile.android.vpn.processor.tcp.TcbState;
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import timber.log.Timber;
 
 public class TCB {
     public final long creationTime;
     public final String ipAndPort;
 
-    public long sequenceNumberToClient, sequenceNumberToClientInitial;
-    public long sequenceNumberToServer, sequenceNumberToServerInitial;
-    public long acknowledgementNumberToClient, acknowledgementNumberToServer;
+    public final AtomicLong sequenceNumberToClient = new AtomicLong();
+    public final AtomicLong sequenceNumberToClientInitial = new AtomicLong();
+    public final long sequenceNumberToServer, sequenceNumberToServerInitial;
+    public final AtomicLong acknowledgementNumberToClient = new AtomicLong();
+    public final AtomicLong acknowledgementNumberToServer = new AtomicLong();
     public long finSequenceNumberToClient = -1;
 
     public TcbState tcbState;
@@ -70,10 +70,9 @@ public class TCB {
 
     public final SocketChannel channel;
     public boolean waitingForNetworkData;
-    public SelectionKey selectionKey;
 
     private static final int MAX_CACHE_SIZE = 500; // XXX: Is this ideal?
-    public static final LRUCache<String, TCB> tcbCache =
+    private static final LRUCache<String, TCB> tcbCache =
             new LRUCache<>(
                     MAX_CACHE_SIZE,
                     (LRUCache.CleanupCallback<String, TCB>)
@@ -98,14 +97,10 @@ public class TCB {
         Timber.v("TCB cache size has now reached %d entries", tcbCache.size());
     }
 
-    public static List<TCB> copyTCBs() {
-        List<TCB> tcbCopy = new ArrayList<>();
+    public static int size() {
         synchronized (tcbCache) {
-            for (Map.Entry<String, TCB> entry : tcbCache.entrySet()) {
-                tcbCopy.add(entry.getValue());
-            }
+            return tcbCache.size();
         }
-        return tcbCopy;
     }
 
     public TCB(
@@ -120,12 +115,12 @@ public class TCB {
         this.tcbState = new TcbState();
         this.ipAndPort = ipAndPort;
 
-        this.sequenceNumberToClient = sequenceNumberToClient;
-        this.sequenceNumberToClientInitial = sequenceNumberToClient;
+        this.sequenceNumberToClient.set(sequenceNumberToClient);
+        this.sequenceNumberToClientInitial.set(sequenceNumberToClient);
         this.sequenceNumberToServer = sequenceNumberToServer;
         this.sequenceNumberToServerInitial = sequenceNumberToServer;
-        this.acknowledgementNumberToClient = acknowledgementNumberToClient;
-        this.acknowledgementNumberToServer = acknowledgementNumberToServer;
+        this.acknowledgementNumberToClient.set(acknowledgementNumberToClient);
+        this.acknowledgementNumberToServer.set(acknowledgementNumberToServer);
 
         this.channel = channel;
         this.referencePacket = referencePacket;

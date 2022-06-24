@@ -45,14 +45,14 @@ class VariantManagerTest {
     @Test
     fun retentionStudyControlGroupHasExpectedWeightAndOneFeatures() {
         val variant = variants.first { it.key == "na" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(listOf(VariantManager.VariantFeature.VpnRetentionStudyControl), variant.features)
     }
 
     @Test
     fun retentionStudyVariantGroupWithFeatureHasExpectedWeightAndOneFeatures() {
         val variant = variants.first { it.key == "nb" }
-        assertEqualsDouble(1.0, variant.weight)
+        assertEqualsDouble(0.0, variant.weight)
         assertEquals(listOf(VariantManager.VariantFeature.VpnRetentionStudyTreatment), variant.features)
     }
 

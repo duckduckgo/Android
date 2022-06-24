@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.os.SystemClock
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.processor.tcp.TcpSelectorOp
 import com.squareup.anvil.annotations.ContributesBinding
 import xyz.hexene.localvpn.Packet
 import java.nio.ByteBuffer
@@ -27,6 +28,7 @@ import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import dagger.SingleInstanceIn
+import java.util.*
 import kotlin.math.min
 
 interface VpnQueuesTimeLogger {
@@ -55,6 +57,8 @@ class VpnQueues @Inject constructor() : VpnQueuesTimeLogger {
     val udpDeviceToNetwork: BlockingQueue<Packet> = LoggingLinkedBlockingDeque()
 
     val networkToDevice: BlockingDeque<ByteBuffer> = LoggingLinkedBlockingDeque()
+
+    val selectorQueue: LinkedList<TcpSelectorOp> = LinkedList<TcpSelectorOp>()
 
     override fun millisSinceLastDeviceToNetworkWrite(): Long {
         return min(

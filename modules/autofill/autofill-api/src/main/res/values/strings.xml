@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (c) 2022 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,4 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="autofill_auth_text">Unlock to use Saved Logins</string>
-    <string name="biometric_prompt_title">Verify it\'s you</string>
-</resources>
+<resources></resources>
