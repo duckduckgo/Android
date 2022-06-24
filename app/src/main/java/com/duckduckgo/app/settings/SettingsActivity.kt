@@ -59,7 +59,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.waitlist.trackerprotection.ui.AppTPWaitlistActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.macos_api.MacWaitlistState
 import com.duckduckgo.macos_api.MacWaitlistState.*
@@ -99,9 +98,6 @@ class SettingsActivity :
 
     @Inject
     lateinit var autofillSettingsActivityLauncher: AutofillSettingsActivityLauncher
-
-    @Inject
-    lateinit var deviceAuthenticator: DeviceAuthenticator
 
     private val defaultBrowserChangeListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onDefaultBrowserToggled(isChecked)
@@ -157,12 +153,8 @@ class SettingsActivity :
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-            if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-                autofill.isEnabled = true
-                autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
-            } else {
-                autofill.isEnabled = false
-            }
+            autofill.isEnabled = true
+            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
             locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
