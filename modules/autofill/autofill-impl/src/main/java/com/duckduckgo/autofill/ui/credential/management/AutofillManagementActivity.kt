@@ -29,7 +29,13 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowEditMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowViewMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementEditMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
@@ -82,6 +88,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 if (it == AuthResult.Success) {
                     viewModel.unlock()
                     showViewMode()
+                } else {
+                    viewModel.lock()
+                    showLockMode()
                 }
             }
         } else {
