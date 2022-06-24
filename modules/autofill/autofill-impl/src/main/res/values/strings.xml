@@ -15,6 +15,8 @@
   -->
 
 <resources>
-    <string name="autofill_auth_text">Unlock to use Saved Logins</string>
-    <string name="biometric_prompt_title">Verify it\'s you</string>
+    <string name="management_locked_mode_text">Unlock Autofill</string>
+    <string name="management_disabled_mode_cta"><b>Set up in Settings</b></string>
+    <string name="management_disabled_mode_subtitle">A device lock pattern, PIN, or biometrics are required to protect your Autofill Login details.</string>
+    <string name="management_disabled_mode_title">Secure your device to use Autofill</string>
 </resources>

@@ -109,7 +109,7 @@ class RecentAppTrackerCache @Inject constructor(private val tcbCloser: TCBCloser
 
             connectionsToRemove.forEach { connection ->
                 Timber.d("Killing connection: %s", connection)
-                TCB.tcbCache[connection.tcbCacheKey]?.let { tcbCloser.closeConnection(it) }
+                TCB.getTCB(connection.tcbCacheKey)?.let { tcbCloser.closeConnection(it) }
                 val trackersForApp = recentTrackingAttempts[connection.appPackage]
                 val trackingEvents = trackersForApp?.get(connection.trackerDomain)
                 trackingEvents?.remove(connection)

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -59,6 +60,26 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun onEditCredentials(credentials: LoginCredentials) {
         addCommand(ShowEditMode(credentials))
+    }
+
+    fun launchDeviceAuth(savedInstanceState: Bundle?) {
+        lock()
+        addCommand(LaunchDeviceAuth(savedInstanceState))
+    }
+
+    fun lock() {
+        if (!viewState.value.isLocked) {
+            addCommand(ShowLockedMode)
+            _viewState.value = viewState.value.copy(isLocked = true)
+        }
+    }
+
+    fun unlock() {
+        _viewState.value = viewState.value.copy(isLocked = false)
+    }
+
+    fun disabled() {
+        addCommand(ShowDisabledMode)
     }
 
     private fun addCommand(command: Command) {
@@ -124,7 +145,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val autofillEnabled: Boolean = true,
-        val logins: List<LoginCredentials> = emptyList()
+        val logins: List<LoginCredentials> = emptyList(),
+        val isLocked: Boolean = true
     )
 
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
@@ -132,5 +154,8 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserPasswordCopied : Command()
         data class ShowEditMode(val credentials: LoginCredentials) : Command()
         object ShowListMode : Command()
+        object ShowLockedMode : Command()
+        object ShowDisabledMode : Command()
+        data class LaunchDeviceAuth(val savedInstanceState: Bundle?) : Command()
     }
 }

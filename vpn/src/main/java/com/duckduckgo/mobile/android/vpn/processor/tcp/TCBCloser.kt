@@ -44,8 +44,8 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
         val buffer = ByteBufferPool.acquire()
         val tcb = connectionParams.tcbOrClose() ?: return
 
-        var responseAck = tcb.acknowledgementNumberToClient + payloadSize
-        val responseSeq = tcb.acknowledgementNumberToServer
+        var responseAck = tcb.acknowledgementNumberToClient.addAndGet(payloadSize.toLong())
+        val responseSeq = tcb.acknowledgementNumberToServer.get()
 
         if (isFIN) {
             responseAck = TcpPacketProcessor.increaseOrWraparound(responseAck, 1)
@@ -57,7 +57,7 @@ class TCBCloser @Inject constructor(private val socketWriter: TcpSocketWriter) {
                 tcb.ipAndPort,
                 tcb.requestingAppPackage, tcb.trackerHostName,
                 responseSeq, responseAck,
-                tcb.sequenceNumberToClient, tcb.acknowledgementNumberToClient, payloadSize
+                tcb.sequenceNumberToClient.get(), tcb.acknowledgementNumberToClient.get(), payloadSize
             )
 
             tcb.referencePacket.updateTcpBuffer(buffer, (Packet.TCPHeader.RST or Packet.TCPHeader.ACK).toByte(), responseSeq, responseAck, 0)

@@ -62,7 +62,7 @@ class RealTrackingParametersRepository(
 
         parameters.clear()
         trackingParametersDao.getAllTrackingParameters().map {
-            parameters.add(it.parameter.toRegex(RegexOption.IGNORE_CASE))
+            parameters.add(it.parameter.toRegex())
         }
     }
 }

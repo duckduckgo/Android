@@ -2,109 +2,112 @@ plugins {
     id("de.fayard.refreshVersions") version "0.40.1"
 }
 
-include ':browser-api'
-include ':vpn'
-include ':vpn-store'
-include ':vpn-api'
-include ':vpn-internal'
-include ':di'
 include ':app'
-include ':statistics'
-include ':common'
-include ':common-ui'
-include ':app-store'
-include ':appbuildconfig-api'
 
-include ':feature-toggles-api'
-include ':feature-toggles-impl'
+"feature-toggles".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+}
 
-include ':privacy-config-api'
-include ':privacy-config-impl'
-include ':privacy-config-store'
+"privacy-config".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':traces-api'
-include ':traces-impl'
+"remote-messaging".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':anrs-api'
-include ':anrs-impl'
-include ':anrs-store'
+"voice-search".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':remote-messaging-api'
-include ':remote-messaging-impl'
-include ':remote-messaging-store'
+"downloads".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':macos-api'
-include ':macos-impl'
-include ':macos-store'
+"traces".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+}
 
-include ':bandwidth-impl'
-include ':bandwidth-store'
+"anrs".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':downloads-api'
-include ':downloads-impl'
-include ':downloads-store'
+"macos".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':common-test'
+"bandwidth".with {
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
-include ':anvil-compiler'
-include ':anvil-annotations'
+"anvil".with {
+    include ":$it-compiler"; project(":$it-compiler").projectDir = new File("$it/$it-compiler")
+    include ":$it-annotations"; project(":$it-annotations").projectDir = new File("$it/$it-annotations")
+}
 
-include ':voice-search-api'
-include ':voice-search-impl'
-include ':voice-search-store'
+"di".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+}
 
-include ':secure-storage-api'
-include ':secure-storage-impl'
-include ':secure-storage-store'
+"statistics".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+}
 
-include ':device-auth-api'
-include ':device-auth-impl'
+"app-store".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+}
 
-project(':feature-toggles-api').projectDir = new File('feature-toggles/feature-toggles-api')
-project(':feature-toggles-impl').projectDir = new File('feature-toggles/feature-toggles-impl')
-project(':privacy-config-api').projectDir = new File('privacy-config/privacy-config-api')
-project(':privacy-config-impl').projectDir = new File('privacy-config/privacy-config-impl')
-project(':privacy-config-store').projectDir = new File('privacy-config/privacy-config-store')
-project(':remote-messaging-api').projectDir = new File('remote-messaging/remote-messaging-api')
-project(':remote-messaging-impl').projectDir = new File('remote-messaging/remote-messaging-impl')
-project(':remote-messaging-store').projectDir = new File('remote-messaging/remote-messaging-store')
+"browser-api".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+}
 
-project(':voice-search-api').projectDir = new File('voice-search/voice-search-api')
-project(':voice-search-impl').projectDir = new File('voice-search/voice-search-impl')
-project(':voice-search-store').projectDir = new File('voice-search/voice-search-store')
+"app-build-config".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+}
 
-project(':downloads-api').projectDir = new File('downloads/downloads-api')
-project(':downloads-impl').projectDir = new File('downloads/downloads-impl')
-project(':downloads-store').projectDir = new File('downloads/downloads-store')
+"common".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+    include ":$it-ui"; project(":$it-ui").projectDir = new File("$it-ui")
+    include ":$it-test"; project(":$it-test").projectDir = new File("$it-test")
+}
 
-project(':traces-api').projectDir = new File('traces/traces-api')
-project(':traces-impl').projectDir = new File('traces/traces-impl')
+"vpn".with {
+    include ":$it"; project(":$it").projectDir = new File("$it")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it-store")
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it-api")
+    include ":$it-internal"; project(":$it-internal").projectDir = new File("$it-internal")
+}
 
-project(':anrs-api').projectDir = new File('anrs/anrs-api')
-project(':anrs-impl').projectDir = new File('anrs/anrs-impl')
-project(':anrs-store').projectDir = new File('anrs/anrs-store')
-
-project(':macos-api').projectDir = new File('macos/macos-api')
-project(':macos-impl').projectDir = new File('macos/macos-impl')
-project(':macos-store').projectDir = new File('macos/macos-store')
-
-project(':bandwidth-impl').projectDir = new File('bandwidth/bandwidth-impl')
-project(':bandwidth-store').projectDir = new File('bandwidth/bandwidth-store')
-
-project(':anvil-compiler').projectDir = new File('anvil/anvil-compiler')
-project(':anvil-annotations').projectDir = new File('anvil/anvil-annotations')
-
-project(':secure-storage-api').projectDir = new File('secure-storage/secure-storage-api')
-project(':secure-storage-impl').projectDir = new File('secure-storage/secure-storage-impl')
-project(':secure-storage-store').projectDir = new File('secure-storage/secure-storage-store')
-
-project(':device-auth-api').projectDir = new File('device-auth/device-auth-api')
-project(':device-auth-impl').projectDir = new File('device-auth/device-auth-impl')
+"secure-storage".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
+}
 
 "autofill".with {
     include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
     include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
     include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+}
+
+"device-auth".with {
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
 }
 
 rootProject.children.each { subproject ->
@@ -145,5 +148,3 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
-include ':autofill-impl'
-include ':autofill-store'

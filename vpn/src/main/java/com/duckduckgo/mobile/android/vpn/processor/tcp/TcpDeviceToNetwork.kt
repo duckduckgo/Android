@@ -60,7 +60,6 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.channels.CancelledKeyException
 import java.nio.channels.SelectionKey
-import java.nio.channels.SelectionKey.OP_READ
 import java.nio.channels.SelectionKey.OP_WRITE
 import java.nio.channels.Selector
 
@@ -187,11 +186,11 @@ class TcpDeviceToNetwork(
         )
 
         if (packet.tcpHeader.isACK) {
-            tcb.acknowledgementNumberToServer = packet.tcpHeader.acknowledgementNumber
+            tcb.acknowledgementNumberToServer.set(packet.tcpHeader.acknowledgementNumber)
         }
 
         val action = TcpStateFlow.newPacket(
-            connectionParams.key(), tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial
+            connectionParams.key(), tcb.tcbState, packet.asPacketType(tcb.finSequenceNumberToClient), tcb.sequenceNumberToClientInitial.get()
         )
         Timber.v("Action: %s for %s", action.events, tcb.ipAndPort)
         Timber.v("payloadBuffer size: %s", payloadBuffer)
@@ -238,18 +237,20 @@ class TcpDeviceToNetwork(
                         params.packet.updateTcpBuffer(
                             params.responseBuffer,
                             (SYN or ACK).toByte(),
-                            tcb.sequenceNumberToClient,
-                            tcb.acknowledgementNumberToClient,
+                            tcb.sequenceNumberToClient.get(),
+                            tcb.acknowledgementNumberToClient.get(),
                             0
                         )
-                        tcb.sequenceNumberToClient++
+                        tcb.sequenceNumberToClient.incrementAndGet()
                         queues.networkToDevice.offer(params.responseBuffer)
                     }
                 }
                 WaitToConnect -> {
-                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.selectionKey)
+                    Timber.v("Not finished connecting yet to %s, will register for OP_CONNECT event", tcb.ipAndPort)
+                    synchronized(queues.selectorQueue) {
+                        queues.selectorQueue.offerLast(TcpSelectorOp(SelectionKey.OP_CONNECT, tcb))
+                    }
                     selector.wakeup()
-                    tcb.selectionKey = channel.register(selector, SelectionKey.OP_CONNECT, tcb)
                 }
                 else -> Timber.w("Unexpected action: %s", it)
             }
@@ -312,26 +313,21 @@ class TcpDeviceToNetwork(
                 return
             }
 
-            if (!tcb.waitingForNetworkData) {
-                Timber.v("Register for OP_READ and wait for network data. %s.", tcb.ipAndPort)
-                selector.wakeup()
-                tcb.selectionKey.interestOps(OP_READ)
-                tcb.waitingForNetworkData = true
-            }
-
             try {
                 val seqNumber = packet.tcpHeader.acknowledgementNumber
                 var ackNumber = increaseOrWraparound(packet.tcpHeader.sequenceNumber, payloadSize.toLong())
                 if (packet.tcpHeader.isFIN || packet.tcpHeader.isRST || packet.tcpHeader.isSYN) {
                     ackNumber = increaseOrWraparound(ackNumber, 1)
                 }
-                tcb.acknowledgementNumberToClient = ackNumber
-
-                selector.wakeup()
-                tcb.channel.register(selector, OP_WRITE, tcb)
+                tcb.acknowledgementNumberToClient.set(ackNumber)
 
                 val writeData = PendingWriteData(payloadBuffer, tcb.channel, payloadSize, tcb, connectionParams, ackNumber, seqNumber)
                 socketWriter.addToWriteQueue(writeData, false)
+
+                synchronized(queues.selectorQueue) {
+                    queues.selectorQueue.offerLast(TcpSelectorOp(OP_WRITE, tcb))
+                }
+                selector.wakeup()
             } catch (e: IOException) {
                 val bytesUnwritten = payloadBuffer.remaining()
                 val bytesWritten = payloadSize - bytesUnwritten
