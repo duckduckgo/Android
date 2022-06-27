@@ -29,8 +29,8 @@ import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.C
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -41,13 +41,12 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class AutofillJavascriptInterfaceTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
-
-    private val moshi = Moshi.Builder().build()
 
     private val requestParser: AutofillRequestParser = mock()
     private val autofillStore: AutofillStore = mock()
