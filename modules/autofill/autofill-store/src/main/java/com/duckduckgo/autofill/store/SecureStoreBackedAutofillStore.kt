@@ -16,20 +16,36 @@
 
 package com.duckduckgo.autofill.store
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
-import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
+import com.duckduckgo.securestorage.api.WebsiteLoginDetailsWithCredentials
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
-class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : AutofillStore {
+class SecureStoreBackedAutofillStore(
+    private val secureStorage: SecureStorage,
+    private val applicationContext: Context
+) : AutofillStore {
+
+    private val prefs: SharedPreferences by lazy {
+        applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    }
+
+    override var autofillEnabled: Boolean
+        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value) }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
@@ -89,6 +105,11 @@ class SecureStoreBackedAutofillStore(val secureStorage: SecureStorage) : Autofil
             password = password
         )
     }
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
+        const val AUTOFILL_ENABLED = "autofill_enabled"
+    }
 }
 
 @Module
@@ -97,7 +118,7 @@ class AutofillStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun autofillStore(secureStorage: SecureStorage): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage)
+    fun autofillStore(secureStorage: SecureStorage, context: Context): AutofillStore {
+        return SecureStoreBackedAutofillStore(secureStorage, context)
     }
 }
