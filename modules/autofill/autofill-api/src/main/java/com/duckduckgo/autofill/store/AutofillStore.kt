@@ -21,13 +21,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutofillStore {
 
-    suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
+    var autofillEnabled: Boolean
 
+    suspend fun getCredentials(rawUrl: String): List<LoginCredentials>
     suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials)
     suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials)
-
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
-
     suspend fun deleteCredentials(id: Int)
     suspend fun updateCredentials(credentials: LoginCredentials)
 

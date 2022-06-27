@@ -16,6 +16,9 @@
 
 package com.duckduckgo.autofill.store
 
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
@@ -33,7 +36,18 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
-class SecureStoreBackedAutofillStore(private val secureStorage: SecureStorage) : AutofillStore {
+class SecureStoreBackedAutofillStore(
+    private val secureStorage: SecureStorage,
+    private val applicationContext: Context
+) : AutofillStore {
+
+    private val prefs: SharedPreferences by lazy {
+        applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
+    }
+
+    override var autofillEnabled: Boolean
+        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value) }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
@@ -45,7 +59,10 @@ class SecureStoreBackedAutofillStore(private val secureStorage: SecureStorage) :
         return storedCredentials.map { it.toLoginCredentials() }
     }
 
-    override suspend fun saveCredentials(rawUrl: String, credentials: LoginCredentials) {
+    override suspend fun saveCredentials(
+        rawUrl: String,
+        credentials: LoginCredentials
+    ) {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot save credentials as given url was in an unexpected format. Original url: %s", rawUrl)
@@ -142,6 +159,11 @@ class SecureStoreBackedAutofillStore(private val secureStorage: SecureStorage) :
             password = password
         )
     }
+
+    companion object {
+        const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
+        const val AUTOFILL_ENABLED = "autofill_enabled"
+    }
 }
 
 @Module
@@ -150,7 +172,7 @@ class AutofillStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun autofillStore(secureStorage: SecureStorage): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage)
+    fun autofillStore(secureStorage: SecureStorage, context: Context): AutofillStore {
+        return SecureStoreBackedAutofillStore(secureStorage, context)
     }
 }
