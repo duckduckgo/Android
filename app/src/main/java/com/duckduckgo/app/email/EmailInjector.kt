@@ -84,7 +84,7 @@ class EmailInjectorJs(
         url: String?
     ) {
         url?.let {
-            if (isFeatureEnabled() && isDuckDuckGoUrl(url) && !emailManager.isSignedIn()) {
+            if (isFeatureEnabled() && isDuckDuckGoUrl(url)) {
                 webView.evaluateJavascript("javascript:${javaScriptInjector.getSignOutFunctions(webView.context)}", null)
             }
         }

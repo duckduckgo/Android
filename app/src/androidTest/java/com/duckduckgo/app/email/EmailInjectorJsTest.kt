@@ -147,21 +147,6 @@ class EmailInjectorJsTest {
         verify(webView).evaluateJavascript(jsToEvaluate, null)
     }
 
-    @UiThreadTest
-    @Test
-    @SdkSuppress(minSdkVersion = 24)
-    fun whenNotifyWebAppSignEventAndUrlIsFromDuckDuckGoAndFeatureIsEnabledAndEmailIsSignedInThenDoNotEvaluateJsCode() {
-        whenever(mockEmailManager.isSignedIn()).thenReturn(true)
-        whenever(mockFeatureToggle.isFeatureEnabled(AutofillFeatureName)).thenReturn(true)
-
-        val jsToEvaluate = getNotifySignOutJsToEvaluate()
-        val webView = spy(WebView(InstrumentationRegistry.getInstrumentation().targetContext))
-
-        testee.notifyWebAppSignEvent(webView, "https://duckduckgo.com/email")
-
-        verify(webView, never()).evaluateJavascript(jsToEvaluate, null)
-    }
-
     private fun getAliasJsToEvaluate(): String {
         val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(com.duckduckgo.app.global.R.raw.inject_alias)
             .bufferedReader()
