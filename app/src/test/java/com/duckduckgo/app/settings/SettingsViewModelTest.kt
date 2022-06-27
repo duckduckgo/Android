@@ -117,7 +117,7 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
-        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore, mockVariantManager)
+        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore)
 
         testee = SettingsViewModel(
             mockContext,
