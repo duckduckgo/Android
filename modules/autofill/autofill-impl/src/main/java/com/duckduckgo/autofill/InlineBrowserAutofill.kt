@@ -39,6 +39,10 @@ class InlineBrowserAutofill(
         autofillInterface.callback = callback
     }
 
+    override fun removeJsInterface() {
+        autofillInterface.webView = null
+    }
+
     override fun configureAutofillForCurrentPage(webView: WebView, url: String?) {
         coroutineScope.launch {
             val rawJs = javascriptInjector.getFunctionsJS()

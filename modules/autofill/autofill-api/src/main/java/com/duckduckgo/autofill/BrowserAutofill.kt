@@ -22,6 +22,7 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 interface BrowserAutofill {
 
     fun addJsInterface(webView: WebView, callback: Callback)
+    fun removeJsInterface()
 
     fun configureAutofillForCurrentPage(webView: WebView, url: String?)
 
