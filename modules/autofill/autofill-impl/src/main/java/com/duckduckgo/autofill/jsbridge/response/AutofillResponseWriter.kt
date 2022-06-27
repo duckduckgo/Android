@@ -17,7 +17,10 @@
 package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
 interface AutofillResponseWriter {
     fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String
@@ -28,7 +31,8 @@ interface AutofillResponseWriter {
     fun generateUserPreferences(autofillCredentials: Boolean, showInlineKeyIcon: Boolean = false): String
 }
 
-class AutofillJsonResponseWriter(val moshi: Moshi) : AutofillResponseWriter {
+@ContributesBinding(AppScope::class)
+class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : AutofillResponseWriter {
 
     private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")

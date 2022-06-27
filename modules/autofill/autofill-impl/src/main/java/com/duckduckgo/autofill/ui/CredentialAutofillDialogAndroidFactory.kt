@@ -24,8 +24,12 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.ui.credential.saving.AutofillSavingUpdatingExistingCredentialsDialogFragment
 import com.duckduckgo.autofill.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-class CredentialAutofillDialogAndroidFactory : CredentialAutofillDialogFactory {
+@ContributesBinding(AppScope::class)
+class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialAutofillDialogFactory {
 
     override fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog {
         return AutofillSelectCredentialsDialogFragment.instance(url, credentials)

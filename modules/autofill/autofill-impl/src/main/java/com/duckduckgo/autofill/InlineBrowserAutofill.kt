@@ -20,13 +20,17 @@ import android.webkit.WebView
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
-class InlineBrowserAutofill(
+@ContributesBinding(AppScope::class)
+class InlineBrowserAutofill @Inject constructor(
     private val autofillInterface: AutofillJavascriptInterface,
     private val javascriptInjector: JavascriptInjector,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
