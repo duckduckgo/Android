@@ -79,7 +79,6 @@ class AutofillManagementListMode : Fragment() {
     }
 
     private fun configureToggle() {
-        // binding.enabledToggle.isEnabled = false
         binding.enabledToggle.setOnCheckedChangeListener(globalAutofillToggleListener)
     }
 
