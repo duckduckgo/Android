@@ -1962,6 +1962,7 @@ class BrowserTabFragment :
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         emailAutofillTooltipDialog?.dismiss()
+        browserAutofill.removeJsInterface()
         destroyWebView()
         super.onDestroy()
     }

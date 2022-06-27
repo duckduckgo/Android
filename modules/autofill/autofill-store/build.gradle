@@ -46,7 +46,7 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation Google.android.material
     implementation project(path: ':secure-storage-api')
-    testImplementation 'junit:junit:_'
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023

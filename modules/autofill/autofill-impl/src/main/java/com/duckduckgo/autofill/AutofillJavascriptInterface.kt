@@ -110,13 +110,12 @@ class AutofillJavascriptInterface(
     private fun determineIfAutofillEnabled(): Boolean = true
 
     private suspend fun determineIfCredentialsAvailable(url: String?): Boolean {
-        val credentialsAvailable = if (url == null) {
+        return if (url == null) {
             false
         } else {
             val savedCredentials = autofillStore.getCredentials(url)
             savedCredentials.isNotEmpty()
         }
-        return credentialsAvailable
     }
 
     @JavascriptInterface

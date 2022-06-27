@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package com.duckduckgo.app.browser.autofill
 
 import android.os.Bundle
@@ -42,12 +40,13 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
 
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class AutofillCredentialsSelectionResultHandlerTest {
 
     private val credentialsSaver: AutofillCredentialSaver = mock()
     private val credentialsInjector: CredentialInjector = mock()
-    private val dummyFragment = BrowserTabFragment()
+    private val dummyFragment = Fragment()
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: AutofillCredentialsSelectionResultHandler
 
