@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.autofill
 
 import android.os.Bundle
-import com.duckduckgo.app.browser.BrowserTabFragment
+import androidx.fragment.app.Fragment
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
@@ -31,7 +31,7 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
 
     fun processAutofillCredentialSelectionResult(
         result: Bundle,
-        browserTabFragment: BrowserTabFragment,
+        browserTabFragment: Fragment,
         credentialInjector: CredentialInjector,
     ) {
         val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
