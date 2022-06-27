@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.store
 
+import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -34,8 +35,9 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class SecureStoreBackedAutofillStoreTest {
 
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val secureStore = FakeSecureStore()
-    private val testee = SecureStoreBackedAutofillStore(secureStore)
+    private val testee = SecureStoreBackedAutofillStore(secureStore, context)
 
     @Test
     fun whenStoreEmptyThenNoMatch() = runTest {
