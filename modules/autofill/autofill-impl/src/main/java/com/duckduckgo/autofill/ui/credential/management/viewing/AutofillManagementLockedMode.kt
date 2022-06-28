@@ -61,10 +61,10 @@ class AutofillManagementLockedMode : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.lockedIcon.setOnClickListener {
-            viewModel.launchDeviceAuth(null)
+            viewModel.launchDeviceAuth()
         }
         binding.lockedText.setOnClickListener {
-            viewModel.launchDeviceAuth(null)
+            viewModel.launchDeviceAuth()
         }
     }
 

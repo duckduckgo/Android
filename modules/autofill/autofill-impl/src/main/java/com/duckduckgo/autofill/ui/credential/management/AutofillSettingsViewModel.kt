@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
@@ -62,9 +61,9 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowEditMode(credentials))
     }
 
-    fun launchDeviceAuth(savedInstanceState: Bundle?) {
+    fun launchDeviceAuth() {
         lock()
-        addCommand(LaunchDeviceAuth(savedInstanceState))
+        addCommand(LaunchDeviceAuth)
     }
 
     fun lock() {
@@ -156,6 +155,6 @@ class AutofillSettingsViewModel @Inject constructor(
         object ShowListMode : Command()
         object ShowLockedMode : Command()
         object ShowDisabledMode : Command()
-        data class LaunchDeviceAuth(val savedInstanceState: Bundle?) : Command()
+        object LaunchDeviceAuth : Command()
     }
 }
