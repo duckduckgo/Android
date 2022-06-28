@@ -100,7 +100,7 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
                       "inputType_creditCards": false,
                       "emailProtection": true,
                       "password_generation": false,
-                      "credentials_saving": true,
+                      "credentials_saving": $autofillCredentials,
                       "inlineIcon_credentials": $showInlineKeyIcon
                     }
                   }
