@@ -22,12 +22,16 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 interface BrowserAutofill {
 
     fun addJsInterface(webView: WebView, callback: Callback)
+    fun removeJsInterface()
 
-    fun injectCredentials(credentials: LoginCredentials)
+    fun configureAutofillForCurrentPage(webView: WebView, url: String?)
+
+    fun injectCredentials(credentials: LoginCredentials?)
 
 }
 
 interface Callback {
     fun onCredentialsAvailableToInject(credentials: List<LoginCredentials>)
     fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials)
+    fun noCredentialsAvailable(originalUrl: String)
 }

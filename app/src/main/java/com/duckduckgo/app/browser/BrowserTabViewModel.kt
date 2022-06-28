@@ -54,6 +54,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.NonHttpAppLink
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.applinks.AppLinksHandler
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -181,6 +182,8 @@ class BrowserTabViewModel @Inject constructor(
     SiteLocationPermissionDialog.SiteLocationPermissionDialogListener,
     SystemLocationPermissionDialog.SystemLocationPermissionDialogListener,
     UrlExtractionListener,
+    AutofillCredentialsSelectionResultHandler.AutofillCredentialSaver,
+    AutofillCredentialsSelectionResultHandler.CredentialInjector,
     ViewModel(),
     NavigationHistoryListener {
 
@@ -429,6 +432,7 @@ class BrowserTabViewModel @Inject constructor(
             class HideDaxDialog(val cta: Cta) : DaxCommand()
         }
         class InjectCredentials(val url: String, val credentials: LoginCredentials) : Command()
+        class CancelIncomingAutofillRequest(val url: String) : Command()
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
         class NavigateToHistory(val historyStackIndex: Int) : Command()
@@ -2655,13 +2659,23 @@ class BrowserTabViewModel @Inject constructor(
         command.postValue(LoadExtractedUrl(extractedUrl = destinationUrl))
     }
 
-    fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
+    override fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials) {
         command.postValue(InjectCredentials(originalUrl, credentials))
     }
 
-    fun saveCredentials(url: String, credentials: LoginCredentials) {
+    override fun returnNoCredentialsWithPage(originalUrl: String) {
+        command.postValue(CancelIncomingAutofillRequest(originalUrl))
+    }
+
+    override fun saveCredentials(url: String, credentials: LoginCredentials) {
         viewModelScope.launch {
             autofillStore.saveCredentials(url, credentials)
+        }
+    }
+
+    override fun updateCredentials(url: String, credentials: LoginCredentials) {
+        viewModelScope.launch {
+            autofillStore.updateCredentials(url, credentials)
         }
     }
 

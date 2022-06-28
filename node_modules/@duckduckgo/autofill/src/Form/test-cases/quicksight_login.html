@@ -1,0 +1,142 @@
+<!-- https://us-east-1.quicksight.aws.amazon.com/sn/dashboards/f27fc042-9f6c-4202-aa05-394d3f83c7c2?directory_alias=gmedical&ignore=true&ref_=pe_3035110_233161710 -->
+<form id="signin_form" name="signin_form" action="/login" method="post" class="form fwcim-form" data-fwcim-id="379964b4">
+    <input type="hidden" name="redirect_uri" value="https://us-east-1.quicksight.aws.amazon.com/sn/dashboards/f27fc042-9f6c-4202-aa05-394d3f83c7c2?directory_alias=gmedical&amp;ignore=true&amp;ref_=pe_3035110_233161710&amp;state=hashArgs%23&amp;isauthcode=true">
+    <input type="hidden" name="client_id" value="arn:aws:iam::015428540659:user/spaceneedle-prod">
+    <input type="hidden" id="forceMobileApp" name="forceMobileApp" value="">
+    <input type="hidden" id="forceMobileLayout" name="forceMobileLayout" value="">
+    <input type="hidden" id="mfaLoginFailure" name="mfaLoginFailure" value="">
+    <input type="hidden" name="Action" value="login">
+
+    <div id="sso-interstitial" class="formbox">
+        <p> Automatically logging you<br>into the account:<br><span id="auth-account-alias">gmedical</span> </p>
+        <span class="aws-signin-spinner"></span>
+        <p>
+            <button id="sso-interstitial-cancel" class="cancel">
+                Cancel
+            </button>
+        </p>
+    </div>
+
+    <div id="signin_box" style="">
+
+        <div id="broadcast_banner" style="display:block; background-color: #E7F3F8; padding: 15px; border: 1px solid transparent; border-radius: 2px; text-align: left; font-size: 14px; color: #666;">
+            The QuickSight sign-in experience is changing. <a href="https://aws.amazon.com/blogs/big-data/coming-january-2022-an-updated-amazon-quicksight-sign-in-experience" class="link">Learn more</a>
+        </div>
+
+        <div class="title">
+            Sign in to QuickSight <br>
+        </div>
+        <div id="account_name">
+            QuickSight account name
+        </div>
+        <div id="account_name_link">
+            <a class="link" id="accountname">gmedical</a>
+        </div>
+        <div id="main_error"></div>
+        <div id="f2" class="formbox">
+
+            <label>Email address or username</label>
+            <input type="text" id="username" name="username" class="input" tabindex="1" value="" placeholder="john@email.com" data-manual-scoring="username">
+
+            <label>Password</label>
+            <input type="password" id="password" name="password" class="input" tabindex="2" placeholder="Enter password" data-manual-scoring="password">
+
+
+
+
+            <div class="checkboxinput" id="input_mfa_checkbox">
+                <input type="checkbox" name="mfa_checkbox" id="mfa_checkbox">
+                <label for="mfa_checkbox">
+                    I have an
+
+                    <a class="link" href="https://docs.aws.amazon.com/console/iam/mfa" target="_blank">
+                        MFA token
+                    </a>
+
+                </label>
+            </div>
+
+            <div id="input_mfacode" style="">
+                <label for="mfacode" id="mfa_login_label">
+                    MFA code
+                </label>
+                <label for="mfacode" id="mfa_resync_label" style="display: none;">
+                    MFA code #1
+                </label>
+                <input type="password" class="input" id="mfacode" name="mfacode" autocapitalize="off" autocorrect="off" autocomplete="off" data-manual-scoring="unknown">
+            </div>
+
+            <div id="input_next_mfacode" style="display: none;">
+                <label for="next_mfacode">
+                    MFA code #2
+                </label>
+                <input type="password" class="input" id="next_mfacode" name="next_mfacode" autocapitalize="off" autocorrect="off" autocomplete="off" data-manual-scoring="unknown">
+            </div>
+
+            <button type="submit" id="signin_submit" href="#" class="submit" data-manual-submit>
+                Sign in
+            </button>
+
+            <button type="submit" href="#" class="submit" id="resync_button" style="display: none;" data-manual-submit>
+                Resync and sign in
+            </button>
+        </div>
+
+        <span>
+                <a id="forgotpassword_button" href="#" class="link">
+                    Forgot Password?
+                </a>
+                <span class="horizontal_spacer">|</span>
+                <a id="identity_provider_link" href="https://docs.aws.amazon.com/quicksight/latest/user/signing-in.html" class="link">
+                    Identity Provider Sign-in
+                </a>
+            </span>
+    </div>
+
+
+    <div id="signup_box">
+        Not signed up for QuickSight yet?
+        <a href="https://quicksight.aws.amazon.com/sn/console/signup" class="link">
+            Sign up here
+        </a>
+    </div>
+    <div id="identity_provider_box" style="display: none;">
+        Does your organization use an identity provider?
+        <a href="https://docs.aws.amazon.com/quicksight/latest/user/signing-in.html" class="link">
+            Learn more
+        </a>
+    </div>
+
+    <br>
+    <br>
+
+    <br>
+
+
+    <div id="smallprint" style="text-align: center;">
+        <div class="textinput" style="text-align: center; font-size: x-small;">
+
+            <div style="font-size: 12px;">
+                This site uses cookies.
+                <a href="https://www.amazon.co.uk/gp/help/customer/display.html/ref=footer_iba?ie=UTF8&amp;nodeId=201149560" target="_blank">
+                    more information
+                </a>
+            </div>
+
+            <hr>
+
+
+            <a href="https://aws.amazon.com/terms/" target="_blank">
+                Terms of Use;
+            </a>
+            <a href="https://aws.amazon.com/privacy/" target="_blank">
+                Privacy Policy;
+            </a>
+            <br>
+
+
+        </div>
+    </div>
+
+
+</form>

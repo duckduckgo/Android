@@ -123,19 +123,22 @@ const matchingConfiguration = {
             birthdayDay: {
                 type: 'birthdayDay',
                 strategies: {
-                    cssSelector: 'birthdayDay'
+                    cssSelector: 'birthdayDay',
+                    ddgMatcher: 'birthdayDay'
                 }
             },
             birthdayMonth: {
                 type: 'birthdayMonth',
                 strategies: {
-                    cssSelector: 'birthdayMonth'
+                    cssSelector: 'birthdayMonth',
+                    ddgMatcher: 'birthdayMonth'
                 }
             },
             birthdayYear: {
                 type: 'birthdayYear',
                 strategies: {
-                    cssSelector: 'birthdayYear'
+                    cssSelector: 'birthdayYear',
+                    ddgMatcher: 'birthdayYear'
                 }
             },
             cardName: {
@@ -252,9 +255,9 @@ const matchingConfiguration = {
         /** @type {DDGMatcherConfiguration} */
         ddgMatcher: {
             matchers: {
-                email: {match: '.mail\\b', skip: 'phone', forceUnknown: 'search|filter|subject'},
-                password: {match: 'password', forceUnknown: 'captcha'},
-                username: {match: '(user|account|apple|login)((.)?(name|id|login).?)?$', forceUnknown: 'search'},
+                email: {match: '.mail\\b', skip: 'phone|name|reservation number', forceUnknown: 'search|filter|subject'},
+                password: {match: 'password', forceUnknown: 'captcha|mfa|2fa|two factor'},
+                username: {match: '(user|account|apple|login)((.)?(name|id|login).?)?(.or.+)?$', forceUnknown: 'search'},
 
                 // CC
                 cardName: {match: '(card.*name|name.*card)|(card.*holder|holder.*card)|(card.*owner|owner.*card)'},
@@ -289,7 +292,10 @@ const matchingConfiguration = {
                 addressCity: {match: 'city|town', forceUnknown: 'vatican'},
                 addressProvince: {match: 'state|province|region|county', forceUnknown: 'united', skip: 'country'},
                 addressPostalCode: {match: '\\bzip\\b|postal\b|post.?code'},
-                addressCountryCode: {match: 'country'}
+                addressCountryCode: {match: 'country'},
+                birthdayDay: {match: '(birth.*day|day.*birth)', skip: 'month|year'},
+                birthdayMonth: {match: '(birth.*month|month.*birth)', skip: 'year'},
+                birthdayYear: {match: '(birth.*year|year.*birth)'}
             }
         },
         /**

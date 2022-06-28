@@ -27,7 +27,7 @@ input[autocomplete=email]`
 const GENERIC_TEXT_FIELD = `
 input:not([type=button]):not([type=checkbox]):not([type=color]):not([type=date]):not([type=datetime-local]):not([type=datetime]):not([type=file]):not([type=hidden]):not([type=month]):not([type=number]):not([type=radio]):not([type=range]):not([type=reset]):not([type=search]):not([type=submit]):not([type=time]):not([type=url]):not([type=week])`
 
-const password = `input[type=password]:not([autocomplete*=cc]):not([autocomplete=one-time-code]):not([name*=answer i])`
+const password = `input[type=password]:not([autocomplete*=cc]):not([autocomplete=one-time-code]):not([name*=answer i]):not([name*=mfa i]):not([name*=tin i])`
 
 const cardName = `
 input[autocomplete="cc-name"],
@@ -157,29 +157,32 @@ const birthdayDay = `
 [name=bday-day],
 [name=birthday_day], [name=birthday-day],
 [name=date_of_birth_day], [name=date-of-birth-day],
-[name^=birthdate_d], [name^=birthdate-d]`
+[name^=birthdate_d], [name^=birthdate-d],
+[aria-label="birthday" i][placeholder="day" i]`
 
 const birthdayMonth = `
 [name=bday-month],
 [name=birthday_month], [name=birthday-month],
 [name=date_of_birth_month], [name=date-of-birth-month],
-[name^=birthdate_m], [name^=birthdate-m]`
+[name^=birthdate_m], [name^=birthdate-m],
+select[name="mm"]`
 
 const birthdayYear = `
 [name=bday-year],
 [name=birthday_year], [name=birthday-year],
 [name=date_of_birth_year], [name=date-of-birth-year],
-[name^=birthdate_y], [name^=birthdate-y]`
+[name^=birthdate_y], [name^=birthdate-y],
+[aria-label="birthday" i][placeholder="year" i]`
 
 const username = [
     `${GENERIC_TEXT_FIELD}[autocomplete^=user]`,
-    `input[name=username]`,
+    `input[name=username i]`,
     // fix for `aa.com`
-    `input[name="loginId"]`,
+    `input[name="loginId" i]`,
     // fix for https://online.mbank.pl/pl/Login
-    `input[name="userID"]`,
-    `input[id="login-id"]`,
-    `input[name=accountname]`
+    `input[name="userID" i]`,
+    `input[id="login-id" i]`,
+    `input[name=accountname i]`
 ]
 
 // todo: these are still used directly right now, mostly in scanForInputs

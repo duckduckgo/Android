@@ -174,6 +174,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandler
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
 import com.duckduckgo.app.downloads.DownloadsFileActions
@@ -188,9 +189,11 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.autofill.Callback
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog.Companion.RESULT_KEY_CREDENTIAL_RESULT_UPDATE
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
+import com.duckduckgo.autofill.ui.ExistingCredentialMatchDetector
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
-import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -324,9 +327,6 @@ class BrowserTabFragment :
     lateinit var urlExtractorUserAgent: Provider<UserAgentProvider>
 
     @Inject
-    lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
-
-    @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
 
     @Inject
@@ -334,6 +334,15 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
+
+    @Inject
+    lateinit var credentialAutofillDialogFactory: CredentialAutofillDialogFactory
+
+    @Inject
+    lateinit var autofillCredentialsSelectionResultHandler: AutofillCredentialsSelectionResultHandler
+
+    @Inject
+    lateinit var existingCredentialMatchDetector: ExistingCredentialMatchDetector
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -416,8 +425,32 @@ class BrowserTabFragment :
             showAutofillDialogChooseCredentials(credentials)
         }
 
+        override fun noCredentialsAvailable(originalUrl: String) {
+            viewModel.returnNoCredentialsWithPage(originalUrl)
+        }
+
         override fun onCredentialsAvailableToSave(currentUrl: String, credentials: LoginCredentials) {
-            showAutofillDialogSaveCredentials(currentUrl, credentials)
+            launch {
+                val username = credentials.username
+                val password = credentials.password
+
+                if (username == null) {
+                    Timber.w("Not saving credentials with null username")
+                    return@launch
+                }
+
+                if (password == null) {
+                    Timber.w("Not saving credentials with null password")
+                    return@launch
+                }
+
+                when (existingCredentialMatchDetector.determine(currentUrl, username, password)) {
+                    ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
+                    UsernameMatch -> showAutofillDialogUpdateCredentials(currentUrl, credentials)
+                    NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
+                    UrlOnlyMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
+                }
+            }
         }
     }
 
@@ -901,6 +934,7 @@ class BrowserTabFragment :
             is Command.InjectEmailAddress -> injectEmailAddress(it.address)
             is Command.ShowEmailTooltip -> showEmailTooltip(it.address)
             is Command.InjectCredentials -> injectAutofillCredentials(it.url, it.credentials)
+            is Command.CancelIncomingAutofillRequest -> injectAutofillCredentials(it.url, null)
             is Command.EditWithSelectedQuery -> {
                 omnibarTextInput.setText(it.query)
                 omnibarTextInput.setSelection(it.query.length)
@@ -1548,24 +1582,20 @@ class BrowserTabFragment :
             browserAutofill.addJsInterface(it, autofillCallback)
 
             setFragmentResultListener(RESULT_KEY_CREDENTIAL_PICKER) { _, result ->
-                deviceAuthenticator.authenticate(AUTOFILL, this) {
-                    if (it is DeviceAuthenticator.AuthResult.Success) {
-                        val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@authenticate
-                        val originalUrl = result.getString("url") ?: return@authenticate
-                        viewModel.shareCredentialsWithPage(originalUrl, selectedCredentials)
-                    }
-                }
+                autofillCredentialsSelectionResultHandler.processAutofillCredentialSelectionResult(result, this, viewModel)
             }
 
             setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_SAVE) { _, result ->
-                val selectedCredentials = result.getParcelable<LoginCredentials>("creds") ?: return@setFragmentResultListener
-                val originalUrl = result.getString("url") ?: return@setFragmentResultListener
-                viewModel.saveCredentials(originalUrl, selectedCredentials)
+                autofillCredentialsSelectionResultHandler.processSaveCredentialsResult(result, viewModel)
+            }
+
+            setFragmentResultListener(RESULT_KEY_CREDENTIAL_RESULT_UPDATE) { _, result ->
+                autofillCredentialsSelectionResultHandler.processUpdateCredentialsResult(result, viewModel)
             }
         }
     }
 
-    private fun injectAutofillCredentials(url: String, credentials: LoginCredentials) {
+    private fun injectAutofillCredentials(url: String, credentials: LoginCredentials?) {
         webView?.let {
             if (it.url != url) {
                 Timber.w("WebView url has changed since autofill request; bailing")
@@ -1588,6 +1618,14 @@ class BrowserTabFragment :
 
         val dialog = credentialAutofillDialogFactory.autofillSavingCredentialsDialog(url, credentials)
         showDialogHidingPrevious(dialog.asDialogFragment(), CredentialSavePickerDialog.TAG)
+    }
+
+    private fun showAutofillDialogUpdateCredentials(currentUrl: String, credentials: LoginCredentials) {
+        val url = webView?.url ?: return
+        if (url != currentUrl) return
+
+        val dialog = credentialAutofillDialogFactory.autofillSavingUpdateCredentialsDialog(url, credentials)
+        showDialogHidingPrevious(dialog.asDialogFragment(), CredentialUpdateExistingCredentialsDialog.TAG)
     }
 
     private fun showDialogHidingPrevious(dialog: DialogFragment, tag: String) {
@@ -1924,6 +1962,7 @@ class BrowserTabFragment :
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
         emailAutofillTooltipDialog?.dismiss()
+        browserAutofill.removeJsInterface()
         destroyWebView()
         super.onDestroy()
     }

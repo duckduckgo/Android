@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "GetRuntimeConfigurationResponse",
+  "description": "Data that can be understood by @duckduckgo/content-scope-scripts",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "description": "Required on Android + Windows devices, optional on iOS",
+      "type": "string",
+      "const": "getRuntimeConfigurationResponse"
+    },
+    "success": {
+      "description": "This is loaded dynamically from @duckduckgo/content-scope-scripts/src/schema/runtime-configuration.schema.json",
+      "$ref": "runtime-configuration.json"
+    },
+    "error": {
+      "$ref": "error.json"
+    }
+  }
+}

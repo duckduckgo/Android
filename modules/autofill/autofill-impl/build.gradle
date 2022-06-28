@@ -37,6 +37,9 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -74,6 +77,7 @@ dependencies {
     testImplementation "androidx.test:runner:_"
     testImplementation Testing.robolectric
     testImplementation CashApp.turbine
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')

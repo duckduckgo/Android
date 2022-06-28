@@ -86,6 +86,7 @@ type MatchableStrings =
 type MatchingResult = {
     matched: boolean
     proceed?: boolean
+    skip?: boolean
 }
 
 type SupportedMainTypes =

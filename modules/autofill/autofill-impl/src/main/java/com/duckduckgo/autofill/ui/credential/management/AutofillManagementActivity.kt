@@ -29,17 +29,11 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
 import com.duckduckgo.autofill.ui.AutofillSettingsActivityLauncher
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowEditMode
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.ShowViewMode
+import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementEditMode
 import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementLockedMode
-import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementViewMode
+import com.duckduckgo.autofill.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.Features.AUTOFILL
@@ -87,7 +81,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             deviceAuthenticator.authenticate(AUTOFILL, this) {
                 if (it == AuthResult.Success) {
                     viewModel.unlock()
-                    showViewMode()
+                    showListMode()
                 } else {
                     viewModel.lock()
                     showLockMode()
@@ -117,12 +111,13 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
+
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
         var processed = true
         when (command) {
-            is ShowViewMode -> showViewMode()
+            is ShowListMode -> showListMode()
             is ShowEditMode -> showEditMode(command.credentials)
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
@@ -141,12 +136,12 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         Snackbar.make(binding.root, "$type copied to clipboard", Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun showViewMode() {
+    private fun showListMode() {
         Timber.e("Show view mode")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             // addToBackStack(null)
-            replace(R.id.fragment_container_view, AutofillManagementViewMode.instance())
+            replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
         }
 
         inEditMode = false
@@ -186,7 +181,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onBackPressed() {
         if (inEditMode) {
-            showViewMode()
+            showListMode()
         } else {
             super.onBackPressed()
         }

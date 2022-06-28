@@ -17,18 +17,14 @@
 package com.duckduckgo.autofill.di
 
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
-import com.duckduckgo.autofill.BrowserAutofill
-import com.duckduckgo.autofill.CredentialAutofillDialogFactory
-import com.duckduckgo.autofill.InlineBrowserAutofill
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
-import com.duckduckgo.autofill.ui.CredentialAutofillDialogAndroidFactory
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
@@ -38,39 +34,21 @@ import kotlinx.coroutines.CoroutineScope
 class AutofillModule {
 
     @Provides
-    fun browserAutofill(javascriptInterface: AutofillJavascriptInterface): BrowserAutofill {
-        return InlineBrowserAutofill(javascriptInterface)
-    }
-
-    @Provides
-    fun providesAutofillMessagePoster(): AutofillMessagePoster {
-        return AutofillMessagePoster()
-    }
-
-    @Provides
-    fun providesAutofillResponseWriter(moshi: Moshi): AutofillResponseWriter {
-        return AutofillResponseWriter(moshi)
-    }
-
-    @Provides
     fun providesAutofillInterface(
         requestParser: AutofillRequestParser,
         autofillStore: AutofillStore,
         @AppCoroutineScope coroutineScope: CoroutineScope,
         autofillMessagePoster: AutofillMessagePoster,
-        autofillResponseWriter: AutofillResponseWriter
+        autofillResponseWriter: AutofillResponseWriter,
+        emailManager: EmailManager
     ): AutofillJavascriptInterface {
         return AutofillJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,
             autofillMessagePoster = autofillMessagePoster,
             autofillResponseWriter = autofillResponseWriter,
-            coroutineScope = coroutineScope,
+            emailManager = emailManager,
+            coroutineScope = coroutineScope
         )
-    }
-
-    @Provides
-    fun providesFactory(): CredentialAutofillDialogFactory {
-        return CredentialAutofillDialogAndroidFactory()
     }
 }

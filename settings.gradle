@@ -148,5 +148,3 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
-include ':autofill-impl'
-include ':autofill-store'

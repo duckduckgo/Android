@@ -37,11 +37,11 @@ import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.print.PrintInjector
-import com.duckduckgo.app.email.EmailInjector
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autofill.BrowserAutofill
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
@@ -63,7 +63,7 @@ class BrowserWebViewClient(
     private val thirdPartyCookieManager: ThirdPartyCookieManager,
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val emailInjector: EmailInjector,
+    private val browserAutofill: BrowserAutofill,
     private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector
@@ -251,7 +251,7 @@ class BrowserWebViewClient(
                 webViewClientListener?.pageRefreshed(url)
             }
             lastPageStarted = url
-            emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
+            browserAutofill.configureAutofillForCurrentPage(webView, url)
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
         } catch (e: Throwable) {

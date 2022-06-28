@@ -62,12 +62,6 @@ class AutofillSettingsViewModel @Inject constructor(
         addCommand(ShowEditMode(credentials))
     }
 
-    fun addCredentials(credentials: LoginCredentials) {
-        viewModelScope.launch {
-            autofillStore.saveCredentials("hello", credentials)
-        }
-    }
-
     fun launchDeviceAuth(savedInstanceState: Bundle?) {
         lock()
         addCommand(LaunchDeviceAuth(savedInstanceState))
@@ -86,10 +80,6 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun disabled() {
         addCommand(ShowDisabledMode)
-    }
-
-    fun showViewMode() {
-        addCommand(ShowViewMode)
     }
 
     private fun addCommand(command: Command) {
@@ -117,6 +107,8 @@ class AutofillSettingsViewModel @Inject constructor(
 
     fun observeCredentials() {
         viewModelScope.launch {
+            _viewState.value = _viewState.value.copy(autofillEnabled = autofillStore.autofillEnabled)
+
             autofillStore.getAllCredentials().collect { credentials ->
                 _viewState.value = _viewState.value.copy(
                     logins = credentials
@@ -132,7 +124,7 @@ class AutofillSettingsViewModel @Inject constructor(
             autofillStore.deleteCredentials(credentialsId)
         }
 
-        addCommand(ShowViewMode)
+        addCommand(ShowListMode)
     }
 
     fun updateCredentials(updatedCredentials: LoginCredentials) {
@@ -141,7 +133,18 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onEnableAutofill() {
+        autofillStore.autofillEnabled = true
+        _viewState.value = viewState.value.copy(autofillEnabled = true)
+    }
+
+    fun onDisableAutofill() {
+        autofillStore.autofillEnabled = false
+        _viewState.value = viewState.value.copy(autofillEnabled = false)
+    }
+
     data class ViewState(
+        val autofillEnabled: Boolean = true,
         val logins: List<LoginCredentials> = emptyList(),
         val isLocked: Boolean = true
     )
@@ -150,7 +153,7 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserUsernameCopied : Command()
         class ShowUserPasswordCopied : Command()
         data class ShowEditMode(val credentials: LoginCredentials) : Command()
-        object ShowViewMode : Command()
+        object ShowListMode : Command()
         object ShowLockedMode : Command()
         object ShowDisabledMode : Command()
         data class LaunchDeviceAuth(val savedInstanceState: Bundle?) : Command()

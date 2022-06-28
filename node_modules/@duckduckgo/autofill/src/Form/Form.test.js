@@ -1,5 +1,6 @@
 import InterfacePrototype from '../DeviceInterface/InterfacePrototype'
 import { createScanner } from '../Scanner'
+import {attachAndReturnGenericForm} from '../test-utils'
 
 afterEach(() => {
     document.body.innerHTML = ''
@@ -248,12 +249,8 @@ describe('Test the form class reading values correctly', () => {
             expHasValues,
             expValues
         }) => {
-        document.body.innerHTML = form
-        // When we require autofill, the script scores the fields in the DOM
-
+        const formEl = attachAndReturnGenericForm(form)
         const scanner = createScanner(InterfacePrototype.default()).findEligibleInputs(document)
-        const formEl = document.querySelector('form')
-        if (!formEl) throw new Error('unreachable')
         const formClass = scanner.forms.get(formEl)
         const hasValues = formClass?.hasValues()
         const formValues = formClass?.getValues()
@@ -327,12 +324,10 @@ describe('Form validity is reported correctly', () => {
             form,
             expIsValid
         }) => {
-        document.body.innerHTML = form
-        // When we require autofill, the script scores the fields in the DOM
+        const formEl = attachAndReturnGenericForm(form)
+
         const scanner = createScanner(InterfacePrototype.default()).findEligibleInputs(document)
 
-        const formEl = /** @type {HTMLElement} */ (document.querySelector('form, #form'))
-        if (!formEl) throw new Error('unreachable')
         const formClass = scanner.forms.get(formEl)
         const isValid = formClass?.isValid()
 
@@ -342,17 +337,11 @@ describe('Form validity is reported correctly', () => {
 
 describe('Check form has focus', () => {
     test('focus detected correctly', () => {
-        document.body.innerHTML = `
-<form>
-    <input autocomplete="cc-name" required value="Peppa Pig">
-    <input autocomplete="cc-number" required value="4111111111111111">
-</form>`
+        const formEl = attachAndReturnGenericForm()
 
         // When we require autofill, the script scores the fields in the DOM
         const scanner = createScanner(InterfacePrototype.default()).findEligibleInputs(document)
 
-        const formEl = /** @type {HTMLFormElement} */ (document.querySelector('form'))
-        if (!formEl) throw new Error('unreachable')
         const formClass = scanner.forms.get(formEl)
 
         expect(formClass?.hasFocus()).toBe(false)

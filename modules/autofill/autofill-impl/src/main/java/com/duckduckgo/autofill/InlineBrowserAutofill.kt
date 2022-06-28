@@ -17,10 +17,24 @@
 package com.duckduckgo.autofill
 
 import android.webkit.WebView
+import com.duckduckgo.app.autofill.JavascriptInjector
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
-class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInterface) : BrowserAutofill {
+@ContributesBinding(AppScope::class)
+class InlineBrowserAutofill @Inject constructor(
+    private val autofillInterface: AutofillJavascriptInterface,
+    private val javascriptInjector: JavascriptInjector,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+) : BrowserAutofill {
 
     override fun addJsInterface(webView: WebView, callback: Callback) {
         Timber.v("Injecting BrowserAutofill interface")
@@ -29,7 +43,27 @@ class InlineBrowserAutofill(private val autofillInterface: AutofillJavascriptInt
         autofillInterface.callback = callback
     }
 
-    override fun injectCredentials(credentials: LoginCredentials) {
-        autofillInterface.injectCredentials(credentials)
+    override fun removeJsInterface() {
+        autofillInterface.webView = null
+    }
+
+    override fun configureAutofillForCurrentPage(webView: WebView, url: String?) {
+        coroutineScope.launch {
+            val rawJs = javascriptInjector.getFunctionsJS()
+            val formatted = autofillInterface.getRuntimeConfiguration(rawJs, url)
+
+            withContext(Dispatchers.Main) {
+                webView.evaluateJavascript("javascript:$formatted", null)
+            }
+        }
+    }
+
+    override fun injectCredentials(credentials: LoginCredentials?) {
+        if (credentials == null) {
+            autofillInterface.injectNoCredentials()
+        } else {
+            autofillInterface.injectCredentials(credentials)
+        }
+
     }
 }
