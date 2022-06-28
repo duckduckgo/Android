@@ -204,16 +204,16 @@ class SurveyDownloaderTest {
 
     private fun surveyWithAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 1.0, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
 
     private fun surveyNoAllocation(id: String): SurveyGroup {
         val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, null, emptyList()),
-            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, null, emptyList())
+            SurveyGroup.SurveyOption(SURVEY_URL, 1, 0.0, null, null, null, emptyList()),
+            SurveyGroup.SurveyOption(SURVEY_URL, 7, 0.0, null, null, null, emptyList())
         )
         return SurveyGroup(id, surveyOptions)
     }
@@ -225,7 +225,6 @@ class SurveyDownloaderTest {
                 -1,
                 1.0,
                 true,
-                null,
                 null,
                 null, listOf(SurveyUrlParameter.EmailCohortParam.parameter)
             )
@@ -240,7 +239,6 @@ class SurveyDownloaderTest {
                 -1, 1.0,
                 null,
                 true,
-                null,
                 null,
                 listOf(SurveyUrlParameter.AtpCohortParam.parameter)
             )
@@ -257,23 +255,6 @@ class SurveyDownloaderTest {
                 null,
                 isAtpEverEnabledRequired = true,
                 isAtpWaitlistRequired = true,
-                isAtpRetentionStudyRequired = null,
-                urlParameters = emptyList()
-            )
-        )
-        return SurveyGroup(id, surveyOptions)
-    }
-
-    private fun surveyWithAllocationForAppTPRetentionStudy(id: String): SurveyGroup {
-        val surveyOptions = listOf(
-            SurveyGroup.SurveyOption(
-                SURVEY_URL,
-                7,
-                1.0,
-                null,
-                isAtpEverEnabledRequired = false,
-                isAtpWaitlistRequired = false,
-                isAtpRetentionStudyRequired = true,
                 urlParameters = emptyList()
             )
         )

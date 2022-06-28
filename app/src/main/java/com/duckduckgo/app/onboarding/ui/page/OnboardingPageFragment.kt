@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
-import kotlinx.android.synthetic.main.content_onboarding_default_browser.*
 
 abstract class OnboardingPageFragment : Fragment() {
 
@@ -42,11 +41,4 @@ abstract class OnboardingPageFragment : Fragment() {
             is OnboardingActivity -> (activity as OnboardingActivity).onContinueClicked()
         }
     }
-
-    fun onOnboardingDone() {
-        when (activity) {
-            is OnboardingActivity -> (activity as OnboardingActivity).onOnboardingDone()
-        }
-    }
-
 }
