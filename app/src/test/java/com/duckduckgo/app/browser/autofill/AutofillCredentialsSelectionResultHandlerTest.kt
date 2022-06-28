@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHan
 import com.duckduckgo.app.browser.autofill.AutofillCredentialsSelectionResultHandlerTest.FakeAuthenticator.DenyEverything
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Failed
@@ -74,6 +75,29 @@ class AutofillCredentialsSelectionResultHandlerTest {
         val bundle = bundleForSaveDialog("example.com", loginCredentials)
         testee.processSaveCredentialsResult(bundle, credentialsSaver)
         verify(credentialsSaver).saveCredentials(eq("example.com"), eq(loginCredentials))
+    }
+
+    @Test
+    fun whenUpdateBundleMissingUrlThenNoAttemptToUpdateMade() = runTest {
+        val bundle = bundleForUpdateDialog(url = null, credentials = someLoginCredentials())
+        testee.processUpdateCredentialsResult(bundle, credentialsSaver)
+        verifyUpdateNeverCalled()
+    }
+
+    @Test
+    fun whenUpdateBundleMissingCredentialsThenNoAttemptToSaveMade() = runTest {
+        val bundle = bundleForUpdateDialog(url = "example.com", credentials = null)
+        testee.processUpdateCredentialsResult(bundle, credentialsSaver)
+        verifyUpdateNeverCalled()
+    }
+
+    @Test
+    fun whenUpdateBundleWellFormedThenCredentialsAreUpdated() = runTest {
+        val loginCredentials = LoginCredentials(domain = "example.com", username = "foo", password = "bar")
+        val bundle = bundleForUpdateDialog("example.com", loginCredentials)
+        testee.processUpdateCredentialsResult(bundle, credentialsSaver)
+        verify(credentialsSaver).updateCredentials(eq("example.com"), eq(loginCredentials))
+        verifySaveNeverCalled()
     }
 
     @Test
@@ -131,6 +155,10 @@ class AutofillCredentialsSelectionResultHandlerTest {
         verify(credentialsSaver, never()).saveCredentials(any(), any())
     }
 
+    private fun verifyUpdateNeverCalled() {
+        verify(credentialsSaver, never()).updateCredentials(any(), any())
+    }
+
     private fun verifyCredentialsSharedWithPage(url: String, credentials: LoginCredentials) {
         verify(credentialsInjector).shareCredentialsWithPage(url, credentials)
     }
@@ -158,6 +186,13 @@ class AutofillCredentialsSelectionResultHandlerTest {
         return Bundle().also {
             if (url != null) it.putString(CredentialSavePickerDialog.KEY_URL, url)
             if (credentials != null) it.putParcelable(CredentialSavePickerDialog.KEY_CREDENTIALS, credentials)
+        }
+    }
+
+    private fun bundleForUpdateDialog(url: String?, credentials: LoginCredentials?): Bundle {
+        return Bundle().also {
+            if (url != null) it.putString(CredentialUpdateExistingCredentialsDialog.KEY_URL, url)
+            if (credentials != null) it.putParcelable(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS, credentials)
         }
     }
 

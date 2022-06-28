@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
@@ -33,9 +32,6 @@ import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ContentAutofillSelectCredentialsTooltipBinding
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.mobile.android.ui.view.toPx
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.launch
@@ -52,26 +48,14 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
         super.onAttach(context)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
         return binding.root
     }
 
     private fun configureViews(binding: ContentAutofillSelectCredentialsTooltipBinding) {
-        dialog?.setOnShowListener {
-            val bottomSheetDialog = it as BottomSheetDialog
-            val sheet: FrameLayout = bottomSheetDialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)!!
-
-            BottomSheetBehavior.from(sheet).setPeekHeight(600.toPx(), true)
-        }
-
         configureSiteDetails(binding)
-
         configureRecyclerView(binding)
     }
 
@@ -111,16 +95,11 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     private fun getOriginalUrl() = arguments?.getString(CredentialAutofillPickerDialog.KEY_URL)!!
 
-    // needed to avoid an untyped cast when wanting to show DialogFragment, as outside this module
-    // it is known by its interface CredentialAutofillPickerDialog, not as a DialogFragment.
     override fun asDialogFragment(): DialogFragment = this
 
     companion object {
 
-        fun instance(
-            url: String,
-            credentials: List<LoginCredentials>
-        ): AutofillSelectCredentialsDialogFragment {
+        fun instance(url: String, credentials: List<LoginCredentials>): AutofillSelectCredentialsDialogFragment {
 
             val cr = ArrayList<LoginCredentials>(credentials)
 

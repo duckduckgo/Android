@@ -20,6 +20,8 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
+import com.duckduckgo.app.global.DefaultDispatcherProvider
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
@@ -29,7 +31,6 @@ import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.C
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -41,6 +42,8 @@ class AutofillJavascriptInterface(
     private val autofillResponseWriter: AutofillResponseWriter,
     private val emailManager: EmailManager,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
+    private val currentUrlProvider: UrlProvider = WebViewUrlProvider(dispatcherProvider),
     var callback: Callback? = null
 ) {
 
@@ -50,7 +53,7 @@ class AutofillJavascriptInterface(
     @JavascriptInterface
     fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
-        getAutofillDataJob += coroutineScope.launch {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val request = requestParser.parseAutofillDataRequest(requestString)
 
             if (request.mainType != CREDENTIALS) {
@@ -58,7 +61,7 @@ class AutofillJavascriptInterface(
                 return@launch
             }
 
-            val url = currentUrl()
+            val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
                 return@launch
@@ -66,7 +69,7 @@ class AutofillJavascriptInterface(
 
             val credentials = autofillStore.getCredentials(url)
 
-            withContext(Dispatchers.Main) {
+            withContext(dispatcherProvider.main()) {
                 if (credentials.isEmpty()) {
                     callback?.noCredentialsAvailable(url)
                 } else {
@@ -120,27 +123,27 @@ class AutofillJavascriptInterface(
         Timber.i("storeFormData called, credentials provided to be persisted")
 
         getAutofillDataJob += coroutineScope.launch {
-            val currentUrl = currentUrl() ?: return@launch
+            val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
 
             val request = requestParser.parseStoreFormDataRequest(data).credentials
             val jsCredentials = JavascriptCredentials(request.username, request.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl)
 
-            withContext(Dispatchers.Main) {
+            withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
             }
         }
     }
 
     fun injectCredentials(credentials: LoginCredentials) {
-        getAutofillDataJob += coroutineScope.launch {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             val jsCredentials = credentials.asJsCredentials()
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseGetAutofillData(jsCredentials))
         }
     }
 
     fun injectNoCredentials() {
-        getAutofillDataJob += coroutineScope.launch {
+        getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
     }
@@ -161,14 +164,20 @@ class AutofillJavascriptInterface(
         )
     }
 
-    private suspend fun currentUrl(): String? {
-        return withContext(Dispatchers.Main) {
-            webView?.url
-        }
-    }
-
     companion object {
         const val INTERFACE_NAME = "BrowserAutofill"
+    }
+
+    interface UrlProvider {
+        suspend fun currentUrl(webView: WebView?): String?
+    }
+
+    private class WebViewUrlProvider(val dispatcherProvider: DispatcherProvider) : UrlProvider {
+        override suspend fun currentUrl(webView: WebView?): String? {
+            return withContext(dispatcherProvider.main()) {
+                webView?.url
+            }
+        }
     }
 
 }

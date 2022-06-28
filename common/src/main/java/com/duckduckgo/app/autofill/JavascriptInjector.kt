@@ -18,7 +18,10 @@ package com.duckduckgo.app.autofill
 
 import android.content.Context
 import com.duckduckgo.app.global.R
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import java.io.BufferedReader
+import javax.inject.Inject
 
 interface JavascriptInjector {
     fun getFunctionsJS(): String
@@ -32,7 +35,8 @@ interface JavascriptInjector {
     ): String
 }
 
-class FileBasedJavaScriptInjector : JavascriptInjector {
+@ContributesBinding(AppScope::class)
+class FileBasedJavaScriptInjector @Inject constructor() : JavascriptInjector {
     private lateinit var functions: String
     private lateinit var aliasFunctions: String
     private lateinit var signOutFunctions: String

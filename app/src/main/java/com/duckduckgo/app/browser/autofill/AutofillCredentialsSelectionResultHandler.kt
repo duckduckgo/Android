@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.duckduckgo.autofill.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.CredentialSavePickerDialog
+import com.duckduckgo.autofill.CredentialUpdateExistingCredentialsDialog
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator
 import com.duckduckgo.deviceauth.api.DeviceAuthenticator.AuthResult.Success
@@ -61,6 +62,12 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
         credentialSaver.saveCredentials(originalUrl, selectedCredentials)
     }
 
+    fun processUpdateCredentialsResult(result: Bundle, credentialSaver: AutofillCredentialSaver) {
+        val selectedCredentials = result.getParcelable<LoginCredentials>(CredentialUpdateExistingCredentialsDialog.KEY_CREDENTIALS) ?: return
+        val originalUrl = result.getString(CredentialUpdateExistingCredentialsDialog.KEY_URL) ?: return
+        credentialSaver.updateCredentials(originalUrl, selectedCredentials)
+    }
+
     interface CredentialInjector {
         fun shareCredentialsWithPage(originalUrl: String, credentials: LoginCredentials)
         fun returnNoCredentialsWithPage(originalUrl: String)
@@ -68,5 +75,6 @@ class AutofillCredentialsSelectionResultHandler @Inject constructor(private val 
 
     interface AutofillCredentialSaver {
         fun saveCredentials(url: String, credentials: LoginCredentials)
+        fun updateCredentials(url: String, credentials: LoginCredentials)
     }
 }

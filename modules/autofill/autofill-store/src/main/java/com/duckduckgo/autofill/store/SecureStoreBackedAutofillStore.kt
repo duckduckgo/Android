@@ -21,6 +21,8 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.extractSchemeAndDomain
 import com.duckduckgo.autofill.domain.app.LoginCredentials
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
+import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorage
 import com.duckduckgo.securestorage.api.WebsiteLoginDetails
@@ -75,6 +77,28 @@ class SecureStoreBackedAutofillStore(
         secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
     }
 
+    override suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials) {
+        val url = rawUrl.extractSchemeAndDomain()
+        if (url == null) {
+            Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
+            return
+        }
+
+        val matchingCredentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull()
+        if (matchingCredentials.isNullOrEmpty()) {
+            Timber.w("Cannot update credentials as no credentials were found for %s", url)
+            return
+        }
+
+        Timber.i("Updating %d saved login credentials for %s. username=%s", matchingCredentials.size, url, credentials.username)
+
+        matchingCredentials.forEach {
+            val modifiedDetails = it.details.copy(username = credentials.username)
+            val modified = it.copy(password = credentials.password, details = modifiedDetails)
+            secureStorage.updateWebsiteLoginDetailsWithCredentials(modified)
+        }
+    }
+
     override suspend fun getAllCredentials(): Flow<List<LoginCredentials>> {
         return secureStorage.websiteLoginDetailsWithCredentials()
             .map { list ->
@@ -88,6 +112,36 @@ class SecureStoreBackedAutofillStore(
 
     override suspend fun updateCredentials(credentials: LoginCredentials) {
         secureStorage.updateWebsiteLoginDetailsWithCredentials(credentials.toWebsiteLoginCredentials())
+    }
+
+    override suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult {
+        val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
+        val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
+
+        var exactMatchFound = false
+        var usernameMatchFound = false
+        var urlMatch = false
+
+        credentials.forEach {
+            urlMatch = true
+
+            if (it.details.username == username) {
+                usernameMatchFound = true
+                if (it.password == password) {
+                    exactMatchFound = true
+                }
+            }
+        }
+
+        return if (exactMatchFound) {
+            ContainsCredentialsResult.ExactMatch
+        } else if (usernameMatchFound) {
+            ContainsCredentialsResult.UsernameMatch
+        } else if (urlMatch) {
+            ContainsCredentialsResult.UrlOnlyMatch
+        } else {
+            NoMatch
+        }
     }
 
     private fun WebsiteLoginDetailsWithCredentials.toLoginCredentials(): LoginCredentials {

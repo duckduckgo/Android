@@ -17,27 +17,40 @@
 package com.duckduckgo.autofill.jsbridge.response
 
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import javax.inject.Inject
 
-class AutofillResponseWriter(val moshi: Moshi) {
+interface AutofillResponseWriter {
+    fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String
+    fun generateEmptyResponseGetAutofillData(): String
+    fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String
+    fun generateContentScope(): String
+    fun generateUserUnprotectedDomains(): String
+    fun generateUserPreferences(autofillCredentials: Boolean, showInlineKeyIcon: Boolean = false): String
+}
+
+@ContributesBinding(AppScope::class)
+class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : AutofillResponseWriter {
 
     private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")
     private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
 
-    fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
+    override fun generateResponseGetAutofillData(credentials: JavascriptCredentials): String {
         val credentialsResponse = ContainingCredentials.CredentialSuccessResponse(credentials)
         val topLevelResponse = ContainingCredentials(success = credentialsResponse)
         return autofillDataAdapterCredentialsAvailable.toJson(topLevelResponse)
     }
 
-    fun generateEmptyResponseGetAutofillData(): String {
+    override fun generateEmptyResponseGetAutofillData(): String {
         val credentialsResponse = EmptyResponse.EmptyCredentialResponse()
         val topLevelResponse = EmptyResponse(success = credentialsResponse)
         return autofillDataAdapterCredentialsUnavailable.toJson(topLevelResponse)
     }
 
-    fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {
+    override fun generateResponseGetAvailableInputTypes(credentialsAvailable: Boolean, emailAvailable: Boolean): String {
         val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
         return availableInputTypesAdapter.toJson(availableInputTypes)
     }
@@ -45,7 +58,7 @@ class AutofillResponseWriter(val moshi: Moshi) {
     /*
     * hardcoded for now, but eventually will be a dump of the most up-to-date privacy remote config, untouched by us
     */
-    fun generateContentScope(): String {
+    override fun generateContentScope(): String {
         return """
             contentScope = {
               "features": {
@@ -62,15 +75,15 @@ class AutofillResponseWriter(val moshi: Moshi) {
     /*
      * userUnprotectedDomains: any sites for which the user has chosen to disable privacy protections (leave empty for now)
      */
-    fun generateUserUnprotectedDomains(): String {
+    override fun generateUserUnprotectedDomains(): String {
         return """
             userUnprotectedDomains = [];
         """.trimIndent()
     }
 
-    fun generateUserPreferences(
+    override fun generateUserPreferences(
         autofillCredentials: Boolean,
-        showInlineKeyIcon: Boolean = false
+        showInlineKeyIcon: Boolean
     ): String {
         return """
             userPreferences = {
