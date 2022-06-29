@@ -90,7 +90,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.downloads_activity_menu, menu)
         return true
     }
@@ -102,8 +102,8 @@ class DownloadsActivity : DuckDuckGoActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        searchMenuItem = menu?.findItem(R.id.action_search)
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        searchMenuItem = menu.findItem(R.id.action_search)
         initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)
     }

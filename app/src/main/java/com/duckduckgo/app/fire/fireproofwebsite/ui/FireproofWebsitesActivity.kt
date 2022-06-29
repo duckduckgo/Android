@@ -61,7 +61,7 @@ class FireproofWebsitesActivity : DuckDuckGoActivity(), FireproofSettingsSelecto
         observeViewModel()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_fireproof_websites_activity, menu)
         return true
     }
