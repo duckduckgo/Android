@@ -16,9 +16,12 @@
 
 package com.duckduckgo.autofill.di
 
+import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.email.EmailManager
 import com.duckduckgo.autofill.AutofillJavascriptInterface
+import com.duckduckgo.autofill.store.InternalTestUserStore
+import com.duckduckgo.autofill.store.RealInternalTestUserStore
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
@@ -51,4 +54,7 @@ class AutofillModule {
             coroutineScope = coroutineScope
         )
     }
+
+    @Provides
+    fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
 }
