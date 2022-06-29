@@ -35,7 +35,6 @@ sealed class DownloadCommand(@StringRes val messageId: Int, val showNotification
     class ShowDownloadFailedMessage(
         @StringRes messageId: Int,
         showNotification: Boolean,
-        val showEnableDownloadManagerAction: Boolean
     ) : DownloadCommand(messageId, showNotification)
 }
 

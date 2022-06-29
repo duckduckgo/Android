@@ -28,10 +28,15 @@ interface DownloadCallback {
     fun onStart(downloadItem: DownloadItem)
 
     /**
+     * Called during the download progress. Takes as parameters the [downloadId] and the [progress] of the download.
+     */
+    fun onProgress(downloadId: Long, filename: String, progress: Int)
+
+    /**
      * Called when a download done using the DownloadManager finishes with success. Takes as parameters the [downloadId] and [contentLength]
      * provided by the DownloadManager.
      */
-    fun onSuccess(downloadId: Long, contentLength: Long)
+    fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?)
 
     /**
      * Called when a download done without using the DownloadManager finishes with success. Takes as parameters the [file]
@@ -40,17 +45,10 @@ interface DownloadCallback {
     fun onSuccess(file: File, mimeType: String?)
 
     /**
-     * Called on when the DownloadManager completes a download with a failed state.
-     * Takes as mandatory parameters the [downloadId] provided by the DownloadManager when the download is enqueued and the [reason] describing
-     * why the download has failed.
-     */
-    fun onError(downloadId: Long, reason: DownloadFailReason)
-
-    /**
      * Called when the download fails. Takes as optional parameter the [url] which started the download. Takes as mandatory parameter
      * the [reason] describing why the download has failed.
      */
-    fun onError(url: String? = null, reason: DownloadFailReason)
+    fun onError(url: String? = null, downloadId: Long? = null, reason: DownloadFailReason)
 
     /**
      * Called when the download is cancelled from the app or from the notification. Takes as mandatory parameter the [downloadId] provided by
