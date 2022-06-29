@@ -153,8 +153,6 @@ class SettingsActivity :
         with(viewsPrivacy) {
             globalPrivacyControlSetting.setOnClickListener { viewModel.onGlobalPrivacyControlClicked() }
             fireproofWebsites.setOnClickListener { viewModel.onFireproofWebsitesClicked() }
-            autofill.isEnabled = true
-            autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
             locationPermissions.setOnClickListener { viewModel.onLocationClicked() }
             automaticallyClearWhatSetting.setOnClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setOnClickListener { viewModel.onAutomaticallyClearWhenClicked() }
@@ -219,6 +217,7 @@ class SettingsActivity :
                     updateDeviceShieldSettings(it.appTrackingProtectionEnabled, it.appTrackingProtectionWaitlistState)
                     updateEmailSubtitle(it.emailAddress)
                     updateMacOsSettings(it.macOsWaitlistState)
+                    updateAutofill(it.showAutofill)
                 }
             }.launchIn(lifecycleScope)
 
@@ -226,6 +225,15 @@ class SettingsActivity :
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { processCommand(it) }
             .launchIn(lifecycleScope)
+    }
+
+    private fun updateAutofill(autofillEnabled: Boolean) {
+        if (autofillEnabled) {
+            viewsPrivacy.autofill.visibility = View.VISIBLE
+            viewsPrivacy.autofill.setOnClickListener { viewModel.onAutofillSettingsClick() }
+        } else {
+            viewsPrivacy.autofill.visibility = View.GONE
+        }
     }
 
     private fun updateEmailSubtitle(emailAddress: String?) {

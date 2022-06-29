@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.global.extractSchemeAndDomain
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.NoMatch
@@ -38,7 +39,8 @@ import timber.log.Timber
 
 class SecureStoreBackedAutofillStore(
     private val secureStorage: SecureStorage,
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val internalTestUserChecker: InternalTestUserChecker
 ) : AutofillStore {
 
     private val prefs: SharedPreferences by lazy {
@@ -46,8 +48,8 @@ class SecureStoreBackedAutofillStore(
     }
 
     override var autofillEnabled: Boolean
-        get() = prefs.getBoolean(AUTOFILL_ENABLED, true)
-        set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value) }
+        get() = internalTestUserChecker.isInternalTestUser && prefs.getBoolean(AUTOFILL_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(AUTOFILL_ENABLED, value && internalTestUserChecker.isInternalTestUser) }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         Timber.i("Querying secure store for stored credentials. rawUrl: %s, extractedDomain:%s", rawUrl, rawUrl.extractSchemeAndDomain())
@@ -77,7 +79,10 @@ class SecureStoreBackedAutofillStore(
         secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)
     }
 
-    override suspend fun updateCredentials(rawUrl: String, credentials: LoginCredentials) {
+    override suspend fun updateCredentials(
+        rawUrl: String,
+        credentials: LoginCredentials
+    ) {
         val url = rawUrl.extractSchemeAndDomain()
         if (url == null) {
             Timber.w("Cannot update credentials as given url was in an unexpected format. Original url: %s", rawUrl)
@@ -114,7 +119,11 @@ class SecureStoreBackedAutofillStore(
         secureStorage.updateWebsiteLoginDetailsWithCredentials(credentials.toWebsiteLoginCredentials())
     }
 
-    override suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult {
+    override suspend fun containsCredentials(
+        rawUrl: String,
+        username: String,
+        password: String
+    ): ContainsCredentialsResult {
         val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
 
@@ -172,7 +181,11 @@ class AutofillStoreModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun autofillStore(secureStorage: SecureStorage, context: Context): AutofillStore {
-        return SecureStoreBackedAutofillStore(secureStorage, context)
+    fun autofillStore(
+        secureStorage: SecureStorage,
+        context: Context,
+        internalTestUserChecker: InternalTestUserChecker
+    ): AutofillStore {
+        return SecureStoreBackedAutofillStore(secureStorage, context, internalTestUserChecker)
     }
 }
