@@ -23,8 +23,6 @@ import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.statistics.Variant
-import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.survey.db.SurveyDao
@@ -33,7 +31,6 @@ import com.duckduckgo.app.survey.model.Survey.Status.DONE
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.ui.SurveyViewModel.Command
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.mobile.android.vpn.cohort.AtpCohortManager
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.After
@@ -68,10 +65,6 @@ class SurveyViewModelTest {
 
     private var mockAppBuildConfig: AppBuildConfig = mock()
 
-    private var mockVariantManager: VariantManager = mock()
-
-    private var mockAppTpCohortManager: AtpCohortManager = mock()
-
     private lateinit var testee: SurveyViewModel
 
     @Before
@@ -79,15 +72,12 @@ class SurveyViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         whenever(mockAppBuildConfig.versionName).thenReturn("name")
-        whenever(mockVariantManager.getVariant()).thenReturn(Variant("ma", 100.0, filterBy = { true }))
 
         testee = SurveyViewModel(
             mockSurveyDao,
             mockStatisticsStore,
             mockAppInstallStore,
             mockAppBuildConfig,
-            mockVariantManager,
-            mockAppTpCohortManager,
             coroutineTestRule.testDispatcherProvider
         )
         testee.command.observeForever(mockCommandObserver)
@@ -110,8 +100,6 @@ class SurveyViewModelTest {
 
     @Test
     fun whenSurveyStartedThenParametersAddedToUrl() {
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
-        whenever(mockAppTpCohortManager.getCohort()).thenReturn("atp-cohort")
         whenever(mockStatisticsStore.atb).thenReturn(Atb("123"))
         whenever(mockStatisticsStore.variant).thenReturn("abc")
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2))
@@ -127,7 +115,6 @@ class SurveyViewModelTest {
         assertEquals("${Build.VERSION.SDK_INT}", loadedUri.getQueryParameter("av"))
         assertEquals("name", loadedUri.getQueryParameter("ddgv"))
         assertEquals(Build.MANUFACTURER, loadedUri.getQueryParameter("man"))
-        assertEquals("atp-cohort", loadedUri.getQueryParameter("atp_cohort"))
     }
 
     @Test

@@ -117,7 +117,17 @@ class SettingsViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         appTrackingProtectionWaitlistDataStore = FakeAppTrackingProtectionWaitlistDataStore()
-        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore, mockVariantManager)
+        appTPRepository = WaitlistStateRepository(appTrackingProtectionWaitlistDataStore)
+
+        whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
+        whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
+        whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
+        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
+        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
+        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
+        whenever(mockAppBuildConfig.versionName).thenReturn("name")
+        whenever(mockAppBuildConfig.versionCode).thenReturn(1)
 
         testee = SettingsViewModel(
             mockContext,
@@ -135,16 +145,6 @@ class SettingsViewModelTest {
             mockEmailManager,
             mockMacOsWaitlist
         )
-
-        whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(APP_EXIT_ONLY)
-        whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(CLEAR_NONE)
-        whenever(mockAppSettingsDataStore.appIcon).thenReturn(AppIcon.DEFAULT)
-        whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
-        whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
-        whenever(mockMacOsWaitlist.getWaitlistState()).thenReturn(MacWaitlistState.NotJoinedQueue)
-        whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.DEFAULT_VARIANT)
-        whenever(mockAppBuildConfig.versionName).thenReturn("name")
-        whenever(mockAppBuildConfig.versionCode).thenReturn(1)
     }
 
     @Test
@@ -589,106 +589,6 @@ class SettingsViewModelTest {
             testee.onAutomaticallyClearWhenClicked()
 
             assertEquals(Command.ShowClearWhenDialog(APP_EXIT_ONLY), awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaBetaAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
-        testee.commands().test {
-            appTrackingProtectionWaitlistDataStore.inviteCode = "inviteCode"
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
-            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPTrackersScreen, expectMostRecentItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNotInAppTPRetentionStudyAndUserDidJoinBetaAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
-        testee.commands().test {
-            appTrackingProtectionWaitlistDataStore.inviteCode = "inviteCode"
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
-            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPOnboarding, expectMostRecentItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNotInAppTPRetentionStudyAndUserDidNotJoinBetaThenClickingOnSettingLaunchAppTPWaitlist() = runTest {
-        testee.commands().test {
-
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPWaitlist, expectMostRecentItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNotInAppTPRetentionStudyAndUserNotJoinedQueueForAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
-        testee.commands().test {
-
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPWaitlist, awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenNotInAppTPRetentionStudyAndUserJoinedQueueAppTPBetaThenClickingOnSettingOpensWaitlistScreen() = runTest {
-        testee.commands().test {
-
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "na" })
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPWaitlist, awaitItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInAppTPRetentionStudyAndOnboardingDidShowThenClickingOnSettingOpensTrackersScreen() = runTest {
-        testee.commands().test {
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
-            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(true)
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPTrackersScreen, expectMostRecentItem())
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenInAppTPRetentionStudyAndOnboardingDidNotShowThenClickingOnSettingOpensTrackersScreen() = runTest {
-        testee.commands().test {
-            whenever(mockVariantManager.getVariant()).thenReturn(VariantManager.ACTIVE_VARIANTS.first { it.key == "nb" })
-            whenever(mockDeviceShieldOnboarding.didShowOnboarding()).thenReturn(false)
-
-            testee.onAppTPSettingClicked()
-
-            assertEquals(Command.LaunchAppTPOnboarding, expectMostRecentItem())
 
             cancelAndConsumeRemainingEvents()
         }
