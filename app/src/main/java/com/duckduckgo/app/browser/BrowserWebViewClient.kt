@@ -271,7 +271,10 @@ class BrowserWebViewClient(
     ) {
         try {
             accessibilityManager.onPageFinished(webView, url)
-            url?.let { internalTestUserChecker.verifyVerificationCompleted(it) }
+            url?.let {
+                // We call this for any url but it will only be processed for an internal tester verification url
+                internalTestUserChecker.verifyVerificationCompleted(it)
+            }
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
@@ -423,6 +426,7 @@ class BrowserWebViewClient(
     ) {
         super.onReceivedHttpError(view, request, errorResponse)
         view?.url?.let {
+            // We call this for any url but it will only be processed for an internal tester verification url
             internalTestUserChecker.verifyVerificationErrorReceived(it)
         }
     }

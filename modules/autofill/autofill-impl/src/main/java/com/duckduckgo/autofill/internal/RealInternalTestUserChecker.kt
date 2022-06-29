@@ -24,6 +24,11 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+/**
+ * The logic for this implementation of [InternalTestUserChecker] relies on the fact that
+ * a user loads a verification url and goes through auth and completes the process to be
+ * an internal test user.
+ */
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealInternalTestUserChecker @Inject constructor(
@@ -36,12 +41,22 @@ class RealInternalTestUserChecker @Inject constructor(
         get() = internalTestUserStore.isVerifiedInternalTestUser
 
     override fun verifyVerificationErrorReceived(url: String) {
+        /**
+         * When the page is loaded for [LOGIN_URL_SUCCESS] and the user hasn't completed auth,
+         * the page could successfully complete loading BUT will emit an http error [WebViewClient.onReceivedHttpError].
+         * This http error will be our signal that the user should NOT be an internal test user.
+         */
         if (url.internalTestUrlSuccessUrl()) {
             verificationErrorDetected = true
         }
     }
 
     override fun verifyVerificationCompleted(url: String) {
+        /**
+         * This method is processed when [LOGIN_URL_SUCCESS] has been successfully loaded. If no http error
+         * has been emitted / [verifyVerificationErrorReceived] not called, This means that the user
+         * has completed auth and the user should be set as an internal tester.
+         */
         if (url.internalTestUrlSuccessUrl()) {
             internalTestUserStore.isVerifiedInternalTestUser = !verificationErrorDetected
             verificationErrorDetected = false
