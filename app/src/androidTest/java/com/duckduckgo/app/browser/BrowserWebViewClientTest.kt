@@ -43,6 +43,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.autofill.BrowserAutofill
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import org.mockito.kotlin.any
@@ -90,6 +91,7 @@ class BrowserWebViewClientTest {
     private val webResourceRequest: WebResourceRequest = mock()
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
+    private val internalTestUserChecker: InternalTestUserChecker = mock()
 
     @UiThreadTest
     @Before
@@ -113,7 +115,8 @@ class BrowserWebViewClientTest {
             browserAutofill,
             accessibilitySettings,
             ampLinks,
-            printInjector
+            printInjector,
+            internalTestUserChecker
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -569,6 +572,22 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+    }
+
+    @Test
+    fun whenOnPageFinishedThenCallVerifyVerificationCompleted() {
+        testee.onPageFinished(webView, EXAMPLE_URL)
+
+        verify(internalTestUserChecker).verifyVerificationCompleted(EXAMPLE_URL)
+    }
+
+    @Test
+    fun whenOnReceivedHttpErrorThenCallVerifyVerificationErrorReceived() {
+        val mockWebView = getImmediatelyInvokedMockWebView()
+        whenever(mockWebView.url).thenReturn(EXAMPLE_URL)
+        testee.onReceivedHttpError(mockWebView, null, null)
+
+        verify(internalTestUserChecker).verifyVerificationErrorReceived(EXAMPLE_URL)
     }
 
     private fun getImmediatelyInvokedMockWebView(): WebView {
