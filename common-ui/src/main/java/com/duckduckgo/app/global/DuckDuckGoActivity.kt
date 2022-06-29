@@ -104,6 +104,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
-        ViewModelProvider(this, viewModelFactory).get(V::class.java)
+        ViewModelProvider(this, viewModelFactory)[V::class.java]
     }
 }
