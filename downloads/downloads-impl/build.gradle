@@ -35,6 +35,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common')
     implementation project(path: ':statistics')
+    implementation project(path: ':app-build-config-api')
     api project(path: ':downloads-store')
 
     implementation Kotlin.stdlib.jdk7
