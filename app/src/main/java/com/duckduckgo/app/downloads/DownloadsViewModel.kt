@@ -16,8 +16,6 @@
 
 package com.duckduckgo.app.downloads
 
-import android.app.DownloadManager
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,6 +33,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.FileDownloadManager
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -53,7 +52,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    applicationContext: Context
+    private val downloadManager: FileDownloadManager,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -72,7 +71,6 @@ class DownloadsViewModel @Inject constructor(
 
     private val viewState = MutableStateFlow(ViewState())
     private val command = Channel<Command>(1, DROP_OLDEST)
-    private val downloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
 
     fun downloads() {
         viewModelScope.launch(dispatcher.io()) {
@@ -121,14 +119,12 @@ class DownloadsViewModel @Inject constructor(
             File(it.filePath).delete()
         }
 
-        if (downloadManager == null) return
-
         // Remove all unfinished downloads from DownloadManager.
         items.filter { it.downloadStatus != DownloadStatus.FINISHED }.forEach { removeFromDownloadManager(it.downloadId) }
     }
 
     fun removeFromDownloadManager(downloadId: Long) {
-        downloadManager?.remove(downloadId)
+        downloadManager.remove(downloadId)
     }
 
     fun onQueryTextChange(newText: String) {

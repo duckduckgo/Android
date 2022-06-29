@@ -16,39 +16,29 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.app.DownloadManager
 import android.content.Context
-import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED
-import android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
-import android.webkit.CookieManager
-import androidx.core.net.toUri
-import com.duckduckgo.downloads.api.model.DownloadItem
-import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.store.DownloadStatus.STARTED
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(
     private val context: Context,
     private val filenameExtractor: FilenameExtractor,
-    private val fileService: DownloadFileService
+    private val fileService: DownloadFileService,
+    private val urlFileDownloader: UrlFileDownloader,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
         Timber.d("Start download for ${pendingDownload.url}.")
-
-        if (!downloadManagerAvailable()) {
-            callback.onError(url = pendingDownload.url, reason = DownloadFailReason.DownloadManagerDisabled)
-            return
-        }
 
         Timber.d(
             "Content-Disposition is ${pendingDownload.contentDisposition} and " +
@@ -111,46 +101,14 @@ class NetworkFileDownloader @Inject constructor(
         }
     }
 
-    private fun downloadManagerAvailable(): Boolean {
-        return when (context.packageManager.getApplicationEnabledSetting(DOWNLOAD_MANAGER_PACKAGE)) {
-            COMPONENT_ENABLED_STATE_DISABLED -> false
-            COMPONENT_ENABLED_STATE_DISABLED_USER -> false
-            COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
-            else -> true
-        }
-    }
-
     private fun downloadFile(
         pendingDownload: PendingFileDownload,
         guessedFileName: String,
         callback: DownloadCallback
     ) {
-        val request = DownloadManager.Request(pendingDownload.url.toUri()).apply {
-            allowScanningByMediaScanner()
-            addRequestHeader("User-Agent", pendingDownload.userAgent)
-            addRequestHeader("Cookie", CookieManager.getInstance().getCookie(pendingDownload.url))
-            setMimeType(fixedApkMimeType(mimeType = pendingDownload.mimeType, fileName = guessedFileName))
-            setDestinationInExternalPublicDir(pendingDownload.subfolder, guessedFileName)
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        }
 
-        val manager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager? ?: return
-
-        try {
-            val downloadId = manager.enqueue(request)
-            val downloadItem = DownloadItem(
-                id = 0,
-                downloadId = downloadId,
-                downloadStatus = STARTED,
-                fileName = guessedFileName,
-                contentLength = 0,
-                filePath = pendingDownload.directory.path + File.separatorChar + guessedFileName,
-                createdAt = DatabaseDateFormatter.timestamp()
-            )
-            callback.onStart(downloadItem)
-        } catch (e: IllegalArgumentException) {
-            Timber.e(e, "Failed when trying to enqueue the download.")
-            callback.onError(pendingDownload.url, DownloadFailReason.Other)
+        coroutineScope.launch {
+            urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
         }
     }
 

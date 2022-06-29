@@ -32,6 +32,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
+import com.duckduckgo.downloads.api.FileDownloadManager
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -61,13 +62,15 @@ class DownloadsViewModelTest {
 
     private val context: Context = mock()
 
+    private val fileDownloadManager: FileDownloadManager = mock()
+
     private val testee: DownloadsViewModel by lazy {
         val model =
             DownloadsViewModel(
                 RealTimeDiffFormatter(context),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
-                context
+                fileDownloadManager,
             )
         model
     }
@@ -121,6 +124,7 @@ class DownloadsViewModelTest {
         )
 
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
+        // we need this because we passed in a mock context to the RealTimeDiffFormatter
         whenever(context.getString(CommonR.string.common_Today)).thenReturn("Today")
         whenever(context.getString(CommonR.string.common_Yesterday)).thenReturn("Yesterday")
         whenever(context.getString(CommonR.string.common_PastWeek)).thenReturn("Past Week")
@@ -299,6 +303,15 @@ class DownloadsViewModelTest {
                 awaitItem()
             )
         }
+    }
+
+    @Test
+    fun whenRemoveFromDownloadManagerThenRemoveIt() {
+        val downloadId = 1L
+
+        testee.removeFromDownloadManager(downloadId)
+
+        verify(fileDownloadManager).remove(downloadId)
     }
 
     private fun oneItem() =
