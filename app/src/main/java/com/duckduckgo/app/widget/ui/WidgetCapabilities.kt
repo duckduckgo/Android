@@ -26,14 +26,11 @@ import com.duckduckgo.widget.SearchWidgetLight
 import javax.inject.Inject
 
 interface WidgetCapabilities {
-    val supportsStandardWidgetAdd: Boolean
     val supportsAutomaticWidgetAdd: Boolean
     val hasInstalledWidgets: Boolean
 }
 
 class AppWidgetCapabilities @Inject constructor(val context: Context) : WidgetCapabilities {
-
-    override val supportsStandardWidgetAdd: Boolean get() = true
 
     override val supportsAutomaticWidgetAdd: Boolean
         get() = context.supportsAutomaticWidgetAdd
