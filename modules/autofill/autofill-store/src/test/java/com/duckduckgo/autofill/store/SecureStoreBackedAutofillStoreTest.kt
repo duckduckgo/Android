@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.store
 
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult
 import com.duckduckgo.autofill.store.AutofillStore.ContainsCredentialsResult.*
 import com.duckduckgo.securestorage.api.SecureStorage
@@ -26,7 +27,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -37,16 +40,37 @@ class SecureStoreBackedAutofillStoreTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val secureStore = FakeSecureStore()
-    private val testee = SecureStoreBackedAutofillStore(secureStore, context)
+    private lateinit var testee: SecureStoreBackedAutofillStore
+    private lateinit var internalTestUserChecker: FakeInternalTestUserChecker
+
+    @Before
+    fun setUp() {
+        internalTestUserChecker = FakeInternalTestUserChecker(true)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
+    }
+
+    @Test
+    fun whenInternalTestUserTrueThenReturnAutofillEnabled() {
+        setupTesteeWithInternalTestUserTrue()
+        assertTrue(testee.autofillEnabled)
+    }
+
+    @Test
+    fun whenInternalTestUserFalseThenReturnAutofillDisabled() {
+        setupTesteeWithInternalTestUserFalse()
+        assertFalse(testee.autofillEnabled)
+    }
 
     @Test
     fun whenStoreEmptyThenNoMatch() = runTest {
+        setupTesteeWithInternalTestUserTrue()
         val result = testee.containsCredentials("example.com", "username", "password")
         assertNotMatch(result)
     }
 
     @Test
     fun whenStoreContainsMatchingUsernameEntriesButNoneMatchingUrlThenNoMatch() = runTest {
+        setupTesteeWithInternalTestUserTrue()
         storeCredentials("https://example.com", "username", "password")
         val result = testee.containsCredentials("foo.com", "username", "password")
         assertNotMatch(result)
@@ -54,6 +78,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsDomainButDifferentCredentialsThenUrlMatch() = runTest {
+        setupTesteeWithInternalTestUserTrue()
         storeCredentials("https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "differentUsername", "differentPassword")
         assertUrlOnlyMatch(result)
@@ -61,6 +86,7 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsDomainAndUsernameButDifferentPassword() = runTest {
+        setupTesteeWithInternalTestUserTrue()
         storeCredentials("https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "differentPassword")
         assertUsernameMatch(result)
@@ -68,9 +94,20 @@ class SecureStoreBackedAutofillStoreTest {
 
     @Test
     fun whenStoreContainsMatchingDomainAndUsernameAndPassword() = runTest {
+        setupTesteeWithInternalTestUserTrue()
         storeCredentials("https://example.com", "username", "password")
         val result = testee.containsCredentials("example.com", "username", "password")
         assertExactMatch(result)
+    }
+
+    private fun setupTesteeWithInternalTestUserTrue() {
+        internalTestUserChecker = FakeInternalTestUserChecker(true)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
+    }
+
+    private fun setupTesteeWithInternalTestUserFalse() {
+        internalTestUserChecker = FakeInternalTestUserChecker(false)
+        testee = SecureStoreBackedAutofillStore(secureStore, context, internalTestUserChecker)
     }
 
     private fun assertNotMatch(result: ContainsCredentialsResult) {
@@ -89,7 +126,11 @@ class SecureStoreBackedAutofillStoreTest {
         assertTrue(String.format("Expected ExactMatch but was %s", result), result is ExactMatch)
     }
 
-    private suspend fun storeCredentials(domain: String, username: String, password: String) {
+    private suspend fun storeCredentials(
+        domain: String,
+        username: String,
+        password: String
+    ) {
         val details = WebsiteLoginDetails(domain, username)
         val credentials = WebsiteLoginDetailsWithCredentials(details, password)
         secureStore.addWebsiteLoginDetailsWithCredentials(credentials)
@@ -140,5 +181,14 @@ class SecureStoreBackedAutofillStoreTest {
         }
 
         override fun canAccessSecureStorage(): Boolean = true
+    }
+
+    private class FakeInternalTestUserChecker constructor(val expectedValueIsInternalTestUser: Boolean) : InternalTestUserChecker {
+        override val isInternalTestUser: Boolean
+            get() = expectedValueIsInternalTestUser
+
+        override fun verifyVerificationErrorReceived(url: String) {}
+
+        override fun verifyVerificationCompleted(url: String) {}
     }
 }
