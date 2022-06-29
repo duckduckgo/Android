@@ -71,6 +71,7 @@ interface EncryptionHelper {
 class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
     private val cipher = Cipher.getInstance(TRANSFORMATION)
 
+    @Synchronized
     override fun encrypt(
         raw: ByteArray,
         key: Key
@@ -86,6 +87,7 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         return EncryptedBytes(encrypted, iv)
     }
 
+    @Synchronized
     override fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key
@@ -99,6 +101,7 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         }
     }
 
+    @Synchronized
     override fun encrypt(
         raw: String,
         key: Key
@@ -112,6 +115,7 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         }
     }
 
+    @Synchronized
     override fun decrypt(
         toDecrypt: EncryptedString,
         key: Key
