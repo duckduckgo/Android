@@ -66,15 +66,18 @@ class AutofillManagementDisabledMode : Fragment() {
 
     @SuppressLint("InlinedApi")
     private fun launchDeviceAuthEnrollment() {
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
-            requireActivity().startActivity(Intent(android.provider.Settings.ACTION_BIOMETRIC_ENROLL))
-        } else {
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.P) {
+        when {
+            appBuildConfig.manufacturer == "Xiaomi" ->
+                // Issue on Xiaomi: https://stackoverflow.com/questions/68484485/intent-action-fingerprint-enroll-on-redmi-results-in-exception
+                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.R ->
+                requireActivity().startActivity(Intent(android.provider.Settings.ACTION_BIOMETRIC_ENROLL))
+            appBuildConfig.sdkInt >= Build.VERSION_CODES.P ->
                 requireActivity().startActivity(Intent(android.provider.Settings.ACTION_FINGERPRINT_ENROLL))
-            } else {
+            else ->
                 requireActivity().startActivity(Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS))
-            }
         }
+
         requireActivity().finish()
     }
 
