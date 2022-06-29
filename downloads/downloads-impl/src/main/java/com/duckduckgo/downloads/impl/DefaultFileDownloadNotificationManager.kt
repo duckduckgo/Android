@@ -21,14 +21,15 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.io.File
 import javax.inject.Inject
 
 @AnyThread
@@ -36,54 +37,96 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class DefaultFileDownloadNotificationManager @Inject constructor(
     private val notificationManager: NotificationManager,
-    private val applicationContext: Context
+    private val applicationContext: Context,
+    private val appBuildConfig: AppBuildConfig,
 ) : FileDownloadNotificationManager {
 
-    override fun showDownloadInProgressNotification() {
-        mainThreadHandler().post {
-            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
-                .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
-                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                .build()
+    @AnyThread
+    override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
+        val pendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            1234,
+            FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+            .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
+            .setContentText("$filename ($progress%)")
+            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setProgress(100, progress, progress == 0)
+            .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), pendingIntent)
+            .build()
 
-            notificationManager.notify(NOTIFICATION_ID, notification)
-        }
+        notificationManager.notify(downloadId.toInt(), notification)
     }
 
-    override fun showDownloadFinishedNotification(filename: String, uri: Uri, mimeType: String?) {
-        mainThreadHandler().post {
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(uri, mimeType)
+    @AnyThread
+    override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
+        val filename = file.name
+
+        val intent = createIntentToOpenFile(applicationContext, file)
+
+        val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
+        val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+            .setContentTitle(filename)
+            .setContentText(applicationContext.getString(R.string.downloadComplete))
+            .setContentIntent(PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags))
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .build()
+
+        notificationManager.cancel(downloadId.toInt())
+        // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
+        waitForNotificationToBeCancelled(downloadId)
+        notificationManager.notify(downloadId.toInt(), notification)
+    }
+
+    @AnyThread
+    override fun showDownloadFailedNotification(downloadId: Long, url: String?) {
+        val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+            .setContentTitle(applicationContext.getString(R.string.downloadFailed))
+            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .apply {
+                url?.let { fileUrl ->
+                    val pendingIntent = PendingIntent.getBroadcast(
+                        applicationContext,
+                        1234,
+                        FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                    addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
+                }
             }
+            .build()
 
-            val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
+        notificationManager.cancel(downloadId.toInt())
+        waitForNotificationToBeCancelled(downloadId)
+        notificationManager.notify(downloadId.toInt(), notification)
+    }
 
-            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
-                .setContentTitle(filename)
-                .setContentText(applicationContext.getString(R.string.downloadComplete))
-                .setContentIntent(PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags))
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                .build()
+    @AnyThread
+    override fun cancelDownloadFileNotification(downloadId: Long) {
+        notificationManager.cancel(downloadId.toInt())
+    }
 
-            notificationManager.notify(NOTIFICATION_ID, notification)
+    private fun createIntentToOpenFile(applicationContext: Context, file: File): Intent {
+        val fileUri = getFilePathUri(applicationContext, file)
+        return Intent().apply {
+            setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
     }
 
-    override fun showDownloadFailedNotification() {
-        mainThreadHandler().post {
-            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
-                .setContentTitle(applicationContext.getString(R.string.downloadFailed))
-                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                .build()
-
-            notificationManager.notify(NOTIFICATION_ID, notification)
-        }
+    private fun getFilePathUri(context: Context, file: File): Uri {
+        return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
     }
 
-    private fun mainThreadHandler() = Handler(Looper.getMainLooper())
-
-    companion object {
-        private const val NOTIFICATION_ID = 1
+    private fun waitForNotificationToBeCancelled(downloadId: Long) {
+        while (notificationManager.activeNotifications.any { it.id == downloadId.toInt() }) {
+            Thread.sleep(10)
+        }
     }
 }

@@ -18,12 +18,10 @@ package com.duckduckgo.mobile.android.vpn.apps
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.feature.AppTpFeatureConfig
-import com.duckduckgo.mobile.android.vpn.feature.AppTpSetting
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerExcludedPackage
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerManualExcludedApp
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerRepository
@@ -132,21 +130,9 @@ class RealTrackingProtectionAppsRepository @Inject constructor(
         ddgExclusionList: List<AppTrackerExcludedPackage>,
         userExclusionList: List<AppTrackerManualExcludedApp>
     ): Boolean {
-        if (transparencyModeBugFixForAndroid12(appInfo)) {
-            Timber.d("DDG App in transparency mode for Android 12")
-            return false
-        }
         return VpnExclusionList.isDdgApp(appInfo.packageName) ||
             isSystemAppAndNotOverridden(appInfo) ||
             isManuallyExcluded(appInfo, ddgExclusionList, userExclusionList)
-    }
-
-    // https://issuetracker.google.com/issues/217570500
-    // https://app.asana.com/0/1174433894299346/1201657419006650
-    private fun transparencyModeBugFixForAndroid12(appInfo: ApplicationInfo): Boolean {
-        return appBuildConfig.sdkInt >= Build.VERSION_CODES.S &&
-            VpnExclusionList.isDdgApp(appInfo.packageName) &&
-            appTpFeatureConfig.isEnabled(AppTpSetting.VpnDdgBrowserTraffic)
     }
 
     private fun isManuallyExcluded(
