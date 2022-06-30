@@ -46,7 +46,7 @@
                             class="form-control js-continue-input js-continue-focus-target signup-input input-block flex-1 border-0 rounded-0 p-0 box-shadow-none color-text-white f4 text-mono"
                             required="" passwordrules="minlength: 15; allowed: unicode;" autocomplete="off"
                             data-target="visible-password.input" aria-describedby="password-err" type="password"
-                            name="user[password]" spellcheck="false" 
+                            name="user[password]" spellcheck="false"
                             data-manual-scoring="password">
                         <input type="hidden" data-csrf="true"
                             value="zcZFE9+3jBlr1Nkg8a11uLDKbGAmMNtMGkpaIodm+WPEg5q8fDU1w9D0iN5jEnLQS389UCbnl1aA6z79dLGIGA==">
@@ -93,7 +93,7 @@
                     <input id="login"
                         class="form-control js-continue-input js-continue-focus-target signup-input input-block flex-1 border-0 rounded-0 p-0 box-shadow-none color-text-white f4 text-mono"
                         required="" autocomplete="off" aria-describedby="login-err" type="text" name="user[login]"
-                        spellcheck="false">
+                        spellcheck="false" data-manual-scoring="username">
                     <input type="hidden" data-csrf="true"
                         value="Te8ve1oVo6600CDM6E9Gp8Dm1OemU0DZiAcfQlBVsxA+PdD3zdY29O78Sm8t6QrpgiOZWs0rGmtvFXeElgpq/w==">
                 </auto-check>
@@ -120,6 +120,7 @@
                 <span class="signup-continue-prompt mr-2"></span>
                 <input type="text" name="opt_in" id="opt_in" value=""
                     class="form-control js-continue-input js-continue-focus-target signup-input input-block flex-1 border-0 rounded-0 p-0 box-shadow-none color-text-white f4 text-mono"
+                       data-manual-scoring="unknown"
                     >
             </div>
             <button type="button"
@@ -163,7 +164,7 @@
                 </div>
 
                 <input required="" name="octocaptcha-token" class="js-octocaptcha-token d-none"
-                    data-octocaptcha-url="https://octocaptcha.com" data-octocaptcha-timeout="30000">
+                    data-octocaptcha-url="https://octocaptcha.com" data-octocaptcha-timeout="30000" data-manual-scoring="unknown">
             </div>
 
         </div>
