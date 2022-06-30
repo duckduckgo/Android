@@ -4,7 +4,7 @@ import {
     withIOSContext, withIOSFeatureToggles
 } from '../helpers/harness.js'
 import {test as base} from '@playwright/test'
-import {loginPage, signupPage} from '../helpers/pages.js'
+import {loginPage, loginPageWithPoorForm, signupPage} from '../helpers/pages.js'
 import {createWebkitMocks} from '../helpers/mocks.webkit.js'
 import {constants} from '../helpers/mocks.js'
 
@@ -121,6 +121,55 @@ test.describe('iOS Save prompts', () => {
                 const credentials = {username: '123456'}
                 await login.submitUsernameOnlyForm(credentials.username)
                 await login.shouldNotPromptToSave()
+            })
+        })
+
+        test.describe('Prompting to save from a poor login form (using Enter and click on a button outside the form)', () => {
+            const credentials = {
+                username: 'dax@wearejh.com',
+                password: '123456'
+            }
+            /**
+             * @param {import("playwright").Page} page
+             */
+            async function setup (page) {
+                await forwardConsoleMessages(page)
+                await createWebkitMocks().applyTo(page)
+                await withIOSFeatureToggles(page, {
+                    credentials_saving: true
+                })
+                const login = loginPageWithPoorForm(page, server)
+                await login.navigate()
+
+                await page.type('#password', credentials.password)
+                await page.type('#email', credentials.username)
+
+                // Check that we haven't detected any submission at this point
+                await login.shouldNotPromptToSave()
+
+                return login
+            }
+
+            test('submit by clicking on the out-of-form button', async ({page}) => {
+                const login = await setup(page)
+
+                await page.click('"Log in"')
+                await login.assertWasPromptedToSave(credentials)
+            })
+            test('should not prompt if the out-of-form button does not match the form type', async ({page}) => {
+                const login = await setup(page)
+
+                await page.click('"Sign up"')
+                await login.shouldNotPromptToSave()
+            })
+            test('should prompt when hitting enter while an input is focused', async ({page}) => {
+                const login = await setup(page)
+
+                await page.press('#email', 'Tab')
+                await login.shouldNotPromptToSave()
+
+                await page.press('#password', 'Enter')
+                await login.assertWasPromptedToSave(credentials)
             })
         })
     })

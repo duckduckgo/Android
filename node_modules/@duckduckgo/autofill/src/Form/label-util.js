@@ -1,3 +1,4 @@
+import {removeExcessWhitespace} from './matching'
 const EXCLUDED_TAGS = ['SCRIPT', 'NOSCRIPT', 'OPTION', 'STYLE']
 
 /**
@@ -19,7 +20,7 @@ const extractElementStrings = (element) => {
 
         // only take the string when it's an explicit text node
         if (el.nodeType === el.TEXT_NODE || !el.childNodes.length) {
-            let trimmedText = el.textContent.trim()
+            let trimmedText = removeExcessWhitespace(el.textContent)
             if (trimmedText) {
                 strings.push(trimmedText)
             }
@@ -38,4 +39,4 @@ const extractElementStrings = (element) => {
     return strings
 }
 
-module.exports.extractElementStrings = extractElementStrings
+export {extractElementStrings}

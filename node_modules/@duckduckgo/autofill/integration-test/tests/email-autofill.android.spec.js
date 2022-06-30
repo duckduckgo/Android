@@ -38,6 +38,7 @@ test.describe('android', () => {
 
             // create + inject the script
             await createAutofillScript()
+                .replaceAll(androidStringReplacements())
                 .platform('android')
                 .applyTo(page)
 
