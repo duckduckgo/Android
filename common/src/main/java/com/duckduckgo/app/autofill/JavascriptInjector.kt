@@ -43,7 +43,10 @@ class FileBasedJavaScriptInjector @Inject constructor() : JavascriptInjector {
 
     override fun getFunctionsJS(): String {
         if (!this::functions.isInitialized) {
-            functions = loadJs("autofill.js")
+            // this can be enabled to see more verbose output from the autofill JS; useful for debugging autofill-related issues
+            val debugMode = false
+
+            functions = loadJs(if (debugMode) "autofill-debug.js" else "autofill.js")
         }
         return functions
     }
