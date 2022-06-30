@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.mobile.android.vpn">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:largeHeap="true"
@@ -12,145 +11,157 @@
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsGetUserHealthReportActivity"
+            android:exported="false"
             android:parentActivityName="dummy.ui.VpnDiagnosticsActivity"
-            android:process=":vpn"/>
+            android:process=":vpn" />
 
         <activity
             android:name="dummy.ui.VpnControllerActivity"
             android:exported="true"
             android:label="@string/atp_name"
-            android:process=":vpn"
-            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity">
-        </activity>
+            android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:process=":vpn"/>
 
         <activity
             android:name="dummy.ui.VpnDiagnosticsActivity"
+            android:exported="false"
             android:parentActivityName=".ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:process=":vpn">
-        </activity>
+            android:process=":vpn"/>
 
         <activity
             android:name=".service.VpnPermissionRequesterActivity"
-            android:screenOrientation="portrait"/>
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity"
-            android:screenOrientation="portrait"
-            />
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.report.DeviceShieldAppTrackersInfo"
+            android:exported="false"
             android:label="@string/atp_ProfilingActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.onboarding.DeviceShieldFAQActivity"
+            android:exported="false"
             android:label="@string/atp_FAQActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
+            android:exported="false"
             android:label="@string/atp_ActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldMostRecentActivity"
+            android:exported="false"
             android:label="@string/atp_MostRecentActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity"
+            android:exported="false"
             android:label="@string/atp_ManageRecentAppsProtectionActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.apps.ui.TrackingProtectionExclusionListActivity"
+            android:exported="false"
             android:label="@string/atp_ExclusionListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.apps.ui.ManageRecentAppsProtectionActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
+            android:exported="false"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
+            android:exported="false"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageAppListActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageSingleChoiceFormActivity"
+            android:exported="false"
             android:label="@string/atp_ReportBreakageAppListActivityTitle"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.breakage.ReportBreakageTextFormActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.AppTPCompanyTrackersActivity"
+            android:exported="false"
             android:parentActivityName="com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
 
         <service
-            android:name=".service.state.VpnStateMonitorService">
-        </service>
+            android:name=".service.state.VpnStateMonitorService"
+            android:exported="false"/>
 
         <service
             android:name=".service.TrackerBlockingVpnService"
+            android:exported="false"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="android.net.VpnService"/>
+                <action android:name="android.net.VpnService" />
             </intent-filter>
             <meta-data
                 android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
-                android:value="true"/>
+                android:value="true" />
         </service>
 
         <service
             android:name=".service.DeviceShieldTileService"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:label="@string/atp_name"
+            android:exported="true"
             android:icon="@drawable/ic_device_shield_tile"
-            >
+            android:label="@string/atp_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
 
         <receiver
             android:name=".service.VpnReminderReceiver"
             android:enabled="false"
+            android:exported="false"
             android:process=":vpn">
             <intent-filter>
-                <action android:name="com.duckduckgo.vpn.internaltesters.reminder"/>
+                <action android:name="com.duckduckgo.vpn.internaltesters.reminder" />
             </intent-filter>
         </receiver>
 
         <receiver
             android:name=".heartbeat.VpnHeartbeatDeviceBootMonitor"
             android:enabled="false"
+            android:exported="false"
             android:process=":vpn">
             <intent-filter android:priority="999">
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.REBOOT"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
             </intent-filter>
         </receiver>
 
 
-        <receiver android:name="com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver">
+        <receiver
+            android:name="com.duckduckgo.mobile.android.vpn.appupdates.AppUpdateReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 
