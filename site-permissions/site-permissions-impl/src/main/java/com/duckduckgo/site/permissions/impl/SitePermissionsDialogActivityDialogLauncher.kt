@@ -16,27 +16,26 @@
 
 package com.duckduckgo.site.permissions.impl
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-interface SystemPermissionsHelper {
-    fun hasMicPermissionsGranted(context: Context): Boolean
-
-    fun hasCameraPermissionsGranted(context: Context): Boolean
-
-}
-
 @ContributesBinding(ActivityScope::class)
-class SystemPermissionsHelperImp @Inject constructor(): SystemPermissionsHelper {
 
-    override fun hasMicPermissionsGranted(context: Context): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+class SitePermissionsDialogActivityDialogLauncher @Inject constructor(
 
-    override fun hasCameraPermissionsGranted(context: Context): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+): SitePermissionsDialogLauncher {
+
+    override fun showSitePermissionDialog(
+        context: Context,
+        permissionsRequested: Array<String>
+    ) {
+        permissionsRequested.forEach {
+            //TODO implement dialog
+            Toast.makeText(context, "$it Requested", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

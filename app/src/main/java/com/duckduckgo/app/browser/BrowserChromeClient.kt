@@ -29,7 +29,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
-import com.duckduckgo.site.permissions.api.SitePermissionsRepository
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -41,7 +41,7 @@ class BrowserChromeClient @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
-    private val sitePermissionsRepository: SitePermissionsRepository
+    private val sitePermissionsManager: SitePermissionsManager
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -172,7 +172,7 @@ class BrowserChromeClient @Inject constructor(
 
     override fun onPermissionRequest(request: PermissionRequest) {
         val drmPermissions = drm.getDrmPermissionsForRequest(request.origin.toString(), request.resources)
-        val sitePermissions = sitePermissionsRepository.getSitePermissionsFromRequest(request.origin.toString(), request.resources)
+        val sitePermissions = sitePermissionsManager.getSitePermissionsFromRequest(request.origin.toString(), request.resources)
         when {
             drmPermissions.isNotEmpty() -> request.grant(drmPermissions)
             sitePermissions.isNotEmpty() -> webViewClientListener?.onSitePermissionRequested(request)

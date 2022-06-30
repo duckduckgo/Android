@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.site.permissions.api
+package com.duckduckgo.site.permissions.impl
 
-import android.content.Context
-import android.webkit.PermissionRequest
+import com.duckduckgo.di.scopes.ActivityScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 interface SitePermissionsRepository {
+    fun isDomainAllowedToAsk(url: String, permission: String): Boolean
+}
 
-    fun getSitePermissionsFromRequest(url: String, resources: Array<String>): Array<String>
+@ContributesBinding(ActivityScope::class)
+class SitePermissionsRepositoryImpl @Inject constructor() : SitePermissionsRepository {
 
-    fun sitePermissionsRequested(request: PermissionRequest)
+    override fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
+        // TODO check if url is in db with any resource set to "Always Deny"
+        return true
+    }
 }

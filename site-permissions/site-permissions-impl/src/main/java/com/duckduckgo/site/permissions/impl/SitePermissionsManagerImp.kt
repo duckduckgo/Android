@@ -18,35 +18,27 @@ package com.duckduckgo.site.permissions.impl
 
 import android.webkit.PermissionRequest
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.site.permissions.api.SitePermissionsRepository
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.squareup.anvil.annotations.ContributesBinding
-import timber.log.Timber
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
-class SitePermissionsRepositoryImp @Inject constructor(
+class SitePermissionsManagerImp @Inject constructor(
+    private val sitePermissionsRepository: SitePermissionsRepository,
+    private val systemPermissionsHelper: SystemPermissionsHelper
+) : SitePermissionsManager {
 
-) : SitePermissionsRepository {
-    override fun getSitePermissionsFromRequest(
-        url: String,
-        resources: Array<String>
-    ): Array<String> =
+    override fun getSitePermissionsFromRequest(url: String, resources: Array<String>): Array<String> =
         resources
             .filter { isPermissionSupported(it) }
-            .filter { isDomainAllowedToAsk(url, it) }
+            .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
-    override fun sitePermissionsRequested(request: PermissionRequest) {
-        request.resources.forEach {
-            Timber.i("$it -> permission requested")
-        }
+    override fun getPermissionsAllowedToAsk(request: PermissionRequest): Array<String> {
+        return request.resources.map { it }.toTypedArray()
     }
 
     private fun isPermissionSupported(permission: String): Boolean =
         permission == PermissionRequest.RESOURCE_AUDIO_CAPTURE || permission == PermissionRequest.RESOURCE_VIDEO_CAPTURE
 
-    private fun isDomainAllowedToAsk(url: String, permission: String): Boolean {
-        // TODO check if url is in db with any resource set to "Always Deny"
-        return true
-    }
 }
