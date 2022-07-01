@@ -21,10 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.securestorage.api.SecureStorageException
 import com.duckduckgo.securestorage.api.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
-import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.squareup.anvil.annotations.ContributesBinding
-import okio.ByteString.Companion.decodeBase64
-import okio.ByteString.Companion.toByteString
 import java.lang.Exception
 import java.security.Key
 import javax.crypto.Cipher
@@ -44,18 +41,6 @@ interface EncryptionHelper {
         key: Key
     ): ByteArray
 
-    @Throws(SecureStorageException::class)
-    fun encrypt(
-        raw: String,
-        key: Key
-    ): EncryptedString
-
-    @Throws(SecureStorageException::class)
-    fun decrypt(
-        toDecrypt: EncryptedString,
-        key: Key
-    ): String
-
     class EncryptedBytes(
         val data: ByteArray,
         val iv: ByteArray
@@ -69,7 +54,8 @@ interface EncryptionHelper {
 
 @ContributesBinding(AppScope::class)
 class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
-    private val cipher = Cipher.getInstance(TRANSFORMATION)
+    private val encryptionCipher = Cipher.getInstance(TRANSFORMATION)
+    private val decryptionCipher = Cipher.getInstance(TRANSFORMATION)
 
     @Synchronized
     override fun encrypt(
@@ -77,12 +63,12 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
         key: Key
     ): EncryptedBytes {
         val encrypted = try {
-            cipher.init(Cipher.ENCRYPT_MODE, key)
-            cipher.doFinal(raw)
+            encryptionCipher.init(Cipher.ENCRYPT_MODE, key)
+            encryptionCipher.doFinal(raw)
         } catch (exception: Exception) {
             throw InternalSecureStorageException(message = "Error occurred while encrypting data", cause = exception)
         }
-        val iv = cipher.iv
+        val iv = encryptionCipher.iv
 
         return EncryptedBytes(encrypted, iv)
     }
@@ -94,44 +80,12 @@ class RealEncryptionHelper @Inject constructor() : EncryptionHelper {
     ): ByteArray {
         return try {
             val ivSpec = GCMParameterSpec(GCM_PARAM_SPEC_LENGTH, toDecrypt.iv)
-            cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
-            cipher.doFinal(toDecrypt.data)
+            decryptionCipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
+            decryptionCipher.doFinal(toDecrypt.data)
         } catch (exception: Exception) {
             throw InternalSecureStorageException(message = "Error occurred while decrypting data", cause = exception)
         }
     }
-
-    @Synchronized
-    override fun encrypt(
-        raw: String,
-        key: Key
-    ): EncryptedString {
-        // get ByteArray -> encrypt -> encode to String
-        return encrypt(raw.toByteArray(), key).run {
-            EncryptedString(
-                this.data.transformToString(),
-                this.iv.transformToString()
-            )
-        }
-    }
-
-    @Synchronized
-    override fun decrypt(
-        toDecrypt: EncryptedString,
-        key: Key
-    ): String {
-        // decode to ByteArray -> decrypt -> get String
-        val encryptedBytes = EncryptedBytes(
-            toDecrypt.data.transformToByteArray(),
-            toDecrypt.iv.transformToByteArray()
-        )
-        return String(decrypt(encryptedBytes, key))
-    }
-
-    private fun String.transformToByteArray(): ByteArray =
-        this.decodeBase64()?.toByteArray() ?: throw InternalSecureStorageException("Error while decoding string data to Base64")
-
-    private fun ByteArray.transformToString(): String = this.toByteString().base64()
 
     companion object {
         private const val GCM_PARAM_SPEC_LENGTH = 128
