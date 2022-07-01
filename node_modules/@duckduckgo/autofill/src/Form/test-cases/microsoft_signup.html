@@ -33,7 +33,7 @@
                                             {
                                                 'phoneCountry': config.showInlinePhoneCountryCode !== 0,
                                                 'win-dropdown': config.isWin10HostOOBEDesktop !== 0
-                                            }" aria-label="Country code">
+                                            }" aria-label="Country code" data-manual-scoring="addressCountryCode">
                     <option value="" data-value="AF">Afghanistan ‏(‎+93)</option>
                     <option value="" data-value="AL">Albania ‏(‎+355)</option>
                     <option value="" data-value="DZ">Algeria ‏(‎+213)</option>
@@ -290,9 +290,9 @@
                                                     'liveDomainInput col-xs-14': memberNameType() === 'Live',
                                                     'form-control email-input-max-width': memberNameType() !== 'Live'
                                                 },
-                                                
+
                                                     textInput: memberNameInput,
-                                                
+
                                                 hasFocus: memberName.focused,
                                                 ariaLabel: memberNameAriaLabel,
                                                 attr:
@@ -409,7 +409,7 @@
                                     {
                                         'phoneCountry': config.showInlinePhoneCountryCode !== 0,
                                         'win-dropdown': config.isWin10HostOOBEDesktop !== 0
-                                    }" aria-label="Country code">
+                                    }" aria-label="Country code" data-manual-scoring="addressCountryCode">
                                 <option value="" data-value="AF">Afghanistan ‏(‎+93)</option>
                                 <option value="" data-value="AL">Albania ‏(‎+355)</option>
                                 <option value="" data-value="DZ">Algeria ‏(‎+213)</option>
@@ -668,9 +668,9 @@
                                             'liveDomainInput col-xs-14': memberNameType() === 'Live',
                                             'form-control email-input-max-width': memberNameType() !== 'Live'
                                         },
-                                        
+
                                             textInput: memberNameInput,
-                                        
+
                                         hasFocus: memberName.focused,
                                         ariaLabel: memberNameAriaLabel,
                                         attr:

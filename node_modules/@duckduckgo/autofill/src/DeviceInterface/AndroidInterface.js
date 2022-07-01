@@ -27,12 +27,15 @@ class AndroidInterface extends InterfacePrototype {
      * @returns {boolean}
      */
     isDeviceSignedIn () {
-        // if availableInputTypes are available, use .email first, whether true or false
+        // on DDG domains, always check via `window.EmailInterface.isSignedIn()`
+        if (this.globalConfig.isDDGDomain) {
+            return window.EmailInterface.isSignedIn() === 'true'
+        }
+
+        // on non-DDG domains, where `availableInputTypes.email` is present, use it
         if (typeof this.globalConfig.availableInputTypes?.email === 'boolean') {
             return this.globalConfig.availableInputTypes.email
         }
-        // isDeviceSignedIn is only available on DDG domains...
-        if (this.globalConfig.isDDGDomain) return window.EmailInterface.isSignedIn() === 'true'
 
         // ...on other domains we assume true because the script wouldn't exist otherwise
         return true
@@ -46,7 +49,6 @@ class AndroidInterface extends InterfacePrototype {
         const cleanup = this.scanner.init()
         this.addLogoutListener(cleanup)
     }
-
     /**
      * Used by the email web app
      * Settings page displays data of the logged in user data
