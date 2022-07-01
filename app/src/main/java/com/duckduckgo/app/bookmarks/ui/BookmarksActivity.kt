@@ -215,7 +215,7 @@ class BookmarksActivity : DuckDuckGoActivity() {
         ).show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.bookmark_activity_menu, menu)
         return true
     }
@@ -255,8 +255,8 @@ class BookmarksActivity : DuckDuckGoActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        searchMenuItem = menu?.findItem(R.id.action_search)
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        searchMenuItem = menu.findItem(R.id.action_search)
         setSearchMenuItemVisibility()
         initializeSearchBar()
         return super.onPrepareOptionsMenu(menu)

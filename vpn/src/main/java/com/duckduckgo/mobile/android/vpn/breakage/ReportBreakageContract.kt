@@ -27,7 +27,7 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
 
     override fun createIntent(
         context: Context,
-        input: ReportBreakageScreen?
+        input: ReportBreakageScreen
     ): Intent {
         return when (input) {
             ReportBreakageScreen.ListOfInstalledApps -> ReportBreakageAppListActivity.intent(context)
@@ -37,7 +37,6 @@ class ReportBreakageContract : ActivityResultContract<ReportBreakageScreen, Issu
             is ReportBreakageScreen.LoginInformation -> {
                 ReportBreakageSingleChoiceFormActivity.intent(context, BrokenApp(appName = input.appName, appPackageId = input.appPackageId))
             }
-            null -> throw IllegalStateException("Screen must be specified")
         }
     }
 

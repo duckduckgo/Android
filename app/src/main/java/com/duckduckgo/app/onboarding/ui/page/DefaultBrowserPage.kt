@@ -138,7 +138,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
             }
         }
 
-        viewModel.command.observe(this) {
+        viewModel.command.observe(viewLifecycleOwner) {
             when (it) {
                 is DefaultBrowserPageViewModel.Command.OpenDialog -> onLaunchDefaultBrowserWithDialogClicked(it.url)
                 is DefaultBrowserPageViewModel.Command.OpenSettings -> onLaunchDefaultBrowserSettingsClicked()
