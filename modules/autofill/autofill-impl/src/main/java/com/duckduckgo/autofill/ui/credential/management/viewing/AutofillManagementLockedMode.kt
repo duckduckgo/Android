@@ -16,35 +16,15 @@
 
 package com.duckduckgo.autofill.ui.credential.management.viewing
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementLockedBinding
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
-import com.duckduckgo.di.scopes.FragmentScope
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 
-@InjectWith(FragmentScope::class)
 class AutofillManagementLockedMode : Fragment() {
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
-
-    private val viewModel by lazy {
-        ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
-    }
     private lateinit var binding: FragmentAutofillManagementLockedBinding
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,19 +33,6 @@ class AutofillManagementLockedMode : Fragment() {
     ): View {
         binding = FragmentAutofillManagementLockedBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.lockedIcon.setOnClickListener {
-            viewModel.launchDeviceAuth()
-        }
-        binding.lockedText.setOnClickListener {
-            viewModel.launchDeviceAuth()
-        }
     }
 
     companion object {
