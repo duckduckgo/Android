@@ -17,26 +17,14 @@
 package com.duckduckgo.app.autofill
 
 import android.content.Context
-import com.duckduckgo.app.global.R
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.BufferedReader
 import javax.inject.Inject
 
-interface JavascriptInjector {
-    fun getFunctionsJS(): String
-    fun getAliasFunctions(
-        context: Context,
-        alias: String?
-    ): String
-
-    fun getSignOutFunctions(
-        context: Context
-    ): String
-}
-
 @ContributesBinding(AppScope::class)
-class FileBasedJavaScriptInjector @Inject constructor() : JavascriptInjector {
+class FileBasedJavascriptInjector @Inject constructor() : JavascriptInjector {
     private lateinit var functions: String
     private lateinit var aliasFunctions: String
     private lateinit var signOutFunctions: String
