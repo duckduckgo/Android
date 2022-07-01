@@ -20,9 +20,10 @@ import android.webkit.WebView
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.autofill.FileBasedJavaScriptInjector
+import com.duckduckgo.app.autofill.FileBasedJavascriptInjector
 import com.duckduckgo.app.autofill.JavascriptInjector
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Autofill
@@ -38,7 +39,7 @@ class EmailInjectorJsTest {
     private val mockDispatcherProvider: DispatcherProvider = mock()
     private val mockFeatureToggle: FeatureToggle = mock()
     private val mockAutofill: Autofill = mock()
-    private val javascriptInjector: JavascriptInjector = FileBasedJavaScriptInjector()
+    private val javascriptInjector: JavascriptInjector = FileBasedJavascriptInjector()
     lateinit var testee: EmailInjectorJs
 
     @Before
@@ -148,7 +149,7 @@ class EmailInjectorJsTest {
     }
 
     private fun getAliasJsToEvaluate(): String {
-        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(com.duckduckgo.app.global.R.raw.inject_alias)
+        val js = InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.inject_alias)
             .bufferedReader()
             .use { it.readText() }
         return "javascript:$js"
@@ -156,7 +157,7 @@ class EmailInjectorJsTest {
 
     private fun getNotifySignOutJsToEvaluate(): String {
         val js =
-            InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(com.duckduckgo.app.global.R.raw.signout_autofill)
+            InstrumentationRegistry.getInstrumentation().targetContext.resources.openRawResource(R.raw.signout_autofill)
                 .bufferedReader()
                 .use { it.readText() }
         return "javascript:$js"
