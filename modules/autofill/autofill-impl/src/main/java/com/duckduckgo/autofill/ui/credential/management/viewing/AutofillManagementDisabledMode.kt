@@ -64,7 +64,7 @@ class AutofillManagementDisabledMode : Fragment() {
         }
     }
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint("InlinedApi", "DEPRECATION")
     private fun launchDeviceAuthEnrollment() {
         when {
             appBuildConfig.manufacturer == "Xiaomi" ->
