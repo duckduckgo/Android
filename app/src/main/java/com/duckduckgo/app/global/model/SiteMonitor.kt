@@ -33,7 +33,7 @@ import com.duckduckgo.app.privacy.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.privacy.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.privacy.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import kotlinx.coroutines.CoroutineScope

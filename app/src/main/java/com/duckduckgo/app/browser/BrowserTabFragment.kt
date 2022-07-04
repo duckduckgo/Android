@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.browser
 
+import com.duckduckgo.privacy.dashboard.api.TrackersAnimatorListener
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
@@ -173,6 +174,7 @@ import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.asMessage
+import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
@@ -194,6 +196,7 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
+import com.duckduckgo.privacy.dashboard.impl.animations.BrowserLottieTrackersAnimatorHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.view_tracker_animation.*
 import kotlinx.coroutines.flow.cancellable
@@ -2479,7 +2482,7 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
-                            lastSeenCtaViewState?.cta, activity,
+                            lastSeenCtaViewState?.cta is DaxTrackersBlockedCta, activity,
                             shieldIcon, trackerAnimationView, omnibarViews(), events, appTheme
                         )
                     }

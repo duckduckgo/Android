@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,65 +14,46 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser
+package com.duckduckgo.privacy.dashboard.impl.animations
 
 import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.ColorFilter
-import android.graphics.Paint
-import android.graphics.PixelFormat
-import android.graphics.Typeface
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.app.browser.TrackerLogo.ImageLogo
-import com.duckduckgo.app.browser.TrackerLogo.LetterLogo
-import com.duckduckgo.app.browser.TrackerLogo.StackedLogo
-import com.duckduckgo.app.cta.ui.Cta
-import com.duckduckgo.app.cta.ui.DaxDialogCta
-import com.duckduckgo.app.privacy.renderer.TrackersRenderer
-import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.mobile.android.ui.view.getColorFromAttr
-import com.duckduckgo.mobile.android.ui.view.toPx
+import com.duckduckgo.privacy.dashboard.api.BrowserTrackersAnimatorHelper
+import com.duckduckgo.privacy.dashboard.api.TrackersAnimatorListener
+import com.duckduckgo.privacy.dashboard.impl.R
+import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
+import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo
+import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
+import com.duckduckgo.trackerdetection.model.Entity
 import timber.log.Timber
-import java.util.*
 
-interface TrackersAnimatorListener {
-    fun onAnimationFinished()
-}
-
-class BrowserLottieTrackersAnimatorHelper {
+class BrowserLottieTrackersAnimatorHelper : BrowserTrackersAnimatorHelper {
     private var listener: TrackersAnimatorListener? = null
     private lateinit var trackersAnimation: LottieAnimationView
     private lateinit var shieldAnimation: LottieAnimationView
-    private var currentCta: Cta? = null
-    private val isCtaVisible
-        get() = currentCta is DaxDialogCta.DaxTrackersBlockedCta
 
-    private var partialAnimation: Boolean = false
+    private var runPartialAnimation: Boolean = false
+    private var completePartialAnimation: Boolean = false
 
-    fun startTrackersAnimation(
-        cta: Cta?,
-        activity: Activity,
+    override fun startTrackersAnimation(
+        runPartialAnimation: Boolean,
+        context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
         theme: AppTheme
     ) {
+        this.runPartialAnimation = runPartialAnimation
         this.trackersAnimation = trackersAnimationView
         this.shieldAnimation = shieldAnimationView
-        this.currentCta = cta
 
         Timber.i("Lottie: isAnimating ${trackersAnimationView.isAnimating}")
         if (trackersAnimationView.isAnimating) return
@@ -85,7 +66,7 @@ class BrowserLottieTrackersAnimatorHelper {
         entities.forEach {
             Timber.i("Lottie: entities ${it.name}")
         }
-        val logos = getLogos(activity, entities)
+        val logos = getLogos(context, entities)
         if (logos.isEmpty()) {
             Timber.i("Lottie: logos empty")
             return
@@ -96,46 +77,20 @@ class BrowserLottieTrackersAnimatorHelper {
             this.setCacheComposition(false) // ensure assets are not cached
             this.setAnimation(animationRawRes)
             this.maintainOriginalImageBounds = true
-            this.setImageAssetDelegate { asset ->
-                Timber.i("Lottie: ${asset?.id} ${asset?.fileName}")
-                when (asset?.id) {
-                    "image_0" -> {
-                        kotlin.runCatching { logos[0].asDrawable(activity) }
-                            .getOrDefault(
-                                ContextCompat.getDrawable(activity, R.drawable.network_logo_blank)!!.toBitmap()
-                            )
-                    }
-                    "image_1" -> {
-                        kotlin.runCatching { logos[1].asDrawable(activity) }
-                            .getOrDefault(
-                                ContextCompat.getDrawable(activity, R.drawable.network_logo_blank)!!.toBitmap()
-                            )
-                    }
-                    "image_2" -> {
-                        kotlin.runCatching { logos[2].asDrawable(activity) }
-                            .getOrDefault(
-                                ContextCompat.getDrawable(activity, R.drawable.network_logo_blank)!!.toBitmap()
-                            )
-                    }
-                    "image_3" ->
-                        kotlin.runCatching { logos[3].asDrawable(activity) }
-                            .getOrNull()
-                    else -> TODO()
-                }
-            }
+            this.setImageAssetDelegate(TrackersLottieAssetDelegate(context, logos))
             this.removeAllAnimatorListeners()
             this.addAnimatorListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
                     Timber.i("Lottie: onAnimationStart")
-                    if (partialAnimation) return
+                    if (completePartialAnimation) return
                     animateOmnibarOut(omnibarViews).start()
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
                     Timber.i("Lottie: onAnimationEnd")
-                    if (!isCtaVisible) {
+                    if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
-                        partialAnimation = false
+                        completePartialAnimation = false
                         listener?.onAnimationFinished()
                     }
                 }
@@ -147,8 +102,8 @@ class BrowserLottieTrackersAnimatorHelper {
                 }
             })
 
-            Timber.i("Lottie: isCtaVisible $isCtaVisible")
-            if (isCtaVisible) {
+            Timber.i("Lottie: ctaVisible? $runPartialAnimation")
+            if (runPartialAnimation) {
                 this.setMaxProgress(0.5f)
                 shieldAnimationView.setMaxProgress(0.5f)
             } else {
@@ -158,6 +113,34 @@ class BrowserLottieTrackersAnimatorHelper {
             shieldAnimationView.playAnimation()
             this.playAnimation()
         }
+    }
+
+    override fun removeListener() {
+        listener = null
+    }
+
+    override fun setListener(animatorListener: TrackersAnimatorListener) {
+        listener = animatorListener
+    }
+
+    override fun cancelAnimations(
+        omnibarViews: List<View>,
+        container: ViewGroup
+    ) {
+        Timber.i("Lottie: cancelAnimations")
+        stopTrackersAnimation()
+        omnibarViews.forEach { it.alpha = 1f }
+        container.alpha = 0f
+    }
+
+    override fun finishPartialTrackerAnimation() {
+        runPartialAnimation = false
+        completePartialAnimation = true
+        Timber.i("Lottie: finishTrackerAnimation")
+        this.trackersAnimation.setMinAndMaxProgress(0.5f, 1f)
+        this.shieldAnimation.setMinAndMaxProgress(0.5f, 1f)
+        this.trackersAnimation.playAnimation()
+        this.shieldAnimation.playAnimation()
     }
 
     private fun getAnimationRawRes(
@@ -173,28 +156,18 @@ class BrowserLottieTrackersAnimatorHelper {
         }
     }
 
-    private fun TrackerLogo.asDrawable(activity: Activity): Bitmap {
-        return kotlin.runCatching {
-            when (this) {
-                is ImageLogo -> ContextCompat.getDrawable(activity, resId)!!.toBitmap()
-                is LetterLogo -> generateDefaultDrawable(activity, this.trackerLetter).toBitmap(24.toPx(), 24.toPx())
-                is StackedLogo -> ContextCompat.getDrawable(activity, R.drawable.network_logo_more)!!.toBitmap()
-            }
-        }.getOrThrow()
-    }
-
     private fun getLogos(
-        activity: Activity,
+        context: Context,
         entities: List<Entity>
     ): List<TrackerLogo> {
-        if (activity.packageName == null) return emptyList()
+        if (context.packageName == null) return emptyList()
         val trackerLogoList = entities
             .asSequence()
             .distinct()
             .take(MAX_LOGOS_SHOWN + 1)
             .sortedWithDisplayNamesStartingWithVowelsToTheEnd()
             .map {
-                val resId = TrackersRenderer().networkLogoIcon(activity, it.name)
+                val resId = TrackersRenderer().networkLogoIcon(context, it.name)
                 if (resId == null) {
                     LetterLogo(it.displayName.take(1))
                 } else {
@@ -209,73 +182,6 @@ class BrowserLottieTrackersAnimatorHelper {
                 .toMutableList()
                 .apply { add(StackedLogo()) }
         }
-    }
-
-    fun generateDefaultDrawable(
-        context: Context,
-        letter: String
-    ): Drawable {
-        Timber.i("Lottie: will create logo for $letter")
-        return object : Drawable() {
-
-            private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.toolbarIconColor)
-            }
-
-            private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = context.getColorFromAttr(com.duckduckgo.mobile.android.R.attr.omnibarRoundedFieldBackgroundColor)
-                typeface = Typeface.SANS_SERIF
-            }
-
-            override fun draw(canvas: Canvas) {
-                val centerX = bounds.width() * 0.5f
-                val centerY = bounds.height() * 0.5f
-                textPaint.textSize = (bounds.width() / 2).toFloat()
-                val textWidth: Float = textPaint.measureText(letter) * 0.5f
-                val textBaseLineHeight = textPaint.fontMetrics.ascent * -0.4f
-                canvas.drawCircle(centerX, centerY, centerX, backgroundPaint)
-                canvas.drawText(letter, centerX - textWidth, centerY + textBaseLineHeight, textPaint)
-                Timber.i("Lottie: will create logo for $letter")
-            }
-
-            override fun setAlpha(alpha: Int) {
-            }
-
-            override fun setColorFilter(colorFilter: ColorFilter?) {
-            }
-
-            override fun getOpacity(): Int {
-                return PixelFormat.TRANSPARENT
-            }
-        }
-    }
-
-    fun removeListener() {
-        listener = null
-    }
-
-    fun setListener(animatorListener: TrackersAnimatorListener) {
-        listener = animatorListener
-    }
-
-    fun cancelAnimations(
-        omnibarViews: List<View>,
-        container: ViewGroup
-    ) {
-        Timber.i("Lottie: cancelAnimations")
-        stopTrackersAnimation()
-        omnibarViews.forEach { it.alpha = 1f }
-        container.alpha = 0f
-    }
-
-    fun finishPartialTrackerAnimation() {
-        currentCta = null
-        partialAnimation = true
-        Timber.i("Lottie: finishTrackerAnimation")
-        this.trackersAnimation.setMinAndMaxProgress(0.5f, 1f)
-        this.shieldAnimation.setMinAndMaxProgress(0.5f, 1f)
-        this.trackersAnimation.playAnimation()
-        this.shieldAnimation.playAnimation()
     }
 
     private fun stopTrackersAnimation() {
@@ -346,12 +252,11 @@ class BrowserLottieTrackersAnimatorHelper {
     }
 }
 
-sealed class TrackerLogo(val resId: Int) {
-    class ImageLogo(resId: Int) : TrackerLogo(resId)
+internal sealed class TrackerLogo() {
+    class ImageLogo(val resId: Int) : TrackerLogo()
     class LetterLogo(
-        val trackerLetter: String = "",
-        resId: Int = R.drawable.other_tracker_bg
-    ) : TrackerLogo(resId)
+        val trackerLetter: String = ""
+    ) : TrackerLogo()
 
-    class StackedLogo(resId: Int = R.drawable.other_tracker_bg) : TrackerLogo(resId)
+    class StackedLogo(val resId: Int = R.drawable.network_logo_more) : TrackerLogo()
 }

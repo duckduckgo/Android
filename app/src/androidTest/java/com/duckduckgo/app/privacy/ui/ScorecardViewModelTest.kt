@@ -30,7 +30,7 @@ import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
