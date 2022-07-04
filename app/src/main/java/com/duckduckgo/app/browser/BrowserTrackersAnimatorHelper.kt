@@ -268,10 +268,7 @@ class BrowserLottieTrackersAnimatorHelper {
         container.alpha = 0f
     }
 
-    fun finishTrackerAnimation(
-        omnibarViews: List<View>,
-        container: ViewGroup
-    ) {
+    fun finishPartialTrackerAnimation() {
         currentCta = null
         partialAnimation = true
         Timber.i("Lottie: finishTrackerAnimation")
