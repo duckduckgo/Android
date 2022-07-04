@@ -6,7 +6,8 @@ export const constants = {
         'overlay': 'overlay.html',
         'email-autofill': 'email-autofill.html',
         'signup': 'signup.html',
-        'login': 'login.html'
+        'login': 'login.html',
+        'loginWithPoorForm': 'login-poor-form.html'
     },
     fields: {
         email: {

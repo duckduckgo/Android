@@ -33,11 +33,15 @@ function createGlobalConfig () {
     // The native layer will inject a randomised secret here and use it to verify the origin
     let secret = 'PLACEHOLDER_SECRET'
 
-    let isDDGApp = /(iPhone|iPad|Android|Mac).*DuckDuckGo\/[0-9]/i.test(window.navigator.userAgent) ||
-        isApp ||
-        isTopFrame
-    const isAndroid = isDDGApp && /Android/i.test(window.navigator.userAgent)
-    const isMobileApp = isDDGApp && !isApp
+    /**
+     * The user agent check will not be needed here once `android` supports `userPreferences?.platform.name`
+     */
+    // @ts-ignore
+    const isAndroid = userPreferences?.platform.name === 'android' || /Android.*DuckDuckGo\/\d/i.test(window.navigator.userAgent)
+    // @ts-ignore
+    const isDDGApp = ['ios', 'android', 'macos', 'windows'].includes(userPreferences?.platform.name) || isAndroid
+    // @ts-ignore
+    const isMobileApp = ['ios', 'android'].includes(userPreferences?.platform.name) || isAndroid
     const isFirefox = navigator.userAgent.includes('Firefox')
     const isDDGDomain = Boolean(window.location.href.match(DDG_DOMAIN_REGEX))
 

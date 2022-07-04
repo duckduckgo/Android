@@ -13,6 +13,32 @@
  */
 export class UIController {
     /**
+     * @type {any}
+     */
+    _options;
+
+    /**
+     * @param {any} [options]
+     */
+    constructor (options) {
+        this._options = options
+
+        // We always register this 'pointerdown' event, regardless of
+        // whether we have a tooltip currently open or not. This is to ensure
+        // we can clear out any existing state before opening a new one.
+        window.addEventListener('pointerdown', this, true)
+    }
+
+    handleEvent (event) {
+        switch (event.type) {
+        case 'pointerdown': {
+            this._options.onPointerDown?.(event)
+            break
+        }
+        }
+    }
+
+    /**
      * Implement this method to control what happen when Autofill
      * has enough information to 'attach' a tooltip.
      *

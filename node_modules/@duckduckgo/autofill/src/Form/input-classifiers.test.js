@@ -160,12 +160,12 @@ describe.each(testCases)('Test $html fields', (testCase) => {
         expect(submitFalsePositives).toEqual(expectedSubmitFalsePositives)
         expect(submitFalseNegatives).toEqual(expectedSubmitFalseNegatives)
 
-        /**
-         * @type {NodeListOf<HTMLInputElement>}
-         */
-        const manuallyScoredFields = document.querySelectorAll('[data-manual-scoring]')
+        /** @type {Array<HTMLInputElement>} */
+        const manuallyScoredFields = Array.from(document.querySelectorAll('[data-manual-scoring]'))
+        /** @type {Array<HTMLInputElement>} */
+        const automaticallyScoredFields = Array.from(document.querySelectorAll('[data-ddg-inputtype]'))
 
-        const scores = Array.from(manuallyScoredFields).map(field => {
+        const getDetailsFromFailure = (field) => {
             const { manualScoring, ddgInputtype, ...rest } = field.dataset
             // @ts-ignore
             field.style = ''
@@ -179,7 +179,19 @@ describe.each(testCases)('Test $html fields', (testCase) => {
                 inferredType: getInputSubtype(field),
                 manualScore: field.getAttribute('data-manual-scoring')
             }
-        })
+        }
+
+        const scores = manuallyScoredFields.map(getDetailsFromFailure)
+
+        const falseScores = automaticallyScoredFields
+            .filter(field =>
+                !manuallyScoredFields.includes(field) &&
+                field.getAttribute('data-ddg-inputtype') !== 'unknown' &&
+                field.tabIndex !== -1
+            )
+            .map(getDetailsFromFailure)
+
+        scores.concat(falseScores)
 
         const submitButtonScores = {
             detected: detectedSubmitButtons.length,
@@ -196,11 +208,12 @@ describe.each(testCases)('Test $html fields', (testCase) => {
         if (bad.length !== expectedFailures.length) {
             for (let score of bad) {
                 console.log(
-                    'manualType:   ' + JSON.stringify(score.manualScore),
+                    'file:         ' + html,
+                    '\nmanualType:   ' + JSON.stringify(score.manualScore),
                     '\ninferredType: ' + JSON.stringify(score.inferredType),
-                    '\nid:          ', JSON.stringify(score.attrs.id),
-                    '\nname:        ', JSON.stringify(score.attrs.name),
-                    '\nHTML:        ', score.html
+                    '\nid:           ' + JSON.stringify(score.attrs.id),
+                    '\nname:         ' + JSON.stringify(score.attrs.name),
+                    '\nHTML:         ' + score.html
                 )
             }
         }
@@ -224,7 +237,9 @@ afterAll(() => {
         }
     })
 
-    const proportionFailingSites = Object.values(siteHasFailures).filter(t => t === true).length / Object.values(siteHasFailures).length
+    const allSites = Object.values(siteHasFailures).length
+    const failingSites = Object.values(siteHasFailures).filter(t => t === true).length
+    const proportionFailingSites = failingSites / allSites
 
     /* field statistics */
 
@@ -237,28 +252,32 @@ afterAll(() => {
 
     testResults.forEach((result) => {
         result.scores.forEach((field) => {
-            if (!totalFieldsByType[field.manualScore]) {
-                totalFieldsByType[field.manualScore] = 0
-                totalFailuresByFieldType[field.manualScore] = 0
+            const {manualScore, inferredType} = field
+            if (!totalFieldsByType[manualScore]) {
+                totalFieldsByType[manualScore] = 0
+                totalFailuresByFieldType[manualScore] = 0
             }
 
-            if (field.manualScore !== field.inferredType) {
+            if (manualScore !== inferredType) {
                 totalFailedFields++
-                totalFailuresByFieldType[field.manualScore]++
+                totalFailuresByFieldType[manualScore]++
             }
-            if (field.manualScore === 'unknown' && field.inferredType !== field.manualScore) {
+            if ((!manualScore || manualScore === 'unknown') && inferredType !== manualScore) {
                 totalFalsePositives++
             }
             totalFields++
-            totalFieldsByType[field.manualScore]++
+            totalFieldsByType[manualScore]++
         })
     })
 
     console.log(
         'Input classification statistics:',
-        '\n% of failing sites:\t\t' + Math.round(proportionFailingSites * 100) + '%',
-        '\n% of failing fields:\t' + Math.round((totalFailedFields / totalFields) * 100) + '%',
-        '\n% of false positive fields:\t' + Math.round((totalFalsePositives / totalFields) * 100) + '%',
+        '\n% of failing sites:\t\t' + (proportionFailingSites * 100).toFixed(1) + '%',
+        '\n\t\t (' + failingSites + ' of ' + allSites + ', for a total of ' + testCases.length + ' forms)',
+        '\n% of failing fields:\t' + ((totalFailedFields / totalFields) * 100).toFixed(1) + '%',
+        '\n\t\t (' + totalFailedFields + ' of ' + totalFields + ')',
+        '\n% of false positive fields:\t' + ((totalFalsePositives / totalFields) * 100).toFixed(1) + '%',
+        '\n\t\t (' + totalFalsePositives + ' of ' + totalFields + ')',
         '\n% fields failing by type:',
         '\n' + Object.keys(totalFieldsByType).sort().map((type) => {
             return '\n' + (type + ':').padEnd(24) +
