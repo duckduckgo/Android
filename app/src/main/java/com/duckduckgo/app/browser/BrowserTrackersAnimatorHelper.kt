@@ -79,7 +79,6 @@ class BrowserLottieTrackersAnimatorHelper {
 
         if (entities.isNullOrEmpty()) { // no badge nor tracker animations
             Timber.i("Lottie: entities.isNullOrEmpty()")
-            listener?.onAnimationFinished()
             return
         }
 
@@ -89,7 +88,6 @@ class BrowserLottieTrackersAnimatorHelper {
         val logos = getLogos(activity, entities)
         if (logos.isEmpty()) {
             Timber.i("Lottie: logos empty")
-            listener?.onAnimationFinished()
             return
         }
 
@@ -125,6 +123,7 @@ class BrowserLottieTrackersAnimatorHelper {
                     else -> TODO()
                 }
             }
+            this.removeAllAnimatorListeners()
             this.addAnimatorListener(object : AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) {
                     Timber.i("Lottie: onAnimationStart")
@@ -137,6 +136,7 @@ class BrowserLottieTrackersAnimatorHelper {
                     if (!isCtaVisible) {
                         animateOmnibarIn(omnibarViews).start()
                         partialAnimation = false
+                        listener?.onAnimationFinished()
                     }
                 }
 
@@ -264,7 +264,6 @@ class BrowserLottieTrackersAnimatorHelper {
     ) {
         Timber.i("Lottie: cancelAnimations")
         stopTrackersAnimation()
-        listener?.onAnimationFinished()
         omnibarViews.forEach { it.alpha = 1f }
         container.alpha = 0f
     }
@@ -287,8 +286,10 @@ class BrowserLottieTrackersAnimatorHelper {
         if (!::trackersAnimation.isInitialized || !::shieldAnimation.isInitialized) return
 
         Timber.i("Lottie: stopTrackersAnimation real")
-        trackersAnimation.cancelAnimation()
-        trackersAnimation.progress = 1f
+        if (trackersAnimation.isAnimating) {
+            trackersAnimation.cancelAnimation()
+            trackersAnimation.progress = 1f
+        }
         if (shieldAnimation.isAnimating) {
             shieldAnimation.cancelAnimation()
             shieldAnimation.progress = 0f

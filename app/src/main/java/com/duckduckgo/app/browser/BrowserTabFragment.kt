@@ -753,8 +753,8 @@ class BrowserTabFragment :
     private fun processCommand(it: Command?) {
         Timber.i("Lottie: command $it")
         if (it !is Command.DaxCommand) {
-            Timber.i("Lottie: will cancel animations $it")
             if (it is Command.Refresh || it is Command.NavigateForward || it is Command.Navigate || it is Command.NavigateBack) {
+                Timber.i("Lottie: will cancel animations $it")
                 renderer.cancelTrackersAnimation()
             }
         }
