@@ -361,7 +361,7 @@ class BrowserTabFragment :
         viewModel
     }
 
-    private val animatorHelper by lazy { BrowserLottieTrackersAnimatorHelper() }
+    private val animatorHelper by lazy { BrowserLottieTrackersAnimatorHelper(requireContext(), appTheme) }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
@@ -2482,8 +2482,11 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
-                            lastSeenCtaViewState?.cta is DaxTrackersBlockedCta, activity,
-                            shieldIcon, trackerAnimationView, omnibarViews(), events, appTheme
+                            runPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
+                            shieldAnimationView = shieldIcon,
+                            trackersAnimationView = trackerAnimationView,
+                            omnibarViews = omnibarViews(),
+                            entities = events
                         )
                     }
                 }

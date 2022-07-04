@@ -16,22 +16,18 @@
 
 package com.duckduckgo.privacy.dashboard.api
 
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.trackerdetection.model.Entity
 
 interface BrowserTrackersAnimatorHelper {
     fun startTrackersAnimation(
         runPartialAnimation: Boolean,
-        context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
-        entities: List<Entity>?,
-        theme: AppTheme
+        entities: List<Entity>?
     )
 
     fun cancelAnimations(

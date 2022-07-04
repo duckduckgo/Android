@@ -34,7 +34,11 @@ import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.StackedLogo
 import com.duckduckgo.trackerdetection.model.Entity
 import timber.log.Timber
 
-class BrowserLottieTrackersAnimatorHelper : BrowserTrackersAnimatorHelper {
+class BrowserLottieTrackersAnimatorHelper(
+    val context: Context,
+    val theme: AppTheme
+) : BrowserTrackersAnimatorHelper {
+
     private var listener: TrackersAnimatorListener? = null
     private lateinit var trackersAnimation: LottieAnimationView
     private lateinit var shieldAnimation: LottieAnimationView
@@ -44,12 +48,10 @@ class BrowserLottieTrackersAnimatorHelper : BrowserTrackersAnimatorHelper {
 
     override fun startTrackersAnimation(
         runPartialAnimation: Boolean,
-        context: Context,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
-        entities: List<Entity>?,
-        theme: AppTheme
+        entities: List<Entity>?
     ) {
         this.runPartialAnimation = runPartialAnimation
         this.trackersAnimation = trackersAnimationView
