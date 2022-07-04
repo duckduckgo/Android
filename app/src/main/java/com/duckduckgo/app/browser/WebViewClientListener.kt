@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
@@ -43,6 +44,7 @@ interface WebViewClientListener {
     fun titleReceived(newTitle: String)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
+    fun onCertificateReceived(certificate: SslCertificate?)
 
     fun sendEmailRequested(emailAddress: String)
     fun sendSmsRequested(telephoneNumber: String)

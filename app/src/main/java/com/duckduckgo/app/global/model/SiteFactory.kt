@@ -18,17 +18,24 @@ package com.duckduckgo.app.global.model
 
 import androidx.annotation.AnyThread
 import androidx.annotation.WorkerThread
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.trackerdetection.EntityLookup
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.ContentBlocking
 import javax.inject.Inject
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
 
 @SingleInstanceIn(AppScope::class)
 class SiteFactory @Inject constructor(
     private val privacyPractices: PrivacyPractices,
-    private val entityLookup: EntityLookup
+    private val entityLookup: EntityLookup,
+    private val userWhitelistDao: UserWhitelistDao,
+    private val contentBlocking: ContentBlocking,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope
 ) {
 
     /**
@@ -42,7 +49,7 @@ class SiteFactory @Inject constructor(
         title: String? = null,
         httpUpgraded: Boolean = false
     ): Site {
-        return SiteMonitor(url, title, httpUpgraded)
+        return SiteMonitor(url, title, httpUpgraded, userWhitelistDao, contentBlocking, appCoroutineScope)
     }
 
     /**

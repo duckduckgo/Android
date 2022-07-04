@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
+import android.net.http.SslCertificate
 import android.os.Message
 import android.util.Patterns
 import android.view.ContextMenu
@@ -96,7 +97,7 @@ import com.duckduckgo.app.location.ui.SystemLocationPermissionDialog
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.app.privacy.model.PrivacyShield
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ALWAYS
 import com.duckduckgo.app.settings.db.SettingsSharedPreferences.LoginDetectorPrefsMapper.AutomaticFireproofSetting.ASK_EVERY_TIME
@@ -287,12 +288,8 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     data class PrivacyGradeViewState(
-        val privacyGrade: PrivacyGrade? = null,
-        val shouldAnimate: Boolean = false,
-        val showEmptyGrade: Boolean = true
-    ) {
-        val isEnabled: Boolean = privacyGrade != PrivacyGrade.UNKNOWN
-    }
+        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN
+    )
 
     data class AutoCompleteViewState(
         val showSuggestions: Boolean = false,
@@ -1366,12 +1363,6 @@ class BrowserTabViewModel @Inject constructor(
 
         loadingViewState.value = progress.copy(isLoading = isLoading, progress = visualProgress)
 
-        val showLoadingGrade = progress.privacyOn || isLoading
-        privacyGradeViewState.value = currentPrivacyGradeState().copy(
-            shouldAnimate = isLoading,
-            showEmptyGrade = showLoadingGrade
-        )
-
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
@@ -1584,6 +1575,7 @@ class BrowserTabViewModel @Inject constructor(
         site?.surrogateDetected(surrogate)
     }
 
+    // This is called when interceptor upgrades to https
     override fun upgradedToHttps() {
         httpsUpgraded = true
     }
@@ -1609,6 +1601,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    override fun onCertificateReceived(certificate: SslCertificate?) {
+        site?.certificate = certificate
+    }
+
     private fun enableUrlParametersRemovedFlag() {
         site?.urlParametersRemoved = true
         onSiteChanged()
@@ -1617,28 +1613,17 @@ class BrowserTabViewModel @Inject constructor(
     private fun onSiteChanged() {
         httpsUpgraded = false
         viewModelScope.launch {
-
-            val improvedGrade = withContext(dispatchers.io()) {
-                site?.calculateGrades()?.improvedGrade
+            val privacyProtection: PrivacyShield = withContext(dispatchers.io()) {
+                site?.privacyProtection() ?: PrivacyShield.UNKNOWN
             }
-
+            Timber.i("Shield: privacyProtection $privacyProtection")
             withContext(dispatchers.main()) {
                 siteLiveData.value = site
-                val isWhiteListed: Boolean = site?.domain?.let { isWhitelisted(it) } ?: false
-                if (!isWhiteListed) {
-                    privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyGrade = improvedGrade)
-                }
+                privacyGradeViewState.value = currentPrivacyGradeState().copy(privacyShield = privacyProtection)
             }
-
             withContext(dispatchers.io()) {
                 tabRepository.update(tabId, site)
             }
-        }
-    }
-
-    fun stopShowingEmptyGrade() {
-        if (currentPrivacyGradeState().showEmptyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
         }
     }
 
@@ -1664,7 +1649,6 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean
     ) {
-
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
@@ -1686,11 +1670,6 @@ class BrowserTabViewModel @Inject constructor(
         val showControls = !hasFocus || query.isBlank()
         val showPrivacyGrade = !hasFocus
         val showSearchIcon = hasFocus
-
-        // show the real grade in case the animation was canceled before changing the state, this avoids showing an empty grade when regaining focus.
-        if (showPrivacyGrade) {
-            privacyGradeViewState.value = currentPrivacyGradeState().copy(showEmptyGrade = false)
-        }
 
         omnibarViewState.value = currentOmnibarViewState().copy(
             isEditing = hasFocus,

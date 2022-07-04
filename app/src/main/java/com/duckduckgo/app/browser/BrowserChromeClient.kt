@@ -89,6 +89,7 @@ class BrowserChromeClient @Inject constructor(
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList, newProgress))
             webViewClientListener?.progressChanged(newProgress)
+            webViewClientListener?.onCertificateReceived(webView.certificate)
         } catch (e: Throwable) {
             appCoroutineScope.launch(coroutineDispatcher.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PROGRESS_CHANGED)

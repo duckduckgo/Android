@@ -1,13 +1,29 @@
+<!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="22dp"
-    android:height="22dp"
-    android:viewportWidth="22"
-    android:viewportHeight="22">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
   <path
-      android:pathData="M11.0001,21.0832C16.5689,21.0832 21.0834,16.5687 21.0834,10.9998C21.0834,5.431 16.5689,0.9165 11.0001,0.9165C5.4312,0.9165 0.9167,5.431 0.9167,10.9998C0.9167,16.5687 5.4312,21.0832 11.0001,21.0832Z"
-      android:fillColor="#00000000"/>
+      android:pathData="M12,12m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0"
+      android:fillColor="?attr/omnibarRoundedFieldBackgroundColor"/>
   <path
-      android:pathData="M22,11C22,17.0751 17.0751,22 11,22C4.9249,22 0,17.0751 0,11C0,4.9249 4.9249,0 11,0C17.0751,0 22,4.9249 22,11ZM17.4167,10.7308H11.2692V4.5833H17.4167V10.7308ZM10.7308,10.7308H4.5833V4.5833H10.7308V10.7308ZM17.4167,17.4167H11.2692V11.2692H17.4167V17.4167ZM10.7308,17.4167H4.5833V11.2692H10.7308V17.4167Z"
+      android:pathData="M24,12C24,18.6274 18.6274,24 12,24C5.3726,24 0,18.6274 0,12C0,5.3726 5.3726,0 12,0C18.6274,0 24,5.3726 24,12ZM19,11.7063H12.2937V5H19V11.7063ZM11.7063,11.7063H5V5H11.7063V11.7063ZM19,19H12.2937V12.2937H19V19ZM11.7063,19H5V12.2937H11.7063V19Z"
       android:fillColor="?attr/toolbarIconColor"
       android:fillType="evenOdd"/>
 </vector>
