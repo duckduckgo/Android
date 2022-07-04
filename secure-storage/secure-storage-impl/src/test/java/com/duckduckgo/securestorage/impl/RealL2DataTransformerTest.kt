@@ -69,12 +69,13 @@ class RealL2DataTransformerTest {
     fun whenDataIsDecryptedThenDelegateDecryptionToEncryptionHelper() {
         val result = testee.decrypt("test123", "iv")
 
-        assertEquals(expectedDecryptedData, result)
+        assertEquals(decodedDecryptedData, result)
     }
 
     companion object {
         private const val expectedEncryptedData: String = "ZXhwZWN0ZWRFbmNyeXB0ZWREYXRh"
         private const val expectedEncryptedIv: String = "ZXhwZWN0ZWRFbmNyeXB0ZWRJVg=="
         private const val expectedDecryptedData: String = "ZXhwZWN0ZWREZWNyeXB0ZWREYXRh"
+        private const val decodedDecryptedData: String = "expectedDecryptedData"
     }
 }

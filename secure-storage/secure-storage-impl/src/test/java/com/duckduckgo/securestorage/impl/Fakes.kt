@@ -18,7 +18,6 @@ package com.duckduckgo.securestorage.impl
 
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
-import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
 import okio.ByteString.Companion.decodeBase64
 import java.security.Key
@@ -49,19 +48,6 @@ class FakeEncryptionHelper constructor(
         toDecrypt: EncryptedBytes,
         key: Key
     ): ByteArray = expectedDecryptedData.decodeBase64()!!.toByteArray()
-
-    override fun encrypt(
-        raw: String,
-        key: Key
-    ): EncryptedString = EncryptedString(
-        expectedEncryptedData,
-        expectedEncryptedIv
-    )
-
-    override fun decrypt(
-        toDecrypt: EncryptedString,
-        key: Key
-    ): String = expectedDecryptedData
 }
 
 class FakeSecureStorageKeyGenerator constructor(private val key: Key) : SecureStorageKeyGenerator {

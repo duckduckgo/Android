@@ -17,17 +17,24 @@
 package com.duckduckgo.securestorage.impl
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.securestorage.api.SecureStorageException
+import com.duckduckgo.securestorage.api.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper
+import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.securestorage.impl.encryption.EncryptionHelper.EncryptedString
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.toByteString
 import javax.inject.Inject
 
 interface L2DataTransformer {
     fun canProcessData(): Boolean
 
+    @Throws(SecureStorageException::class)
     fun encrypt(data: String): EncryptedString
 
+    @Throws(SecureStorageException::class)
     fun decrypt(
         data: String,
         iv: String
@@ -46,16 +53,28 @@ class RealL2DataTransformer @Inject constructor(
 
     override fun canProcessData(): Boolean = secureStorageKeyProvider.canAccessKeyStore()
 
-    override fun encrypt(data: String): EncryptedString = encryptionHelper.encrypt(data, l2Key)
+    // get ByteArray -> encrypt -> encode to String
+    override fun encrypt(data: String): EncryptedString = encryptionHelper.encrypt(data.toByteArray(), l2Key).run {
+        EncryptedString(
+            this.data.transformToString(),
+            this.iv.transformToString()
+        )
+    }
 
+    // decode to ByteArray -> decrypt -> get String
     override fun decrypt(
         data: String,
         iv: String
     ): String = encryptionHelper.decrypt(
-        EncryptedString(
-            data = data,
-            iv = iv
+        EncryptedBytes(
+            data = data.transformToByteArray(),
+            iv = iv.transformToByteArray()
         ),
         l2Key
-    )
+    ).run { String(this) }
+
+    private fun ByteArray.transformToString(): String = this.toByteString().base64()
+
+    private fun String.transformToByteArray(): ByteArray =
+        this.decodeBase64()?.toByteArray() ?: throw InternalSecureStorageException("Error while decoding string data to Base64")
 }
