@@ -25,18 +25,18 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface SystemPermissionsHelper {
-    fun hasMicPermissionsGranted(context: Context): Boolean
-
-    fun hasCameraPermissionsGranted(context: Context): Boolean
-
+    fun hasMicPermissionsGranted(): Boolean
+    fun hasCameraPermissionsGranted(): Boolean
 }
 
 @ContributesBinding(ActivityScope::class)
-class SystemPermissionsHelperImp @Inject constructor(): SystemPermissionsHelper {
+class SystemPermissionsHelperImp @Inject constructor(
+    private val context: Context
+): SystemPermissionsHelper {
 
-    override fun hasMicPermissionsGranted(context: Context): Boolean =
+    override fun hasMicPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
 
-    override fun hasCameraPermissionsGranted(context: Context): Boolean =
+    override fun hasCameraPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
 }

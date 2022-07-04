@@ -4,5 +4,5 @@ import android.content.Context
 
 interface SitePermissionsDialogLauncher {
 
-    fun showSitePermissionDialog(context: Context, permissionsRequested: Array<String>)
+    fun askForSitePermission(context: Context, url: String, permissionsRequested: Array<String>)
 }

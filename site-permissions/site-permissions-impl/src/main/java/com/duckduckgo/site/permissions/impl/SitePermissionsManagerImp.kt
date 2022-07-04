@@ -24,8 +24,7 @@ import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)
 class SitePermissionsManagerImp @Inject constructor(
-    private val sitePermissionsRepository: SitePermissionsRepository,
-    private val systemPermissionsHelper: SystemPermissionsHelper
+    private val sitePermissionsRepository: SitePermissionsRepository
 ) : SitePermissionsManager {
 
     override fun getSitePermissionsFromRequest(url: String, resources: Array<String>): Array<String> =
@@ -35,7 +34,22 @@ class SitePermissionsManagerImp @Inject constructor(
             .toTypedArray()
 
     override fun getPermissionsAllowedToAsk(request: PermissionRequest): Array<String> {
-        return request.resources.map { it }.toTypedArray()
+        val permissionsAllowToAsk: MutableList<String> = mutableListOf()
+        request.resources.forEach { permission ->
+            when(permission) {
+                PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
+                    //TODO if (!always deny) {
+                        permissionsAllowToAsk.add(permission)
+                    // }
+                }
+                PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
+                    //TODO if (!always deny) {
+                        permissionsAllowToAsk.add(permission)
+                    // }
+                }
+            }
+        }
+        return permissionsAllowToAsk.toTypedArray()
     }
 
     private fun isPermissionSupported(permission: String): Boolean =
