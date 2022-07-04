@@ -19,8 +19,6 @@ package com.duckduckgo.app.survey.api
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.app.statistics.VariantManager
-import com.duckduckgo.app.statistics.isVpnExperiment
 import com.duckduckgo.app.survey.api.SurveyGroup.SurveyOption
 import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.survey.model.Survey
@@ -42,7 +40,6 @@ class SurveyDownloader @Inject constructor(
     private val emailManager: EmailManager,
     private val atpCohortManager: AtpCohortManager,
     private val atpWaitlistStateRepository: AtpWaitlistStateRepository,
-    private val variantManager: VariantManager
 ) {
 
     private fun getSurveyResponse(): Response<SurveyGroup?> {
@@ -143,8 +140,6 @@ class SurveyDownloader @Inject constructor(
                 atpCohortManager.getCohort() == null
         } else if (surveyOption.isAtpEverEnabledRequired == true) {
             atpCohortManager.getCohort() != null
-        } else if (surveyOption.isAtpRetentionStudyRequired == true) {
-            variantManager.isVpnExperiment()
         } else {
             true
         }

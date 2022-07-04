@@ -22,6 +22,7 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
+import timber.log.Timber
 
 class AndroidAppProperties(
     private val appContext: Context,
@@ -51,7 +52,12 @@ class AndroidAppProperties(
     }
 
     override fun webView(): String {
-        return WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
+        return kotlin.runCatching {
+            WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
+        }.getOrElse {
+            Timber.e(it, "Error getting current WebView package")
+            WEBVIEW_UNKNOWN_VERSION
+        }
     }
 
     companion object {

@@ -20,6 +20,8 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.work.*
 import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.app.notification.model.ClearDataNotification
+import com.duckduckgo.app.notification.model.PrivacyProtectionNotification
 import com.duckduckgo.app.notification.model.SchedulableNotification
 import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
@@ -91,30 +93,48 @@ class NotificationScheduler(
 
 // Legacy code. Unused class required for users who already have this notification scheduled from previous version. We will
 // delete this as part of https://app.asana.com/0/414730916066338/1119619712088571
+@ContributesWorker(AppScope::class)
 class ShowClearDataNotification(
     context: Context,
     params: WorkerParameters
-) : ClearDataNotificationWorker(context, params)
+) : SchedulableNotificationWorker<ClearDataNotification>(context, params) {
+    @Inject
+    override lateinit var notificationSender: NotificationSender
 
+    @Inject
+    override lateinit var notification: ClearDataNotification
+}
+
+@ContributesWorker(AppScope::class)
 open class ClearDataNotificationWorker(
     context: Context,
     params: WorkerParameters
-) : SchedulableNotificationWorker(context, params)
+) : SchedulableNotificationWorker<ClearDataNotification>(context, params) {
+    @Inject
+    override lateinit var notificationSender: NotificationSender
 
+    @Inject
+    override lateinit var notification: ClearDataNotification
+}
+
+@ContributesWorker(AppScope::class)
 class PrivacyNotificationWorker(
     context: Context,
     params: WorkerParameters
-) : SchedulableNotificationWorker(context, params)
+) : SchedulableNotificationWorker<PrivacyProtectionNotification>(context, params) {
+    @Inject
+    override lateinit var notificationSender: NotificationSender
 
-@ContributesWorker(AppScope::class)
-open class SchedulableNotificationWorker(
+    @Inject
+    override lateinit var notification: PrivacyProtectionNotification
+}
+
+open class SchedulableNotificationWorker<T : SchedulableNotification>(
     val context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
-    @Inject
-    lateinit var notificationSender: NotificationSender
-    @Inject
-    lateinit var notification: SchedulableNotification
+    open lateinit var notificationSender: NotificationSender
+    open lateinit var notification: T
 
     override suspend fun doWork(): Result {
         notificationSender.sendNotification(notification)

@@ -19,7 +19,9 @@ class AndroidInterface extends InterfacePrototype {
      * @override
      */
     createUIController () {
-        return new NativeUIController()
+        return new NativeUIController({
+            onPointerDown: (event) => this._onPointerDown(event)
+        })
     }
 
     /**

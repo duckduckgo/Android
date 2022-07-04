@@ -233,10 +233,16 @@ export function loginPage (page, server, opts = {}) {
             await page.type('#email', data.username)
             await page.click('#login button[type="submit"]')
         },
-        async shouldNotPromptToSave () {
-            const calls = await page.evaluate('window.__playwright.mocks.calls')
-            // todo(Shane): is it too apple specific?
-            const mockCalls = calls.filter(([name]) => name === 'pmHandlerStoreData')
+        /** @param {Platform} platform */
+        async shouldNotPromptToSave (platform = 'ios') {
+            let mockCalls = []
+            if (['ios', 'macos'].includes(platform)) {
+                mockCalls = await mockedCalls(page, ['pmHandlerStoreData'])
+            }
+            if (platform === 'android') {
+                mockCalls = await mockedCalls(page, ['storeFormData'])
+            }
+
             expect(mockCalls.length).toBe(0)
         },
         /** @param {string} mockCallName */
@@ -297,6 +303,23 @@ export function loginPage (page, server, opts = {}) {
             const [call1, call2] = calls
             expect(call1[1].wasFromClick).toBe(true)
             expect(call2[1].wasFromClick).toBe(false)
+        }
+    }
+}
+
+/**
+ * A wrapper around interactions for `integration-test/pages/login-poor-form.html`
+ *
+ * @param {import("playwright").Page} page
+ * @param {ServerWrapper} server
+ * @param {{overlay?: boolean, clickLabel?: boolean}} [opts]
+ */
+export function loginPageWithPoorForm (page, server, opts) {
+    const originalLoginPage = loginPage(page, server, opts)
+    return {
+        ...originalLoginPage,
+        async navigate () {
+            await page.goto(server.urlForPath(constants.pages['loginWithPoorForm']))
         }
     }
 }

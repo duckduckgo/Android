@@ -17,10 +17,10 @@ export class AndroidTransport extends DeviceApiTransport {
 
         if (this.config.isDDGTestMode) {
             if (typeof window.BrowserAutofill?.getAutofillData !== 'function') {
-                throw new Error('window.BrowserAutofill.getAutofillData missing')
+                console.warn('window.BrowserAutofill.getAutofillData missing')
             }
             if (typeof window.BrowserAutofill?.storeFormData !== 'function') {
-                throw new Error('window.BrowserAutofill.storeFormData missing')
+                console.warn('window.BrowserAutofill.storeFormData missing')
             }
         }
     }

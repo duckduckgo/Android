@@ -182,7 +182,8 @@ const username = [
     // fix for https://online.mbank.pl/pl/Login
     `input[name="userID" i]`,
     `input[id="login-id" i]`,
-    `input[name=accountname i]`
+    `input[name=accountname i]`,
+    `input[autocomplete=username]`
 ]
 
 // todo: these are still used directly right now, mostly in scanForInputs

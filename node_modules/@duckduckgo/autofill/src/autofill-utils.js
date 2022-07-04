@@ -287,6 +287,21 @@ const isLikelyASubmitButton = (el) => {
     !SUBMIT_BUTTON_UNLIKELY_REGEX.test(contentExcludingLabel + ' ' + ariaLabel)
 }
 
+/**
+ * Check that a button matches the form type - login buttons on a login form, signup buttons on a signup form
+ * @param {HTMLElement} el
+ * @param {import('./Form/Form').Form} formObj
+ */
+const buttonMatchesFormType = (el, formObj) => {
+    if (formObj.isLogin) {
+        return !/sign.?up/i.test(el.textContent || '')
+    } else if (formObj.isSignup) {
+        return !/(log|sign).?([io])n/i.test(el.textContent || '')
+    } else {
+        return true
+    }
+}
+
 export {
     notifyWebApp,
     sendAndWaitForAnswer,
@@ -303,5 +318,6 @@ export {
     ADDRESS_DOMAIN,
     formatDuckAddress,
     escapeXML,
-    isLikelyASubmitButton
+    isLikelyASubmitButton,
+    buttonMatchesFormType
 }

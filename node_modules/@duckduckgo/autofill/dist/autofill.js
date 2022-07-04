@@ -2902,7 +2902,9 @@ class AndroidInterface extends _InterfacePrototype.default {
 
 
   createUIController() {
-    return new _NativeUIController.NativeUIController();
+    return new _NativeUIController.NativeUIController({
+      onPointerDown: event => this._onPointerDown(event)
+    });
   }
   /**
    * @deprecated use `this.settings.availableInputTypes.email` in the future
@@ -3071,7 +3073,9 @@ class AppleDeviceInterface extends _InterfacePrototype.default {
     var _this$globalConfig$us, _this$globalConfig$us2;
 
     if (((_this$globalConfig$us = this.globalConfig.userPreferences) === null || _this$globalConfig$us === void 0 ? void 0 : (_this$globalConfig$us2 = _this$globalConfig$us.platform) === null || _this$globalConfig$us2 === void 0 ? void 0 : _this$globalConfig$us2.name) === 'ios') {
-      return new _NativeUIController.NativeUIController();
+      return new _NativeUIController.NativeUIController({
+        onPointerDown: event => this._onPointerDown(event)
+      });
     }
 
     if (!this.globalConfig.supportsTopFrame) {
@@ -3413,32 +3417,6 @@ class AppleDeviceInterface extends _InterfacePrototype.default {
 
       poll();
     });
-  }
-  /**
-   * on macOS we try to detect if a click occurred within a form
-   * @param {PointerEvent} event
-   */
-
-
-  _onPointerDown(event) {
-    if (this.settings.featureToggles.credentials_saving) {
-      this._detectFormSubmission(event);
-    }
-  }
-  /**
-   * @param {PointerEvent} event
-   */
-
-
-  _detectFormSubmission(event) {
-    const matchingForm = [...this.scanner.forms.values()].find(form => {
-      const btns = [...form.submitButtons]; // @ts-ignore
-
-      if (btns.includes(event.target)) return true; // @ts-ignore
-
-      if (btns.find(btn => btn.contains(event.target))) return true;
-    });
-    matchingForm === null || matchingForm === void 0 ? void 0 : matchingForm.submitHandler();
   }
 
 }
@@ -3825,6 +3803,8 @@ var _Settings = require("../Settings");
 var _deviceApi = require("../../packages/device-api");
 
 var _deviceApiCalls = require("../deviceApiCalls/__generated__/deviceApiCalls");
+
+var _selectorsCss = require("../Form/selectors-css");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4555,6 +4535,55 @@ class InterfacePrototype {
     }
   }
   /**
+   * on macOS we try to detect if a click occurred within a form
+   * @param {PointerEvent} event
+   */
+
+
+  _onPointerDown(event) {
+    if (this.settings.featureToggles.credentials_saving) {
+      this._detectFormSubmission(event);
+    }
+  }
+  /**
+   * @param {PointerEvent} event
+   */
+
+
+  _detectFormSubmission(event) {
+    const matchingForm = [...this.scanner.forms.values()].find(form => {
+      const btns = [...form.submitButtons]; // @ts-ignore
+
+      if (btns.includes(event.target)) return true; // @ts-ignore
+
+      if (btns.find(btn => btn.contains(event.target))) return true;
+    });
+    matchingForm === null || matchingForm === void 0 ? void 0 : matchingForm.submitHandler();
+
+    if (!matchingForm) {
+      var _event$target;
+
+      // check if the click happened on a button
+      const button =
+      /** @type HTMLElement */
+      (_event$target = event.target) === null || _event$target === void 0 ? void 0 : _event$target.closest(_selectorsCss.SUBMIT_BUTTON_SELECTOR);
+      if (!button) return;
+      const text = (0, _matching.removeExcessWhitespace)(button === null || button === void 0 ? void 0 : button.textContent);
+      const hasRelevantText = /(log|sign).?(in|up)|continue|next|submit/i.test(text);
+
+      if (hasRelevantText && text.length < 25) {
+        // check if there's a form with values
+        const filledForm = [...this.scanner.forms.values()].find(form => form.hasValues());
+
+        if (filledForm && (0, _autofillUtils.buttonMatchesFormType)(
+        /** @type HTMLElement */
+        button, filledForm)) {
+          filledForm === null || filledForm === void 0 ? void 0 : filledForm.submitHandler();
+        }
+      }
+    }
+  }
+  /**
    * This serves as a single place to create a default instance
    * of InterfacePrototype that can be useful in testing scenarios
    * @returns {InterfacePrototype}
@@ -4576,7 +4605,7 @@ class InterfacePrototype {
 var _default = InterfacePrototype;
 exports.default = _default;
 
-},{"../../packages/device-api":2,"../Form/formatters":19,"../Form/listenForFormSubmission":23,"../Form/matching":26,"../InputTypes/Credentials":29,"../PasswordGenerator":32,"../Scanner":33,"../Settings":34,"../UI/controllers/NativeUIController":39,"../autofill-utils":46,"../config":48,"../deviceApiCalls/__generated__/deviceApiCalls":50,"../deviceApiCalls/transports/transports":56}],16:[function(require,module,exports){
+},{"../../packages/device-api":2,"../Form/formatters":19,"../Form/listenForFormSubmission":23,"../Form/matching":26,"../Form/selectors-css":27,"../InputTypes/Credentials":29,"../PasswordGenerator":32,"../Scanner":33,"../Settings":34,"../UI/controllers/NativeUIController":39,"../autofill-utils":46,"../config":48,"../deviceApiCalls/__generated__/deviceApiCalls":50,"../deviceApiCalls/transports/transports":56}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4671,13 +4700,16 @@ class Form {
     this.categorizeInputs();
   }
   /**
-   * Checks if the form element contains the activeElement
+   * Checks if the form element contains the activeElement or the event target
    * @return {boolean}
+   * @param {KeyboardEvent | null} [e]
    */
 
 
-  hasFocus() {
-    return this.form.contains(document.activeElement);
+  hasFocus(e) {
+    return this.form.contains(document.activeElement) || this.form.contains(
+    /** @type HTMLElement */
+    e === null || e === void 0 ? void 0 : e.target);
   }
   /**
    * Checks that the form element doesn't contain an invalid field
@@ -4837,16 +4869,7 @@ class Form {
     const allButtons =
     /** @type {HTMLElement[]} */
     [...this.form.querySelectorAll(selector)];
-    return allButtons.filter(_autofillUtils.isLikelyASubmitButton) // filter out buttons of the wrong type - login buttons on a signup form, signup buttons on a login form
-    .filter(button => {
-      if (this.isLogin) {
-        return !/sign.?up/i.test(button.textContent || '');
-      } else if (this.isSignup) {
-        return !/(log|sign).?([io])n/i.test(button.textContent || '');
-      } else {
-        return true;
-      }
-    });
+    return allButtons.filter(btn => (0, _autofillUtils.isLikelyASubmitButton)(btn) && (0, _autofillUtils.buttonMatchesFormType)(btn, this));
   }
   /**
    * Executes a function on input elements. Can be limited to certain element types
@@ -6584,15 +6607,15 @@ const listenForGlobalFormSubmission = forms => {
         (_forms$get = forms.get(e.target)) === null || _forms$get === void 0 ? void 0 : _forms$get.submitHandler()
       );
     }, true);
-    window.addEventListener('keypress', e => {
+    window.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
-        const focusedForm = [...forms.values()].find(form => form.hasFocus());
+        const focusedForm = [...forms.values()].find(form => form.hasFocus(e));
         focusedForm === null || focusedForm === void 0 ? void 0 : focusedForm.submitHandler();
       }
     });
     const observer = new PerformanceObserver(list => {
       const entries = list.getEntries().filter(entry => // @ts-ignore why does TS not know about `entry.initiatorType`?
-      ['fetch', 'xmlhttprequest'].includes(entry.initiatorType) && entry.name.match(/login|sign-in|signin/));
+      ['fetch', 'xmlhttprequest'].includes(entry.initiatorType) && /login|sign-in|signin/.test(entry.name));
       if (!entries.length) return;
       const filledForm = [...forms.values()].find(form => form.hasValues());
       filledForm === null || filledForm === void 0 ? void 0 : filledForm.submitHandler();
@@ -6869,14 +6892,14 @@ const matchingConfiguration = {
         email: {
           match: '.mail\\b',
           skip: 'phone|name|reservation number',
-          forceUnknown: 'search|filter|subject|title|tab'
+          forceUnknown: 'search|filter|subject|title|\btab\b'
         },
         password: {
           match: 'password',
           forceUnknown: 'captcha|mfa|2fa|two factor'
         },
         username: {
-          match: '(user|account|apple|login)((.)?(name|id|login).?)?(.or.+)?$',
+          match: '(user|account|apple|login)((.)?(name|id|login).?)?(.or.+)?$|benutzername',
           forceUnknown: 'search'
         },
         // CC
@@ -8292,7 +8315,7 @@ const birthdayMonth = "\n[name=bday-month],\n[name=birthday_month], [name=birthd
 const birthdayYear = "\n[name=bday-year],\n[name=birthday_year], [name=birthday-year],\n[name=date_of_birth_year], [name=date-of-birth-year],\n[name^=birthdate_y], [name^=birthdate-y],\n[aria-label=\"birthday\" i][placeholder=\"year\" i]";
 const username = ["".concat(GENERIC_TEXT_FIELD, "[autocomplete^=user]"), "input[name=username i]", // fix for `aa.com`
 "input[name=\"loginId\" i]", // fix for https://online.mbank.pl/pl/Login
-"input[name=\"userID\" i]", "input[id=\"login-id\" i]", "input[name=accountname i]"]; // todo: these are still used directly right now, mostly in scanForInputs
+"input[name=\"userID\" i]", "input[id=\"login-id\" i]", "input[name=accountname i]", "input[autocomplete=username]"]; // todo: these are still used directly right now, mostly in scanForInputs
 // todo: ensure these can be set via configuration
 
 module.exports.FORM_INPUTS_SELECTOR = FORM_INPUTS_SELECTOR;
@@ -10038,14 +10061,12 @@ class OverlayUIController extends _UIController.UIController {
   /** @type {import('../HTMLTooltip.js').HTMLTooltip | null} */
 
   /**
-   * @type {OverlayControllerOptions}
-   */
-
-  /**
    * @param {OverlayControllerOptions} options
    */
   constructor(options) {
-    super();
+    super(options); // We always register this 'pointerdown' event, regardless of
+    // whether we have a tooltip currently open or not. This is to ensure
+    // we can clear out any existing state before opening a new one.
 
     _classPrivateFieldInitSpec(this, _state, {
       writable: true,
@@ -10053,12 +10074,6 @@ class OverlayUIController extends _UIController.UIController {
     });
 
     _defineProperty(this, "_activeTooltip", null);
-
-    _defineProperty(this, "_options", void 0);
-
-    this._options = options; // We always register this 'pointerdown' event, regardless of
-    // whether we have a tooltip currently open or not. This is to ensure
-    // we can clear out any existing state before opening a new one.
 
     window.addEventListener('pointerdown', this, true);
   }
@@ -10225,6 +10240,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.UIController = void 0;
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /**
  * @typedef AttachArgs The argument required to 'attach' a tooltip
  * @property {import("../../Form/Form").Form} form the Form that triggered this 'attach' call
@@ -10240,12 +10257,42 @@ exports.UIController = void 0;
  */
 class UIController {
   /**
+   * @type {any}
+   */
+
+  /**
+   * @param {any} [options]
+   */
+  constructor(options) {
+    _defineProperty(this, "_options", void 0);
+
+    this._options = options; // We always register this 'pointerdown' event, regardless of
+    // whether we have a tooltip currently open or not. This is to ensure
+    // we can clear out any existing state before opening a new one.
+
+    window.addEventListener('pointerdown', this, true);
+  }
+
+  handleEvent(event) {
+    switch (event.type) {
+      case 'pointerdown':
+        {
+          var _this$_options$onPoin, _this$_options;
+
+          (_this$_options$onPoin = (_this$_options = this._options).onPointerDown) === null || _this$_options$onPoin === void 0 ? void 0 : _this$_options$onPoin.call(_this$_options, event);
+          break;
+        }
+    }
+  }
+  /**
    * Implement this method to control what happen when Autofill
    * has enough information to 'attach' a tooltip.
    *
    * @param {AttachArgs} _args
    * @returns {void}
    */
+
+
   attach(_args) {
     throw new Error('must implement attach');
   }
@@ -10522,7 +10569,7 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.autofillEnabled = exports.addInlineStyles = exports.SIGN_IN_MSG = exports.ADDRESS_DOMAIN = void 0;
+exports.buttonMatchesFormType = exports.autofillEnabled = exports.addInlineStyles = exports.SIGN_IN_MSG = exports.ADDRESS_DOMAIN = void 0;
 exports.escapeXML = escapeXML;
 exports.setValue = exports.sendAndWaitForAnswer = exports.safeExecute = exports.removeInlineStyles = exports.notifyWebApp = exports.isVisible = exports.isLikelyASubmitButton = exports.isEventWithinDax = exports.isAutofillEnabledFromProcessedConfig = exports.getDaxBoundingBox = exports.formatDuckAddress = void 0;
 
@@ -10888,8 +10935,26 @@ const isLikelyASubmitButton = el => {
   el.offsetHeight * el.offsetWidth >= 10000) && // it's a large element, at least 250x40px
   !SUBMIT_BUTTON_UNLIKELY_REGEX.test(contentExcludingLabel + ' ' + ariaLabel);
 };
+/**
+ * Check that a button matches the form type - login buttons on a login form, signup buttons on a signup form
+ * @param {HTMLElement} el
+ * @param {import('./Form/Form').Form} formObj
+ */
+
 
 exports.isLikelyASubmitButton = isLikelyASubmitButton;
+
+const buttonMatchesFormType = (el, formObj) => {
+  if (formObj.isLogin) {
+    return !/sign.?up/i.test(el.textContent || '');
+  } else if (formObj.isSignup) {
+    return !/(log|sign).?([io])n/i.test(el.textContent || '');
+  } else {
+    return true;
+  }
+};
+
+exports.buttonMatchesFormType = buttonMatchesFormType;
 
 },{"./Form/matching":26}],47:[function(require,module,exports){
 "use strict";
@@ -10903,8 +10968,18 @@ var _DeviceInterface = require("./DeviceInterface");
   if (!window.isSecureContext) return false;
 
   try {
-    const deviceInterface = (0, _DeviceInterface.createDevice)();
-    deviceInterface.init();
+    const startupAutofill = () => {
+      if (document.visibilityState === 'visible') {
+        const deviceInterface = (0, _DeviceInterface.createDevice)();
+        deviceInterface.init();
+      } else {
+        document.addEventListener('visibilitychange', startupAutofill, {
+          once: true
+        });
+      }
+    };
+
+    startupAutofill();
   } catch (e) {
     console.error(e); // Noop, we errored
   }
@@ -10944,9 +11019,16 @@ function createGlobalConfig() {
   // The native layer will inject a randomised secret here and use it to verify the origin
 
   let secret = 'PLACEHOLDER_SECRET';
-  let isDDGApp = /(iPhone|iPad|Android|Mac).*DuckDuckGo\/[0-9]/i.test(window.navigator.userAgent) || isApp || isTopFrame;
-  const isAndroid = isDDGApp && /Android/i.test(window.navigator.userAgent);
-  const isMobileApp = isDDGApp && !isApp;
+  /**
+   * The user agent check will not be needed here once `android` supports `userPreferences?.platform.name`
+   */
+  // @ts-ignore
+
+  const isAndroid = (userPreferences === null || userPreferences === void 0 ? void 0 : userPreferences.platform.name) === 'android' || /Android.*DuckDuckGo\/\d/i.test(window.navigator.userAgent); // @ts-ignore
+
+  const isDDGApp = ['ios', 'android', 'macos', 'windows'].includes(userPreferences === null || userPreferences === void 0 ? void 0 : userPreferences.platform.name) || isAndroid; // @ts-ignore
+
+  const isMobileApp = ['ios', 'android'].includes(userPreferences === null || userPreferences === void 0 ? void 0 : userPreferences.platform.name) || isAndroid;
   const isFirefox = navigator.userAgent.includes('Firefox');
   const isDDGDomain = Boolean(window.location.href.match(DDG_DOMAIN_REGEX));
   return {
@@ -11188,11 +11270,11 @@ class AndroidTransport extends _deviceApi.DeviceApiTransport {
       var _window$BrowserAutofi, _window$BrowserAutofi2;
 
       if (typeof ((_window$BrowserAutofi = window.BrowserAutofill) === null || _window$BrowserAutofi === void 0 ? void 0 : _window$BrowserAutofi.getAutofillData) !== 'function') {
-        throw new Error('window.BrowserAutofill.getAutofillData missing');
+        console.warn('window.BrowserAutofill.getAutofillData missing');
       }
 
       if (typeof ((_window$BrowserAutofi2 = window.BrowserAutofill) === null || _window$BrowserAutofi2 === void 0 ? void 0 : _window$BrowserAutofi2.storeFormData) !== 'function') {
-        throw new Error('window.BrowserAutofill.storeFormData missing');
+        console.warn('window.BrowserAutofill.storeFormData missing');
       }
     }
   }
