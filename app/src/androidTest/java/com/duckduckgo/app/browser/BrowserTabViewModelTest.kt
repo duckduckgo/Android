@@ -137,6 +137,7 @@ import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import org.mockito.kotlin.*
@@ -326,6 +327,9 @@ class BrowserTabViewModelTest {
     @Mock
     private lateinit var mockAdClickManager: AdClickManager
 
+    @Mock
+    private lateinit var mockSitePermissionsManager: SitePermissionsManager
+
     private lateinit var remoteMessagingModel: RemoteMessagingModel
 
     private val lazyFaviconManager = Lazy { mockFaviconManager }
@@ -478,7 +482,8 @@ class BrowserTabViewModelTest {
             voiceSearchPixelLogger = voiceSearchPixelLogger,
             settingsDataStore = mockSettingsDataStore,
             autofillStore = mockAutofillStore,
-            adClickManager = mockAdClickManager
+            adClickManager = mockAdClickManager,
+            sitePermissionsManager = mockSitePermissionsManager
         )
 
         testee.loadData("abc", null, false, false)

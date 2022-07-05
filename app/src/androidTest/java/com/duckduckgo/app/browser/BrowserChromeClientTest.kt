@@ -35,6 +35,7 @@ import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Drm
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import org.mockito.kotlin.*
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,6 +58,7 @@ class BrowserChromeClientTest {
     private lateinit var mockFileChooserParams: WebChromeClient.FileChooserParams
     private lateinit var mockDrm: Drm
     private lateinit var mockAppBuildConfig: AppBuildConfig
+    private lateinit var mockSitePermissionsManager: SitePermissionsManager
     private val fakeView = View(getInstrumentation().targetContext)
 
     @get:Rule
@@ -69,12 +71,14 @@ class BrowserChromeClientTest {
         mockUncaughtExceptionRepository = mock()
         mockDrm = mock()
         mockAppBuildConfig = mock()
+        mockSitePermissionsManager = mock()
         testee = BrowserChromeClient(
             mockUncaughtExceptionRepository,
             mockDrm,
             mockAppBuildConfig,
             TestScope(),
-            coroutineTestRule.testDispatcherProvider
+            coroutineTestRule.testDispatcherProvider,
+            mockSitePermissionsManager
         )
         mockWebViewClientListener = mock()
         mockFilePathCallback = mock()
@@ -218,6 +222,7 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://open.spotify.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(permissions)
+        whenever(mockSitePermissionsManager.getSitePermissionsFromRequest(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 
@@ -231,6 +236,7 @@ class BrowserChromeClientTest {
         whenever(mockPermission.resources).thenReturn(permissions)
         whenever(mockPermission.origin).thenReturn("https://www.example.com".toUri())
         whenever(mockDrm.getDrmPermissionsForRequest(any(), any())).thenReturn(arrayOf())
+        whenever(mockSitePermissionsManager.getSitePermissionsFromRequest(any(), any())).thenReturn(arrayOf())
 
         testee.onPermissionRequest(mockPermission)
 
