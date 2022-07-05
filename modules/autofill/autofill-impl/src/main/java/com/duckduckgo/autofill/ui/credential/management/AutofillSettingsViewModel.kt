@@ -62,13 +62,11 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun launchDeviceAuth() {
-        lock()
         addCommand(LaunchDeviceAuth)
     }
 
     fun lock() {
         if (!viewState.value.isLocked) {
-            addCommand(ShowLockedMode)
             _viewState.value = viewState.value.copy(isLocked = true)
         }
     }
@@ -153,7 +151,6 @@ class AutofillSettingsViewModel @Inject constructor(
         class ShowUserPasswordCopied : Command()
         data class ShowEditMode(val credentials: LoginCredentials) : Command()
         object ShowListMode : Command()
-        object ShowLockedMode : Command()
         object ShowDisabledMode : Command()
         object LaunchDeviceAuth : Command()
     }

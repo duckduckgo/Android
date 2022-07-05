@@ -64,18 +64,17 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
         observeViewModel()
-        viewModel.launchDeviceAuth()
         setTitle(R.string.managementScreenTitle)
     }
 
-    override fun onPause() {
-        super.onPause()
-        viewModel.lock()
+    override fun onStart() {
+        super.onStart()
+        viewModel.launchDeviceAuth()
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (!hasFocus) viewModel.lock()
+    override fun onStop() {
+        super.onStop()
+        viewModel.lock()
     }
 
     private fun launchDeviceAuth() {
@@ -85,8 +84,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                     viewModel.unlock()
                     showListMode()
                 } else {
-                    viewModel.lock()
-                    showLockMode()
+                    finish()
                 }
             }
         } else {
@@ -113,7 +111,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
-
+        if (state.isLocked) {
+            showLockMode()
+        }
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
@@ -124,7 +124,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
-            is ShowLockedMode -> showLockMode()
             is LaunchDeviceAuth -> launchDeviceAuth()
             else -> processed = false
         }
