@@ -304,14 +304,6 @@ class BrowserTabViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object Refresh : Command()
-        class Navigate(
-            val url: String,
-            val headers: Map<String, String>
-        ) : Command()
-
-        class NavigateBack(val steps: Int) : Command()
-        object NavigateForward : Command()
         class OpenInNewTab(
             val query: String,
             val sourceTabId: String? = null
@@ -429,8 +421,19 @@ class BrowserTabViewModel @Inject constructor(
 
         class EditWithSelectedQuery(val query: String) : Command()
         class ShowBackNavigationHistory(val history: List<NavigationHistoryEntry>) : Command()
-        class NavigateToHistory(val historyStackIndex: Int) : Command()
         object EmailSignEvent : Command()
+    }
+
+    sealed class NavigationCommand() : Command() {
+        class NavigateToHistory(val historyStackIndex: Int) : Command()
+        object Refresh : NavigationCommand()
+        class Navigate(
+            val url: String,
+            val headers: Map<String, String>
+        ) : NavigationCommand()
+
+        class NavigateBack(val steps: Int) : NavigationCommand()
+        object NavigateForward : NavigationCommand()
     }
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
@@ -847,7 +850,7 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
-                command.value = Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
+                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
 
@@ -983,9 +986,9 @@ class BrowserTabViewModel @Inject constructor(
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.NavigateForward)
         if (!currentBrowserViewState().browserShowing) {
             browserViewState.value = browserStateModifier.copyForBrowserShowing(currentBrowserViewState())
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         } else {
-            command.value = NavigateForward
+            command.value = NavigationCommand.NavigateForward
         }
     }
 
@@ -998,7 +1001,7 @@ class BrowserTabViewModel @Inject constructor(
         if (currentGlobalLayoutState() is Invalidated) {
             recoverTabWithQuery(url.orEmpty())
         } else {
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         }
     }
 
@@ -1023,7 +1026,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (navigation.canGoBack) {
-            command.value = NavigateBack(navigation.stepsToPreviousPage)
+            command.value = NavigationCommand.NavigateBack(navigation.stepsToPreviousPage)
             return true
         } else if (hasSourceTab) {
             viewModelScope.launch {
@@ -1934,7 +1937,7 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 addToWhitelist(domain)
             }
-            command.postValue(Refresh)
+            command.postValue(NavigationCommand.Refresh)
         }
     }
 
@@ -1965,7 +1968,7 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.insert(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = true)
-                command.value = Refresh
+                command.value = NavigationCommand.Refresh
             }
         }
     }
@@ -1975,7 +1978,7 @@ class BrowserTabViewModel @Inject constructor(
             userWhitelistDao.delete(domain)
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(isPrivacyProtectionEnabled = false)
-                command.value = Refresh
+                command.value = NavigationCommand.Refresh
             }
         }
     }
@@ -2086,9 +2089,9 @@ class BrowserTabViewModel @Inject constructor(
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
             Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
-            command.value = Navigate(desktopUrl, getUrlHeaders(desktopUrl))
+            command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
-            command.value = Refresh
+            command.value = NavigationCommand.Refresh
         }
     }
 
@@ -2129,7 +2132,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun historicalPageSelected(stackIndex: Int) {
-        command.value = NavigateToHistory(stackIndex)
+        command.value = NavigationCommand.NavigateToHistory(stackIndex)
     }
 
     private fun removeAtbAndSourceParamsFromSearch(url: String): String {

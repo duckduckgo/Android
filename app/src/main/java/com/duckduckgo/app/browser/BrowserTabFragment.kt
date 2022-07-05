@@ -157,13 +157,13 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.AccessibilityViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.AutoCompleteViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.BrowserViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.NavigateToHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.CtaViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.FindInPageViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.GlobalLayoutViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
@@ -755,13 +755,13 @@ class BrowserTabFragment :
     private fun processCommand(it: Command?) {
         Timber.i("Lottie: command $it")
         if (it !is Command.DaxCommand) {
-            if (it is Command.Refresh || it is Command.NavigateForward || it is Command.Navigate || it is Command.NavigateBack) {
+            if (it is NavigationCommand) {
                 Timber.i("Lottie: will cancel animations $it")
                 renderer.cancelTrackersAnimation()
             }
         }
         when (it) {
-            is Command.Refresh -> refresh()
+            is NavigationCommand.Refresh -> refresh()
             is Command.OpenInNewTab -> {
                 browserActivity?.openInNewTab(it.query, it.sourceTabId)
             }
@@ -779,15 +779,15 @@ class BrowserTabFragment :
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
             is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
-            is Command.Navigate -> {
+            is NavigationCommand.Navigate -> {
                 dismissAppLinkSnackBar()
                 navigate(it.url, it.headers)
             }
-            is Command.NavigateBack -> {
+            is NavigationCommand.NavigateBack -> {
                 dismissAppLinkSnackBar()
                 webView?.goBackOrForward(-it.steps)
             }
-            is Command.NavigateForward -> {
+            is NavigationCommand.NavigateForward -> {
                 dismissAppLinkSnackBar()
                 webView?.goForward()
             }
@@ -895,7 +895,7 @@ class BrowserTabFragment :
                 omnibarTextInput.setSelection(it.query.length)
             }
             is ShowBackNavigationHistory -> showBackNavigationHistory(it)
-            is NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
+            is NavigationCommand.NavigateToHistory -> navigateBackHistoryStack(it.historyStackIndex)
             is Command.EmailSignEvent -> {
                 notifyEmailSignEvent()
             }
