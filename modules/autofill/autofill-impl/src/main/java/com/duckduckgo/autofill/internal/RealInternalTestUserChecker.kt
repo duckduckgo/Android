@@ -17,6 +17,8 @@
 package com.duckduckgo.autofill.internal
 
 import androidx.core.net.toUri
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.InternalTestUserChecker
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.di.scopes.AppScope
@@ -32,13 +34,14 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class RealInternalTestUserChecker @Inject constructor(
-    private val internalTestUserStore: InternalTestUserStore
+    private val internalTestUserStore: InternalTestUserStore,
+    private val appBuildConfig: AppBuildConfig
 ) : InternalTestUserChecker {
 
     private var verificationErrorDetected = false
 
     override val isInternalTestUser: Boolean
-        get() = internalTestUserStore.isVerifiedInternalTestUser
+        get() = appBuildConfig.isInternalBuild() || internalTestUserStore.isVerifiedInternalTestUser
 
     override fun verifyVerificationErrorReceived(url: String) {
         /**
