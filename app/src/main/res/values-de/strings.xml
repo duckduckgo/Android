@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbindung getrennt. Diese Website könnte schädlich für dein Gerät sein.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Der Download-Manager ist deaktiviert</string>
-    <string name="downloadManagerIncompatible">Der Download-Manager ist auf diesem Gerät nicht verfügbar</string>
-    <string name="enable">Aktivieren</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Gerätestandort für DuckDuckGo Privacy Browser freigeben?</string>

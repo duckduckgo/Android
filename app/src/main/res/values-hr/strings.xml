@@ -575,10 +575,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Veza je prekinuta. Ovo mrežno mjesto može biti štetno za vaš uređaj.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Onemogućen je upravitelj preuzimanja</string>
-    <string name="downloadManagerIncompatible">Upravitelj preuzimanja nije dostupan na ovom uređaju</string>
-    <string name="enable">Omogući</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Omogućiti lokaciju uređaja za preglednik privatnosti DuckDuckGo?</string>

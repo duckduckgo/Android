@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Връзката е прекъсната. Този уебсайт може да навреди на вашето устройство.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Управлението на изтеглени файлове е деактивирано</string>
-    <string name="downloadManagerIncompatible">Управлението на изтеглени файлове не е налично на това устройство</string>
-    <string name="enable">Активиране</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Да се активира ли местоположение на устройството за поверителния браузър на DuckDuckGo?</string>
