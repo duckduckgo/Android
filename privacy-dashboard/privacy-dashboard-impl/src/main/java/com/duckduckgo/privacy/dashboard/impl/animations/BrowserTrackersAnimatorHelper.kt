@@ -22,7 +22,6 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.mobile.android.ui.store.AppTheme
 import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper

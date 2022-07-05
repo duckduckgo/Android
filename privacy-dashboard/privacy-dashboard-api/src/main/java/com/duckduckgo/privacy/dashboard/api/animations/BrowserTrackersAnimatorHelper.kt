@@ -17,7 +17,6 @@
 package com.duckduckgo.privacy.dashboard.api.animations
 
 import android.view.View
-import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.trackerdetection.model.Entity
 
