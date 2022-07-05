@@ -13,8 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -40,8 +39,9 @@
             style="@style/TextAppearance.DuckDuckGo.Headline2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="80dp"
+            android:layout_marginHorizontal="@dimen/keyline_6"
             android:layout_marginTop="@dimen/keyline_2"
+            android:breakStrategy="balanced"
             android:gravity="center"
             android:text="@string/managementDisabledModeTitle"
             android:textColor="?attr/normalTextColor"
@@ -54,8 +54,9 @@
             style="@style/TextAppearance.DuckDuckGo.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="56dp"
+            android:layout_marginHorizontal="@dimen/keyline_6"
             android:layout_marginTop="@dimen/keyline_4"
+            android:breakStrategy="balanced"
             android:gravity="center"
             android:text="@string/managementDisabledModeSubtitle"
             android:textColor="?attr/secondaryTextColor"
@@ -69,8 +70,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_5"
-            android:paddingBottom="80dp"
             android:gravity="center"
+            android:paddingBottom="80dp"
             android:text="@string/managementDisabledModeCta"
             android:textColor="?attr/colorAccent"
             app:layout_constraintEnd_toEndOf="parent"
