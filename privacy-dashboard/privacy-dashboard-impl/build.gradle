@@ -29,7 +29,7 @@ dependencies {
     implementation project(path: ':privacy-dashboard-api')
     api project(path: ':browser-api')
 
-
+    implementation Google.dagger
     implementation AndroidX.appCompat
 
     implementation JakeWharton.timber

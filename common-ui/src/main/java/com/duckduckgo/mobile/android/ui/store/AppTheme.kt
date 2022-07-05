@@ -18,9 +18,10 @@ package com.duckduckgo.mobile.android.ui.store
 
 import android.content.Context
 import android.content.res.Configuration
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface AppTheme {
@@ -28,7 +29,8 @@ interface AppTheme {
     fun isLightModeEnabled(): Boolean
 }
 
-@ContributesBinding(ActivityScope::class)
+@ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class BrowserAppTheme @Inject constructor(
     private val context: Context,
     private val themeDataStore: ThemingDataStore

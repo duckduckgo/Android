@@ -16,6 +16,9 @@
 
 package com.duckduckgo.privacy.dashboard.api
 
-interface TrackersAnimatorListener {
-    fun onAnimationFinished()
+enum class PrivacyShield {
+    PROTECTED,
+    UNPROTECTED,
+    WARNING,
+    UNKNOWN
 }

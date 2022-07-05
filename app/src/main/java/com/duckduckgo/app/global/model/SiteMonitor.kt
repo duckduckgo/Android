@@ -28,10 +28,10 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyGrade.B
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.privacy.model.PrivacyShield
-import com.duckduckgo.app.privacy.model.PrivacyShield.PROTECTED
-import com.duckduckgo.app.privacy.model.PrivacyShield.UNKNOWN
-import com.duckduckgo.app.privacy.model.PrivacyShield.UNPROTECTED
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNKNOWN
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent

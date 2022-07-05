@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser
 
-import com.duckduckgo.privacy.dashboard.api.TrackersAnimatorListener
+import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
@@ -169,7 +169,6 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
-import com.duckduckgo.app.browser.R.raw
 import com.duckduckgo.app.downloads.DownloadsFileActions
 import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -178,10 +177,6 @@ import com.duckduckgo.app.cta.ui.DaxDialogCta.DaxTrackersBlockedCta
 import com.duckduckgo.app.global.FragmentViewModelFactory
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.playstore.PlayStoreUtils
-import com.duckduckgo.app.privacy.model.PrivacyShield.PROTECTED
-import com.duckduckgo.app.privacy.model.PrivacyShield.UNKNOWN
-import com.duckduckgo.app.privacy.model.PrivacyShield.UNPROTECTED
-import com.duckduckgo.app.privacy.model.PrivacyShield.WARNING
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -196,6 +191,7 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
+import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldView
 import com.duckduckgo.privacy.dashboard.impl.animations.BrowserLottieTrackersAnimatorHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.view_tracker_animation.*
@@ -322,6 +318,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var printInjector: PrintInjector
+
+    @Inject
+    lateinit var privacyShieldView: PrivacyShieldView
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -2346,28 +2345,7 @@ class BrowserTabFragment :
                 val privacyShield = viewState.privacyShield
 
                 Timber.i("Shield: old $oldShield new $privacyShield ")
-                when (privacyShield) {
-                    PROTECTED -> {
-                        val res = if (appTheme.isLightModeEnabled()) raw.protected_shield else raw.dark_protected_shield
-                        shieldIcon.setAnimation(res)
-                        Timber.i("Shield: PROTECTED")
-                    }
-                    UNPROTECTED -> {
-                        val res = if (appTheme.isLightModeEnabled()) raw.unprotected_shield else raw.dark_unprotected_shield
-                        shieldIcon.setAnimation(res)
-                        shieldIcon.progress = 1.0f
-                        Timber.i("Shield: UNPROTECTED")
-                    }
-                    UNKNOWN -> {
-                        Timber.i("Shield: UNKNOWN")
-                    }
-                    WARNING -> {
-                        val res = if (appTheme.isLightModeEnabled()) raw.unprotected_shield else raw.dark_unprotected_shield
-                        shieldIcon.setAnimation(res)
-                        shieldIcon.progress = 1.0f
-                        Timber.i("Shield: WARNING")
-                    }
-                }
+                privacyShieldView.setAnimationView(shieldIcon, privacyShield)
             }
         }
 

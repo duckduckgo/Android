@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.privacy.dashboard.api
+package com.duckduckgo.privacy.dashboard.api.animations
 
 import android.view.View
 import android.view.ViewGroup

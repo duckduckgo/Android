@@ -25,8 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.mobile.android.ui.store.AppTheme
-import com.duckduckgo.privacy.dashboard.api.BrowserTrackersAnimatorHelper
-import com.duckduckgo.privacy.dashboard.api.TrackersAnimatorListener
+import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
+import com.duckduckgo.privacy.dashboard.api.animations.TrackersAnimatorListener
 import com.duckduckgo.privacy.dashboard.impl.R
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.privacy.dashboard.impl.animations.TrackerLogo.LetterLogo

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.privacy.dashboard.api.animations
 
-enum class PrivacyGrade {
-    A,
-    B_PLUS,
-    B,
-    C_PLUS,
-    C,
-    D,
-    UNKNOWN
+interface TrackersAnimatorListener {
+    fun onAnimationFinished()
 }
