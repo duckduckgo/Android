@@ -36,15 +36,15 @@ class SitePermissionsManagerImp @Inject constructor(
     override fun getPermissionsAllowedToAsk(request: PermissionRequest): Array<String> {
         val permissionsAllowToAsk: MutableList<String> = mutableListOf()
         request.resources.forEach { permission ->
-            when(permission) {
+            when (permission) {
                 PermissionRequest.RESOURCE_VIDEO_CAPTURE -> {
-                    //TODO if (!always deny) {
-                        permissionsAllowToAsk.add(permission)
+                    // TODO if (!always deny) {
+                    permissionsAllowToAsk.add(permission)
                     // }
                 }
                 PermissionRequest.RESOURCE_AUDIO_CAPTURE -> {
-                    //TODO if (!always deny) {
-                        permissionsAllowToAsk.add(permission)
+                    // TODO if (!always deny) {
+                    permissionsAllowToAsk.add(permission)
                     // }
                 }
             }

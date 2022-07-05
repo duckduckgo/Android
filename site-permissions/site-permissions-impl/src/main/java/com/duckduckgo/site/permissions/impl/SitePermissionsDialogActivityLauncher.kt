@@ -96,18 +96,15 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun askForMicAndCameraPermissions() {
+        permissionRequested = SitePermissionsRequestedType.CAMERA_AND_AUDIO
         when {
             systemPermissionsHelper.hasMicPermissionsGranted() && systemPermissionsHelper.hasCameraPermissionsGranted() -> {
                 systemPermissionGranted(SitePermissionsRequestedType.CAMERA_AND_AUDIO)
             }
             systemPermissionsHelper.hasMicPermissionsGranted() -> {
-                systemPermissionGranted(SitePermissionsRequestedType.AUDIO)
-                permissionRequested = SitePermissionsRequestedType.CAMERA
                 systemPermissionsHelper.requestPermission(Manifest.permission.CAMERA)
             }
             systemPermissionsHelper.hasCameraPermissionsGranted() -> {
-                systemPermissionGranted(SitePermissionsRequestedType.CAMERA)
-                permissionRequested = SitePermissionsRequestedType.AUDIO
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
@@ -116,7 +113,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
                 )
             }
             else -> {
-                permissionRequested = SitePermissionsRequestedType.CAMERA_AND_AUDIO
                 systemPermissionsHelper.requestMultiplePermissions(
                     arrayOf(
                         Manifest.permission.RECORD_AUDIO,
@@ -129,19 +125,19 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun askForMicPermissions() {
+        permissionRequested = SitePermissionsRequestedType.AUDIO
         if (systemPermissionsHelper.hasMicPermissionsGranted()) {
             systemPermissionGranted(SitePermissionsRequestedType.AUDIO)
         } else {
-            permissionRequested = SitePermissionsRequestedType.AUDIO
             systemPermissionsHelper.requestMultiplePermissions(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.MODIFY_AUDIO_SETTINGS))
         }
     }
 
     private fun askForCameraPermissions() {
+        permissionRequested = SitePermissionsRequestedType.CAMERA
         if (systemPermissionsHelper.hasCameraPermissionsGranted()) {
             systemPermissionGranted(SitePermissionsRequestedType.CAMERA)
         } else {
-            permissionRequested = SitePermissionsRequestedType.CAMERA
             systemPermissionsHelper.requestPermission(Manifest.permission.CAMERA)
         }
     }
@@ -154,11 +150,10 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun onResultMultipleSystemPermissionsRequest(grantedPermissions: Map<String, Boolean>) {
-        grantedPermissions.entries.forEach {
-            when (it.value) {
-                true -> systemPermissionGranted(SitePermissionsRequestedType.convertSystemPermissionToType(it.key))
-                false -> systemPermissionDenied(SitePermissionsRequestedType.convertSystemPermissionToType(it.key))
-            }
+        if (grantedPermissions.values.contains(false)) {
+            systemPermissionDenied(permissionRequested)
+        } else {
+            systemPermissionGranted(permissionRequested)
         }
     }
 
@@ -173,7 +168,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun systemPermissionDenied(permissionType: SitePermissionsRequestedType) {
-        //TODO show correct snackbar
+        // TODO show correct snackbar
         val message =
             when (permissionType) {
                 SitePermissionsRequestedType.CAMERA -> "Camera denied"

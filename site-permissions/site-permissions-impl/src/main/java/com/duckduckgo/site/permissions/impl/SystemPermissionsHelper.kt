@@ -25,7 +25,6 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -74,7 +73,7 @@ class SystemPermissionsHelperImp @Inject constructor(
 
     override fun requestPermission(permission: String) {
         if (this::permissionLauncher.isInitialized) {
-                permissionLauncher.launch(permission)
+            permissionLauncher.launch(permission)
         } else {
             throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")
         }

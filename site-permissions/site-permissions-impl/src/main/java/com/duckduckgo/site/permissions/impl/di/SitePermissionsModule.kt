@@ -22,5 +22,4 @@ import dagger.Module
 
 @Module
 @ContributesTo(AppScope::class)
-object SitePermissionsModule {
-}
+object SitePermissionsModule
