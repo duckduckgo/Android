@@ -76,16 +76,6 @@
                         app:layout_constraintStart_toStartOf="@id/omniBarContainer"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/animationContainer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:paddingStart="10dp"
-                        app:layout_constraintBottom_toBottomOf="@id/omnibarIconContainer"
-                        app:layout_constraintStart_toStartOf="@id/omnibarIconContainer"
-                        app:layout_constraintTop_toTopOf="@id/omnibarIconContainer"
-                        tools:ignore="RtlSymmetry"></androidx.constraintlayout.widget.ConstraintLayout>
-
                     <FrameLayout
                         android:id="@+id/omnibarIconContainer"
                         android:layout_width="wrap_content"
@@ -114,17 +104,6 @@
                             android:gravity="center"
                             android:padding="4dp"
                             android:src="@drawable/ic_ddg_logo"
-                            android:visibility="gone" />
-
-                        <ImageButton
-                            android:id="@+id/privacyGradeButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/privacyGradeContentDescription"
-                            android:gravity="center"
-                            android:padding="4dp"
-                            android:src="@drawable/privacygrade_icon_loading"
                             android:visibility="gone" />
 
                         <ImageView

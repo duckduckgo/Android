@@ -31,8 +31,7 @@ interface BrowserTrackersAnimatorHelper {
     )
 
     fun cancelAnimations(
-        omnibarViews: List<View>,
-        container: ViewGroup
+        omnibarViews: List<View>
     )
     fun setListener(animatorListener: TrackersAnimatorListener)
     fun removeListener()

@@ -126,13 +126,11 @@ class BrowserLottieTrackersAnimatorHelper(
     }
 
     override fun cancelAnimations(
-        omnibarViews: List<View>,
-        container: ViewGroup
+        omnibarViews: List<View>
     ) {
         Timber.i("Lottie: cancelAnimations")
         stopTrackersAnimation()
         omnibarViews.forEach { it.alpha = 1f }
-        container.alpha = 0f
     }
 
     override fun finishPartialTrackerAnimation() {
