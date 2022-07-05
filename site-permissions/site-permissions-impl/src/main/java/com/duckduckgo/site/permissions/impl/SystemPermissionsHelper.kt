@@ -43,7 +43,7 @@ interface SystemPermissionsHelper {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleInstanceIn(ActivityScope::class)
 class SystemPermissionsHelperImp @Inject constructor(
     private val context: Context
 ) : SystemPermissionsHelper {
@@ -76,7 +76,7 @@ class SystemPermissionsHelperImp @Inject constructor(
         if (this::permissionLauncher.isInitialized) {
                 permissionLauncher.launch(permission)
         } else {
-            throw IllegalAccessException("You need to registerPermissionLaunchers() before calling requestPermission")
+            throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestPermission()")
         }
     }
 
@@ -84,7 +84,7 @@ class SystemPermissionsHelperImp @Inject constructor(
         if (this::multiplePermissionsLauncher.isInitialized) {
             multiplePermissionsLauncher.launch(permissions)
         } else {
-            throw IllegalAccessException("You need to registerPermissionLaunchers() before calling requestMultiplePermissions")
+            throw IllegalAccessException("registerPermissionLaunchers() needs to be called before requestMultiplePermissions()")
         }
     }
 }
