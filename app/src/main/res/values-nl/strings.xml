@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Verbinding verbroken. Deze website kan schadelijk zijn voor je apparaat.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Downloadbeheerder is uitgeschakeld</string>
-    <string name="downloadManagerIncompatible">Downloadbeheerder is niet beschikbaar op dit apparaat</string>
-    <string name="enable">Inschakelen</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Apparaatlocatie inschakelen voor DuckDuckGo Privacy Browser?</string>
