@@ -33,7 +33,6 @@ dependencies {
     implementation project(path: ':device-auth-api')
     implementation project(path: ':browser-api')
     api project(path: ':autofill-store')
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
