@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Connessione interrotta. Questo sito Web potrebbe essere pericoloso per il tuo dispositivo.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Il Gestore di download è disattivato</string>
-    <string name="downloadManagerIncompatible">Il Gestore di download non è disponibile su questo dispositivo</string>
-    <string name="enable">Attiva</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Consentire la localizzazione del dispositivo per DuckDuckGo Privacy Browser?</string>
