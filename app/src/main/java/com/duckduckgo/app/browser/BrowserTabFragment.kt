@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import android.content.pm.ResolveInfo
 import android.print.PrintAttributes
 import android.print.PrintManager
+import android.webkit.PermissionRequest
 import android.webkit.URLUtil
 import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
@@ -524,6 +525,7 @@ class BrowserTabFragment :
                 else -> resumeWebView()
             }
         }
+        sitePermissionsDialogLauncher.registerPermissionLauncher(this)
     }
 
     private fun resumeWebView() {
@@ -980,7 +982,7 @@ class BrowserTabFragment :
                 notifyEmailSignEvent()
             }
             is Command.PrintLink -> launchPrint(it.url)
-            is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest)
+            is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
             else -> {
                 // NO OP
             }
@@ -3018,8 +3020,8 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showSitePermissionsDialog(permissionsToRequest: Array<String>) {
-        sitePermissionsDialogLauncher.askForSitePermission(requireContext(), webView?.url ?: "", permissionsToRequest)
+    private fun showSitePermissionsDialog(permissionsToRequest: Array<String>, request: PermissionRequest) {
+        sitePermissionsDialogLauncher.askForSitePermission(requireContext(), webView?.url ?: "", permissionsToRequest, request)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {

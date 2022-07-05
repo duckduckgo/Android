@@ -19,24 +19,72 @@ package com.duckduckgo.site.permissions.impl
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.activity.result.ActivityResultCaller
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SystemPermissionsHelper {
     fun hasMicPermissionsGranted(): Boolean
     fun hasCameraPermissionsGranted(): Boolean
+    fun registerPermissionLaunchers(
+        caller: ActivityResultCaller,
+        onResultPermissionRequest: (Boolean) -> Unit,
+        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit
+    )
+    fun requestPermission(permission: String)
+    fun requestMultiplePermissions(permissions: Array<String>)
 }
 
 @ContributesBinding(ActivityScope::class)
+@SingleInstanceIn(AppScope::class)
 class SystemPermissionsHelperImp @Inject constructor(
     private val context: Context
-): SystemPermissionsHelper {
+) : SystemPermissionsHelper {
+
+    private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private lateinit var multiplePermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     override fun hasMicPermissionsGranted(): Boolean =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED
 
     override fun hasCameraPermissionsGranted(): Boolean =
         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+    override fun registerPermissionLaunchers(
+        caller: ActivityResultCaller,
+        onResultPermissionRequest: (Boolean) -> Unit,
+        onResultMultiplePermissionsRequest: (Map<String, Boolean>) -> Unit
+    ) {
+        permissionLauncher = caller.registerForActivityResult(RequestPermission()) {
+            onResultPermissionRequest.invoke(it)
+        }
+
+        multiplePermissionsLauncher = caller.registerForActivityResult(RequestMultiplePermissions()) {
+            onResultMultiplePermissionsRequest(it)
+        }
+    }
+
+    override fun requestPermission(permission: String) {
+        if (this::permissionLauncher.isInitialized) {
+                permissionLauncher.launch(permission)
+        } else {
+            throw IllegalAccessException("You need to registerPermissionLaunchers() before calling requestPermission")
+        }
+    }
+
+    override fun requestMultiplePermissions(permissions: Array<String>) {
+        if (this::multiplePermissionsLauncher.isInitialized) {
+            multiplePermissionsLauncher.launch(permissions)
+        } else {
+            throw IllegalAccessException("You need to registerPermissionLaunchers() before calling requestMultiplePermissions")
+        }
+    }
 }
