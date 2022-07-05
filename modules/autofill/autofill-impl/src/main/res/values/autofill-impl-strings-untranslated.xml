@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2022 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="management_locked_mode_text">Unlock Autofill</string>
+
+    <string name="management_disabled_mode_cta"><b>Set up in Settings</b></string>
+    <string name="management_disabled_mode_subtitle">A device lock pattern, PIN, or biometrics are required to protect your Autofill Login details.</string>
+    <string name="management_disabled_mode_title">Secure your device to use Autofill</string>
+
+    <string name="save_login_dialog_title">Save Login?</string>
+    <string name="save_login_dialog_button_save">Save Login</string>
+    <string name="save_login_dialog_button_not_now">Not Now</string>
+
+    <string name="use_saved_login_dialog_title">Use Saved Login?</string>
+
+    <string name="update_login_dialog_title">Update Password?</string>
+    <string name="update_login_dialog_update_button_update_password">Update Password</string>
+    <string name="update_login_dialog_button_not_now">Now Now</string>
+
+    <string name="credential_management_edit_username_hint">Username</string>
+    <string name="credential_management_edit_password_hint">Password</string>
+    <string name="credential_management_edit_website_hint">Website</string>
+    <string name="credential_management_edit_delete_button">Delete</string>
+    <string name="credential_management_edit_save_changes_button">Save Changes</string>
+    <string name="credential_management_edit_copy_username_button">Copy Username</string>
+    <string name="credential_management_edit_copy_password_button">Copy Password</string>
+
+    <string name="credential_management_autofill_toggle_label">Save and Autofill Logins</string>
+
+</resources>

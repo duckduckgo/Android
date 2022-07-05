@@ -31,7 +31,7 @@
 
 
         <com.google.android.material.textfield.TextInputLayout
-            android:hint="Username"
+            android:hint="@string/credential_management_edit_username_hint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -44,7 +44,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:hint="Password"
+            android:hint="@string/credential_management_edit_password_hint"
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -57,7 +57,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:hint="Website"
+            android:hint="@string/credential_management_edit_website_hint"
             android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -76,13 +76,13 @@
 
         <Button
             android:id="@+id/deleteButton"
-            android:text="Delete"
+            android:text="@string/credential_management_edit_delete_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/saveButton"
-            android:text="Save Changes"
+            android:text="@string/credential_management_edit_save_changes_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -96,13 +96,13 @@
 
             <Button
                 android:id="@+id/copyUsernameButton"
-                android:text="Copy Username"
+                android:text="@string/credential_management_edit_copy_username_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <Button
                 android:id="@+id/copyPasswordButton"
-                android:text="Copy Password"
+                android:text="@string/credential_management_edit_copy_password_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
