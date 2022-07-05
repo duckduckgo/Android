@@ -575,10 +575,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Spojenie bolo prerušené. Táto webová stránka môže byť pre vaše zariadenie škodlivá.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Správca sťahovania je zakázaný</string>
-    <string name="downloadManagerIncompatible">Správca sťahovania nie je na tomto zariadení k dispozícií</string>
-    <string name="enable">Povoliť</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Povoliť polohu zariadenia pre súkromný prehliadač DuckDuckGo?</string>

@@ -575,10 +575,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Połączenie nie powiodło się. Ta strona może być szkodliwa dla Twojego urządzenia.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Wyłączono Menedżera pobierania</string>
-    <string name="downloadManagerIncompatible">Menedżer pobierania nie jest dostępny na tym urządzeniu</string>
-    <string name="enable">Włącz</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Udostępnić lokalizację urządzenia przeglądarce prywatności DuckDuckGo?</string>
