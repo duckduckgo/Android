@@ -37,9 +37,6 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
-    anvil project(path: ':anvil-compiler')
-    implementation project(path: ':anvil-annotations')
-
     implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
@@ -49,12 +46,6 @@ dependencies {
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
     implementation "androidx.webkit:webkit:_"
-
-    testImplementation (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
 
     implementation Square.retrofit2.converter.moshi
     implementation Square.okHttp3.okHttp
@@ -66,7 +57,6 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
 
     // Testing dependencies
-    testImplementation project(path: ':common-test')
     testImplementation AndroidX.work.testing
     testImplementation AndroidX.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -81,6 +71,13 @@ dependencies {
 
     androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
+
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
 }
 
 android {
