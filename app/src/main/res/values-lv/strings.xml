@@ -569,10 +569,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Savienojums pārtraukts. Šī vietne var kaitēt tavai ierīcei.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Lejupielāžu pārvaldnieks ir atspējots</string>
-    <string name="downloadManagerIncompatible">Lejupielāžu pārvaldnieks šajā ierīcē nav pieejams</string>
-    <string name="enable">Iespējot</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vai iespējot ierīces atrašanās vietu DuckDuckGo privātuma pārlūkprogrammai?</string>

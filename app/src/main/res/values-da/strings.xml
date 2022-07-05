@@ -563,10 +563,7 @@
     <!-- Dos Attack error-->
     <string name="dosErrorMessage">Forbindelse blev afbrudt. Dette websted kan være skadeligt for din enhed.</string>
 
-    <!-- Download Manager problems -->
-    <string name="downloadManagerDisabled">Download Manager er deaktiveret</string>
-    <string name="downloadManagerIncompatible">Download Manager er ikke tilgængelig på denne enhed</string>
-    <string name="enable">Aktiver</string>
+
 
     <!-- Precise Location -->
     <string name="preciseLocationSystemDialogTitle">Vil du aktivere enhedsplacering for DuckDuckGo-databeskyttelsesbrowser?</string>
