@@ -1,3 +1,9 @@
 package com.duckduckgo.autoconsent.api
 
-interface Autoconsent
+import android.webkit.WebView
+
+interface Autoconsent {
+    fun injectAutoconsent(webView: WebView)
+
+    fun addJsInterface(webView: WebView)
+}

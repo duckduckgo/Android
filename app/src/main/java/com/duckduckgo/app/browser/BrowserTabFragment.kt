@@ -181,6 +181,7 @@ import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.voice.api.VoiceSearchLauncher
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
@@ -315,6 +316,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var printInjector: PrintInjector
+
+    @Inject
+    lateinit var autoconsent: Autoconsent
 
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
@@ -1505,6 +1509,7 @@ class BrowserTabFragment :
             blobConverterInjector.addJsInterface(it) { url, mimeType -> viewModel.requestFileDownload(url, null, mimeType, true) }
             emailInjector.addJsInterface(it) { viewModel.showEmailTooltip() }
             printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+            autoconsent.addJsInterface(it)
         }
 
         if (appBuildConfig.isDebug) {

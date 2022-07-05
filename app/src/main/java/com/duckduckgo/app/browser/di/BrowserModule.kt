@@ -78,6 +78,7 @@ import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -130,7 +131,8 @@ class BrowserModule {
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
         ampLinks: AmpLinks,
-        printInjector: PrintInjector
+        printInjector: PrintInjector,
+        autoconsent: Autoconsent
     ): BrowserWebViewClient {
         return BrowserWebViewClient(
             webViewHttpAuthStore,
@@ -150,7 +152,8 @@ class BrowserModule {
             emailInjector,
             accessibilityManager,
             ampLinks,
-            printInjector
+            printInjector,
+            autoconsent
         )
     }
 

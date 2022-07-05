@@ -42,6 +42,7 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
 import com.duckduckgo.app.global.exception.UncaughtExceptionSource.*
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
+import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.AmpLinks
 import kotlinx.coroutines.*
@@ -66,7 +67,8 @@ class BrowserWebViewClient(
     private val emailInjector: EmailInjector,
     private val accessibilityManager: AccessibilityManager,
     private val ampLinks: AmpLinks,
-    private val printInjector: PrintInjector
+    private val printInjector: PrintInjector,
+    private val autoconsent: Autoconsent
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -241,6 +243,7 @@ class BrowserWebViewClient(
         try {
             Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
             url?.let {
+                autoconsent.injectAutoconsent(webView)
                 appCoroutineScope.launch(dispatcherProvider.default()) {
                     thirdPartyCookieManager.processUriForThirdPartyCookies(webView, url.toUri())
                 }

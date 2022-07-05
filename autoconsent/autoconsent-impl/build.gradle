@@ -72,6 +72,16 @@ dependencies {
 }
 
 android {
+    sourceSets {
+        main {
+            java {
+                resources {
+                    srcDirs += files("$projectDir/../node_modules/@duckduckgo/autoconsent/".toString())
+                    srcDirs += files("libs/")
+                }
+            }
+        }
+    }
     anvil {
         generateDaggerFactories = true // default is false
     }
