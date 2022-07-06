@@ -34,6 +34,7 @@ class ServiceWorkerLifecycleObserver @Inject constructor(
     private val uncaughtExceptionRepository: UncaughtExceptionRepository,
     private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
+    @Suppress("NewApi") // we use appBuildConfig
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 

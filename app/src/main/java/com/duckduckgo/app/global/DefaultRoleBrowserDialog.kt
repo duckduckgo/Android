@@ -38,6 +38,7 @@ class RealDefaultRoleBrowserDialog(
     /**
      * @return an Intent to launch the role browser dialog
      */
+    @Suppress("NewApi") // we use appBuildConfig
     override fun createIntent(context: Context): Intent? {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             val roleManager = context.getSystemService(RoleManager::class.java) ?: return null

@@ -58,6 +58,7 @@ class AppShortcutCreatorLifecycleObserver(
 ) : LifecycleObserver {
     @UiThread
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    @Suppress("NewApi") // we use appBuildConfig
     fun configureAppShortcuts() {
         Timber.i("Configure app shortcuts")
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N_MR1) {

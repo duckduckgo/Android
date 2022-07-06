@@ -356,6 +356,7 @@ class SettingsActivity :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultAppScreen() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             launchDefaultAppActivity()

@@ -206,6 +206,7 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         startActivityForResult(intent, DEFAULT_BROWSER_REQUEST_CODE_DIALOG)
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun onLaunchDefaultBrowserSettingsClicked() {
         userTriedToSetDDGAsDefault = true
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {

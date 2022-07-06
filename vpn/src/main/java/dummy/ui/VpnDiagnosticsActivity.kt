@@ -394,6 +394,7 @@ class VpnDiagnosticsActivity : DuckDuckGoActivity(), CoroutineScope by MainScope
         )
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun retrieveHistoricalCrashInfo(): AppExitHistory {
         if (appBuildConfig.sdkInt < 30) {
             return AppExitHistory()

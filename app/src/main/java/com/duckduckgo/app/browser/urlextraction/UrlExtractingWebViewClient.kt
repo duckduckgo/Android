@@ -30,7 +30,6 @@ import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.global.DispatcherProvider
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.privacy.config.api.Gpc
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -45,7 +44,6 @@ class UrlExtractingWebViewClient(
     private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val urlExtractor: DOMUrlExtractor,
-    private val appBuildConfig: AppBuildConfig
 ) : WebViewClient() {
 
     var urlExtractionListener: UrlExtractionListener? = null

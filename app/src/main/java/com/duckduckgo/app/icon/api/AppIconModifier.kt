@@ -85,6 +85,7 @@ class AppIconModifier @Inject constructor(
     private val appBuildConfig: AppBuildConfig
 ) : IconModifier {
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun changeIcon(
         previousIcon: AppIcon,
         newIcon: AppIcon

@@ -1082,6 +1082,7 @@ class BrowserTabFragment :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1927,6 +1928,7 @@ class BrowserTabFragment :
         return appBuildConfig.sdkInt >= Build.VERSION_CODES.Q
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun hasWriteStoragePermission(): Boolean {
         return minSdk29() ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -1969,6 +1971,7 @@ class BrowserTabFragment :
         playStoreUtils.launchPlayStore(appPackage)
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultBrowser() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             requireActivity().launchDefaultAppActivity()

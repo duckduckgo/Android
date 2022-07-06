@@ -71,6 +71,7 @@ class AndroidDeviceShieldAlertNotificationBuilder constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : DeviceShieldAlertNotificationBuilder {
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun registerAlertChannel(context: Context) {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

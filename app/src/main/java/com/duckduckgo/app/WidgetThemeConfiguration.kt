@@ -48,6 +48,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityWidgetConfigurationBinding.inflate(layoutInflater)

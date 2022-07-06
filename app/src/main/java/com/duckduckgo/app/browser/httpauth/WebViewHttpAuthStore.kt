@@ -97,6 +97,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun setHttpAuthUsernamePassword(
         webView: WebView,
         host: String,
@@ -111,6 +112,7 @@ class RealWebViewHttpAuthStore @Inject constructor(
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     override fun getHttpAuthUsernamePassword(
         webView: WebView,
         host: String,

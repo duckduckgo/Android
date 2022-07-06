@@ -418,6 +418,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun VpnService.Builder.configureMeteredConnection() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             setMetered(false)

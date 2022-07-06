@@ -40,6 +40,7 @@ class AppWidgetCapabilities @Inject constructor(
     override val supportsStandardWidgetAdd = true
 
     override val supportsAutomaticWidgetAdd: Boolean
+        @Suppress("NewApi") // we use appBuildConfig
         get() = appBuildConfig.sdkInt >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(context).isRequestPinAppWidgetSupported
 
     override val hasInstalledWidgets: Boolean

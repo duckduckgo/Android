@@ -92,6 +92,7 @@ class NotificationRegistrar @Inject constructor(
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    @Suppress("NewApi") // we use appBuildConfig
     fun updateNotificationStatus() {
         val systemEnabled = compatManager.areNotificationsEnabled()
         val allChannelsEnabled = when {
