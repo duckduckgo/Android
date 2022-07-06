@@ -128,6 +128,7 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER_VALUE
 import com.duckduckgo.privacy.config.impl.features.unprotectedtemporary.UnprotectedTemporary
 import com.duckduckgo.privacy.config.store.features.gpc.GpcRepository
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
 import com.duckduckgo.remote.messaging.api.Content
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
@@ -916,7 +917,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
+    fun whentrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = privacyShieldState().privacyShield
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
@@ -924,6 +925,19 @@ class BrowserTabViewModelTest {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
         }
         assertNotEquals(grade, privacyShieldState().privacyShield)
+    }
+
+    @Test
+    fun whenOnSiteChangedThenPrivacyGradeIsUpdated() {
+        givenCurrentSite("https://www.example.com/").also {
+            whenever(it.privacyProtection()).thenReturn(PROTECTED)
+        }
+        loadUrl("https://example.com")
+        val entity = TestEntity("Network1", "Network1", 10.0)
+        for (i in 1..10) {
+            testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
+        }
+        assertEquals(PROTECTED, privacyShieldState().privacyShield)
     }
 
     @Test
@@ -2474,7 +2488,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenBrowsingDDGSiteAndPrivacyGradeIsVisibleThenDaxIconIsVisible() {
+    fun whenBrowsingDDGSiteThenDaxIconIsVisible() {
         val url = "https://duckduckgo.com?q=test%20search"
         loadUrl(url, isBrowserShowing = true)
         assertTrue(browserViewState().showDaxIcon)
@@ -4118,7 +4132,7 @@ class BrowserTabViewModelTest {
 
     private fun givenLoginDetected(domain: String) = LoginDetected(authLoginDomain = "", forwardedToDomain = domain)
 
-    private fun givenCurrentSite(domain: String) {
+    private fun givenCurrentSite(domain: String): Site {
         val site: Site = mock()
         whenever(site.url).thenReturn(domain)
         whenever(site.uri).thenReturn(Uri.parse(domain))
@@ -4126,6 +4140,8 @@ class BrowserTabViewModelTest {
         siteLiveData.value = site
         whenever(mockTabRepository.retrieveSiteData("TAB_ID")).thenReturn(siteLiveData)
         testee.loadData("TAB_ID", domain, false, false)
+
+        return site
     }
 
     private fun givenRemoteMessagingModel(
