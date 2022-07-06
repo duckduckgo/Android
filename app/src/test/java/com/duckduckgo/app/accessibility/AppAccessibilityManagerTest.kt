@@ -37,16 +37,25 @@ class AppAccessibilityManagerTest {
     fun whenForceZoomEnabledThenJavaScriptInjected() {
         forceZoom(enabled = true)
 
-        appAccessibilityManager.onPageFinished(webView, "http://example.com")
+        appAccessibilityManager.onPageFinished(webView, "http://example.com", false)
 
         verify(webView).loadUrl(any())
+    }
+
+    @Test
+    fun whenForceZoomEnabledButDeskoptModeTrueThenNoInteractions() {
+        forceZoom(enabled = true)
+
+        appAccessibilityManager.onPageFinished(webView, "http://example.com", true)
+
+        verifyNoInteractions(webView)
     }
 
     @Test
     fun whenForceZoomDisabledThenNoInteractions() {
         forceZoom(enabled = false)
 
-        appAccessibilityManager.onPageFinished(webView, "http://example.com")
+        appAccessibilityManager.onPageFinished(webView, "http://example.com", false)
 
         verifyNoInteractions(webView)
     }
