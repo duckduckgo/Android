@@ -2493,6 +2493,8 @@ class BrowserTabFragment :
                     }
                 }
 
+                webViewClient.desktopMode = viewState.isDesktopBrowsingMode
+
                 renderToolbarMenus(viewState)
                 popupMenu.renderState(browserShowing, viewState)
                 renderFullscreenMode(viewState)

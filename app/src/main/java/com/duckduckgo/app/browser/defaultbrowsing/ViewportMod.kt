@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.accessibility
+package com.duckduckgo.app.browser.defaultbrowsing
 
 import android.webkit.WebView
-import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
-interface AccessibilityManager {
-    fun onPageFinished(
+interface ViewportMod {
+    fun onPageStarted(
         webView: WebView,
         url: String?,
         desktopMode: Boolean
     )
 }
 
-class AppAccessibilityManager(val accessibilitySettingsDataStore: AccessibilitySettingsDataStore) : AccessibilityManager {
-    override fun onPageFinished(
+@ContributesBinding(AppScope::class)
+class DesktopViewportMod @Inject constructor() : ViewportMod {
+    override fun onPageStarted(
         webView: WebView,
         url: String?,
         desktopMode: Boolean
     ) {
-        // when desktopMode enabled, zoom is always enabled (due to large viewport). No need to override
-        if (desktopMode) return
-
-        if (accessibilitySettingsDataStore.forceZoom) {
+        if (desktopMode) {
             webView.loadUrl(
                 "javascript:document.getElementsByName('viewport')[0].setAttribute('content', " +
-                    "'width=device-width,initial-scale=1.0,maximum-scale=10.0,user-scalable=yes');"
+                    "'width=980px');"
             )
         }
     }

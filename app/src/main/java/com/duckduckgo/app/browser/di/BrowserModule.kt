@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.AndroidDefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
+import com.duckduckgo.app.browser.defaultbrowsing.ViewportMod
 import com.duckduckgo.app.browser.downloader.*
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
@@ -129,6 +130,7 @@ class BrowserModule {
         dispatcherProvider: DispatcherProvider,
         emailInjector: EmailInjector,
         accessibilityManager: AccessibilityManager,
+        viewportMod: ViewportMod,
         ampLinks: AmpLinks,
         printInjector: PrintInjector
     ): BrowserWebViewClient {
@@ -149,6 +151,7 @@ class BrowserModule {
             dispatcherProvider,
             emailInjector,
             accessibilityManager,
+            viewportMod,
             ampLinks,
             printInjector
         )

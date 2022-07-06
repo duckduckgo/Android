@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationSt
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.defaultbrowsing.ViewportMod
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
@@ -65,12 +66,15 @@ class BrowserWebViewClient(
     private val dispatcherProvider: DispatcherProvider,
     private val emailInjector: EmailInjector,
     private val accessibilityManager: AccessibilityManager,
+    private val viewportMod: ViewportMod,
     private val ampLinks: AmpLinks,
     private val printInjector: PrintInjector
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
     private var lastPageStarted: String? = null
+
+    var desktopMode: Boolean = false
 
     /**
      * This is the new method of url overriding available from API 24 onwards
@@ -254,6 +258,7 @@ class BrowserWebViewClient(
             emailInjector.injectEmailAutofillJs(webView, url) // Needs to be injected onPageStarted
             injectGpcToDom(webView, url)
             loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
+            viewportMod.onPageStarted(webView, url, desktopMode)
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_STARTED)
@@ -268,7 +273,7 @@ class BrowserWebViewClient(
         url: String?
     ) {
         try {
-            accessibilityManager.onPageFinished(webView, url)
+            accessibilityManager.onPageFinished(webView, url, desktopMode)
             Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
             val navigationList = webView.safeCopyBackForwardList() ?: return
             webViewClientListener?.run {
