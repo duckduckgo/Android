@@ -5,34 +5,6 @@ plugins {
     id 'kotlin-android-extensions'
 }
 
-android {
-    compileSdkVersion 32
-
-    defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion 32
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-}
-
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
@@ -41,11 +13,16 @@ dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':secure-storage-api')
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation AndroidX.core.ktx
+    implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core
     implementation Google.android.material
     implementation project(path: ':secure-storage-api')
+
+    implementation Google.dagger
+    implementation JakeWharton.timber
+
+    // Testing dependencies
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {
@@ -53,15 +30,15 @@ dependencies {
         // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
-    implementation Google.dagger
-    implementation JakeWharton.timber
 }
 
 android {
     anvil {
         generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }

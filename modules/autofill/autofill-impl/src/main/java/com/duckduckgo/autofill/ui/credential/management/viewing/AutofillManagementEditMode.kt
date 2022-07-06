@@ -92,8 +92,6 @@ class AutofillManagementEditMode : Fragment() {
         val updatedCredentials = getCredentials().copy(
             username = binding.usernameEditText.text.toString(),
             password = binding.passwordEditText.text.toString(),
-            // domain = binding.,
-            // title = binding.titleEditText.text.toString()
         )
         viewModel.updateCredentials(updatedCredentials)
     }
@@ -109,7 +107,7 @@ class AutofillManagementEditMode : Fragment() {
     }
 
     private fun getCredentials(): LoginCredentials {
-        return requireArguments().getParcelable("creds")!!
+        return requireArguments().getParcelable(EXTRA_KEY_CREDENTIALS)!!
     }
 
     private fun observeViewModel() {
@@ -133,10 +131,13 @@ class AutofillManagementEditMode : Fragment() {
     }
 
     companion object {
+
+        private const val EXTRA_KEY_CREDENTIALS = "credentials"
+
         fun instance(credentials: LoginCredentials) =
             AutofillManagementEditMode().apply {
                 arguments = Bundle().apply {
-                    putParcelable("creds", credentials)
+                    putParcelable(EXTRA_KEY_CREDENTIALS, credentials)
                 }
             }
     }

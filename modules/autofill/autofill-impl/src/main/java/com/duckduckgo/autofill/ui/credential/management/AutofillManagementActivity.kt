@@ -140,7 +140,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         Timber.e("Show view mode")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            // addToBackStack(null)
             replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
         }
 
@@ -151,7 +150,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         Timber.e("Show edit mode")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            // addToBackStack(null)
             replace(R.id.fragment_container_view, AutofillManagementEditMode.instance(credentials))
         }
 
@@ -161,7 +159,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showLockMode() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            // addToBackStack(null)
             replace(
                 R.id.fragment_container_view,
                 AutofillManagementLockedMode.instance()
@@ -173,7 +170,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     private fun showDisabledMode() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            // addToBackStack(null)
             replace(R.id.fragment_container_view, AutofillManagementDisabledMode.instance())
         }
         inEditMode = false
