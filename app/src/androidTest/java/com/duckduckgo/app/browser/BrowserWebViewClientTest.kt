@@ -34,6 +34,7 @@ import com.duckduckgo.app.accessibility.AccessibilityManager
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.CookieManagerProvider
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
+import com.duckduckgo.app.browser.defaultbrowsing.ViewportMod
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
@@ -90,6 +91,7 @@ class BrowserWebViewClientTest {
     private val webResourceRequest: WebResourceRequest = mock()
     private val ampLinks: AmpLinks = mock()
     private val printInjector: PrintInjector = mock()
+    private val viewportMod: ViewportMod = mock()
 
     @UiThreadTest
     @Before
@@ -112,6 +114,7 @@ class BrowserWebViewClientTest {
             coroutinesTestRule.testDispatcherProvider,
             emailInjector,
             accessibilitySettings,
+            viewportMod,
             ampLinks,
             printInjector
         )
@@ -282,7 +285,7 @@ class BrowserWebViewClientTest {
     fun whenOnPageFinishedThenNotifyAccessibilityManager() {
         testee.onPageFinished(webView, "http://example.com")
 
-        verify(accessibilitySettings).onPageFinished(webView, "http://example.com")
+        verify(accessibilitySettings).onPageFinished(webView, "http://example.com", false)
     }
 
     @UiThreadTest
@@ -569,6 +572,15 @@ class BrowserWebViewClientTest {
         whenever(webResourceRequest.isForMainFrame).thenReturn(true)
         val mockWebView = mock<WebView>()
         assertFalse(testee.shouldOverrideUrlLoading(mockWebView, webResourceRequest))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenPageStartLoadingThenViewportModNotified() {
+        testee.desktopMode = true
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+
+        verify(viewportMod).onPageStarted(webView, EXAMPLE_URL, true)
     }
 
     private fun getImmediatelyInvokedMockWebView(): WebView {
