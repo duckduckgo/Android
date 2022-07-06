@@ -17,6 +17,7 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
@@ -24,12 +25,17 @@ import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.PROTECTED
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNKNOWN
+import com.duckduckgo.privacy.dashboard.api.PrivacyShield.UNPROTECTED
+import com.duckduckgo.trackerdetection.model.Entity
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class SiteMonitorTest {
@@ -231,4 +237,69 @@ class SiteMonitorTest {
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
     }
+
+    @Test
+    fun whenSiteBelongsToUserAllowListThenPrivacyShieldIsUnprotected() {
+        val testee = givenASiteMonitor(url = document)
+        whenever(mockWhitelistDao.contains(document)).thenReturn(true)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenSiteIsHttptThenPrivacyShieldIsUnprotected() {
+        val testee = givenASiteMonitor(url = httpDocument)
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenSiteIsNotExceptionOrHttpButFullDetailsNotAvailableThenReturnUnkown() {
+        val testee = givenASiteMonitor(url = httpsDocument)
+
+        assertEquals(UNKNOWN, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenSiteIsMajorNetworkThenPrivacyShieldIsUnprotected() {
+        val testee = givenASiteMonitor(url = httpsDocument)
+
+        testee.updatePrivacyData(givenSitePrivacyData(entity = majorNetwork))
+
+        assertEquals(UNPROTECTED, testee.privacyProtection())
+    }
+
+    @Test
+    fun whenPrivacyIssuesNotFoundThenPrivacyShieldIsProtected() {
+        val testee = givenASiteMonitor(url = httpsDocument)
+
+        testee.updatePrivacyData(givenSitePrivacyData(entity = network))
+
+        assertEquals(PROTECTED, testee.privacyProtection())
+    }
+
+    fun givenASiteMonitor(
+        url: String = document,
+        title: String? = null,
+        upgradedHttps: Boolean = false
+    ) = SiteMonitor(
+        url = url,
+        title = title,
+        upgradedHttps = upgradedHttps,
+        userWhitelistDao = mockWhitelistDao,
+        contentBlocking = mockContentBlocking,
+        appCoroutineScope = TestScope()
+    )
+
+    fun givenSitePrivacyData(
+        url: String = document,
+        practices: PrivacyPractices.Practices = unknownPractices,
+        entity: Entity? = null,
+        prevalence: Double? = null
+    ) = SitePrivacyData(
+        url = url,
+        practices = practices,
+        entity = entity,
+        prevalence = null
+    )
 }
