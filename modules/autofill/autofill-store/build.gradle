@@ -23,11 +23,6 @@ dependencies {
     implementation JakeWharton.timber
 
     // Testing dependencies
-    testImplementation project(path: ':common-test')
-    testImplementation AndroidX.work.testing
-    testImplementation AndroidX.room.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
     testImplementation (KotlinX.coroutines.test) {
