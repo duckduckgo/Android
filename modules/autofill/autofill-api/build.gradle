@@ -40,9 +40,8 @@ dependencies {
     implementation AndroidX.lifecycle.runtimeKtx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
-    implementation 'androidx.appcompat:appcompat:_'
-    implementation 'com.google.android.material:material:_'
-    implementation 'androidx.constraintlayout:constraintlayout:_'
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
     implementation Google.dagger
 }
 
