@@ -19,14 +19,22 @@ package com.duckduckgo.app.brokensite
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteMonitor
+import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.privacy.config.api.ContentBlocking
+import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class BrokenSiteDataTest {
+
+    private val mockWhitelistDao: UserWhitelistDao = mock()
+
+    private val mockContentBlocking: ContentBlocking = mock()
 
     @Test
     fun whenSiteIsNullThenDataIsEmptyAndUpgradedIsFalse() {
@@ -131,7 +139,7 @@ class BrokenSiteDataTest {
         url: String,
         httpsUpgraded: Boolean = false
     ): Site {
-        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded)
+        return SiteMonitor(url, "", upgradedHttps = httpsUpgraded, mockWhitelistDao, mockContentBlocking, TestScope())
     }
 
     companion object {

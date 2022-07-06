@@ -48,11 +48,12 @@ import com.duckduckgo.app.bookmarks.model.SavedSite.Bookmark
 import com.duckduckgo.app.bookmarks.model.SavedSite.Favorite
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.LoadExtractedUrl
-import com.duckduckgo.app.browser.BrowserTabViewModel.Command.Navigate
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowBackNavigationHistory
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionDisabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.Command.ShowPrivacyProtectionEnabledConfirmation
 import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
+import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.DownloadFile
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction.OpenInNewTab
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
@@ -101,7 +102,6 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.privacy.model.UserWhitelistedDomain
@@ -400,7 +400,7 @@ class BrowserTabViewModelTest {
             duckDuckGoUrlDetector = DuckDuckGoUrlDetector()
         )
 
-        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup)
+        val siteFactory = SiteFactory(mockPrivacyPractices, mockEntityLookup, mockUserWhitelistDao, mockContentBlocking, TestScope())
 
         accessibilitySettingsDataStore = AccessibilitySettingsSharedPreferences(context, coroutineRule.testDispatcherProvider, TestScope())
 
@@ -916,48 +916,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenUrlClearedThenPrivacyGradeIsCleared() = runTest {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(privacyGradeState().privacyGrade)
-        loadUrl(null)
-        assertNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
-    fun whenUrlLoadedThenPrivacyGradeIsReset() = runTest {
-        loadUrl("https://duckduckgo.com")
-        assertNotNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
     fun whenEnoughTrackersDetectedThenPrivacyGradeIsUpdated() {
-        val grade = privacyGradeState().privacyGrade
+        val grade = privacyShieldState().privacyShield
         loadUrl("https://example.com")
         val entity = TestEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(TrackingEvent("https://example.com", "", null, entity, false, null))
         }
-        assertNotEquals(grade, privacyGradeState().privacyGrade)
-    }
-
-    @Test
-    fun whenPrivacyGradeFinishedLoadingThenDoNotShowLoadingGrade() {
-        testee.stopShowingEmptyGrade()
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesWhileBrowsingButSiteNotFullyLoadedThenPrivacyGradeShouldAnimateIsTrue() {
-        setBrowserShowing(true)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().shouldAnimate)
-    }
-
-    @Test
-    fun whenProgressChangesWhileBrowsingAndSiteIsFullyLoadedThenPrivacyGradeShouldAnimateIsFalse() {
-        setBrowserShowing(true)
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().shouldAnimate)
+        assertNotEquals(grade, privacyShieldState().privacyShield)
     }
 
     @Test
@@ -969,95 +935,20 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenProgressChangesAndIsProcessingTrackingLinkThenPrivacyGradeShouldAnimateIsTrue() {
-        setBrowserShowing(true)
-        testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().shouldAnimate)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOnThenShowLoadingGradeIsAlwaysTrue() {
-        setBrowserShowing(true)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().showEmptyGrade)
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOffButSiteNotFullyLoadedThenShowLoadingGradeIsTrue() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.progressChanged(50)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndPrivacyIsOffAndSiteIsFullyLoadedThenShowLoadingGradeIsFalse() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesAndIsProcessingTrackingLinkThenShowLoadingGradeIsTrue() {
-        setBrowserShowing(true)
-        testee.loadingViewState.value = loadingViewState().copy(privacyOn = false)
-        testee.startProcessingTrackingLink()
-        testee.progressChanged(100)
-        assertTrue(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenProgressChangesButIsTheSameAsBeforeThenDoNotUpdateState() {
-        setBrowserShowing(true)
-        testee.progressChanged(100)
-        testee.stopShowingEmptyGrade()
-        testee.progressChanged(100)
-        assertFalse(privacyGradeState().showEmptyGrade)
-    }
-
-    @Test
-    fun whenNotShowingEmptyGradeAndPrivacyGradeIsNotUnknownThenIsEnableIsTrue() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = false)
-        assertTrue(testee.isEnabled)
-    }
-
-    @Test
-    fun whenPrivacyGradeIsUnknownThenIsEnableIsFalse() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.UNKNOWN, shouldAnimate = false, showEmptyGrade = false)
-        assertFalse(testee.isEnabled)
-    }
-
-    @Test
-    fun whenShowEmptyGradeIsTrueThenIsEnableIsTrue() {
-        val testee = BrowserTabViewModel.PrivacyGradeViewState(PrivacyGrade.A, shouldAnimate = false, showEmptyGrade = true)
-        assertTrue(testee.isEnabled)
-    }
-
-    @Test
     fun whenInitialisedThenPrivacyGradeIsNotShown() {
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
     }
 
     @Test
     fun whenUrlUpdatedThenPrivacyGradeIsShown() {
         loadUrl("")
-        assertTrue(browserViewState().showPrivacyGrade)
-    }
-
-    @Test
-    fun whenOmnibarDoesNotHaveFocusThenShowEmptyGradeIsFalse() {
-        testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertFalse(privacyGradeState().showEmptyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
     }
 
     @Test
     fun whenOmnibarDoesNotHaveFocusThenPrivacyGradeIsShownAndSearchIconIsHidden() {
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
         assertFalse(browserViewState().showSearchIcon)
     }
 
@@ -1066,14 +957,14 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged(query = "", hasFocus = false, hasQueryChanged = false)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
         assertFalse(browserViewState().showSearchIcon)
     }
 
     @Test
     fun whenBrowserNotShownAndOmnibarInputHasFocusThenPrivacyGradeIsNotShown() {
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
     }
 
     @Test
@@ -1081,7 +972,7 @@ class BrowserTabViewModelTest {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         testee.onOmnibarInputStateChanged("", true, hasQueryChanged = false)
-        assertFalse(browserViewState().showPrivacyGrade)
+        assertFalse(browserViewState().showPrivacyShield)
         assertTrue(browserViewState().showSearchIcon)
     }
 
@@ -1362,7 +1253,7 @@ class BrowserTabViewModelTest {
         assertFalse(findInPageViewState().visible)
         assertCommandIssued<Command.DismissFindInPage>()
 
-        val issuedCommand = commandCaptor.allValues.find { it is Command.NavigateBack }
+        val issuedCommand = commandCaptor.allValues.find { it is NavigationCommand.NavigateBack }
         assertNull(issuedCommand)
     }
 
@@ -1418,7 +1309,7 @@ class BrowserTabViewModelTest {
     fun whenUserBrowsingPressesForwardThenNavigatesForward() {
         setBrowserShowing(true)
         testee.onUserPressedForward()
-        assertTrue(captureCommands().lastValue == Command.NavigateForward)
+        assertTrue(captureCommands().lastValue == NavigationCommand.NavigateForward)
     }
 
     @Test
@@ -1426,7 +1317,7 @@ class BrowserTabViewModelTest {
         setBrowserShowing(false)
         testee.onUserPressedForward()
         assertTrue(browserViewState().browserShowing)
-        assertTrue(captureCommands().lastValue == Command.Refresh)
+        assertTrue(captureCommands().lastValue == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1456,7 +1347,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenRefreshRequestedWithBrowserGlobalLayoutThenRefresh() {
         testee.onRefreshRequested()
-        assertCommandIssued<Command.Refresh>()
+        assertCommandIssued<NavigationCommand.Refresh>()
     }
 
     @Test
@@ -1515,7 +1406,7 @@ class BrowserTabViewModelTest {
         setupNavigation(isBrowsing = true, canGoBack = true, stepsToPreviousPage = 2)
         assertTrue(testee.onUserPressedBack())
 
-        val backCommand = captureCommands().lastValue as Command.NavigateBack
+        val backCommand = captureCommands().lastValue as NavigationCommand.NavigateBack
         assertNotNull(backCommand)
         assertEquals(2, backCommand.steps)
     }
@@ -1557,7 +1448,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1567,7 +1458,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1577,7 +1468,7 @@ class BrowserTabViewModelTest {
         testee.onChangeBrowserModeClicked()
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val ultimateCommand = commandCaptor.lastValue
-        assertTrue(ultimateCommand == Command.Refresh)
+        assertTrue(ultimateCommand == NavigationCommand.Refresh)
     }
 
     @Test
@@ -1625,7 +1516,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).insert(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_ADD)
-        verify(mockCommandObserver).onChanged(Command.Refresh)
+        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
@@ -1645,7 +1536,7 @@ class BrowserTabViewModelTest {
         testee.onPrivacyProtectionMenuClicked()
         verify(mockUserWhitelistDao).delete(UserWhitelistedDomain("www.example.com"))
         verify(mockPixel).fire(AppPixelName.BROWSER_MENU_WHITELIST_REMOVE)
-        verify(mockCommandObserver).onChanged(Command.Refresh)
+        verify(mockCommandObserver).onChanged(NavigationCommand.Refresh)
     }
 
     @Test
@@ -2595,7 +2486,7 @@ class BrowserTabViewModelTest {
         val url = "https://example.com"
         loadUrl(url, isBrowserShowing = true)
         assertFalse(browserViewState().showDaxIcon)
-        assertTrue(browserViewState().showPrivacyGrade)
+        assertTrue(browserViewState().showPrivacyShield)
     }
 
     @Test
@@ -3671,13 +3562,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLoadUrlAndSiteIsInContentBlockingExceptionsListThenDoNotChangePrivacyGrade() {
-        whenever(mockContentBlocking.isAnException(any())).thenReturn(true)
-        loadUrl("https://example.com")
-        assertNull(privacyGradeState().privacyGrade)
-    }
-
-    @Test
     fun whenEditBookmarkRequestedThenRepositoryIsNotUpdated() = runTest {
         val url = "http://www.example.com"
         val bookmark = Bookmark(id = 1L, title = "", url = url, parentId = 0L)
@@ -4345,7 +4229,7 @@ class BrowserTabViewModelTest {
         return nav
     }
 
-    private fun privacyGradeState() = testee.privacyGradeViewState.value!!
+    private fun privacyShieldState() = testee.privacyShieldViewState.value!!
     private fun ctaViewState() = testee.ctaViewState.value!!
     private fun browserViewState() = testee.browserViewState.value!!
     private fun omnibarViewState() = testee.omnibarViewState.value!!

@@ -25,11 +25,11 @@ class EntityTest {
 
     @Test
     fun whenEntityPrevalenceIsGreaterThan7ThenIsMajorIsTrue() {
-        assertTrue(TdsEntity("", "", 7.1).isMajor)
+        assertTrue(TdsEntity("", "", 25.1).isMajor)
     }
 
     @Test
     fun whenEntityPrevalenceIs7ThenIsMajorIsFalse() {
-        assertFalse(TdsEntity("", "", 7.0).isMajor)
+        assertFalse(TdsEntity("", "", 25.0).isMajor)
     }
 }

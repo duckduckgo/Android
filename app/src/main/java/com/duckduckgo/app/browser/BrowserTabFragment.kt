@@ -165,7 +165,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel.HighlightableButton
 import com.duckduckgo.app.browser.BrowserTabViewModel.LoadingViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.NavigationCommand
 import com.duckduckgo.app.browser.BrowserTabViewModel.OmnibarViewState
-import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyGradeViewState
+import com.duckduckgo.app.browser.BrowserTabViewModel.PrivacyShieldViewState
 import com.duckduckgo.app.browser.BrowserTabViewModel.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.history.NavigationHistorySheet
 import com.duckduckgo.app.browser.history.NavigationHistorySheet.NavigationHistorySheetListener
@@ -458,7 +458,7 @@ class BrowserTabFragment :
         super.onActivityCreated(savedInstanceState)
         Timber.i("PDHy: tabfragment onActivityCreated")
         configureObservers()
-        configurePrivacyGrade()
+        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
@@ -643,10 +643,10 @@ class BrowserTabFragment :
             }
         )
 
-        viewModel.privacyGradeViewState.observe(
+        viewModel.privacyShieldViewState.observe(
             viewLifecycleOwner,
             Observer {
-                it.let { renderer.renderPrivacyGrade(it) }
+                it.let { renderer.renderPrivacyShield(it) }
             }
         )
 
@@ -1402,7 +1402,7 @@ class BrowserTabFragment :
         recyclerView.setPadding(sidePadding, recyclerView.paddingTop, sidePadding, recyclerView.paddingBottom)
     }
 
-    private fun configurePrivacyGrade() {
+    private fun configurePrivacyShield() {
         toolbar.shieldIcon.setOnClickListener {
             browserActivity?.launchPrivacyDashboard()
         }
@@ -2332,15 +2332,15 @@ class BrowserTabFragment :
         private var lastSeenGlobalViewState: GlobalLayoutViewState? = null
         private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
         private var lastSeenCtaViewState: CtaViewState? = null
-        private var lastSeenPrivacyGradeViewState: PrivacyGradeViewState? = null
+        private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
 
-        fun renderPrivacyGrade(viewState: PrivacyGradeViewState) {
+        fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
 
             Timber.i("Shield: event received with ${viewState.privacyShield}")
-            renderIfChanged(viewState, lastSeenPrivacyGradeViewState) {
-                if (viewState.privacyShield == lastSeenPrivacyGradeViewState?.privacyShield) return
-                val oldShield = lastSeenPrivacyGradeViewState?.privacyShield
-                lastSeenPrivacyGradeViewState = viewState
+            renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
+                if (viewState.privacyShield == lastSeenPrivacyShieldViewState?.privacyShield) return
+                val oldShield = lastSeenPrivacyShieldViewState?.privacyShield
+                lastSeenPrivacyShieldViewState = viewState
 
                 val privacyShield = viewState.privacyShield
 
@@ -2552,7 +2552,7 @@ class BrowserTabFragment :
         private fun renderToolbarMenus(viewState: BrowserViewState) {
             if (viewState.browserShowing) {
                 daxIcon?.isVisible = viewState.showDaxIcon
-                shieldIcon?.isInvisible = !viewState.showPrivacyGrade || viewState.showDaxIcon
+                shieldIcon?.isInvisible = !viewState.showPrivacyShield || viewState.showDaxIcon
                 clearTextButton?.isVisible = viewState.showClearButton
                 searchIcon?.isVisible = viewState.showSearchIcon
             } else {

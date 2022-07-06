@@ -34,6 +34,23 @@ dependencies {
 
     implementation JakeWharton.timber
     implementation "com.airbnb.android:lottie:_"
+
+    testImplementation project(path: ':common-test')
+    testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+
+    androidTestImplementation project(path: ':common-test')
+    androidTestImplementation AndroidX.archCore.testing
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.test.rules
+    androidTestImplementation CashApp.turbine
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
 }
 
 android {

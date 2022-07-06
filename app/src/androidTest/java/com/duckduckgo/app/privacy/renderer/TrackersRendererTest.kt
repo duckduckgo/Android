@@ -119,18 +119,6 @@ class TrackersRendererTest {
     }
 
     @Test
-    fun whenNetworkNameMatchesLogoIconThenResourceIsReturned() {
-        val resource = testee.networkLogoIcon(context, "outbrain")
-        assertEquals(R.drawable.network_logo_outbrain, resource)
-    }
-
-    @Test
-    fun whenNetworkNameSansSpecialCharactersAndWithUnderscoresForSpacesMatchesLogoIconThenResourceIsReturned() {
-        val resource = testee.networkLogoIcon(context, "Amazon Technologies, Inc.")
-        assertEquals(R.drawable.network_logo_amazon_technologies_inc, resource)
-    }
-
-    @Test
     fun whenNetworkNameSansSpecialCharactersAndWithUnderscoresForSpacesMatchesPillIconWithUnderscoresThenResourceIsReturned() {
         val resource = testee.networkPillIcon(context, "Amazon Technologies, Inc.")
         assertEquals(R.drawable.network_pill_amazon_technologies_inc, resource)
