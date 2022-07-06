@@ -29,7 +29,7 @@
         style="@style/TextAppearance.AppCompat.Title"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content"
-        android:text="@string/credential_management_autofill_toggle_label" />
+        android:text="@string/credentialManagementAutofillToggleLabel" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/enabledToggle"

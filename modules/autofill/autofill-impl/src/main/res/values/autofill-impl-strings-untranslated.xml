@@ -15,30 +15,30 @@
   -->
 
 <resources>
-    <string name="management_locked_mode_text">Unlock Autofill</string>
+    <string name="managementLockedModeText">Unlock Autofill</string>
 
-    <string name="management_disabled_mode_cta"><b>Set up in Settings</b></string>
-    <string name="management_disabled_mode_subtitle">A device lock pattern, PIN, or biometrics are required to protect your Autofill Login details.</string>
-    <string name="management_disabled_mode_title">Secure your device to use Autofill</string>
+    <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
+    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics are required to protect your Autofill Login details.</string>
+    <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
 
-    <string name="save_login_dialog_title">Save Login?</string>
-    <string name="save_login_dialog_button_save">Save Login</string>
-    <string name="save_login_dialog_button_not_now">Not Now</string>
+    <string name="saveLoginDialogTitle">Save Login?</string>
+    <string name="saveLoginDialogButtonSave">Save Login</string>
+    <string name="saveLoginDialogNotNow">Not Now</string>
 
-    <string name="use_saved_login_dialog_title">Use Saved Login?</string>
+    <string name="useSavedLoginDialogTitle">Use Saved Login?</string>
 
-    <string name="update_login_dialog_title">Update Password?</string>
-    <string name="update_login_dialog_update_button_update_password">Update Password</string>
-    <string name="update_login_dialog_button_not_now">Now Now</string>
+    <string name="updateLoginDialogTitle">Update Password?</string>
+    <string name="updateLoginDialogButtonUpdatePassword">Update Password</string>
+    <string name="updateLoginDialogButtonNotNow">Now Now</string>
 
-    <string name="credential_management_edit_username_hint">Username</string>
-    <string name="credential_management_edit_password_hint">Password</string>
-    <string name="credential_management_edit_website_hint">Website</string>
-    <string name="credential_management_edit_delete_button">Delete</string>
-    <string name="credential_management_edit_save_changes_button">Save Changes</string>
-    <string name="credential_management_edit_copy_username_button">Copy Username</string>
-    <string name="credential_management_edit_copy_password_button">Copy Password</string>
+    <string name="credentialManagementEditUsernameHint">Username</string>
+    <string name="credentialManagementEditPasswordHint">Password</string>
+    <string name="credentialManagementEditWebsiteHint">Website</string>
+    <string name="credentialManagementEditButtonDelete">Delete</string>
+    <string name="credentialManagementEditButtonSaveChanges">Save Changes</string>
+    <string name="credentialManagementEditButtonCopyUsername">Copy Username</string>
+    <string name="credentialManagementEditButtonCopyPassword">Copy Password</string>
 
-    <string name="credential_management_autofill_toggle_label">Save and Autofill Logins</string>
+    <string name="credentialManagementAutofillToggleLabel">Save and Autofill Logins</string>
 
 </resources>

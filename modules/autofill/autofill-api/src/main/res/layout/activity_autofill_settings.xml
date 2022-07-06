@@ -28,7 +28,7 @@
         android:background="#f00"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_height="wrap_content"
-        android:text="@string/autofill_credential_management_screen_title" />
+        android:text="@string/autofillCredentialManagementScreenTitle" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/logins"

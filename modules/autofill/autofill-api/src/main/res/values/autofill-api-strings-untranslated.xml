@@ -16,6 +16,6 @@
 
 <resources>
 
-    <string name="autofill_credential_management_screen_title">Save and Autofill Logins</string>
+    <string name="autofillCredentialManagementScreenTitle">Save and Autofill Logins</string>
 
 </resources>
