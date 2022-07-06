@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.urlextraction
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.net.http.SslError.*
-import android.os.Build
 import android.webkit.*
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
@@ -152,11 +151,7 @@ class UrlExtractingWebViewClient(
         if (webView != null) {
             val initialUrl = (webView as UrlExtractingWebView).initialUrl
 
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.M) {
-                if (error?.errorCode == ERROR_CONNECT) {
-                    urlExtractionListener?.onUrlExtractionError(initialUrl)
-                }
-            } else {
+            if (error?.errorCode == ERROR_CONNECT) {
                 urlExtractionListener?.onUrlExtractionError(initialUrl)
             }
         }

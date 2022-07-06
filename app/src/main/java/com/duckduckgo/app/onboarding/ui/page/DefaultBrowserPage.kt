@@ -82,13 +82,11 @@ class DefaultBrowserPage : OnboardingPageFragment() {
         }
     }
 
-    internal fun applyStyle() {
+    private fun applyStyle() {
         activity?.window?.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.M) {
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             statusBarColor = Color.WHITE
         }
         ViewCompat.requestApplyInsets(longDescriptionContainer)
