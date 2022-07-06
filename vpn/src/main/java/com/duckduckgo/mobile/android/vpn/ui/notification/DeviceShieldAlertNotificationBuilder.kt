@@ -27,6 +27,7 @@ import android.os.ResultReceiver
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
@@ -41,8 +42,10 @@ import dagger.Provides
 object DeviceShieldAlertNotificationBuilderModule {
 
     @Provides
-    fun providesDeviceShieldAlertNotificationBuilder(): DeviceShieldAlertNotificationBuilder {
-        return AndroidDeviceShieldAlertNotificationBuilder()
+    fun providesDeviceShieldAlertNotificationBuilder(
+        appBuildConfig: AppBuildConfig
+    ): DeviceShieldAlertNotificationBuilder {
+        return AndroidDeviceShieldAlertNotificationBuilder(appBuildConfig)
     }
 }
 
@@ -64,10 +67,12 @@ interface DeviceShieldAlertNotificationBuilder {
     ): Notification
 }
 
-class AndroidDeviceShieldAlertNotificationBuilder : DeviceShieldAlertNotificationBuilder {
+class AndroidDeviceShieldAlertNotificationBuilder constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : DeviceShieldAlertNotificationBuilder {
 
     private fun registerAlertChannel(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.O) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (notificationManager.getNotificationChannel(VPN_ALERTS_CHANNEL_ID) == null) {
                 val channel = NotificationChannel(VPN_ALERTS_CHANNEL_ID, VPN_ALERTS_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)

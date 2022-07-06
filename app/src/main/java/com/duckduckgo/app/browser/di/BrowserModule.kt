@@ -164,7 +164,8 @@ class BrowserModule {
         thirdPartyCookieManager: ThirdPartyCookieManager,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         dispatcherProvider: DispatcherProvider,
-        urlExtractor: DOMUrlExtractor
+        urlExtractor: DOMUrlExtractor,
+        appBuildConfig: AppBuildConfig,
     ): UrlExtractingWebViewClient {
         return UrlExtractingWebViewClient(
             webViewHttpAuthStore,
@@ -175,7 +176,8 @@ class BrowserModule {
             thirdPartyCookieManager,
             appCoroutineScope,
             dispatcherProvider,
-            urlExtractor
+            urlExtractor,
+            appBuildConfig,
         )
     }
 
@@ -235,8 +237,9 @@ class BrowserModule {
     fun specialUrlDetector(
         packageManager: PackageManager,
         ampLinks: AmpLinks,
-        trackingParameters: TrackingParameters
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
+        trackingParameters: TrackingParameters,
+        appBuildConfig: AppBuildConfig,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, appBuildConfig)
 
     @Provides
     @SingleInstanceIn(AppScope::class)

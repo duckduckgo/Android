@@ -22,6 +22,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.RequestInterceptor
 import com.duckduckgo.app.global.exception.UncaughtExceptionRepository
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,12 +31,13 @@ import dagger.SingleInstanceIn
 @SingleInstanceIn(AppScope::class)
 class ServiceWorkerLifecycleObserver @Inject constructor(
     private val requestInterceptor: RequestInterceptor,
-    private val uncaughtExceptionRepository: UncaughtExceptionRepository
+    private val uncaughtExceptionRepository: UncaughtExceptionRepository,
+    private val appBuildConfig: AppBuildConfig,
 ) : DefaultLifecycleObserver {
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             try {
                 ServiceWorkerController.getInstance().setServiceWorkerClient(
                     BrowserServiceWorkerClient(requestInterceptor, uncaughtExceptionRepository)

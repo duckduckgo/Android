@@ -33,6 +33,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.app.global.view.html
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.content_onboarding_welcome.*
@@ -49,6 +50,9 @@ class WelcomePage : OnboardingPageFragment() {
 
     @Inject
     lateinit var viewModelFactory: WelcomePageViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private var ctaText: String = ""
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
@@ -139,7 +143,7 @@ class WelcomePage : OnboardingPageFragment() {
         activity?.window?.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.M) {
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
             }
             decorView.systemUiVisibility += View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN

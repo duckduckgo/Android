@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.databinding.ActivityWidgetConfigurationBinding
 import com.duckduckgo.app.global.DuckDuckGoActivity
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.widget.WidgetPreferences
 import com.duckduckgo.widget.WidgetTheme
@@ -41,6 +42,9 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
 
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
@@ -61,7 +65,7 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
             finish()
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             binding.widgetConfigThemeSystem.visibility = View.VISIBLE
             binding.widgetConfigThemeSystem.isChecked = true
         } else {

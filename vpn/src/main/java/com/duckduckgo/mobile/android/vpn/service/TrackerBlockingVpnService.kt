@@ -419,7 +419,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope() {
     }
 
     private fun VpnService.Builder.configureMeteredConnection() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             setMetered(false)
         }
     }
