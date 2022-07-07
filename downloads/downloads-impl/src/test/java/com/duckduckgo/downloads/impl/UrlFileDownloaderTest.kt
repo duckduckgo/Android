@@ -49,9 +49,11 @@ class UrlFileDownloaderTest {
     fun setup() {
 
         realFileDownloadManager = RealFileDownloadManager()
-        whenever(downloadFileService.downloadFile(anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyString(), anyString(), anyString())).thenReturn(call)
 
-        urlFileDownloader = UrlFileDownloader(downloadFileService, realFileDownloadManager, coroutineRule.testDispatcherProvider)
+        urlFileDownloader = UrlFileDownloader(
+            downloadFileService, realFileDownloadManager, coroutineRule.testDispatcherProvider, FakeCookieManagerWrapper()
+        )
     }
 
     @Test
@@ -184,5 +186,11 @@ class UrlFileDownloaderTest {
             userAgent = "user_agent",
             directory = File("directory"),
         )
+    }
+
+    private class FakeCookieManagerWrapper : CookieManagerWrapper {
+        override fun getCookie(url: String): String? {
+            return null
+        }
     }
 }
