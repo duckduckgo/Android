@@ -45,8 +45,8 @@ interface DownloadCallback {
     fun onSuccess(file: File, mimeType: String?)
 
     /**
-     * Called when the download fails. Takes as optional parameter the [url] which started the download. Takes as mandatory parameter
-     * the [reason] describing why the download has failed.
+     * Called when the download fails. Takes as optional parameter the [url] which started the download. Takes optional parameters download [url] and
+     * [downloadId] and a mandatory parameter [reason] describing why the download has failed.
      */
     fun onError(url: String? = null, downloadId: Long? = null, reason: DownloadFailReason)
 
