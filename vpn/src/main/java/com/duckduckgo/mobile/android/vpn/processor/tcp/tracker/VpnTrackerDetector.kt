@@ -41,7 +41,8 @@ interface VpnTrackerDetector {
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
+        hostname: String?
     ): RequestTrackerType
 }
 
@@ -60,7 +61,8 @@ class DomainBasedTrackerDetector(
         packet: Packet,
         payloadBuffer: ByteBuffer,
         isLocalAddress: Boolean,
-        requestingApp: OriginatingApp
+        requestingApp: OriginatingApp,
+        hostname: String?
     ): RequestTrackerType {
 
         if (isLocalAddress) {
@@ -72,7 +74,6 @@ class DomainBasedTrackerDetector(
         }
 
         val payloadBytes = payloadBytesExtractor.extract(packet, payloadBuffer)
-        val hostname = hostnameExtractor.extract(tcb, payloadBytes)
         if (hostname == null) {
             Timber.w("Failed to determine if packet is a tracker as hostname not extracted %s", tcb.ipAndPort)
             return RequestTrackerType.Undetermined
