@@ -17,11 +17,10 @@
 package com.duckduckgo.downloads.impl
 
 import androidx.core.net.toUri
-import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.NotGoodEnough
-import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.TriedAllOptions
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
-import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
+import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.NotGoodEnough
+import com.duckduckgo.downloads.impl.FilenameExtractor.GuessQuality.TriedAllOptions
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -85,7 +84,6 @@ class FilenameExtractor @Inject constructor(
     private fun bestGuess(guesses: Guesses, directory: File): FilenameExtractionResult {
         val guess = guesses.bestGuess ?: guesses.latestGuess
         if (!guess.contains(".")) {
-            pixel.fire(DownloadsPixelName.DOWNLOAD_FILE_DEFAULT_GUESSED_NAME)
             return FilenameExtractionResult.Guess(handleDuplicates(guess, directory))
         }
         return FilenameExtractionResult.Extracted(handleDuplicates(guess, directory))
