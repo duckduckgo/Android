@@ -16,7 +16,6 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.downloads.api.DownloadCallback
 import com.duckduckgo.downloads.api.DownloadFailReason
@@ -30,7 +29,6 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class NetworkFileDownloader @Inject constructor(
-    private val context: Context,
     private val filenameExtractor: FilenameExtractor,
     private val fileService: DownloadFileService,
     private val urlFileDownloader: UrlFileDownloader,
@@ -110,25 +108,5 @@ class NetworkFileDownloader @Inject constructor(
         coroutineScope.launch {
             urlFileDownloader.downloadFile(pendingDownload, guessedFileName, callback)
         }
-    }
-
-    private fun fixedApkMimeType(mimeType: String?, fileName: String): String? {
-        // There are cases when APKs are downloaded with generic mime types such as the examples below.
-        // Content-Type:
-        // "application/octet-stream"
-        // "application/unknown"
-        // "binary/octet-stream"
-        // When this happens the OS can't install the APK when the user taps on the download notification.
-        // Passing the correct "application/vnd.android.package-archive" mime type to the Download Manager resolves the issue.
-        if (fileName.lowercase().endsWith(ANDROID_APK_SUFFIX)) {
-            return ANDROID_APK_MIME_TYPE
-        }
-        return mimeType
-    }
-
-    companion object {
-        private const val DOWNLOAD_MANAGER_PACKAGE = "com.android.providers.downloads"
-        private const val ANDROID_APK_MIME_TYPE = "application/vnd.android.package-archive"
-        private const val ANDROID_APK_SUFFIX = ".apk"
     }
 }
