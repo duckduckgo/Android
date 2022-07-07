@@ -45,7 +45,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
         val pendingIntent = PendingIntent.getBroadcast(
             applicationContext,
-            1234,
+            downloadId.toInt(),
             FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
             PendingIntent.FLAG_UPDATE_CURRENT
         )
@@ -71,7 +71,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
             .setContentTitle(filename)
             .setContentText(applicationContext.getString(R.string.downloadComplete))
-            .setContentIntent(PendingIntent.getActivity(applicationContext, 0, intent, pendingIntentFlags))
+            .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .build()
@@ -91,7 +91,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
                 url?.let { fileUrl ->
                     val pendingIntent = PendingIntent.getBroadcast(
                         applicationContext,
-                        1234,
+                        downloadId.toInt(),
                         FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
                         PendingIntent.FLAG_UPDATE_CURRENT
                     )
