@@ -30,7 +30,7 @@ import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 private const val DOWNLOAD_IN_PROGRESS_GROUP = "com.duckduckgo.downloads.IN_PROGRESS"
@@ -46,7 +46,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 ) : FileDownloadNotificationManager {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
-    private val groupNotificationsCounter = AtomicInteger()
+    private val groupNotificationsCounter = AtomicReference<Set<Long>>(mutableSetOf())
 
     @AnyThread
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
@@ -75,7 +75,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         notificationManager.apply {
             notify(downloadId.toInt(), notification)
             notify(SUMMARY_ID, summary)
-            groupNotificationsCounter.incrementAndGet()
+            groupNotificationsCounter.getAndUpdate { it + downloadId }
         }
     }
 
@@ -96,8 +96,6 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         cancelDownloadFileNotification(downloadId)
-        // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
-        waitForNotificationToBeCancelled(downloadId)
         notificationManager.notify(downloadId.toInt(), notification)
     }
 
@@ -119,26 +117,26 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             }
             .build()
 
-        // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
         cancelDownloadFileNotification(downloadId)
-        waitForNotificationToBeCancelled(downloadId)
         notificationManager.notify(downloadId.toInt(), notification)
     }
 
     @AnyThread
     override fun cancelDownloadFileNotification(downloadId: Long) {
-        if (groupNotificationsCounter.safeDecrementAndGet() == 0) {
-            notificationManager.cancel(SUMMARY_ID)
+        groupNotificationsCounter.atomicUpdateAndGet(downloadId).run {
+            if (isEmpty()) {
+                notificationManager.cancel(SUMMARY_ID)
+            }
         }
         notificationManager.cancel(downloadId.toInt())
     }
 
-    private fun AtomicInteger.safeDecrementAndGet(): Int {
-        var prev: Int
-        var next: Int
+    private fun AtomicReference<Set<Long>>.atomicUpdateAndGet(downloadId: Long): Set<Long> {
+        var prev: Set<Long>
+        var next: Set<Long>
         do {
             prev = get()
-            next = if (prev > 0) prev - 1 else prev
+            next = prev - downloadId
         } while (!compareAndSet(prev, next))
         return next
     }
@@ -154,11 +152,5 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     private fun getFilePathUri(context: Context, file: File): Uri {
         return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
-    }
-
-    private fun waitForNotificationToBeCancelled(downloadId: Long) {
-        while (notificationManager.activeNotifications.any { it.id == downloadId.toInt() }) {
-            Thread.sleep(10)
-        }
     }
 }
