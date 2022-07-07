@@ -20,6 +20,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.HEAD
+import retrofit2.http.Header
 import retrofit2.http.Streaming
 import retrofit2.http.Url
 
@@ -30,5 +31,9 @@ interface DownloadFileService {
 
     @Streaming
     @GET
-    fun downloadFile(@Url urlString: String): Call<ResponseBody>
+    fun downloadFile(
+        @Header("User-Agent") userAgent: String,
+        @Header("Cookie") cookie: String,
+        @Url urlString: String,
+    ): Call<ResponseBody>
 }
