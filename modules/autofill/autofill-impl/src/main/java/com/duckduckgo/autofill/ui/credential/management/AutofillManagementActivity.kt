@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.ui.credential.management
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -61,30 +62,31 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(binding.root)
+        setupToolbar(binding.includeToolbar.toolbar)
         observeViewModel()
-        viewModel.launchDeviceAuth(savedInstanceState)
+        setTitle(R.string.managementScreenTitle)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStart() {
+        super.onStart()
+        viewModel.launchDeviceAuth()
+    }
+
+    override fun onStop() {
+        super.onStop()
         viewModel.lock()
     }
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (!hasFocus) viewModel.lock()
-    }
-
-    private fun launchDeviceAuth(savedInstanceState: Bundle?) {
+    private fun launchDeviceAuth() {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
             deviceAuthenticator.authenticate(AUTOFILL, this) {
                 if (it == AuthResult.Success) {
                     viewModel.unlock()
                     showListMode()
                 } else {
-                    viewModel.lock()
-                    showLockMode()
+                    finish()
                 }
             }
         } else {
@@ -111,7 +113,9 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
     }
 
     private fun processState(state: AutofillSettingsViewModel.ViewState) {
-
+        if (state.isLocked) {
+            showLockMode()
+        }
     }
 
     private fun processCommand(command: AutofillSettingsViewModel.Command) {
@@ -122,8 +126,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             is ShowUserUsernameCopied -> showCopiedToClipboardSnackbar("Username")
             is ShowUserPasswordCopied -> showCopiedToClipboardSnackbar("Password")
             is ShowDisabledMode -> showDisabledMode()
-            is ShowLockedMode -> showLockMode()
-            is LaunchDeviceAuth -> launchDeviceAuth(command.savedInstanceState)
+            is LaunchDeviceAuth -> launchDeviceAuth()
             else -> processed = false
         }
         if (processed) {
@@ -142,7 +145,6 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
             setReorderingAllowed(true)
             replace(R.id.fragment_container_view, AutofillManagementListMode.instance())
         }
-
         inEditMode = false
     }
 

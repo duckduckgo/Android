@@ -15,10 +15,12 @@
   -->
 
 <resources>
+    <string name="managementScreenTitle">Autofill Logins</string>
+
     <string name="managementLockedModeText">Unlock Autofill</string>
 
     <string name="managementDisabledModeCta"><b>Set up in Settings</b></string>
-    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics are required to protect your Autofill Login details.</string>
+    <string name="managementDisabledModeSubtitle">A device lock pattern, PIN, or biometrics is required to protect your Autofill Login details.</string>
     <string name="managementDisabledModeTitle">Secure your device to use Autofill</string>
 
     <string name="saveLoginDialogTitle">Save Login?</string>
