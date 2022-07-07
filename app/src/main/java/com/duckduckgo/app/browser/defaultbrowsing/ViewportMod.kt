@@ -27,6 +27,12 @@ interface ViewportMod {
         url: String?,
         desktopMode: Boolean
     )
+
+    fun onPageFinished(
+        webView: WebView,
+        url: String?,
+        desktopMode: Boolean
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -36,11 +42,20 @@ class DesktopViewportMod @Inject constructor() : ViewportMod {
         url: String?,
         desktopMode: Boolean
     ) {
-        if (desktopMode) {
-            webView.loadUrl(
-                "javascript:document.getElementsByName('viewport')[0].setAttribute('content', " +
-                    "'width=980px');"
-            )
-        }
+        if (desktopMode) { changeViewport(webView) }
+    }
+
+    override fun onPageFinished(
+        webView: WebView,
+        url: String?,
+        desktopMode: Boolean
+    ) {
+        if (desktopMode) { changeViewport(webView) }
+    }
+
+    private fun changeViewport(webView: WebView) {
+        webView.loadUrl(
+            "javascript:document.getElementsByName('viewport')[0].setAttribute('content', 'width=980');"
+        )
     }
 }

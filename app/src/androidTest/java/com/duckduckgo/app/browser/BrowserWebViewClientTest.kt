@@ -583,6 +583,15 @@ class BrowserWebViewClientTest {
         verify(viewportMod).onPageStarted(webView, EXAMPLE_URL, true)
     }
 
+    @UiThreadTest
+    @Test
+    fun whenPageFinishesLoadingThenViewportModNotified() {
+        testee.desktopMode = true
+        testee.onPageFinished(webView, EXAMPLE_URL)
+
+        verify(viewportMod).onPageFinished(webView, EXAMPLE_URL, true)
+    }
+
     private fun getImmediatelyInvokedMockWebView(): WebView {
         val mockWebView = mock<WebView>()
         whenever(mockWebView.originalUrl).thenReturn(EXAMPLE_URL)

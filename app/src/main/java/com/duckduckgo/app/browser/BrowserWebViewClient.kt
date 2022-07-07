@@ -282,6 +282,7 @@ class BrowserWebViewClient(
             }
             flushCookies()
             printInjector.injectPrint(webView)
+            viewportMod.onPageFinished(webView, url, desktopMode)
         } catch (e: Throwable) {
             appCoroutineScope.launch(dispatcherProvider.default()) {
                 uncaughtExceptionRepository.recordUncaughtException(e, ON_PAGE_FINISHED)
