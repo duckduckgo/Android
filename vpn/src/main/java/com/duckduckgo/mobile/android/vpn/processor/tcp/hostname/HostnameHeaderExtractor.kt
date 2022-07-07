@@ -24,20 +24,17 @@ interface HostnameHeaderExtractor {
 class PlaintextHostHeaderExtractor : HostnameHeaderExtractor {
 
     override fun extract(payload: String): String? {
+        var hostIdx = payload.indexOf(HOST_HEADER_PREFIX)
+        if (hostIdx >= 0) {
+            hostIdx += HOST_HEADER_PREFIX.length
 
-        payload.split(NEWLINE_REGEX)
-            .map { it.trim() }
-            .forEach { line ->
-                if (line.startsWith(HOST_HEADER_PREFIX)) {
-                    return line.substring(HOST_HEADER_PREFIX.length)
-                }
-            }
+            return payload.substring(hostIdx, payload.indexOf("\r\n", hostIdx))
+        }
 
         return null
     }
 
     companion object {
-        private const val HOST_HEADER_PREFIX = "Host: "
-        private val NEWLINE_REGEX: Regex = "\\n".toRegex()
+        private const val HOST_HEADER_PREFIX = "\nHost: "
     }
 }

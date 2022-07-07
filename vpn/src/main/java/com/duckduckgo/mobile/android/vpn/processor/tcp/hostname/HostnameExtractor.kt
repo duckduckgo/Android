@@ -47,16 +47,16 @@ class AndroidHostnameExtractor(
         tcb: TCB,
         payloadBytes: ByteArray
     ) {
-        var host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
+        var host = encryptedRequestHostExtractor.extract(payloadBytes)
         if (host != null) {
-            Timber.v("Found domain from plaintext headers: %s", host)
+            Timber.v("Found domain from encrypted headers: %s", host)
             tcb.hostName = host
             return
         }
 
-        host = encryptedRequestHostExtractor.extract(payloadBytes)
+        host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
         if (host != null) {
-            Timber.v("Found domain from encrypted headers: %s", host)
+            Timber.v("Found domain from plaintext headers: %s", host)
             tcb.hostName = host
             return
         }
