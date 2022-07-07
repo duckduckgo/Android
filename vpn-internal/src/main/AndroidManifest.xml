@@ -4,11 +4,13 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
-        <activity android:name=".feature.rules.ExceptionRulesDebugActivity" />
+        <activity android:name=".feature.rules.ExceptionRulesDebugActivity"
+            android:exported="false"/>
         <activity
             android:name=".feature.VpnInternalSettingsActivity"
             android:process=":vpn"
-            android:label="@string/vpnDevSettingsTitle" />
+            android:label="@string/vpnDevSettingsTitle"
+            android:exported="false" />
 
     </application>
 
