@@ -30,7 +30,11 @@ import com.duckduckgo.downloads.api.FileDownloadNotificationManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
+
+private const val DOWNLOAD_IN_PROGRESS_GROUP = "com.duckduckgo.downloads.IN_PROGRESS"
+private const val SUMMARY_ID = 0
 
 @AnyThread
 @ContributesBinding(AppScope::class)
@@ -40,6 +44,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     private val applicationContext: Context,
     private val appBuildConfig: AppBuildConfig,
 ) : FileDownloadNotificationManager {
+
+    // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
+    private val groupNotificationsCounter = AtomicInteger()
 
     @AnyThread
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
@@ -53,12 +60,23 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
             .setContentText("$filename ($progress%)")
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-            .setProgress(100, progress, progress == 0)
+            .setProgress(100, progress, progress == SUMMARY_ID)
             .setOngoing(true)
+            .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
             .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), pendingIntent)
             .build()
 
-        notificationManager.notify(downloadId.toInt(), notification)
+        val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
+            .setGroupSummary(true)
+            .build()
+
+        notificationManager.apply {
+            notify(downloadId.toInt(), notification)
+            notify(SUMMARY_ID, summary)
+            groupNotificationsCounter.incrementAndGet()
+        }
     }
 
     @AnyThread
@@ -77,7 +95,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .build()
 
-        notificationManager.cancel(downloadId.toInt())
+        cancelDownloadFileNotification(downloadId)
         // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
         waitForNotificationToBeCancelled(downloadId)
         notificationManager.notify(downloadId.toInt(), notification)
@@ -102,14 +120,27 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         // cancelling notifications is a deferred action, and I have seen how in subsequent notify calls end up in the wrong end state
-        notificationManager.cancel(downloadId.toInt())
+        cancelDownloadFileNotification(downloadId)
         waitForNotificationToBeCancelled(downloadId)
         notificationManager.notify(downloadId.toInt(), notification)
     }
 
     @AnyThread
     override fun cancelDownloadFileNotification(downloadId: Long) {
+        if (groupNotificationsCounter.safeDecrementAndGet() == 0) {
+            notificationManager.cancel(SUMMARY_ID)
+        }
         notificationManager.cancel(downloadId.toInt())
+    }
+
+    private fun AtomicInteger.safeDecrementAndGet(): Int {
+        var prev: Int
+        var next: Int
+        do {
+            prev = get()
+            next = if (prev > 0) prev - 1 else prev
+        } while (!compareAndSet(prev, next))
+        return next
     }
 
     private fun createIntentToOpenFile(applicationContext: Context, file: File): Intent {
