@@ -87,16 +87,6 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
-                            android:id="@+id/daxIcon1"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@string/privacyGradeContentDescription"
-                            android:gravity="center"
-                            android:padding="4dp"
-                            android:src="@drawable/ic_ddg_logo"
-                            android:visibility="gone" />
-
-                        <ImageView
                             android:id="@+id/daxIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
@@ -116,9 +106,10 @@
                             android:src="@drawable/ic_loupe_24dp" />
 
                         <ImageView
-                            android:id="@+id/fakeView"
+                            android:id="@+id/placeholder"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
+                            android:importantForAccessibility="no"
                             android:gravity="center"
                             android:padding="4dp" />
 
