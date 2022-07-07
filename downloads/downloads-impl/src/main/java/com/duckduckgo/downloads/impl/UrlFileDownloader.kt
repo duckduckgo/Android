@@ -16,7 +16,6 @@
 
 package com.duckduckgo.downloads.impl
 
-import android.webkit.CookieManager
 import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadCallback
@@ -37,6 +36,7 @@ class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
     private val realFileDownloadManager: RealFileDownloadManager,
     private val dispatcherProvider: DispatcherProvider,
+    private val cookieManagerWrapper: CookieManagerWrapper,
 ) {
 
     suspend fun downloadFile(
@@ -48,7 +48,7 @@ class UrlFileDownloader @Inject constructor(
         val directory = pendingFileDownload.directory
         val call = downloadFileService.downloadFile(
             urlString = url,
-            cookie = CookieManager.getInstance().getCookie(url).orEmpty(),
+            cookie = cookieManagerWrapper.getCookie(url).orEmpty(),
             userAgent = pendingFileDownload.userAgent,
         )
         val downloadId = Random.nextLong()
