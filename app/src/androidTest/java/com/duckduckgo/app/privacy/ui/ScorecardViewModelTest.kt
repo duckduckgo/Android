@@ -182,7 +182,7 @@ class ScorecardViewModelTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = 10.0)))
+        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = 25.0)))
 
         testee.scoreCard("1").test {
             assertTrue(awaitItem().showIsMemberOfMajorNetwork)
