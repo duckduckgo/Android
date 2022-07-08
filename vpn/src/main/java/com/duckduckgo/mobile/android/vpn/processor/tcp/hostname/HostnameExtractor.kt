@@ -54,7 +54,7 @@ class AndroidHostnameExtractor(
             return
         }
 
-        host = hostnameHeaderExtractor.extract(String(payloadBytes, StandardCharsets.US_ASCII))
+        host = hostnameHeaderExtractor.extract(payloadBytes)
         if (host != null) {
             Timber.v("Found domain from plaintext headers: %s", host)
             tcb.hostName = host
