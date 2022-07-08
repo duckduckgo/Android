@@ -129,13 +129,6 @@
         <item name="android:gravity">start</item>
     </style>
 
-    <style name="SettingsGroupDivider">
-        <item name="android:background">?attr/settingsDividerColor</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_marginTop">25dp</item>
-        <item name="android:layout_height">1dp</item>
-    </style>
-
     <style name="OverflowMenuFullDivider">
         <item name="android:background">?attr/overflowMenuDividerColor</item>
         <item name="android:layout_height">1dp</item>
