@@ -75,7 +75,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         notificationManager.apply {
             notify(downloadId.toInt(), notification)
             notify(SUMMARY_ID, summary)
-            groupNotificationsCounter.getAndUpdate { it + downloadId }
+            groupNotificationsCounter.atomicUpdateAndGet { it + downloadId }
         }
     }
 
@@ -123,7 +123,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     @AnyThread
     override fun cancelDownloadFileNotification(downloadId: Long) {
-        groupNotificationsCounter.atomicUpdateAndGet(downloadId).run {
+        groupNotificationsCounter.atomicUpdateAndGet { it - downloadId }.run {
             if (isEmpty()) {
                 notificationManager.cancel(SUMMARY_ID)
             }
@@ -131,12 +131,13 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         notificationManager.cancel(downloadId.toInt())
     }
 
-    private fun AtomicReference<Set<Long>>.atomicUpdateAndGet(downloadId: Long): Set<Long> {
+    // We could have used [AtomicReference#getAndUpdate] but it's not available in Android API level 24.
+    private fun AtomicReference<Set<Long>>.atomicUpdateAndGet(updateFunction: UpdateInProgress): Set<Long> {
         var prev: Set<Long>
         var next: Set<Long>
         do {
             prev = get()
-            next = prev - downloadId
+            next = updateFunction.update(prev)
         } while (!compareAndSet(prev, next))
         return next
     }
@@ -152,5 +153,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     private fun getFilePathUri(context: Context, file: File): Uri {
         return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
+    }
+
+    private fun interface UpdateInProgress {
+        fun update(current: Set<Long>): Set<Long>
     }
 }
