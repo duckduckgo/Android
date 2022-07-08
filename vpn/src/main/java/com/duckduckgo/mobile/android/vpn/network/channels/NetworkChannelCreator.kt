@@ -16,16 +16,13 @@
 
 package com.duckduckgo.mobile.android.vpn.network.channels
 
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.channels.DatagramChannel
 import java.nio.channels.SocketChannel
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface NetworkChannelCreator {
 
@@ -51,21 +48,13 @@ interface NetworkChannelCreator {
 }
 
 @ContributesBinding(VpnScope::class)
-class NetworkChannelCreatorImpl @Inject constructor(
-    vpnServiceProvider: Provider<TrackerBlockingVpnService>,
-    private val appBuildConfig: AppBuildConfig,
-) : NetworkChannelCreator {
-
-    private val vpnService by lazy { vpnServiceProvider.get() }
+class NetworkChannelCreatorImpl @Inject constructor() : NetworkChannelCreator {
 
     @Throws(IOException::class)
     override fun createDatagramChannelAndConnect(inetSocketAddress: InetSocketAddress): DatagramChannel {
         return DatagramChannel.open().also { channel ->
             channel.configureBlocking(false)
             channel.socket().run {
-                if (socketNeedsProtection()) {
-                    vpnService.protect(this)
-                }
                 broadcast = true
             }
             try {
@@ -82,9 +71,6 @@ class NetworkChannelCreatorImpl @Inject constructor(
     override fun createSocketChannelAndConnect(inetSocketAddress: InetSocketAddress): SocketChannel {
         return SocketChannel.open().also { channel ->
             channel.configureBlocking(false)
-            if (socketNeedsProtection()) {
-                vpnService.protect(channel.socket())
-            }
             try {
                 channel.connect(inetSocketAddress)
             } catch (e: IOException) {
@@ -92,9 +78,5 @@ class NetworkChannelCreatorImpl @Inject constructor(
                 throw e
             }
         }
-    }
-
-    private fun socketNeedsProtection(): Boolean {
-        return appBuildConfig.sdkInt !in 21..30
     }
 }
