@@ -1,6 +1,6 @@
 package com.duckduckgo.macos_api
 
-/** Public interface for MacOs wait lsit */
+/** Public interface for MacOs wait list */
 interface MacOsWaitlist {
     /**
      * This method returns the current state of the user in the MacOs waitlist
