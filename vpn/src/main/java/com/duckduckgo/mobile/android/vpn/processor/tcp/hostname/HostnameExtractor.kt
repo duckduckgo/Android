@@ -18,7 +18,6 @@ package com.duckduckgo.mobile.android.vpn.processor.tcp.hostname
 
 import timber.log.Timber
 import xyz.hexene.localvpn.TCB
-import java.nio.charset.StandardCharsets
 
 interface HostnameExtractor {
 

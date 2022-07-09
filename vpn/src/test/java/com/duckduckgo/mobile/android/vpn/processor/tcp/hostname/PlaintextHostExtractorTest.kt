@@ -31,57 +31,67 @@ class PlaintextHostExtractorTest {
 
     @Test
     fun whenHostAvailableThenHostExtractedSuccessfully() {
-        val requestHostAvailable = prepareTestByteArray("""
+        val requestHostAvailable = prepareTestByteArray(
+            """
             GET / HTTP/1.1
             Host: example.com
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """)
+        """
+        )
         assertEquals("example.com", testee.extract(requestHostAvailable))
     }
 
     @Test
     fun whenHostAvailableInUnexpectedOrderThenHostExtractedSuccessfully() {
-        val requestHostAvailableOutOfOrder = prepareTestByteArray("""
+        val requestHostAvailableOutOfOrder = prepareTestByteArray(
+            """
             GET / HTTP/1.1
             Connection: Keep-Alive
             Accept-Encoding: gzip
             Host: example.com
             User-Agent: okhttp/4.3.1
-        """)
+        """
+        )
         assertEquals("example.com", testee.extract(requestHostAvailableOutOfOrder))
     }
 
     @Test
     fun whenHostMissingThenNulReturned() {
-        val requestHostMissing = prepareTestByteArray("""
+        val requestHostMissing = prepareTestByteArray(
+            """
             GET / HTTP/1.1
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """)
+        """
+        )
         assertNull(testee.extract(requestHostMissing))
     }
 
     @Test
     fun whenHostEmptyThenNulReturned() {
-        val requestHostEmpty = prepareTestByteArray("""
+        val requestHostEmpty = prepareTestByteArray(
+            """
             GET / HTTP/1.1
-            Host: 
+            Host:
             Connection: Keep-Alive
             Accept-Encoding: gzip
             User-Agent: okhttp/4.3.1
-        """)
+        """
+        )
         assertNull(testee.extract(requestHostEmpty))
     }
 
     @Test
     fun whenMalformedHTTPThenNulReturned() {
-        val requestMalformed = prepareTestByteArray("""
+        val requestMalformed = prepareTestByteArray(
+            """
             GET / HTTP/1.1
-            Host: 
-        """)
+            Host:
+        """
+        )
         assertNull(testee.extract(requestMalformed))
     }
 }
