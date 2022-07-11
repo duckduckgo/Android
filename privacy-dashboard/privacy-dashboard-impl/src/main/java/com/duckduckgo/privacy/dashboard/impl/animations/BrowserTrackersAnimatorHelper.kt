@@ -46,13 +46,13 @@ class BrowserLottieTrackersAnimatorHelper(
     private var completePartialAnimation: Boolean = false
 
     override fun startTrackersAnimation(
-        runPartialAnimation: Boolean,
+        shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?
     ) {
-        this.runPartialAnimation = runPartialAnimation
+        this.runPartialAnimation = shouldRunPartialAnimation
         this.trackersAnimation = trackersAnimationView
         this.shieldAnimation = shieldAnimationView
 
@@ -88,7 +88,7 @@ class BrowserLottieTrackersAnimatorHelper(
                 }
 
                 override fun onAnimationEnd(animation: Animator?) {
-                    Timber.i("Lottie: onAnimationEnd")
+                    Timber.i("Lottie: onAnimationEnd $runPartialAnimation $completePartialAnimation")
                     if (!runPartialAnimation) {
                         animateOmnibarIn(omnibarViews).start()
                         completePartialAnimation = false

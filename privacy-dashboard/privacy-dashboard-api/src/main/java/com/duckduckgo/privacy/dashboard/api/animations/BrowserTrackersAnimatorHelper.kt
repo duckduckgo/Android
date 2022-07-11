@@ -22,7 +22,7 @@ import com.duckduckgo.trackerdetection.model.Entity
 
 interface BrowserTrackersAnimatorHelper {
     fun startTrackersAnimation(
-        runPartialAnimation: Boolean,
+        shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,

@@ -2460,7 +2460,7 @@ class BrowserTabFragment :
 
                     activity?.let { activity ->
                         animatorHelper.startTrackersAnimation(
-                            runPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
+                            shouldRunPartialAnimation = lastSeenCtaViewState?.cta is DaxTrackersBlockedCta,
                             shieldAnimationView = shieldIcon,
                             trackersAnimationView = trackerAnimationView,
                             omnibarViews = omnibarViews(),
