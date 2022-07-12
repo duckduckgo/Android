@@ -5,15 +5,12 @@
 
     const autoconsent = new k(
         (message) => {
-            MARCOS.console(message.type);
+            var msg = MARCOS.console(message.type);
             console.log('sending', message);
-            window.webkit.messageHandlers[message.type].postMessage(message).then(resp => {
-                console.log('received', resp);
-                autoconsent.receiveMessageCallback(resp);
-            });
         },
     );
     window.autoconsentMessageCallback = (msg) => {
+        MARCOS.console('squifoso');
         autoconsent.receiveMessageCallback(msg);
     };
 

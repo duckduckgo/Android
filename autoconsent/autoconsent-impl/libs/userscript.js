@@ -1,15 +1,12 @@
 import AutoConsent from '@duckduckgo/autoconsent';
 
-const autoconsent = new AutoConsent(
+const autoconsent = new k(
     (message) => {
-        MARCOS.console('test');
+        var msg = MARCOS.console(message.type);
         console.log('sending', message);
-        window.webkit.messageHandlers[message.type].postMessage(message).then(resp => {
-            console.log('received', resp);
-            autoconsent.receiveMessageCallback(resp);
-        });
     },
 );
 window.autoconsentMessageCallback = (msg) => {
+    MARCOS.console('squifoso');
     autoconsent.receiveMessageCallback(msg);
-}
+};ss
