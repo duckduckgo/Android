@@ -41,14 +41,14 @@ class UrlFileDownloaderTest {
 
     private val downloadFileService: DownloadFileService = mock()
     private val call: Call<ResponseBody> = mock()
-    private lateinit var realFileDownloadManager: RealFileDownloadManager
+    private lateinit var realFileDownloadManager: RealUrlFileDownloadCallManager
 
     private lateinit var urlFileDownloader: UrlFileDownloader
 
     @Before
     fun setup() {
 
-        realFileDownloadManager = RealFileDownloadManager()
+        realFileDownloadManager = RealUrlFileDownloadCallManager()
         whenever(downloadFileService.downloadFile(anyString(), anyString(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
