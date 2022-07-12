@@ -25,7 +25,7 @@ import javax.inject.Inject
 class ExistingCredentialStoreInterrogatingMatchDetector @Inject constructor(private val autofillStore: AutofillStore) :
     ExistingCredentialMatchDetector {
 
-    override suspend fun determine(currentUrl: String, username: String, password: String): AutofillStore.ContainsCredentialsResult {
+    override suspend fun determine(currentUrl: String, username: String?, password: String?): AutofillStore.ContainsCredentialsResult {
         return autofillStore.containsCredentials(currentUrl, username, password)
     }
 }

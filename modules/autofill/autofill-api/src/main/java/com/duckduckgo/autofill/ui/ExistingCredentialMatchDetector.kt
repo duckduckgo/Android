@@ -19,5 +19,5 @@ package com.duckduckgo.autofill.ui
 import com.duckduckgo.autofill.store.AutofillStore
 
 interface ExistingCredentialMatchDetector {
-    suspend fun determine(currentUrl: String, username: String, password: String): AutofillStore.ContainsCredentialsResult
+    suspend fun determine(currentUrl: String, username: String?, password: String?): AutofillStore.ContainsCredentialsResult
 }

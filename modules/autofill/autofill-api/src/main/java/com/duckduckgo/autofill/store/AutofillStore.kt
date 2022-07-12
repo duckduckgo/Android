@@ -29,8 +29,7 @@ interface AutofillStore {
     suspend fun getAllCredentials(): Flow<List<LoginCredentials>>
     suspend fun deleteCredentials(id: Int)
     suspend fun updateCredentials(credentials: LoginCredentials)
-
-    suspend fun containsCredentials(rawUrl: String, username: String, password: String): ContainsCredentialsResult
+    suspend fun containsCredentials(rawUrl: String, username: String?, password: String?): ContainsCredentialsResult
 
     sealed interface ContainsCredentialsResult {
         object ExactMatch : ContainsCredentialsResult

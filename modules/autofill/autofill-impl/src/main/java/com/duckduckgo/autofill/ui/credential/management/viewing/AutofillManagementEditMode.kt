@@ -33,10 +33,8 @@ import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementEditModeBinding
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command
-import com.duckduckgo.autofill.ui.credential.management.AutofillSettingsViewModel.Command.*
 import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_autofill_management_edit_mode.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -90,8 +88,8 @@ class AutofillManagementEditMode : Fragment() {
 
     private fun saveCredentials() {
         val updatedCredentials = getCredentials().copy(
-            username = binding.usernameEditText.text.toString(),
-            password = binding.passwordEditText.text.toString(),
+            username = binding.usernameEditText.text.toString().convertBlankToNull(),
+            password = binding.passwordEditText.text.toString().convertBlankToNull(),
         )
         viewModel.updateCredentials(updatedCredentials)
     }
@@ -141,4 +139,9 @@ class AutofillManagementEditMode : Fragment() {
                 }
             }
     }
+}
+
+private fun String.convertBlankToNull(): String? {
+    if (this.isBlank()) return null
+    return this
 }

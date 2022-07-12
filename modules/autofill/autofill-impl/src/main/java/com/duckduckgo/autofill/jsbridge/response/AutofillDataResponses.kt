@@ -35,7 +35,7 @@ data class EmptyResponse(
 ) {
 
     data class EmptyCredentialResponse(
-        val action: String = "non"
+        val action: String = "none"
     )
 }
 

@@ -119,11 +119,7 @@ class SecureStoreBackedAutofillStore(
         secureStorage.updateWebsiteLoginDetailsWithCredentials(credentials.toWebsiteLoginCredentials())
     }
 
-    override suspend fun containsCredentials(
-        rawUrl: String,
-        username: String,
-        password: String
-    ): ContainsCredentialsResult {
+    override suspend fun containsCredentials(rawUrl: String, username: String?, password: String?): ContainsCredentialsResult {
         val url = rawUrl.extractSchemeAndDomain() ?: return NoMatch
         val credentials = secureStorage.websiteLoginDetailsWithCredentialsForDomain(url).firstOrNull() ?: return NoMatch
 

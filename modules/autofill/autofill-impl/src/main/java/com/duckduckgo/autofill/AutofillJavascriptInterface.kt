@@ -26,8 +26,11 @@ import com.duckduckgo.app.utils.ConflatedJob
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
+import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
 import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputMainType.CREDENTIALS
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.PASSWORD
+import com.duckduckgo.autofill.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.store.AutofillStore
 import kotlinx.coroutines.CoroutineScope
@@ -54,20 +57,21 @@ class AutofillJavascriptInterface(
     fun getAutofillData(requestString: String) {
         Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.default()) {
-            val request = requestParser.parseAutofillDataRequest(requestString)
-
-            if (request.mainType != CREDENTIALS) {
-                Timber.w("Autofill type %s unsupported", request.mainType)
-                return@launch
-            }
-
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
                 Timber.w("Can't autofill as can't retrieve current URL")
                 return@launch
             }
 
-            val credentials = autofillStore.getCredentials(url)
+            val request = requestParser.parseAutofillDataRequest(requestString)
+
+            if (request.mainType != CREDENTIALS) {
+                handleUnknownRequestMainType(request, url)
+                return@launch
+            }
+
+            val allCredentials = autofillStore.getCredentials(url)
+            val credentials = filterRequestedSubtypes(request, allCredentials)
 
             withContext(dispatcherProvider.main()) {
                 if (credentials.isEmpty()) {
@@ -77,6 +81,18 @@ class AutofillJavascriptInterface(
                 }
             }
         }
+    }
+
+    private fun filterRequestedSubtypes(request: AutofillDataRequest, credentials: List<LoginCredentials>): List<LoginCredentials> {
+        return when (request.subType) {
+            USERNAME -> credentials.filterNot { it.username.isNullOrBlank() }
+            PASSWORD -> credentials.filterNot { it.password.isNullOrBlank() }
+        }
+    }
+
+    private fun handleUnknownRequestMainType(request: AutofillDataRequest, url: String) {
+        Timber.w("Autofill type %s unsupported", request.mainType)
+        callback?.noCredentialsAvailable(url)
     }
 
     suspend fun getRuntimeConfiguration(rawJs: String, url: String?): String {
@@ -128,6 +144,8 @@ class AutofillJavascriptInterface(
             val request = requestParser.parseStoreFormDataRequest(data).credentials
             val jsCredentials = JavascriptCredentials(request.username, request.password)
             val credentials = jsCredentials.asLoginCredentials(currentUrl)
+
+            Timber.v("storeFormData contains:\nusername: %s\npassword: %s", credentials.username != null, credentials.password != null)
 
             withContext(dispatcherProvider.main()) {
                 callback?.onCredentialsAvailableToSave(currentUrl, credentials)
