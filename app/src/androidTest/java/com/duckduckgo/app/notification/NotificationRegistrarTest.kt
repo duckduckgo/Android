@@ -27,6 +27,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.VariantManager
 import com.duckduckgo.app.statistics.VariantManager.Companion.DEFAULT_VARIANT
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -44,12 +45,14 @@ class NotificationRegistrarTest {
     private val mockVariantManager: VariantManager = mock()
     private val mockPixel: Pixel = mock()
     private val mockSchedulableNotificationPluginPoint: PluginPoint<SchedulableNotificationPlugin> = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var testee: NotificationRegistrar
 
     @Before
     fun before() {
         whenever(mockVariantManager.getVariant(any())).thenReturn(DEFAULT_VARIANT)
+        whenever(appBuildConfig.sdkInt).thenReturn(30)
         testee = NotificationRegistrar(
             TestScope(),
             context,
@@ -57,7 +60,8 @@ class NotificationRegistrarTest {
             notificationManagerCompat,
             mockSettingsDataStore,
             mockPixel,
-            mockSchedulableNotificationPluginPoint
+            mockSchedulableNotificationPluginPoint,
+            appBuildConfig,
         )
     }
 

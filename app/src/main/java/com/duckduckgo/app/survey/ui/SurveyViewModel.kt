@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.survey.ui
 
-import android.os.Build
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -67,10 +66,10 @@ class SurveyViewModel @Inject constructor(
             .appendQueryParameter(SurveyParams.ATB, statisticsStore.atb?.version ?: "")
             .appendQueryParameter(SurveyParams.ATB_VARIANT, statisticsStore.variant)
             .appendQueryParameter(SurveyParams.DAYS_INSTALLED, "${appInstallStore.daysInstalled()}")
-            .appendQueryParameter(SurveyParams.ANDROID_VERSION, "${Build.VERSION.SDK_INT}")
+            .appendQueryParameter(SurveyParams.ANDROID_VERSION, "${appBuildConfig.sdkInt}")
             .appendQueryParameter(SurveyParams.APP_VERSION, appBuildConfig.versionName)
-            .appendQueryParameter(SurveyParams.MANUFACTURER, Build.MANUFACTURER)
-            .appendQueryParameter(SurveyParams.MODEL, Build.MODEL)
+            .appendQueryParameter(SurveyParams.MANUFACTURER, appBuildConfig.manufacturer)
+            .appendQueryParameter(SurveyParams.MODEL, appBuildConfig.model)
 
         return urlBuilder.build().toString()
     }

@@ -2771,50 +2771,6 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/DefaultBrowserPage.kt"
-            line="85"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/browser/urlextraction/UrlExtractingWebViewClient.kt"
-            line="153"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {"
-        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/onboarding/ui/page/WelcomePage.kt"
-            line="142"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="Unnecessary; SDK_INT is always >= 23"
-        errorLine1="    override val supportsStandardWidgetAdd: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M"
-        errorLine2="                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/app/widget/ui/WidgetCapabilities.kt"
-            line="36"
-            column="61"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
         message="This folder configuration (`v23`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values`.">
         <location
             file="src/main/res/values-v23"/>
