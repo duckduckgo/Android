@@ -671,11 +671,11 @@ function getInputSubtype (input) {
 
 /**
  * Remove whitespace of more than 2 in a row and trim the string
- * @param string
+ * @param {string | null} string
  * @return {string}
  */
 const removeExcessWhitespace = (string = '') => {
-    return string
+    return (string || '')
         .replace(/\n/g, ' ')
         .replace(/\s{2,}/, ' ').trim()
 }
@@ -691,11 +691,11 @@ const getExplicitLabelsText = (el) => {
         labelTextCandidates.push(...extractElementStrings(label))
     }
     if (el.hasAttribute('aria-label')) {
-        labelTextCandidates.push(el.getAttribute('aria-label'))
+        labelTextCandidates.push(removeExcessWhitespace(el.getAttribute('aria-label')))
     }
 
     // Try to access another element if it was marked as the label for this input/select
-    const ariaLabelAttr = el.getAttribute('aria-labelled') || el.getAttribute('aria-labelledby')
+    const ariaLabelAttr = removeExcessWhitespace(el.getAttribute('aria-labelled') || el.getAttribute('aria-labelledby'))
 
     if (ariaLabelAttr) {
         const labelledByElement = document.getElementById(ariaLabelAttr)
@@ -704,8 +704,11 @@ const getExplicitLabelsText = (el) => {
         }
     }
 
-    if (labelTextCandidates.length > 0) {
-        return removeExcessWhitespace(labelTextCandidates.join(' '))
+    // Labels with long text are likely to be noisy and lead to false positives
+    const filteredLabels = labelTextCandidates.filter((string) => string.length < 65)
+
+    if (filteredLabels.length > 0) {
+        return filteredLabels.join(' ')
     }
 
     return ''

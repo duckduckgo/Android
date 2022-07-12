@@ -63,7 +63,7 @@
                                     <input type="email" id="op_order_checkout_email" name="op_order_checkout[email]"
                                         required="required" validate-email="async" validate-required="true"
                                         class="input-required e-form__input e-form__input_required e-form__input_email parsley-validated garlic-auto-save"
-                                        
+
                                         style=""
                                         data-manual-scoring="emailAddress">
                                     <div class="e-auto-suggest-item-list">
@@ -116,7 +116,7 @@
                             <div class="input-error-block e-form__input-c">
                                 <select id="shipping-country" name="op_order_checkout[shippingAddress][country]"
                                     class="cart-event-tracking checkout-address-country e-form__select e-form__select_country garlic-auto-save"
-                                    
+
                                     data-manual-scoring="addressCountryCode">
                                     <option value="223">United States</option>
                                     <option disabled="disabled">-------------------</option>
@@ -454,6 +454,7 @@
                                         placeholder="Address Line 2" autocomplete="address-line2"
                                         validate-addressdata="true"
                                         class="checkout-address-line-2 e-form__input e-form__input_address-2 parsley-validated garlic-auto-save"
+                                           data-manual-scoring="addressStreet2"
                                         >
                                     <span class="input-help-text gray-text e-form__hint">apartment, suite number,
                                         etc.</span>
@@ -473,6 +474,7 @@
                                     name="op_order_checkout[shippingAddress][city]" required="required"
                                     validate-addressdata="true" autocomplete="address-level2" validate-required="true"
                                     class="checkout-address-city e-form__input e-form__input_city input-required e-form__input_required parsley-validated garlic-auto-save"
+                                                                                  data-manual-scoring="addressCity"
                                     ><span
                                     class="input-help-text gray-text e-form__hint">or APO/FPO/DPO</span><span
                                     class="input-error-message e-form__error" style="display: none;"></span></div>
@@ -485,7 +487,7 @@
                                     id="op_order_checkout_shippingAddress_state" validate-required="true"
                                     class="checkout-address-state e-form__input e-form__input_state parsley-validated e-form__select e-form__select_state input-required garlic-auto-save"
                                     name="op_order_checkout[shippingAddress][state]"
-                                    
+
                                     data-manual-scoring="addressProvince">
                                     <option value="">Please choose your state</option>
                                     <option value="AL">Alabama</option>
@@ -563,7 +565,7 @@
                                     class="cart-event-tracking checkout-address-zip e-form__input e-form__input e-form__input_zip input-required e-form__input_required parsley-validated garlic-auto-save"
                                     autocomplete="postal-code" validate-postcode="true" validate-required="true"
                                     data-country-id="#shipping-country" placeholder="Zip code"
-                                    
+
                                     data-manual-scoring="addressPostalCode"><span
                                     class="input-error-message e-form__error" style="display: none;"></span></div>
                             <div class="clear-both"></div>
@@ -659,7 +661,7 @@
                                     name="op_order_checkout[shippingAddress][phone]" required="required"
                                     validate-phone="true" autocomplete="tel" validate-required="true"
                                     class="checkout-address-phone input-required e-form__input e-form__input_required e-form__input_phone parsley-validated garlic-auto-save"
-                                    validate-extension="true" 
+                                    validate-extension="true"
                                     data-manual-scoring="phone">
                                 <input type="text" id="op_order_checkout_shippingAddress_phoneExtension"
                                     name="op_order_checkout[shippingAddress][phoneExtension]" placeholder="Ext."
@@ -1392,6 +1394,7 @@
                                     <select id="op_order_checkout_paymentAddress_country"
                                         name="op_order_checkout[paymentAddress][country]"
                                         class="cart-event-tracking checkout-address-country e-form__select e-form__select_country garlic-auto-save"
+                                            data-manual-scoring="addressCountryCode"
                                         >
                                         <option value="223">United States</option>
                                         <option disabled="disabled">-------------------</option>
@@ -1653,12 +1656,14 @@
                                         placeholder="First Name" autocomplete="given-name" validate-firstname="true"
                                         validate-required="true"
                                         class="checkout-address-name input-required e-form__input e-form__input_required e-form__input_name parsley-validated garlic-auto-save"
+                                           data-manual-scoring="firstName"
                                         >
                                     <input type="text" id="op_order_checkout_paymentAddress_lastName"
                                         name="op_order_checkout[paymentAddress][lastName]" required="required"
                                         placeholder="Last Name" autocomplete="family-name" validate-lastname="true"
                                         validate-required="true"
                                         class="checkout-address-name input-required e-form__input e-form__input_required e-form__input_name parsley-validated garlic-auto-save"
+                                           data-manual-scoring="lastName"
                                         >
                                     <span class="input-error-message e-form__error"></span>
                                 </div>
@@ -1703,6 +1708,7 @@
                                         placeholder="Address Line 1" autocomplete="off" validate-addressdata="true"
                                         validate-required="true"
                                         class="checkout-address-line-1 input-required e-form__input e-form__input_required e-form__input_address-1 parsley-validated garlic-auto-save pac-target-input"
+                                           data-manual-scoring="addressStreet"
                                         >
                                     <span class="input-error-message e-form__error e-form__error_address-1"></span>
                                     <div class="clear-both"></div>
@@ -1728,6 +1734,7 @@
                                             placeholder="Address Line 2" autocomplete="address-line2"
                                             validate-addressdata="true"
                                             class="checkout-address-line-2 e-form__input e-form__input_address-2 parsley-validated garlic-auto-save"
+                                               data-manual-scoring="addressStreet2"
                                             >
                                         <span class="input-help-text gray-text e-form__hint">apartment, suite number,
                                             etc.</span>
@@ -1748,6 +1755,7 @@
                                         validate-addressdata="true" autocomplete="address-level2"
                                         validate-required="true"
                                         class="checkout-address-city e-form__input e-form__input_city input-required e-form__input_required parsley-validated garlic-auto-save"
+                                                                                      data-manual-scoring="addressCity"
                                         ><span
                                         class="input-help-text gray-text e-form__hint">or APO/FPO/DPO</span><span
                                         class="input-error-message e-form__error"></span></div>
@@ -1759,7 +1767,7 @@
                                 <div class="input-error-block e-form__input-c"><select
                                         id="op_order_checkout_paymentAddress_state" validate-required="true"
                                         class="checkout-address-state e-form__input e-form__input_state parsley-validated e-form__select e-form__select_state input-required garlic-auto-save"
-                                        name="op_order_checkout[paymentAddress][state]"
+                                        name="op_order_checkout[paymentAddress][state]" data-manual-scoring="addressProvince"
                                         >
                                         <option value="">Please choose your state</option>
                                         <option value="AL">Alabama</option>
@@ -1837,7 +1845,7 @@
                                         class="cart-event-tracking checkout-address-zip e-form__input e-form__input e-form__input_zip input-required e-form__input_required parsley-validated garlic-auto-save"
                                         autocomplete="postal-code" validate-postcode="true" validate-required="true"
                                         data-country-id="#op_order_checkout_paymentAddress_country"
-                                        placeholder="Zip code" ><span
+                                        placeholder="Zip code" data-manual-scoring="addressPostalCode" ><span
                                         class="input-error-message e-form__error"></span></div>
                                 <div class="clear-both"></div>
                             </div>
@@ -1935,7 +1943,7 @@
                                         name="op_order_checkout[paymentAddress][phone]" required="required"
                                         validate-phone="true" autocomplete="tel" validate-required="true"
                                         class="checkout-address-phone input-required e-form__input e-form__input_required e-form__input_phone parsley-validated garlic-auto-save"
-                                        validate-extension="true" >
+                                        validate-extension="true" data-manual-scoring="phone">
                                     <input type="text" id="op_order_checkout_paymentAddress_phoneExtension"
                                         name="op_order_checkout[paymentAddress][phoneExtension]" placeholder="Ext."
                                         size="6" autocomplete="tel-extension" maxlength="6" validate-extension="true"

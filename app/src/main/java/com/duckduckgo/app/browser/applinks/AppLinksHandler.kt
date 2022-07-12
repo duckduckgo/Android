@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.applinks
 
 import android.os.Build
 import com.duckduckgo.app.global.UriString
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -37,7 +38,9 @@ interface AppLinksHandler {
 }
 
 @ContributesBinding(AppScope::class)
-class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
+class DuckDuckGoAppLinksHandler @Inject constructor(
+    private val appBuildConfig: AppBuildConfig,
+) : AppLinksHandler {
 
     var previousUrl: String? = null
     var isAUserQuery = false
@@ -50,7 +53,7 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
         launchAppLink: () -> Unit
     ): Boolean {
 
-        if (!appLinksEnabled || Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !isForMainFrame) {
+        if (!appLinksEnabled || appBuildConfig.sdkInt < Build.VERSION_CODES.N || !isForMainFrame) {
             return false
         }
 

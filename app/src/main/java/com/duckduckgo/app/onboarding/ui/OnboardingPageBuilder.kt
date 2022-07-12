@@ -18,22 +18,14 @@ package com.duckduckgo.app.onboarding.ui
 
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnIntroPage
-import com.duckduckgo.app.onboarding.ui.page.vpn.VpnPermissionPage
 
 interface OnboardingPageBuilder {
     fun buildWelcomePage(): WelcomePage
     fun buildDefaultBrowserPage(): DefaultBrowserPage
 
-    fun buildVpnIntro(): VpnIntroPage
-
-    fun buildVpnPermission(): VpnPermissionPage
-
     sealed class OnboardingPageBlueprint {
         object DefaultBrowserBlueprint : OnboardingPageBlueprint()
         object WelcomeBlueprint : OnboardingPageBlueprint()
-        object VpnIntroBlueprint : OnboardingPageBlueprint()
-        object VpnPermissionBlueprint : OnboardingPageBlueprint()
     }
 }
 
@@ -41,6 +33,4 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildWelcomePage() = WelcomePage()
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
-    override fun buildVpnIntro() = VpnIntroPage()
-    override fun buildVpnPermission() = VpnPermissionPage()
 }

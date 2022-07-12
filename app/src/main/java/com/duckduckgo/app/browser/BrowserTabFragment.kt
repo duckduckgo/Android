@@ -1082,11 +1082,12 @@ class BrowserTabFragment :
         }
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun openAppLink(appLink: SpecialUrlDetector.UrlType.AppLink) {
         if (appLink.appIntent != null) {
             appLink.appIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(appLink.appIntent)
-        } else if (appLink.excludedComponents != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        } else if (appLink.excludedComponents != null && appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             val title = getString(R.string.appLinkIntentChooserTitle)
             val chooserIntent = getChooserIntent(appLink.uriString, title, appLink.excludedComponents)
             startActivity(chooserIntent)
@@ -1927,6 +1928,7 @@ class BrowserTabFragment :
         return appBuildConfig.sdkInt >= Build.VERSION_CODES.Q
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun hasWriteStoragePermission(): Boolean {
         return minSdk29() ||
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -1969,8 +1971,9 @@ class BrowserTabFragment :
         playStoreUtils.launchPlayStore(appPackage)
     }
 
+    @Suppress("NewApi") // we use appBuildConfig
     private fun launchDefaultBrowser() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.N) {
             requireActivity().launchDefaultAppActivity()
         }
     }
