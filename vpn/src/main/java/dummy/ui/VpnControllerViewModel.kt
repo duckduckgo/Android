@@ -16,7 +16,6 @@
 
 package dummy.ui
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -24,9 +23,10 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedRepository
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.model.VpnState
 import com.duckduckgo.mobile.android.vpn.model.VpnTracker
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.DataStats
 import kotlinx.coroutines.flow.map
@@ -36,12 +36,12 @@ import javax.inject.Inject
 class VpnControllerViewModel @Inject constructor(
     private val appTrackerBlockedRepository: AppTrackerBlockingStatsRepository,
     private val webTrackersBlockedRepository: WebTrackersBlockedRepository,
-    private val applicationContext: Context,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : ViewModel() {
 
     fun getRunningTimeUpdates(startTime: () -> String): LiveData<VpnRunningStatus> {
         return appTrackerBlockedRepository.getRunningTimeMillis(startTime)
-            .map { timeRunning -> VpnRunningStatus(timeRunning, TrackerBlockingVpnService.isServiceRunning(applicationContext)) }
+            .map { timeRunning -> VpnRunningStatus(timeRunning, vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) }
             .asLiveData()
     }
 

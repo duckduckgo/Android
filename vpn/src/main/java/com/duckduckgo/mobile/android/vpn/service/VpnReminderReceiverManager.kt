@@ -21,6 +21,8 @@ import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.edit
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_FILENAME
 import com.duckduckgo.mobile.android.vpn.prefs.PREFS_KEY_REMINDER_NOTIFICATION_SHOWN
@@ -37,11 +39,12 @@ interface VpnReminderReceiverManager {
 class AndroidVpnReminderReceiverManager @Inject constructor(
     private val deviceShieldPixels: DeviceShieldPixels,
     private val notificationManager: NotificationManagerCompat,
-    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder
+    private val deviceShieldAlertNotificationBuilder: DeviceShieldAlertNotificationBuilder,
+    private val vpnFeaturesRegistry: VpnFeaturesRegistry,
 ) : VpnReminderReceiverManager {
 
     override fun showReminderNotificationIfVpnDisabled(context: Context) {
-        if (TrackerBlockingVpnService.isServiceRunning(context)) {
+        if (vpnFeaturesRegistry.isFeatureRegistered(AppTpVpnFeature.APPTP_VPN)) {
             Timber.v("Vpn is already running, nothing to show")
         } else {
             Timber.v("Vpn is not running, showing reminder notification")

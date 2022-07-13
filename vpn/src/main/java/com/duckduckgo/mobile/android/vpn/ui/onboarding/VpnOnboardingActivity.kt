@@ -34,10 +34,11 @@ import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.R
+import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.databinding.ActivityVpnOnboardingBinding
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.CheckVPNPermission
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.LaunchVPN
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.Command.RequestVPNPermission
@@ -59,6 +60,8 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
     private val viewModel: VpnOnboardingViewModel by bindViewModel()
     private val binding: ActivityVpnOnboardingBinding by viewBinding()
@@ -243,7 +246,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity(), AppTPVpnConflictDialog.Liste
     }
 
     private fun startVpn() {
-        TrackerBlockingVpnService.startService(this)
+        vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
         showEnabledState()
         viewModel.onAppTpEnabled()
     }
