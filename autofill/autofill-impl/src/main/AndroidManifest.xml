@@ -18,9 +18,7 @@
     package="com.duckduckgo.autofill.impl">
 
     <application>
-        <activity
-            android:name="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity"
-            android:exported="true" />
+        <activity android:name="com.duckduckgo.autofill.ui.credential.management.AutofillManagementActivity" />
     </application>
 
 
