@@ -34,7 +34,7 @@ import kotlin.random.Random
 
 class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
-    private val realFileDownloadManager: RealFileDownloadManager,
+    private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
     private val dispatcherProvider: DispatcherProvider,
     private val cookieManagerWrapper: CookieManagerWrapper,
 ) {
@@ -52,12 +52,11 @@ class UrlFileDownloader @Inject constructor(
             userAgent = pendingFileDownload.userAgent,
         )
         val downloadId = Random.nextLong()
-        realFileDownloadManager.add(downloadId, call)
+        urlFileDownloadCallManager.add(downloadId, call)
 
         Timber.d("Starting download $fileName / $url")
         downloadCallback.onStart(
             DownloadItem(
-                id = 0,
                 downloadId = downloadId,
                 downloadStatus = STARTED,
                 fileName = fileName,
@@ -78,7 +77,6 @@ class UrlFileDownloader @Inject constructor(
                         // for file length we don't use body.contentLength() as it is not reliable. Eg. when downloading image from DDG search
                         // as the link is a re-direct, contentLength() will be -1
                         downloadCallback.onSuccess(downloadId, file.length(), file, pendingFileDownload.mimeType)
-                        realFileDownloadManager.remove(downloadId)
                     } else {
                         if (call.isCanceled) {
                             Timber.v("Download $fileName cancelled")
@@ -88,14 +86,12 @@ class UrlFileDownloader @Inject constructor(
                             downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.Other)
                         }
                         // clean up
-                        realFileDownloadManager.remove(downloadId)
                         directory.getOrCreate(fileName).delete()
                     }
                 }
             } else {
                 Timber.w("Failed to download $fileName / ${response.errorBody()?.string()}")
                 downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
-                realFileDownloadManager.remove(downloadId)
             }
         }.onFailure {
             Timber.w(it, "Failed to download $fileName")
@@ -105,7 +101,6 @@ class UrlFileDownloader @Inject constructor(
                 downloadCallback.onError(url = url, downloadId = downloadId, reason = DownloadFailReason.ConnectionRefused)
             }
             // clean up
-            realFileDownloadManager.remove(downloadId)
             directory.getOrCreate(fileName).delete()
         }
     }

@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Sťahovanie súboru</string>
     <string name="notificationChannelFileDownloaded">Súbor je stiahnutý</string>
-
-    <string name="downloadComplete">Sťahovanie je dokončené</string>
-    <string name="downloadFailed">Sťahovanie zlyhalo</string>
     <string name="downloadInProgress">Prebieha sťahovanie</string>
 </resources>

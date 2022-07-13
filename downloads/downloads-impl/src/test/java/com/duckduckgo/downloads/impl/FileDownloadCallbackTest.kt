@@ -209,7 +209,6 @@ class FileDownloadCallbackTest {
 
     private fun oneItem() =
         DownloadItem(
-            id = 1L,
             downloadId = 10L,
             downloadStatus = FINISHED,
             fileName = "file.jpg",

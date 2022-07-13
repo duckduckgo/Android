@@ -18,7 +18,6 @@ package com.duckduckgo.downloads.api.model
 
 /** Public data class for a downloaded file. */
 data class DownloadItem(
-    val id: Long,
     val downloadId: Long,
     val downloadStatus: Int,
     val fileName: String,
