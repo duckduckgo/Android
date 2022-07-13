@@ -25,13 +25,15 @@ import android.os.Environment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.downloads.api.DownloadCallback
-import com.duckduckgo.downloads.api.FileDownloadManager
-import com.duckduckgo.downloads.api.FileDownloadNotificationManager
-import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.api.*
+import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,10 +44,12 @@ import javax.inject.Inject
 @SingleInstanceIn(AppScope::class)
 class FileDownloadNotificationActionReceiver @Inject constructor(
     private val context: Context,
-    private val fileDownloadManager: FileDownloadManager,
     private val fileDownloader: FileDownloader,
     private val downloadCallback: DownloadCallback,
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
+    private val downloadsRepository: DownloadsRepository,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : BroadcastReceiver(), DefaultLifecycleObserver {
 
     // TODO use the UA provider
@@ -56,6 +60,12 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
         super.onCreate(owner)
         Timber.v("Registering file download notification action receiver")
         context.registerReceiver(this, IntentFilter(INTENT_DOWNLOADS_NOTIFICATION_ACTION))
+
+        // When the app process is killed and restarted, this onCreate method is called and we take the opportunity
+        // to clean up the pending downloads that were in progress and will be no longer downloading.
+        coroutineScope.launch(dispatcherProvider.io()) {
+            purgePendingDownloads()
+        }
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
@@ -73,7 +83,9 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
         if (isCancelIntent(intent)) {
             Timber.v("Received cancel download intent for download id $downloadId")
-            fileDownloadManager.remove(downloadId)
+            coroutineScope.launch(dispatcherProvider.io()) {
+                downloadsRepository.delete(downloadId)
+            }
         } else if (isRetryIntent(intent)) {
             Timber.v("Received retry download intent for download id $downloadId")
             val url = extractUrlFromRetryIntent(intent) ?: return
@@ -83,9 +95,18 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
                 subfolder = Environment.DIRECTORY_DOWNLOADS,
             ).run {
                 Timber.v("Retrying download for $url")
-                fileDownloadManager.remove(downloadId)
-                fileDownloader.download(this, downloadCallback)
+                coroutineScope.launch(dispatcherProvider.io()) {
+                    downloadsRepository.delete(downloadId)
+                    fileDownloader.download(this@run, downloadCallback)
+                }
             }
+        }
+    }
+
+    private suspend fun purgePendingDownloads() {
+        downloadsRepository.getDownloads().filter { it.downloadStatus == STARTED }.map { it.downloadId }.run {
+            downloadsRepository.delete(this)
+            forEach { fileDownloadNotificationManager.cancelDownloadFileNotification(it) }
         }
     }
 

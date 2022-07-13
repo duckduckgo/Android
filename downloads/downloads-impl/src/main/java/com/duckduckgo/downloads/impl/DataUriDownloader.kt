@@ -53,7 +53,6 @@ class DataUriDownloader @Inject constructor(
 
                     callback.onStart(
                         DownloadItem(
-                            id = 0L,
                             downloadId = 0L,
                             downloadStatus = STARTED,
                             fileName = file.name,

@@ -46,7 +46,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 ) : FileDownloadNotificationManager {
 
     // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
-    private val groupNotificationsCounter = AtomicReference<Set<Long>>(mutableSetOf())
+    private val groupNotificationsCounter = AtomicReference<Map<Long, String>>(mapOf())
 
     @AnyThread
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
@@ -54,11 +54,12 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             applicationContext,
             downloadId.toInt(),
             FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
             .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
-            .setContentText("$filename ($progress%)")
+            .setContentText("$filename ($progress%).")
+            .setShowWhen(false)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .setProgress(100, progress, progress == SUMMARY_ID)
             .setOngoing(true)
@@ -67,6 +68,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+            .setShowWhen(false)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
             .setGroupSummary(true)
@@ -75,7 +77,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         notificationManager.apply {
             notify(downloadId.toInt(), notification)
             notify(SUMMARY_ID, summary)
-            groupNotificationsCounter.atomicUpdateAndGet { it + downloadId }
+            groupNotificationsCounter.atomicUpdateAndGet { it.plus(downloadId to filename) }
         }
     }
 
@@ -88,8 +90,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+            .setShowWhen(false)
             .setContentTitle(filename)
-            .setContentText(applicationContext.getString(R.string.downloadComplete))
+            .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
             .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
@@ -102,7 +105,8 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     @AnyThread
     override fun showDownloadFailedNotification(downloadId: Long, url: String?) {
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
-            .setContentTitle(applicationContext.getString(R.string.downloadFailed))
+            .setShowWhen(false)
+            .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .apply {
                 url?.let { fileUrl ->
@@ -110,9 +114,12 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
                         applicationContext,
                         downloadId.toInt(),
                         FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                     addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
+                }
+                groupNotificationsCounter.get()[downloadId]?.let { fileName ->
+                    setContentText(fileName)
                 }
             }
             .build()
@@ -132,9 +139,9 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     }
 
     // We could have used [AtomicReference#getAndUpdate] but it's not available in Android API level 24.
-    private fun AtomicReference<Set<Long>>.atomicUpdateAndGet(updateFunction: UpdateInProgress): Set<Long> {
-        var prev: Set<Long>
-        var next: Set<Long>
+    private fun AtomicReference<Map<Long, String>>.atomicUpdateAndGet(updateFunction: UpdateInProgress): Map<Long, String> {
+        var prev: Map<Long, String>
+        var next: Map<Long, String>
         do {
             prev = get()
             next = updateFunction.update(prev)
@@ -156,6 +163,6 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     }
 
     private fun interface UpdateInProgress {
-        fun update(current: Set<Long>): Set<Long>
+        fun update(current: Map<Long, String>): Map<Long, String>
     }
 }
