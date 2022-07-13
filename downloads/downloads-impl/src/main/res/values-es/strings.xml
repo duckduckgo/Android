@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Archivo descargándose</string>
     <string name="notificationChannelFileDownloaded">Archivo descargado</string>
-
-    <string name="downloadComplete">Descarga finalizada</string>
-    <string name="downloadFailed">No se ha podido descargar</string>
     <string name="downloadInProgress">Descargando</string>
 </resources>

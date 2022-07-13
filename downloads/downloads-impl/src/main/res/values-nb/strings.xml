@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Filen lastes ned</string>
     <string name="notificationChannelFileDownloaded">Filen er lastet ned</string>
-
-    <string name="downloadComplete">Nedlastingen er fullført</string>
-    <string name="downloadFailed">Nedlastingen feilet</string>
     <string name="downloadInProgress">Laster ned</string>
 </resources>
