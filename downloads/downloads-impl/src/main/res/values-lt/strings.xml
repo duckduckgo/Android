@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Failas atsisiunčiamas</string>
     <string name="notificationChannelFileDownloaded">Failas atsiųstas</string>
-
-    <string name="downloadComplete">Atsisiuntimas baigtas</string>
-    <string name="downloadFailed">Atsisiųsti nepavyko</string>
     <string name="downloadInProgress">Atsisiunčiama</string>
 </resources>
