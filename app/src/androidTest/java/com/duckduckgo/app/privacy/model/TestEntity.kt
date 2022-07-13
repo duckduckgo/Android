@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.privacy.model
 
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.site.api.Entity
 
 data class TestEntity(
     override val name: String,

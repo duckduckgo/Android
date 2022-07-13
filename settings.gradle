@@ -93,6 +93,8 @@ include ':app'
     include ":$it-internal"; project(":$it-internal").projectDir = new File("$it-internal")
 }
 
+include ':site-api'
+
 rootProject.children.each { subproject ->
 
     if (subproject.name == "vpn") {
@@ -131,3 +133,4 @@ buildCache {
         removeUnusedEntriesAfterDays = 7
     }
 }
+include ':site-impl'

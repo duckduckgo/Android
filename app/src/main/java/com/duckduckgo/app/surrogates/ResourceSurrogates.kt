@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.surrogates
 
+import com.duckduckgo.site.api.SurrogateResponse
+
 interface ResourceSurrogates {
     fun loadSurrogates(urls: List<SurrogateResponse>)
     fun get(scriptId: String): SurrogateResponse
@@ -42,10 +44,3 @@ class ResourceSurrogatesImpl : ResourceSurrogates {
     }
 }
 
-data class SurrogateResponse(
-    val scriptId: String = "",
-    val responseAvailable: Boolean = true,
-    val name: String = "",
-    val jsFunction: String = "",
-    val mimeType: String = ""
-)

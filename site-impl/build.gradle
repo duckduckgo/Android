@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2022 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'com.squareup.anvil'
+}
+
+apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+
+dependencies {
+    anvil project(path: ':anvil-compiler')
+    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':di')
+    implementation project(path: ':common')
+    api project(path: ':browser-api')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':site-api')
+
+    implementation AndroidX.core.ktx
+    implementation JakeWharton.timber
+    implementation Google.dagger
+}
+
+android {
+    anvil {
+        generateDaggerFactories = true // default is false
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+fulladleModuleConfig {
+    maxTestShards.set(1)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
+}

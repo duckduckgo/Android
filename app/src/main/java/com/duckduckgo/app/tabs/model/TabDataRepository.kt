@@ -22,10 +22,11 @@ import androidx.lifecycle.MutableLiveData
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.global.model.Site
-import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.site.api.Site
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.api.SiteFactory
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers

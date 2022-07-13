@@ -22,10 +22,11 @@ import com.duckduckgo.app.global.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.privacy.db.UserWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.site.api.TrackingEvent
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.api.EntityLookup
 import com.squareup.anvil.annotations.ContributesBinding
 import timber.log.Timber
 import java.util.concurrent.CopyOnWriteArrayList

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.site.api
 
-import com.duckduckgo.app.privacy.model.Grade.Grading.*
-import com.duckduckgo.app.privacy.model.Grade.Scores.ScoresAvailable
-import com.duckduckgo.app.privacy.model.Grade.Scores.ScoresUnavailable
-import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.site.api.Grade.Grading.*
+import com.duckduckgo.site.api.Grade.Scores.ScoresAvailable
+import com.duckduckgo.site.api.Grade.Scores.ScoresUnavailable
 import com.squareup.moshi.Json
 import timber.log.Timber
 

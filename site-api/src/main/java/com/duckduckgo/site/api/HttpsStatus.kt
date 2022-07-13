@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.site.api
 
-enum class PrivacyGrade {
-
-    A,
-    B_PLUS,
-    B,
-    C_PLUS,
-    C,
-    D,
-    UNKNOWN
+enum class HttpsStatus {
+    NONE,
+    MIXED,
+    SECURE
 }

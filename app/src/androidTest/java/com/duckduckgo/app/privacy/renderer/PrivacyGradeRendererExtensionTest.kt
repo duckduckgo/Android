@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.renderer
 
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.model.PrivacyGrade
+import com.duckduckgo.site.api.PrivacyGrade
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

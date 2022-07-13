@@ -27,7 +27,6 @@ import com.duckduckgo.app.onboarding.store.OnboardingSharedPreferences
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.privacy.store.TermsOfServiceRawStore
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
 import com.duckduckgo.app.statistics.store.OfflinePixelCountDataStore
 import com.duckduckgo.app.statistics.store.OfflinePixelCountSharedPreferences
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -38,6 +37,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.mobile.android.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.ui.store.ThemingSharedPreferences
 import com.duckduckgo.app.widget.FavoritesObserver
+import com.duckduckgo.site.api.TermsOfServiceStore
 import com.duckduckgo.widget.AppWidgetThemePreferences
 import com.duckduckgo.widget.WidgetPreferences
 import dagger.Binds

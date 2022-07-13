@@ -21,13 +21,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Practices
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.GOOD
-import com.duckduckgo.app.privacy.store.TermsOfServiceStore
-import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.site.api.TermsOfServiceStore
+import com.duckduckgo.site.api.EntityLookup
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.model.TdsDomainEntity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
+import com.duckduckgo.site.api.TermsOfService
+import com.duckduckgo.site.impl.PrivacyPracticesImpl
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlinx.coroutines.ExperimentalCoroutinesApi

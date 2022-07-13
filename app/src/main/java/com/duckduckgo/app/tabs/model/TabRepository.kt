@@ -18,7 +18,7 @@ package com.duckduckgo.app.tabs.model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.duckduckgo.app.global.model.Site
+import com.duckduckgo.site.api.Site
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 

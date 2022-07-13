@@ -18,8 +18,10 @@ package com.duckduckgo.app.privacy.store
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.site.api.TermsOfService
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.api.TermsOfServiceStore
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -33,7 +35,6 @@ import dagger.SingleInstanceIn
  * This raw file store is temporary. Once we move to an api call to retrieve the json
  * we'll store the content in a db rather than a raw file.
  */
-@SingleInstanceIn(AppScope::class)
 class TermsOfServiceRawStore @Inject constructor(
     private val moshi: Moshi,
     private val context: Context

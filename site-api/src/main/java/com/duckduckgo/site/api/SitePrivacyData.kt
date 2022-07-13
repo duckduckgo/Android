@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.site.api
 
-interface Entity {
-    val name: String
-    val displayName: String
-    val prevalence: Double
+import com.duckduckgo.app.privacy.model.PrivacyPractices
 
-    val isMajor get() = prevalence > MAJOR_NETWORK_PREVALENCE
-
-    companion object {
-        const val MAJOR_NETWORK_PREVALENCE = 7.0
-    }
-}
+data class SitePrivacyData(
+    val url: String,
+    val practices: PrivacyPractices.Practices,
+    val entity: Entity?,
+    val prevalence: Double?
+)

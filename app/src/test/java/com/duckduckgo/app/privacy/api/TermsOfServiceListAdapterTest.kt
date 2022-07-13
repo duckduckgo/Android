@@ -17,7 +17,7 @@
 package com.duckduckgo.app.privacy.api
 
 import com.duckduckgo.app.FileUtilities.loadText
-import com.duckduckgo.app.privacy.model.TermsOfService
+import com.duckduckgo.site.api.TermsOfService
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi

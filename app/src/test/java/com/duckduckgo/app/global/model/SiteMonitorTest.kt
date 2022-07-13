@@ -17,11 +17,12 @@
 package com.duckduckgo.app.global.model
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.site.api.HttpsStatus
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.privacy.model.TestingEntity
-import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.site.impl.SiteMonitor
+import com.duckduckgo.site.api.SurrogateResponse
+import com.duckduckgo.site.api.TrackingEvent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
@@ -50,50 +51,50 @@ class SiteMonitorTest {
 
     @Test
     fun whenUrlIsHttpsThenHttpsStatusIsSecure() {
-        val testee = SiteMonitor(httpsDocument, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(httpsDocument, null)
         assertEquals(HttpsStatus.SECURE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(httpDocument, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(httpDocument, null)
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 
     @Test
     fun whenUrlIsHttpsWithHttpResourcesThenHttpsStatusIsMixed() {
-        val testee = SiteMonitor(httpsDocument, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(httpsDocument, null)
         testee.hasHttpResources = true
         assertEquals(HttpsStatus.MIXED, testee.https)
     }
 
     @Test
     fun whenUrlIsMalformedThenHttpsStatusIsNone() {
-        val testee = SiteMonitor(malformedDocument, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(malformedDocument, null)
         assertEquals(HttpsStatus.NONE, testee.https)
     }
 
     @Test
     fun whenSiteMonitorCreatedThenUrlIsCorrect() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         assertEquals(document, testee.url)
     }
 
     @Test
     fun whenSiteMonitorCreatedWithTermsThenTermsAreSet() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         assertEquals(unknownPractices, testee.privacyPractices)
     }
 
     @Test
     fun whenSiteMonitorCreatedThenTrackerCountIsZero() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         assertEquals(0, testee.trackerCount)
     }
 
     @Test
     fun whenTrackersAreDetectedThenTrackerCountIsIncremented() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         testee.trackerDetected(TrackingEvent(document, trackerA, null, null, true, null))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, null, true, null))
         assertEquals(2, testee.trackerCount)
@@ -101,21 +102,21 @@ class SiteMonitorTest {
 
     @Test
     fun whenNonMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsZero() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         testee.trackerDetected(TrackingEvent(document, trackerA, null, network, true, null))
         assertEquals(0, testee.majorNetworkCount)
     }
 
     @Test
     fun whenMajorNetworkTrackerIsDetectedThenMajorNetworkCountIsOne() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         testee.trackerDetected(TrackingEvent(document, majorNetworkTracker, null, majorNetwork, true, null))
         assertEquals(1, testee.majorNetworkCount)
     }
 
     @Test
     fun whenDuplicateMajorNetworkIsDetectedThenMajorNetworkCountIsStillOne() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         testee.trackerDetected(TrackingEvent(document, trackerA, null, majorNetwork, true, null))
         testee.trackerDetected(TrackingEvent(document, trackerB, null, majorNetwork, true, null))
         assertEquals(1, testee.majorNetworkCount)
@@ -123,19 +124,19 @@ class SiteMonitorTest {
 
     @Test
     fun whenSiteCreatedThenUpgradedHttpsIsFalse() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         assertFalse(testee.upgradedHttps)
     }
 
     @Test
     fun whenSiteCreatedThenSurrogatesSizeIsZero() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         assertEquals(0, testee.surrogates.size)
     }
 
     @Test
     fun whenSurrogatesAreDetectedThenSurrogatesListIsIncremented() {
-        val testee = SiteMonitor(document, null)
+        val testee = com.duckduckgo.site.impl.SiteMonitor(document, null)
         testee.surrogateDetected(SurrogateResponse())
         assertEquals(1, testee.surrogates.size)
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.model
+package com.duckduckgo.site.api
 
-data class TrackingEvent(
-    val documentUrl: String,
-    val trackerUrl: String,
-    val categories: List<String>?,
-    val entity: Entity?,
-    val blocked: Boolean,
-    val surrogateId: String?
-)
+import androidx.annotation.AnyThread
+import androidx.annotation.WorkerThread
+
+interface SiteFactory {
+    @AnyThread
+    fun buildSite(
+        url: String,
+        title: String? = null,
+        httpUpgraded: Boolean = false
+    ): Site
+
+    /**
+     * Updates the given Site with the full details
+     *
+     * This can be expensive to execute.
+     */
+    @WorkerThread
+    fun loadFullSiteDetails(site: Site)
+}

@@ -19,7 +19,7 @@ package com.duckduckgo.app.privacy.renderer
 import android.content.Context
 import androidx.annotation.DrawableRes
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.privacy.model.HttpsStatus
+import com.duckduckgo.site.api.HttpsStatus
 
 @DrawableRes
 fun HttpsStatus.icon(): Int {

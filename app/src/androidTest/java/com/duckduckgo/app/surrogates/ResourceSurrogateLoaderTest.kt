@@ -18,6 +18,7 @@ package com.duckduckgo.app.surrogates
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.surrogates.store.ResourceSurrogateDataStore
+import com.duckduckgo.site.api.SurrogateResponse
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import org.junit.Assert.assertEquals

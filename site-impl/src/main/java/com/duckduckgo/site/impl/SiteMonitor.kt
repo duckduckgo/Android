@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.global.model
+package com.duckduckgo.site.impl
 
 import android.net.Uri
 import androidx.core.net.toUri
 import com.duckduckgo.app.global.isHttps
-import com.duckduckgo.app.global.model.Site.SiteGrades
-import com.duckduckgo.app.global.model.SiteFactory.SitePrivacyData
-import com.duckduckgo.app.privacy.model.Grade
-import com.duckduckgo.app.privacy.model.HttpsStatus
-import com.duckduckgo.app.privacy.model.PrivacyGrade
 import com.duckduckgo.app.privacy.model.PrivacyPractices
-import com.duckduckgo.app.surrogates.SurrogateResponse
-import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.site.api.Entity
+import com.duckduckgo.site.api.Grade
+import com.duckduckgo.site.api.HttpsStatus
+import com.duckduckgo.site.api.PrivacyGrade
+import com.duckduckgo.site.api.Site
+import com.duckduckgo.site.api.Site.SiteGrades
+import com.duckduckgo.site.api.SitePrivacyData
+import com.duckduckgo.site.api.SurrogateResponse
+import com.duckduckgo.site.api.TrackingEvent
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SiteMonitor(

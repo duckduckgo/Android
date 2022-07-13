@@ -29,10 +29,11 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
-import com.duckduckgo.app.global.model.SiteFactory
+import com.duckduckgo.site.api.SiteFactory
 import com.duckduckgo.app.privacy.model.PrivacyPractices
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.site.api.EntityLookup
+import com.duckduckgo.site.impl.SiteFactoryImpl
 import org.mockito.kotlin.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -417,7 +418,7 @@ class TabDataRepositoryTest {
     private fun tabDataRepository(dao: TabsDao): TabDataRepository {
         return TabDataRepository(
             dao,
-            SiteFactory(mockPrivacyPractices, mockEntityLookup),
+            SiteFactoryImpl(mockPrivacyPractices, mockEntityLookup),
             mockWebViewPreviewPersister,
             mockFaviconManager,
             TestScope()

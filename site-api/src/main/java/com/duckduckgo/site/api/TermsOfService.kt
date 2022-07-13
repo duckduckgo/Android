@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privacy.model
+package com.duckduckgo.site.api
 
+import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary
 import com.duckduckgo.app.privacy.model.PrivacyPractices.Summary.*
 
 data class TermsOfService(
@@ -26,7 +27,7 @@ data class TermsOfService(
     val badPrivacyTerms: List<String> = ArrayList()
 ) {
 
-    val practices: PrivacyPractices.Summary
+    val practices: Summary
         get() {
 
             when (classification) {
