@@ -100,9 +100,9 @@ include ':app'
 }
 
 "autofill".with {
-    include ":$it-api"; project(":$it-api").projectDir = new File("modules/$it/$it-api")
-    include ":$it-impl"; project(":$it-impl").projectDir = new File("modules/$it/$it-impl")
-    include ":$it-store"; project(":$it-store").projectDir = new File("modules/$it/$it-store")
+    include ":$it-api"; project(":$it-api").projectDir = new File("$it/$it-api")
+    include ":$it-impl"; project(":$it-impl").projectDir = new File("$it/$it-impl")
+    include ":$it-store"; project(":$it-store").projectDir = new File("$it/$it-store")
 }
 
 "device-auth".with {
