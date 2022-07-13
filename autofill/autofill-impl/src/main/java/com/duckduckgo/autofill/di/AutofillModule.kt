@@ -17,43 +17,16 @@
 package com.duckduckgo.autofill.di
 
 import android.content.Context
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.autofill.AutofillJavascriptInterface
 import com.duckduckgo.autofill.store.InternalTestUserStore
 import com.duckduckgo.autofill.store.RealInternalTestUserStore
-import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
-import com.duckduckgo.autofill.jsbridge.request.AutofillRequestParser
-import com.duckduckgo.autofill.jsbridge.response.AutofillResponseWriter
-import com.duckduckgo.autofill.store.AutofillStore
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 
 @Module
 @ContributesTo(AppScope::class)
 class AutofillModule {
-
-    @Provides
-    fun providesAutofillInterface(
-        requestParser: AutofillRequestParser,
-        autofillStore: AutofillStore,
-        @AppCoroutineScope coroutineScope: CoroutineScope,
-        autofillMessagePoster: AutofillMessagePoster,
-        autofillResponseWriter: AutofillResponseWriter,
-        emailManager: EmailManager
-    ): AutofillJavascriptInterface {
-        return AutofillJavascriptInterface(
-            requestParser = requestParser,
-            autofillStore = autofillStore,
-            autofillMessagePoster = autofillMessagePoster,
-            autofillResponseWriter = autofillResponseWriter,
-            emailManager = emailManager,
-            coroutineScope = coroutineScope
-        )
-    }
 
     @Provides
     fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)

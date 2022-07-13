@@ -20,7 +20,7 @@ import android.webkit.WebView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.duckduckgo.app.CoroutineTestRule
 import com.duckduckgo.app.email.EmailManager
-import com.duckduckgo.autofill.AutofillJavascriptInterface.UrlProvider
+import com.duckduckgo.autofill.AutofillStoredBackJavascriptInterface.UrlProvider
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 import com.duckduckgo.autofill.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.jsbridge.request.AutofillDataRequest
@@ -43,7 +43,7 @@ import org.robolectric.RobolectricTestRunner
 
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
-class AutofillJavascriptInterfaceTest {
+class AutofillStoredBackJavascriptInterfaceTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -62,7 +62,7 @@ class AutofillJavascriptInterfaceTest {
 
     @Before
     fun setup() = runTest {
-        testee = AutofillJavascriptInterface(
+        testee = AutofillStoredBackJavascriptInterface(
             requestParser = requestParser,
             autofillStore = autofillStore,
             autofillMessagePoster = autofillMessagePoster,
@@ -71,8 +71,8 @@ class AutofillJavascriptInterfaceTest {
             coroutineScope = coroutineScope,
             currentUrlProvider = currentUrlProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            callback = TestCallback
         )
+        testee.callback = TestCallback
         testee.webView = testWebView
 
         whenever(currentUrlProvider.currentUrl(testWebView)).thenReturn("https://example.com")
