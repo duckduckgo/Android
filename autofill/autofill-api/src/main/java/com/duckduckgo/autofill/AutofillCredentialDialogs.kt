@@ -19,6 +19,9 @@ package com.duckduckgo.autofill
 import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.domain.app.LoginCredentials
 
+/**
+ * Dialog which can be shown when user is required to select which saved credential to autofill
+ */
 interface CredentialAutofillPickerDialog : DialogFragmentType {
 
     companion object {
@@ -30,6 +33,9 @@ interface CredentialAutofillPickerDialog : DialogFragmentType {
     }
 }
 
+/**
+ * Dialog which can be shown to prompt user to save credentials or not
+ */
 interface CredentialSavePickerDialog : DialogFragmentType {
 
     companion object {
@@ -40,6 +46,9 @@ interface CredentialSavePickerDialog : DialogFragmentType {
     }
 }
 
+/**
+ * Dialog which can be shown to prompt user to update existing saved credentials or not
+ */
 interface CredentialUpdateExistingCredentialsDialog : DialogFragmentType {
 
     companion object {
@@ -50,10 +59,17 @@ interface CredentialUpdateExistingCredentialsDialog : DialogFragmentType {
     }
 }
 
+/**
+ * A workaround caused by modularization:
+ * clients using these dialogs will know them by their interface but will also need to know they are DialogFragments to show them
+ */
 interface DialogFragmentType {
     fun asDialogFragment(): DialogFragment
 }
 
+/**
+ * Factory used to get instances of the various autofill dialogs
+ */
 interface CredentialAutofillDialogFactory {
 
     fun autofillSelectCredentialsDialog(url: String, credentials: List<LoginCredentials>): CredentialAutofillPickerDialog
