@@ -20,18 +20,21 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.DownloadsRepository
 import com.duckduckgo.downloads.store.DownloadEntity
+import com.duckduckgo.downloads.store.DownloadStatus
 import com.duckduckgo.downloads.store.DownloadsDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.io.File
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class DefaultDownloadsRepository @Inject constructor(
-    private val downloadsDatabase: DownloadsDatabase
+    private val downloadsDatabase: DownloadsDatabase,
+    private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
 ) : DownloadsRepository {
 
     override suspend fun insert(downloadItem: DownloadItem): Long {
@@ -44,21 +47,33 @@ class DefaultDownloadsRepository @Inject constructor(
 
     override suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long) {
         downloadsDatabase.downloadsDao().update(downloadId, downloadStatus, contentLength)
+        if (downloadStatus != DownloadStatus.STARTED) {
+            urlFileDownloadCallManager.remove(downloadId)
+        }
     }
 
     override suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long) {
         downloadsDatabase.downloadsDao().update(fileName, downloadStatus, contentLength)
     }
 
-    override suspend fun delete(id: Long) {
-        downloadsDatabase.downloadsDao().delete(id)
+    override suspend fun delete(downloadId: Long) {
+        downloadsDatabase.downloadsDao().getDownloadItem(downloadId)?.let {
+            File(it.filePath).delete()
+        }
+        downloadsDatabase.downloadsDao().delete(downloadId)
+        urlFileDownloadCallManager.remove(downloadId)
     }
 
     override suspend fun delete(downloadIdList: List<Long>) {
         downloadsDatabase.downloadsDao().delete(downloadIdList)
+        downloadIdList.forEach { urlFileDownloadCallManager.remove(it) }
     }
 
     override suspend fun deleteAll() {
+        downloadsDatabase.downloadsDao().getDownloads().forEach {
+            File(it.filePath).delete()
+            urlFileDownloadCallManager.remove(it.downloadId)
+        }
         downloadsDatabase.downloadsDao().delete()
     }
 
@@ -76,7 +91,6 @@ class DefaultDownloadsRepository @Inject constructor(
 
     private fun DownloadEntity.mapToDownloadItem(): DownloadItem =
         DownloadItem(
-            id = this.id,
             downloadId = this.downloadId,
             downloadStatus = this.downloadStatus,
             fileName = this.fileName,
@@ -90,7 +104,6 @@ class DefaultDownloadsRepository @Inject constructor(
 
     private fun DownloadItem.mapToDownloadEntity(): DownloadEntity =
         DownloadEntity(
-            id = this.id,
             downloadId = this.downloadId,
             downloadStatus = this.downloadStatus,
             fileName = this.fileName,

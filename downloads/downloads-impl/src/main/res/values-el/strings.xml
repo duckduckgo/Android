@@ -19,8 +19,5 @@
 
     <string name="notificationChannelFileDownloading">Λήψη αρχείου</string>
     <string name="notificationChannelFileDownloaded">Έγινε λήψη του αρχείου</string>
-
-    <string name="downloadComplete">Η λήψη ολοκληρώθηκε</string>
-    <string name="downloadFailed">Αποτυχία λήψης</string>
     <string name="downloadInProgress">Λήψη…</string>
 </resources>

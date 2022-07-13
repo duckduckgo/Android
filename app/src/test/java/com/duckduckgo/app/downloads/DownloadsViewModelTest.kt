@@ -32,7 +32,6 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.app.global.formatters.time.RealTimeDiffFormatter
 import com.duckduckgo.downloads.api.DownloadsRepository
-import com.duckduckgo.downloads.api.FileDownloadManager
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -62,15 +61,12 @@ class DownloadsViewModelTest {
 
     private val context: Context = mock()
 
-    private val fileDownloadManager: FileDownloadManager = mock()
-
     private val testee: DownloadsViewModel by lazy {
         val model =
             DownloadsViewModel(
                 RealTimeDiffFormatter(context),
                 mockDownloadsRepository,
                 coroutineRule.testDispatcherProvider,
-                fileDownloadManager,
             )
         model
     }
@@ -115,12 +111,12 @@ class DownloadsViewModelTest {
         val sometimeInThePreviousYear = today.minusDays(370)
 
         val downloadList = listOf(
-            oneItem().copy(id = 1L, createdAt = today.toString()),
-            oneItem().copy(id = 2L, createdAt = yesterday.toString()),
-            oneItem().copy(id = 3L, createdAt = sometimeDuringPastWeek.toString()),
-            oneItem().copy(id = 4L, createdAt = sometimeDuringPastMonth.toString()),
-            oneItem().copy(id = 5L, createdAt = sometimeBeforePastMonth.toString()),
-            oneItem().copy(id = 6L, createdAt = sometimeInThePreviousYear.toString())
+            oneItem().copy(downloadId = 1L, createdAt = today.toString()),
+            oneItem().copy(downloadId = 2L, createdAt = yesterday.toString()),
+            oneItem().copy(downloadId = 3L, createdAt = sometimeDuringPastWeek.toString()),
+            oneItem().copy(downloadId = 4L, createdAt = sometimeDuringPastMonth.toString()),
+            oneItem().copy(downloadId = 5L, createdAt = sometimeBeforePastMonth.toString()),
+            oneItem().copy(downloadId = 6L, createdAt = sometimeInThePreviousYear.toString())
         )
 
         whenever(mockDownloadsRepository.getDownloadsAsFlow()).thenReturn(flowOf(downloadList))
@@ -139,32 +135,32 @@ class DownloadsViewModelTest {
             assertTrue(items[0] is Header)
             assertTrue((items[0] as Header).text == "Today")
             assertTrue(items[1] is Item)
-            assertEquals(downloadList[0].id, (items[1] as Item).downloadItem.id)
+            assertEquals(downloadList[0].downloadId, (items[1] as Item).downloadItem.downloadId)
 
             assertTrue(items[2] is Header)
             assertTrue((items[2] as Header).text == "Yesterday")
             assertTrue(items[3] is Item)
-            assertEquals(downloadList[1].id, (items[3] as Item).downloadItem.id)
+            assertEquals(downloadList[1].downloadId, (items[3] as Item).downloadItem.downloadId)
 
             assertTrue(items[4] is Header)
             assertTrue((items[4] as Header).text == "Past Week")
             assertTrue(items[5] is Item)
-            assertEquals(downloadList[2].id, (items[5] as Item).downloadItem.id)
+            assertEquals(downloadList[2].downloadId, (items[5] as Item).downloadItem.downloadId)
 
             assertTrue(items[6] is Header)
             assertTrue((items[6] as Header).text == "Past Month")
             assertTrue(items[7] is Item)
-            assertEquals(downloadList[3].id, (items[7] as Item).downloadItem.id)
+            assertEquals(downloadList[3].downloadId, (items[7] as Item).downloadItem.downloadId)
 
             assertTrue(items[8] is Header)
             assertTrue((items[8] as Header).text.lowercase() == sometimeBeforePastMonth.month.name.lowercase())
             assertTrue(items[9] is Item)
-            assertEquals(downloadList[4].id, (items[9] as Item).downloadItem.id)
+            assertEquals(downloadList[4].downloadId, (items[9] as Item).downloadItem.downloadId)
 
             assertTrue(items[10] is Header)
             assertTrue((items[10] as Header).text == sometimeInThePreviousYear.year.toString())
             assertTrue(items[11] is Item)
-            assertEquals(downloadList[5].id, (items[11] as Item).downloadItem.id)
+            assertEquals(downloadList[5].downloadId, (items[11] as Item).downloadItem.downloadId)
         }
     }
 
@@ -190,7 +186,7 @@ class DownloadsViewModelTest {
 
         testee.delete(item)
 
-        verify(mockDownloadsRepository).delete(item.id)
+        verify(mockDownloadsRepository).delete(item.downloadId)
         testee.commands().test {
             assertEquals(
                 DisplayMessage(R.string.downloadsFileNotFoundErrorMessage),
@@ -277,7 +273,7 @@ class DownloadsViewModelTest {
 
         testee.onDeleteItemClicked(item)
 
-        verify(mockDownloadsRepository).delete(item.id)
+        verify(mockDownloadsRepository).delete(item.downloadId)
         testee.commands().test {
             assertEquals(
                 DisplayUndoMessage(
@@ -296,7 +292,7 @@ class DownloadsViewModelTest {
 
         testee.onCancelItemClicked(item)
 
-        verify(mockDownloadsRepository).delete(item.id)
+        verify(mockDownloadsRepository).delete(item.downloadId)
         testee.commands().test {
             assertEquals(
                 CancelDownload(item),
@@ -306,17 +302,16 @@ class DownloadsViewModelTest {
     }
 
     @Test
-    fun whenRemoveFromDownloadManagerThenRemoveIt() {
+    fun whenRemoveFromDownloadManagerThenRemoveIt() = runTest {
         val downloadId = 1L
 
         testee.removeFromDownloadManager(downloadId)
 
-        verify(fileDownloadManager).remove(downloadId)
+        verify(mockDownloadsRepository).delete(downloadId)
     }
 
     private fun oneItem() =
         DownloadItem(
-            id = 1L,
             downloadId = 10L,
             downloadStatus = FINISHED,
             fileName = "file.jpg",
@@ -327,7 +322,6 @@ class DownloadsViewModelTest {
 
     private fun otherItem() =
         DownloadItem(
-            id = 2L,
             downloadId = 20L,
             downloadStatus = FINISHED,
             fileName = "other-file.jpg",
