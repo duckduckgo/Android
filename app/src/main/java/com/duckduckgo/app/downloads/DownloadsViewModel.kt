@@ -33,7 +33,6 @@ import com.duckduckgo.app.global.DispatcherProvider
 import com.duckduckgo.app.global.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsRepository
-import com.duckduckgo.downloads.api.FileDownloadManager
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -52,7 +51,6 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
-    private val downloadManager: FileDownloadManager,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -103,7 +101,7 @@ class DownloadsViewModel @Inject constructor(
 
     fun delete(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(DisplayMessage(R.string.downloadsFileNotFoundErrorMessage))
         }
     }
@@ -124,7 +122,9 @@ class DownloadsViewModel @Inject constructor(
     }
 
     fun removeFromDownloadManager(downloadId: Long) {
-        downloadManager.remove(downloadId)
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(downloadId)
+        }
     }
 
     fun onQueryTextChange(newText: String) {
@@ -173,14 +173,14 @@ class DownloadsViewModel @Inject constructor(
 
     override fun onDeleteItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
         }
     }
 
     override fun onCancelItemClicked(item: DownloadItem) {
         viewModelScope.launch(dispatcher.io()) {
-            downloadsRepository.delete(item.id)
+            downloadsRepository.delete(item.downloadId)
             command.send(CancelDownload(item))
         }
     }

@@ -17,7 +17,6 @@
 package com.duckduckgo.downloads.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.downloads.api.FileDownloadManager
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import okhttp3.ResponseBody
@@ -26,9 +25,15 @@ import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
+interface UrlFileDownloadCallManager {
+    fun add(downloadId: Long, call: Call<ResponseBody>)
+
+    fun remove(downloadId: Long)
+}
+
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
-class RealFileDownloadManager @Inject constructor() : FileDownloadManager {
+class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager {
     private val callsMap = ConcurrentHashMap<Long, Call<ResponseBody>>()
 
     /**
@@ -45,7 +50,7 @@ class RealFileDownloadManager @Inject constructor() : FileDownloadManager {
      * Call this method to add the ongoing download to the list of downloads.
      * The ongoing download is identified by its [downloadId] and the network [call].
      */
-    fun add(downloadId: Long, call: Call<ResponseBody>) {
+    override fun add(downloadId: Long, call: Call<ResponseBody>) {
         Timber.d("Adding download $downloadId")
         callsMap[downloadId] = call
     }

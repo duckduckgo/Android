@@ -24,20 +24,20 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import retrofit2.Call
 
-class RealFileDownloadManagerTest {
+class RealUrlFileDownloadCallManagerTest {
 
     private val call: Call<ResponseBody> = mock()
 
     @Test
     fun whenRemovingNotAddedDownloadIdThenNoop() {
-        RealFileDownloadManager().remove(0L)
+        RealUrlFileDownloadCallManager().remove(0L)
 
         verifyNoInteractions(call)
     }
 
     @Test
     fun whenRemovingAddedDownloadIdThenCancelDownloadAndRemove() {
-        val downloadManager = RealFileDownloadManager()
+        val downloadManager = RealUrlFileDownloadCallManager()
         downloadManager.add(0L, call)
 
         downloadManager.remove(0L)
@@ -52,7 +52,7 @@ class RealFileDownloadManagerTest {
     fun whenAddingDownloadIdTwiceThenOnlyLatestCallIsReplaced() {
         val secondCall: Call<ResponseBody> = mock()
 
-        val downloadManager = RealFileDownloadManager()
+        val downloadManager = RealUrlFileDownloadCallManager()
         downloadManager.add(0L, call)
         downloadManager.add(0L, secondCall)
 
