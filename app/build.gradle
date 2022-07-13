@@ -152,6 +152,7 @@ fladle {
 dependencies {
     implementation project(path: ':autofill-api')
     implementation project(path: ':autofill-impl')
+    implementation project(path: ':autofill-store')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
