@@ -212,8 +212,7 @@ class DuckDuckGoFaviconManager constructor(
         icon: Bitmap,
         domain: String
     ): File? {
-        val countSpecialCasesForSite = persistedFaviconsForDomain(domain)
-        return if (countSpecialCasesForSite > 0) {
+        return if (persistedFaviconsForDomain(domain) > 0) {
             faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, icon, domain)
         } else null
     }
