@@ -29,9 +29,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 @ExperimentalCoroutinesApi
 class DefaultDownloadsRepositoryTest {
@@ -42,13 +40,14 @@ class DefaultDownloadsRepositoryTest {
 
     private val mockDb: DownloadsDatabase = mock()
     private val mockDao: DownloadsDao = mock()
+    private val mockUrlFileDownloadCallManager: UrlFileDownloadCallManager = mock()
     private lateinit var repository: DownloadsRepository
 
     @Before
     fun before() {
         whenever(mockDb.downloadsDao()).thenReturn(mockDao)
 
-        repository = DefaultDownloadsRepository(mockDb)
+        repository = DefaultDownloadsRepository(mockDb, mockUrlFileDownloadCallManager)
     }
 
     @Test
@@ -59,6 +58,7 @@ class DefaultDownloadsRepositoryTest {
         repository.insert(item)
 
         verify(mockDb.downloadsDao()).insert(entity)
+        verifyNoInteractions(mockUrlFileDownloadCallManager)
     }
 
     @Test
@@ -71,10 +71,11 @@ class DefaultDownloadsRepositoryTest {
         repository.insertAll(listOf(firstItem, secondItem))
 
         verify(mockDb.downloadsDao()).insertAll(listOf(firstEntity, secondEntity))
+        verifyNoInteractions(mockUrlFileDownloadCallManager)
     }
 
     @Test
-    fun whenUpdateDownloadItemByIdWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() =
+    fun whenUpdateDownloadItemByIdWithDownloadStatusFinishedAndContentLengthThenUpdateCalledWithSameParams() =
         runTest {
             val item = oneItem()
             val updatedStatus = FINISHED
@@ -91,10 +92,34 @@ class DefaultDownloadsRepositoryTest {
                 downloadStatus = updatedStatus,
                 contentLength = updatedContentLength
             )
+
+            verify(mockUrlFileDownloadCallManager).remove(item.downloadId)
         }
 
     @Test
-    fun whenUpdateDownloadItemByFileNameWithDownloadStatusAndContentLengthThenUpdateCalledWithSameParams() =
+    fun whenUpdateDownloadItemByIdWithDownloadStatusStartedAndContentLengthThenUpdateCalledWithSameParams() =
+        runTest {
+            val item = oneItem()
+            val updatedStatus = STARTED
+            val updatedContentLength = 1111111L
+
+            repository.update(
+                downloadId = item.downloadId,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+
+            verify(mockDb.downloadsDao()).update(
+                downloadId = item.downloadId,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+
+            verifyNoInteractions(mockUrlFileDownloadCallManager)
+        }
+
+    @Test
+    fun whenUpdateDownloadItemByFileNameWithDownloadStatusFinishedAndContentLengthThenUpdateCalledWithSameParams() =
         runTest {
             val item = oneItem().copy(downloadId = 0L)
             val updatedStatus = FINISHED
@@ -111,15 +136,40 @@ class DefaultDownloadsRepositoryTest {
                 downloadStatus = updatedStatus,
                 contentLength = updatedContentLength
             )
+
+            verifyNoInteractions(mockUrlFileDownloadCallManager)
+        }
+
+    @Test
+    fun whenUpdateDownloadItemByFileNameWithDownloadStatusStartedAndContentLengthThenUpdateCalledWithSameParams() =
+        runTest {
+            val item = oneItem().copy(downloadId = 0L)
+            val updatedStatus = FINISHED
+            val updatedContentLength = 1111111L
+
+            repository.update(
+                fileName = item.fileName,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+
+            verify(mockDb.downloadsDao()).update(
+                fileName = item.fileName,
+                downloadStatus = updatedStatus,
+                contentLength = updatedContentLength
+            )
+
+            verifyNoInteractions(mockUrlFileDownloadCallManager)
         }
 
     @Test
     fun whenDeleteDownloadItemThenDeleteCalled() = runTest {
         val item = oneItem()
 
-        repository.delete(item.id)
+        repository.delete(item.downloadId)
 
-        verify(mockDb.downloadsDao()).delete(item.id)
+        verify(mockDb.downloadsDao()).delete(item.downloadId)
+        verify(mockUrlFileDownloadCallManager).remove(item.downloadId)
     }
 
     @Test
@@ -130,13 +180,18 @@ class DefaultDownloadsRepositoryTest {
         repository.delete(listOf(firstItem.downloadId, secondItem.downloadId))
 
         verify(mockDb.downloadsDao()).delete(listOf(firstItem.downloadId, secondItem.downloadId))
+        verify(mockUrlFileDownloadCallManager, times(2)).remove(any())
     }
 
     @Test
     fun whenDeleteAllDownloadItemsThenDeleteWithNoParamsCalled() = runTest {
+        val entity = oneEntity()
+        whenever(mockDb.downloadsDao().getDownloads()).thenReturn(listOf(entity))
+
         repository.deleteAll()
 
         verify(mockDb.downloadsDao()).delete()
+        verify(mockUrlFileDownloadCallManager).remove(entity.downloadId)
     }
 
     @Test
@@ -160,7 +215,6 @@ class DefaultDownloadsRepositoryTest {
     }
 
     private fun oneItem() = DownloadItem(
-        id = 1L,
         downloadId = 10L,
         downloadStatus = STARTED,
         fileName = "file.jpg",
@@ -170,7 +224,6 @@ class DefaultDownloadsRepositoryTest {
     )
 
     private fun otherItem() = DownloadItem(
-        id = 2L,
         downloadId = 20L,
         downloadStatus = STARTED,
         fileName = "other-file.jpg",
@@ -180,7 +233,7 @@ class DefaultDownloadsRepositoryTest {
     )
 
     private fun oneEntity() = DownloadEntity(
-        id = 1L,
+        id = 0L,
         downloadId = 10L,
         downloadStatus = STARTED,
         fileName = "file.jpg",
@@ -190,7 +243,7 @@ class DefaultDownloadsRepositoryTest {
     )
 
     private fun otherEntity() = DownloadEntity(
-        id = 2L,
+        id = 0L,
         downloadId = 20L,
         downloadStatus = STARTED,
         fileName = "other-file.jpg",
