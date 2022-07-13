@@ -24,7 +24,6 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation Kotlin.stdlib.jdk7
     implementation project(path: ':di')
     implementation project(path: ':common')
     implementation project(path: ':common-ui')
@@ -32,11 +31,8 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation KotlinX.coroutines.core
-    implementation AndroidX.lifecycle.runtimeKtx
-    implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
-    implementation Google.dagger
 }
 

@@ -37,7 +37,6 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
-    implementation Kotlin.stdlib.jdk7
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -48,20 +47,13 @@ dependencies {
     implementation "androidx.webkit:webkit:_"
 
     implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
     implementation Google.dagger
     implementation AndroidX.core.ktx
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.ktx
     implementation AndroidX.work.runtimeKtx
 
     // Testing dependencies
-    testImplementation AndroidX.work.testing
-    testImplementation AndroidX.room.testing
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
@@ -69,7 +61,6 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
 
-    androidTestImplementation project(path: ':common-test')
     testImplementation project(path: ':common-test')
 
     testImplementation (KotlinX.coroutines.test) {
