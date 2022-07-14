@@ -2323,17 +2323,9 @@ class BrowserTabFragment :
         private var lastSeenPrivacyShieldViewState: PrivacyShieldViewState? = null
 
         fun renderPrivacyShield(viewState: PrivacyShieldViewState) {
-
-            Timber.i("Shield: event received with ${viewState.privacyShield}")
             renderIfChanged(viewState, lastSeenPrivacyShieldViewState) {
-                if (viewState.privacyShield == lastSeenPrivacyShieldViewState?.privacyShield) return
-                val oldShield = lastSeenPrivacyShieldViewState?.privacyShield
                 lastSeenPrivacyShieldViewState = viewState
-
-                val privacyShield = viewState.privacyShield
-
-                Timber.i("Shield: old $oldShield new $privacyShield ")
-                privacyShieldView.setAnimationView(shieldIcon, privacyShield)
+                privacyShieldView.setAnimationView(shieldIcon, viewState.privacyShield)
             }
         }
 
