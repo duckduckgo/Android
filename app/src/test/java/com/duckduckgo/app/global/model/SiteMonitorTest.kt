@@ -53,7 +53,7 @@ class SiteMonitorTest {
         private const val majorNetworkTracker = "http://majorNetworkTracker.com/script.js"
 
         private val network = TestingEntity("Network", "Network", 1.0)
-        private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", 26.0)
+        private val majorNetwork = TestingEntity("MajorNetwork", "MajorNetwork", Entity.MAJOR_NETWORK_PREVALENCE + 1)
 
         private val unknownPractices = PrivacyPractices.UNKNOWN
     }

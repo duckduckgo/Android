@@ -32,6 +32,7 @@ import com.duckduckgo.app.privacy.model.TestEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.trackerdetection.model.Entity
 import com.duckduckgo.privacy.config.api.ContentBlocking
+import com.duckduckgo.trackerdetection.model.Entity.Companion.MAJOR_NETWORK_PREVALENCE
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -182,7 +183,7 @@ class ScorecardViewModelTest {
         val siteData = MutableLiveData<Site>()
         whenever(tabRepository.retrieveSiteData(any())).thenReturn(siteData)
 
-        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = 26.0)))
+        siteData.postValue(site(entity = TestEntity(name = "", displayName = "", prevalence = MAJOR_NETWORK_PREVALENCE + 1)))
 
         testee.scoreCard("1").test {
             assertTrue(awaitItem().showIsMemberOfMajorNetwork)
