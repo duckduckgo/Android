@@ -69,11 +69,13 @@ import com.duckduckgo.mobile.android.ui.DuckDuckGoTheme
 import com.duckduckgo.mobile.android.ui.sendThemeChangedBroadcast
 import com.duckduckgo.mobile.android.ui.view.quietlySetIsChecked
 import com.duckduckgo.mobile.android.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.vpn.service.TrackerBlockingVpnService
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnOnboardingActivity
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import com.duckduckgo.mobile.android.vpn.waitlist.store.WaitlistState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -133,12 +135,16 @@ class SettingsActivity :
         configureInternalFeatures()
         configureAppLinksSettingVisibility()
         observeViewModel()
+
+        lifecycle.addObserver(viewModel)
     }
 
     override fun onStart() {
         super.onStart()
-        viewModel.start()
-        viewModel.startPollingAppTpEnableState()
+        viewModel.start(TrackerBlockingVpnService.isServiceRunning(this))
+        viewModel.startPollingAppTpEnableState {
+            TrackerBlockingVpnService.isServiceRunning(this)
+        }
     }
 
     private fun configureUiEventHandlers() {

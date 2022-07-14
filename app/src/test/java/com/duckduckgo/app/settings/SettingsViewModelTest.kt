@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.settings
 
-import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.duckduckgo.app.CoroutineTestRule
@@ -84,9 +83,6 @@ class SettingsViewModelTest {
     @Mock
     private lateinit var mockFireAnimationLoader: FireAnimationLoader
 
-    @Mock
-    lateinit var mockContext: Context
-
     private lateinit var appTPRepository: AtpWaitlistStateRepository
 
     @Mock
@@ -130,7 +126,6 @@ class SettingsViewModelTest {
         whenever(mockAppBuildConfig.versionCode).thenReturn(1)
 
         testee = SettingsViewModel(
-            mockContext,
             mockThemeSettingsDataStore,
             mockAppSettingsDataStore,
             mockDefaultBrowserDetector,
@@ -143,7 +138,7 @@ class SettingsViewModelTest {
             mockPixel,
             mockAppBuildConfig,
             mockEmailManager,
-            mockMacOsWaitlist
+            mockMacOsWaitlist,
         )
     }
 
@@ -158,7 +153,7 @@ class SettingsViewModelTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(false)
         whenever(mockGpc.isEnabled()).thenReturn(true)
 
-        testee.start()
+        testee.start(false)
 
         testee.viewState().test {
             assertFalse(awaitItem().globalPrivacyControlEnabled)
@@ -170,7 +165,7 @@ class SettingsViewModelTest {
     fun whenStartIfGpcToggleEnabledAndGpcDisabledThenGpgDisabled() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(false)
-        testee.start()
+        testee.start(false)
 
         testee.viewState().test {
             assertFalse(awaitItem().globalPrivacyControlEnabled)
@@ -182,7 +177,7 @@ class SettingsViewModelTest {
     fun whenStartIfGpcToggleEnabledAndGpcEnabledThenGpgEnabled() = runTest {
         whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName), any())).thenReturn(true)
         whenever(mockGpc.isEnabled()).thenReturn(true)
-        testee.start()
+        testee.start(false)
 
         testee.viewState().test {
             assertTrue(awaitItem().globalPrivacyControlEnabled)
@@ -206,7 +201,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartCalledThenLoadingSetToFalse() = runTest {
-        testee.start()
+        testee.start(false)
         testee.viewState().test {
             val value = awaitItem()
             assertEquals(false, value.loading)
@@ -217,7 +212,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenStartCalledThenVersionSetCorrectly() = runTest {
-        testee.start()
+        testee.start(false)
         testee.viewState().test {
             val value = expectMostRecentItem()
             val expectedStartString = "name (1)"
@@ -230,7 +225,7 @@ class SettingsViewModelTest {
     @Test
     fun whenStartCalledThenEmailAddressSetCorrectly() = runTest {
         whenever(mockEmailManager.getEmailAddress()).thenReturn("email")
-        testee.start()
+        testee.start(false)
         testee.viewState().test {
             val value = expectMostRecentItem()
             val expectedEmail = "email"
@@ -403,7 +398,7 @@ class SettingsViewModelTest {
     @Test
     fun whenDefaultBrowserAppAlreadySetToOursThenIsDefaultBrowserFlagIsTrue() = runTest {
         whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
-        testee.start()
+        testee.start(false)
 
         testee.viewState().test {
             assertTrue(awaitItem().isAppDefaultBrowser)
@@ -416,7 +411,7 @@ class SettingsViewModelTest {
     fun whenDefaultBrowserAppNotSetToOursThenIsDefaultBrowserFlagIsFalse() = runTest {
         testee.viewState().test {
             whenever(mockDefaultBrowserDetector.isDefaultBrowser()).thenReturn(false)
-            testee.start()
+            testee.start(false)
 
             assertFalse(awaitItem().isAppDefaultBrowser)
 
@@ -428,7 +423,7 @@ class SettingsViewModelTest {
     fun whenBrowserDetectorIndicatesDefaultCannotBeSetThenFlagToShowSettingIsFalse() = runTest {
         testee.viewState().test {
             whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(false)
-            testee.start()
+            testee.start(false)
 
             assertFalse(awaitItem().showDefaultBrowserSetting)
 
@@ -439,7 +434,7 @@ class SettingsViewModelTest {
     @Test
     fun whenBrowserDetectorIndicatesDefaultCanBeSetThenFlagToShowSettingIsTrue() = runTest {
         whenever(mockDefaultBrowserDetector.deviceSupportsDefaultBrowserConfiguration()).thenReturn(true)
-        testee.start()
+        testee.start(false)
         testee.viewState().test {
             assertTrue(awaitItem().showDefaultBrowserSetting)
 
@@ -461,7 +456,7 @@ class SettingsViewModelTest {
 
     @Test
     fun whenVariantIsEmptyThenEmptyVariantIncludedInSettings() = runTest {
-        testee.start()
+        testee.start(false)
         testee.viewState().test {
             val expectedStartString = "name (1)"
             assertEquals(expectedStartString, awaitItem().version)
@@ -473,7 +468,7 @@ class SettingsViewModelTest {
     @Test
     fun whenVariantIsSetThenVariantKeyIncludedInSettings() = runTest {
         whenever(mockVariantManager.getVariant()).thenReturn(Variant("ab", filterBy = { true }))
-        testee.start()
+        testee.start(false)
 
         testee.viewState().test {
             val expectedStartString = "name ab (1)"
@@ -624,6 +619,15 @@ class SettingsViewModelTest {
             assertEquals(Command.LaunchMacOs, awaitItem())
 
             cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenViewModelStartedWithAppTpEnabledThenViewStateAppTrackingProtectionEnabledTrue() = runTest {
+        testee.start(true)
+
+        testee.viewState().test {
+            assertTrue(awaitItem().appTrackingProtectionEnabled)
         }
     }
 
