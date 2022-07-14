@@ -191,8 +191,8 @@ import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.mobile.android.ui.store.BrowserAppTheme
+import com.duckduckgo.privacy.dashboard.api.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.privacy.dashboard.api.animations.PrivacyShieldView
-import com.duckduckgo.privacy.dashboard.impl.animations.BrowserLottieTrackersAnimatorHelper
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import kotlinx.android.synthetic.main.view_tracker_animation.*
 import kotlinx.coroutines.flow.cancellable
@@ -322,6 +322,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var privacyShieldView: PrivacyShieldView
 
+    @Inject
+    lateinit var animatorHelper: BrowserTrackersAnimatorHelper
+
     private var urlExtractingWebView: UrlExtractingWebView? = null
 
     var messageFromPreviousTab: Message? = null
@@ -359,8 +362,6 @@ class BrowserTabFragment :
         launchDownloadMessagesJob()
         viewModel
     }
-
-    private val animatorHelper by lazy { BrowserLottieTrackersAnimatorHelper(requireContext(), appTheme) }
 
     private val smoothProgressAnimator by lazy { SmoothProgressAnimator(pageLoadingIndicator) }
 
