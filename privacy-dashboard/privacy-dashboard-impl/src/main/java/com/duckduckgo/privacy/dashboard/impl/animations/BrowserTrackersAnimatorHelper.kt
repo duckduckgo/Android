@@ -121,7 +121,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     override fun cancelAnimations(
         omnibarViews: List<View>
     ) {
-
         stopTrackersAnimation()
         omnibarViews.forEach { it.alpha = 1f }
     }

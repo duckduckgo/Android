@@ -20,7 +20,20 @@ import android.view.View
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.trackerdetection.model.Entity
 
+/** Public interface for the Browser URL Bar Privacy and Trackers animations */
 interface BrowserTrackersAnimatorHelper {
+
+    /**
+     * This method takes [entities] to create an animation in [trackersAnimationView].
+     * Then it plays both animations, [shieldAnimationView] and [trackersAnimationView], at the same time.
+     * When the animations starts, views in [omnibarViews] will fade out. When animation finishes, view in [omnibarViews] will fade in.
+     *
+     * @param shouldRunPartialAnimation indicates if animation should pause, at 50% of progress, until {@link finishPartialTrackerAnimation()} is called.
+     * @param shieldAnimationView holder of the privacy shield animation.
+     * @param trackersAnimationView holder of the trackers animations.
+     * @param omnibarViews are the views that should be hidden while the animation is running
+     * @param entities are the tracker entities detected on the current site
+     */
     fun startTrackersAnimation(
         shouldRunPartialAnimation: Boolean,
         shieldAnimationView: LottieAnimationView,
@@ -29,10 +42,28 @@ interface BrowserTrackersAnimatorHelper {
         entities: List<Entity>?
     )
 
+    /**
+     * Cancel a running animation.
+     *
+     * @param omnibarViews are the views that should become visible after canceling the running animation.
+     */
     fun cancelAnimations(
         omnibarViews: List<View>
     )
+
+    /**
+     * Set [TrackersAnimatorListener] to receive animation progress events.
+     */
     fun setListener(animatorListener: TrackersAnimatorListener)
+
+    /**
+     * removes [TrackersAnimatorListener]
+     */
     fun removeListener()
+
+    /**
+     * Finishes a partial tracker animation.
+     * See startTrackersAnimation.shouldRunPartialAnimation for more details.
+     */
     fun finishPartialTrackerAnimation()
 }
